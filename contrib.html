@@ -1,89 +1,170 @@
 <html>
 <body>
 
-<h1>Getting involved</h1>
+<img src="http://www.tinyos.net/scoop/images/tos-jwall.jpg"></img>
 
-<ul>
-<li>Reporting a bug
-<li>Starting a project in <i>contrib</i>
-<li>Forming a working group
-</ul>
+<!-- <h1>Getting involved</h1> -->
+<!-- <ul> -->
+<!-- <li> <a href="#contributing_code">Contributing code</a> -->
+<!-- <li> <a href="#working_group">Forming a working group</a> -->
+<!-- <li> <a href="#bug_report">Submitting a bug report</a> -->
+<!-- </ul> -->
 
-<h1>TinyOS 2.x Contrib</h1>
-
+<a name="contributing_code"></a>
+<h1>Contributing Code</h1>
 <p>
-The tinyos-2.x-contrib module is a collection of contributions from
-the TinyOS community. Unlike the TinyOS core, which is maintained by
-working groups, contrib is maintained by individual contributors. The
-two are maintained separately and must be downloaded separately. The
-contrib directory of TinyOS 2.x is made of up a number of project
-directories. The look at the current set of projects check out the
-index.
+We welcome code contributions to the TinyOS source code base and have tried to make 
+contributing code as easy as possible. Code can be contributed to either TinyOS 1.x or 
+TinyOS 2.x, and the process for contributing code to either is essentially the same with 
+a few minor differences.  In order to contribute code to either code base, you must first 
+obtain a SourceForge developer account.  If you don't have an account yet, see 
+<a href="http://www.sourceforge.net/">SourceForge</a> for details on how 
+to get one.
+</p>
+<p>
+Once you have obtained your SourceForge user account send an email to 
+<a href="mailto:tinyos-contrib-caretakers@millennium.berkeley.edu">tinyos-contrib-caretakers@millennium.berkeley.edu</a>
+indicating your intent to contribute code.  Depending on whether you would like to contribute
+code to TinyOS 1.x or TinyOS 2.x the information that must be provided in the email and the 
+process of actually contributing it slightly is different.
 </p>
 
 <p>
-The contrib directory is managed by one or more caretakers that
-compile an index of the current projects and tries to ensure that the
-project are reasonably easy to use.
+It should be noted that since all contributed code is ultimately stored in a CVS repository it is highly discouraged to contribute anything not directly related to the code or documentation supporting a project under development.  For example, video, audio, or sensor data gathered using the code contributed for your project should NOT be committed to the CVS repository.  If you want others to have access to data of this type, you should instead provide some documentation pointing them to a location where it can be downloaded from (e.g. a webpage maintained on your local server).
 </p>
 
-<h2>Using the contrib directory</h2>
-
-If you wish to use one of the projects in contrib you must obtain a
-copy of the current <a
-href="http://sourceforge.net/cvs/?group_id=28656">CVS repository</a>.
-
-
-<h2>Contributing code</h2>
-
+<h3>Contributing Code to TinyOS 1.x</h3>
 <p>
-We welcome code contributions to the TinyOS 2.x contrib directory and
-have tried to make contributing code as easy as possible. If you have
-a project that you feel is interesting for others and would like to
-share it you should follow the steps below. We will provide you with a
-directory under the tinyos-2.x-contrib, the name of this directory can
-represent your institution or the name of the project. Your project
-will be entered in the index with a short description that you provide
-and the index will point to a longer description located in your
-project directory. You should think of you directory as you
-<i>domain</i> in which you control what is going on - the role of the
-caretaker is to provide you with this directory and to make sure that
-the project stays with the guidelines.
-</p>
-
-<p>
-Your project directory should mimic the directories of the core
-distribution, however it should not copy the content of the core
-distribution. We can create the directories for you if you are
-unfamiliar with the directory structure. You should only put code and
-documentation in you contrib directory if you need video, audio,
-sensor data you will need to place it somewhere else (say your own
-website).
-</p>
-
-<p>
-The structure will contain some or all of the following sub directories:
-<ul>
-<li>index.html
-<li>apps
-<li>tos/chips
-<li>tos/platforms
-<li>tos/sensorboards
-</ul>
-</p>
-
-<p>
-To obtain your project directory:
+If you are contributing code to TinyOS 1.x then you only need to provide the following 
+information in your email:
 <ol>
-<li> Write an e-mail to "contrib@tinyos.net" with the following information:
-<li>  A name for the project
-<li>  Your preferred directory name for the CVS tree
-<li>  A short (3-4 sentence) description of the project for the index
+<li> Your intent to contribute code to TinyOS 1.x and not TinyOS 2.x
+<li> A list of SourceForge developer usernames you would like to be given access for contributing code
 </ol>
+Once you receive a confirmation email indicating that your users have been granted developer 
+access, you should be ready to go.  Simply checkout the tinyos-1.x source tree from SourceForge 
+following the instructions found <a href="http://sourceforge.net/cvs/?group_id=28656">here</a>, 
+and create your project directory under tinyos-1.x/contrib.  Make sure you follow the directions for
+<b>"Developer CVS Access via SSH"</b> and that you use <i>tinyos-1.x</i> as the module name
+when checking out the tree.  If you are unfamiliar with CVS and how to use it to commit your code,
+a short tutorial to get you started can be found
+<a href="http://www.star.bnl.gov/STAR/sds_l/ssd_l/cvs_tutorial.html">here</a>. 
+</p>
+<p>
+Once you have been granted access, you will have free reign to create and modify any directories or
+files located under tinyos-1.x/contrib.  You should create directories of your own in order 
+to organize your code and keep it separate from everyone elses.  Some developers like to name their 
+directories after the institution they are affiliated with (e.g. ucb, wustl, motiv, xbow).  Others 
+like to name them after the project their code is associated with (e.g. s-mac, mate, nucleus).  
+It is entirely up to you how to organize them.  If you would like write access to a particular directory 
+restricted to a specific set of users, please send an email to 
+<a href="mailto:tinyos-contrib-caretakers@millennium.berkeley.edu">tinyos-contrib-caretakers@millennium.berkeley.edu</a>
+and we will accomodate your request as best we can.  
 </p>
 
-After you have obtained you directory you must ensure that it follows
-the directory structure and that an index.html file is provided.
+<h3>Contributing Code to TinyOS 2.x</h3>
+<p>
+The process for contributing code to TinyOS 2.x is a little stricter than for TinyOS 1.x.  A set of 
+caretakers have been assigned to ensure that any contributed code follows a certain set of guidelines.
+When sending an email requesting access to contribute code for TinyOS 2.x please include the following 
+information:
+</p>
+<ol>
+<li> Your intent to contribute code to TinyOS 2.x and not TinyOS 1.x.
+<li> The name of a directory underneath which all of your contributed code will be contained.
+<li> The name and email address of someone who will act as the point of contanct for maintaining that directory
+<li> A list of SourceForge developer usernames you would like to be given access for 
+contributing code underneath that directory.
+<li> A short description of any projects you plan to develop inside of that directory.  Please 
+write one to three sentences about each project for inclusion in an index listing all contributed
+code.  You can always write another email later if you start working on other projects at some point
+in the future and you want them included in the index as well.  
+</ol>
+Once you receive a confirmation email indicating that your users have been granted developer 
+access, you can checkout the tinyos-2.x-contrib source tree from SourceForge 
+following the instructions found <a href="http://sourceforge.net/cvs/?group_id=28656">here</a>, 
+and create your project directory under tinyos-1.x/contrib.  Make sure you follow the directions for
+<b>"Developer CVS Access via SSH"</b> and that you use <i>tinyos-2.x-contrib</i> as the module name
+when checking out the tree.  If you are unfamiliar with CVS and how to use it to commit your code,
+a short tutorial to get you started can be found
+<a href="http://www.star.bnl.gov/STAR/sds_l/ssd_l/cvs_tutorial.html">here</a>. 
+</p>
+<p>
+Unlike in TinyOS 1.x where developers have free reign to commit files anywhere they please underneath 
+tinyos-1.x/contrib, commit access is restricted under tinyos-2.x-contrib to the specific 
+directory specified in the email for each set of developers.  It is highly encouraged to specify the name of this directory
+to be indicative of the institution from which any contributed code is being generated.  For pojects being developed across multiple institutions, however, it may be apropriate to specify a project name instead of an institution.
+The reason we encourage the use of an institution name over a project name is that most of the time a single institution tends to contribute code from multiple projects. 
+</p>
+<p>
+One of the duties of the TinyOS 2.x contrib caretakers is to ensure that the organization of any contributed code under tinyos-2.x-contrib mimics the organization in the tinyos-2.x core.  By mimicing this organization, it is easier for anyone wanting to use this code to navigate it and understand its structure.  This does not mean that code from the core should be replicated in these directories, but rather that any newly contributed code should try and follow a similar structure.  For example, the directory structure for someone at UCLA developing a set of applications and libraries would look like the following:
+</p>
+
+<pre>
+tinyos-2.x-contrib
+|-- ucla
+|   |-- apps
+|   |   |-- uclaApp0
+|   |   |-- uclaApp1
+|   |-- lib
+|   |   |-- uclaLib0
+|   |   |-- uclaLib1
+</pre>
+
+<p>
+For an institution working on the development of two new platforms containing a set of new chips and platform specific code, the directory structure might look like this.
+</p>
+
+<pre>
+tinyos-2.x-contrib
+|-- institution_name
+|   |-- chips
+|   |   |-- mcuChip
+|   |   |-- chip1
+|   |   |-- chip2
+|   |-- platforms
+|   |   |-- platform0
+|   |   |   |-- .platform
+|   |   |-- platform1
+|   |   |   |-- .platform
+|   |-- support
+|   |   |-- make
+|   |   |   |-- mcuChip
+|   |   |   |   |-- mcuChip.rules
+|   |   |   |-- platform0.extra
+|   |   |   |-- platform1.extra
+</pre>
+
+<p>
+In general, code should be organized within the following set of directories:
+</p>
+
+<pre>
+|-- apps
+|-- chips
+|-- libs
+|-- platforms
+|-- sensorboards
+|-- support
+|   |-- make
+|   |-- sdk
+|-- system
+|-- tools
+</pre>
+
+If you would like any or all of these directories to be created for you at the time your top level directory is created please indicate so in your email to 
+<a href="mailto:tinyos-contrib-caretakers@millennium.berkeley.edu">tinyos-contrib-caretakers@millennium.berkeley.edu</a>.
+
+<p>
+Another duty of the TinyOS 2.x contrib caretakers is to maintain an index of any contributed code.  This index is located directly underneath the tinyos-2.x-contrib directory in a file called 
+<a href="http://tinyos.cvs.sourceforge.net/*checkout*/tinyos/tinyos-2.x-contrib/index.html/">index.html</a>.  
+In order for you to get your code included in this index it must follow the organizational guidelines outlined above and be in a stable operating state.  The index contains two or three sentences summarizing what each of your projects is about as well as provide a link to a separate index.html located in your top level directory.  This file can be used to contain a longer description of each of your projects or a redirection to another webpage maintained on a different server.  If your code does not follow these guidelines or you do not provide an index.html file describing your projects in more detail, your projects will not be included in the index.
+</p>
+
+<p>
+Note that if code has existed in the repository for more than 6 months without being promoted to the status where it is ready to be included in the index, an email will be sent to whoever is in cahrge of maintaining that project.  If there is no response after 1 week, a second email will be sent.  If after another week there is still no response, the project and all of its contents will be removed from the repository.  In order to make sure that this doesn't happen to your code, make sure that you keep the contrib caretakers up to date with who is the current maintainer of each of your projects and that you organize all of your code appropriately.  If you have any questions about whether your organization is correct or not, or you would like to change your point of contact as the maintainer of your contrib directory, feel free to 
+<a href="mailto:tinyos-contrib-caretakers@millennium.berkeley.edu">email the caretakers</a> at any time.
+</p>
 
 </body>
 </html>

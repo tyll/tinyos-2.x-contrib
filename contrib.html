@@ -3,30 +3,19 @@
 
 <img src="http://www.tinyos.net/scoop/images/tos-jwall.jpg"></img>
 
-<!-- <h1>Getting involved</h1> -->
-<!-- <ul> -->
-<!-- <li> <a href="#contributing_code">Contributing code</a> -->
-<!-- <li> <a href="#working_group">Forming a working group</a> -->
-<!-- <li> <a href="#bug_report">Submitting a bug report</a> -->
-<!-- </ul> -->
-
 <a name="contributing_code"></a>
 <h1>Contributing Code</h1>
 <p>
 We welcome code contributions to the TinyOS source code base and have tried to make 
-contributing code as easy as possible. Code can be contributed to either TinyOS 1.x or 
-TinyOS 2.x, and the process for contributing code to either is essentially the same with 
-a few minor differences.  In order to contribute code to either code base, you must first 
+contributing as easy as possible.  In order to contribute code, you must first 
 obtain a SourceForge developer account.  If you don't have an account yet, see 
-<a href="http://www.sourceforge.net/">SourceForge</a> for details on how 
+<a href="http://sourceforge.net/account/newuser_emailverify.php">SourceForge</a> for details on how 
 to get one.
 </p>
 <p>
 Once you have obtained your SourceForge user account send an email to 
 <a href="mailto:tinyos-contrib-caretakers@millennium.berkeley.edu">tinyos-contrib-caretakers@millennium.berkeley.edu</a>
-indicating your intent to contribute code.  Depending on whether you would like to contribute
-code to TinyOS 1.x or TinyOS 2.x the information that must be provided in the email and the 
-process of actually contributing it slightly is different.
+indicating your intent to contribute code.  TinyOS 1.x and 2.x have slightly different processes for contributingcode, as described below.
 </p>
 
 <p>
@@ -90,11 +79,10 @@ a short tutorial to get you started can be found
 <p>
 Unlike in TinyOS 1.x where developers have free reign to commit files anywhere they please underneath 
 tinyos-1.x/contrib, commit access is restricted under tinyos-2.x-contrib to the specific 
-directory created for each group.  It is highly encouraged to have this directory named after the institution the developers working on a project are affiliatd with.  For pojects being developed across multiple institutions, however, it may be apropriate to specify a project name instead of an institution.
-The reason we encourage the use of an institution name over a project name is that most of the time a single institution tends to contribute code from multiple projects. 
+directory created for each group.  Many developers like to name this directory after the institution with which their project is affiliated.  For projects being developed across multiple institutions, however, it may be apropriate to specify a project name instead of an institution.  If a directory name is already taken underneath which you would like tocontribute code, you can either (1) directly contact the maintainer of that directory to work out a plan for contributing your code underneath it, (2) request the creation of a new directory by the contrib-caretakers.  If you choose to follow (1), then it is your responsibility to have the maintainer of that directory send an email to the contrib caretakers requesting that you be given access to it.  They should also provide a short description of your project for inclusion in the index.  The most common reason for following this course of action is when two different groups at the same institution would like their code included under the same directory name.  
 </p>
 <p>
-One of the duties of the TinyOS 2.x contrib caretakers is to ensure that the organization of any contributed code mimics the organization in the tinyos-2.x core.  By mimicing this organization, it is easier for anyone wanting to use this code to navigate it and understand its structure.  It is also easier to migrate it into the core if its status ever gets promoted.  This does not mean that code from the core should be replicated in these directories, but rather that any newly contributed code should try and follow a similar structure.  For example, the directory structure would look like the following for someone at UCLA developing a set of libraries and applications:
+While there is no restriction on how to organize your contributed code, it is highly encouraged to try and mimic the organizational structure used in the tinyos-2.x core.  By mimicing this organization, it is easier for anyone wanting to use this code to navigate it and understand it.  It is also easier to migrate it into the core if its status ever gets promoted.  This does not mean that code from the core should be replicated in these directories, but rather that any newly contributed code should try and follow a similar structure.  For example, the directory structure would look like the following for someone at UCLA developing a set of libraries and applications:
 </p>
 
 <pre>
@@ -133,7 +121,7 @@ tinyos-2.x-contrib
 </pre>
 
 <p>
-In general, code should be organized within the following set of directories:
+In general, the organizational structure could look like the following:
 </p>
 
 <pre>
@@ -149,37 +137,36 @@ In general, code should be organized within the following set of directories:
 |-- tools
 </pre>
 
-If you would like any or all of these directories to be created for you at the time your top level directory is created please indicate so in your email to 
+If you would like any or all of these directories to be created for you at the time your top level directory is created, please indicate so in your email to 
 <a href="mailto:tinyos-contrib-caretakers@millennium.berkeley.edu">tinyos-contrib-caretakers@millennium.berkeley.edu</a>.
 
 <p>
-Another duty of the TinyOS 2.x contrib caretakers is to maintain an index of any contributed code.  This index is located directly underneath the tinyos-2.x-contrib directory in a file called 
+As indicated earlier, one of the duties of the TinyOS 2.x contrib caretakers is to maintain an index of all contributed code.  This index is located directly underneath the tinyos-2.x-contrib directory in a file called 
 <a href="http://tinyos.cvs.sourceforge.net/*checkout*/tinyos/tinyos-2.x-contrib/index.html/">index.html</a>. 
 All contributed projects will be included in this index with the following information:
 <ul>
 <li> The name of the project
 <li> The name and email address of the developer in charge of maintaining the project
 <li> The name of the institution working on the project
-<li> The date the project was entered into the index
+<li> The date the project was last updated in the index
 <li> A short two or three sentence description of the project
 </ul>
-The name of the project will contain a link to a local index.html file created for you underneath your top level directory.  This file is used to document the projects contained in that directory.  Some people will prefer to write their project documentaton directly within their local.html file and others will prefer to use this file to redirect users to another webpage maintained on a different server.  Either way is fine as long as some sort of documentation is provided.
+The name of the project will contain a link to a local index.html file created for you underneath your top level directory.  This file is used to document the projects contained in that directory.  Some people will prefer to write their project documentaton directly within their local.html file.  Others will prefer to use this file to redirect users to another webpage maintained on a different server.  It is in your best interest to make this documentation as comprehensive as possible so that other people will know how to use your code. 
 </p>
 <p>
-Depending on the status of each project including how well they adhere to the organizational guidelines outlined above and how detailed their index.html files are, different projects will be be organized into different categories.  
+Depending on the status of each project, different projects will be be organized into different categories.  
 <ul>
-<li><b>Stable and Supported Projects</b> contain code that follows the organizational guidelines outlined above and are in a stable operating state. Their local index.html files document their project in detail.  Projects move into this category once they are mostly completed and are only maintained by minor bug fixes and improvements.
-<li><b>Experimental but Supported Projects</b> contain code that follows the organizational structure outlined above but is in a constant state of flux.  Their local index.html files still need to provide a more detailed overveiw of the project than what is contained in the index, but they do not need to be as comprehensive as for stable projects.  
-<li><b>Unsupported Projects</b> contain code that does not adhere to the organizational structure outlined above and/or does not provide sufficient documentation describing them.
+<li><b>Stable Projects</b> contain code that the developers of that project consider to be in a stable operating state. Developers should request to have their projects moved into this category once they are mostly completed and are only maintained by minor bug fixes and improvements.
+<li><b>Experimental Projects</b> contain code that is in a constant state of flux.  Developers should request to have their code moved into this category once they have a reasonably working code base, but things are still changing quite a bit. 
+<li><b>Unsupported Projects</b> contain code that is either no longer being properly maintained, or is too unstable to even be considered experimental.
 </ul>
-Whenever a project is newly created it will be entered into the index as an "Unsupported Project".  It will only be promoted to another category after sufficient evidence has been given that it belongs there.  When you think your project is ready to be moved into another category, just send an 
+Whenever a project is newly created it will be entered into the index as an "Unsupported Project".  It will only be promoted to another category upon request by its maintainer.  When you think your project is ready to be moved into another category, just send an 
 <a href="mailto:tinyos-contrib-caretakers@millennium.berkeley.edu">email to the caretakers</a>
-with the reasons you think it should be promoted and they will decide if it is ready or not.  Promotion will be taken on a case by case basis and is under the descration of the caretakers themselves.
+and we will update the index
 </p>
 
 <p>
-Note that if code has existed in the repository in either the "Experimental or Unstable" categories for more than 6 months without being promoted to "Stable", an email will be sent to whoever is in charge of maintaining that project.  If there is no response after 1 week, a second email will be sent.  If after another week there is still no response, the project and all of its contents will be removed from the repository.  In order to make sure that this doesn't happen to your code, make sure that you keep the contrib caretakers up to date with who is the current maintainer of each of your projects and that you organize all of your code appropriately.  If you have any questions about whether your organization is correct or not, you would like to change your point of contact, or you feel that your code is ready to be promoted from one category to another, you can
-<a href="mailto:tinyos-contrib-caretakers@millennium.berkeley.edu">email the caretakers</a> at any time.
+Note that if code that has existed in the repository in either the "Stable" or "Experimental" categories for more than 6 months without any new commits to it, an email will be sent to whoever is in charge of maintaining it.  If there is no response after 1 week, a second email will be sent.  If after another week there is still no response, the project will be demoted to either the "Unsupported" category if your code had been considered "Experimental", or a special "Stable but Unsupported" category if your code had been considered "Stable".  In order to make sure that this doesn't happen to you, please keep the contrib caretakers up to date on the current maintainer of your project.
 </p>
 
 </body>

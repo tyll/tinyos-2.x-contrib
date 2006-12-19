@@ -1,0 +1,22 @@
+#
+# FILE: null/.platform
+# 
+# A do-nothing platform. A good target for mig when using external types.
+#
+# $Id$
+#
+push( @includes, qw(
+
+  %T/lib/timer
+  %T/lib/serial
+
+) );
+
+@opts = qw(
+
+  -gcc=gcc
+  -fnesc-target=pc
+  -fnesc-no-debug
+  -fnesc-scheduler=TinySchedulerC,TinySchedulerC.TaskBasic,TaskBasic,TaskBasic,runTask,postTask
+
+);

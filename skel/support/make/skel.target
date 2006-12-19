@@ -1,0 +1,7 @@
+PLATFORM = skel
+PFLAGS += -finline-limit=100000 -I../../tos/platforms/skel
+
+$(call TOSMake_include_platform,skel)
+
+skel: $(BUILD_DEPS)
+	@:

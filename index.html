@@ -47,6 +47,7 @@ at your own risk.
 <center>
 <a href="#directstorage_viewer">DirectStorage_Viewer</a>&nbsp;&nbsp;&nbsp;
 <a href="#blackbookconnect">BlackbookConnect</a>&nbsp;&nbsp;&nbsp;
+<a href="#high_freq_rssi">High_Frequency_RSSI_Sampling</a>&nbsp;&nbsp;&nbsp;
 </center>
 </p>
 <h2><center>CHIPS</center></h2>
@@ -62,6 +63,7 @@ at your own risk.
 <a href="#directstorage">DirectStorage</a>&nbsp;&nbsp;&nbsp;
 <a href="#blackbook_file_system">Blackbook_File_System</a>&nbsp;&nbsp;&nbsp;
 <a href="#configurator">Configurator</a>&nbsp;&nbsp;&nbsp;
+<a href="#mnet_architecture">Mote_Network_(MNet)_Architecture</a>&nbsp;&nbsp;&nbsp;
 </center>
 </p>
 <!--
@@ -411,6 +413,98 @@ format. Useful for debugging and testing applications and libraries that access 
     <td align="left", valign="top"><b>Description:</b></td>
     <td>  Quickstart Blackbook application development by running Blackbook commands on the mote directly from the
 computer.  Useful for testing the <a href="#blackbook_file_system">Blackbook File System Library</a>.
+    </td>
+  </tr>
+</table>
+<a href="#the_top">Back to top</a>
+<br><br>
+<!--------------------------->
+<!--------------------------->
+<!--------------------------->
+
+<!--------------------------->
+<!-------- Project ---------->
+<!--------------------------->
+<a name="high_freq_rssi"></a>
+<table>
+  <tr>
+    <td align="left", NOWRAP><b>Project Name:</b></td>
+    <td>
+      <a href="http://tinyos.cvs.sourceforge.net/*checkout*/tinyos/tinyos-2.x-contrib/stanford-sing/index.html">
+      High Speed RSSI Sampling Application</a>
+    </td>
+  </tr>
+  <tr>
+    <td align="left"><b>Contact:</b></td>
+    <td>
+      <a href="mailto:pal@cs.stanford.edu">Phil Levis</a>
+    </td>
+  </tr>
+  <tr>
+    <td align="left"><b>Institution:</b></td>
+    <td>
+      <a href="http://www.stanford.edu/">Stanford University</a>
+    </td>
+  </tr>
+  <tr>
+    <td align="left"><b>License:</b></td>
+    <td>
+      <a href="http://tinyos.cvs.sourceforge.net/*checkout*/tinyos/tinyos-2.x-contrib/stanford-sing/license.txt"> Stanford BSD License</a>
+    </td>
+  </tr>
+  <tr>
+    <td align="left", NOWRAP><b>Date Modified:</b></td>
+    <td> December 22, 2006</td>
+  </tr>
+  <tr>
+    <td align="left", valign="top"><b>Description:</b></td>
+    <td>  This application measures CC2420 RSSI readings at 1kHz and stores them to local flash. A user can later retrieve the readings to obtain a trace of RSSI readings. This can be used to detect the presence of 802.11 traffic and 802.15.4 interference.
+    </td>
+  </tr>
+</table>
+<a href="#the_top">Back to top</a>
+<br><br>
+<!--------------------------->
+<!--------------------------->
+<!--------------------------->
+
+<!--------------------------->
+<!-------- Project ---------->
+<!--------------------------->
+<a name="mnet_architecture"></a>
+<table>
+  <tr>
+    <td align="left", NOWRAP><b>Project Name:</b></td>
+    <td>
+      <a href="http://tinyos.cvs.sourceforge.net/*checkout*/tinyos/tinyos-2.x-contrib/stanford-sing/index.html">
+      The Mote Network (MNet) Architecture</a>
+    </td>
+  </tr>
+  <tr>
+    <td align="left"><b>Contact:</b></td>
+    <td>
+      <a href="mailto:pal@cs.stanford.edu">Phil Levis</a>
+    </td>
+  </tr>
+  <tr>
+    <td align="left"><b>Institution:</b></td>
+    <td>
+      <a href="http://www.stanford.edu/">Stanford University</a>
+    </td>
+  </tr>
+  <tr>
+    <td align="left"><b>License:</b></td>
+    <td>
+      <a href="http://tinyos.cvs.sourceforge.net/*checkout*/tinyos/tinyos-2.x-contrib/stanford-sing/license.txt"> Stanford BSD License</a>
+    </td>
+  </tr>
+  <tr>
+    <td align="left", NOWRAP><b>Date Modified:</b></td>
+    <td> December 22, 2006</td>
+  </tr>
+  <tr>
+    <td align="left", valign="top"><b>Description:</b></td>
+    <td>   The basic architectural principle is to increase the visibility of a deployed network, making it easier to observe and understand its behavior. The architecture is built on top of the Fair Waiting Protocol (FWP), which isolates network protocols from one another.
     </td>
   </tr>
 </table>

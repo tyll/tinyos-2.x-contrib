@@ -1,0 +1,13 @@
+Rx == 0
+Tx(1) == 1
+Tx(2) == 2
+Tx(3) == 3
+
+Tx 1, 2, and 3 will transmit to ID 0, simultaneously
+Mote ID 0 should light up red and green after receiving a message from each
+individual transmitter.
+
+The packets are full TOSH_DATA_LENGTH packets, and all the bytes are
+incrementing for each send.  This will let us know what kind of bit errors
+to expect when multiple transmitters are simultaneously transmitting
+full packets with no CCA.

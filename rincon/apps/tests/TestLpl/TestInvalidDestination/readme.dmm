@@ -1,0 +1,9 @@
+Rx == 0
+Tx != 0
+
+Tx will try to send to mote ID 100, which is not 0.
+
+Expected behavior: Receiver mote 0 should perform a receive check and shut
+off very quickly.  You should enable Led's on the DutyCycle component to see
+the radio turn on and off
+

@@ -1,0 +1,8 @@
+Tx != 0
+Rx == 0
+
+This app sends a message from Tx to 0 and waits 500 ms between each delivery
+so the Rx mote's radio shuts back off and has to redetect to receive the next
+message.
+
+

@@ -1,0 +1,13 @@
+#-*-Makefile-*- vim:syntax=make
+#$Id$
+
+PROGRAM = mib510
+PROGRAMMER_FLAGS = -dprog=mib510 -dserial=/dev/ttyS9 --wr_fuse_h=$(AVR_FUSE_H) $(PROGRAMMER_PART) $(PROGRAMMER_EXTRA_FLAGS_MIB)
+
+program: FORCE
+	@echo "    installing $(PLATFORM) binary using mib510"
+	$(PROGRAMMER) $(PROGRAMMER_FLAGS) --erase --upload if=$(INSTALL_SREC)
+
+program_bl: FORCE
+	@echo "    installing $(PLATFORM) bootloader using mib510"
+	$(PROGRAMMER) $(PROGRAMMER_FLAGS) --upload if=$(BOOTLOADER)

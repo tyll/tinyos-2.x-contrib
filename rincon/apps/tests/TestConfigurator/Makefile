@@ -1,0 +1,7 @@
+COMPONENT=TestConfiguratorC
+
+CFLAGS += -DMESSAGE_POOL_SIZE=20
+include $(MAKERULES)
+
+
+ 

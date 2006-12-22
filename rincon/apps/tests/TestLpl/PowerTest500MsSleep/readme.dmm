@@ -1,0 +1,4 @@
+
+This is for power testing only, it does nothing but duty cycle at 500 ms 
+sleep interval no matter what the mote ID is
+

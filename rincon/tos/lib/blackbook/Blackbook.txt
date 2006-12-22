@@ -1,0 +1,5 @@
+Blackbook TinyOS Cross-Platform Compatible Flash File System v.6.0
+Copyright (c) 2004-2006 Rincon Research Corporation.  
+All rights reserved.
+
+@author David Moss - dmm@rincon.com

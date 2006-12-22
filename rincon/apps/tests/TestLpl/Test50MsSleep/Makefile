@@ -1,0 +1,8 @@
+COMPONENT=TestBroadcastC
+
+CFLAGS += -DLOW_POWER_LISTENING
+
+include $(MAKERULES)
+
+
+ 

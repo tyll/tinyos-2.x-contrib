@@ -1,0 +1,5 @@
+Rx == 0
+Tx != 0
+
+This should crash motes quickly.
+

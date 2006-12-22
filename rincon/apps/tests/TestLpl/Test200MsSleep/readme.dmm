@@ -1,0 +1,7 @@
+Rx == 0
+Tx != 0
+
+The sleep period is 200 ms. 
+This should crash motes quickly.  Obviously, acks are transmitted and
+received, which is different than the Test200MsBroadcast version.
+

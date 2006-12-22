@@ -1,0 +1,3 @@
+COMPONENT=MediaFormatC
+
+include $(MAKERULES)

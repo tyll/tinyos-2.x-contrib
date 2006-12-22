@@ -1,0 +1,6 @@
+COMPONENT=TestPeriodicC
+
+include $(MAKERULES)
+
+
+ 

@@ -1,0 +1,6 @@
+COMPONENT=ViewerC
+
+include $(MAKERULES)
+
+
+ 

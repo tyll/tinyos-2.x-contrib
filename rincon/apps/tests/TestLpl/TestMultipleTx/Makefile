@@ -1,0 +1,7 @@
+COMPONENT=TestMultiC
+
+CFLAGS += -DMESSAGE_POOL_SIZE=100
+include $(MAKERULES)
+
+
+ 

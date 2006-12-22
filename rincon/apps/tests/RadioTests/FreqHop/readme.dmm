@@ -1,0 +1,8 @@
+Tx = 0
+Rx1 = 1 = channel 11
+Rx2 = 2 = channel 26
+
+This app tests the ability for a transmitter to hop between two frequencies
+and successfully send messages.  The two receivers should be turned on and
+both should be blinking green lights to indicate they're receiving their 
+messages.

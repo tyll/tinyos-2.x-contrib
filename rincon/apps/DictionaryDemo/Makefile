@@ -1,14 +1,15 @@
 COMPONENT=DictionaryDemoC
 
-# Choose a flash type:
-#CFLAGS += -I../../media/AT45DB
-CFLAGS += -I../../media/STM25P
+# Make sure you include paths to Blackbook!
+# /tos/lib/blackbook
+# /tos/lib/blackbook/boot
+# /tos/lib/blackbook/core
+# /tos/lib/blackbook/interfaces
 
-# Default include directories:
-CFLAGS += -I../../ -I../../core 
-CFLAGS += -I../../interfaces 
-CFLAGS += -I../../boot
-CFLAGS += -I../../../../tos/lib/State 
+# .. And your platform dependant DirectStorage add-ons to access flash
+# /tos/chips/stm25p  - telos
+# /tos/chips/at45db  - mica*
+
 
 include $(MAKERULES)
 

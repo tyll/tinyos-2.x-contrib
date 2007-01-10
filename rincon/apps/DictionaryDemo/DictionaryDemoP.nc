@@ -41,7 +41,7 @@
  * @author David Moss
  */
  
-module DictionaryDemoM { 
+module DictionaryDemoP { 
   uses {
     interface BBoot;
     interface BDictionary;
@@ -65,34 +65,32 @@ implementation {
    * @param totalNodes - the total number of nodes found on flash
    * @param result - SUCCESS if the file system is ready for use.
    */
-  event void BBoot.booted(uint16_t totalNodes, uint8_t totalFiles, result_t result) {
-    call Leds.init(); // maintaining compatibility at the expense of stupidity 
-    if(result) {
-      call BDictionary.open("dictdemo.ini", 0x100);
-    }
+  event void BBoot.booted(uint16_t totalNodes, uint8_t totalFiles, error_t error) {
+    call BDictionary.open("dicdemo", 0x100);
   }
 
   
-  
-  /***************** BDictionary Events ****************/
+  /***************** BDictionary Events ****************/  
   /**
    * A Dictionary file was opened successfully.
    * @param totalSize - the total amount of flash space dedicated to storing
    *     key-value pairs in the file
    * @param remainingBytes - the remaining amount of space left to write to
-   * @param result - SUCCESS if the file was successfully opened.
+   * @param error - SUCCESS if the file was successfully opened.
    */
-  event void BDictionary.opened(uint32_t totalSize, uint32_t remainingBytes, result_t result) {
-    if(result) {
-      call BDictionary.retrieve(REBOOT_KEY, &reboots, sizeof(reboots));
-    }
+  event void BDictionary.opened(uint32_t totalSize, uint32_t remainingBytes, error_t error) {
+    // If your system may attempt to access Blackbook multiple times in 
+    // parallel, you should put your commands in a spinning task.
+    // Since this program only accesses Blackbook one step at a time,
+    // there is no need to post a task to open or retrieve data from Blackbook.
+    call BDictionary.retrieve(REBOOT_KEY, &reboots, sizeof(reboots));
   }
   
   /** 
    * The opened Dictionary file is now closed
-   * @param result - SUCCSESS if there are no open files
+   * @param error - SUCCSESS if there are no open files
    */
-  event void BDictionary.closed(result_t result) {
+  event void BDictionary.closed(error_t error) {
   }
   
   /**
@@ -100,9 +98,9 @@ implementation {
    * @param key - the key used to insert the value
    * @param value - pointer to the buffer containing the value.
    * @param valueSize - the amount of bytes copied from the buffer into flash
-   * @param result - SUCCESS if the key was written successfully.
+   * @param error - SUCCESS if the key was written successfully.
    */
-  event void BDictionary.inserted(uint32_t key, void *value, uint16_t valueSize, result_t result) {
+  event void BDictionary.inserted(uint32_t key, void *value, uint16_t valueSize, error_t error) {
   }
   
   /**
@@ -110,10 +108,10 @@ implementation {
    * @param key - the key used to find the value
    * @param valueHolder - pointer to the buffer where the value was stored
    * @param valueSize - the actual size of the value.
-   * @param result - SUCCESS if the value was pulled out and is uncorrupted
+   * @param error - SUCCESS if the value was pulled out and is uncorrupted
    */
-  event void BDictionary.retrieved(uint32_t key, void *valueHolder, uint16_t valueSize, result_t result) {
-    if(result) {
+  event void BDictionary.retrieved(uint32_t key, void *valueHolder, uint16_t valueSize, error_t error) {
+    if(!error) {
       // Loaded the value from non-volatile memory!
       reboots++;
       
@@ -130,25 +128,31 @@ implementation {
   /**
    * A key-value pair was removed
    * @param key - the key that should no longer exist
-   * @param result - SUCCESS if the key was really removed
+   * @param error - SUCCESS if the key was really removed
    */
-  event void BDictionary.removed(uint32_t key, result_t result) {
+  event void BDictionary.removed(uint32_t key, error_t error) {
   }
   
   /**
    * The next key in the open Dictionary file
    * @param nextKey - the next key
-   * @param result - SUCCESS if this is the really the next key,
+   * @param error - SUCCESS if this is the really the next key,
    *     FAIL if the presentKey was invalid or there is no next key.
    */
-  event void BDictionary.nextKey(uint32_t nextKey, result_t result) {
+  event void BDictionary.nextKey(uint32_t nextKey, error_t error) {
   }
 
   /**
    * @param isDictionary - TRUE if the file is a dictionary
-   * @param result - SUCCESS if the reading is valid
+   * @param error - SUCCESS if the reading is valid
    */
-  event void BDictionary.fileIsDictionary(bool isDictionary, result_t result) {
+  event void BDictionary.fileIsDictionary(bool isDictionary, error_t error) {
+  }
+  
+  /**
+   * @param totalKeys the total keys in the open dictionary file
+   */
+  event void BDictionary.totalKeys(uint16_t totalKeys) {
   }
 }
 

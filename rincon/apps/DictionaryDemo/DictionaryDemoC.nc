@@ -45,13 +45,13 @@ configuration DictionaryDemoC {
 }
 
 implementation {
-  components Main, BlackbookDictionaryC, LedsC, DictionaryDemoM;
+  components DictionaryDemoP,
+      new BlackbookFullC(), 
+      LedsC;
   
-  Main.StdControl -> BlackbookDictionaryC;
-  
-  DictionaryDemoM.BBoot -> BlackbookDictionaryC;
-  DictionaryDemoM.BDictionary -> BlackbookDictionaryC.BDictionary[unique("BDictionary")];
-  DictionaryDemoM.Leds -> LedsC;
+  DictionaryDemoP.BBoot -> BlackbookFullC;
+  DictionaryDemoP.BDictionary -> BlackbookFullC;
+  DictionaryDemoP.Leds -> LedsC;
   
 }
 

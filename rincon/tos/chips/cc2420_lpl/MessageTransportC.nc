@@ -57,8 +57,8 @@ implementation {
       new TimerMilliC() as DelayTimerC;
   
   MessageTransport = MessageTransportP;
-  Send = MessageTransportP;
-  SubSend = MessageTransportP;
+  Send = MessageTransportP.Send;
+  SubSend = MessageTransportP.SubSend;
   
   MessageTransportP.SendState -> SendStateC;
   MessageTransportP.DelayTimer -> DelayTimerC;

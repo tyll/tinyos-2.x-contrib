@@ -301,6 +301,12 @@ implementation {
   default event void CC2420DutyCycle.detected() {
   }
 
+
+  default event void SplitControl.startDone(error_t error) {
+  }
+  
+  default event void SplitControl.stopDone(error_t error) {
+  }
 }
 
 

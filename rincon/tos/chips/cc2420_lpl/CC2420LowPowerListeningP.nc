@@ -498,6 +498,6 @@ implementation {
     }
     
     return dutyCycle;
-  }
+  }  
 }
 

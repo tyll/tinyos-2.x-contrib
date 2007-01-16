@@ -32,7 +32,10 @@
 /**
  * @author Jonathan Hui <jhui@archrock.com>
  * @author David Moss
+ * @author Chad Metcalf
  */
+
+#include "message.h"
 
 interface CC2420Packet {
   

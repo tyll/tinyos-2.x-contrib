@@ -32,7 +32,11 @@
 /**
  * @author Jonathan Hui <jhui@archrock.com>
  * @author David Moss
+ * @author Chad Metcalf
  */
+
+#include "IEEE802154.h"
+#include "message.h"
 
 module CC2420PacketC {
 

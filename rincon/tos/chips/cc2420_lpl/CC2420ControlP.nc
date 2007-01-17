@@ -56,7 +56,6 @@ module CC2420ControlP {
   uses interface CC2420Register as IOCFG1;
   uses interface CC2420Register as MDMCTRL0;
   uses interface CC2420Register as MDMCTRL1;
-  uses interface CC2420Register as TXCTRL;
   uses interface CC2420Register as RXCTRL1;
   uses interface CC2420Strobe as SRXON;
   uses interface CC2420Strobe as SRFOFF;
@@ -65,7 +64,9 @@ module CC2420ControlP {
   uses interface AMPacket;
 
   uses interface Resource as SyncResource;
-  
+
+  uses interface Leds;
+
 }
 
 implementation {
@@ -79,6 +80,7 @@ implementation {
   } cc2420_control_state_t;
 
   uint8_t m_channel = CC2420_DEF_CHANNEL;
+  uint8_t m_tx_power = CC2420_DEF_RFPOWER;
   uint16_t m_pan = TOS_AM_GROUP;
   uint16_t m_short_addr;
   bool m_sync_busy;
@@ -124,7 +126,7 @@ implementation {
   async command error_t CC2420Power.startVReg() {
     atomic {
       if ( m_state != S_VREG_STOPPED )
-        return FAIL;
+	return FAIL;
       m_state = S_VREG_STARTING;
     }
     call VREN.set();
@@ -152,31 +154,25 @@ implementation {
   async command error_t CC2420Power.startOscillator() {
     atomic {
       if ( m_state != S_VREG_STARTED )
-        return FAIL;
-        
+	return FAIL;
+	
       m_state = S_XOSC_STARTING;
       call IOCFG1.write( CC2420_SFDMUX_XOSC16M_STABLE << 
-                         CC2420_IOCFG1_CCAMUX );
+			 CC2420_IOCFG1_CCAMUX );
       call InterruptCCA.enableRisingEdge();
       call SXOSCON.strobe();
       call IOCFG0.write( ( 1 << CC2420_IOCFG0_FIFOP_POLARITY ) |
-                         ( 127 << CC2420_IOCFG0_FIFOP_THR ) );
+			 ( 127 << CC2420_IOCFG0_FIFOP_THR ) );
       call FSCTRL.write( ( 1 << CC2420_FSCTRL_LOCK_THR ) |
-                         ( ( (m_channel - 11)*5+357 ) 
-                           << CC2420_FSCTRL_FREQ ) );
+			 ( ( (m_channel - 11)*5+357 ) 
+			   << CC2420_FSCTRL_FREQ ) );
       call MDMCTRL0.write( ( 1 << CC2420_MDMCTRL0_RESERVED_FRAME_MODE ) |
-                           ( 1 << CC2420_MDMCTRL0_ADR_DECODE ) |
-                           ( 2 << CC2420_MDMCTRL0_CCA_HYST ) |
-                           ( 3 << CC2420_MDMCTRL0_CCA_MOD ) |
-                           ( 1 << CC2420_MDMCTRL0_AUTOCRC ) |
-                           ( 1 << CC2420_MDMCTRL0_AUTOACK ) |
-                           ( 2 << CC2420_MDMCTRL0_PREAMBLE_LENGTH ) );
-                           
-      call TXCTRL.write( ( 2 << CC2420_TXCTRL_TXMIXBUF_CUR ) |
-                         ( 3 << CC2420_TXCTRL_PA_CURRENT ) |
-                         ( 1 << CC2420_TXCTRL_RESERVED ) |
-                         ( CC2420_DEF_RFPOWER << CC2420_TXCTRL_PA_LEVEL ) );
-                         
+			   ( 1 << CC2420_MDMCTRL0_ADR_DECODE ) |
+			   ( 2 << CC2420_MDMCTRL0_CCA_HYST ) |
+			   ( 3 << CC2420_MDMCTRL0_CCA_MOD ) |
+			   ( 1 << CC2420_MDMCTRL0_AUTOCRC ) |
+			   ( 1 << CC2420_MDMCTRL0_AUTOACK ) |
+			   ( 2 << CC2420_MDMCTRL0_PREAMBLE_LENGTH ) );
       call RXCTRL1.write( ( 1 << CC2420_RXCTRL1_RXBPF_LOCUR ) |
                           ( 1 << CC2420_RXCTRL1_LOW_LOWGAIN ) |
                           ( 1 << CC2420_RXCTRL1_HIGH_HGM ) |
@@ -204,7 +200,7 @@ implementation {
   async command error_t CC2420Power.stopOscillator() {
     atomic {
       if ( m_state != S_XOSC_STARTED )
-        return FAIL;
+	return FAIL;
       m_state = S_VREG_STARTED;
       call SXOSCOFF.strobe();
     }
@@ -214,7 +210,7 @@ implementation {
   async command error_t CC2420Power.rxOn() {
     atomic {
       if ( m_state != S_XOSC_STARTED )
-        return FAIL;
+	return FAIL;
       call SRXON.strobe();
     }
     return SUCCESS;
@@ -223,7 +219,7 @@ implementation {
   async command error_t CC2420Power.rfOff() {
     atomic {  
       if ( m_state != S_XOSC_STARTED )
-        return FAIL;
+	return FAIL;
       call SRFOFF.strobe();
     }
     return SUCCESS;
@@ -255,17 +251,13 @@ implementation {
 
   command error_t CC2420Config.sync() {
     atomic {
-      if ( m_sync_busy ) {
+      if ( m_sync_busy )
         return FAIL;
-      }
-      
       m_sync_busy = TRUE;
-      
-      if ( m_state == S_XOSC_STARTED ) {
+      if ( m_state == S_XOSC_STARTED )
         call SyncResource.request();
-      } else {
+      else
         post syncDone_task();
-      }
     }
     return SUCCESS;
   }
@@ -280,16 +272,16 @@ implementation {
       id[ 0 ] = m_pan;
       id[ 1 ] = m_short_addr;
     }
-    
-    call SRFOFF.strobe();
-    call CSN.set();
+
     call CSN.clr();
+    call SRFOFF.strobe();
     call FSCTRL.write( ( 1 << CC2420_FSCTRL_LOCK_THR ) |
-                       ( ( (channel - 11)*5+357 ) << CC2420_FSCTRL_FREQ ) );
+		       ( ( (channel - 11)*5+357 ) << CC2420_FSCTRL_FREQ ) );
     call PANID.write( 0, (uint8_t*)id, sizeof( id ) );
     call CSN.set();
+    call CSN.clr();
     call SRXON.strobe();
-    
+    call CSN.set();
     call SyncResource.release();
     
     post syncDone_task();

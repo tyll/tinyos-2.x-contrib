@@ -61,5 +61,8 @@ implementation {
   BFileReadP.NodeMap -> NodeMapC;
   BFileReadP.Fileio -> FileioC;
   BFileReadP.BlackbookUtil -> BlackbookUtilC;
+  
+  ////components JDebugC;
+  ////BFileReadP.JDebug -> JDebugC;
 }
 

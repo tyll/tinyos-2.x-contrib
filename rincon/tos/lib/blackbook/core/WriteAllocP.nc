@@ -59,6 +59,7 @@ module WriteAllocP {
     interface State;
     interface BClean;
     interface BlackbookUtil;
+    ////interface JDebug;
   }
 }
 
@@ -148,7 +149,7 @@ implementation {
     
     if(currentFile == NULL || forceConstruction) {
       // The file_t does not exist and needs to be created
-      ////call JDebug.jdbg("WA: File needs to be created", 0, 0, 0);
+      ////call JDebug.jdbg("WA: File needs to be created\n", 0, 0, 0);
       if((currentFile = call NodeBooter.requestAddFile()) == NULL) {
         call State.toIdle();
         return FAIL;
@@ -172,8 +173,9 @@ implementation {
       
     } else {
       // The file_t already exists.
-      ////call JDebug.jdbg("WA: File already exists", 0, 0, 0);
-      if(currentFile->filestate != FILE_IDLE) {
+      ////call JDebug.jdbg("WA: File already exists\n", 0, 0, 0);
+      //ADDED SECOND TEST CONDITION SO FILE CAN BE OPENED FOR WRITING IF ALREADY OPEN FOR READING!!!!
+      if((currentFile->filestate != FILE_IDLE) && (currentFile->filestate != FILE_READING)) {
         call State.toIdle();
         return FAIL;
       }
@@ -182,6 +184,7 @@ implementation {
 
       // Traverse through each existing flashnode_t of the file.
       do {
+        ////call JDebug.jdbg("WA.openforwrite flashAddr = %xl\n", currentNode->flashAddress, 0, 0);
         if(oneNode) {
           // This is a dictionary file, add up its reserveLength
           // because the dataLength isn't set when Checkpoint opens this up
@@ -189,19 +192,36 @@ implementation {
           totalSize += currentNode->reserveLength;  
         } else {
           totalSize += currentNode->dataLength;
-          minSize -= currentNode->dataLength;
+          //minSize -= currentNode->dataLength;
         }
         
         lastNode = currentNode;
         nextElement++;
       } while((currentNode = currentNode->nextNode) != NULL);
       
+      //At the last node, we need to see what space is available in the reserve also, as it is part of
+      //the total size of the node, reserve length on dictionary file should be 0
+      if(lastNode->nodestate != NODE_LOCKED){
+        totalSize += lastNode->reserveLength;
+        //reserve length includes the datalength as it represents the entire space of the node
+        totalSize -= lastNode->dataLength;
+      }
       // 'lastNode' now contains the last flashnode_t of the file.
       // 'currentNode' now contains NULL
-      
+      ////call JDebug.jdbg("WA.openforwrite: resLen = %xl, dataLen = %xi\n", 
+      ////		lastNode->reserveLength, (uint16_t)(lastNode->dataLength), 0);   
       if((totalSize < minSize || lastNode->nodestate == NODE_LOCKED) 
           && !oneNode) {
-        
+        if(lastNode->nodestate == NODE_LOCKED){
+          ////call JDebug.jdbg("WA.openforwrite: node locked flashAddr = %xl\n", (uint32_t)(lastNode->flashAddress), 0, 0);
+        }
+        else{
+          ////call JDebug.jdbg("WA.openforwrite: not enough space total= %xl, minsize= %xi\n", totalSize, minSize, 0);
+        }
+        if(totalSize >= minSize){
+          getWritableNode();
+          return SUCCESS;
+        }
         // Allocate more nodes to this file.
         if((currentNode = call NodeBooter.requestAddNode()) == NULL) {
           // Can't - we're out of nodes in our NodeMap.
@@ -209,6 +229,7 @@ implementation {
           return FAIL;
           
         } else {
+          ////call JDebug.jdbg("WA.openforwrite: allocating node\n", 0, 0, 0);
           lastNode->nextNode = currentNode;
           currentNode->filenameCrc = currentFile->filenameCrc;
           currentNode->nodestate = NODE_TEMPORARY;
@@ -218,6 +239,7 @@ implementation {
         
       } else {
         // Enough reserve space exists already, hand it over.
+        ////call JDebug.jdbg("WA.openforwrite: enough reserve totalsize= %xl, minsize= %xi\n", totalSize, minSize, 0);
         getWritableNode();
         return SUCCESS;
         
@@ -370,8 +392,28 @@ implementation {
       currentNode->dataLength = currentNode->reserveLength;
     }
     
-    totalSize += currentNode->reserveLength;
-
+    totalSize = 0;
+    currentNode = currentFile->firstNode;
+    do {
+      if(currentNode->nodestate == NODE_VALID 
+           || currentNode->nodestate == NODE_BOOTING
+           || currentNode->nodestate == NODE_TEMPORARY
+           || currentNode->nodestate == NODE_CONSTRUCTING) {
+        totalSize += currentNode -> reserveLength;
+      } else /*if(currentNode->nodestate == NODE_LOCKED)*/ {
+        totalSize += currentNode->dataLength;
+      }
+      ////call JDebug.jdbg("WA:finish: totalSize: %xl\n", totalSize, 0, 0);
+      ////call JDebug.jdbg("WA:finish: resVal: %xl\n", (uint32_t)(currentNode->reserveLength), 0, 0);
+      ////call JDebug.jdbg("WA:finish: dataVal: %xl\n", (uint32_t)(currentNode->dataLength), 0, 0);
+    
+    } while((currentNode = currentNode->nextNode) != NULL);
+    
+    //totalSize += currentNode->reserveLength;
+    //totalSize -= currentNode->dataLength;
+    //////call JDebug.jdbg("WA:finish: totalSize: %xl\n", totalSize, 0, 0);
+    //////call JDebug.jdbg("WA:finish: resVal: %xl\n", (uint32_t)(currentNode->reserveLength), 0, 0);
+    //////call JDebug.jdbg("WA:finish: dataVal: %xl\n", (uint32_t)(currentNode->dataLength), 0, 0);
     // The totalSize here is actually the append address in the file,
     // if we're finishing successfully.
     signal WriteAlloc.openedForWriting(currentFile, currentNode, totalSize, 
@@ -413,7 +455,6 @@ implementation {
       
       currentNode->reserveLength = call EraseUnitMap.bytesRemaining(
           currentEraseBlock);
-      
       if(call BlackbookUtil.convertBytesToWriteUnits(currentNode->reserveLength)
            > call BlackbookUtil.convertBytesToWriteUnits(minSize + metaSize 
                - totalSize)) {
@@ -423,12 +464,17 @@ implementation {
                 call BlackbookUtil.convertBytesToWriteUnits(minSize + metaSize 
                     - totalSize));
       }
-
+	  
       currentNode->reserveLength -= metaSize;
       totalSize += currentNode->reserveLength;
+      ////call JDebug.jdbg("WA: allocate: reservelen: %xl\n",
+      ////	 (uint32_t)(currentNode->reserveLength), 0, 0);
+      ////call JDebug.jdbg("WA: allocate: totalSize: %xl \n", totalSize, 0, 0);
+      ////call JDebug.jdbg("WA: allocate: minSize: %xl, metaLen: %xs \n", minSize, 0, metaSize); 
       
       if(totalSize < minSize) {
         // Need to allocate more space
+        ////call JDebug.jdbg("WA: allocate: need more space\n", 0, 0, 0);
         lastNode = currentNode;
         if(onlyOneNode 
             || (currentNode = call NodeBooter.requestAddNode()) == NULL) {
@@ -464,10 +510,15 @@ implementation {
   void getWritableNode() {
     totalSize = 0;  // here, totalSize is used to reflect the append address 
     currentNode = currentFile->firstNode;
-    currentFile->filestate = FILE_WRITING;
+    if(currentFile->filestate == FILE_READING){
+      currentFile->filestate = FILE_READING_AND_WRITING;
+    }
+    else{
+      currentFile->filestate = FILE_WRITING;
+    }
     
     do {
-      totalSize += currentNode->dataLength;
+      //totalSize += currentNode->dataLength;
       
       // Traverse through each existing flashnode_t of the file.
       // Find the first writable node.
@@ -516,6 +567,9 @@ implementation {
       
     } else if(currentFile->filestate == FILE_WRITING) {
       currentFile->filestate = FILE_IDLE;
+    }
+    else if(currentFile->filestate == FILE_READING_AND_WRITING){
+      currentFile->filestate = FILE_READING;  
     }
     
     currentNode = currentFile->firstNode;

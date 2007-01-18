@@ -56,6 +56,9 @@ implementation {
   BlackbookUtilP.EraseUnitMap -> EraseUnitMapC;
   BlackbookUtilP.VolumeSettings -> BlackbookStorageC;
   
+  ////components JDebugC;
+  ////BlackbookUtilP.JDebug -> JDebugC;
+  
 }
 
 

@@ -66,6 +66,7 @@ module BBootFullP {
     interface NodeMap;
     interface State as CommandState;
     interface State as BlackbookState;
+    ////interface JDebug;
   }
 }
 
@@ -118,8 +119,8 @@ implementation {
 
   /** Recover all node's dataLength's and dataCrc's */
   task void recoverNodes();
-
-  /***************** BBoot Commands ****************/
+  
+ /***************** BBoot Commands ****************/
   /**
    * @return TRUE if the file_t system has booted
    */
@@ -156,7 +157,7 @@ implementation {
 
       if(currentNodeMeta.magicNumber != META_INVALID 
           && currentNodeMeta.fileElement == 0) {
-        ////call JDebug.jdbg("Boot: Reading filemeta at %xl", currentAddress + sizeof(nodemeta_t), 0, 0);
+        ////////call JDebug.jdbg("Boot: Reading filemeta at %xl", currentAddress + sizeof(nodemeta_t), 0, 0);
         post getNewFile();
         return;
         
@@ -315,12 +316,13 @@ implementation {
     currentNode->fileElement = currentNodeMeta.fileElement;
     currentNode->filenameCrc = currentNodeMeta.filenameCrc;
     currentNode->reserveLength = currentNodeMeta.reserveLength;
+    //WHY IS THIS TRUE???
     currentNode->dataLength = currentNode->reserveLength;
     
-    ////call JDebug.jdbg("Boot: parsing node...", 0, 0, 0);
+    ////////call JDebug.jdbg("Boot: parsing node...", 0, 0, 0);
     if(currentNodeMeta.magicNumber == META_EMPTY) {
       // Advance to the next sector.
-      ////call JDebug.jdbg("Boot:      no node found", 0, 0, 0);
+      ////////call JDebug.jdbg("Boot:      no node found", 0, 0, 0);
       currentNode->nodestate = NODE_EMPTY;
       if(currentFile != NULL) {
         currentFile->filestate = FILE_EMPTY;
@@ -333,20 +335,23 @@ implementation {
        * This flashnode_t must be deleted. 
        * First we act like it's there, then we delete it.
        */
-      ////call JDebug.jdbg("Boot:      constructing node found", 0, 0, 0);
+      ////////call JDebug.jdbg("Boot:      constructing node found", 0, 0, 0);
       currentNode->nodestate = NODE_VALID;
       call EraseUnitMap.documentNode(currentNode);
+      ////call JDebug.jdbg("BBoot.parse: Meta Constructing\n", 0, 0, 0);
       call NodeShop.deleteNode(currentNode);
       return;
         
     } else if(currentNodeMeta.magicNumber == META_VALID) {
-      ////call JDebug.jdbg("Boot:      valid node found", 0, 0, 0);
+      ////call JDebug.jdbg("Boot.parseNode: Valid node found, addr: %xl, data: %xi, res: %xs",
+      ////  currentNode->flashAddress, (uint16_t)(currentNode->reserveLength), (uint8_t)(currentNode->dataLength));
       currentNode->nodestate = NODE_BOOTING;
       if(currentFile != NULL) {
         currentFile->filestate = FILE_IDLE;
       }
       
       if(call NodeMap.hasDuplicate(currentNode)) {
+        ////call JDebug.jdbg("BBoot.parseNode: Duplicate found\n", 0, 0, 0);
         call NodeShop.deleteNode(currentNode);
         return; 
       } else {
@@ -354,19 +359,19 @@ implementation {
       }
       
     } else if(currentNodeMeta.magicNumber == META_INVALID) {
-      ////call JDebug.jdbg("Boot:      invalid node found", 0, 0, 0);
+      ////////call JDebug.jdbg("Boot:      invalid node found", 0, 0, 0);
       currentNode->nodestate = NODE_DELETED;
       if(currentFile != NULL) {
         currentFile->filestate = FILE_EMPTY;
       }
-      ////call JDebug.jdbg("Boot:      documenting invalid node", 0, 0, 0);
+      ////////call JDebug.jdbg("Boot:      documenting invalid node", 0, 0, 0);
       call EraseUnitMap.documentNode(currentNode);
-      ////call JDebug.jdbg("Boot:      done documenting", 0, 0, 0);
+      ////////call JDebug.jdbg("Boot:      done documenting", 0, 0, 0);
       currentNode->nodestate = NODE_EMPTY;
       
     } else {
       // Garbage found. Document, remove, and advance to the next page.
-      ////call JDebug.jdbg("Boot:      garbage found", 0, 0, 0);
+      ////////call JDebug.jdbg("Boot:      garbage found", 0, 0, 0);
       currentNode->nodestate = NODE_DELETED;
       currentNode->flashAddress = currentAddress;
       currentNode->reserveLength = 1;
@@ -386,7 +391,7 @@ implementation {
    * and verifies the currentAddress is within range
    */
   task void continueParsing() {
-    ////call JDebug.jdbg("Boot: currentIndex=%i", 0, currentIndex, 0);
+    ////////call JDebug.jdbg("Boot: currentIndex=%i", 0, currentIndex, 0);
     if(currentIndex < call EraseUnitMap.getTotalEraseBlocks()) {
       // Ensure the current address is not at the next sector's base address
       if((currentAddress = call EraseUnitMap.getEraseBlockWriteAddress(
@@ -394,19 +399,19 @@ implementation {
               < call EraseUnitMap.getNextEraseBlockAddress(
                   call EraseUnitMap.getEraseBlock(currentIndex))) {
         
-        ////call JDebug.jdbg("Boot: currentAddress set to %xl", currentAddress, 0, 0);
+        ////////call JDebug.jdbg("Boot: currentAddress set to %xl", currentAddress, 0, 0);
         post getNewNode();
       
       } else {
         // Reached the end of the erase block
-        ////call JDebug.jdbg("Boot: reached the end of the erase block", 0, 0, 0);
+        ////////call JDebug.jdbg("Boot: reached the end of the erase block", 0, 0, 0);
         currentIndex++;
         post continueParsing();
       }
       
     } else {
       // Done loading nodes, open the checkpoint, link, and finish booting
-      ////call JDebug.jdbg("Boot: call Checkpoint.openCheckpoint", 0, 0, 0);
+      ////////call JDebug.jdbg("Boot: call Checkpoint.openCheckpoint", 0, 0, 0);
       call Checkpoint.openCheckpoint();
     }
   }
@@ -431,7 +436,7 @@ implementation {
     } else {
       call NodeBooter.link();
       call BlackbookState.toIdle();
-      ////call JDebug.jdbg("BBootFull: Booted with %i files", 0, call NodeMap.getTotalFiles(), 0);
+      ////////call JDebug.jdbg("BBootFull: Booted with %i files", 0, call NodeMap.getTotalFiles(), 0);
       signal BBoot.booted(call NodeMap.getTotalNodes(), 
           call NodeMap.getTotalFiles(), SUCCESS);
     }
@@ -477,7 +482,7 @@ implementation {
    * Read the nodemeta_t from the flashnode_t at currentAddress
    */
   task void readNodeMeta() {
-    ////call JDebug.jdbg("Boot: node@%xl?", currentAddress, 0, 0);
+    ////////call JDebug.jdbg("Boot: node@%xl?", currentAddress, 0, 0);
     call CommandState.forceState(S_READ_NODEMETA);
     currentNode->flashAddress = currentAddress;
     if(call DirectStorage.read(currentAddress, &currentNodeMeta, 
@@ -491,13 +496,53 @@ implementation {
    * into the currentFile
    */
   task void readFileMeta() {
-    ////call JDebug.jdbg("Boot: file@%xl?", currentAddress + sizeof(nodemeta_t), 0, 0);
+    ////////call JDebug.jdbg("Boot: file@%xl?", currentAddress + sizeof(nodemeta_t), 0, 0);
     call CommandState.forceState(S_READ_FILEMETA);
     if(call DirectStorage.read(currentAddress + sizeof(nodemeta_t), 
         &currentFilename, sizeof(filemeta_t)) != SUCCESS) {
       post readFileMeta();
     }
   }
+  /*
+  task void checkNodeCorruption(){
+    
+    uint16_t diff;
+    uint8_t i;
+    call CommandState.forceState(S_CHECK_NODE_CORRUPTION);
+    diff = currentNode->reserveLength - currentNode->dataLength;
+    ////call JDebug.jdbg("BBP.checkCorr: resLen: %xl, dataLen: %xi\n", 
+      		currentNode->reserveLength, currentNode->dataLength, 0); 
+    if(diff <= 0){
+      //nothing to check
+      return; 
+    }  		
+    //only check the first 20 bytes
+    if(diff > MAX_CHECK_BYTES){
+      diff = MAX_CHECK_BYTES;
+    }
+    if(currentNodeMeta.fileElement == 0){
+      //if it is the first file, need to add the size of filemeta_t to read address
+      if(call DirectStorage.read(currentAddress + sizeof(nodemeta_t)+ sizeof(filemeta_t)
+          + currentNode->dataLength, &check_buffer, diff) != SUCCESS){
+        post checkNodeCorruption();
+      }
+    }
+    else{
+      //otherwise, use this address
+      if(call DirectStorage.read(currentAddress + sizeof(nodemeta_t)
+          + currentNode->dataLength, &check_buffer, diff) != SUCCESS){
+        post checkNodeCorruption();
+      }
+    }
+    for(i=0; i<diff; i++){
+      if(check_buffer[i] != 0xFF){
+        ////call JDebug.jdbg("BBP.checkCorr: NODE LOCKED, found: %xs\n", 0, 0, check_buffer[i]);
+        currentNode->nodestate = NODE_LOCKED;
+        break;
+      }
+    }
+  }
+  */
 }
 
 

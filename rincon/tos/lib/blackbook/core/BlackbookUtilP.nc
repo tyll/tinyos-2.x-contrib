@@ -46,6 +46,7 @@ module BlackbookUtilP {
     interface GenericCrc;
     interface VolumeSettings;
     interface EraseUnitMap;
+    ////interface JDebug;
   }
 }
 
@@ -60,7 +61,13 @@ implementation {
    *     to hold the data
    */
   command uint32_t BlackbookUtil.convertBytesToWriteUnits(uint32_t bytes) {
-    return (bytes >> call VolumeSettings.getWriteUnitSizeLog2()) + 1;
+   
+    if((bytes % (call VolumeSettings.getWriteUnitSize())) == 0){
+      return (bytes >> call VolumeSettings.getWriteUnitSizeLog2());
+    }
+    else{
+      return (bytes >> call VolumeSettings.getWriteUnitSizeLog2()) + 1;
+    }
   }
     
   /**

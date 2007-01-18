@@ -50,6 +50,7 @@ module BFileReadP {
     interface Fileio;
     interface NodeMap;
     interface BlackbookUtil;
+    ////interface JDebug;
   }
 }
 
@@ -105,10 +106,17 @@ implementation {
           // We set it to READING only to prevent this file_t from being deleted
           readers[currentClient].openFile->filestate = FILE_READING;
         }
+        else if(readers[currentClient].openFile->filestate == FILE_WRITING) {
+          readers[currentClient].openFile->filestate = FILE_READING_AND_WRITING;
+        }
         readers[currentClient].readAddress = 0;
         call BlackbookState.toIdle();    
+        ////call JDebug.jdbg("BFR.open, nodeAddr: %xl\n", (readers[currentClient].openFile)->firstNode, 0, 0);
+        ////call JDebug.jdbg("BFR.open, dataAddr: %xl\n", (uint32_t)&(((readers[currentClient].openFile)->firstNode)->dataLength), 0, 0);
+        ////call JDebug.jdbg("BFR.open, dataVal: %xl\n", (uint32_t)(((readers[currentClient].openFile)->firstNode)->dataLength), 0, 0);
+     
         signal BFileRead.opened[currentClient](call NodeMap.getDataLength(
-            readers[currentClient].openFile), SUCCESS);
+            (readers[currentClient].openFile)), SUCCESS);
         return SUCCESS;
       }
       
@@ -147,6 +155,9 @@ implementation {
       // Set the file_t to IDLE only if it was IDLE to begin with.
       if(readers[currentClient].openFile->filestate == FILE_READING) {
         readers[currentClient].openFile->filestate = FILE_IDLE;
+      }
+      else if(readers[currentClient].openFile->filestate == FILE_READING_AND_WRITING){
+        readers[currentClient].openFile->filestate = FILE_WRITING;
       }
     }
     

@@ -174,6 +174,8 @@ typedef enum {
   
   /** The nodes in this file are open for writing */
   FILE_WRITING,
+  
+  FILE_READING_AND_WRITING,
 
 } file_state_enum;
 

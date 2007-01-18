@@ -150,7 +150,8 @@ implementation {
       targetCrc = call BlackbookUtil.filenameCrc(&filenameBuffer);
       
       for(i = 0; i < call NodeMap.getMaxFiles(); i++) {
-        if((call NodeMap.getFileAtIndex(i))->filenameCrc == targetCrc) {
+        if(((call NodeMap.getFileAtIndex(i))->filenameCrc == targetCrc) &&
+          ((call NodeMap.getFileAtIndex(i))->filestate != FILE_EMPTY)) {
           // The index of the present filename_t was found
           for(i += 1; i < call NodeMap.getMaxFiles(); i++) {
             if((call NodeMap.getFileAtIndex(i))->filestate != FILE_EMPTY) {

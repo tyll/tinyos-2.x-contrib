@@ -67,6 +67,9 @@ implementation {
   BBootFullP.CommandState -> StateC;
   BBootFullP.BlackbookState -> BlackbookStateC;
   
+  ////components JDebugC;
+  ////BBootFullP.JDebug -> JDebugC;
+  
 }
 
 

@@ -49,6 +49,7 @@ module NodeShopP {
     interface State;
     interface EraseUnitMap;
     interface DirectStorage;
+    ////interface JDebug;
   }
 }
 
@@ -298,6 +299,8 @@ implementation {
    * Write the nodemeta_t to flash
    */
   task void writeNodemeta() {
+    ////call JDebug.jdbg("NS.writeMeta: resLen = %xl, dataLen = %xi\n", currentNode->reserveLength, 
+    ////	(uint16_t)(currentNode->dataLength), 0);
     if(call DirectStorage.write(currentNode->flashAddress, &currentNodeMeta, 
         sizeof(nodemeta_t)) != SUCCESS) {
       post writeNodemeta();

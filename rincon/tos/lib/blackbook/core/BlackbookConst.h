@@ -154,6 +154,15 @@
 #define UQ_BLACKBOOKSTORAGE "Blackbook.Storage"
 #endif
 
+/* Upon bootup, the mote recreates the file system. While doing so, 
+ * it checks to see if the node has been written to since its last 
+ * save. To do this, it reads in MAX_CHECK_BYTES bytes after the 
+ * dataLength of the node and before the reserveLength. 
+ */
+ 
+ #ifndef MAX_CHECK_BYTES
+ #define MAX_CHECK_BYTES 20
+ #endif
 
 #endif
 

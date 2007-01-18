@@ -52,7 +52,8 @@ implementation {
       NodeShopC, 
       NodeMapC, 
       new StateC(),
-      BlackbookUtilC;
+      BlackbookUtilC,
+      CheckNodeC;
   
   Checkpoint = CheckpointP;
   
@@ -64,6 +65,10 @@ implementation {
   CheckpointP.NodeShop -> NodeShopC;
   CheckpointP.State -> StateC;
   CheckpointP.BlackbookUtil -> BlackbookUtilC;
+  CheckpointP.CheckNode -> CheckNodeC;
+  
+  ////components JDebugC;
+  ////CheckpointP.JDebug -> JDebugC;
   
 }
 

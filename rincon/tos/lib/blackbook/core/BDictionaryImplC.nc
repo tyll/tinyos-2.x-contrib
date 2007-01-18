@@ -57,7 +57,8 @@ implementation {
       new StateC() as DictionaryStateC,
       new StateC() as SearchStateC,
       BlackbookUtilC,
-      FileioC;
+      FileioC,
+      CheckpointC;
   
   BDictionary = BDictionaryP;
   InternalDictionary = BDictionaryP;
@@ -74,6 +75,10 @@ implementation {
   BDictionaryP.DictionaryState -> DictionaryStateC;
   BDictionaryP.SearchState -> SearchStateC;
   BDictionaryP.BlackbookUtil -> BlackbookUtilC;
+  BDictionaryP.Checkpoint -> CheckpointC;
+  
+  ////components JDebugC;
+  ////BDictionaryP.JDebug -> JDebugC;
   
 }
 

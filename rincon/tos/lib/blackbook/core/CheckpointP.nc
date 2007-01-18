@@ -54,6 +54,9 @@ module CheckpointP {
     interface InternalDictionary;
     interface State;
     interface BlackbookUtil;
+    interface CheckNode;
+    
+    ////interface JDebug;
   }
 }
 
@@ -103,7 +106,8 @@ implementation {
       
       if(call BDictionary.open("cp.bb_", 
           call BlackbookUtil.convertWriteUnitsToBytes(
-              CHECKPOINT_DEDICATED_PAGES)) != SUCCESS) {
+              CHECKPOINT_DEDICATED_PAGES) - sizeof(nodemeta_t) 
+                  - sizeof(filemeta_t)) != SUCCESS) {
         call State.toIdle();
         return FAIL;
       }
@@ -125,7 +129,7 @@ implementation {
     if(call State.requestState(S_UPDATE) != SUCCESS) {
       return FAIL;
     }
-    
+    ////call JDebug.jdbg("cp.update\n", 0, 0, 0);
     currentNode = focusedNode;
     
     if(currentNode == NULL) {
@@ -138,8 +142,9 @@ implementation {
       currentCheckpoint.filenameCrc = currentNode->filenameCrc;
       currentCheckpoint.dataCrc = currentNode->dataCrc;
       currentCheckpoint.dataLength = currentNode->dataLength;
-      
+      ////call JDebug.jdbg("cp.update node is valid addr: %xl\n", &(currentNode->flashAddress), 0, 0);
       if(currentNode->nextNode->nodestate == NODE_VALID) {
+        ////call JDebug.jdbg("cp.update: node locked\n", 0, 0, 0);
         currentNode->nodestate = NODE_LOCKED;
       }
       
@@ -158,10 +163,12 @@ implementation {
             
     } else {
       // Nothing to do. Signal and complete.
+      ////call JDebug.jdbg("cp.update nothing happening\n", 0, 0, 0);
       call State.toIdle();
       signal Checkpoint.updated(currentNode, SUCCESS);
     }
-    
+    ////call JDebug.jdbg("cp.update returned\n", 0, 0, 0);
+      
     return SUCCESS;
   }
   
@@ -223,6 +230,7 @@ implementation {
   event void BDictionary.inserted(uint32_t key, void *value, uint16_t valueSize,
       error_t error) {
     call State.toIdle();
+    ////call JDebug.jdbg("CP.inserted\n", 0, 0, 0);
     signal Checkpoint.updated(currentNode, error);
   }
   
@@ -236,12 +244,18 @@ implementation {
   event void BDictionary.retrieved(uint32_t key, void *valueHolder, 
       uint16_t valueSize, error_t error) {
     if(!error) {
+      ////call JDebug.jdbg("CP.Bdict.retrieved ln 245\n", 0, 0, 0);
       if(currentNode->filenameCrc == currentCheckpoint.filenameCrc) {
-        currentNode->nodestate = NODE_LOCKED;
+        if(currentNode->nextNode != NULL){
+          ////call JDebug.jdbg("CP.Bdict.retrieved: node locked here flashAddr = %xl\n", currentNode->flashAddress, 0, 0);
+          currentNode->nodestate = NODE_LOCKED;
+        }
         currentNode->dataLength = currentCheckpoint.dataLength;
         currentNode->dataCrc = currentCheckpoint.dataCrc;
         call State.toIdle();
-        signal Checkpoint.recovered(currentNode, SUCCESS);
+        //This is where we check to see if the node was written after the last save
+        call CheckNode.checkNode(currentNode);
+        //signal Checkpoint.recovered(currentNode, SUCCESS);
         return;
       }
     }
@@ -253,7 +267,7 @@ implementation {
         return;
       }
     }
-    
+    ////call JDebug.jdbg("CP.Bdict.retrieved: retrieve failed\n", 0, 0, 0);
     call NodeShop.deleteNode(currentNode); 
   }
   
@@ -297,7 +311,15 @@ implementation {
   
   event void BDictionary.totalKeys(uint16_t totalKeys) {
   }
+  /***************** CheckNode Events*****************/
   
+  event void CheckNode.nodeChecked(flashnode_t *focusedNode, bool ok2write){
+  
+    if(!ok2write){
+      focusedNode -> nodestate = NODE_LOCKED;
+    }
+    signal Checkpoint.recovered(currentNode, SUCCESS);  
+  }
   /***************** NodeShop Events ****************/
   
   /** 

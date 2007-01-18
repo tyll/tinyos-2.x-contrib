@@ -54,6 +54,8 @@ module BFileWriteP {
     interface Fileio; 
     interface Checkpoint;
     interface BlackbookUtil;
+    
+    ////interface JDebug;
   }
 }
 
@@ -85,6 +87,8 @@ implementation {
   /** Checkpoint the current client's open file_t */
   task void checkpointNode();
   
+  uint32_t getFileLength();
+  
   
   /***************** Init Commands ****************/
   command error_t Init.init() {
@@ -109,7 +113,6 @@ implementation {
     if(call BlackbookState.requestState(S_WRITE_BUSY) != SUCCESS) {
       return FAIL;
     }
-    
     currentClient = id;
     
     if(writers[currentClient] == NULL) {
@@ -124,8 +127,12 @@ implementation {
       if(call BlackbookUtil.filenameCrc((filename_t *) fileName) ==
           writers[currentClient]->filenameCrc) {
         // It's the same file
+        /*
         signal BFileWrite.opened[currentClient](
             call NodeMap.getReserveLength(writers[currentClient]), SUCCESS);
+        */
+        signal BFileWrite.opened[currentClient](
+            getFileLength(), SUCCESS);
         return SUCCESS;
       }
       
@@ -304,6 +311,10 @@ implementation {
    */
   event void Checkpoint.updated(flashnode_t *focusedNode, error_t error) {
     flashnode_t *previousNode;
+    if(call BlackbookState.getState() == S_DICTIONARY_BUSY){
+      //This will get signalled when I updating a dictionary file, so ignore it if that is the case
+      return;
+    }
     if(call BlackbookState.getState() == S_WRITE_SAVE_BUSY) {
       currentNode = currentNode->nextNode;
       if(currentNode != NULL) {
@@ -334,11 +345,20 @@ implementation {
         
         } else if(currentNode->nodestate == NODE_VALID) {
           // Prevent this flashnode_t from ever being written to again
-          currentNode->nodestate = NODE_LOCKED;
+          if(currentNode->nextNode != NULL){
+            ////call JDebug.jdbg("BFW.updated: node locked here addr: %xl\n", &(currentNode->flashAddress), 0, 0);
+            currentNode->nodestate = NODE_LOCKED;
+          }
         }
       }
       
-      writers[currentClient]->filestate = FILE_IDLE;
+      if(writers[currentClient]->filestate == FILE_READING_AND_WRITING){
+        writers[currentClient]->filestate = FILE_READING;
+      }
+      else{
+        writers[currentClient]->filestate = FILE_IDLE;
+      }
+      
       writers[currentClient] = NULL;
       call BlackbookState.toIdle();
       signal BFileWrite.closed[currentClient](SUCCESS);
@@ -372,6 +392,24 @@ implementation {
   
   /***************** Functions ****************/
   
+  uint32_t getFileLength(){
+  
+    flashnode_t *curNode = writers[currentClient]->firstNode;
+    flashnode_t *lastNode;
+    uint32_t totalSize = 0;
+    do {
+      totalSize += curNode->dataLength;
+      lastNode = curNode;
+      
+    } while((curNode = curNode->nextNode) != NULL);
+    
+    if(lastNode->nodestate != NODE_LOCKED){
+      totalSize += lastNode->reserveLength;
+      totalSize -= lastNode->dataLength;
+    }
+    return totalSize;
+    
+  }
   /***************** Defaults ****************/  
   default event void BFileWrite.opened[uint8_t id](uint32_t len, 
       error_t error) {

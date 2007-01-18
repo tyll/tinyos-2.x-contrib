@@ -50,6 +50,7 @@ module NodeMapP {
   uses {
     interface EraseUnitMap;
     interface BlackbookUtil;
+    ////interface JDebug;
   }
 }
 
@@ -149,8 +150,9 @@ implementation {
     
     // Link all files and nodes
     for(fileIndex = 0; fileIndex < call NodeMap.getMaxFiles(); fileIndex++) {
-      if(files[fileIndex].filestate != FILE_EMPTY && files[fileIndex].filestate 
-          != FILE_WRITING) {
+      if(files[fileIndex].filestate != FILE_EMPTY && ((files[fileIndex].filestate 
+          != FILE_WRITING) || (files[fileIndex].filestate 
+          != FILE_READING_AND_WRITING))) {
         files[fileIndex].filestate = FILE_IDLE;
         lastLinkedNode = NULL;
         currentElement = 0;
@@ -171,6 +173,8 @@ implementation {
                 } else {
                   // This is the next flashnode_t of the file
                   lastLinkedNode->nextNode = &nodes[nodeIndex];
+                  /*my addition for setting the states properly*/
+                  lastLinkedNode->nodestate = NODE_LOCKED;
                 }
                 
                 nodes[nodeIndex].fileElement = 0xFF;
@@ -374,6 +378,9 @@ implementation {
         && focusedNode != NULL; focusedNode = focusedNode->nextNode) {
       dataLength += focusedNode->dataLength;
     }
+    //////call JDebug.jdbg("map.dataLen, nodeAddr: %xl\n", focusedFile->firstNode, 0, 0);
+    //////call JDebug.jdbg("map.dataLen, dataAddr: %xl\n", (uint32_t)&((focusedFile->firstNode)->dataLength), 0, 0);
+    //////call JDebug.jdbg("map.dataLen, dataVal: %xl\n", (uint32_t)((focusedFile->firstNode)->dataLength), 0, 0);
     
     return dataLength;
   }

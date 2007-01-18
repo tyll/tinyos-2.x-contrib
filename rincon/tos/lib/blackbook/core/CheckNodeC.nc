@@ -30,37 +30,36 @@
  */
 
 /**
- * Blackbook NodeShop Configuration
+ * Used during BlackBook rebooting
+ * checks and sees if a node was written to since the last save
+ * if it has, it locks the node
  *
- * NodeShop writes metadata for nodes and files to flash.
- *
- * @author David Moss (dmm@rincon.com)
+ * @author Jared Hill - jch@rincon.com
  */
-
+ 
 #include "Blackbook.h"
 
-configuration NodeShopC {
+configuration CheckNodeC {
   provides {
-    interface NodeShop;
+    interface CheckNode;
   }
 }
 
 implementation {
-  components NodeShopP, 
-      NodeMapC, 
-      EraseUnitMapC,
-      new StateC(), 
-      new BlackbookStorageC();
+  components MainC,
+      new BlackbookStorageC(), 
+      GenericCrcC,
+      CheckNodeP;
   
-  NodeShop = NodeShopP;
+  CheckNode = CheckNodeP;
  
-  NodeShopP.EraseUnitMap -> EraseUnitMapC;
-  NodeShopP.NodeMap -> NodeMapC;
-  NodeShopP.State -> StateC;
-  NodeShopP.DirectStorage -> BlackbookStorageC;
+  CheckNodeP.Boot -> MainC;
+  CheckNodeP.GenericCrc -> GenericCrcC;
+  CheckNodeP.DirectStorage -> BlackbookStorageC;
+  CheckNodeP.VolumeSettings -> BlackbookStorageC;
   
   ////components JDebugC;
-  ////NodeShopP.JDebug -> JDebugC;
+  ////CheckNodeP.JDebug -> JDebugC;
   
 }
 

@@ -60,6 +60,9 @@ implementation {
   
   NodeMapP.EraseUnitMap -> EraseUnitMapC;
   NodeMapP.BlackbookUtil -> BlackbookUtilC;
+  
+  ////components JDebugC;
+  ////NodeMapP.JDebug -> JDebugC;
 }
 
 

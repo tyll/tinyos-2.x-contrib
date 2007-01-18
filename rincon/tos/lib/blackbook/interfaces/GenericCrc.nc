@@ -11,7 +11,7 @@
  *   notice, this list of conditions and the following disclaimer in the
  *   documentation and/or other materials provided with the
  *   distribution.
- * - Neither the name of the Rincon Research Corporation nor the names of
+ * - Neither the name of the Arch Rock Corporation nor the names of
  *   its contributors may be used to endorse or promote products derived
  *   from this software without specific prior written permission.
  *
@@ -30,38 +30,24 @@
  */
 
 /**
- * Blackbook NodeShop Configuration
- *
- * NodeShop writes metadata for nodes and files to flash.
- *
- * @author David Moss (dmm@rincon.com)
+ * GenericCrc Interface
+ * @author David Moss
  */
-
-#include "Blackbook.h"
-
-configuration NodeShopC {
-  provides {
-    interface NodeShop;
-  }
-}
-
-implementation {
-  components NodeShopP, 
-      NodeMapC, 
-      EraseUnitMapC,
-      new StateC(), 
-      new BlackbookStorageC();
-  
-  NodeShop = NodeShopP;
  
-  NodeShopP.EraseUnitMap -> EraseUnitMapC;
-  NodeShopP.NodeMap -> NodeMapC;
-  NodeShopP.State -> StateC;
-  NodeShopP.DirectStorage -> BlackbookStorageC;
-  
-  ////components JDebugC;
-  ////NodeShopP.JDebug -> JDebugC;
+interface GenericCrc {
+
+  /**
+   * Calculate the CRC from a buffer of data
+   * of size len, starting with the crc given in 
+   * startCrc. This uses the CRC algorithm found
+   * in /tos/crc.h.
+   *
+   * @param startCrc - the starting crc value
+   * @param *buf - the buffer of data to take a crc of
+   * @param len - the amount of data to calculate the crc for
+   * @return the crc.
+   */
+  command uint16_t crc16(uint16_t startCrc, void *buf, uint32_t len);
   
 }
-
 

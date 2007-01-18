@@ -58,4 +58,7 @@ implementation {
   FileioP.NodeShop -> NodeShopC;
   FileioP.NodeMap -> NodeMapC; 
   FileioP.State -> StateC;
+  
+  ////components JDebugC;
+  ////FileioP.JDebug->JDebugC;
 }

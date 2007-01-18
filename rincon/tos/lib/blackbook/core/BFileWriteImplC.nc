@@ -66,6 +66,9 @@ implementation {
   BFileWriteP.Checkpoint -> CheckpointC;
   BFileWriteP.BlackbookUtil -> BlackbookUtilC;
   
+  ////components JDebugC;
+  ////BFileWriteP.JDebug -> JDebugC;
+  
 }
 
 

@@ -11,7 +11,7 @@
  *   notice, this list of conditions and the following disclaimer in the
  *   documentation and/or other materials provided with the
  *   distribution.
- * - Neither the name of the Rincon Research Corporation nor the names of
+ * - Neither the name of the Arch Rock Corporation nor the names of
  *   its contributors may be used to endorse or promote products derived
  *   from this software without specific prior written permission.
  *
@@ -29,39 +29,46 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE
  */
 
-/**
- * Blackbook NodeShop Configuration
- *
- * NodeShop writes metadata for nodes and files to flash.
- *
- * @author David Moss (dmm@rincon.com)
+/*
+ * Copyright (c) 2004-2006 Rincon Research Corporation.  
+ * All rights reserved.
+ * 
+ * Rincon Research will permit distribution and use by others subject to
+ * the restrictions of a licensing agreement which contains (among other things)
+ * the following restrictions:
+ * 
+ *  1. No credit will be taken for the Work of others.
+ *  2. It will not be resold for a price in excess of reproduction and 
+ *      distribution costs.
+ *  3. Others are not restricted from copying it or using it except as 
+ *      set forward in the licensing agreement.
+ *  4. Commented source code of any modifications or additions will be 
+ *      made available to Rincon Research on the same terms.
+ *  5. This notice will remain intact and displayed prominently.
+ * 
+ * Copies of the complete licensing agreement may be obtained by contacting 
+ * Rincon Research, 101 N. Wilmot, Suite 101, Tucson, AZ 85711.
+ * 
+ * There is no warranty with this product, either expressed or implied.  
+ * Use at your own risk.  Rincon Research is not liable or responsible for 
+ * damage or loss incurred or resulting from the use or misuse of this software.
  */
 
-#include "Blackbook.h"
 
-configuration NodeShopC {
+/**
+ * GenericCrc configuration
+ * @author David Moss (dmm@rincon.com)
+ */
+ 
+configuration GenericCrcC {
   provides {
-    interface NodeShop;
+    interface GenericCrc;
   }
 }
 
 implementation {
-  components NodeShopP, 
-      NodeMapC, 
-      EraseUnitMapC,
-      new StateC(), 
-      new BlackbookStorageC();
+  components GenericCrcP;
   
-  NodeShop = NodeShopP;
- 
-  NodeShopP.EraseUnitMap -> EraseUnitMapC;
-  NodeShopP.NodeMap -> NodeMapC;
-  NodeShopP.State -> StateC;
-  NodeShopP.DirectStorage -> BlackbookStorageC;
-  
-  ////components JDebugC;
-  ////NodeShopP.JDebug -> JDebugC;
-  
+  GenericCrc = GenericCrcP;
 }
-
 

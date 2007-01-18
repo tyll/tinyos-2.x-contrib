@@ -59,6 +59,9 @@ implementation {
   WriteAllocP.BClean -> BCleanC;
   WriteAllocP.BlackbookUtil -> BlackbookUtilC;
   
+  ////components JDebugC;
+  ////WriteAllocP.JDebug -> JDebugC;
+  
 }
 
 

@@ -30,38 +30,24 @@
  */
 
 /**
- * Blackbook NodeShop Configuration
- *
- * NodeShop writes metadata for nodes and files to flash.
- *
- * @author David Moss (dmm@rincon.com)
+ * Blackbook CheckNode Interface
+ * @author Jared Hill 
  */
-
-#include "Blackbook.h"
-
-configuration NodeShopC {
-  provides {
-    interface NodeShop;
-  }
-}
-
-implementation {
-  components NodeShopP, 
-      NodeMapC, 
-      EraseUnitMapC,
-      new StateC(), 
-      new BlackbookStorageC();
-  
-  NodeShop = NodeShopP;
  
-  NodeShopP.EraseUnitMap -> EraseUnitMapC;
-  NodeShopP.NodeMap -> NodeMapC;
-  NodeShopP.State -> StateC;
-  NodeShopP.DirectStorage -> BlackbookStorageC;
+interface CheckNode {
   
-  ////components JDebugC;
-  ////NodeShopP.JDebug -> JDebugC;
+  /**
+   * @return TRUE if the file system has booted
+   */
+  command error_t checkNode(flashnode_t *focusedNode);
   
+  /**
+   * The file system finished booting
+   * @param totalNodes - the total number of nodes found on flash
+   * @param error - SUCCESS if the file system is ready for use.
+   */
+  event void nodeChecked(flashnode_t *focusedNode, bool ok2write);
+
 }
 
 

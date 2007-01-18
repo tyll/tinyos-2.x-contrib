@@ -55,6 +55,7 @@ module FileioP {
     interface NodeMap;
     interface NodeShop;
     interface State;
+    ////interface JDebug;
   }
 }
 
@@ -371,6 +372,7 @@ implementation {
   task void write() {
     currentNode->dataCrc = call GenericCrc.crc16(currentNode->dataCrc, 
         currentBuffer + totalComplete, currentAmount);
+    ////call JDebug.jdbg("FIO.write: writing to address: %xl\n", actualAddress, 0, 0); 
     if(call DirectStorage.write(actualAddress, currentBuffer + totalComplete, 
         currentAmount) != SUCCESS) {
       post write();
@@ -392,7 +394,7 @@ implementation {
         &offset)) == NULL) {
       finish(SUCCESS);
     }
-
+   
     // Any information written to the end of a file_t must be appended!
     // Because if the next address to write to actually belongs to
     // the next flashnode_t in the file, that flashnode_t is checked to see if its

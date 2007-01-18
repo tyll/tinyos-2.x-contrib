@@ -131,6 +131,7 @@ implementation {
     if((error = call SubStorage.flush()) != SUCCESS) {
       call State.toIdle();
     }
+    
     return error;
   }
   

@@ -37,8 +37,6 @@
 #include "Storage.h"
 #include "Blackbook.h"
 
-#warning "*** USING JARED's BLACKBOOK VERSION"
-
 generic configuration BlackbookFullC() {
   provides {
     interface BFileRead;

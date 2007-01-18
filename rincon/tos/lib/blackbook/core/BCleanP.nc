@@ -59,6 +59,9 @@ implementation {
   /** The focused erase unit in our erase block to erase */
   uint8_t focusedEraseUnit;
   
+  /** SUCCESS if atleast one sector was erased **/
+  error_t sectorErased;
+  
   /***************** Prototypes *****************/
   /** Loop to search and destroy erasable sectors */
   task void garbageLoop();
@@ -147,7 +150,14 @@ implementation {
       call BlackbookState.toIdle();
     }
     
-    signal BClean.gcDone(erased);
+    if(erased){
+      sectorErased = SUCCESS;
+    }
+    else{
+      sectorErased = FAIL;
+    }
+    
+    signal BClean.gcDone(sectorErased);
   }
   
   /**

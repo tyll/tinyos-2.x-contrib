@@ -476,8 +476,9 @@ implementation {
         // Need to allocate more space
         ////call JDebug.jdbg("WA: allocate: need more space\n", 0, 0, 0);
         lastNode = currentNode;
-        if(onlyOneNode 
-            || (currentNode = call NodeBooter.requestAddNode()) == NULL) {
+        if(onlyOneNode){
+          return FALSE;
+        } else if((currentNode = call NodeBooter.requestAddNode()) == NULL) {
           // We're out of nodes in our NodeMap, or we're trying to
           // create a dictionary file_t that requires a single node.
           fail();

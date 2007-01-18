@@ -1151,16 +1151,17 @@ implementation {
     		call DictionaryState.getState() == S_INIT_DUPLICATE &&
     		  currentClient != INTERNAL_DICTIONARY){
     */
-    if(currentNodeRamAddress == &(focusedNode->flashAddress)){
-       currentClient = fileClient;
-       resetStates();	
-       //////call JDebug.jdbg("BDP.update signalling open\n", 0, 0, 0);
-       signal BDictionary.opened[fileClient](call NodeMap.getReserveLength(
+    if(call BlackbookState.getState() != S_DELETE_BUSY){
+      if(currentNodeRamAddress == &(focusedNode->flashAddress)){
+        currentClient = fileClient;
+        resetStates();	
+        //////call JDebug.jdbg("BDP.update signalling open\n", 0, 0, 0);
+        signal BDictionary.opened[fileClient](call NodeMap.getReserveLength(
           clients[fileClient].dictionaryFile), call NodeMap.getReserveLength(
               clients[fileClient].dictionaryFile) 
                   - clients[fileClient].writeOffset, SUCCESS);
+      }
     }
-    
   }
   
   /** 

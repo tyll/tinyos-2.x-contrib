@@ -291,7 +291,6 @@ implementation {
            }
         }
       }
-      
       call CheckState.toIdle();
       post stopRadio();
     }  

@@ -153,6 +153,7 @@ implementation {
     atomic {
       m_state = S_STOPPED;
       stopBackoffTimer();
+      call CaptureSFD.disable();
     }
     
     // Crashes micaz's:
@@ -393,7 +394,7 @@ implementation {
         call CSN.clr();
         call SFLUSHTX.strobe();
         call CSN.set();
-        //call CaptureSFD.disable();
+        call CaptureSFD.disable();
         call CaptureSFD.captureRisingEdge();
 
         atomic m_state = S_STARTED;

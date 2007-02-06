@@ -36,13 +36,13 @@
   
 #include "At45db.h"
 
-module At45dbVolumeSettingsP {
+generic module At45dbVolumeSettingsP() {
   provides {
-    interface VolumeSettings[uint8_t id];
+    interface VolumeSettings;
   }
   
   uses {
-    interface At45dbVolume[uint8_t id];
+    interface At45dbVolume;
   }
 }
 
@@ -52,43 +52,43 @@ implementation {
   /**
    * @return the total size of the volume
    */
-  command uint32_t VolumeSettings.getVolumeSize[uint8_t id]() {
-     return (((uint32_t) call At45dbVolume.volumeSize[id]()) 
+  command uint32_t VolumeSettings.getVolumeSize() {
+     return (((uint32_t) call At45dbVolume.volumeSize()) 
          << AT45_PAGE_SIZE_LOG2);
   }
   
   /**
    * @return the total number of erase units on the volume
    */
-  command uint32_t VolumeSettings.getTotalEraseUnits[uint8_t id]() {
-    return (uint32_t) call At45dbVolume.volumeSize[id]();
+  command uint32_t VolumeSettings.getTotalEraseUnits() {
+    return (uint32_t) call At45dbVolume.volumeSize();
   }
   
   /**
    * @return the erase unit size
    */
-  command uint32_t VolumeSettings.getEraseUnitSize[uint8_t id]() {
+  command uint32_t VolumeSettings.getEraseUnitSize() {
     return (uint32_t) 1 << AT45_PAGE_SIZE_LOG2;
   }
   
   /**
    * @return the total write units on the volume
    */
-  command uint32_t VolumeSettings.getTotalWriteUnits[uint8_t id]() {
-    return (uint32_t) call At45dbVolume.volumeSize[id]();
+  command uint32_t VolumeSettings.getTotalWriteUnits() {
+    return (uint32_t) call At45dbVolume.volumeSize();
   }
   
   /**
    * @return the total write unit size
    */
-  command uint32_t VolumeSettings.getWriteUnitSize[uint8_t id]() {
+  command uint32_t VolumeSettings.getWriteUnitSize() {
     return (uint32_t) 1 << AT45_PAGE_SIZE_LOG2;
   }
   
   /**
    * @return the fill byte used on this volume when the volume is empty
    */
-  command uint8_t VolumeSettings.getFillByte[uint8_t id]() {
+  command uint8_t VolumeSettings.getFillByte() {
     return 0xFF;
   }
   
@@ -106,7 +106,7 @@ implementation {
    * @return the erase unit size in Log base-2 format, ignoring the last 8 
    *     bytes
    */
-  command uint8_t VolumeSettings.getEraseUnitSizeLog2[uint8_t id]() {
+  command uint8_t VolumeSettings.getEraseUnitSizeLog2() {
     return AT45_PAGE_SIZE_LOG2;
   }
   
@@ -124,18 +124,9 @@ implementation {
    * @return the write unit size in Log2 base-2 format, ignoring the last 8 
    *     bytes
    */
-  command uint8_t VolumeSettings.getWriteUnitSizeLog2[uint8_t id]() {
+  command uint8_t VolumeSettings.getWriteUnitSizeLog2() {
     return AT45_PAGE_SIZE_LOG2;
   }
   
-  /***************** Defaults ****************/
-  default command at45page_t At45dbVolume.remap[uint8_t id](
-      at45page_t volumePage) { 
-    return 0; 
-  }
-  
-  default command at45page_t At45dbVolume.volumeSize[uint8_t id]() { 
-    return 0;
-  }
 }
 

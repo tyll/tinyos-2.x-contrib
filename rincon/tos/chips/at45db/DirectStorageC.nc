@@ -52,20 +52,20 @@ implementation {
   };
     
   components DirectStorageP,
-      At45dbVolumeSettingsP as SettingsP, 
+      new At45dbVolumeSettingsP() as SettingsP, 
       At45dbStorageManagerC as StorageC, 
-      At45dbC;
+      At45dbC,
+      WireDirectStorageC;
 
   DirectStorage = DirectStorageP.DirectStorage[DIRECT_ID];
   DirectModify = DirectStorageP.DirectModify[DIRECT_ID];
-  DirectStorageSettings = SettingsP.VolumeSettings[DIRECT_ID];
-  DirectModifySettings = SettingsP.VolumeSettings[DIRECT_ID];
+  DirectStorageSettings = SettingsP.VolumeSettings;
+  DirectModifySettings = SettingsP.VolumeSettings;
 
   DirectStorageP.At45dbVolume[DIRECT_ID] -> StorageC.At45dbVolume[volume_id];  
   DirectStorageP.Resource[DIRECT_ID] -> At45dbC.Resource[RESOURCE_ID];
-  DirectStorageP.VolumeSettings -> SettingsP.VolumeSettings[DIRECT_ID];
-  DirectStorageP.At45db -> At45dbC;
+  DirectStorageP.VolumeSettings -> SettingsP.VolumeSettings;
   
-  SettingsP.At45dbVolume[DIRECT_ID] -> StorageC.At45dbVolume[volume_id];
+  SettingsP.At45dbVolume -> StorageC.At45dbVolume[volume_id];
   
 }

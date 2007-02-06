@@ -199,7 +199,7 @@ implementation {
         break;
     
       case S_FLUSH:
-        call At45db.flushAll();
+        call At45db.syncAll();
         break;
         
       default:
@@ -236,11 +236,12 @@ implementation {
 
   event void At45db.syncDone(error_t error) {
     if (currentClient != NO_CLIENT) {
-      endRequest(error, 0);
+      //endRequest(error, 0);
+      call At45db.flushAll();
     }
   }
 
-  event void At45db.flushDone(error_t error) { \
+  event void At45db.flushDone(error_t error) {
     if (currentClient != NO_CLIENT) {
       endRequest(error, 0);
     }
@@ -262,10 +263,12 @@ implementation {
       return EINVAL;
     }
 
-    s[id].request = newState;
-    s[id].addr = addr;
-    s[id].buf = buf;
-    s[id].len = len;
+    atomic {
+      s[id].request = newState;
+      s[id].addr = addr;
+      s[id].buf = buf;
+      s[id].len = len;
+    }
 
     call Resource.request[id]();
 

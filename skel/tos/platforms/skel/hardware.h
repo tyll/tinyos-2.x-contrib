@@ -11,6 +11,5 @@ inline __nesc_atomic_t __nesc_atomic_start(void) @spontaneous() {
 }
 
 inline void __nesc_atomic_end(__nesc_atomic_t x) @spontaneous() { }
-inline void __nesc_atomic_sleep() { }
 
 #endif

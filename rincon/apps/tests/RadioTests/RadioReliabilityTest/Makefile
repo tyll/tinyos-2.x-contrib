@@ -1,0 +1,6 @@
+COMPONENT=ReliabilityC
+
+include $(MAKERULES)
+
+
+ 

@@ -1,0 +1,9 @@
+
+This application was created to test if the micaz radio is causing the mote to reboot.
+Results show that the receiver mote is rebooting intermittently.  Sometimes
+it gets to the point where it indefinitely stops blinking its led2 on what should be
+receive events.
+
+Mote ID's:
+0 = Tx
+1+ = Rx

@@ -1,4 +1,4 @@
-/* Copyright (c) 2006 #### NAME_OF_YOUR_INSTITUTION #####.
+/* Copyright (c) 2007 #### NAME_OF_YOUR_INSTITUTION #####.
 *  All rights reserved.
 *
 *  Permission to use, copy, modify, and distribute this software and its

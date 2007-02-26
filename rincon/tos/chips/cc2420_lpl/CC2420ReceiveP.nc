@@ -31,6 +31,7 @@
 
 /**
  * @author Jonathan Hui <jhui@archrock.com>
+ * @author David Moss
  * @version $Revision$ $Date$
  */
 
@@ -71,31 +72,38 @@ implementation {
   };
 
   uint16_t m_timestamp_queue[ TIMESTAMP_QUEUE_SIZE ];
-  uint8_t m_timestamp_head, m_timestamp_size;
+  
+  uint8_t m_timestamp_head;
+  
+  uint8_t m_timestamp_size;
+  
   uint8_t m_missed_packets;
 
   bool fallingEdgeEnabled;
   
   norace uint8_t m_bytes_left;
+  
   norace message_t* m_p_rx_buf;
 
   message_t m_rx_buf;
+  
   cc2420_receive_state_t m_state;
   
+  /***************** Prototypes ****************/
   void reset_state();
   void beginReceive();
   void receive();
   void waitForNextPacket();
-  task void receiveDone_task();
-  task void shutdown();
+  void flush();
   
+  task void receiveDone_task();
+  
+  /***************** Init Commands ****************/
   command error_t Init.init() {
     fallingEdgeEnabled = FALSE;
     m_p_rx_buf = &m_rx_buf;
     return SUCCESS;
   }
-
-
 
   /***************** AsyncStdControl ****************/
   async command error_t AsyncStdControl.start() {
@@ -105,10 +113,7 @@ implementation {
         
       // Warning: MicaZ problems have been encountered with the following line
       // after it follows a .disable command
-      //if(!fallingEdgeEnabled) {
-        call InterruptFIFOP.enableFallingEdge();
-      //  fallingEdgeEnabled = TRUE;
-      //}
+      call InterruptFIFOP.enableFallingEdge();
     }
     return SUCCESS;
   }
@@ -119,9 +124,6 @@ implementation {
     atomic {
       m_state = S_STOPPED;
       reset_state();
-      
-      // Crashes micaz's:
-      //post shutdown();
       
       // Warning: MicaZ problems have been encountered with the following line
       // followed by a re-enable.  The re-enable doesn't occur.
@@ -145,6 +147,10 @@ implementation {
   
   
   /***************** CC2420Receive Commands ****************/
+  /**
+   * Start frame delimiter signifies the beginning/end of a packet
+   * See the CC2420 datasheet for details.
+   */
   async command void CC2420Receive.sfd( uint16_t time ) {
     if ( m_timestamp_size < TIMESTAMP_QUEUE_SIZE ) {
       uint8_t tail =  ( ( m_timestamp_head + m_timestamp_size ) % 
@@ -155,8 +161,9 @@ implementation {
   }
 
   async command void CC2420Receive.sfd_dropped() {
-    if ( m_timestamp_size )
+    if ( m_timestamp_size ) {
       m_timestamp_size--;
+    }
   }
 
 
@@ -164,8 +171,8 @@ implementation {
   async event void InterruptFIFOP.fired() {
     if ( m_state == S_STARTED ) {
       beginReceive();
+      
     } else {
-      //call Leds.led0Toggle();
       m_missed_packets++;
     }
   }
@@ -177,12 +184,16 @@ implementation {
   }
   
   /***************** RXFIFO Events ****************/
+  /**
+   * We received some bytes from the SPI bus.  Process them in the context
+   * of the state we're in
+   */
   async event void RXFIFO.readDone( uint8_t* rx_buf, uint8_t rx_len,
                                     error_t error ) {
 
     cc2420_header_t* header = call CC2420Packet.getHeader( m_p_rx_buf );
     cc2420_metadata_t* metadata = call CC2420Packet.getMetadata( m_p_rx_buf );
-    uint8_t* buf = (uint8_t*)header;
+    uint8_t* buf = (uint8_t*) header;
     uint8_t length = buf[ 0 ];
 
     switch( m_state ) {
@@ -190,25 +201,34 @@ implementation {
     case S_RX_HEADER:
       m_state = S_RX_PAYLOAD;
       if ( length + 1 > m_bytes_left ) {
-        reset_state();
-        call CSN.set();
-        call CSN.clr();
-        call SFLUSHRX.strobe();
-        call SFLUSHRX.strobe();
-        call CSN.set();
-        call SpiResource.release();
-        waitForNextPacket();
-      }
-      else {
-        if ( !call FIFO.get() && !call FIFOP.get() )
+        flush();
+        
+      } else {
+        if ( !call FIFO.get() && !call FIFOP.get() ) {
           m_bytes_left -= length + 1;
-        call RXFIFO.continueRead( (length <= MAC_PACKET_SIZE) ? buf + 1 : NULL,
-                                  length );
+        }
+        
+        if(length <= MAC_PACKET_SIZE) {
+          if(length > 0) {
+            // Length is in bounds; read in this packet
+            call RXFIFO.continueRead((uint8_t*)(call CC2420Packet.getHeader(
+                m_p_rx_buf )) + 1, length);
+                
+          } else {
+            // Length == 0; start reading the next packet
+            call CSN.set();
+            call SpiResource.release();
+            waitForNextPacket();
+          }
+          
+        } else {
+          // Length is too large; we have to flush out the Rx FIFO
+          flush();
+        }
       }
       break;
       
     case S_RX_PAYLOAD:
-      
       call CSN.set();
       call SpiResource.release();
       
@@ -218,12 +238,13 @@ implementation {
           m_timestamp_head = ( m_timestamp_head + 1 ) % TIMESTAMP_QUEUE_SIZE;
           m_timestamp_size--;
         }
-      }
-      else {
+      } else {
         metadata->time = 0xffff;
       }
       
-      // pass packet up if crc is good
+      // pass packet up if crc is good.  
+      // We may have received an ack that should be processed by the Transmit
+      // side...
       if ( ( buf[ length ] >> 7 ) && rx_buf ) {
         uint8_t type = ( header->fcf >> IEEE154_FCF_FRAME_TYPE ) & 7;
         signal CC2420Receive.receive( type, m_p_rx_buf );
@@ -245,11 +266,15 @@ implementation {
     
   }
 
-  async event void RXFIFO.writeDone( uint8_t* tx_buf, uint8_t tx_len, error_t error ) {}  
+  async event void RXFIFO.writeDone( uint8_t* tx_buf, uint8_t tx_len, error_t error ) {
+  }  
   
   /***************** Tasks *****************/
+  /**
+   * Fill in metadata details, pass the packet up the stack, and
+   * get the next packet.
+   */
   task void receiveDone_task() {
-    
     cc2420_header_t* header = call CC2420Packet.getHeader( m_p_rx_buf );
     cc2420_metadata_t* metadata = call CC2420Packet.getMetadata( m_p_rx_buf );
     uint8_t* buf = (uint8_t*)header;
@@ -262,57 +287,82 @@ implementation {
                                          length );
 
     waitForNextPacket();
-
   }
 
-  task void shutdown() {
-    atomic {
-      reset_state();
+  
+  /****************** Functions ****************/
+  /**
+   * Attempt to acquire the SPI bus to receive a packet.
+   */
+  void beginReceive() { 
+    m_state = S_RX_HEADER;
+    
+    if ( call SpiResource.immediateRequest() == SUCCESS ) {
+      receive();
+    } else {
+      call SpiResource.request();
     }
+  }
+  
+  /**
+   * Flush out the Rx FIFO
+   */
+  void flush() {
+    reset_state();
     call CSN.set();
     call CSN.clr();
     call SFLUSHRX.strobe();
     call SFLUSHRX.strobe();
     call CSN.set();
     call SpiResource.release();
+    waitForNextPacket();
   }
   
-  /****************** Functions ****************/
-  void beginReceive() { 
-    m_state = S_RX_HEADER;
-    if ( call SpiResource.immediateRequest() == SUCCESS )
-      receive();
-    else
-      call SpiResource.request();
-  }
-  
+  /**
+   * The first byte of each packet is the length byte.  Read in that single
+   * byte, and then read in the rest of the packet.  The CC2420 could contain
+   * multiple packets that have been buffered up, so if something goes wrong, 
+   * we necessarily want to flush out the FIFO unless we have to.
+   */
   void receive() {
     call CSN.clr();
     call RXFIFO.beginRead( (uint8_t*)(call CC2420Packet.getHeader( m_p_rx_buf )), 1 );
   }
 
 
+  /**
+   * Determine if there's a packet ready to go, or if we should do nothing
+   * until the next packet arrives
+   */
   void waitForNextPacket() {
     atomic {
-      if ( m_state == S_STOPPED )
+      if ( m_state == S_STOPPED ) {
         return;
+      }
 
       if ( ( m_missed_packets && call FIFO.get() ) || !call FIFOP.get() ) {
-        if ( m_missed_packets )
+        // A new packet is buffered up and ready to go
+        if ( m_missed_packets ) {
           m_missed_packets--;
+        }
+        
         beginReceive();
-      }
-      else {
+        
+      } else {
+        // Wait for the next packet to arrive
         m_state = S_STARTED;
         m_missed_packets = 0;
       }
-    }      
-    
+    }
   }
   
+  /**
+   * Reset this component
+   */
   void reset_state() {
     m_bytes_left = RXFIFO_SIZE;
-    m_timestamp_head = m_timestamp_size = 0;
+    m_timestamp_head = 0;
+    m_timestamp_size = 0;
     m_missed_packets = 0;
   }
 

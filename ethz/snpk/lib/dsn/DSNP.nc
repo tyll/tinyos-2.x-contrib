@@ -27,6 +27,8 @@ module DSNP
 	uses interface GpioInterrupt as RxRTSInt;
 #endif
 	uses command void setAmAddress(am_addr_t a);
+	uses interface Packet;
+	uses interface SplitControl as RadioControl;
 	uses interface Timer<TMilli> as Timer;
 	uses interface Timer<TMilli> as EmergencyTimer;
 	uses interface LocalTime<T32khz>;
@@ -296,7 +298,7 @@ implementation
   	}
   }
 
-	async command void DSN.logInt(int32_t nn) {
+	async command void DSN.logInt(uint32_t nn) {
 		atomic {
 			if (nptr<LOG_NR_BUFFERSIZE) {
 				n[nptr++]=nn;
@@ -371,16 +373,17 @@ implementation
 		return call DSN.log("\n");
     }
   	
-  	cc2420_header_t* getHeader( message_t* msg ) {
-    	return (cc2420_header_t*)( msg->data - sizeof(cc2420_header_t) );
+  	
+  	radio_header_t* getHeader( message_t* msg ) {
+    	return (radio_header_t*)( msg->data - sizeof(radio_header_t) );
 	}
 
 	command error_t DSN.logPacket(message_t * msg) {
-	    cc2420_header_t * header = getHeader( msg );
+		radio_header_t * header = getHeader( msg );
    		storeMsgNr("D ",2); // log as debug message
-		storeMsgHex( (uint8_t *) header, sizeof(cc2420_header_t));
+		storeMsgHex( (uint8_t *) header, sizeof(radio_header_t));
 		storeMsgNr("|",1);
-		storeMsgHex( (uint8_t *) msg->data, header->length - sizeof(cc2420_header_t) - 1);
+		storeMsgHex( (uint8_t *) msg->data, call Packet.payloadLength(msg));
 		return call DSN.log("\n");
 	}
   
@@ -502,4 +505,7 @@ implementation
 	
 	async event void UartStream.receiveDone( uint8_t* buf, uint16_t len, error_t error ) {
 	}
+	
+	event void RadioControl.startDone(error_t error) {}
+	event void RadioControl.stopDone(error_t error) {}
 }

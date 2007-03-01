@@ -1,4 +1,3 @@
-#include <msp430Usart.h>
 #include <AM.h>
 #include "DSN.h"
 

@@ -1,4 +1,3 @@
-#include <msp430Usart.h>
 #include <AM.h>
 #include "DSN.h"
 
@@ -10,16 +9,29 @@ module noDSNP
 }
 implementation
 {
-  command error_t DSN.log(void * msg) {}
-  command error_t DSN.logLen(void * msg, uint8_t len) {}
-  command error_t DSN.logError(void * msg) {}
-  command error_t DSN.logWarning(void * msg) {}
-  command error_t DSN.logInfo(void * msg) {}
-  command error_t DSN.logDebug(void * msg) {}
+  command error_t DSN.log(void * msg) {
+  	return SUCCESS;
+  	}
+  command error_t DSN.logLen(void * msg, uint8_t len) {
+  	return SUCCESS;
+  	}
+  command error_t DSN.logError(void * msg) {
+  	return SUCCESS;
+  	}
+  command error_t DSN.logWarning(void * msg) {
+  	return SUCCESS;
+  	}
+  command error_t DSN.logInfo(void * msg) {
+  	return SUCCESS;
+  	}
+  command error_t DSN.logDebug(void * msg) {
+  	return SUCCESS;
+  	}
 
   async command void DSN.logInt(uint32_t n) {}
   command error_t DSN.logPacket(message_t * msg) {}
-   
+  command error_t DSN.logHexStream(uint8_t* msg, uint8_t len) {}   
+
   command error_t DSN.stopLog() {}
   command error_t DSN.startLog() {}
   
@@ -34,8 +46,10 @@ implementation
 		return SUCCESS;
   }
   
-  command void DSN.emergencyLogEnable(uint16_t timeout) {}
+  command void DSN.emergencyLogEnable(uint32_t timeout) {}
   command void DSN.emergencyLogDisable() {}
-  command error_t DSN.emergencyLogAdd(void * pointer, uint8_t numBytes, uint8_t * description) {}
+  command error_t DSN.emergencyLogAdd(void * pointer, uint8_t numBytes, uint8_t * description) {
+  	return SUCCESS;
+  	}
 }
 

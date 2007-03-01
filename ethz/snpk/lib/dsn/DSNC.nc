@@ -46,6 +46,10 @@ implementation
 	Init = DSNP.Init;
 	DSNP.setAmAddress -> ActiveMessageAddressC;
 	
+	components ActiveMessageC;
+	DSNP.Packet->ActiveMessageC;
+	DSNP.RadioControl->ActiveMessageC;
+	
 	// wire uart stuff
 	DSNP.UartStream -> Uart;
 	DSNP.HplMsp430Usart -> HplUsart;

@@ -62,7 +62,7 @@ interface DSN {
 * 	there is buffer space for up to 5 numbers
 *	@param n Number to be logged
 */
-  async command void logInt(int32_t n);
+  async command void logInt(uint32_t n);
   
 /**
 *	loggs an active message in following format:

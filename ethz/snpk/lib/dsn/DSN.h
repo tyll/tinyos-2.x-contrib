@@ -17,13 +17,27 @@ typedef struct VarStruct {
 	uint8_t * description;
 } VarStruct;
 
-#ifndef 	BUFFERSIZE
-#define 	BUFFERSIZE 1024
-#endif
-
-// USART to be used for logging (0 or 1)
+// ########### platform dependent (with msp430 cpu)
+// tmote
+#if defined(PLATFORM_TELOSB)
+typedef cc2420_header_t radio_header_t;	// tmote cc2420
 #ifndef USART
 #define USART 0
+#endif
+#endif
+
+// tinynode
+#if defined(PLATFORM_TINYNODE)
+typedef xe1205_header_t radio_header_t; // tinynode xe1205
+#ifndef USART
+#define USART 1
+#endif
+#endif
+
+// ########### end platform dependent (with msp430 cpu)
+
+#ifndef 	BUFFERSIZE
+#define 	BUFFERSIZE 1024
 #endif
 
 // USART 1 on tmote has no flow control

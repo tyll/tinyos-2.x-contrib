@@ -44,7 +44,3 @@ channel to 11 for node 1, you can set it in compile time as follows.
 make telosb CFLAGS=-DCC2420_DEF_CHANNEL=11 install,1
 
 
-Do not distribute these codes without permission.
-
-/**************************************************************************/
-

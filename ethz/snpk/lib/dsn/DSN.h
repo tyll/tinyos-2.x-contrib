@@ -1,5 +1,6 @@
 #ifndef DSN_H
 #define DSN_H
+#include <message.h>
 
 enum {
 	MAX_LEN = 1024,

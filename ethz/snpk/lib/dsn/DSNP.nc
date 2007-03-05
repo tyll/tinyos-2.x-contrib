@@ -16,6 +16,7 @@ module DSNP
 {
 	provides interface DSN;	
 	provides interface Init;
+	provides interface Init as NodeIdInit;
 	
 	uses interface UartStream;
 	uses interface HplMsp430Usart;
@@ -61,6 +62,16 @@ implementation
 	void stop();
 	void adjustEmergencytimeout();
 	
+	command error_t NodeIdInit.init() {
+		// setup node id
+		IdAddr=(uint16_t *)ID_ADDR;
+		if (*IdAddr!=NO_ID) {
+			TOS_NODE_ID=*IdAddr;
+			call setAmAddress(TOS_NODE_ID);
+		}
+		return SUCCESS;
+	}
+	
 	/**
 	* Initialization for the DSN Component
 	* Sets up pins, buffer and node id
@@ -83,13 +94,6 @@ implementation
 		// setup ringbuffer
 		bufferStart=&ringbuffer[0];
 		bufferEnd=&ringbuffer[0];
-		
-		// setup node id
-		IdAddr=(uint16_t *)ID_ADDR;
-		if (*IdAddr!=NO_ID) {
-			TOS_NODE_ID=*IdAddr;
-			call setAmAddress(TOS_NODE_ID);
-		}
 		
 		// set startup time (a few ms, all output is buffered)
 		call Timer.startOneShot(STARTUP_WAIT_TIME);		

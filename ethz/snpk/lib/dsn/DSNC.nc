@@ -16,7 +16,7 @@
 configuration DSNC
 {
 	provides interface DSN;	
-	provides interface Init;
+//	provides interface Init;
 }
 implementation
 {
@@ -42,8 +42,11 @@ implementation
 	components DSNP;
 	components dsnUartConfigureP;
 	
+	components RealMainP, MainC;
+	RealMainP.PlatformInit -> DSNP.NodeIdInit;
+	
 	DSN = DSNP.DSN;
-	Init = DSNP.Init;
+	MainC.SoftwareInit->DSNP.Init;
 	DSNP.setAmAddress -> ActiveMessageAddressC;
 	
 	components ActiveMessageC;

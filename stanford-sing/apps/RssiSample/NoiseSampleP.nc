@@ -80,24 +80,24 @@ implementation
 		call RadioControl.start();
 	}
 
-	void DataReport(SerialMsg data)
+	void DataReport(rssi_sample_msg* data)
 	{
-		SerialMsg *msg = (SerialMsg *)(call AMSend.getPayload(&packet));
-		memcpy(msg, &data, sizeof(SerialMsg));
-
-		if (sendBusy == TRUE)
-			return;
-
-		if (call AMSend.send(AM_BROADCAST_ADDR, &packet, sizeof(SerialMsg)) == SUCCESS)
-		{
-			sendBusy = TRUE;
-		}
-		else
-		{
-			call Leds.led0On();
-			call Leds.led1Off();
-			call Leds.led2On();
-		}
+	  rssi_sample_msg *msg = (rssi_sample_msg *)(call AMSend.getPayload(&packet));
+	  memcpy(msg, data, sizeof(rssi_sample_msg));
+	  
+	  if (sendBusy == TRUE)
+	    return;
+	  
+	  if (call AMSend.send(AM_BROADCAST_ADDR, &packet, sizeof(rssi_sample_msg)) == SUCCESS)
+	    {
+	      sendBusy = TRUE;
+	    }
+	  else
+	    {
+	      call Leds.led0On();
+	      call Leds.led1Off();
+	      call Leds.led2On();
+	    }
 	}
 
 	void Report(error_t e)
@@ -157,13 +157,13 @@ implementation
 
 	task void SendSerial()
 	{
-		SerialMsg msg;
+		rssi_sample_msg msg;
 
-		msg.NodeId = TOS_NODE_ID;
-		msg.SeqNo = Buf_len + 1 + (Addr_offset - BUF_SIZE);
-		msg.RssiVal = rdata[Buf_len];
+		msg.nodeId = TOS_NODE_ID;
+		msg.seqNo = Buf_len + 1 + (Addr_offset - BUF_SIZE);
+		msg.rssiVal = rdata[Buf_len];
 		Buf_len++;
-		DataReport(msg);	
+		DataReport(&msg);	
 	}
 
 	event void Resource.granted()

@@ -56,20 +56,23 @@ public class RssiSample implements MessageListener {
 
 	//added by Hyungjune Lee
 	try {
-	this.outputFile = new FileOutputStream("Noise.txt");
-	this.output = new PrintStream(outputFile);
-	this.output.println("*** Noise data with 1KHz sampling by Hyungjune Lee (abbado@stanford.edu) ***");
-	this.output.println("");
-	this.output.println("[Node Id] [Sequence No] [RSSI(dBm)]");
-	this.output.println("");
+	    this.outputFile = new FileOutputStream("Noise.txt");
+	    this.output = new PrintStream(outputFile);
+	    this.output.println("# Noise data with 1KHz sampling by Hyungjune Lee (abbado@stanford.edu)");
+	    this.output.println("# Note that RSSI values do not have the RSSI offset value included.");
+	    this.output.println("# Please consult the CC2420 data sheet for how to obtain this value.");
+	    this.output.println("# It is typically -45.");
+	    this.output.println();
+	    this.output.println("# [Node Id] [Sequence No] [RSSI(dBm)]");
+	    this.output.println("");
 	}
 	catch(IOException e) {
-	 System.err.println("Exception thrown when creating a file. Exiting.");
-	 System.err.println(e);
+	    System.err.println("Exception thrown when creating a file. Exiting.");
+	    System.err.println(e);
 	}
-    this.moteIF.registerListener(new RssiSampleMsg(), this);
+	this.moteIF.registerListener(new RssiSampleMsg(), this);
   }
-
+    
   public void sendPackets() {
     int counter = 0;
     RssiSampleMsg payload = new RssiSampleMsg();
@@ -77,7 +80,7 @@ public class RssiSample implements MessageListener {
     try {
       while (true) {
 	System.out.println("Sending packet " + counter);
-	payload.set_counter(counter);
+	payload.set_seqNo(counter);
 	moteIF.send(0, payload);
 	counter++;
 	try {Thread.sleep(1000);}
@@ -96,7 +99,8 @@ public class RssiSample implements MessageListener {
 
 	//modified by Hyungjune Lee	
 	try {
-    output.println(msg.get_nodeid()+ " " + msg.get_seq() + " " + msg.get_rssi());
+	    int rssiVal = (int)((byte)msg.get_rssiVal());
+	    output.println(msg.get_nodeId()+ " " + msg.get_seqNo() + " " + rssiVal);
 	}
 	catch (Exception e){
 	 System.err.println("Exception thrown when writing the outputs. Exiting.");

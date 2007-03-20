@@ -51,7 +51,7 @@ implementation
 	components NoiseSampleP as App;
 	components ActiveMessageC;
 	components SerialActiveMessageC;
-	components new SerialAMSenderC(AM_SERIAL_ID);
+	components new SerialAMSenderC(AM_RSSI_SAMPLE_MSG);
 	components new BlockStorageC(VOLUME_BLOCK);
 	components HplCC2420PinsC as Pins;
 

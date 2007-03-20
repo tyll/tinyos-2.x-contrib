@@ -1,6 +1,6 @@
 COMPONENT=NoiseAppC
 
-BUILD_EXTRA_DEPS += RssiSample.class
+BUILD_EXTRA_DEPS=RssiSample.class
 CLEAN_EXTRA = *.class RssiSampleMsg.java
 
 RssiSample.class: $(wildcard *.java) RssiSampleMsg.java

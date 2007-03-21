@@ -1,4 +1,4 @@
-/* Copyright (c) 2006 Rasmus Ulslev Pedersen
+/* Copyright (c) 2006 nxtmote project
 *  All rights reserved.
 *
 *  Permission to use, copy, modify, and distribute this software and its

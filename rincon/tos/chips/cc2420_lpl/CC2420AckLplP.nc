@@ -364,8 +364,6 @@ implementation {
   
   /***************** SubSend Events ***************/
   event void SubSend.sendDone(message_t* msg, error_t error) {
-    call Leds.led1Toggle();
-    
     switch(call SendState.getState()) {
     case S_LPL_FIRST_MESSAGE:
       /*

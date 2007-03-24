@@ -379,11 +379,8 @@ implementation {
   
   /***************** SubSend Events ***************/
   event void SubSend.sendDone(message_t* msg, error_t error) {
-    call Leds.led1Toggle();
-    
     switch(call SendState.getState()) {
     case S_LPL_FIRST_MESSAGE:
-      call Leds.led0On();
       // After the first message is sent, we start the timer that tells us when
       // to stop the delivery. We add 20 bms to the delivery duration to account
       // for Rx checks at the edge of Tx transmissions
@@ -422,7 +419,6 @@ implementation {
       break;
     }
     
-    call Leds.led0Off();
     call SendState.toIdle();
     call SendDoneTimer.stop();
     startOffTimer();

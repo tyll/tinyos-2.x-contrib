@@ -141,12 +141,6 @@ implementation {
     for(i = 0; i < uniqueCount(UQ_CONFIGURATOR); i++) {
       clients[i].state = NOT_LOGGED_IN;
     }
-    return SUCCESS;
-  }
-  
-  /***************** Boot Events ****************/
-  event void Boot.booted() {
-    int i;
     
     call State.forceState(S_LOGIN);
     
@@ -159,6 +153,13 @@ implementation {
     
     call State.toIdle();
     post processRequest();
+    
+    return SUCCESS;
+  }
+  
+  /***************** Boot Events ****************/
+  event void Boot.booted() {
+  
   }
   
   /***************** Configurator Commands ****************/

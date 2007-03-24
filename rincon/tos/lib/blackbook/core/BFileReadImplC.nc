@@ -62,6 +62,7 @@ implementation {
   BFileReadP.Fileio -> FileioC;
   BFileReadP.BlackbookUtil -> BlackbookUtilC;
   
+////#warning ">>> BFileRead uses JDebug"
   ////components JDebugC;
   ////BFileReadP.JDebug -> JDebugC;
 }

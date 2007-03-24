@@ -129,14 +129,13 @@ implementation {
    */
   event void DirectStorage.eraseDone(uint16_t eraseUnit, error_t error) {
     focusedEraseUnit++;
-    if(focusedEraseUnit < call EraseUnitMap.getTotalEraseUnits(
-        call EraseUnitMap.getEraseBlock(currentEraseBlockIndex))) {
+    erased = TRUE;
+    if(focusedEraseUnit < call EraseUnitMap.getTotalEraseUnits(call EraseUnitMap.getEraseBlock(currentEraseBlockIndex))) {
       post erase();
     
     } else {
       call EraseUnitMap.eraseComplete(currentEraseBlockIndex);
       currentEraseBlockIndex++;
-      erased = TRUE;
       post garbageLoop();
     }
   }
@@ -178,7 +177,7 @@ implementation {
    * make sure the currentEraseBlockIndex = 0
    */
   task void garbageLoop() {
-    if(currentEraseBlockIndex < call VolumeSettings.getTotalEraseUnits()) {
+    if(currentEraseBlockIndex < call EraseUnitMap.getTotalEraseBlocks()) {
       if(call EraseUnitMap.canErase(call EraseUnitMap.getEraseBlock(
           currentEraseBlockIndex))) {
         signal BClean.erasing();
@@ -200,10 +199,9 @@ implementation {
    * Erase an individual erase unit in the focused erase block 
    */
   task void erase() {
-    call DirectStorage.erase(
-        call EraseUnitMap.getBaseEraseUnit(call EraseUnitMap.getEraseBlock(
-            currentEraseBlockIndex)
-        + focusedEraseUnit));
+    if(call DirectStorage.erase(call EraseUnitMap.getBaseEraseUnit(call EraseUnitMap.getEraseBlock(currentEraseBlockIndex)) + focusedEraseUnit) != SUCCESS) {
+      post erase();
+    }
   }
 }
 

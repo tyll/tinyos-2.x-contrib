@@ -42,6 +42,9 @@ configuration BDictionaryImplC {
   provides {
     interface BDictionary[uint8_t id];
     interface InternalDictionary[uint8_t id];
+    interface State as CommandState;
+    interface State as DictionaryState;
+    interface State as SearchState;
   }
 }
 
@@ -57,11 +60,13 @@ implementation {
       new StateC() as DictionaryStateC,
       new StateC() as SearchStateC,
       BlackbookUtilC,
-      FileioC,
-      CheckpointC;
+      FileioC;
   
   BDictionary = BDictionaryP;
   InternalDictionary = BDictionaryP;
+  CommandState = CommandStateC;
+  DictionaryState = DictionaryStateC;
+  SearchState = SearchStateC;
   
   MainC.SoftwareInit -> BDictionaryP;
   
@@ -74,9 +79,9 @@ implementation {
   BDictionaryP.CommandState -> CommandStateC;
   BDictionaryP.DictionaryState -> DictionaryStateC;
   BDictionaryP.SearchState -> SearchStateC;
-  BDictionaryP.BlackbookUtil -> BlackbookUtilC;
-  BDictionaryP.Checkpoint -> CheckpointC;
+  BDictionaryP.BlackbookUtil -> BlackbookUtilC;  
   
+////#warning ">>> BFileDictionaryImplC uses JDebug"
   ////components JDebugC;
   ////BDictionaryP.JDebug -> JDebugC;
   

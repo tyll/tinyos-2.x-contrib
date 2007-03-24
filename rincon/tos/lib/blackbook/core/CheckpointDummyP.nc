@@ -41,6 +41,8 @@
  * @author David Moss (dmm@rincon.com)
  */
  
+#warning "*** USING BLACKBOOK CHECKPOINT DUMMY"
+
 module CheckpointDummyP {
   provides {
     interface Checkpoint;

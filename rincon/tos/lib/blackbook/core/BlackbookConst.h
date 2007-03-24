@@ -71,7 +71,7 @@
  *   MAX_FILES * NODES_PER_FILE * sizeof(node_t)
  */
 #ifndef MAX_FILES
-#define MAX_FILES 8
+#define MAX_FILES 19
 #endif
 
 /**
@@ -91,7 +91,7 @@
  *       + MAX_FILES * sizeof(file)
  */
 #ifndef NODES_PER_FILE
-#define NODES_PER_FILE 3
+#define NODES_PER_FILE 2
 #endif
 
 /**
@@ -160,9 +160,9 @@
  * dataLength of the node and before the reserveLength. 
  */
  
- #ifndef MAX_CHECK_BYTES
- #define MAX_CHECK_BYTES 20
- #endif
+#ifndef MAX_CHECK_BYTES
+#define MAX_CHECK_BYTES 20
+#endif
 
 #endif
 

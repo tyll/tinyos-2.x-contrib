@@ -1,5 +1,23 @@
-Blackbook TinyOS Cross-Platform Compatible Flash File System v.6.0
+Blackbook TinyOS Cross-Platform Compatible Flash File System v.6.3
 Copyright (c) 2004-2006 Rincon Research Corporation.  
 All rights reserved.
 
 @author David Moss - dmm@rincon.com
+@author Jared Hill
+@author Jon Wyant
+
+
+Recent updates:
+ * ROM footprint cleanup attempt - remove unused parameters in event signals
+
+ * MicaZ corrupted files bug found. The Checkpoint was being wired multiple times
+   to the at45db DirectStorage implementation, causing calls to double up and
+   corrupt pointers.  Also fixed the at45db's DirectStorage.flush() command to
+   be reliable every time.
+
+ * Fixed a bunch of bugs, making it more reliable
+
+ * Added a flags byte to the nodemeta_t and flashnode_t
+
+
+Known Bugs:

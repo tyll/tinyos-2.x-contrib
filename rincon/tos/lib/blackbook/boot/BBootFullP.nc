@@ -224,7 +224,7 @@ implementation {
    * @param focusedNode - the flashnode_t that metadata was written for
    * @param error - SUCCESS if it was written
    */
-  event void NodeShop.metaWritten(flashnode_t *focusedNode, error_t error) {
+  event void NodeShop.metaWritten() {
   }
   
   /**
@@ -233,8 +233,7 @@ implementation {
    * @param *name - pointer to where the filename_t was stored
    * @param error - SUCCESS if the filename_t was retrieved
    */
-  event void NodeShop.filenameRetrieved(file_t *focusedFile, filename_t *name, 
-      error_t error) {
+  event void NodeShop.filenameRetrieved(filename_t *name) {
   }
   
   /**
@@ -243,7 +242,7 @@ implementation {
    * @param focusedNode - the flashnode_t that was deleted.
    * @param error - SUCCESS if the flashnode_t was deleted successfully.
    */
-  event void NodeShop.metaDeleted(flashnode_t *focusedNode, error_t error) {
+  event void NodeShop.metaDeleted(flashnode_t *focusedNode) {
     if(call BlackbookState.getState() == S_BOOT_BUSY) {
       currentNode->nodestate = NODE_EMPTY;
       if(currentFile != NULL) {
@@ -258,7 +257,7 @@ implementation {
    * @param dataCrc - the crc of the data read from the flashnode_t on flash.
    * @param error - SUCCESS if the crc is valid
    */
-  event void NodeShop.crcCalculated(uint16_t dataCrc, error_t error) {
+  event void NodeShop.crcCalculated(uint16_t dataCrc) {
   }
   
   
@@ -315,9 +314,17 @@ implementation {
   task void parseCurrentNode() {
     currentNode->fileElement = currentNodeMeta.fileElement;
     currentNode->filenameCrc = currentNodeMeta.filenameCrc;
+    currentNode->nodeflags = currentNodeMeta.nodeflags;
     currentNode->reserveLength = currentNodeMeta.reserveLength;
     //WHY IS THIS TRUE???
     currentNode->dataLength = currentNode->reserveLength;
+    ////call JDebug.jdbg("Node flags %s", 0, 0, currentNode->nodeflags);
+    if(currentNode->nodeflags & DICTIONARY) {
+      ////call JDebug.jdbg("Dictionary node", 0, 0, 0);
+    } else {
+      ////call JDebug.jdbg("Regular node", 0, 0, 0);
+    }
+    
     
     ////////call JDebug.jdbg("Boot: parsing node...", 0, 0, 0);
     if(currentNodeMeta.magicNumber == META_EMPTY) {
@@ -343,8 +350,7 @@ implementation {
       return;
         
     } else if(currentNodeMeta.magicNumber == META_VALID) {
-      ////call JDebug.jdbg("Boot.parseNode: Valid node found, addr: %xl, data: %xi, res: %xs",
-      ////  currentNode->flashAddress, (uint16_t)(currentNode->reserveLength), (uint8_t)(currentNode->dataLength));
+      ////call JDebug.jdbg("Boot.parseNode: Valid node found, addr: %xl, data: %xi, res: %xs",  currentNode->flashAddress, (uint16_t)(currentNode->reserveLength), (uint8_t)(currentNode->dataLength));
       currentNode->nodestate = NODE_BOOTING;
       if(currentFile != NULL) {
         currentFile->filestate = FILE_IDLE;
@@ -371,7 +377,7 @@ implementation {
       
     } else {
       // Garbage found. Document, remove, and advance to the next page.
-      ////////call JDebug.jdbg("Boot:      garbage found", 0, 0, 0);
+      ////call JDebug.jdbg("Boot:      garbage found", 0, 0, 0);
       currentNode->nodestate = NODE_DELETED;
       currentNode->flashAddress = currentAddress;
       currentNode->reserveLength = 1;
@@ -503,46 +509,10 @@ implementation {
       post readFileMeta();
     }
   }
-  /*
-  task void checkNodeCorruption(){
-    
-    uint16_t diff;
-    uint8_t i;
-    call CommandState.forceState(S_CHECK_NODE_CORRUPTION);
-    diff = currentNode->reserveLength - currentNode->dataLength;
-    ////call JDebug.jdbg("BBP.checkCorr: resLen: %xl, dataLen: %xi\n", 
-      		currentNode->reserveLength, currentNode->dataLength, 0); 
-    if(diff <= 0){
-      //nothing to check
-      return; 
-    }  		
-    //only check the first 20 bytes
-    if(diff > MAX_CHECK_BYTES){
-      diff = MAX_CHECK_BYTES;
-    }
-    if(currentNodeMeta.fileElement == 0){
-      //if it is the first file, need to add the size of filemeta_t to read address
-      if(call DirectStorage.read(currentAddress + sizeof(nodemeta_t)+ sizeof(filemeta_t)
-          + currentNode->dataLength, &check_buffer, diff) != SUCCESS){
-        post checkNodeCorruption();
-      }
-    }
-    else{
-      //otherwise, use this address
-      if(call DirectStorage.read(currentAddress + sizeof(nodemeta_t)
-          + currentNode->dataLength, &check_buffer, diff) != SUCCESS){
-        post checkNodeCorruption();
-      }
-    }
-    for(i=0; i<diff; i++){
-      if(check_buffer[i] != 0xFF){
-        ////call JDebug.jdbg("BBP.checkCorr: NODE LOCKED, found: %xs\n", 0, 0, check_buffer[i]);
-        currentNode->nodestate = NODE_LOCKED;
-        break;
-      }
-    }
+  
+  default event void BBoot.booted(uint16_t totalNodes, uint8_t totalFiles, error_t error) {
   }
-  */
+  
 }
 
 

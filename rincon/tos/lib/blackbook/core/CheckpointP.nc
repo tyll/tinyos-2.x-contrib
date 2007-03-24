@@ -55,7 +55,6 @@ module CheckpointP {
     interface State;
     interface BlackbookUtil;
     interface CheckNode;
-    
     ////interface JDebug;
   }
 }
@@ -127,17 +126,21 @@ implementation {
    */
   command error_t Checkpoint.update(flashnode_t *focusedNode) {
     if(call State.requestState(S_UPDATE) != SUCCESS) {
-      return FAIL;
+      //trace(1000);
+      return FAIL;  
     }
-    ////call JDebug.jdbg("cp.update\n", 0, 0, 0);
+    
+    //trace(1001);
     currentNode = focusedNode;
     
     if(currentNode == NULL) {
+      //trace(1002);
       call State.toIdle();
       return FAIL;
     }
     
     if(currentNode->nodestate == NODE_VALID) {
+      //trace(1003);
       // This flashnode_t needs to be saved.
       currentCheckpoint.filenameCrc = currentNode->filenameCrc;
       currentCheckpoint.dataCrc = currentNode->dataCrc;
@@ -145,30 +148,37 @@ implementation {
       ////call JDebug.jdbg("cp.update node is valid addr: %xl\n", &(currentNode->flashAddress), 0, 0);
       if(currentNode->nextNode->nodestate == NODE_VALID) {
         ////call JDebug.jdbg("cp.update: node locked\n", 0, 0, 0);
+        //trace(1004);
         currentNode->nodestate = NODE_LOCKED;
       }
       
+      //trace(1005);
       if(call BDictionary.insert(currentNode->flashAddress, &currentCheckpoint, 
           sizeof(checkpoint_t)) != SUCCESS) {
+        //trace(1006);
         call State.toIdle();
         return FAIL;
       }
       
     } else if(currentNode->nodestate == NODE_DELETED) {
+      //trace(1007);
       // This flashnode_t should be removed from the Checkpoint.
       if(call BDictionary.remove(currentNode->flashAddress) != SUCCESS) {
+        //trace(1008);
         call State.toIdle();
         return FAIL;
       }
             
     } else {
+      //trace(1009);
       // Nothing to do. Signal and complete.
       ////call JDebug.jdbg("cp.update nothing happening\n", 0, 0, 0);
       call State.toIdle();
       signal Checkpoint.updated(currentNode, SUCCESS);
     }
     ////call JDebug.jdbg("cp.update returned\n", 0, 0, 0);
-      
+    
+    //trace(1010);
     return SUCCESS;
   }
   
@@ -187,6 +197,16 @@ implementation {
     }
     
     currentNode = focusedNode;
+    
+    if(currentNode->nodeflags & DICTIONARY) {
+      currentNode->dataLength = currentNode->reserveLength;
+      currentNode->dataCrc = 0;
+      currentNode->nodestate = NODE_VALID;
+      call State.toIdle();
+      signal Checkpoint.recovered(currentNode, SUCCESS);
+      return SUCCESS;
+    }
+    
     if(SUCCESS != call BDictionary.retrieve(currentNode->flashAddress, &currentCheckpoint, 
         sizeof(checkpoint_t))) {
       call State.toIdle();
@@ -252,21 +272,26 @@ implementation {
         }
         currentNode->dataLength = currentCheckpoint.dataLength;
         currentNode->dataCrc = currentCheckpoint.dataCrc;
-        call State.toIdle();
         //This is where we check to see if the node was written after the last save
+        call State.toIdle();
         call CheckNode.checkNode(currentNode);
-        //signal Checkpoint.recovered(currentNode, SUCCESS);
         return;
       }
     }
       
     // Recovery failed
+    /*
+     * We now do a check on Checkpoint.recover to see if this is a dictionary
+     * node
     if(currentNode->fileElement == 0) {
       if(call InternalDictionary.isFileDictionary(
           call NodeMap.getFileFromNode(currentNode))) {
         return;
       }
     }
+     *
+     */
+     
     ////call JDebug.jdbg("CP.Bdict.retrieved: retrieve failed\n", 0, 0, 0);
     call NodeShop.deleteNode(currentNode); 
   }
@@ -279,6 +304,7 @@ implementation {
   event void BDictionary.removed(uint32_t key, error_t error) {
     if(call State.getState() == S_UPDATE) {
       call State.toIdle();
+      ////call JDebug.jdbg("CP: updated!", 0, 0, 0);
       signal Checkpoint.updated(currentNode, error);
       
     } else if(call State.getState() == S_RECOVER) {
@@ -314,7 +340,7 @@ implementation {
   /***************** CheckNode Events*****************/
   
   event void CheckNode.nodeChecked(flashnode_t *focusedNode, bool ok2write){
-  
+    
     if(!ok2write){
       focusedNode -> nodestate = NODE_LOCKED;
     }
@@ -327,7 +353,7 @@ implementation {
    * @param focusedNode - the flashnode_t that metadata was written for
    * @param error - SUCCESS if it was written
    */
-  event void NodeShop.metaWritten(flashnode_t *focusedNode, error_t error) {
+  event void NodeShop.metaWritten() {
   }
   
   /**
@@ -336,8 +362,7 @@ implementation {
    * @param *name - pointer to where the filename was stored
    * @param error - SUCCESS if the filename was retrieved
    */
-  event void NodeShop.filenameRetrieved(file_t *focusedFile, filename_t *name, 
-      error_t error) {
+  event void NodeShop.filenameRetrieved(filename_t *name) {
   }
   
   /**
@@ -346,7 +371,7 @@ implementation {
    * @param focusedNode - the flashnode_t that was deleted.
    * @param error - SUCCESS if the flashnode_t was deleted successfully.
    */
-  event void NodeShop.metaDeleted(flashnode_t *focusedNode, error_t error) {
+  event void NodeShop.metaDeleted(flashnode_t *focusedNode) {
     file_t *focusedFile;
     
     if(call State.getState() == S_RECOVER) {
@@ -366,10 +391,9 @@ implementation {
    * @param dataCrc - the crc of the data read from the flashnode_t on flash.
    * @param error - SUCCESS if the crc is valid
    */
-  event void NodeShop.crcCalculated(uint16_t dataCrc, error_t error) {
+  event void NodeShop.crcCalculated(uint16_t dataCrc) {
   }
   
-
 }
 
 

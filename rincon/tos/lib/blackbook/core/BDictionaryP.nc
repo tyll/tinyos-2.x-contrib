@@ -78,7 +78,6 @@ module BDictionaryP {
     interface GenericCrc;
     interface Fileio;
     interface BlackbookUtil;
-    interface Checkpoint;
     ////interface JDebug;
   }
 }
@@ -169,16 +168,6 @@ implementation {
   /** getTotalKeys: The total valid keys in this open dictionary file_t */
   uint16_t totalKeys;
   
-  /** when opening a dictionary file, it needs to be written to cp.bb_ file. This is 
-   	* by calling the checkpoint function, with uses the BDictionary interface and wipes
-   	* out all global variables. currentNodeRamAddress and fileClient allow us to restore 
-   	* the current node, as well as the currentClient variables for signalling a successful
-   	* completion of the open command.
-   	**/
-  uint32_t *currentNodeRamAddress;
-  
-  uint8_t fileClient;
-  
   /**
    * CommandState states
    * This is what the overall goal is to accomplish at the moment
@@ -245,9 +234,6 @@ implementation {
     /** Open: Search for a duplicate entry for the last key */
     S_INIT_DUPLICATE, 
 
-    /** Dictionary Check: Find if a file_t is a dictionary file_t */
-    S_CHECK_DICTIONARY,
-        
   };
   
   /**
@@ -370,15 +356,18 @@ implementation {
       uint32_t minimumSize) {
     if(id != INTERNAL_DICTIONARY) {
       if(call BlackbookState.requestState(S_DICTIONARY_BUSY) != SUCCESS) {
+        ////call JDebug.jdbg("Dict: blackbookState blocked", 0, 0, 0);
         return FAIL;
       }
     }
     call CommandState.forceState(S_COMMAND_OPEN);
     
     currentClient = id;
-    
+    ////call JDebug.jdbg("Dict: %i client", 0, id, 0);
     if(clients[currentClient].dictionaryFile != NULL) {
       // There's already a file open
+      
+      ////call JDebug.jdbg("Dict: already open", 0, 0, 0);
       resetStates();
       if(call BlackbookUtil.filenameCrc((filename_t *) fileName) == 
           clients[currentClient].dictionaryFile->filenameCrc) {
@@ -395,6 +384,8 @@ implementation {
       // The open file is different, we can't open a new one.
       return FAIL;
     }
+    
+    ////call JDebug.jdbg("Dict: opening...", 0, currentClient, 0);
     call BlackbookUtil.filenameCpy(&clients[currentClient].filename, fileName);
     return call WriteAlloc.openForWriting(fileName, minimumSize, FALSE, TRUE);
   }
@@ -437,6 +428,7 @@ implementation {
     totalKeys = 0;
     currentSearchOffset = 0x2;
   
+    ////call JDebug.jdbg("Dict: %i getTotalKeys client", 0, id, 0);
     if(clients[currentClient].dictionaryFile != NULL) {
       searchForValidKey();
       return SUCCESS;
@@ -452,6 +444,7 @@ implementation {
    */
   command error_t BDictionary.close[uint8_t id]() {
     currentClient = id;
+    ////call JDebug.jdbg("Dict: %i close client", 0, id, 0);
     closeCurrentClient();
     signal BDictionary.closed[id](SUCCESS);
     return SUCCESS;
@@ -496,12 +489,14 @@ implementation {
       uint16_t valueSize) {
     keycache_t *cacheEntry;
     uint8_t cacheIndex;
-    
+    //trace(1011);
     if(id != INTERNAL_DICTIONARY) {
       if(call BlackbookState.requestState(S_DICTIONARY_BUSY) != SUCCESS) {
+        //trace(1012);
         return FAIL;
       }
     }
+    //trace(1013);
     //////call JDebug.jdbg("BDP.insert HERE\n", 0, 0, 0);
     
     call CommandState.forceState(S_COMMAND_INSERT);
@@ -511,13 +506,16 @@ implementation {
     currentValuePtr = value;
     currentValueSize = valueSize;
     marker = ENTRY_INVALID;
+    ////call JDebug.jdbg("Dict: %i insert client", 0, id, 0);
     //////call JDebug.jdbg("BDP.insert: ln 507 key = %xl\n", key, 0, 0);  
     if(clients[currentClient].dictionaryFile == NULL) {
       // No open file
+      ////call JDebug.jdbg("FAIL", 0, 0, 0);
+      //trace(1014);
       resetStates();
       return FAIL;
     }
-    //////call JDebug.jdbg("BDP.insert: ln 513 key = %xl\n", key, 0, 0);  
+    ////call JDebug.jdbg("BDP.insert: ln 513 key = %xl\n", key, 0, 0);  
     
     if(call NodeMap.getReserveLength(clients[currentClient].dictionaryFile) 
         - clients[currentClient].writeOffset 
@@ -527,21 +525,27 @@ implementation {
        * We need to allocate a new file_t if there is at least one
        * invalid key in the current file.
        */
+       ////call JDebug.jdbg("Dict Full", 0, 0, 0);
+      //trace(1015);
       searchForInvalidKey();
     
     } else {
       if((cacheEntry = searchCache(currentKey, 0, &cacheIndex)) != NULL) {
         marker = cacheEntry->keyOffset;
         removeCacheKey(currentClient, cacheIndex);
-        //////call JDebug.jdbg("BDP.insert: ln 529 key = %xl\n", key, 0, 0);  
+        ////call JDebug.jdbg("BDP.insert: ln 529 key = %xl\n", key, 0, 0);  
+        //trace(1016);
         post appendNewKey();
         
       } else {
-        //////call JDebug.jdbg("BDP.insert: ln 533 key = %xl\n", key, 0, 0);  
+        //trace(1017);
+        ////call JDebug.jdbg("BDP.insert: ln 533 key = %xl\n", key, 0, 0);  
         searchForCurrentKey();
       }
     }
-   // ////call JDebug.jdbg("BDP.insert: ln 537 key = %xl\n", key, 0, 0);  
+    
+    //trace(1019);
+    ////call JDebug.jdbg("BDP.insert: ln 537 key = %xl\n", key, 0, 0);  
     
     return SUCCESS;
   }
@@ -582,6 +586,7 @@ implementation {
     currentValuePtr = valueHolder;
     currentValueSize = maxValueSize;
     
+    ////call JDebug.jdbg("Dict: %i retrieve client", 0, id, 0);
     if(clients[currentClient].dictionaryFile == NULL) {
       // No open file
       resetStates();
@@ -605,8 +610,8 @@ implementation {
       // If the cache is not full, then we know
       // the key is not going to exist on flash. So don't bother.
       resetStates();
-    //////call JDebug.jdbg("BDP.retrieve ln 595 retrieveing key: %xl\n", key, 0, 0);
-    signal BDictionary.retrieved[currentClient](currentKey, currentValuePtr, 
+      //////call JDebug.jdbg("BDP.retrieve ln 595 retrieveing key: %xl\n", key, 0, 0);
+      signal BDictionary.retrieved[currentClient](currentKey, currentValuePtr, 
           0, FAIL);
       return SUCCESS;
     }
@@ -622,7 +627,7 @@ implementation {
    */
   command uint32_t BDictionary.getLastKey[uint8_t id]() {
     currentClient = id;
-    
+    ////call JDebug.jdbg("Dict: %i getLastKey client", 0, id, 0);
     if(clients[currentClient].dictionaryFile != NULL 
         && clients[currentClient].recent[0].keyOffset != ENTRY_INVALID) {
       return clients[currentClient].recent[0].key;
@@ -651,7 +656,7 @@ implementation {
     
     currentClient = id;
     currentKey = key;
-
+    ////call JDebug.jdbg("Dict: %i remove client", 0, id, 0);
     if(clients[currentClient].dictionaryFile == NULL) {
       // No open file
       resetStates();
@@ -684,7 +689,7 @@ implementation {
     
     currentClient = id;
     
-        
+    ////call JDebug.jdbg("Dict: %i getFirstKey client", 0, id, 0);
     if(clients[currentClient].dictionaryFile == NULL) {
       // No open file
       resetStates();
@@ -722,7 +727,7 @@ implementation {
     
     currentClient = id;
     currentKey = presentKey;
-    
+    ////call JDebug.jdbg("Dict: %i getNextKey client", 0, id, 0);
     if(clients[currentClient].dictionaryFile == NULL) {
       // No open file
       resetStates();
@@ -744,22 +749,21 @@ implementation {
     filename_t focusedFilename;
     file_t *focusedFile;
     
+    /*
     if(id != INTERNAL_DICTIONARY) {
       if(call BlackbookState.requestState(S_DICTIONARY_BUSY) != SUCCESS) {
         return FAIL;
       }
     }
+    */
     
     call BlackbookUtil.filenameCpy(&focusedFilename, fileName);
     
     if((focusedFile = call NodeMap.getFile(&focusedFilename)) != NULL) {
-      if(call InternalDictionary.isFileDictionary[id](focusedFile) != SUCCESS) {
-        resetStates();
-        return FAIL;
-      }
-      
+      signal BDictionary.fileIsDictionary[id](focusedFile->firstNode->nodeflags & DICTIONARY, SUCCESS);
       return SUCCESS;
     }
+    
     resetStates();
     return FAIL;
   }
@@ -773,16 +777,9 @@ implementation {
    */
   command error_t InternalDictionary.isFileDictionary[uint8_t id](
       file_t *focusedFile) {
-    currentClient = id;
-    call DictionaryState.forceState(S_CHECK_DICTIONARY);
-    dictionaryHeader = 0;
-    if(call Fileio.readData(focusedFile, 0x0, &dictionaryHeader, 
-        sizeof(dictionaryHeader)) == SUCCESS) {
-      return SUCCESS;
-    }
-    
-    call DictionaryState.toIdle();
-    return FAIL;
+      
+    signal BDictionary.fileIsDictionary[id](focusedFile->firstNode->nodeflags & DICTIONARY, SUCCESS);
+    return SUCCESS;
   }
   
   /***************** WriteAlloc Events ***************/
@@ -796,6 +793,7 @@ implementation {
       flashnode_t *writeNode, uint32_t totalSize, error_t error) {
     if(call CommandState.getState() == S_COMMAND_OPEN) {
       if(!error) {
+        ////call JDebug.jdbg("Dict: openedForWriting", writeNode->flashAddress, 0, 0);
         currentSearchOffset = sizeof(dictionaryHeader);
         writeNode->nodestate = NODE_VALID;
         clients[currentClient].dictionaryFile = openFile;
@@ -841,7 +839,7 @@ implementation {
   event void Fileio.writeDone(void *writeBuffer, uint32_t amountWritten, 
       error_t error) {
     
-    //////call JDebug.jdbg("BDP.writedone ln 837\n", 0, 0, 0);
+    ////call JDebug.jdbg("BDP.writedone ln 837\n", 0, 0, 0);
     if(call DictionaryState.getState() == S_INSERT_CHANGEFILES){
       post appendNewKey();
       return;
@@ -867,12 +865,13 @@ implementation {
       clients[currentClient].writeOffset += currentValueSize;
       
       //////call JDebug.jdbg("BDP.writedone ln 862\n", 0, 0, 0);
-    if(marker != ENTRY_INVALID) {
+      if(marker != ENTRY_INVALID) {
         // There's an existing key that needs to be invalidated
         call DictionaryState.forceState(S_INSERT_CLEANUP);
         writeMagicNumber(marker, KEY_INVALID);
 
       } else {
+        ////call JDebug.jdbg("Dict: insert flush 887", 0, 0, 0);
         call Fileio.flushData();
       }
  
@@ -887,7 +886,7 @@ implementation {
        * the offset in the new file_t to place the new chunk of data.
        */
       //////call JDebug.jdbg("BDP.writedone ln 882\n", 0, 0, 0);
-    insertCacheKey(currentClient, keyBuffer.key, currentWriteOffset, 
+      insertCacheKey(currentClient, keyBuffer.key, currentWriteOffset, 
           keyBuffer.valueCrc, keyBuffer.valueLength);
       currentWriteOffset += sizeof(keymeta_t);
       totalAmountCopied = 0;
@@ -898,7 +897,7 @@ implementation {
       totalAmountCopied += currentCopyAmount;
       
       //////call JDebug.jdbg("BDP.writedone ln 893\n", 0, 0, 0);
-    if(totalAmountCopied < keyBuffer.valueLength) {
+      if(totalAmountCopied < keyBuffer.valueLength) {
         post readCopyValue();
         
       } else {
@@ -923,7 +922,7 @@ implementation {
   event void Fileio.readDone(void *readBuffer, uint32_t amountRead, 
       error_t error) {
     
-    //////call JDebug.jdbg("BDP.readDone: ReadDone fired ln 919\n", 0, 0, 0);  
+    ////call JDebug.jdbg("BDP.readDone: ReadDone fired ln 919\n", 0, 0, 0);  
     if(call DictionaryState.getState() == S_IDLE_DICTIONARY 
         && call SearchState.getState() == S_IDLE_SEARCH) {
       // Not for me
@@ -946,11 +945,6 @@ implementation {
           currentCopyAmount);
       return;
    
-    } else if(call DictionaryState.getState() == S_CHECK_DICTIONARY) {
-      resetStates();
-      signal BDictionary.fileIsDictionary[currentClient](
-          dictionaryHeader == DICTIONARY_HEADER, error);
-      return;
     }
     
     //////call JDebug.jdbg("BDP:readDone, ln 949\n", 0, 0, 0);
@@ -958,7 +952,7 @@ implementation {
       if(call SearchState.getState() == S_INIT_ALLKEYS) {
         insertCacheKey(currentClient, keyBuffer.key, currentSearchOffset, 
             keyBuffer.valueCrc, keyBuffer.valueLength);
-        //////call JDebug.jdbg("BDP:readDone, ln 954\n",0,0,0);
+        ////call JDebug.jdbg("BDP:readDone, ln 954\n",0,0,0);
         
         continueSearch();
       
@@ -1009,13 +1003,13 @@ implementation {
       
     } else if(keyBuffer.magicNumber == KEY_EMPTY) {
       // Reached the end of the valid keys in the file
-      //////call JDebug.jdbg("BDP.readDone: ln 1005\n", 0, 0, 0);
+      ////call JDebug.jdbg("BDP.readDone: ln 1005\n", 0, 0, 0);
         stopSearch(FAIL);
       
     } else {
       // Unexpected magic number - something's probably corrupt.
       if(call CommandState.getState() == S_COMMAND_OPEN) {
-        //////call JDebug.jdbg("BDP.readDone: ln 1011\n", 0, 0, 0);
+        ////call JDebug.jdbg("BDP.readDone: ln 1011\n", 0, 0, 0);
         closeCurrentClient();
         resetStates();
         signal BDictionary.opened[currentClient](0, 0, FAIL);
@@ -1030,18 +1024,19 @@ implementation {
    */
   event void Fileio.flushDone(error_t error) {
     uint8_t dictionaryState;
-    uint8_t bbstate = call BlackbookState.getState();
     dictionaryState = call DictionaryState.getState();
     if(dictionaryState == S_IDLE_DICTIONARY) {
       // Not for me
       return;
     }
     
+    ////call JDebug.jdbg("flush done 1052", 0, 0, 0);
+    
     if(dictionaryState == S_INSERT_VALUE 
         || dictionaryState == S_INSERT_CLEANUP) {
   
       resetStates();
-      //////call JDebug.jdbg("BDP.flushdone error: %xl\n", error, 0, 0);
+      ////call JDebug.jdbg("BDP.flushdone error: %xl\n", error, 0, 0);
       signal BDictionary.inserted[currentClient](currentKey, currentValuePtr, 
           currentValueSize, error);
 
@@ -1050,21 +1045,13 @@ implementation {
       signal BDictionary.removed[currentClient](currentKey, error);
     
     } else if(dictionaryState == S_INIT_DUPLICATE) {
-      ////call JDebug.jdbg("BDP.flush flashAddr = %xl\n", 
-      ////		clients[currentClient].dictionaryFile->firstNode->flashAddress, 0, 0);
-      if(bbstate == S_DICTIONARY_BUSY && currentClient != INTERNAL_DICTIONARY){
-      
-        currentNodeRamAddress = &(clients[currentClient].dictionaryFile->firstNode->flashAddress);
-        fileClient = currentClient;
-        call Checkpoint.update(clients[currentClient].dictionaryFile->firstNode);
-      }
-      else{
-        resetStates();
-        signal BDictionary.opened[currentClient](call NodeMap.getReserveLength(
-            clients[currentClient].dictionaryFile), call NodeMap.getReserveLength(
-                clients[currentClient].dictionaryFile) 
-                  - clients[currentClient].writeOffset, SUCCESS);
-      }
+      ////call JDebug.jdbg("BDP.flush flash=%xl; curClient=%i\n", clients[currentClient].dictionaryFile->firstNode->flashAddress, currentClient, 0);
+      resetStates();
+      ////call JDebug.jdbg("BDP.opened 1069", 0, 0, 0);
+      signal BDictionary.opened[currentClient](call NodeMap.getReserveLength(
+          clients[currentClient].dictionaryFile), call NodeMap.getReserveLength(
+              clients[currentClient].dictionaryFile) 
+                - clients[currentClient].writeOffset, SUCCESS);
     }  
   }
   
@@ -1075,7 +1062,7 @@ implementation {
    * @param focusedNode - the flashnode_t that metadata was written for
    * @param error - SUCCESS if it was written
    */
-  event void NodeShop.metaWritten(flashnode_t *focusedNode, error_t error) {
+  event void NodeShop.metaWritten() {
     if(call DictionaryState.getState() == S_INSERT_CHANGEFILES) {
       /*
        * Done turning our constructing file_t into a valid file. Now delete
@@ -1100,8 +1087,7 @@ implementation {
    * @param *name - pointer to where the filename_t was stored
    * @param error - SUCCESS if the filename_t was retrieved
    */
-  event void NodeShop.filenameRetrieved(file_t *focusedFile, filename_t *name, 
-      error_t error) {
+  event void NodeShop.filenameRetrieved(filename_t *name) {
   }
   
   /**
@@ -1110,7 +1096,7 @@ implementation {
    * @param focusedNode - the flashnode_t that was deleted.
    * @param error - SUCCESS if the flashnode_t was deleted successfully.
    */
-  event void NodeShop.metaDeleted(flashnode_t *focusedNode, error_t error) {
+  event void NodeShop.metaDeleted(flashnode_t *focusedNode) {
     if(call DictionaryState.getState() == S_INSERT_CHANGEFILES) {
       focusedNode->nodestate = NODE_EMPTY;
       clients[currentClient].dictionaryFile->filestate = FILE_EMPTY;
@@ -1128,56 +1114,15 @@ implementation {
    * @param dataCrc - the crc of the data read from the flashnode_t on flash.
    * @param error - SUCCESS if the crc is valid
    */
-  event void NodeShop.crcCalculated(uint16_t dataCrc, error_t error) {
+  event void NodeShop.crcCalculated(uint16_t dataCrc) {
   }
-  
-  /*********************Checkpoint Events***************************/
-  /**
-   * The checkpoint file was opened.
-   * @param error - SUCCESS if it was opened successfully
-   */
-  event void Checkpoint.checkpointOpened(error_t error){}
-  
-  /**
-   * The given flashnode_t was updated in the Checkpoint
-   * @param focusedNode - the flashnode_t that was updated
-   * @param error - SUCCESS if everything's ok
-   */
-  event void Checkpoint.updated(flashnode_t *focusedNode, error_t error){
-    
-    //////call JDebug.jdbg("BDP.updated fn addr: %xl\n", &(focusedNode->flashAddress), 0, 0);
-    //////call JDebug.jdbg("BDP.updated cn addr: %xl\n", currentNodeRamAddress, 0, 0);
-    /*if(call BlackbookState.getState() == S_DICTIONARY_BUSY && 
-    		call DictionaryState.getState() == S_INIT_DUPLICATE &&
-    		  currentClient != INTERNAL_DICTIONARY){
-    */
-    if(call BlackbookState.getState() != S_DELETE_BUSY){
-      if(currentNodeRamAddress == &(focusedNode->flashAddress)){
-        currentClient = fileClient;
-        resetStates();	
-        //////call JDebug.jdbg("BDP.update signalling open\n", 0, 0, 0);
-        signal BDictionary.opened[fileClient](call NodeMap.getReserveLength(
-          clients[fileClient].dictionaryFile), call NodeMap.getReserveLength(
-              clients[fileClient].dictionaryFile) 
-                  - clients[fileClient].writeOffset, SUCCESS);
-      }
-    }
-  }
-  
-  /** 
-   * A flashnode_t was recovered.
-   * @param error - SUCCESS if it was recovered correctly.
-   *                 FAIL if it should be deleted.
-   */
-  event void Checkpoint.recovered(flashnode_t *recoveredNode, error_t error){}
-  
   
   /***************** Tasks ****************/
   /**
    * Read the next entry from flash
    */
   task void keySearchLoop() {
-    //////call JDebug.jdbg("BDP.keysearchloop currentseachoffset=%xl\n", currentSearchOffset, 0, 0);
+    ////call JDebug.jdbg("BDP.keysearchloop currentseachoffset=%xl\n", currentSearchOffset, 0, 0);
     call Fileio.readData(clients[currentClient].dictionaryFile, 
         currentSearchOffset, &keyBuffer, sizeof(keymeta_t));
   }
@@ -1213,9 +1158,10 @@ implementation {
     if(clients[currentClient].recent[MAX_KEY_CACHE-1].keyOffset 
         == ENTRY_INVALID) {
         
-      for(i = MAX_KEY_CACHE-2; i+1 > 0; i--) {
+      for(i = MAX_KEY_CACHE - 2; i + 1 > 0; i--) {
         if(clients[currentClient].recent[i].keyOffset != ENTRY_INVALID) {
           // This is the first key in the file.
+          ////call JDebug.jdbg("Dict: firstKey in cache", 0, 0, 0);
           resetStates();
           signal BDictionary.nextKey[currentClient](
               clients[currentClient].recent[i].key, SUCCESS);
@@ -1226,6 +1172,7 @@ implementation {
     }
     
     // Or else, the first key must be found in flash.
+    ////call JDebug.jdbg("Dict: find firstKey in flash", 0, 0, 0);
     currentSearchOffset = sizeof(dictionaryHeader);
     searchForValidKey();
     return;
@@ -1292,8 +1239,10 @@ implementation {
   void closeCurrentClient() {
     if(clients[currentClient].dictionaryFile == NULL) {
       // This client has no open dictionary.
+      ////call JDebug.jdbg("Dict: no open dict", 0, 0, 0);
       return;
     }
+    ////call JDebug.jdbg("Dict: closing opened dict", 0, 0, 0);
     
     clients[currentClient].dictionaryFile->filestate = FILE_IDLE;
     clients[currentClient].dictionaryFile->firstNode->nodestate = NODE_VALID;    
@@ -1450,7 +1399,7 @@ implementation {
      */
     oldestValidCacheIndex = 0xFF;
     
-    for(i = MAX_KEY_CACHE - 1; i > 0; i++) {
+    for(i = MAX_KEY_CACHE - 1; i > 0; i--) {
       if(clients[currentClient].recent[i].keyOffset != ENTRY_INVALID) {
         oldestValidCacheIndex = (uint8_t) i;
       }
@@ -1618,6 +1567,7 @@ implementation {
          */
         
         currentFile->firstNode->nodestate = NODE_VALID;
+        currentFile->firstNode->nodeflags = DICTIONARY;
         call DictionaryState.forceState(S_INSERT_CHANGEFILES);
         call NodeShop.writeNodemeta(NULL, currentFile->firstNode, NULL);
         //These lines need to be included somewhere so the dictionary tag gets written to flash

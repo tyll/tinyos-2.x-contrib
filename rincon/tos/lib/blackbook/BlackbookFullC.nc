@@ -69,7 +69,5 @@ implementation {
   BBoot = BBootFullC;
   BClean = BCleanC;
   
-  BFileDeleteImplC.Checkpoint -> CheckpointC;
-  
 }
 

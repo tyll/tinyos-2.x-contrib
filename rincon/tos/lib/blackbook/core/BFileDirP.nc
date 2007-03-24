@@ -161,17 +161,15 @@ implementation {
               return SUCCESS;
             }
           }
-        
-          // There is no next file
-          call BlackbookState.toIdle();
-          signal BFileDir.nextFile[id](presentFilename, FAIL);
-          return SUCCESS;
+          
+          // Here, we know there is no next file.
         }
       }
-    
-      // The present filename_t does not exist
+      
+      // Here, we know the file passed in doesn't exist
       call BlackbookState.toIdle();
-      return FAIL;
+      signal BFileDir.nextFile[id](presentFilename, FAIL);
+      return SUCCESS;
       
     } else {
       for(i = 0 ; i < call NodeMap.getMaxFiles(); i++) {
@@ -342,7 +340,7 @@ implementation {
    * @param dataCrc - the crc of the data read from the flashnode_t on flash.
    * @param error - SUCCESS if the crc is valid
    */
-  event void NodeShop.crcCalculated(uint16_t dataCrc, error_t error) {
+  event void NodeShop.crcCalculated(uint16_t dataCrc) {
     if(dataCrc == crcNode->dataCrc) {
       if((crcNode = crcNode->nextNode) != NULL) {
         // More nodes in this file_t to verify
@@ -369,10 +367,9 @@ implementation {
    * @param *name - pointer to where the filename_t was stored
    * @param error - SUCCESS if the filename_t was retrieved
    */
-  event void NodeShop.filenameRetrieved(file_t *focusedFile, filename_t *name, 
-      error_t error) {
+  event void NodeShop.filenameRetrieved(filename_t *name) {
     call BlackbookState.toIdle();
-    signal BFileDir.nextFile[currentClient]((char *) name->getName, error);
+    signal BFileDir.nextFile[currentClient]((char *) name->getName, SUCCESS);
   }
   
   /** 
@@ -380,7 +377,7 @@ implementation {
    * @param focusedNode - the flashnode_t that metadata was written for
    * @param error - SUCCESS if it was written
    */
-  event void NodeShop.metaWritten(flashnode_t *focusedNode, error_t error) {
+  event void NodeShop.metaWritten() {
   }
   
   /**
@@ -389,7 +386,7 @@ implementation {
    * @param focusedNode - the flashnode_t that was deleted.
    * @param error - SUCCESS if the flashnode_t was deleted successfully.
    */
-  event void NodeShop.metaDeleted(flashnode_t *focusedNode, error_t error) {
+  event void NodeShop.metaDeleted(flashnode_t *focusedNode) {
   }
   
   /***************** Tasks ****************/

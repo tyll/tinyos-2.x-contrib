@@ -56,7 +56,8 @@ interface BFileDir {
   command uint32_t getFreeSpace();
   
   /**
-   * Returns TRUE if the file exists, FALSE if it doesn't
+   * Will signal the event existsCheckDone() after determining if the file
+   * exists or not.
    */
   command error_t checkExists(char *fileName);
 

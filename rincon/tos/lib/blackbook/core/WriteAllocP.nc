@@ -168,6 +168,10 @@ implementation {
       currentNode->filenameCrc = currentFile->filenameCrc;
       currentNode->nodestate = NODE_TEMPORARY;
       
+      if(onlyOneNode) {
+        currentNode->nodeflags = DICTIONARY;
+      }
+      
       post allocate();
       return SUCCESS;
       
@@ -212,12 +216,6 @@ implementation {
       ////		lastNode->reserveLength, (uint16_t)(lastNode->dataLength), 0);   
       if((totalSize < minSize || lastNode->nodestate == NODE_LOCKED) 
           && !oneNode) {
-        if(lastNode->nodestate == NODE_LOCKED){
-          ////call JDebug.jdbg("WA.openforwrite: node locked flashAddr = %xl\n", (uint32_t)(lastNode->flashAddress), 0, 0);
-        }
-        else{
-          ////call JDebug.jdbg("WA.openforwrite: not enough space total= %xl, minsize= %xi\n", totalSize, minSize, 0);
-        }
         if(totalSize >= minSize){
           getWritableNode();
           return SUCCESS;
@@ -255,7 +253,7 @@ implementation {
    * @param focusedNode - the flashnode_t that metadata was written for
    * @param error - SUCCESS if it was written
    */
-  event void NodeShop.metaWritten(flashnode_t *focusedNode, error_t error) {
+  event void NodeShop.metaWritten() {
     if(call State.getState() == S_OPEN) {
       finishError = SUCCESS;
       post finish();
@@ -268,8 +266,7 @@ implementation {
    * @param *name - pointer to where the filename_t was stored
    * @param error - SUCCESS if the filename_t was retrieved
    */
-  event void NodeShop.filenameRetrieved(file_t *focusedFile, filename_t *name, 
-      error_t error) {
+  event void NodeShop.filenameRetrieved(filename_t *name) {
   }
   
   /**
@@ -278,7 +275,7 @@ implementation {
    * @param focusedNode - the flashnode_t that was deleted.
    * @param error - SUCCESS if the flashnode_t was deleted successfully.
    */
-  event void NodeShop.metaDeleted(flashnode_t *focusedNode, error_t error) {
+  event void NodeShop.metaDeleted(flashnode_t *focusedNode) {
   }
  
   /**
@@ -286,17 +283,12 @@ implementation {
    * @param dataCrc - the crc of the data read from the flashnode_t on flash.
    * @param error - SUCCESS if the crc is valid
    */
-  event void NodeShop.crcCalculated(uint16_t dataCrc, error_t error) {
+  event void NodeShop.crcCalculated(uint16_t dataCrc) {
   }
   
   
   /***************** BClean Tasks ****************/ 
   /**
-   * Garbage Collection is complete
-   * TODO This works fine, but notice how the code is
-   *  similar to other areas of code in this file.
-   *  To polish it off, maybe think about combining all this
-   *  code into one function.
    * @return SUCCESS if any sectors were erased.
    */
   event void BClean.gcDone(error_t error) {
@@ -478,6 +470,7 @@ implementation {
         lastNode = currentNode;
         if(onlyOneNode){
           return FALSE;
+          
         } else if((currentNode = call NodeBooter.requestAddNode()) == NULL) {
           // We're out of nodes in our NodeMap, or we're trying to
           // create a dictionary file_t that requires a single node.

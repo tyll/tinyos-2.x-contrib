@@ -67,6 +67,20 @@ typedef struct filename_t {
 } filename_t;
 
 
+/** flashnode_t flags */
+typedef enum {
+  NO_FLAGS = 0x0,
+  DICTIONARY = 0x1,
+  RESERVED0 = 0x2,
+  RESERVED1 = 0x4,
+  RESERVED2 = 0x8,
+  RESERVED3 = 0x10,
+  RESERVED4 = 0x20,
+  RESERVED5 = 0x40,
+  RESERVED6 = 0x80,
+} flashnode_flags_enum;
+  
+  
 /** 
  * This is the nodemeta information kept at the start of each 
  * flashnode_t on flash
@@ -84,7 +98,10 @@ typedef struct nodemeta_t {
   
   /** The element of the file this flashnode_t represents, 0 for the first flashnode_t */
   uint16_t fileElement;
-
+  
+  /** Node flags */
+  flashnode_flags_enum nodeflags;
+  
 } nodemeta_t;
 
 
@@ -150,6 +167,9 @@ typedef struct flashnode_t {
   /** The state of the flashnode_t */
   flashnode_state_enum nodestate;
 
+  /** flashnode flags */
+  flashnode_flags_enum nodeflags;
+  
   /** The index this flashnode_t belongs to in its entire file */
   uint8_t fileElement;
 

@@ -50,6 +50,7 @@ module BFileDeleteP {
     interface NodeMap;
     interface Checkpoint;
     interface BlackbookUtil;
+    ////interface JDebug;
   }  
 }
 
@@ -70,7 +71,6 @@ implementation {
   /***************** Prototypes ****************/
   /** Finalize the current flashnode_t if it needs to be */
   task void finalize();
-  
   
   /***************** BFileDelete Commands ****************/
   /**
@@ -94,10 +94,17 @@ implementation {
     currentClient = id;
     
     call BlackbookUtil.filenameCpy(&currentFilename, fileName);
-    if(((currentFile = call NodeMap.getFile(&currentFilename)) == NULL) 
-        || currentFile->filestate != FILE_IDLE) {
+    
+    if((currentFile = call NodeMap.getFile(&currentFilename)) == NULL) {
       call BlackbookState.toIdle();
-      return FAIL;
+      signal BFileDelete.deleted[id](SUCCESS);
+      return SUCCESS;
+    }
+    
+    if(currentFile->filestate != FILE_IDLE) {
+      call BlackbookState.toIdle();
+      signal BFileDelete.deleted[id](FAIL);
+      return SUCCESS;
     }
 
     currentNode = currentFile->firstNode;
@@ -113,7 +120,7 @@ implementation {
    * @param focusedNode - the flashnode_t that was deleted.
    * @param error - SUCCESS if the flashnode_t was deleted successfully.
    */
-  event void NodeShop.metaDeleted(flashnode_t *focusedNode, error_t error) {
+  event void NodeShop.metaDeleted(flashnode_t *focusedNode) {
     if(call BlackbookState.getState() == S_DELETE_BUSY) {
       currentNode->nodestate = NODE_EMPTY;
       previousNode->nextNode = NULL;
@@ -137,7 +144,7 @@ implementation {
    * @param dataCrc - the crc of the data read from the flashnode_t on flash.
    * @param error - SUCCESS if the crc is valid
    */
-  event void NodeShop.crcCalculated(uint16_t dataCrc, error_t error) {
+  event void NodeShop.crcCalculated(uint16_t dataCrc) {
   }
   
   /** 
@@ -145,7 +152,7 @@ implementation {
    * @param focusedNode - the flashnode_t that metadata was written for
    * @param error - SUCCESS if it was written
    */
-  event void NodeShop.metaWritten(flashnode_t *focusedNode, error_t error) {
+  event void NodeShop.metaWritten() {
   }
   
   /**
@@ -154,8 +161,7 @@ implementation {
    * @param *name - pointer to where the filename_t was stored
    * @param error - SUCCESS if the filename_t was retrieved
    */
-  event void NodeShop.filenameRetrieved(file_t *focusedFile, filename_t *name, 
-      error_t error) {
+  event void NodeShop.filenameRetrieved(filename_t *name) {
   }
   
   
@@ -167,6 +173,7 @@ implementation {
    * @param error - SUCCESS if everything's ok
    */
   event void Checkpoint.updated(flashnode_t *focusedNode, error_t error) {
+    
     if(call BlackbookState.getState() == S_DELETE_BUSY) {
       call NodeShop.deleteNode(currentNode);
     }
@@ -199,6 +206,7 @@ implementation {
       //    the flashnode_t will get erased anyway.
       // 2. Invalidate the nodemeta through NodeShop.
       currentNode->nodestate = NODE_DELETED;
+      ////call JDebug.jdbg("BDel: call cp.upd", 0, 0, 0);
       call Checkpoint.update(currentNode);
       
     } else {
@@ -209,13 +217,11 @@ implementation {
     }
   }
   
-  
   /***************** Functions ****************/
 
   /***************** Defaults ****************/
   default event void BFileDelete.deleted[uint8_t id](error_t error) {
   }
-   
 }
 
 

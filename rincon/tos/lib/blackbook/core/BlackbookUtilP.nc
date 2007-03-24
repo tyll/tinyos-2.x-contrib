@@ -76,7 +76,7 @@ implementation {
    * @return the number of bytes in the given number of flash pages
    */
   command uint32_t BlackbookUtil.convertWriteUnitsToBytes(uint32_t writeUnits) {
-    // TODO why do we have to do this?
+    // This is stupid, but fixes a multiplication bug on the MSP430
     uint32_t totalWu = (uint32_t) writeUnits;
     uint32_t wuSize = call VolumeSettings.getWriteUnitSize();
     return totalWu * wuSize;

@@ -120,6 +120,7 @@ implementation {
     currentNodeMeta.filenameCrc = currentNode->filenameCrc;
     currentNodeMeta.reserveLength = currentNode->reserveLength;
     currentNodeMeta.fileElement = currentNode->fileElement;
+    currentNodeMeta.nodeflags = currentNode->nodeflags;
     
     if(focusedNode->nodestate == NODE_CONSTRUCTING) {
       currentNodeMeta.magicNumber = META_CONSTRUCTING;
@@ -254,7 +255,7 @@ implementation {
   event void DirectStorage.crcDone(uint16_t calculatedCrc, uint32_t addr, 
       uint32_t len, error_t error) {
     call State.toIdle();
-    signal NodeShop.crcCalculated(calculatedCrc, error);
+    signal NodeShop.crcCalculated(calculatedCrc);
   }
   
   /**
@@ -366,16 +367,15 @@ implementation {
     switch(state) {
       case S_WRITE_NODEMETA:
       case S_WRITE_FILEMETA:
-        signal NodeShop.metaWritten(currentNode, SUCCESS);
+        signal NodeShop.metaWritten();
         break;
         
       case S_NODEMETA_DELETE:
-        signal NodeShop.metaDeleted(currentNode, SUCCESS);
+        signal NodeShop.metaDeleted(currentNode);
         break;
 
       case S_GET_FILENAME:
-        signal NodeShop.filenameRetrieved(currentFile, currentFilename, 
-            SUCCESS);
+        signal NodeShop.filenameRetrieved(currentFilename);
         break;
         
       default:

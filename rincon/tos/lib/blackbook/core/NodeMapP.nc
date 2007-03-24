@@ -106,6 +106,7 @@ implementation {
     for(i = 0; i < call NodeMap.getMaxNodes(); i++) {
       if(nodes[i].nodestate == NODE_EMPTY) {
         nodes[i].nextNode = NULL;
+        nodes[i].nodeflags = NO_FLAGS;
         return &nodes[i];
       }
     }

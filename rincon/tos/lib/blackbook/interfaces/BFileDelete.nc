@@ -37,14 +37,26 @@
 interface BFileDelete {
  
   /**
-   * Delete a file.
+   * Delete a file.  
+   *
+   * If the file does not exist, this will return SUCCESS along
+   * with a deleted(SUCCESS) event, because the file isn't there.
+   *
+   * If the file does exist but is currently in use by another interface, this
+   * will return SUCCESS and you will get a deleted(FAIL) event.
+   * 
+   * If the file exists and is not in use and is successfully deleted, this
+   * will return SUCCESS and you will get a deleted(SUCCESS) event.
+   *
+   * In all cases, you will get a deleted() event back.
+   * 
    * @param fileName - the name of the file to delete
    * @return SUCCESS if Blackbook will attempt to delete the file.
    */ 
   command error_t delete(char *fileName);
 
   /**
-   * A file was deleted
+   * Result from deleting a file.
    * @param error - SUCCESS if the file was deleted from flash
    */
   event void deleted(error_t error);

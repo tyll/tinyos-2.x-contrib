@@ -50,6 +50,7 @@ module BFileReadP {
     interface Fileio;
     interface NodeMap;
     interface BlackbookUtil;
+    ///interface PrintfFlush;
     ////interface JDebug;
   }
 }
@@ -155,8 +156,8 @@ implementation {
       // Set the file_t to IDLE only if it was IDLE to begin with.
       if(readers[currentClient].openFile->filestate == FILE_READING) {
         readers[currentClient].openFile->filestate = FILE_IDLE;
-      }
-      else if(readers[currentClient].openFile->filestate == FILE_READING_AND_WRITING){
+        
+      } else if(readers[currentClient].openFile->filestate == FILE_READING_AND_WRITING){
         readers[currentClient].openFile->filestate = FILE_WRITING;
       }
     }

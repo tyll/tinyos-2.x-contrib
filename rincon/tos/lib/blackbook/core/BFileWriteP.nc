@@ -54,7 +54,6 @@ module BFileWriteP {
     interface Fileio; 
     interface Checkpoint;
     interface BlackbookUtil;
-    
     ////interface JDebug;
   }
 }
@@ -310,11 +309,8 @@ implementation {
    * @param error - SUCCESS if everything's ok
    */
   event void Checkpoint.updated(flashnode_t *focusedNode, error_t error) {
-    flashnode_t *previousNode;
-    if(call BlackbookState.getState() == S_DICTIONARY_BUSY){
-      //This will get signalled when I updating a dictionary file, so ignore it if that is the case
-      return;
-    }
+    flashnode_t *previousNode;    
+    
     if(call BlackbookState.getState() == S_WRITE_SAVE_BUSY) {
       currentNode = currentNode->nextNode;
       if(currentNode != NULL) {
@@ -424,5 +420,6 @@ implementation {
   default event void BFileWrite.appended[uint8_t id](void *data, 
       uint16_t amountWritten, error_t error) {
   }
+  
 }
 

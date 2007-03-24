@@ -83,7 +83,7 @@ interface NodeShop {
    * @param focusedNode - the flashnode_t that metadata was written for
    * @param error - SUCCESS if it was written
    */
-  event void metaWritten(flashnode_t *focusedNode, error_t error);
+  event void metaWritten();
   
   /**
    * The filename_t was retrieved from flash
@@ -91,7 +91,7 @@ interface NodeShop {
    * @param *name - pointer to where the filename_t was stored
    * @param error - SUCCESS if the filename_t was retrieved
    */
-  event void filenameRetrieved(file_t *focusedFile, filename_t *name, error_t error);
+  event void filenameRetrieved(filename_t *name);
   
   /**
    * A flashnode_t was deleted from flash by marking its magic number
@@ -99,14 +99,14 @@ interface NodeShop {
    * @param focusedNode - the flashnode_t that was deleted.
    * @param error - SUCCESS if the flashnode_t was deleted successfully.
    */
-  event void metaDeleted(flashnode_t *focusedNode, error_t error);
+  event void metaDeleted(flashnode_t *focusedNode);
  
   /**
    * A crc was calculated from flashnode_t data on flash
    * @param dataCrc - the crc of the data read from the flashnode_t on flash.
    * @param error - SUCCESS if the crc is valid
    */
-  event void crcCalculated(uint16_t dataCrc, error_t error);
+  event void crcCalculated(uint16_t dataCrc);
   
 }
 

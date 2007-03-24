@@ -66,7 +66,8 @@ implementation {
   CheckpointP.State -> StateC;
   CheckpointP.BlackbookUtil -> BlackbookUtilC;
   CheckpointP.CheckNode -> CheckNodeC;
-  
+
+////#warning ">>> CheckpointC uses JDebug"
   ////components JDebugC;
   ////CheckpointP.JDebug -> JDebugC;
   

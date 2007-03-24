@@ -42,10 +42,6 @@ configuration BFileDeleteImplC {
   provides {
     interface BFileDelete[uint8_t id];
   }
-  
-  uses {
-    interface Checkpoint;
-  }
 }
 
 implementation {
@@ -53,15 +49,20 @@ implementation {
       NodeShopC, 
       NodeMapC, 
       BlackbookStateC, 
+      CheckpointC,
       BlackbookUtilC;
   
   BFileDelete = BFileDeleteP;
-  
-  Checkpoint = BFileDeleteP;
   
   BFileDeleteP.NodeShop -> NodeShopC;
   BFileDeleteP.NodeMap -> NodeMapC;
   BFileDeleteP.BlackbookState -> BlackbookStateC;
   BFileDeleteP.BlackbookUtil -> BlackbookUtilC;
+  BFileDeleteP.Checkpoint -> CheckpointC;
+  
+////#warning ">>> BFileDelete uses JDebug"
+  ////components JDebugC;
+  ////BFileDeleteP.JDebug -> JDebugC;
+  
 }
 

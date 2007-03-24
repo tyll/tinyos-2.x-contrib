@@ -66,7 +66,8 @@ implementation {
   BBootFullP.NodeShop -> NodeShopC;
   BBootFullP.CommandState -> StateC;
   BBootFullP.BlackbookState -> BlackbookStateC;
-  
+
+////#warning ">>> BBootFull uses JDebug"
   ////components JDebugC;
   ////BBootFullP.JDebug -> JDebugC;
   

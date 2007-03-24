@@ -72,6 +72,8 @@ implementation {
   
   storage_addr_t bytesRemaining;
   
+  at45page_t lastWritePage;
+  
   nx_struct {
     nx_uint16_t crc;
     nx_uint32_t maxAddr;
@@ -199,7 +201,7 @@ implementation {
         break;
     
       case S_FLUSH:
-        call At45db.syncAll();
+        call At45db.sync(lastWritePage);
         break;
         
       default:
@@ -236,8 +238,12 @@ implementation {
 
   event void At45db.syncDone(error_t error) {
     if (currentClient != NO_CLIENT) {
-      //endRequest(error, 0);
-      call At45db.flushAll();
+      if(error) {
+        call At45db.sync(lastWritePage);
+        
+      } else {
+        endRequest(error, 0); 
+      }
     }
   }
 
@@ -345,6 +351,7 @@ implementation {
 
     switch (s[currentClient].request) {
       case S_WRITE:
+        lastWritePage = page;
         call At45db.write(page, offset, buf, count);
         break;
       

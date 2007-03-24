@@ -40,34 +40,20 @@
 interface CC2420Transmit {
 
   /**
-   * Send a message with CCA enabled.
+   * Send a message
    *
    * @param p_msg message to send.
+   * @param useCca TRUE if this Tx should use clear channel assessments
    * @return SUCCESS if the request was accepted, FAIL otherwise.
    */
-  async command error_t sendCCA( message_t* p_msg );
+  async command error_t send( message_t* p_msg, bool useCca );
 
   /**
-   * Send a message with CCA disabled.
-   *
-   * @param p_msg message to send.
+   * Send the previous message again
+   * @param useCca TRUE if this re-Tx should use clear channel assessments
    * @return SUCCESS if the request was accepted, FAIL otherwise.
    */
-  async command error_t send( message_t* p_msg );
-
-  /**
-   * Send the previous message again with CCA enabled.
-   *
-   * @return SUCCESS if the request was accepted, FAIL otherwise.
-   */
-  async command error_t resendCCA();
-
-  /**
-   * Send the previous message again with CCA disabled.
-   *
-   * @return SUCCESS if the request was accepted, FAIL otherwise.
-   */
-  async command error_t resend();
+  async command error_t resend(bool useCca);
 
   /**
    * Cancel sending of the message.

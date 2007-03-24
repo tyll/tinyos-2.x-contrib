@@ -30,17 +30,60 @@
  */
  
 /**
- * Interface to obtain a CCA reading from the CC2420 radio
- * to determine if a neighbor is transmitting
+ * Original TinyOS T-Frames use a packet header that is not compatible with
+ * other 6LowPAN networks.  They do not include the network byte 
+ * responsible for identifying the packing as being sourced from a TinyOS
+ * network.
+ *
+ * TinyOS I-Frames are interoperability packets that do include a network
+ * byte as defined by 6LowPAN specifications.  The I-Frame header type is
+ * the default packet header used in TinyOS networks.
+ *
+ * Since either packet header is acceptable, this layer must do some 
+ * preprocessing (sorry) to figure out whether or not it needs to include 
+ * the functionality to process I-frames.  If I-Frames are used, then
+ * the network byte is added on the way out and checked on the way in.
+ * If the packet came from a network different from a TinyOS network, the
+ * user may access it through the DispatchP's NonTinyosReceive[] Receive 
+ * interface and process it in a different radio stack.
+ *
+ * If T-Frames are used instead, this layer is simply pass-through wiring to the
+ * layer beneath.
+ * 
  * @author David Moss
  */
  
-interface CC2420Cca {
+#include "CC2420.h"
+
+configuration CC2420DispatchC {
+  provides {
+    interface Send;
+    interface Receive;
+  }
   
-  /**
-   * @return TRUE if the CCA pin shows a clear channel
-   */
-  command bool isChannelClear();
+  uses {
+    interface Receive as SubReceive;
+    interface Send as SubSend;
+  }
+}
+
+implementation {
+
+#if (CC2420_FRAME_TYPE == CC2420_IFRAME)
+  components CC2420DispatchP;
+  components CC2420PacketC;
   
+  CC2420DispatchP.Send = Send;
+  CC2420DispatchP.Receive = Receive;
+  CC2420DispatchP.SubSend = SubSend;
+  CC2420DispatchP.SubReceive = SubReceive;
+  
+  CC2420DispatchP.CC2420Packet -> CC2420PacketC;
+
+#else
+  Send = SubSend;
+  Receive = SubReceive;
+#endif
+
 }
 

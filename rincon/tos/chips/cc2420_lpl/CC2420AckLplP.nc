@@ -19,7 +19,7 @@
  * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
  * FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE
- * ARCHED ROCK OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * RINCON RESEARCH OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
  * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
@@ -30,14 +30,19 @@
  */
 
 /**
- * Low Power Listening for the CC2420
+ * Low Power Listening for the CC2420.  This component is responsible for
+ * delivery of an LPL packet, and for turning off the radio when the radio
+ * has run out of tasks.
+ *
+ * The CC2420DutyCycle component is responsible for duty cycling the radio
+ * and performing receive detections.
  *
  * @author David Moss
  */
 
-#include "CC2420LowPowerListening.h"
+#include "CC2420AckLpl.h"
 
-module CC2420LowPowerListeningP {
+module CC2420AckLplP {
   provides {
     interface Init;
     interface LowPowerListening;
@@ -94,6 +99,9 @@ implementation {
     S_SENDING,
   };
   
+  enum {
+    ONE_MESSAGE = 0,
+  };
   
   /***************** Prototypes ***************/
   task void send();
@@ -258,7 +266,7 @@ implementation {
     // Reset our invalid message counter
     invalidMessages = 0;
         
-    if(call SendState.requestState(S_LPL_SENDING) == SUCCESS) {
+    if(call SendState.requestState(S_LPL_FIRST_MESSAGE) == SUCCESS) {
       currentSendMsg = msg;
       currentSendLen = len;
       
@@ -283,6 +291,8 @@ implementation {
   command error_t Send.cancel(message_t *msg) {
     if(currentSendMsg == msg) {
       call SendState.toIdle();
+      call SendDoneTimer.stop();
+      startOffTimer();
       return call SubSend.cancel(msg);
     }
     
@@ -329,7 +339,8 @@ implementation {
     if(!error) {
       call RadioState.forceState(S_ON);
       
-      if(call SendState.getState() == S_LPL_SENDING) {
+      if(call SendState.getState() == S_LPL_FIRST_MESSAGE
+          || call SendState.getState() == S_LPL_SENDING) {
         initializeSend();
       }
     }
@@ -339,7 +350,8 @@ implementation {
     if(!error) {
       call RadioState.forceState(S_OFF);
 
-      if(call SendState.getState() == S_LPL_SENDING) {
+      if(call SendState.getState() == S_LPL_FIRST_MESSAGE
+          || call SendState.getState() == S_LPL_SENDING) {
         // We're in the middle of sending a message; start the radio back up
         post startRadio();
         
@@ -352,14 +364,41 @@ implementation {
   
   /***************** SubSend Events ***************/
   event void SubSend.sendDone(message_t* msg, error_t error) {
-    if(call SendState.getState() == S_LPL_SENDING  
-        && call SendDoneTimer.isRunning()) {
-            
-      if(!call PacketAcknowledgements.wasAcked(msg)) {
-        post resend();
-        return;
+    call Leds.led1Toggle();
+    
+    switch(call SendState.getState()) {
+    case S_LPL_FIRST_MESSAGE:
+      /*
+       * We multiply the time to transmit by 2 to increase delivery reliability.
+       * Because the receiver has to sample its CCA pin for (ack + backoff)
+       * length of time, this allows the receiver to save a little energy
+       * and get as close as it can to (ack + backoff) while maintaining
+       * delivery reliability.
+       */
+      call SendDoneTimer.startOneShot(
+          call LowPowerListening.getRxSleepInterval(currentSendMsg) * 2);
+      call SendState.forceState(S_LPL_SENDING);
+      /** Fall Through */
+      
+    case S_LPL_SENDING:
+      if(call SendDoneTimer.isRunning()) {
+        if(!call PacketAcknowledgements.wasAcked(msg)) {
+          post resend();
+          return;
+        }
       }
-    }
+      break;
+      
+    case S_LPL_CLEAN_UP:
+      /**
+       * We include this state so upper layers can't send a different message
+       * before the last message gets done sending
+       */
+      break;
+      
+    default:
+      break;
+    }  
     
     call SendState.toIdle();
     call SendDoneTimer.stop();
@@ -416,7 +455,7 @@ implementation {
   event void SendDoneTimer.fired() {
     if(call SendState.getState() == S_LPL_SENDING) {
       // The next time SubSend.sendDone is signaled, send is complete.
-      call SendState.toIdle();
+      call SendState.forceState(S_LPL_CLEAN_UP);
     }
   }
   
@@ -442,7 +481,7 @@ implementation {
   task void resend() {
     // Reset our invalid message counter
     invalidMessages = 0;
-    if(call Resend.resendCCA() != SUCCESS) {
+    if(call Resend.resend(TRUE) != SUCCESS) {
       post resend();
     }
   }
@@ -464,18 +503,14 @@ implementation {
   /***************** Functions ***************/
   void initializeSend() {
     if(call LowPowerListening.getRxSleepInterval(currentSendMsg) 
-      > ONE_MESSAGE) {
+        > ONE_MESSAGE) {
     
       if(call AMPacket.destination(currentSendMsg) == AM_BROADCAST_ADDR) {
         call PacketAcknowledgements.noAck(currentSendMsg);
       } else {
         // Send it repetitively within our transmit window
         call PacketAcknowledgements.requestAck(currentSendMsg);
-      }
-
-      call SendDoneTimer.startOneShot(
-          call LowPowerListening.getRxSleepInterval(currentSendMsg) * 2);
-    
+      }   
     }
         
     post send();

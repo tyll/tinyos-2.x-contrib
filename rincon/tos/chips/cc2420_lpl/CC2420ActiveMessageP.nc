@@ -31,6 +31,8 @@
  * @author Philip Levis
  * @version $Revision$ $Date$
  */
+ 
+#include "CC2420.h"
 
 module CC2420ActiveMessageP {
   provides {
@@ -61,6 +63,7 @@ implementation {
     header->type = id;
     header->dest = addr;
     header->destpan = TOS_AM_GROUP;
+    header->network = TINYOS_6LOWPAN_NETWORK_ID;  // I-Frames
 
     return call SubSend.send( msg, len + CC2420_SIZE );
   }

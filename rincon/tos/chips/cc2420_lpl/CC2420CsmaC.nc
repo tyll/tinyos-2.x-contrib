@@ -74,6 +74,9 @@ implementation {
   Receive = CC2420ReceiveC;
   CsmaP.SubControl -> CC2420ReceiveC;
 
+  components CC2420PacketC;
+  CsmaP.CC2420Packet -> CC2420PacketC;
+  
   components RandomC;
   CsmaP.Random -> RandomC;
 

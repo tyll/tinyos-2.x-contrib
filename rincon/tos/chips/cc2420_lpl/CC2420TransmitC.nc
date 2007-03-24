@@ -65,9 +65,6 @@ implementation {
   components AlarmMultiplexC as Alarm;
   CC2420TransmitP.BackoffTimer -> Alarm;
 
-  components new TimerMilliC() as WatchdogTimerC;
-  CC2420TransmitP.WatchdogTimer -> WatchdogTimerC;
-
   components HplCC2420PinsC as Pins;
   CC2420TransmitP.CCA -> Pins.CCA;
   CC2420TransmitP.CSN -> Pins.CSN;

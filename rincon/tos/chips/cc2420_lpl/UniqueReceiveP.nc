@@ -19,7 +19,7 @@
  * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
  * FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE
- * ARCHED ROCK OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * RINCON RESEARCH OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
  * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
@@ -41,6 +41,7 @@
 module UniqueReceiveP {
   provides {
     interface Receive;
+    interface Receive as DuplicateReceive;
     interface Init;
   }
   
@@ -82,12 +83,22 @@ implementation {
     return call SubReceive.payloadLength(msg);
   }
   
+  
+  /***************** DuplicateReceive Commands ****************/
+  command void *DuplicateReceive.getPayload(message_t* msg, uint8_t* len) {
+    return call SubReceive.getPayload(msg, len);
+  }
+
+  command uint8_t DuplicateReceive.payloadLength(message_t* msg) {
+    return call SubReceive.payloadLength(msg);
+  }
+  
   /***************** SubReceive Events *****************/
   event message_t *SubReceive.receive(message_t* msg, void* payload, 
       uint8_t len) {
 
     if(hasSeen(msg)) {
-      return msg;
+      return signal DuplicateReceive.receive(msg, payload, len);
       
     } else {
       insert(msg);
@@ -112,6 +123,11 @@ implementation {
     receivedMessages[writeIndex].dsn = (call CC2420Packet.getHeader(msg))->dsn;
     writeIndex++;
     writeIndex %= RECEIVE_HISTORY_SIZE;
+  }
+  
+  /***************** Defaults ****************/
+  default event message_t *DuplicateReceive.receive(message_t *msg, void *payload, uint8_t len) {
+    return msg;
   }
 }
 

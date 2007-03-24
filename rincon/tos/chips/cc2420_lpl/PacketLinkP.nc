@@ -19,7 +19,7 @@
  * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
  * FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE
- * ARCHED ROCK OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * RINCON RESEARCH OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
  * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
@@ -30,17 +30,17 @@
  */
 
 /**
- * Reliable Message Transport Functionality
+ * Reliable Packet Link Functionality
  * @author David Moss
  * @author Jon Wyant
  */
  
 #include "CC2420.h"
 
-module MessageTransportP {
+module PacketLinkP {
   provides {
     interface Send;
-    interface MessageTransport;
+    interface PacketLink;
   }
   
   uses {
@@ -78,7 +78,7 @@ implementation {
   task void send();
   void signalDone(error_t error);
     
-  /***************** MessageTransport Commands ***************/
+  /***************** PacketLink Commands ***************/
   /**
    * Set the maximum number of times attempt message delivery
    * Default is 0
@@ -86,7 +86,7 @@ implementation {
    * @param maxRetries the maximum number of attempts to deliver
    *     the message
    */
-  command void MessageTransport.setRetries(message_t *msg, uint16_t maxRetries) {
+  command void PacketLink.setRetries(message_t *msg, uint16_t maxRetries) {
     (call CC2420Packet.getMetadata(msg))->maxRetries = maxRetries;
   }
 
@@ -95,30 +95,28 @@ implementation {
    * @param msg
    * @param retryDelay the delay betweeen retry attempts, in milliseconds
    */
-  command void MessageTransport.setRetryDelay(message_t *msg, uint16_t retryDelay) {
+  command void PacketLink.setRetryDelay(message_t *msg, uint16_t retryDelay) {
     (call CC2420Packet.getMetadata(msg))->retryDelay = retryDelay;
   }
 
   /** 
    * @return the maximum number of retry attempts for this message
    */
-  command uint16_t MessageTransport.getRetries(message_t *msg) {
+  command uint16_t PacketLink.getRetries(message_t *msg) {
     return (call CC2420Packet.getMetadata(msg))->maxRetries;
   }
 
   /**
    * @return the delay between retry attempts in ms for this message
    */
-  command uint16_t MessageTransport.getRetryDelay(message_t *msg) {
+  command uint16_t PacketLink.getRetryDelay(message_t *msg) {
     return (call CC2420Packet.getMetadata(msg))->retryDelay;
   }
 
   /**
    * @return TRUE if the message was delivered.
-   *     This should always be TRUE if the message was sent to the
-   *     AM_BROADCAST_ADDR
    */
-  command bool MessageTransport.wasDelivered(message_t *msg) {
+  command bool PacketLink.wasDelivered(message_t *msg) {
     return call PacketAcknowledgements.wasAcked(msg);
   }
   
@@ -138,8 +136,7 @@ implementation {
       currentSendLen = len;
       totalRetries = 0;
 
-      if(call AMPacket.destination(msg) != AM_BROADCAST_ADDR &&
-          call MessageTransport.getRetries(msg) > 0) {
+      if(call PacketLink.getRetries(msg) > 0) {
         call PacketAcknowledgements.requestAck(msg);
       }
       
@@ -180,12 +177,11 @@ implementation {
         signalDone(SUCCESS);
         return;
         
-      } else if(call AMPacket.destination(currentSendMsg) != AM_BROADCAST_ADDR
-          && totalRetries < call MessageTransport.getRetries(currentSendMsg)) {
+      } else if(totalRetries < call PacketLink.getRetries(currentSendMsg)) {
         
-        if(call MessageTransport.getRetryDelay(currentSendMsg) > 0) {
+        if(call PacketLink.getRetryDelay(currentSendMsg) > 0) {
           // Resend after some delay
-          call DelayTimer.startOneShot(call MessageTransport.getRetryDelay(currentSendMsg));
+          call DelayTimer.startOneShot(call PacketLink.getRetryDelay(currentSendMsg));
           
         } else {
           // Resend immediately
@@ -213,8 +209,7 @@ implementation {
   
   /***************** Tasks ***************/
   task void send() {
-    if(call AMPacket.destination(currentSendMsg) != AM_BROADCAST_ADDR &&
-        call MessageTransport.getRetries(currentSendMsg) > 0) {
+    if(call PacketLink.getRetries(currentSendMsg) > 0) {
       call PacketAcknowledgements.requestAck(currentSendMsg);
     }
     

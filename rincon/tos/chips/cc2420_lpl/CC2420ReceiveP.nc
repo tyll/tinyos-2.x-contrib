@@ -32,6 +32,7 @@
 /**
  * @author Jonathan Hui <jhui@archrock.com>
  * @author David Moss
+ * @author Jung Il Choi
  * @version $Revision$ $Date$
  */
 
@@ -54,7 +55,7 @@ module CC2420ReceiveP {
   uses interface CC2420Packet;
   
   uses interface Leds;
-
+  uses async command am_addr_t amAddress();
 }
 
 implementation {
@@ -127,7 +128,7 @@ implementation {
       
       // Warning: MicaZ problems have been encountered with the following line
       // followed by a re-enable.  The re-enable doesn't occur.
-      //call InterruptFIFOP.disable();
+      //call InterruptFIFOP.disable();  // TODO
     }
     return SUCCESS;
   }
@@ -240,6 +241,18 @@ implementation {
         }
       } else {
         metadata->time = 0xffff;
+      }
+      
+      if (((( header->fcf >> IEEE154_FCF_ACK_REQ ) & 0x01) == 1) 
+          && (header->dest == call amAddress())
+          && ((( header->fcf >> IEEE154_FCF_FRAME_TYPE ) & 7) == IEEE154_TYPE_DATA)) {
+        // The datasheet says we should wait for 12 symbol periods before
+        // sending the SACK.  We're not trying to be 802.15.4 compliant here,
+        // and we send the SACK with no backoff which should make for a faster
+        // response without much risk of interference.
+        call CSN.clr();
+        call SACK.strobe();
+        call CSN.set();
       }
       
       // pass packet up if crc is good.  

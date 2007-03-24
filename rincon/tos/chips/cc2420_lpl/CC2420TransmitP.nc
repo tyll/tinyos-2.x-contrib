@@ -31,11 +31,10 @@
 
 /**
  * @author Jonathan Hui <jhui@archrock.com>
+ * @author David Moss
+ * @author Jung Il Choi
  * @version $Revision$ $Date$
  */
- 
-#include "IEEE802154.h"
-#include "CC2420DutyCycle.h"
 
 module CC2420TransmitP {
 
@@ -46,11 +45,8 @@ module CC2420TransmitP {
   provides interface RadioTimeStamping as TimeStamp;
   provides interface CC2420Cca;
   
-  
   uses interface Alarm<T32khz,uint32_t> as BackoffTimer;
-  uses interface Timer<TMilli> as WatchdogTimer;
   uses interface CC2420Packet;
-  
   uses interface GpioCapture as CaptureSFD;
   uses interface GeneralIO as CCA;
   uses interface GeneralIO as CSN;
@@ -66,7 +62,6 @@ module CC2420TransmitP {
   uses interface CC2420Strobe as SFLUSHTX;
 
   uses interface CC2420Receive;
-  
   uses interface Leds;
 }
 
@@ -77,12 +72,13 @@ implementation {
     S_STARTED,
     S_LOAD,
     S_SAMPLE_CCA,
-    S_SAMPLE_CCA_ONLY,
     S_BEGIN_TRANSMIT,
     S_SFD,
     S_EFD,
     S_ACK_WAIT,
-    S_CANCEL,
+    S_LOAD_CANCEL,
+    S_TX_CANCEL,
+    S_CCA_CANCEL,
   } cc2420_transmit_state_t;
 
   // This specifies how many jiffies the stack should wait after a
@@ -93,7 +89,7 @@ implementation {
     CC2420_ABORT_PERIOD = 320
   };
   
-  norace message_t* m_msg;
+  norace message_t *m_msg;
   
   norace bool m_cca;
   
@@ -104,7 +100,12 @@ implementation {
   bool m_receiving = FALSE;
   
   uint16_t m_prev_time;
-
+  
+  bool signalSendDone;
+  
+  /** Total CCA checks that showed no activity before the NoAck LPL send */
+  norace uint8_t totalCcaChecks;
+  
   /** The initial backoff period */
   norace uint16_t myInitialBackoff;
   
@@ -114,23 +115,18 @@ implementation {
   /** The low power listening backoff period */
   norace uint16_t myLplBackoff;
   
+
   /***************** Prototypes ****************/
+  error_t send( message_t *p_msg, bool cca );
+  error_t resend( bool cca );
   void loadTXFIFO();
   void attemptSend();
-  void startBackoffTimer(uint16_t time);
-  void stopBackoffTimer();
-  error_t acquireSpiResource();
-  void releaseSpiResource();
-  void signalDone(error_t err);
   void congestionBackoff();
-  error_t send( message_t* p_msg, bool cca );
-  error_t resend( bool cca );
+  error_t acquireSpiResource();
+  error_t releaseSpiResource();
+  void signalDone( error_t err );
   
-  task void startWatchdogTimer();
-  task void stopWatchdogTimer();
-  task void shutdown();
-
-  /***************** Init Commands ****************/
+  /***************** Init Commands *****************/
   command error_t Init.init() {
     call CCA.makeInput();
     call CSN.makeOutput();
@@ -148,50 +144,43 @@ implementation {
     }
     return SUCCESS;
   }
-  
+
   async command error_t AsyncStdControl.stop() {
     atomic {
       m_state = S_STOPPED;
-      stopBackoffTimer();
+      call BackoffTimer.stop();
       call CaptureSFD.disable();
     }
-    
-    // Crashes micaz's:
-    //post shutdown();
     return SUCCESS;
   }
 
-  /***************** Send Commands ****************/
-  async command error_t Send.sendCCA( message_t* p_msg ) {
-    return send( p_msg, TRUE );
+
+  /**************** Send Commands ****************/
+  async command error_t Send.send( message_t* p_msg, bool useCca ) {
+    return send( p_msg, useCca );
   }
 
-  async command error_t Send.send( message_t* p_msg ) {
-    return send( p_msg, FALSE );
-  }
-
-  async command error_t Send.resendCCA() {
-    return resend( TRUE );
-  }
-
-  async command error_t Send.resend() {
-    return resend( FALSE );
+  async command error_t Send.resend(bool useCca) {
+    return resend( useCca );
   }
 
   async command error_t Send.cancel() {
-    stopBackoffTimer();
-
+    cc2420_header_t* hdr = call CC2420Packet.getHeader(m_msg);
     atomic {
+      signalSendDone = FALSE;
       switch( m_state ) {
       case S_LOAD:
-        m_state = S_CANCEL;
+        m_state = S_LOAD_CANCEL;
         break;
         
-      case S_SAMPLE_CCA: 
-      case S_BEGIN_TRANSMIT:
-        signalDone(ECANCEL);
+      case S_SAMPLE_CCA:
+        m_state = S_CCA_CANCEL;
         break;
-      
+        
+      case S_BEGIN_TRANSMIT:
+        m_state = S_TX_CANCEL;
+        break;
+        
       default:
         // cancel not allowed while radio is busy transmitting
         return FAIL;
@@ -209,20 +198,16 @@ implementation {
     return SUCCESS;
   }
 
-  /***************** CC2420Cca Commands ****************/
-  /**
-   * @return TRUE if the CCA pin shows a clear channel
-   */
-  command bool CC2420Cca.isChannelClear() {
-    return call CCA.get();
-  }
-  
   /***************** RadioBackoff Commands ****************/
   /**
    * Must be called within a requestInitialBackoff event
    * @param backoffTime the amount of time in some unspecified units to backoff
    */
   async command void RadioBackoff.setInitialBackoff(uint16_t backoffTime) {
+    if(!backoffTime) {
+      m_cca = FALSE;
+    }
+    
     myInitialBackoff = backoffTime + 1;
   }
   
@@ -231,6 +216,10 @@ implementation {
    * @param backoffTime the amount of time in some unspecified units to backoff
    */
   async command void RadioBackoff.setCongestionBackoff(uint16_t backoffTime) {
+    if(!backoffTime) {
+      m_cca = FALSE;
+    }
+    
     myCongestionBackoff = backoffTime + 1;
   }
   
@@ -239,39 +228,71 @@ implementation {
    * @param backoffTime the amount of time in some unspecified units to backoff
    */
   async command void RadioBackoff.setLplBackoff(uint16_t backoffTime) {
+    if(!backoffTime) {
+      m_cca = FALSE;
+    }
+    
     myLplBackoff = backoffTime + 1;
   }
+  
+  async command void RadioBackoff.setCca(bool useCca) {
+  }
+  
+  
+  
+  /***************** CC2420Cca Commands ****************/
+  /**
+   * @return TRUE if the CCA pin shows a clear channel
+   */
+  command bool CC2420Cca.isChannelClear() {
+    return call CCA.get();
+  }
+  
 
-  
-  
-  /***************** CaptureSFD Events ****************/
+  /**
+   * The CaptureSFD event is actually an interrupt from the capture pin
+   * which is connected to timing circuitry and timer modules.  This
+   * type of interrupt allows us to see what time (being some relative value)
+   * the event occurred, and lets us accurately timestamp our packets.  This
+   * allows higher levels in our system to synchronize with other nodes.
+   *
+   * Because the SFD events can occur so quickly, and the interrupts go
+   * in both directions, we set up the interrupt but check the SFD pin to
+   * determine if that interrupt condition has already been met - meaning,
+   * we should fall through and continue executing code where that interrupt
+   * would have picked up and executed had our microcontroller been fast enough.
+   */
   async event void CaptureSFD.captured( uint16_t time ) {
     atomic {
       switch( m_state ) {
-        
       case S_SFD:
         call CaptureSFD.captureFallingEdge();
         signal TimeStamp.transmittedSFD( time, m_msg );
         releaseSpiResource();
-        stopBackoffTimer();
+        call BackoffTimer.stop();
         m_state = S_EFD;
-        if ( ( ( (call CC2420Packet.getHeader( m_msg ))->fcf >> IEEE154_FCF_FRAME_TYPE ) & 7 ) == 
-             IEEE154_TYPE_DATA )
+        if ( ( ( (call CC2420Packet.getHeader( m_msg ))->fcf >> IEEE154_FCF_FRAME_TYPE ) & 7 ) == IEEE154_TYPE_DATA ) {
           (call CC2420Packet.getMetadata( m_msg ))->time = time;
-        if ( call SFD.get() )
+        }
+        
+        if ( call SFD.get() ) {
           break;
+        }
+        /** Fall Through because the next interrupt was already received */
         
       case S_EFD:
         call CaptureSFD.captureRisingEdge();
         if ( (call CC2420Packet.getHeader( m_msg ))->fcf & ( 1 << IEEE154_FCF_ACK_REQ ) ) {
           m_state = S_ACK_WAIT;
-          startBackoffTimer( CC2420_ACK_WAIT_DELAY );
-        }
-        else {
+          call BackoffTimer.start( CC2420_ACK_WAIT_DELAY );
+        } else {
           signalDone(SUCCESS);
         }
-        if ( !call SFD.get() )
+        
+        if ( !call SFD.get() ) {
           break;
+        }
+        /** Fall Through because the next interrupt was already received */
         
       default:
         if ( !m_receiving ) {
@@ -280,14 +301,16 @@ implementation {
           call CC2420Receive.sfd( time );
           m_receiving = TRUE;
           m_prev_time = time;
-          if ( call SFD.get() )
+          if ( call SFD.get() ) {
+            // wait for the next interrupt before moving on
             return;
+          }
         }
-        if ( m_receiving ) {
-          call CaptureSFD.captureRisingEdge();
-          m_receiving = FALSE;
-          if ( time - m_prev_time < 10 )
-            call CC2420Receive.sfd_dropped();
+        
+        call CaptureSFD.captureRisingEdge();
+        m_receiving = FALSE;
+        if ( time - m_prev_time < 10 ) {
+          call CC2420Receive.sfd_dropped();
         }
         break;
       
@@ -296,17 +319,27 @@ implementation {
   }
 
   /***************** CC2420Receive Events ****************/
+  /**
+   * If the packet we just received was an ack that we were expecting,
+   * our send is complete.
+   */
   async event void CC2420Receive.receive( uint8_t type, message_t* ack_msg ) {
+    cc2420_header_t* ack_header;
+    cc2420_header_t* msg_header;
+    cc2420_metadata_t* msg_metadata;
+    uint8_t* ack_buf;
+    uint8_t length;
+
     if ( type == IEEE154_TYPE_ACK ) {
-      cc2420_header_t* ack_header = call CC2420Packet.getHeader( ack_msg );
-      cc2420_header_t* msg_header = call CC2420Packet.getHeader( m_msg );
-      cc2420_metadata_t* msg_metadata = call CC2420Packet.getMetadata( m_msg );
-      uint8_t* ack_buf = (uint8_t*)ack_header;
-      uint8_t length = ack_header->length;
+      ack_header = call CC2420Packet.getHeader( ack_msg );
+      msg_header = call CC2420Packet.getHeader( m_msg );
+      msg_metadata = call CC2420Packet.getMetadata( m_msg );
+      ack_buf = (uint8_t *) ack_header;
+      length = ack_header->length;
       
       if ( m_state == S_ACK_WAIT &&
            msg_header->dsn == ack_header->dsn ) {
-        stopBackoffTimer();
+        call BackoffTimer.stop();
         msg_metadata->ack = TRUE;
         msg_metadata->rssi = ack_buf[ length - 1 ];
         msg_metadata->lqi = ack_buf[ length ] & 0x7f;
@@ -318,88 +351,139 @@ implementation {
   /***************** SpiResource Events ****************/
   event void SpiResource.granted() {
     uint8_t cur_state;
+
     atomic {
       cur_state = m_state;
     }
 
     switch( cur_state ) {
-      case S_LOAD: 
-        loadTXFIFO(); 
-        break;
+    case S_LOAD:
+      loadTXFIFO();
+      break;
       
-      case S_BEGIN_TRANSMIT: 
-        attemptSend(); 
-        break;
-      
-      default: 
-        releaseSpiResource(); 
-        break;
-    }
-  }
-
-  /***************** TXFIFO Events ****************/
-  async event void TXFIFO.readDone( uint8_t* tx_buf, uint8_t tx_len, 
-      error_t error ) {
-  }
-
-
-  async event void TXFIFO.writeDone( uint8_t* tx_buf, uint8_t tx_len,
-                                     error_t error ) {
-    call CSN.set();
-    
-    if ( m_state == S_CANCEL ) {
-      signalDone(ECANCEL);
-    
-    } else if ( !m_cca ) {
-      m_state = S_BEGIN_TRANSMIT;
+    case S_BEGIN_TRANSMIT:
       attemptSend();
-    
-    } else {
+      break;
+      
+    case S_LOAD_CANCEL:
+    case S_CCA_CANCEL:
+    case S_TX_CANCEL:
+      call CSN.clr();
+      call SFLUSHTX.strobe();
+      call CSN.set();
       releaseSpiResource();
-      m_state = S_SAMPLE_CCA;
-      signal RadioBackoff.requestInitialBackoff(m_msg);
-      startBackoffTimer(myInitialBackoff);
+      atomic {
+        if (signalSendDone) {
+          signalDone(ECANCEL);
+        } else {
+          m_state = S_STARTED;
+        }
+      }
+      break;
+      
+    default:
+      releaseSpiResource();
+      break;
     }
   }
   
+  /***************** TXFIFO Events ****************/
+  /**
+   * The TXFIFO is used to load packets into the transmit buffer on the
+   * chip
+   */
+  async event void TXFIFO.writeDone( uint8_t* tx_buf, uint8_t tx_len,
+                                     error_t error ) {
+
+    call CSN.set();
+    if ( m_state == S_LOAD_CANCEL ) {
+      atomic {
+        call CSN.clr();
+        call SFLUSHTX.strobe();
+        call CSN.set();
+      }
+      releaseSpiResource();
+      if (signalSendDone) {
+        signalDone(ECANCEL);
+      } else {
+        m_state = S_STARTED;
+      }
+      
+    } else if ( !m_cca ) {
+      atomic {
+        if (m_state == S_LOAD_CANCEL) {
+          m_state = S_TX_CANCEL;
+        } else {
+          m_state = S_BEGIN_TRANSMIT;
+        }
+      }
+      attemptSend();
+      
+    } else {
+      releaseSpiResource();
+      atomic {
+        if (m_state == S_LOAD_CANCEL) {
+          m_state = S_CCA_CANCEL;
+        } else {
+          m_state = S_SAMPLE_CCA;
+        }
+      }
+      
+      signal RadioBackoff.requestInitialBackoff(m_msg);
+      call BackoffTimer.start(myInitialBackoff * CC2420_BACKOFF_PERIOD );
+    }
+  }
+
+  
+  async event void TXFIFO.readDone( uint8_t* tx_buf, uint8_t tx_len, 
+      error_t error ) {
+  }
+  
+  
   /***************** Timer Events ****************/
+  /**
+   * The backoff timer is mainly used to wait for a moment before trying
+   * to send a packet again. But we also use it to timeout the wait for
+   * an acknowledgement, and timeout the wait for an SFD interrupt when
+   * we should have gotten one.
+   */
   async event void BackoffTimer.fired() {
-    
     atomic {
-      switch( m_state ) {        
-      case S_SAMPLE_CCA :        
+      switch( m_state ) {
+        
+      case S_SAMPLE_CCA : 
         // sample CCA and wait a little longer if free, just in case we
         // sampled during the ack turn-around window
         if ( call CCA.get() ) {
           m_state = S_BEGIN_TRANSMIT;
-          startBackoffTimer( CC2420_TIME_ACK_TURNAROUND );
+          call BackoffTimer.start( CC2420_TIME_ACK_TURNAROUND );
+          
         } else {
           congestionBackoff();
         }
         break;
         
-      case S_BEGIN_TRANSMIT :
-        if ( acquireSpiResource() == SUCCESS )
+      case S_CCA_CANCEL:
+        m_state = S_TX_CANCEL;
+        /** Fall Through */
+        
+      case S_BEGIN_TRANSMIT:
+      case S_TX_CANCEL:
+        if ( acquireSpiResource() == SUCCESS ) {
           attemptSend();
+        }
         break;
         
-      case S_ACK_WAIT :
+      case S_ACK_WAIT:
         signalDone( SUCCESS );
         break;
 
       case S_SFD:
         // We didn't receive an SFD interrupt within CC2420_ABORT_PERIOD
         // jiffies. Assume something is wrong.
-        call CSN.set();
-        call CSN.clr();
         call SFLUSHTX.strobe();
-        call CSN.set();
-        call CaptureSFD.disable();
         call CaptureSFD.captureRisingEdge();
-
-        atomic m_state = S_STARTED;
         releaseSpiResource();
-
         signalDone( ERETRY );
         break;
 
@@ -408,27 +492,22 @@ implementation {
       }
     }
   }
-  
-  event void WatchdogTimer.fired() {
-    call CSN.set();
-    call CSN.clr();
-    call SFLUSHTX.strobe();
-    call CSN.set();
-    //call CaptureSFD.disable();
-    call CaptureSFD.captureRisingEdge();
-    atomic m_state = S_STARTED;
-    releaseSpiResource();
-    signalDone(ERETRY);
-  }
-
-  
-  
+    
   /***************** Functions ****************/
   /**
-   * Send a message with or without CCA
+   * Set up a message to be sent. First load it into the outbound tx buffer
+   * on the chip, then attempt to send it.
+   * @param *p_msg Pointer to the message that needs to be sent
+   * @param cca TRUE if this transmit should use clear channel assessment
    */
   error_t send( message_t* p_msg, bool cca ) {
     atomic {
+      if (m_state == S_LOAD_CANCEL
+          || m_state == S_CCA_CANCEL
+          || m_state == S_TX_CANCEL) {
+        return ECANCEL;
+      }
+      
       if ( m_state != S_STARTED ) {
         return FAIL;
       }
@@ -436,34 +515,48 @@ implementation {
       m_state = S_LOAD;
       m_cca = cca;
       m_msg = p_msg;
+      totalCcaChecks = 0;
     }
-
-    post startWatchdogTimer();
-
+    
     if ( acquireSpiResource() == SUCCESS ) {
       loadTXFIFO();
     }
-    // Else, we wait for the SpiResource.granted event..
-    
+
     return SUCCESS;
   }
   
   /**
-   * Resend a message with or without CCA
+   * Resend a packet that already exists in the outbound tx buffer on the
+   * chip
+   * @param cca TRUE if this transmit should use clear channel assessment
    */
   error_t resend( bool cca ) {
+
     atomic {
-      if ( m_state != S_STARTED )
+      if (m_state == S_LOAD_CANCEL
+          || m_state == S_CCA_CANCEL
+          || m_state == S_TX_CANCEL) {
+        return ECANCEL;
+      }
+      
+      if ( m_state != S_STARTED ) {
         return FAIL;
+      }
+      
       m_cca = cca;
       m_state = cca ? S_SAMPLE_CCA : S_BEGIN_TRANSMIT;
+      totalCcaChecks = 0;
     }
-
-    post startWatchdogTimer();
-
-    if ( m_cca ) {
-      signal RadioBackoff.requestInitialBackoff(m_msg);
-      startBackoffTimer(myInitialBackoff);
+    
+    if(m_cca) {
+      if((call CC2420Packet.getMetadata( m_msg ))->rxInterval > 0) {
+        signal RadioBackoff.requestLplBackoff(m_msg);
+        call BackoffTimer.start( myLplBackoff );
+        
+      } else {
+        signal RadioBackoff.requestInitialBackoff(m_msg);
+        call BackoffTimer.start( myInitialBackoff * CC2420_BACKOFF_PERIOD );
+      }
       
     } else if ( acquireSpiResource() == SUCCESS ) {
       attemptSend();
@@ -473,82 +566,99 @@ implementation {
   }
   
   /**
-   * Attempt to send a message
+   * Attempt to send the packet we have loaded into the tx buffer on 
+   * the radio chip.  The STXONCCA will send the packet immediately if
+   * the channel is clear.  If we're not concerned about whether or not
+   * the channel is clear (i.e. m_cca == FALSE), then STXON will send the
+   * packet without checking for a clear channel.
+   *
+   * If the packet didn't get sent, then congestion == TRUE.  In that case,
+   * we reset the backoff timer and try again in a moment.
+   *
+   * If the packet got sent, we should expect an SFD interrupt to take
+   * over, signifying the packet is getting sent.
    */
   void attemptSend() {
     uint8_t status;
     bool congestion = TRUE;
-
-    /*
+    
     atomic {
-      // Handle cancel requests at the last minute
-      if(m_state != S_BEGIN_TRANSMIT) {
+      if (m_state == S_TX_CANCEL) {
+        call SFLUSHTX.strobe();
+        releaseSpiResource();
+        call CSN.set();
+        if (signalSendDone) {
+          signalDone(ECANCEL);
+        } else {
+          m_state = S_STARTED;
+        }
         return;
       }
-    }
-    */
-    
-    call CSN.clr();
+      
+      /*
+       * If we're using LPL, we must ensure nobody else is transmitting
+       * an LPL delivery before sending the first packet, which involves 
+       * sampling the channel at a few random times.
+       */
+      if(m_cca && (call CC2420Packet.getMetadata( m_msg ))->rxInterval > 0) {
+        if(call CCA.get()) {
+          // Channel is clear
+          totalCcaChecks++;
+          
+        } else {
+          // Channel is not clear, restart
+          totalCcaChecks = 0;
+        }
+        
+        // The LPL backoff value here is simply access to a small random number
+        if(totalCcaChecks < MIN_BACKOFF_SAMPLES) {
+          // Keep retrying a few times until the channel is ours for the taking
+          releaseSpiResource();
+          signal RadioBackoff.requestInitialBackoff(m_msg);
+          call BackoffTimer.start( myInitialBackoff );
+          return;
+        }
+      }
 
-    status = m_cca ? call STXONCCA.strobe() : call STXON.strobe();
-    if ( !( status & CC2420_STATUS_TX_ACTIVE ) ) {
-      status = call SNOP.strobe();
-      if ( status & CC2420_STATUS_TX_ACTIVE )
-        congestion = FALSE;
+      call CSN.clr();
+      status = m_cca ? call STXONCCA.strobe() : call STXON.strobe();
+      if ( !( status & CC2420_STATUS_TX_ACTIVE ) ) {
+        status = call SNOP.strobe();
+        if ( status & CC2420_STATUS_TX_ACTIVE ) {
+          congestion = FALSE;
+        }
+      }
+      
+      m_state = congestion ? S_SAMPLE_CCA : S_SFD;
+      call CSN.set();
     }
-    atomic m_state = congestion ? S_SAMPLE_CCA : S_SFD;
     
-    call CSN.set();
-
     if ( congestion ) {
+      totalCcaChecks = 0;
       releaseSpiResource();
       congestionBackoff();
     } else {
-      
-      startBackoffTimer(CC2420_ABORT_PERIOD);
+      call BackoffTimer.start(CC2420_ABORT_PERIOD);
     }
   }
   
-
-  /**
-   * Start the watchdog timer
+  
+  /**  
+   * Congestion Backoff
    */
-  task void startWatchdogTimer() {
-    call WatchdogTimer.startOneShot(50);
+  void congestionBackoff() {
+    atomic {
+      if((call CC2420Packet.getMetadata(m_msg))->rxInterval > 0) {
+        signal RadioBackoff.requestLplBackoff(m_msg);
+        call BackoffTimer.start(myLplBackoff);
+        
+      } else {
+        signal RadioBackoff.requestCongestionBackoff(m_msg);
+        call BackoffTimer.start(myCongestionBackoff);
+      }
+    }
   }
   
-  /**
-   * Stop the watchdog timer
-   */
-  task void stopWatchdogTimer() {
-    call WatchdogTimer.stop();
-  }
-  
-  task void shutdown() {
-    call CSN.set();
-    call CSN.clr();
-    call SFLUSHTX.strobe();
-    call CSN.set();
-    //call CaptureSFD.disable();
-  }
-  
-  /**
-   * Start the backoff timer
-   */
-  void startBackoffTimer(uint16_t time) {
-    call BackoffTimer.start(time);
-  }
-
-  /** 
-   * Stop the backoff timer
-   */
-  void stopBackoffTimer() {
-    call BackoffTimer.stop();
-  }
-
-  /**
-   * Acquire the SPI bus resource immediately, or defer it till later
-   */
   error_t acquireSpiResource() {
     error_t error = call SpiResource.immediateRequest();
     if ( error != SUCCESS ) {
@@ -557,59 +667,64 @@ implementation {
     return error;
   }
 
-  /**
-   * Release the SPI resource
-   */
-  void releaseSpiResource() {
+  error_t releaseSpiResource() {
     call SpiResource.release();
+    return SUCCESS;
   }
 
-  /**
-   * Signal done
-   */
-  void signalDone( error_t err ) {
-    atomic m_state = S_STARTED;
-    post stopWatchdogTimer();
-    signal Send.sendDone( m_msg, err );
-  }
 
-  /**  
-   * Congestion Backoff
-   */
-  void congestionBackoff() {
-    atomic {
-      if((call CC2420Packet.getMetadata(m_msg))->rxInterval > 0) {
-        signal RadioBackoff.requestLplBackoff(m_msg);
-        startBackoffTimer(myLplBackoff);
-        
-      } else {
-        signal RadioBackoff.requestCongestionBackoff(m_msg);
-        startBackoffTimer(myCongestionBackoff);
-      }
-    }
-  }
-  
-  /**
-   * Load TX FIFO
+  /** 
+   * Setup the packet transmission power and load the tx fifo buffer on
+   * the chip with our outbound packet.  
+   *
+   * Warning: the tx_power metadata might not be initialized and
+   * could be a value other than 0 on boot.  Verification is needed here
+   * to make sure the value won't overstep its bounds in the TXCTRL register
+   * and is transmitting at max power by default.
    */
   void loadTXFIFO() {
     cc2420_header_t* header = call CC2420Packet.getHeader( m_msg );
     uint8_t tx_power = (call CC2420Packet.getMetadata( m_msg ))->tx_power;
-
-    if ( !tx_power )
+    
+    if ( !tx_power ) {
+      // If our packet's tx_power wasn't configured to anything but 0,
+      // send it using the default RF power.  This assumes the
+      // packet's metadata is all set to 0's on boot.  To be safe across
+      // all platforms, apps should probably explicitly specify the transmit 
+      // power setting.
+      
       tx_power = CC2420_DEF_RFPOWER;
+    }
+    
     call CSN.clr();
-    if ( m_tx_power != tx_power )
+    
+    if ( m_tx_power != tx_power ) {
       call TXCTRL.write( ( 2 << CC2420_TXCTRL_TXMIXBUF_CUR ) |
                          ( 3 << CC2420_TXCTRL_PA_CURRENT ) |
                          ( 1 << CC2420_TXCTRL_RESERVED ) |
-                         ( tx_power << CC2420_TXCTRL_PA_LEVEL ) );
+                         ( (tx_power & 0x1F) << CC2420_TXCTRL_PA_LEVEL ) );
+    }
+    
     m_tx_power = tx_power;
     call TXFIFO.write( (uint8_t*)header, header->length - 1 );
   }
   
+  void signalDone( error_t err ) {
+    atomic m_state = S_STARTED;
+    signal Send.sendDone( m_msg, err );
+  }
+  
+  
+  
+  /***************** Tasks ****************/
+
+
   /***************** Defaults ****************/
-  default async event void TimeStamp.transmittedSFD( uint16_t time, message_t* p_msg ) {}
-  default async event void TimeStamp.receivedSFD( uint16_t time ) {}
+  default async event void TimeStamp.transmittedSFD( uint16_t time, message_t* p_msg ) {
+  }
+  
+  default async event void TimeStamp.receivedSFD( uint16_t time ) {
+  }
 
 }
+

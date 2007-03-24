@@ -44,6 +44,7 @@ configuration CC2420ControlC {
   provides interface Resource;
   provides interface CC2420Config;
   provides interface CC2420Power;
+  provides interface Read<uint16_t> as ReadRssi;
   
 }
 
@@ -53,6 +54,7 @@ implementation {
   Resource = CC2420ControlP;
   CC2420Config = CC2420ControlP;
   CC2420Power = CC2420ControlP;
+  ReadRssi = CC2420ControlP;
 
   components MainC;
   MainC.SoftwareInit -> CC2420ControlP;
@@ -84,9 +86,13 @@ implementation {
   CC2420ControlP.MDMCTRL1 -> Spi.MDMCTRL1;
   CC2420ControlP.PANID -> Spi.PANID;
   CC2420ControlP.RXCTRL1 -> Spi.RXCTRL1;
+  CC2420ControlP.RSSI  -> Spi.RSSI;
 
   components new CC2420SpiC() as SyncSpiC;
   CC2420ControlP.SyncResource -> SyncSpiC;
+
+  components new CC2420SpiC() as RssiResource;
+  CC2420ControlP.RssiResource -> RssiResource;
 
 }
 

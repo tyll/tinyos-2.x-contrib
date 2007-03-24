@@ -19,7 +19,7 @@
  * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
  * FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE
- * ARCHED ROCK OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * RINCON RESEARCH OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
  * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
@@ -30,40 +30,63 @@
  */
 
 /**
+ * Dummy module for Packet Link layer
  * @author David Moss
+ * @author Jon Wyant
  */
- 
-#ifndef CC2420DUTYCYCLE_H
-#define CC2420DUTYCYCLE_H
 
-/**
- * Default duty period is 0, which is "always on"
- */
-#ifndef DEFAULT_DUTY_PERIOD
-#define DEFAULT_DUTY_PERIOD 0
-#endif
+module PacketLinkDummyP {
+  provides {
+    interface PacketLink;
+  }
+  
+  uses {
+    interface PacketAcknowledgements;
+  }
+}
 
-/**
- * This is a measured value of the time the radio is actually on (5.8 ms)
- * We round this up to 6 ms for erring on the side of better performance ratios
- */
-#ifndef DUTY_ON_TIME
-#define DUTY_ON_TIME 6         // TODO re-measure
-#endif
+implementation {
+  
+  /***************** PacketLink Commands ***************/
+  /**
+   * Set the maximum number of times attempt message delivery
+   * Default is 0
+   * @param msg
+   * @param maxRetries the maximum number of attempts to deliver
+   *     the message
+   */
+  command void PacketLink.setRetries(message_t *msg, uint16_t maxRetries) {
+  }
 
-/**
- * The maximum number of CCA checks performed on each wakeup.
- * If there are too few, the receiver may wake up between messages
- * and not detect the transmitter.
- */
-#ifndef MAX_LPL_CCA_CHECKS
+  /**
+   * Set a delay between each retry attempt
+   * @param msg
+   * @param retryDelay the delay betweeen retry attempts, in milliseconds
+   */
+  command void PacketLink.setRetryDelay(message_t *msg, uint16_t retryDelay) {
+  }
 
-#if defined(PLATFORM_TELOSB)
-#define MAX_LPL_CCA_CHECKS 1200
-#else
-#define MAX_LPL_CCA_CHECKS 1200
-#endif
+  /** 
+   * @return the maximum number of retry attempts for this message
+   */
+  command uint16_t PacketLink.getRetries(message_t *msg) {
+    return 0;
+  }
 
-#endif
+  /**
+   * @return the delay between retry attempts in ms for this message
+   */
+  command uint16_t PacketLink.getRetryDelay(message_t *msg) {
+    return 0;
+  }
 
-#endif
+  /**
+   * @return TRUE if the message was delivered.
+   *     This should always be TRUE if the message was sent to the
+   *     AM_BROADCAST_ADDR
+   */
+  command bool PacketLink.wasDelivered(message_t *msg) {
+    return call PacketAcknowledgements.wasAcked(msg);
+  }
+}
+

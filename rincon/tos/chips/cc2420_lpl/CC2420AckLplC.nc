@@ -19,7 +19,7 @@
  * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
  * FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE
- * ARCHED ROCK OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * RINCON RESEARCH OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
  * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
@@ -33,11 +33,12 @@
  * Low Power Listening for the CC2420
  * @author David Moss
  */
- 
-#include "CC2420LowPowerListening.h"
-#warning "*** USING LOW POWER LISTENING LAYER"
 
-configuration CC2420LowPowerListeningC {
+
+#include "CC2420AckLpl.h"
+#warning "*** USING ACK LOW POWER LISTENING LAYER"
+
+configuration CC2420AckLplC {
   provides {
     interface LowPowerListening;
     interface Send;
@@ -55,7 +56,7 @@ configuration CC2420LowPowerListeningC {
 
 implementation {
   components MainC,
-      CC2420LowPowerListeningP,
+      CC2420AckLplP,
       CC2420DutyCycleC,
       CC2420ActiveMessageC,
       CC2420CsmaC,
@@ -68,31 +69,30 @@ implementation {
       new TimerMilliC() as OffTimerC,
       new TimerMilliC() as SendDoneTimerC;
   
-  LowPowerListening = CC2420LowPowerListeningP;
-  Send = CC2420LowPowerListeningP;
-  Receive = CC2420LowPowerListeningP;
+  LowPowerListening = CC2420AckLplP;
+  Send = CC2420AckLplP;
+  Receive = CC2420AckLplP;
   SplitControl = CC2420DutyCycleC;
   SendState = SendStateC;
   
-  SubControl = CC2420LowPowerListeningP.SubControl;
-  SubReceive = CC2420LowPowerListeningP.SubReceive;
-  SubSend = CC2420LowPowerListeningP.SubSend;
+  SubControl = CC2420AckLplP.SubControl;
+  SubReceive = CC2420AckLplP.SubReceive;
+  SubSend = CC2420AckLplP.SubSend;
   
   
-  MainC.SoftwareInit -> CC2420LowPowerListeningP;
+  MainC.SoftwareInit -> CC2420AckLplP;
   
-  CC2420LowPowerListeningP.Random -> RandomC;
-  CC2420LowPowerListeningP.SendState -> SendStateC;
-  CC2420LowPowerListeningP.RadioState -> RadioStateC;
-  CC2420LowPowerListeningP.SplitControlState -> CC2420DutyCycleC;
-  CC2420LowPowerListeningP.OffTimer -> OffTimerC;
-  CC2420LowPowerListeningP.SendDoneTimer -> SendDoneTimerC;
-  CC2420LowPowerListeningP.CC2420DutyCycle -> CC2420DutyCycleC;
-  CC2420LowPowerListeningP.Resend -> CC2420TransmitC;
-  CC2420LowPowerListeningP.PacketAcknowledgements -> CC2420ActiveMessageC;
-  CC2420LowPowerListeningP.AMPacket -> CC2420ActiveMessageC;
-  CC2420LowPowerListeningP.CC2420Packet -> CC2420PacketC;
-  CC2420LowPowerListeningP.Leds -> LedsC;
+  CC2420AckLplP.Random -> RandomC;
+  CC2420AckLplP.SendState -> SendStateC;
+  CC2420AckLplP.RadioState -> RadioStateC;
+  CC2420AckLplP.SplitControlState -> CC2420DutyCycleC;
+  CC2420AckLplP.OffTimer -> OffTimerC;
+  CC2420AckLplP.SendDoneTimer -> SendDoneTimerC;
+  CC2420AckLplP.CC2420DutyCycle -> CC2420DutyCycleC;
+  CC2420AckLplP.Resend -> CC2420TransmitC;
+  CC2420AckLplP.PacketAcknowledgements -> CC2420ActiveMessageC;
+  CC2420AckLplP.AMPacket -> CC2420ActiveMessageC;
+  CC2420AckLplP.CC2420Packet -> CC2420PacketC;
+  CC2420AckLplP.Leds -> LedsC;
   
 }
-

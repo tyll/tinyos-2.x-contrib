@@ -50,6 +50,8 @@ generic configuration CC2420SpiC() {
   provides interface CC2420Strobe as STXONCCA;
   provides interface CC2420Strobe as SXOSCON;
   provides interface CC2420Strobe as SXOSCOFF;
+  
+  provides interface CC2420Strobe as SACK;
 
   // registers
   provides interface CC2420Register as FSCTRL;
@@ -59,6 +61,7 @@ generic configuration CC2420SpiC() {
   provides interface CC2420Register as MDMCTRL1;
   provides interface CC2420Register as TXCTRL;
   provides interface CC2420Register as RXCTRL1;
+  provides interface CC2420Register as RSSI;
 
   // ram
   provides interface CC2420Ram as IEEEADR;
@@ -93,6 +96,8 @@ implementation {
   STXONCCA = Spi.Strobe[ CC2420_STXONCCA ];
   SXOSCON = Spi.Strobe[ CC2420_SXOSCON ];
   SXOSCOFF = Spi.Strobe[ CC2420_SXOSCOFF ];
+  
+  SACK = Spi.Strobe[ CC2420_SACK ];
 
   // registers
   FSCTRL = Spi.Reg[ CC2420_FSCTRL ];
@@ -102,6 +107,7 @@ implementation {
   MDMCTRL1 = Spi.Reg[ CC2420_MDMCTRL1 ];
   TXCTRL = Spi.Reg[ CC2420_TXCTRL ];
   RXCTRL1 = Spi.Reg[ CC2420_RXCTRL1 ];
+  RSSI = Spi.Reg[ CC2420_RSSI ];
 
   // ram
   IEEEADR = Spi.Ram[ CC2420_RAM_IEEEADR ];

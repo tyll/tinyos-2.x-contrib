@@ -29,16 +29,49 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE
  *
  * @author Jonathan Hui <jhui@archrock.com>
+ * @author David Moss
  * @version $Revision$ $Date$
  */
 
 #ifndef __CC2420_H__
 #define __CC2420_H__
 
-//#include "message.h"
+/**
+ * Define the minimum number of backoff samples to take when transmitting
+ */
+#if defined(LOW_POWER_LISTENING) || defined(ACK_LOW_POWER_LISTENING)
+#include "CC2420AckLpl.h"
+
+#elif defined(NOACK_LOW_POWER_LISTENING)
+#include "CC2420NoAckLpl.h"
+
+#else
+#ifndef MIN_BACKOFF_SAMPLES
+#define MIN_BACKOFF_SAMPLES 1
+#endif
+
+#endif
+
+
 
 typedef uint8_t cc2420_status_t;
 
+enum {
+  CC2420_IFRAME = 0,
+  CC2420_TFRAME = 1,
+};
+
+/**
+ * The default frame type is a T-Frame, not an I-Frame (see TEP125)
+ */
+#ifndef CC2420_FRAME_TYPE
+#define CC2420_FRAME_TYPE CC2420_TFRAME
+#endif
+
+/**
+ * CC2420 header.  An I-frame (interoperability frame) header has an 
+ * extra network byte specified by 6LowPAN
+ */
 typedef nx_struct cc2420_header_t {
   nxle_uint8_t length;
   nxle_uint16_t fcf;
@@ -46,12 +79,25 @@ typedef nx_struct cc2420_header_t {
   nxle_uint16_t destpan;
   nxle_uint16_t dest;
   nxle_uint16_t src;
+  
+  /** I-Frame 6LowPAN byte */
+#if (CC2420_FRAME_TYPE == CC2420_IFRAME)
+  nxle_uint8_t network;
+#endif
+
   nxle_uint8_t type;
 } cc2420_header_t;
-
+  
+/**
+ * CC2420 Packet Footer
+ */
 typedef nx_struct cc2420_footer_t {
 } cc2420_footer_t;
 
+/**
+ * CC2420 Packet metadata. Contains extra information about the message
+ * that will not be transmitted
+ */
 typedef nx_struct cc2420_metadata_t {
   nx_uint8_t tx_power;
   nx_uint8_t rssi;
@@ -60,14 +106,21 @@ typedef nx_struct cc2420_metadata_t {
   nx_bool ack;
   nx_uint16_t time;
   nx_uint16_t rxInterval;
+
+  /** Packet Link Metadata */
+#ifdef PACKET_LINK
   nx_uint16_t maxRetries;
   nx_uint16_t retryDelay;
+#endif
+
 } cc2420_metadata_t;
+
 
 typedef nx_struct cc2420_packet_t {
   cc2420_header_t packet;
   nx_uint8_t data[];
 } cc2420_packet_t;
+
 
 #ifndef TOSH_DATA_LENGTH
 #define TOSH_DATA_LENGTH 28
@@ -84,6 +137,11 @@ typedef nx_struct cc2420_packet_t {
 #ifndef RECEIVE_HISTORY_SIZE
 #define RECEIVE_HISTORY_SIZE 4
 #endif
+
+#ifndef TINYOS_6LOWPAN_NETWORK_ID
+#define TINYOS_6LOWPAN_NETWORK_ID 0x0
+#endif
+
 
 enum {
   // size of the header not including the length byte

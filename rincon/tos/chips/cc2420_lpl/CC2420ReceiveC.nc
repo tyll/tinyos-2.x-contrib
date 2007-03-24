@@ -48,6 +48,7 @@ implementation {
   components MainC;
   components CC2420ReceiveP;
   components CC2420PacketC;
+  components ActiveMessageAddressC;
   components new CC2420SpiC() as Spi;
 
   components HplCC2420PinsC as Pins;
@@ -66,11 +67,11 @@ implementation {
   CC2420ReceiveP.FIFO -> Pins.FIFO;
   CC2420ReceiveP.FIFOP -> Pins.FIFOP;
   CC2420ReceiveP.InterruptFIFOP -> InterruptsC.InterruptFIFOP;
-
   CC2420ReceiveP.SpiResource -> Spi;
   CC2420ReceiveP.RXFIFO -> Spi.RXFIFO;
   CC2420ReceiveP.SFLUSHRX -> Spi.SFLUSHRX;
-  
+  CC2420ReceiveP.SACK -> Spi.SACK;
   CC2420ReceiveP.CC2420Packet -> CC2420PacketC;
+  CC2420ReceiveP.amAddress -> ActiveMessageAddressC;
 
 }

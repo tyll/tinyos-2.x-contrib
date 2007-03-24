@@ -30,12 +30,11 @@
  * early packet rejection if acknowledgements are enabled.
  *
  * @author Philip Levis
+ * @author David Moss
  * @version $Revision$ $Date$
  */
 
 #include "CC2420.h"
-
-#warning "*** USING RRC_CC2420_RELIABLE STACK"
 
 configuration CC2420ActiveMessageC {
   provides {
@@ -49,7 +48,7 @@ configuration CC2420ActiveMessageC {
     interface PacketAcknowledgements;
     interface RadioBackoff[am_id_t amId];
     interface LowPowerListening;
-    interface MessageTransport;
+    interface PacketLink;
   }
 }
 implementation {
@@ -59,18 +58,21 @@ implementation {
   components ActiveMessageAddressC as Address;
   components UniqueSendC;
   components UniqueReceiveC;
+  components CC2420DispatchC;
   components CC2420PacketC;
   
-#ifdef LOW_POWER_LISTENING
-  components CC2420LowPowerListeningC as LplC;
+#if defined(LOW_POWER_LISTENING) || defined(ACK_LOW_POWER_LISTENING)
+  components CC2420AckLplC as LplC;
+#elif defined(NOACK_LOW_POWER_LISTENING)
+  components CC2420NoAckLplC as LplC;
 #else
   components CC2420LplDummyC as LplC;
 #endif
 
-#ifdef MESSAGE_TRANSPORT
-  components MessageTransportC as TransportC;
+#if defined(PACKET_LINK)
+  components PacketLinkC as LinkC;
 #else
-  components MessageTransportDummyC as TransportC;
+  components PacketLinkDummyC as LinkC;
 #endif
 
   
@@ -80,7 +82,7 @@ implementation {
   Receive  = AM.Receive;
   Snoop    = AM.Snoop;
   AMPacket = AM;
-  MessageTransport = TransportC;
+  PacketLink = LinkC;
   LowPowerListening = LplC;
   CC2420Packet = CC2420PacketC;
   PacketAcknowledgements = CC2420PacketC;
@@ -92,14 +94,16 @@ implementation {
   
   // Send Layers
   AM.SubSend -> UniqueSendC;
-  UniqueSendC.SubSend -> TransportC;
-  TransportC.SubSend -> LplC.Send;
-  LplC.SubSend -> CsmaC;
+  UniqueSendC.SubSend -> LinkC;
+  LinkC.SubSend -> LplC.Send;
+  LplC.SubSend -> CC2420DispatchC.Send;
+  CC2420DispatchC.SubSend -> CsmaC;
   
   // Receive Layers
   AM.SubReceive -> LplC;
-  LplC.SubReceive -> UniqueReceiveC;
-  UniqueReceiveC.SubReceive -> CsmaC;
+  LplC.SubReceive -> UniqueReceiveC.Receive;
+  UniqueReceiveC.SubReceive -> CC2420DispatchC.Receive;
+  CC2420DispatchC.SubReceive -> CsmaC;
 
   AM.amAddress -> Address;
   AM.CC2420Packet -> CC2420PacketC;

@@ -19,7 +19,7 @@
  * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
  * FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE
- * ARCHED ROCK OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * RINCON RESEARCH OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
  * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
@@ -39,8 +39,6 @@
  * @author David Moss
  */
  
-#include "CC2420DutyCycle.h"
-
 module CC2420DutyCycleP {
   provides {
     interface CC2420DutyCycle;
@@ -89,8 +87,8 @@ implementation {
   
   /***************** Init Commands ****************/
   command error_t Init.init() {
-    sleepInterval = DEFAULT_DUTY_PERIOD;
-    return SUCCESS;
+    sleepInterval = 0;
+   return SUCCESS;
   }
   
   /***************** CC2420DutyCycle Commands ****************/
@@ -103,7 +101,7 @@ implementation {
       // We were always on, now lets duty cycle
       call DutyCycleState.forceState(S_ON);
       call CheckState.toIdle();
-      post stopRadio();
+      post stopRadio();  // TODO delay turning off the radio
     }
     
     detectionForced = FALSE;
@@ -279,16 +277,15 @@ implementation {
       }
 
       atomic {
-        for( ; ccaChecks < MAX_LPL_CCA_CHECKS && call SendState.isIdle(); 
-            ccaChecks++) {
+        for( ; ccaChecks < MAX_LPL_CCA_CHECKS && call SendState.isIdle(); ccaChecks++) {
           if(!call CC2420Cca.isChannelClear() || detectionForced) {
             detects++;
-            if(detects > 3) {
+            if(detects > MIN_SAMPLES_BEFORE_DETECT) {
               signal CC2420DutyCycle.detected(); 
               return;
             }
             // Leave the radio on for upper layers to perform some transaction
-           }
+          }
         }
       }
       call CheckState.toIdle();

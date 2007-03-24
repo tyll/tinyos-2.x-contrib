@@ -19,7 +19,7 @@
  * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
  * FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE
- * ARCHED ROCK OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * RINCON RESEARCH OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
  * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
@@ -28,56 +28,43 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE
  */
- 
- /**
-  * @author David Moss
-  */
-#ifndef CC2420LOWPOWERLISTENING_H
-#define CC2420LOWPOWERLISTENING_H
-
-#include "CC2420DutyCycle.h"
 
 /**
- * The default duty period is usually 0, which is the equivalent of
- * ONE_MESSAGE (below), which tells the node to transmit the message
- * one time without expecting receiver duty cycling.
+ * Reliable Packet Link Functionality
+ * @author David Moss
+ * @author Jon Wyant
  */
-#ifndef DEFAULT_TRANSMIT_PERIOD
-#define DEFAULT_TRANSMIT_PERIOD DEFAULT_DUTY_PERIOD
-#endif
 
-/**
- * Amount of time, in milliseconds, to keep the radio on after
- * a successful receive addressed to this node
- * You don't want this too fast, or the off timer can accidentally
- * fire due to delays in the system.  The radio would shut off and
- * possibly need to turn back on again immediately, which can lock up
- * the CC2420 if it's in the middle of doing something.
- */
-#ifndef DELAY_AFTER_RECEIVE
-#define DELAY_AFTER_RECEIVE 200
-#endif
+#warning "*** USING PACKET LINK LAYER"
 
-/**
- * Value used to indicate the message being sent should be transmitted
- * one time
- */
-#ifndef ONE_MESSAGE
-#define ONE_MESSAGE 0
-#endif
+configuration PacketLinkC {
+  provides {
+    interface Send;
+    interface PacketLink;
+  }
+  
+  uses {
+    interface Send as SubSend;
+  }
+}
 
-/**
- * If the receiver does a receive check and ends up getting packets destined
- * for another mote, shut the radio back off after so many invalid packets
- */
-#ifndef MAX_INVALID_MESSAGES
-#define MAX_INVALID_MESSAGES 3
-#endif
+implementation {
 
-typedef enum {
-  S_LPL_NOT_SENDING,  // DEFAULT
-  S_LPL_SENDING,
-} lpl_sendstate_t;
+  components PacketLinkP,
+      ActiveMessageC,
+      CC2420PacketC,
+      RandomC,
+      new StateC() as SendStateC,
+      new TimerMilliC() as DelayTimerC;
+  
+  PacketLink = PacketLinkP;
+  Send = PacketLinkP.Send;
+  SubSend = PacketLinkP.SubSend;
+  
+  PacketLinkP.SendState -> SendStateC;
+  PacketLinkP.DelayTimer -> DelayTimerC;
+  PacketLinkP.PacketAcknowledgements -> ActiveMessageC;
+  PacketLinkP.AMPacket -> ActiveMessageC;
+  PacketLinkP.CC2420Packet -> CC2420PacketC;
 
-#endif
-
+}

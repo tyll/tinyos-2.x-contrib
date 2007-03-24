@@ -19,7 +19,7 @@
  * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
  * FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE
- * ARCHED ROCK OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * RINCON RESEARCH OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
  * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
@@ -28,32 +28,45 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE
  */
-
+ 
 /**
- * Dummy configuration for MessageTransport Layer
  * @author David Moss
  * @author Jon Wyant
  */
- 
-configuration MessageTransportDummyC {
-  provides {
-    interface Send;
-    interface MessageTransport;
-  }
-  
-  uses {
-    interface Send as SubSend;
-  }
+
+interface PacketLink {
+
+  /**
+   * Set the maximum number of times attempt message delivery
+   * Default is 0
+   * @param msg
+   * @param maxRetries the maximum number of attempts to deliver
+   *     the message
+   */
+  command void setRetries(message_t *msg, uint16_t maxRetries);
+
+  /**
+   * Set a delay between each retry attempt
+   * @param msg
+   * @param retryDelay the delay betweeen retry attempts, in milliseconds
+   */
+  command void setRetryDelay(message_t *msg, uint16_t retryDelay);
+
+  /** 
+   * @return the maximum number of retry attempts for this message
+   */
+  command uint16_t getRetries(message_t *msg);
+
+  /**
+   * @return the delay between retry attempts in ms for this message
+   */
+  command uint16_t getRetryDelay(message_t *msg);
+
+  /**
+   * @return TRUE if the message was delivered.
+   */
+  command bool wasDelivered(message_t *msg);
+
 }
 
-implementation {
-  components MessageTransportDummyP,
-      ActiveMessageC;
-  
-  MessageTransport = MessageTransportDummyP;
-  Send = SubSend;
-  
-  MessageTransportDummyP.PacketAcknowledgements -> ActiveMessageC;
-  
-}
 

@@ -19,7 +19,7 @@
  * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
  * FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE
- * ARCHED ROCK OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * RINCON RESEARCH OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
  * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
@@ -30,17 +30,15 @@
  */
 
 /**
- * Reliable Message Transport Functionality
+ * Dummy configuration for PacketLink Layer
  * @author David Moss
  * @author Jon Wyant
  */
-
-#warning "*** USING MESSAGE TRANSPORT LAYER"
-
-configuration MessageTransportC {
+ 
+configuration PacketLinkDummyC {
   provides {
     interface Send;
-    interface MessageTransport;
+    interface PacketLink;
   }
   
   uses {
@@ -49,22 +47,13 @@ configuration MessageTransportC {
 }
 
 implementation {
-  components MessageTransportP,
-      ActiveMessageC,
-      CC2420PacketC,
-      RandomC,
-      new StateC() as SendStateC,
-      new TimerMilliC() as DelayTimerC;
+  components PacketLinkDummyP,
+      ActiveMessageC;
   
-  MessageTransport = MessageTransportP;
-  Send = MessageTransportP.Send;
-  SubSend = MessageTransportP.SubSend;
+  PacketLink = PacketLinkDummyP;
+  Send = SubSend;
   
-  MessageTransportP.SendState -> SendStateC;
-  MessageTransportP.DelayTimer -> DelayTimerC;
-  MessageTransportP.PacketAcknowledgements -> ActiveMessageC;
-  MessageTransportP.AMPacket -> ActiveMessageC;
-  MessageTransportP.CC2420Packet -> CC2420PacketC;
-    
+  PacketLinkDummyP.PacketAcknowledgements -> ActiveMessageC;
+  
 }
 

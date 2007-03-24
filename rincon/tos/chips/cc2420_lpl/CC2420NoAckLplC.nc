@@ -28,61 +28,73 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE
  */
- 
-/**
- * Use this component to duty cycle the radio. When a message is heard, 
- * disable DutyCycling.
- *
- * @author David Moss dmm@rincon.com
- */
 
-configuration CC2420DutyCycleC {
+/**
+ * Low Power Listening for the CC2420
+ * @author David Moss
+ */
+ 
+#include "CC2420NoAckLpl.h"
+#warning "*** USING NO-ACK LOW POWER LISTENING LAYER"
+
+configuration CC2420NoAckLplC {
   provides {
-    interface CC2420DutyCycle;
+    interface LowPowerListening;
+    interface Send;
+    interface Receive;
     interface SplitControl;
-    interface State as SplitControlState;
+    interface State as SendState;
+  }
+  
+  uses { 
+    interface Send as SubSend;
+    interface Receive as SubReceive;
+    interface SplitControl as SubControl;
   }
 }
 
 implementation {
   components MainC,
-      CC2420DutyCycleP,
-      CC2420TransmitC,
+      CC2420NoAckLplP,
+      CC2420DutyCycleC,
+      CC2420ActiveMessageC,
       CC2420CsmaC,
+      CC2420TransmitC,
+      CC2420PacketC,
+      RandomC,
       LedsC,
-      new StateC() as RadioPowerStateC,
-      new StateC() as DutyCycleStateC,
-      new StateC() as CheckStateC,
-      new StateC() as SplitControlStateC,
-      new TimerMilliC() as OnTimerC,
-      new TimerMilliC() as CheckTimerC,
-      RandomC;
-
-#if defined(LOW_POWER_LISTENING) || defined(ACK_LOW_POWER_LISTENING)
-  components CC2420AckLplC as LplC;
-#elif defined(NOACK_LOW_POWER_LISTENING)
-  components CC2420NoAckLplC as LplC;
-#else
-  components CC2420LplDummyC as LplC;
-#endif
-
-  CC2420DutyCycle = CC2420DutyCycleP;
-  SplitControl = CC2420DutyCycleP;
-  SplitControlState = SplitControlStateC;
+      new StateC() as SendStateC,
+      new StateC() as RadioStateC,
+      new TimerMilliC() as OffTimerC,
+      new TimerMilliC() as SendDoneTimerC;
   
-  MainC.SoftwareInit -> CC2420DutyCycleP;
+  LowPowerListening = CC2420NoAckLplP;
+  Send = CC2420NoAckLplP;
+  Receive = CC2420NoAckLplP;
+  SplitControl = CC2420DutyCycleC;
+  SendState = SendStateC;
   
-  CC2420DutyCycleP.Random -> RandomC;
-  CC2420DutyCycleP.CC2420Cca -> CC2420TransmitC;
-  CC2420DutyCycleP.SubControl -> CC2420CsmaC;
-  CC2420DutyCycleP.SendState -> LplC;
-  CC2420DutyCycleP.RadioPowerState -> RadioPowerStateC;
-  CC2420DutyCycleP.DutyCycleState -> DutyCycleStateC;
-  CC2420DutyCycleP.SplitControlState -> SplitControlStateC;
-  CC2420DutyCycleP.CheckState -> CheckStateC;
-  CC2420DutyCycleP.OnTimer -> OnTimerC;
-  CC2420DutyCycleP.Leds -> LedsC;
-    
+  SubControl = CC2420NoAckLplP.SubControl;
+  SubReceive = CC2420NoAckLplP.SubReceive;
+  SubSend = CC2420NoAckLplP.SubSend;
+  
+  
+  MainC.SoftwareInit -> CC2420NoAckLplP;
+  
+  CC2420NoAckLplP.Random -> RandomC;
+  CC2420NoAckLplP.SendState -> SendStateC;
+  CC2420NoAckLplP.RadioState -> RadioStateC;
+  CC2420NoAckLplP.SplitControlState -> CC2420DutyCycleC;
+  CC2420NoAckLplP.CC2420Cca -> CC2420TransmitC;
+  CC2420NoAckLplP.OffTimer -> OffTimerC;
+  CC2420NoAckLplP.SendDoneTimer -> SendDoneTimerC;
+  CC2420NoAckLplP.CC2420DutyCycle -> CC2420DutyCycleC;
+  CC2420NoAckLplP.Resend -> CC2420TransmitC;
+  CC2420NoAckLplP.PacketAcknowledgements -> CC2420ActiveMessageC;
+  CC2420NoAckLplP.AMPacket -> CC2420ActiveMessageC;
+  CC2420NoAckLplP.CC2420Packet -> CC2420PacketC;
+  CC2420NoAckLplP.RadioBackoff -> CC2420CsmaC;
+  CC2420NoAckLplP.Leds -> LedsC;
+  
 }
-
 

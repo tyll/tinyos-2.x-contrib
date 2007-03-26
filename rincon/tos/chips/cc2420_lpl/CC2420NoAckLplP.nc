@@ -92,7 +92,7 @@ implementation {
   message_t queuedMsg;
   
   /** Num. times the channel has been sampled in a row and has been clear */
-  uint8_t clearChannelSamples;
+  uint16_t clearChannelSamples;
   
   
   /**
@@ -590,24 +590,22 @@ implementation {
     uint8_t length;
     
     startOffTimer();
-    if(call CC2420Cca.isChannelClear()) {
-      clearChannelSamples++;
-      if(clearChannelSamples > MIN_BACKOFF_SAMPLES * 2) {        
-        if(msgQueued) {
-          msgQueued = FALSE;
-          payload = call SubReceive.getPayload(&queuedMsg, &length);
-          signal Receive.receive(&queuedMsg, payload, length);
-        }
-        
+    for(clearChannelSamples = 0; clearChannelSamples < MAX_LPL_CCA_CHECKS * 2; clearChannelSamples++) {
+      // In one straight shot, sample the channel repetitively and verify that
+      // the transmitter is done transmitting
+      if(!call CC2420Cca.isChannelClear()) {
+        // Nope, start over from the beginning.
+        post detectReceiveDone();
         return;
       }
-      // fall through and repost
-      
-    } else {
-      clearChannelSamples = 0;
     }
     
-    post detectReceiveDone();
+    // Done transmitting.
+    if(msgQueued) {
+      msgQueued = FALSE;
+      payload = call SubReceive.getPayload(&queuedMsg, &length);
+      signal Receive.receive(&queuedMsg, payload, length);
+    }
   }
   
   /***************** Functions ***************/

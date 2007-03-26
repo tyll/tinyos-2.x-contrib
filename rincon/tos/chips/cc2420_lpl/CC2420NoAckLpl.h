@@ -90,9 +90,9 @@ typedef enum {
 #ifndef MAX_LPL_CCA_CHECKS
 
 #if defined(PLATFORM_TELOSB)
-#define MAX_LPL_CCA_CHECKS 50
+#define MAX_LPL_CCA_CHECKS 80
 #else
-#define MAX_LPL_CCA_CHECKS 40
+#define MAX_LPL_CCA_CHECKS 60
 #endif
 
 #endif

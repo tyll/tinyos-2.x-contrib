@@ -38,7 +38,7 @@
 
 configuration CC2420ReceiveC {
 
-  provides interface AsyncStdControl;
+  provides interface StdControl;
   provides interface CC2420Receive;
   provides interface Receive;
 
@@ -57,7 +57,7 @@ implementation {
   components LedsC as Leds;
   CC2420ReceiveP.Leds -> Leds;
 
-  AsyncStdControl = CC2420ReceiveP;
+  StdControl = CC2420ReceiveP;
   CC2420Receive = CC2420ReceiveP;
   Receive = CC2420ReceiveP;
 

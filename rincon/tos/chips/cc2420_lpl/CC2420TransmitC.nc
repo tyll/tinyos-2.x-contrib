@@ -41,7 +41,7 @@
 configuration CC2420TransmitC {
 
   provides {
-    interface AsyncStdControl;
+    interface StdControl;
     interface CC2420Transmit;
     interface RadioBackoff;
     interface RadioTimeStamping;
@@ -52,7 +52,7 @@ configuration CC2420TransmitC {
 implementation {
 
   components CC2420TransmitP;
-  AsyncStdControl = CC2420TransmitP;
+  StdControl = CC2420TransmitP;
   CC2420Transmit = CC2420TransmitP;
   RadioBackoff = CC2420TransmitP;
   RadioTimeStamping = CC2420TransmitP;

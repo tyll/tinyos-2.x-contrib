@@ -211,7 +211,7 @@ implementation {
     }
     
     call RadioPowerState.forceState(S_ON);
-    //call Leds.led2On();
+    call Leds.led2On();
     
     if(call DutyCycleState.getState() == S_ON) {
       if(call CheckState.getState() == S_ON) {
@@ -233,7 +233,7 @@ implementation {
     
     detectionForced = FALSE;
     call RadioPowerState.forceState(S_OFF);
-    //call Leds.led2Off();
+    call Leds.led2Off();
     
     if(call DutyCycleState.getState() == S_ON) {
       call OnTimer.startOneShot(sleepInterval);

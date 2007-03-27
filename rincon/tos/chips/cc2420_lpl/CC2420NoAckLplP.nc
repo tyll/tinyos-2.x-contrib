@@ -91,9 +91,6 @@ implementation {
   /** The message we have queued for reception when the Tx mote completes */
   message_t queuedMsg;
   
-  /** Num. times the channel has been sampled in a row and has been clear */
-  uint16_t clearChannelSamples;
-  
   
   /**
    * Radio State
@@ -588,6 +585,7 @@ implementation {
   task void detectReceiveDone() {
     void *payload;
     uint8_t length;
+    uint16_t clearChannelSamples;
     
     startOffTimer();
     for(clearChannelSamples = 0; clearChannelSamples < MAX_LPL_CCA_CHECKS * 2; clearChannelSamples++) {

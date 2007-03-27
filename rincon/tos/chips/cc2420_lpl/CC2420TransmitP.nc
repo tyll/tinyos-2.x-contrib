@@ -39,7 +39,7 @@
 module CC2420TransmitP {
 
   provides interface Init;
-  provides interface AsyncStdControl;
+  provides interface StdControl;
   provides interface CC2420Transmit as Send;
   provides interface RadioBackoff;
   provides interface RadioTimeStamping as TimeStamp;
@@ -134,8 +134,8 @@ implementation {
     return SUCCESS;
   }
 
-  /***************** AsyncStdControl Commands ****************/
-  async command error_t AsyncStdControl.start() {
+  /***************** StdControl Commands ****************/
+  command error_t StdControl.start() {
     atomic {
       call CaptureSFD.captureRisingEdge();
       m_state = S_STARTED;
@@ -145,11 +145,12 @@ implementation {
     return SUCCESS;
   }
 
-  async command error_t AsyncStdControl.stop() {
+  command error_t StdControl.stop() {
     atomic {
       m_state = S_STOPPED;
       call BackoffTimer.stop();
       call CaptureSFD.disable();
+      call SpiResource.release();
     }
     return SUCCESS;
   }

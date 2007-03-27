@@ -39,7 +39,7 @@
 module CC2420ReceiveP {
 
   provides interface Init;
-  provides interface AsyncStdControl;
+  provides interface StdControl;
   provides interface CC2420Receive;
   provides interface Receive;
 
@@ -106,8 +106,8 @@ implementation {
     return SUCCESS;
   }
 
-  /***************** AsyncStdControl ****************/
-  async command error_t AsyncStdControl.start() {
+  /***************** StdControl ****************/
+  command error_t StdControl.start() {
     atomic {
       reset_state();
       m_state = S_STARTED;
@@ -121,14 +121,16 @@ implementation {
 
 
   
-  async command error_t AsyncStdControl.stop() {
+  command error_t StdControl.stop() {
     atomic {
       m_state = S_STOPPED;
       reset_state();
       
+      call SpiResource.release();
+      
       // Warning: MicaZ problems have been encountered with the following line
       // followed by a re-enable.  The re-enable doesn't occur.
-      //call InterruptFIFOP.disable();  // TODO
+      call InterruptFIFOP.disable();
     }
     return SUCCESS;
   }

@@ -43,7 +43,7 @@ module CC2420CsmaP {
 
   uses interface Resource;
   uses interface CC2420Power;
-  uses interface AsyncStdControl as SubControl;
+  uses interface StdControl as SubControl;
   uses interface CC2420Transmit;
   uses interface RadioBackoff as SubBackoff;
   uses interface Random;

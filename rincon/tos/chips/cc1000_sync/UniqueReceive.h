@@ -1,0 +1,8 @@
+
+#ifndef UNIQUERECEIVE_H
+#define UNIQUERECEIVE_H
+
+#define RECEIVE_HISTORY_SIZE 4
+
+#endif
+

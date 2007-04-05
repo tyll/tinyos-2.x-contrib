@@ -20,7 +20,11 @@ interface DSN {
 *	@param msg Message to be logged
 */
   command error_t log(void * msg);
-  
+/**
+*	log a message without delimiter
+*	@param msg Message to be appended
+*/
+  command error_t appendLog(void * msg);
   /**
 *	log a byte stream as hex stream
 *	@param msg byte stream to be logged

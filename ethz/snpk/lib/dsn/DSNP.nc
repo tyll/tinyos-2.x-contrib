@@ -30,7 +30,6 @@ module DSNP
 	uses command void setAmAddress(am_addr_t a);
 	uses interface Packet;
 	uses interface SplitControl as RadioControl;
-	uses interface Timer<TMilli> as Timer;
 	uses interface Timer<TMilli> as EmergencyTimer;
 	uses interface LocalTime<T32khz>;
 			
@@ -39,18 +38,26 @@ module DSNP
 
 implementation
 {
-	bool sending=FALSE;
 	uint8_t ringbuffer[BUFFERSIZE];
 	uint8_t * bufferStart;
 	uint8_t * bufferEnd;
 	uint8_t rxlen;
 	uint8_t rxbuffer[RXBUFFERSIZE];
-	bool rxreq=FALSE;
 	volatile uint16_t *IdAddr;
 	uint32_t n[LOG_NR_BUFFERSIZE]; // buffer for ints to print out
 	uint8_t nptr=0;
+	
+	enum {
+		S_INIT,
+		S_STARTED,
+		S_REQUEST_PENDING,
+		S_SENDING,
+	};
+	
+	uint8_t m_state=S_INIT;
+	
 	bool running=TRUE;
-	bool requested=FALSE;
+	bool rxreq=FALSE;
 	
 	// emergency variables
 	bool emergencyLogEnabled=FALSE;
@@ -61,7 +68,12 @@ implementation
 	/* prototype */
 	void stop();
 	void adjustEmergencytimeout();
+	void requestUSART();
 	
+	/**
+	 * Initialization (before SoftwareInit)
+	 */
+	 
 	command error_t NodeIdInit.init() {
 		// setup node id
 		IdAddr=(uint16_t *)ID_ADDR;
@@ -77,6 +89,7 @@ implementation
 	* Sets up pins, buffer and node id
 	**/
 	command error_t Init.init() {
+		volatile uint32_t i;        /* declare i as volatile int */
 		// set TxPin high
 		// a low pin would cause framing errors in the dsn uart
 		call TxPin.makeOutput();
@@ -89,16 +102,22 @@ implementation
 		// setup CTS pin
 		call RxCTSPin.makeOutput();
 		call RxCTSPin.set();		// default hi = not ready to receive
+		m_state=S_STARTED;
+		// set startup time (a few ms, all output is buffered)
+		// loop
+		for(i = 0; i < 0x00ffff; i++)
+   		;
 #endif
-
 		// setup ringbuffer
 		bufferStart=&ringbuffer[0];
 		bufferEnd=&ringbuffer[0];
 		
-		// set startup time (a few ms, all output is buffered)
-		call Timer.startOneShot(STARTUP_WAIT_TIME);		
 		return SUCCESS;
 	}
+	
+	/***************************************
+	 * Output Processing: Helper functions
+	 * *************************************/
 
 	uint32_t pow(uint16_t b, uint8_t e) {
 		uint8_t i;
@@ -138,8 +157,9 @@ implementation
 	/**
 	* Add chars to the tx buffer
 	* String has to end with LOG_DELIMITER or 0
+	* If msg is not terminated with LOG_DELIMITER, it is automatocally appended if delimiter=TRUE
 	**/
-    void storeMsg(uint8_t * msg) {
+    void storeMsg(uint8_t * msg, bool delimiter) {
     	uint16_t msgPtr=0;
 		uint8_t nrPtr=0;
 		uint32_t tmpN;
@@ -198,7 +218,7 @@ implementation
     		else    		
 	    		storeByte(msg[msgPtr++]);
     	}
-    	if ((msg[msgPtr]==0) & ((msgPtr==0) | (msg[msgPtr-1]!=LOG_DELIMITER)))
+    	if ((msg[msgPtr]==0) & ((msgPtr==0) | (msg[msgPtr-1]!=LOG_DELIMITER)) & delimiter)
     		storeByte(LOG_DELIMITER);
 		atomic nptr=0;
     }
@@ -225,84 +245,8 @@ implementation
 	   		storeByte(msg[i++]);
    		}
     }
-	
-	/**
-	* Sends all messages until end of ringbuffer
-	**/
-	void sendBuf() {
-		if (bufferEnd<bufferStart) // check wether end of message is before end of ringbuffer
-			call UartStream.send(bufferStart, &ringbuffer[BUFFERSIZE] - bufferStart);
-    	else
-			call UartStream.send(bufferStart, bufferEnd - bufferStart);
-	}
-	
-	void startRxTx() {
-		// start sending or receiving
-		atomic {
-			if (!rxreq) {
-					sending = TRUE;
-					sendBuf();
-			}
-#ifndef	NOSHARE
-			else
-				call RxCTSPin.clr();
-#endif
-		}
-	}
-
-	/**
-	* we have the UART
-	* start sending / receiving
-	**/
-	event void Resource.granted() {
-		// call Msp430UartControl.setModeDuplex(); // not necessary anymore
-		call Leds.led1On();
-		adjustEmergencytimeout();
-		startRxTx();
-	}
-	
-	void stop() {
-#ifndef NOSHARE
-		call Leds.led1Off();
-		while (!call HplMsp430Usart.isTxEmpty());
-		atomic {
-			call Resource.release();
-			requested=FALSE;
-		}
-		// signal DSN.led(0);
-#endif
-	}
-	
-
-  /**
-   * A byte of data is about to be transmitted, ie. the TXBuffer is
-   * empty and ready to accept next byte.
-   */
-   
-  async event void UartStream.sendDone(uint8_t * buf, uint16_t len, error_t error) {
-  	if (error==SUCCESS) {
-  		bufferStart+=len;
-  		if (bufferStart==&ringbuffer[BUFFERSIZE])
-  			bufferStart=&ringbuffer[0];
-  		if (bufferStart == bufferEnd) { // check, if there is more data to be sent
-  			atomic { sending = FALSE; }		
-			if (!rxreq) { // if not, is there something to be received?
-				stop();
-			}
-#ifndef 	NOSHARE
-			else {
-				call RxCTSPin.clr();
-			}
-#endif
-  		}
-  		else {
-			// send next chunk of message
-			sendBuf();
-		}	
-  	}
-  }
-
-	async command void DSN.logInt(uint32_t nn) {
+    
+    async command void DSN.logInt(uint32_t nn) {
 		atomic {
 			if (nptr<LOG_NR_BUFFERSIZE) {
 				n[nptr++]=nn;
@@ -310,30 +254,15 @@ implementation
 		}
 	}
 	
-	/**
-	* this function makes sure that the USART resource is requested only once
-	*
-	**/
-	void requestUSART() {
-#ifdef NOSHARE
-		atomic {
-			if (!sending)
-				startRxTx();
-		}
-#else
-		atomic {
-			if (!requested) {
-				call Resource.request();
-				requested=TRUE;
-			}
-		}
-#endif
+	command error_t DSN.log(void * msg) {
+		storeMsg((uint8_t *)msg, TRUE);
+		if (running) // else just buffer
+			requestUSART();
+		return SUCCESS;
 	}
 	
-	command error_t DSN.log(void * msg) {
-		storeMsg((uint8_t *)msg);
-		if ((!call Timer.isRunning()) & (running)) // else just buffer
-			requestUSART();
+	command error_t DSN.appendLog(void * msg) {
+		storeMsg((uint8_t *)msg, FALSE);
 		return SUCCESS;
 	}
 	
@@ -390,7 +319,118 @@ implementation
 		storeMsgHex( (uint8_t *) msg->data, call Packet.payloadLength(msg));
 		return call DSN.log("\n");
 	}
-  
+	
+	/***************************************
+	 * UARt stuff
+	 * *************************************/
+		
+	/**
+	* Sends all messages until end of ringbuffer
+	**/
+	task void sendBuf() {
+		bool wraparound;
+		uint8_t * start;
+		atomic {
+			wraparound=bufferEnd<bufferStart;
+			start = bufferStart;
+			if (m_state==S_SENDING) {
+				if (wraparound) // check wether end of message is before end of ringbuffer
+					call UartStream.send(start, &ringbuffer[BUFFERSIZE] - start);
+    			else
+					call UartStream.send(start, bufferEnd - start);
+			}
+		}
+	}
+	
+	void startRxTx() {
+		// start sending or receiving
+		atomic {
+			if (!rxreq) {
+				post sendBuf();
+			}
+#ifndef	NOSHARE
+			else
+				call RxCTSPin.clr();
+#endif
+		}
+	}
+
+	/**
+	* we have the UART
+	* start sending / receiving
+	**/
+	event void Resource.granted() {
+		//call Leds.led0On();
+		atomic m_state=S_SENDING;
+		adjustEmergencytimeout();
+		startRxTx();
+	}
+	
+	void stop() {
+#ifndef NOSHARE
+		while (!call HplMsp430Usart.isTxEmpty());
+		atomic {
+			if (m_state==S_SENDING) {
+				call Resource.release();
+				m_state=S_STARTED;
+				// call Leds.led0Off();
+			}
+		}
+		// signal DSN.led(0);
+#endif
+	}
+	
+  	async event void UartStream.sendDone(uint8_t * buf, uint16_t len, error_t error) {
+  		if (error==SUCCESS) {
+  			bufferStart+=len;
+  			if (bufferStart==&ringbuffer[BUFFERSIZE])
+  				bufferStart=&ringbuffer[0];
+  			if (bufferStart == bufferEnd) { // check, if there is more data to be sent
+  				if (!rxreq) { // if not, is there something to be received?
+					stop();
+				}
+#ifndef 	NOSHARE
+				else {
+					call RxCTSPin.clr();
+				}
+#endif
+  			}
+  			else {
+				// send next chunk of message
+				if (m_state==S_SENDING)
+					post sendBuf();
+			}	
+  		}
+  	}
+
+	
+	/**
+	* this function makes sure that the USART resource is requested only once
+	*
+	**/
+	void requestUSART() {
+#ifdef NOSHARE
+		if (m_state==S_INIT) {
+			call Resource.request();
+			m_state=S_STARTED;
+		}
+		else
+		atomic {
+			if (m_state=S_STARTED)
+				startRxTx();
+		}
+#else
+		atomic {
+			if (m_state==S_STARTED) {
+				if (call Resource.request()==SUCCESS)
+					m_state=S_REQUEST_PENDING;
+					//call Leds.led0On();
+			}
+		}
+#endif
+	}
+	
+	  
 	task void ReceivedTask() {
   		uint8_t rxlen_tmp;
   		atomic {
@@ -411,8 +451,8 @@ implementation
 #ifndef NOSHARE
 	  		call RxCTSPin.set();
 #endif
-  			if (bufferStart != bufferEnd)
-  				sendBuf();
+  			if ((bufferStart != bufferEnd) && running)
+  				post sendBuf();
   			else
   				stop();
   			rxbuffer[rxlen++]=LOG_DELIMITER;
@@ -425,42 +465,39 @@ implementation
 
 #ifndef	NOSHARE
 	async event void RxRTSInt.fired() {
+		/*
 		rxreq=TRUE;
 		rxlen=0;
-		call Leds.led0Toggle();
+		// call Leds.led0Toggle();
 		requestUSART();
+		*/
 	}
 #endif
-
-	event void Timer.fired() {
-		atomic {
-#ifdef NOSHARE
-			call Resource.request();
-#else
-			if (bufferStart != bufferEnd)
-				requestUSART();
-#endif
-		}
-	}
 	
 	command error_t DSN.stopLog(){
 #ifndef PERMANENT_LOGGING
 		atomic {
 			running=FALSE;
 		}
-		stop();
+		// stop();
 #endif
 		return SUCCESS;
 	}
 	
 	command error_t DSN.startLog(){
 #ifndef PERMANENT_LOGGING
-		running=TRUE;
-		atomic if (bufferStart != bufferEnd)
-			requestUSART();
+		atomic {
+			running=TRUE;
+			if (bufferStart != bufferEnd)
+				requestUSART();
+		}
 #endif
 		return SUCCESS;
 	}
+	
+	/***************************************
+	 * Emergency output
+	 * *************************************/
 	
 	void adjustEmergencytimeout () {
 		if (emergencyLogEnabled) {

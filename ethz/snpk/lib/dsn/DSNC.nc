@@ -20,6 +20,15 @@ configuration DSNC
 }
 implementation
 {
+#ifdef NODSN
+	components ActiveMessageAddressC;
+	components noDSNP as DSNP;
+	
+	DSN = DSNP.DSN;
+	components RealMainP;
+	RealMainP.PlatformInit -> DSNP.NodeIdInit;
+	DSNP.setAmAddress -> ActiveMessageAddressC;
+#else
 	components HplMsp430GeneralIOC;
 	components new Msp430GpioC() as TxPin;
 
@@ -38,7 +47,6 @@ implementation
 	DSNP.TxPin -> TxPin;
 	
 	components ActiveMessageAddressC;
-	components new TimerMilliC() as Timer;
 	components DSNP;
 	components dsnUartConfigureP;
 	
@@ -57,7 +65,6 @@ implementation
 	DSNP.UartStream -> Uart;
 	DSNP.HplMsp430Usart -> HplUsart;
 	DSNP.Resource -> Uart;
-	DSNP.Timer -> Timer;
 	Uart.Msp430UartConfigure -> dsnUartConfigureP;
 	
 #ifndef 	NOSHARE
@@ -86,8 +93,8 @@ implementation
 	components new TimerMilliC() as EmergencyTimer;
 	DSNP.EmergencyTimer -> EmergencyTimer;
 			
-	components NoLedsC as LedsC;
+	components LedsC as LedsC;
 	DSNP.Leds->LedsC;
-	
+#endif	
 }
 

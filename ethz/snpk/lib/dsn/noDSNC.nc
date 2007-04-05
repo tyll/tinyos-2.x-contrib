@@ -4,7 +4,6 @@
 configuration noDSNC
 {
 	provides interface DSN;	
-	provides interface Init;
 }
 implementation
 {

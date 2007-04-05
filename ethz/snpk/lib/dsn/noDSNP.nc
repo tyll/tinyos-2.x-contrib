@@ -4,7 +4,7 @@
 module noDSNP
 {
 	provides interface DSN;	
-	provides interface Init;
+	provides interface Init as NodeIdInit;
 	uses command void setAmAddress(am_addr_t a);
 }
 implementation
@@ -27,15 +27,22 @@ implementation
   command error_t DSN.logDebug(void * msg) {
   	return SUCCESS;
   	}
-
+  command error_t DSN.appendLog(void * msg) {
+	return SUCCESS;
+	}
+	
   async command void DSN.logInt(uint32_t n) {}
-  command error_t DSN.logPacket(message_t * msg) {}
-  command error_t DSN.logHexStream(uint8_t* msg, uint8_t len) {}   
+  command error_t DSN.logPacket(message_t * msg) {return SUCCESS;}
+  command error_t DSN.logHexStream(uint8_t* msg, uint8_t len) {return SUCCESS;}   
 
-  command error_t DSN.stopLog() {}
-  command error_t DSN.startLog() {}
+  command error_t DSN.stopLog() {
+  	return SUCCESS;
+  	}
+  command error_t DSN.startLog() {
+  	return SUCCESS;
+  	}
   
-  command error_t Init.init() {
+  command error_t NodeIdInit.init() {
 		 volatile uint16_t *IdAddr;
 	  	// setup node id
 		IdAddr=(uint16_t *)ID_ADDR;

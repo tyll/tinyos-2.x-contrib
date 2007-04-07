@@ -266,7 +266,7 @@ implementation {
     // Reset our invalid message counter
     invalidMessages = 0;
         
-    if(call SendState.requestState(S_LPL_FIRST_MESSAGE) == SUCCESS) {
+    if(call SendState.requestState(S_LPL_SENDING) == SUCCESS) {
       currentSendMsg = msg;
       currentSendLen = len;
       
@@ -326,7 +326,8 @@ implementation {
   event void CC2420DutyCycle.detected() {
     // At this point, the duty cycling has been disabled temporary
     // and it will be this component's job to turn the radio back off
-    invalidMessages = 0;
+    
+    invalidMessages = 0; 
     
     if(call SendState.isIdle()) {
       startOffTimer();
@@ -364,18 +365,8 @@ implementation {
   
   /***************** SubSend Events ***************/
   event void SubSend.sendDone(message_t* msg, error_t error) {
+   
     switch(call SendState.getState()) {
-    case S_LPL_FIRST_MESSAGE:
-      /*
-       * After the first message is sent, we start the timer that tells us when
-       * to stop the delivery. We add 20 bms to the delivery duration to account
-       * for Rx checks at the edge of Tx transmissions
-       */
-      call SendDoneTimer.startOneShot(
-          call LowPowerListening.getRxSleepInterval(currentSendMsg) + 20);
-      call SendState.forceState(S_LPL_SENDING);
-      /** Fall Through */
-      
     case S_LPL_SENDING:
       if(call SendDoneTimer.isRunning()) {
         if(!call PacketAcknowledgements.wasAcked(msg)) {
@@ -499,14 +490,17 @@ implementation {
   /***************** Functions ***************/
   void initializeSend() {
     if(call LowPowerListening.getRxSleepInterval(currentSendMsg) 
-        > ONE_MESSAGE) {
+      > ONE_MESSAGE) {
     
       if(call AMPacket.destination(currentSendMsg) == AM_BROADCAST_ADDR) {
         call PacketAcknowledgements.noAck(currentSendMsg);
       } else {
         // Send it repetitively within our transmit window
         call PacketAcknowledgements.requestAck(currentSendMsg);
-      }   
+      }
+
+      call SendDoneTimer.startOneShot(
+          call LowPowerListening.getRxSleepInterval(currentSendMsg) + 20);
     }
         
     post send();

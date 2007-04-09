@@ -1,0 +1,71 @@
+README for print
+
+Author/Contact:
+
+  Prabal Dutta <prabal@cs.berkeley.edu>
+
+Description:
+
+  A simple printf utility that writes to the raw serial port using
+  the standard TinyOS 2.0 UART libraries, so it should be portable to
+  any T2-compliant platform.
+
+  Inspired by SODebug, Jay Taneja's nprintf library, and Kevin Klues'
+  printf library, but simpler and/or more portable.
+
+  Usage:
+
+  1. Include PrintC in the components clause of the configuration file
+     (no need to wire it to anything):
+
+     configuration MyAppC {
+     }
+     implementation {
+       ...
+       components PrintC;
+       ...
+     }
+
+  2. Add the following include directive to the module code:
+
+     #include "print.h"
+
+  3. Call print like you would normally call printf in code:
+
+     print("c=%c, d=%d, s=%s, x=%x, %%=%%\r\n", 'c', 5, "str", 10);
+
+     The current implementation supports print spooling for only a 
+     single call (the call returns before the data is transmitted).
+     If two successive writes occur too quickly in a row, then the 
+     second will fail.  Since the print call returns SUCCESS if the
+     call was spooled, EBUSY if the spool is full, and FAIL if there
+     is an error, a caller can use the return code to determine
+     whether to retry the call.  This is particularly necessary if 
+     print is being called in a tight loop.  In such cases, consider 
+     using code that looks like:
+
+     error_t e;
+     do {
+       e = print("x=%d\n", x);
+     } while e == EBUSY;
+
+     Note that sending even a few characters over the UART can take 
+     hundreds of microseconds, during which time the above code will
+     spin.  While spinning may be appropriate for a few microseconds,
+     it can cause serious problems over longer timescales when used
+     with the non-preemptive, run-to-completion semantics of TinyOS.
+     WARNING: use print in loops with great care.
+
+  4. Program the mote (e.g. Telos).
+
+  5. Open a terminal program (e.g. Hyperterm) with the appropriate
+     settings (e.g. 115200-N-8-1 with no flow control for Telos) to
+     see output.
+
+Tools:
+
+  None
+
+Known bugs/limitations:
+
+  Currently supports the %c, %d, %s, %x, and %% formats.

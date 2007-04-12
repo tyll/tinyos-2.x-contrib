@@ -36,24 +36,6 @@
 #ifndef __CC2420_H__
 #define __CC2420_H__
 
-/**
- * Define the minimum number of backoff samples to take when transmitting
- */
-#if defined(LOW_POWER_LISTENING) || defined(ACK_LOW_POWER_LISTENING)
-#include "CC2420AckLpl.h"
-
-#elif defined(NOACK_LOW_POWER_LISTENING)
-#include "CC2420NoAckLpl.h"
-
-#else
-#ifndef MIN_BACKOFF_SAMPLES
-#define MIN_BACKOFF_SAMPLES 0
-#endif
-
-#endif
-
-
-
 typedef uint8_t cc2420_status_t;
 
 /**
@@ -122,10 +104,17 @@ typedef nx_struct cc2420_packet_t {
 #define CC2420_DEF_RFPOWER 31
 #endif
 
+/**
+ * Ideally, your receive history size should be equal to the number of
+ * RF neighbors your node will have
+ */
 #ifndef RECEIVE_HISTORY_SIZE
 #define RECEIVE_HISTORY_SIZE 4
 #endif
 
+/** 
+ * The 6LowPAN ID has yet to be defined for a TinyOS network.
+ */
 #ifndef TINYOS_6LOWPAN_NETWORK_ID
 #define TINYOS_6LOWPAN_NETWORK_ID 0x0
 #endif

@@ -101,7 +101,7 @@ implementation {
       // We were always on, now lets duty cycle
       call DutyCycleState.forceState(S_ON);
       call CheckState.toIdle();
-      post stopRadio();  // TODO delay turning off the radio
+      post stopRadio();  // Might want to delay turning off the radio
     }
     
     detectionForced = FALSE;
@@ -288,8 +288,11 @@ implementation {
           }
         }
       }
+      
       call CheckState.toIdle();
-      post stopRadio();
+      if(call SendState.isIdle()) {
+        post stopRadio();
+      }
     }  
   }
   

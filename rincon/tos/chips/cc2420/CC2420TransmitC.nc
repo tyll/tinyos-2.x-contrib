@@ -82,9 +82,13 @@ implementation {
   CC2420TransmitP.TXCTRL      -> Spi.TXCTRL;
   CC2420TransmitP.TXFIFO      -> Spi.TXFIFO;
   CC2420TransmitP.TXFIFO_RAM  -> Spi.TXFIFO_RAM;
-
+  CC2420TransmitP.MDMCTRL1    -> Spi.MDMCTRL1;
+  
   components CC2420ReceiveC;
   CC2420TransmitP.CC2420Receive -> CC2420ReceiveC;
+  
+  components new TimerMilliC() as LplDisableTimerC;
+  CC2420TransmitP.LplDisableTimer -> LplDisableTimerC;
   
   components CC2420PacketC;
   CC2420TransmitP.CC2420Packet -> CC2420PacketC;

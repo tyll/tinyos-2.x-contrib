@@ -46,7 +46,6 @@ module CC2420ActiveMessageP {
     interface Send as SubSend;
     interface Receive as SubReceive;
     interface CC2420Packet;
-    interface Leds;
     command am_addr_t amAddress();
   }
 }

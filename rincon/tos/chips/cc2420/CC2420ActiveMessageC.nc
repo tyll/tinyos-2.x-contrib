@@ -60,7 +60,6 @@ implementation {
   components UniqueReceiveC;
   components CC2420TinyosNetworkC;
   components CC2420PacketC;
-  components LedsC;
   
 #if defined(LOW_POWER_LISTENING) || defined(ACK_LOW_POWER_LISTENING)
   components CC2420AckLplC as LplC;
@@ -108,6 +107,5 @@ implementation {
 
   AM.amAddress -> Address;
   AM.CC2420Packet -> CC2420PacketC;
-  AM.Leds -> LedsC;
   
 }

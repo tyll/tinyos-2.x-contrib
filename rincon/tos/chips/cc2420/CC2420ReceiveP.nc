@@ -233,6 +233,8 @@ implementation {
     case S_RX_PAYLOAD:
       call CSN.set();
       
+#ifndef CC2420_NO_ACKNOWLEDGEMENTS
+      // Sorry about the preprocessing stuff. BaseStation depends on it.
       if (((( header->fcf >> IEEE154_FCF_ACK_REQ ) & 0x01) == 1) 
           && (header->dest == call amAddress())
           && ((( header->fcf >> IEEE154_FCF_FRAME_TYPE ) & 7) == IEEE154_TYPE_DATA)) {
@@ -240,6 +242,7 @@ implementation {
         call SACK.strobe();
         call CSN.set();
       }
+#endif
       
       call SpiResource.release();
       

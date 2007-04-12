@@ -36,6 +36,9 @@
  * @version $Revision$ $Date$
  */
 
+#include "CC2420.h"
+#include "crc.h"
+
 module CC2420TransmitP {
 
   provides interface Init;
@@ -60,7 +63,9 @@ module CC2420TransmitP {
   uses interface CC2420Strobe as STXON;
   uses interface CC2420Strobe as STXONCCA;
   uses interface CC2420Strobe as SFLUSHTX;
+  uses interface CC2420Register as MDMCTRL1;
 
+  uses interface Timer<TMilli> as LplDisableTimer;
   uses interface CC2420Receive;
   uses interface Leds;
 }
@@ -103,6 +108,9 @@ implementation {
   
   bool signalSendDone;
   
+  /** TRUE if the current lpl tx is taking place with continuous modulation */
+  norace bool continuousModulation;
+  
   /** Total CCA checks that showed no activity before the NoAck LPL send */
   norace int8_t totalCcaChecks;
   
@@ -125,6 +133,8 @@ implementation {
   error_t acquireSpiResource();
   error_t releaseSpiResource();
   void signalDone( error_t err );
+  
+  task void startLplTimer();
   
   /***************** Init Commands *****************/
   command error_t Init.init() {
@@ -166,7 +176,6 @@ implementation {
   }
 
   async command error_t Send.cancel() {
-    cc2420_header_t* hdr = call CC2420Packet.getHeader(m_msg);
     atomic {
       signalSendDone = FALSE;
       switch( m_state ) {
@@ -254,6 +263,7 @@ implementation {
   async event void CaptureSFD.captured( uint16_t time ) {
     atomic {
       switch( m_state ) {
+        
       case S_SFD:
         call CaptureSFD.captureFallingEdge();
         signal TimeStamp.transmittedSFD( time, m_msg );
@@ -275,6 +285,11 @@ implementation {
           m_state = S_ACK_WAIT;
           call BackoffTimer.start( CC2420_ACK_WAIT_DELAY );
         } else {
+          if(continuousModulation) {
+            // Wait for the LplDisableTimer to fire before running signalDone()
+            return;
+          }
+          
           signalDone(SUCCESS);
         }
         
@@ -481,6 +496,11 @@ implementation {
       }
     }
   }
+  
+  event void LplDisableTimer.fired() {
+    call MDMCTRL1.write(0 << CC2420_MDMCTRL1_TX_MODE);
+    signalDone( SUCCESS );
+  }
     
   /***************** Functions ****************/
   /**
@@ -571,6 +591,15 @@ implementation {
     uint8_t status;
     bool congestion = TRUE;
     
+    continuousModulation = FALSE;
+    
+#ifdef NOACK_LOW_POWER_LISTENING
+      // When the message is being sent with LPL, CCA implies this is the first
+      // message.  Send it using the continuous modulation delivery
+      continuousModulation = m_cca 
+          && (call CC2420Packet.getMetadata( m_msg ))->rxInterval > 0;
+#endif
+
     atomic {
       if (m_state == S_TX_CANCEL) {
         call SFLUSHTX.strobe();
@@ -584,37 +613,53 @@ implementation {
         return;
       }
       
-      /*
-       * If we're using some versions of LPL, we must ensure nobody else is 
-       * transmitting an LPL delivery before sending the first packet, which  
-       * involves sampling the channel at a few random times.
-       */
-      if(m_cca && (call CC2420Packet.getMetadata( m_msg ))->rxInterval > 0) {
-        if(call CCA.get()) {
-          // Channel is clear
-          totalCcaChecks++;
+      
+      call CSN.clr();
+      
+      if(continuousModulation) {
+        /*
+         * We do a complex backoff like this because the last message of a
+         * continuous modulation delivery is currently reloaded into the 
+         * SPI bus and sent off without CCA.  This leaves a small quiet gap
+         * between the continuous modulation and its last message that other
+         * transmitters are guaranteed to hit.
+         *
+         * In the future, when the CRC is built into the continuous delivery
+         * message, this complex backoff may not be needed.  Alternatively,
+         * directly accessing the TXFIFO RAM and adjusting the FCF to 
+         * request an acknowledgement, and then resend without CCA will 
+         * decrease the quiet gap.
+         */
+        if(totalCcaChecks < 20) {
+          if(call CCA.get()) {
+            // Extended backoff
+            totalCcaChecks++;
+          } else {
+            // Saw another transmitter, start over
+            totalCcaChecks = 0;
+          }
           
-        } else {
-          // Channel is not clear, restart
-          totalCcaChecks = 0;
-        }
-        
-        // The LPL backoff value here is simply access to a small random number
-        if(totalCcaChecks < MIN_BACKOFF_SAMPLES) {
-          // Keep retrying a few times until the channel is ours for the taking
+          call CSN.set();
           releaseSpiResource();
-          signal RadioBackoff.requestInitialBackoff(m_msg);
+          signal RadioBackoff.requestInitialBackoff(m_msg);       
           call BackoffTimer.start( myInitialBackoff );
           return;
         }
+        
+        call MDMCTRL1.write(2 << CC2420_MDMCTRL1_TX_MODE);
+      } else {
+        call MDMCTRL1.write(0 << CC2420_MDMCTRL1_TX_MODE);
       }
 
-      call CSN.clr();
       status = m_cca ? call STXONCCA.strobe() : call STXON.strobe();
       if ( !( status & CC2420_STATUS_TX_ACTIVE ) ) {
         status = call SNOP.strobe();
         if ( status & CC2420_STATUS_TX_ACTIVE ) {
           congestion = FALSE;
+          
+          if(continuousModulation) {
+            post startLplTimer();
+          }
         }
       }
       
@@ -670,6 +715,13 @@ implementation {
    * could be a value other than 0 on boot.  Verification is needed here
    * to make sure the value won't overstep its bounds in the TXCTRL register
    * and is transmitting at max power by default.
+   *
+   * It should be possible to manually calculate the packet's CRC here and
+   * tack it onto the end of the header + payload when loading into the TXFIFO,
+   * so the continuous modulation low power listening strategy will continually
+   * deliver valid packets.  This would increase receive reliability for
+   * mobile nodes and lossy connections.  The crcByte() function should use
+   * the same CRC polynomial as the CC2420's AUTOCRC functionality.
    */
   void loadTXFIFO() {
     cc2420_header_t* header = call CC2420Packet.getHeader( m_msg );
@@ -678,9 +730,7 @@ implementation {
     if ( !tx_power ) {
       // If our packet's tx_power wasn't configured to anything but 0,
       // send it using the default RF power.  This assumes the
-      // packet's metadata is all set to 0's on boot.  To be safe across
-      // all platforms, apps should probably explicitly specify the transmit 
-      // power setting.
+      // packet's metadata is all set to 0's on boot.
       
       tx_power = CC2420_DEF_RFPOWER;
     }
@@ -695,6 +745,7 @@ implementation {
     }
     
     m_tx_power = tx_power;
+    
     call TXFIFO.write( (uint8_t*)header, header->length - 1 );
   }
   
@@ -706,7 +757,9 @@ implementation {
   
   
   /***************** Tasks ****************/
-
+  task void startLplTimer() {
+    call LplDisableTimer.startOneShot((call CC2420Packet.getMetadata( m_msg ))->rxInterval + 10);
+  }
 
   /***************** Defaults ****************/
   default async event void TimeStamp.transmittedSFD( uint16_t time, message_t* p_msg ) {

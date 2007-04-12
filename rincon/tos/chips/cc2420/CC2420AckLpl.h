@@ -47,16 +47,6 @@ typedef enum {
 
 
 /**
- * The minimum number of times to sample the channel while backing off to 
- * determine that there are no other LPL transmitters in the area.  This is
- * used in TransmitP.
- */
-#ifndef MIN_BACKOFF_SAMPLES
-#define MIN_BACKOFF_SAMPLES 0
-#endif
-
-
-/**
  * Amount of time, in milliseconds, to keep the radio on after
  * a successful receive addressed to this node
  * You don't want this too fast, or the off timer can accidentally
@@ -73,7 +63,7 @@ typedef enum {
  * We round this up to err on the side of better performance ratios
  */
 #ifndef DUTY_ON_TIME
-#define DUTY_ON_TIME 4 
+#define DUTY_ON_TIME 5 
 #endif
 
 /**
@@ -106,15 +96,6 @@ typedef enum {
  */
 #ifndef MIN_SAMPLES_BEFORE_DETECT
 #define MIN_SAMPLES_BEFORE_DETECT 3
-#endif
-
-
-/**
- * If the receiver does a receive check and ends up getting packets destined
- * for another mote, shut the radio back off after so many invalid packets
- */
-#ifndef MAX_INVALID_MESSAGES
-#define MAX_INVALID_MESSAGES 3
 #endif
 
 #endif

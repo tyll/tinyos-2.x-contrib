@@ -80,9 +80,6 @@ implementation {
   /** TRUE if the radio is duty cycling and not always on */
   bool dutyCycling;
 
-  /** Total number of messages received destined for other motes */
-  uint8_t invalidMessages;
-  
   /**
    * Radio State
    */
@@ -263,9 +260,6 @@ implementation {
       return EOFF;
     }
     
-    // Reset our invalid message counter
-    invalidMessages = 0;
-        
     if(call SendState.requestState(S_LPL_SENDING) == SUCCESS) {
       currentSendMsg = msg;
       currentSendLen = len;
@@ -326,8 +320,9 @@ implementation {
   event void CC2420DutyCycle.detected() {
     // At this point, the duty cycling has been disabled temporary
     // and it will be this component's job to turn the radio back off
-    
-    invalidMessages = 0; 
+    // Wait long enough to see if we actually receive a packet, which is
+    // just a little longer in case there is more than one lpl transmitter on
+    // the channel.
     
     if(call SendState.isIdle()) {
       startOffTimer();
@@ -404,18 +399,6 @@ implementation {
   event message_t *SubReceive.receive(message_t* msg, void* payload, 
       uint8_t len) {
     
-    if(!call AMPacket.isForMe(msg)) {
-      if((++invalidMessages) > MAX_INVALID_MESSAGES) {
-        if(call CC2420DutyCycle.getSleepInterval() > 0
-                && call SplitControlState.getState() == S_ON) {
-          // These messages are not for me; force back off
-          call OffTimer.stop();
-          post stopRadio();
-          return msg;
-        }
-      }
-    }
-    
     call CC2420DutyCycle.forceDetected();
     startOffTimer();
     return signal Receive.receive(msg, payload, len);
@@ -466,8 +449,6 @@ implementation {
   }
   
   task void resend() {
-    // Reset our invalid message counter
-    invalidMessages = 0;
     if(call Resend.resend(TRUE) != SUCCESS) {
       post resend();
     }

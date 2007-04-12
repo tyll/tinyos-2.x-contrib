@@ -157,7 +157,7 @@ implementation {
     uint8_t element = recycleSourceElement;
     bool increment = FALSE;
    
-    atomic {    
+    atomic {
       if(element == INVALID_ELEMENT || writeIndex == element) {
         // Use the writeIndex element to insert this new message into
         element = writeIndex;

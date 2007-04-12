@@ -66,7 +66,6 @@ module CC2420NoAckLplP {
     interface State as SplitControlState;
     interface Random;
     interface Timer<TMilli> as OffTimer;
-    interface Timer<TMilli> as SendDoneTimer;
     interface Leds;
   }
 }
@@ -81,15 +80,9 @@ implementation {
   
   /** TRUE if the radio is duty cycling and not always on */
   bool dutyCycling;
-
-  /** Total number of messages received destined for other motes */
-  uint8_t invalidMessages;
   
-  /** TRUE if we have a receive message queued up */
-  bool msgQueued;
-  
-  /** The message we have queued for reception when the Tx mote completes */
-  message_t queuedMsg;
+  /** TRUE if we have received a message after the last detect */
+  bool receivedMsg;
   
   
   /**
@@ -118,7 +111,7 @@ implementation {
   task void resend();
   task void startRadio();
   task void stopRadio();
-  task void detectReceiveDone();
+  task void detectTxDone();
   
   void initializeSend();
   void startOffTimer();
@@ -127,7 +120,6 @@ implementation {
   /***************** Init Commands ***************/
   command error_t Init.init() {
     dutyCycling = FALSE;
-    msgQueued = FALSE;
     return SUCCESS;
   }
   
@@ -275,16 +267,12 @@ implementation {
       return EOFF;
     }
     
-    // Reset our invalid message counter
-    invalidMessages = 0;
-    
     if(call SendState.requestState(S_LPL_FIRST_MESSAGE) == SUCCESS) {
       currentSendMsg = msg;
       currentSendLen = len;
       
       // In case our off timer is running...
       call OffTimer.stop();
-      call SendDoneTimer.stop();
       
       if(call RadioState.getState() == S_ON) {
         initializeSend();
@@ -303,7 +291,6 @@ implementation {
   command error_t Send.cancel(message_t *msg) {
     if(currentSendMsg == msg) {
       call SendState.toIdle();
-      call SendDoneTimer.stop();
       startOffTimer();
       return call SubSend.cancel(msg);
     }
@@ -338,11 +325,9 @@ implementation {
   event void CC2420DutyCycle.detected() {
     // At this point, the duty cycling has been disabled temporary
     // and it will be this component's job to turn the radio back off
-    invalidMessages = 0;
-    
-    if(call SendState.isIdle()) {
-      startOffTimer();
-    }
+    // Wait long enough to see if we actually receive a packet
+    receivedMsg = FALSE;
+    post detectTxDone();
   }
   
   
@@ -351,8 +336,7 @@ implementation {
     if(!error) {
       call RadioState.forceState(S_ON);
       
-      if(call SendState.getState() == S_LPL_FIRST_MESSAGE
-          || call SendState.getState() == S_LPL_SENDING) {
+      if(call SendState.getState() == S_LPL_FIRST_MESSAGE) {
         initializeSend();
       }
     }
@@ -362,14 +346,12 @@ implementation {
     if(!error) {
       call RadioState.forceState(S_OFF);
 
-      if(call SendState.getState() == S_LPL_FIRST_MESSAGE
-          || call SendState.getState() == S_LPL_SENDING) {
+      if(call SendState.getState() == S_LPL_FIRST_MESSAGE) {
         // We're in the middle of sending a message; start the radio back up
         post startRadio();
         
       } else {
         call OffTimer.stop();
-        call SendDoneTimer.stop();
       }
     }
   }
@@ -378,38 +360,12 @@ implementation {
   event void SubSend.sendDone(message_t* msg, error_t error) {
     switch(call SendState.getState()) {
     case S_LPL_FIRST_MESSAGE:
-      /*
-       * After the first message is sent, we start the timer that tells us when
-       * to stop the delivery. We add 20 bms to the delivery duration to account
-       * for Rx checks at the edge of Tx transmissions
-       */
-      call SendDoneTimer.startOneShot(
-          call LowPowerListening.getRxSleepInterval(currentSendMsg) + 20);
-      /** Fall through */
-
-    case S_LPL_SENDING:
-      /*
-       * Resend the middle messages with no acks and no CCA
-       */
-      call SendState.forceState(S_LPL_SENDING);
-      post resend();
-      return;
-      
-    case S_LPL_LAST_MESSAGE:
-      /*
-       * Send the last message *with* acknowledgements and no CCA
-       */
-      call SendState.forceState(S_LPL_CLEAN_UP);
+      call SendState.forceState(S_LPL_LAST_MESSAGE);
       call PacketAcknowledgements.requestAck(msg);
       post send();
       return;
     
-    case S_LPL_CLEAN_UP:
-      /**
-       * We include the S_LPL_CLEAN_UP state to prevent upper layers
-       * from successfully entering a different message before the last message
-       * gets sent completely.
-       */
+    case S_LPL_LAST_MESSAGE:
       // Execute past the switch statement
       break;
       
@@ -419,7 +375,6 @@ implementation {
     }
     
     call SendState.toIdle();
-    call SendDoneTimer.stop();
     startOffTimer();
     signal Send.sendDone(msg, error);
   }
@@ -435,20 +390,6 @@ implementation {
   event message_t *SubReceive.receive(message_t* msg, void* payload, 
       uint8_t len) {
     
-    if(!call AMPacket.isForMe(msg)) {
-      if((++invalidMessages) > MAX_INVALID_MESSAGES) {
-        if(call CC2420DutyCycle.getSleepInterval() > 0
-                && call SplitControlState.getState() == S_ON) {
-          // These messages are not for me; force back off
-          // i.e. they could be to the broadcast address
-          call OffTimer.stop();
-          post stopRadio();
-          return msg;
-        }
-      }
-    }
-    
-    
     /**
      * Now wait for the next moment the channel is free before passing the 
      * packet up, and keep the radio on that whole time.  That's when our
@@ -456,17 +397,9 @@ implementation {
      */
     
     call CC2420DutyCycle.forceDetected();
+    receivedMsg = TRUE;
     startOffTimer();
-    
-    atomic {
-      if(!msgQueued) {
-        memcpy(&queuedMsg, msg, sizeof(message_t));
-        msgQueued = TRUE;
-      }
-    }
-    
-    post detectReceiveDone();    
-    return msg;
+    return signal Receive.receive(msg, payload, len);
   }
   
   /***************** Timer Events ****************/
@@ -480,19 +413,6 @@ implementation {
             && call SplitControlState.getState() == S_ON
                 && call SendState.getState() == S_LPL_NOT_SENDING)) { 
       post stopRadio();
-    }
-  }
-  
-  /**
-   * When this timer is running, that means we're sending repeating messages
-   * to a node that is receive check duty cycling.
-   */
-  event void SendDoneTimer.fired() {
-
-    if(call SendState.getState() == S_LPL_SENDING
-        || call SendState.getState() == S_LPL_FIRST_MESSAGE) {
-      // The next time SubSend.sendDone is signaled, send is complete.
-      call SendState.forceState(S_LPL_LAST_MESSAGE);
     }
   }
   
@@ -531,9 +451,7 @@ implementation {
     if(call SendState.getState() == S_LPL_FIRST_MESSAGE) {
       call RadioBackoff.setCca[amId](TRUE);
 
-    } else if(call SendState.getState() == S_LPL_SENDING 
-        || call SendState.getState() == S_LPL_LAST_MESSAGE
-        || call SendState.getState() == S_LPL_CLEAN_UP) {
+    } else if(call SendState.getState() == S_LPL_LAST_MESSAGE) {
       call RadioBackoff.setCca[amId](FALSE);
     }
   }
@@ -559,8 +477,6 @@ implementation {
   }
   
   task void resend() {
-    // Reset our invalid message counter
-    invalidMessages = 0;
     if(call Resend.resend(FALSE) != SUCCESS) {
       post resend();
     }
@@ -581,37 +497,26 @@ implementation {
   }
   
   /**
-   * Spinning task to detect when the channel is clear again to find out
-   * when the current transmit is complete so we can pass the packet up 
-   * the stack.  We pass the packet up anyway if we are in control of the 
-   * channel
+   * Don't start the off-timer until the end of the transmitter's transmission.
    */
-  task void detectReceiveDone() {
-    void *payload;
-    uint8_t length;
+  task void detectTxDone() {
     uint16_t clearChannelSamples;
     
-    startOffTimer();
-    if(call SendState.getState() != S_LPL_SENDING 
+    if(call SendState.getState() != S_LPL_FIRST_MESSAGE
         && call SendState.getState() != S_LPL_LAST_MESSAGE
-        && call SendState.getState() != S_LPL_CLEAN_UP) {
+        && !receivedMsg) {
       for(clearChannelSamples = 0; clearChannelSamples < MAX_LPL_CCA_CHECKS * 2; clearChannelSamples++) {
         // In one straight shot, sample the channel repetitively and verify that
         // the transmitter is done transmitting
         if(!call CC2420Cca.isChannelClear()) {
           // Nope, start over from the beginning.
-          post detectReceiveDone();
+          post detectTxDone();
           return;
         }
       }
-    }
-    
-    // Done transmitting.
-    if(msgQueued) {
-      payload = call SubReceive.getPayload(&queuedMsg, NULL);
-      length = call SubReceive.payloadLength(&queuedMsg);
-      signal Receive.receive(&queuedMsg, payload, length);
-      msgQueued = FALSE;
+
+      // Transmitter done, turn the radio off in a few...
+      startOffTimer();
     }
   }
   
@@ -620,12 +525,6 @@ implementation {
     if(call LowPowerListening.getRxSleepInterval(currentSendMsg) 
         > ONE_MESSAGE) {
       call PacketAcknowledgements.noAck(currentSendMsg);
-      
-      /*
-       * The SendDoneTimer is started after the first send completes.
-       * That allows the mote to take as much time as it needs to secure
-       * the channel
-       */
     }
     
     post send();

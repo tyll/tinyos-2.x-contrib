@@ -41,20 +41,8 @@
 typedef enum {
   S_LPL_NOT_SENDING,    // DEFAULT
   S_LPL_FIRST_MESSAGE,  // 1. Initial backoffs, no acks, full CCA
-  S_LPL_SENDING,        // 2. No backoffs, no acks, no CCA
   S_LPL_LAST_MESSAGE,   // 3. No backoffs, acknowledgement request, no CCA
-  S_LPL_CLEAN_UP,       // 4. Done with transmission
 } lpl_sendstate_t;
-
-
-/**
- * The minimum number of times to sample the channel while backing off to 
- * determine that there are no other LPL transmitters in the area.  This is
- * used in TransmitP.
- */
-#ifndef MIN_BACKOFF_SAMPLES
-#define MIN_BACKOFF_SAMPLES 20
-#endif
 
 /**
  * Amount of time, in milliseconds, to keep the radio on after
@@ -90,9 +78,9 @@ typedef enum {
 #ifndef MAX_LPL_CCA_CHECKS
 
 #if defined(PLATFORM_TELOSB)
-#define MAX_LPL_CCA_CHECKS 80
+#define MAX_LPL_CCA_CHECKS 12
 #else
-#define MAX_LPL_CCA_CHECKS 60
+#define MAX_LPL_CCA_CHECKS 12
 #endif
 
 #endif
@@ -103,14 +91,6 @@ typedef enum {
  */
 #ifndef MIN_SAMPLES_BEFORE_DETECT
 #define MIN_SAMPLES_BEFORE_DETECT 1
-#endif
-
-/**
- * If the receiver does a receive check and ends up getting packets destined
- * for another mote, shut the radio back off after so many invalid packets
- */
-#ifndef MAX_INVALID_MESSAGES
-#define MAX_INVALID_MESSAGES 3
 #endif
 
 #endif

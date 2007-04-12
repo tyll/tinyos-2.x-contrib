@@ -35,7 +35,7 @@
  */
  
 #include "CC2420NoAckLpl.h"
-#warning "*** USING NO-ACK LOW POWER LISTENING LAYER"
+#warning "*** USING EXPERIMENTAL NO-ACK LOW POWER LISTENING LAYER"
 
 configuration CC2420NoAckLplC {
   provides {
@@ -65,8 +65,7 @@ implementation {
       LedsC,
       new StateC() as SendStateC,
       new StateC() as RadioStateC,
-      new TimerMilliC() as OffTimerC,
-      new TimerMilliC() as SendDoneTimerC;
+      new TimerMilliC() as OffTimerC;
   
   LowPowerListening = CC2420NoAckLplP;
   Send = CC2420NoAckLplP;
@@ -87,7 +86,6 @@ implementation {
   CC2420NoAckLplP.SplitControlState -> CC2420DutyCycleC;
   CC2420NoAckLplP.CC2420Cca -> CC2420TransmitC;
   CC2420NoAckLplP.OffTimer -> OffTimerC;
-  CC2420NoAckLplP.SendDoneTimer -> SendDoneTimerC;
   CC2420NoAckLplP.CC2420DutyCycle -> CC2420DutyCycleC;
   CC2420NoAckLplP.Resend -> CC2420TransmitC;
   CC2420NoAckLplP.PacketAcknowledgements -> CC2420ActiveMessageC;

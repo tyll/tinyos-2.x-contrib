@@ -387,21 +387,23 @@ implementation
   			bufferStart+=len;
   			if (bufferStart==&ringbuffer[BUFFERSIZE])
   				bufferStart=&ringbuffer[0];
-  			if (bufferStart == bufferEnd) { // check, if there is more data to be sent
-  				if (!rxreq) { // if not, is there something to be received?
-					stop();
-				}
+  			atomic {
+  				if (bufferStart == bufferEnd) { // check, if there is more data to be sent
+  					if (!rxreq) { // if not, is there something to be received?
+						stop();
+					}
 #ifndef 	NOSHARE
-				else {
-					call RxCTSPin.clr();
-				}
+					else {
+						call RxCTSPin.clr();
+					}
 #endif
-  			}
-  			else {
-				// send next chunk of message
-				if (m_state==S_SENDING)
-					post sendBuf();
-			}	
+  				}
+  				else {
+					// send next chunk of message
+					if (m_state==S_SENDING)
+						post sendBuf();
+				}
+  			}	
   		}
   	}
 
@@ -418,7 +420,6 @@ implementation
 				m_state=S_STARTED;
 			}
 			else {
-				if (m_state==S_STARTED)
 				startRxTx();
 			}
 		}

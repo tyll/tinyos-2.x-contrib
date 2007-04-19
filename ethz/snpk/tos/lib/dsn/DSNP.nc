@@ -469,12 +469,10 @@ implementation
 
 #ifndef	NOSHARE
 	async event void RxRTSInt.fired() {
-		/*
 		rxreq=TRUE;
 		rxlen=0;
 		// call Leds.led0Toggle();
 		requestUSART();
-		*/
 	}
 #endif
 	

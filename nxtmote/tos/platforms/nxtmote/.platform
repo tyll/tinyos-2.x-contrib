@@ -1,0 +1,30 @@
+#
+# FILE: nxtmote/.platform
+# 
+# NXTMOTE platform
+#
+push( @includes, qw(
+
+  %T/platforms/nxtmote
+  %T/chips/at91
+  %T/chips/at91/gpio
+  %T/chips/at91/timer
+  %T/lib/timer
+  %T/lib/serial
+
+) );
+
+@opts = qw(
+
+  -gcc=arm-elf-gcc
+  -fnesc-no-debug
+  -nostartfiles
+  -fnesc-target=env
+  -fnesc-scheduler=TinySchedulerC,TinySchedulerC.TaskBasic,TaskBasic,TaskBasic,runTask,postTask
+
+);
+
+
+#$ENV{NESC_MACHINE} = "pointer=4,4 float=4,4 double=8,4 long_double=8,4 short=2,2 int=4,4 long=4,4 long_long=8,4 int1248_align=1,2,4,4 wchar_size_size=4,4 char_wchar_signed=false,true";
+
+$ENV{NESC_MACHINE} = "";

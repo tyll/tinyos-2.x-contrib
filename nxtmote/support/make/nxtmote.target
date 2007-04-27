@@ -1,0 +1,21 @@
+#-*-Makefile-*- vim:syntax=make
+#$Id$
+#/**
+# * Adapted for nxtmote.
+# * @author Rasmus Pedersen
+# */
+PLATFORM = nxtmote
+#PFLAGS += -finline-limit=100000
+
+#ASSEMBLY_FILES += $(TOSDIR)/platforms/nxtmote/crt0.s
+ASSEMBLY_FILES += $(TOSDIR)/platforms/nxtmote/CStartup.S
+#C_FILES = $(TOSDIR)/platforms/nxtmote/Cstartup_SAM7.c
+C_FILES =
+CFLAGS += -T$(TOSDIR)/platforms/nxtmote/AT91SAM7S256-ROM.ld
+#CFLAGS += -T$(TOSDIR)/platforms/nxtmote/AT91SAM7S256-RAM.ld
+
+$(call TOSMake_include_platform,at91)
+
+nxtmote: $(BUILD_DEPS)
+	@:
+

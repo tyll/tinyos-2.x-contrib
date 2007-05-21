@@ -1,0 +1,27 @@
+Author : Jung Il Choi (jungilchoi at stanford dot edu)
+
+Makefile : Include the following(s)
+-I<Dir with FWP files>
+-DNO_PROTOCOL_PENALTY : Achieves more throughput with less fairness (optional)
+
+Usage :
+
+FWP currently supports CC2420 Radio without LPL only.
+
+Use FairAMSend and FairAMSenderC instead of AMSend and AMSenderC. 
+FairAMSend interface has one more argument, the quiet time. The sending 
+and overhearing node of the packet should be quiet for the specified 
+amount of the time. 
+
+Quiet time is one byte, appended to the CC2420 header. Thus the maximum 
+is 255ms. However, it can be scaled with PACKET_TIME defined at FairAMQueueImplP.nc. 
+
+Quiet time is generally the time the recipient of the packet will respond by. 
+For instance, if the recipient is forwarding the packet, the quiet time would 
+be one packet time, approx. 8ms for CC2420 Radio. If the recipient is 
+responding with bursts of packet, e.g. Deluge's request packet, the quiet 
+time should be (# of packets) * (Packet Time). If the recipient is not anticipated 
+to transmit, the quiet time should be zero.
+
+For further details, contact the auther or refer to the technical paper 
+at http://sing.stanford.edu/pubs/sing-06-03.pdf

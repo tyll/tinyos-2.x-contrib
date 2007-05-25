@@ -47,13 +47,6 @@ configuration HilTimerMilliC
 
 implementation
 {
-/*
-  components HilTimerMilliM, HplNXTARMOSTimerM;
-
-  Init = HplNXTARMOSTimerM;
-  TimerMilli = HilTimerMilliM;
-*/
-
   components new VirtualizeTimerC(TMilli,uniqueCount(UQ_TIMER_MILLI)) as VirtTimersMilli32;
   components new AlarmToTimerC(TMilli) as AlarmToTimerMilli32;
   components new HalAT91AlarmM(TMilli,2) as PhysAlarmMilli32;

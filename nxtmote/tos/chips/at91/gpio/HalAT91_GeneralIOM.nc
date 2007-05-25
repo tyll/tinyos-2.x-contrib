@@ -19,15 +19,21 @@ implementation {
   }
 
   async command void GeneralIO.clr[uint8_t pin]() {
+    atomic call HplAT91_GPIOPin.setPIOCODR[pin]();    
     return;
   }
 
   async command void GeneralIO.toggle[uint8_t pin]() {
+    if(call HplAT91_GPIOPin.getPIOPDSR[pin]())
+      call GeneralIO.clr[pin]();
+    else
+      call GeneralIO.set[pin]();
     return;
   }
 
   async command bool GeneralIO.get[uint8_t pin]() {
-    bool result = 0;
+    bool result;
+    result = call HplAT91_GPIOPin.getPIOPDSR[pin]();
     return result;
   }
 
@@ -36,12 +42,9 @@ implementation {
   }
 
   async command void GeneralIO.makeOutput[uint8_t pin]() {
-    /*if(pin==0){
-    atomic call HplNXTARM_GPIOPin.setPIOPER[pin]();
-    atomic call HplNXTARM_GPIOPin.setPIOOER[pin]();
-
-    atomic call HplNXTARM_GPIOPin.setPIOCODR[pin]();
-    }*/
+    atomic call HplAT91_GPIOPin.setPIOPER[pin]();
+    atomic call HplAT91_GPIOPin.setPIOOER[pin]();
+//    atomic call HplAT91_GPIOPin.setPIOCODR[pin]();
     return;
   }
   

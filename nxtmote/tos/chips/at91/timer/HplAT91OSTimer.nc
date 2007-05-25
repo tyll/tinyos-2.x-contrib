@@ -39,6 +39,17 @@ interface HplAT91OSTimer
    * Sets the TC_IER bit corresponding to the timer match.
    */
   async command void setTCIER(bool flag);
+
+  /**
+   * Sets the TC_IDR register. It disables various timer speciffic interrupts.
+   */
+  async command void setTCIDR(uint32_t val);
+
+  /**
+   * Channel control register. Clock enable and disable. Also software triger to
+   * start timer.
+   */
+  async command void setTCCCR(uint32_t val);
   
   /**
    * Clear the interrupt.
@@ -56,12 +67,8 @@ interface HplAT91OSTimer
   async command void setIDCR();
   
   /**
-   * Reset and start the counter. setTCRC should be called first.
-   */
-  async command void setSWTRG();
-  
-  /**
-   * Fired.
+   * Fired. This event must call getTCSR() in this interface.
+   * It will clear the status register.
    */
   async event void fired();
 

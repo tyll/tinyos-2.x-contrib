@@ -53,7 +53,8 @@ void AT91F_TC_Open ( AT91PS_TC TC_pt, unsigned int Mode, unsigned int TimerId)
   unsigned int dummy;
 
   //* First, enable the clock of the TIMER
-  AT91F_PMC_EnablePeriphClock ( AT91C_BASE_PMC, 1<< TimerId ) ;
+  // rup: testing
+  //AT91F_PMC_EnablePeriphClock ( AT91C_BASE_PMC, 1<< TimerId ) ;
 
   //* Disable the clock and the interrupts
   TC_pt->TC_CCR = AT91C_TC_CLKDIS ;

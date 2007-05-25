@@ -97,12 +97,12 @@
 
 			LDR     PC,Reset_Addr		/* 0x00 Reset handler */    
 			LDR     PC,Undef_Addr		/* 0x04 Undefined Instruction */
-			LDR     PC,SWI_Addr			/* 0x08 Software Interrupt */
+			LDR     PC,SWI_Addr		/* 0x08 Software Interrupt */
 			LDR     PC,PAbt_Addr		/* 0x0C Prefetch Abort */
 			LDR     PC,DAbt_Addr		/* 0x10 Data Abort */
 			NOP                 		/* 0x14 reserved  */
-			LDR     PC,IRQ_Addr			/* 0x18 IRQ */
-fiqvec:                                 /* 0x1c FIQ */
+			LDR     PC,IRQ_Addr		/* 0x18 IRQ */
+fiqvec:                                 		/* 0x1c FIQ */
 /*------------------------------------------------------------------------------
 //*- Function             : FIQ_Handler_Entry
 //*- Treatments           : FIQ Controller Interrupt Handler.
@@ -284,10 +284,10 @@ already_remapped:
 
 /*- Set up Supervisor Mode and set Supervisor Mode Stack*/
 //				/* start with INT and FIQ enabled */
-//				msr     CPSR_c, #ARM_MODE_SVC 
+				msr     CPSR_c, #ARM_MODE_SVC 
 
 				/* start with INT and FIQ disabled */
-				msr     CPSR_c, #ARM_MODE_SVC | I_BIT | F_BIT 
+//				msr     CPSR_c, #ARM_MODE_SVC | I_BIT | F_BIT 
 
 				mov     sp, r0                     /* Init stack Sup */
 
@@ -336,15 +336,20 @@ ctor_end:
 		str     r1, [r0], #4 	/* store the fiqhandler address in AIC_SVR[0] */
 		ldr	r1, =irqhandler
 		mov     r2, #31
-		cmp     r2, #0		/* just in case we want to this "mov     r2, #31" */
+		cmp     r2, #0		/* just in case we want to this "mov     r2, #0" (see above) */
 		beq     Svr_done
 Svr_loop:		
-		str     r1, [r0], #4	/* store the irqhandler address in AIC_SVR[1..31] */
+		str     r1, [r0]	/* store the irqhandler address in AIC_SVR[1..31] */ /*rup: removed ,#4 to test */
+		add     r0, r0, #4
 		subs    r2, r2, #1
 		bne     Svr_loop
+
 Svr_done: /* call main() */
 		ldr	lr,=exit
 		ldr	r0,=main
+// rup test
+//ldr	r0, =irqhandler
+/* rup: test irqhandler */
 		bx	r0
 
         .size   _startup, . - _startup
@@ -406,6 +411,7 @@ IRQ_Handler_Entry:
     stmfd   sp!, {r1-r3, r12, r14}
 
 /*---- Branch to the routine pointed by AIC_IVR */
+    //rup: Always irqhandler as set up in this file
     mov     r14, pc
     bx      r0
 
@@ -434,6 +440,12 @@ IRQ_Handler_Entry:
 //* ?EXEPTION_VECTOR
 //* This module is only linked if needed for closing files.
 //*---------------------------------------------------------------*/
+//PIOPER:        .word   0xFFFFF400
+//PIOOER:	.word   0xFFFFF410
+//PIOCODR:	.word   0xFFFFF434	
+//LEDVAL:	.word   0x00000002
+
+
         .global AT91F_Default_FIQ_handler
         .func   AT91F_Default_FIQ_handler
 AT91F_Default_FIQ_handler:
@@ -444,7 +456,16 @@ AT91F_Default_FIQ_handler:
         .global AT91F_Default_IRQ_handler
         .func   AT91F_Default_IRQ_handler
 AT91F_Default_IRQ_handler:
-            b     AT91F_Default_IRQ_handler
+//rup toggle
+//ldr	r0, PIOPER
+//ldr	r1, LEDVAL
+//str	r1, [r0]
+//ldr	r0, PIOOER
+//str	r1, [r0]
+//ldr	r0, PIOCODR
+//str	r1, [r0]
+//            b     AT91F_Default_IRQ_handler
+b     AT91F_Default_IRQ_handler
         .size   AT91F_Default_IRQ_handler, . - AT91F_Default_IRQ_handler
         .endfunc
 

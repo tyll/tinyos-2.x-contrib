@@ -25,11 +25,11 @@ inline void __nesc_enable_interrupt() {
 	       : "=r" (statusReg)
 	       : "0" (statusReg)
 	       );
-
   return;
 }
 
 inline void __nesc_disable_interrupt() {
+/*
   uint32_t statusReg = 0;
 
   asm volatile (
@@ -39,16 +39,16 @@ inline void __nesc_disable_interrupt() {
 		: "=r" (statusReg)
 		: "0" (statusReg)
 		);
-
+*/
   return;
 }
 
 typedef uint32_t __nesc_atomic_t;
-
+//TODO: enable
 inline __nesc_atomic_t __nesc_atomic_start(void) @spontaneous() {
   uint32_t result = 0;
   uint32_t temp = 0;
-
+/*
   asm volatile (
 		"mrs %0,CPSR\n\t"
 		"orr %1,%2,%4\n\t"
@@ -56,6 +56,7 @@ inline __nesc_atomic_t __nesc_atomic_start(void) @spontaneous() {
 		: "=r" (result) , "=r" (temp)
 		: "0" (result) , "1" (temp) , "i" (ARM_CPSR_INT_MASK)
 		);
+*/
   return result;
 }
 
@@ -63,7 +64,7 @@ inline void __nesc_atomic_end(__nesc_atomic_t oldState) @spontaneous() {
   uint32_t  statusReg = 0;
 
   oldState &= ARM_CPSR_INT_MASK;
-
+/*
   asm volatile (
 		"mrs %0,CPSR\n\t"
 		"bic %0, %1, %2\n\t"
@@ -72,11 +73,11 @@ inline void __nesc_atomic_end(__nesc_atomic_t oldState) @spontaneous() {
 		: "=r" (statusReg)
 		: "0" (statusReg),"i" (ARM_CPSR_INT_MASK), "r" (oldState)
 		);
-
+*/
   return;
 }
 inline void __nesc_atomic_sleep() {
-  __nesc_enable_interrupt();
+  //__nesc_enable_interrupt();
 }
 
 // Add offset to channel id (first channel id is zero) to get timer peripheral id
@@ -86,6 +87,21 @@ inline void __nesc_atomic_sleep() {
 // 1 ms is approx. 24028 ticks
 #define TICKSONEMSCLK2 (24028)
 //#define TICKTOMSCLK2(ticks)
+
+// GPIO pins
+// See AT91SAM7S256 LEGO MINDSTORMS HW sheet 1
+// and J7, J8, J9, and J6 on sheet 3
+#define DIGIA0 (23) // Port 1 pin 5 (yellow)
+#define DIGIA1 (18) // Port 1 pin 6 (blue)
+
+#define DIGIB0 (28) // Port 2 pin 5
+#define DIGIB1 (19) // Port 2 pin 6
+
+#define DIGIC0 (29) // Port 3 pin 5
+#define DIGIC1 (20) // Port 3 pin 6
+
+#define DIGID0 (30) // Port 4 pin 5
+#define DIGID1 (2)  // Port 4 pin 6
 
 // priorities which are used in HplAt91InterruptM
 const uint8_t TOSH_IRP_TABLE[] = {
@@ -171,25 +187,19 @@ AT91_REG PID_ADR_TABLE[] = {
 //  TC_CLKS_MCK1024 = 0x4
 //};
 
-  // Little function to toggle a pin
-#define togglepin(toggle)	unsigned long* PIOPER_;\
-							unsigned long* PIOOER_;\
-							unsigned long* PIOCODR_;\
-							unsigned long* PIOSODR_;\
-							unsigned long LEDVAL_;\
-							/* GPIO register addresses */\
-							PIOPER_ = (unsigned long*)0xFFFFF400;\
-							PIOOER_ =  (unsigned long*)0xFFFFF410;\
-							PIOCODR_ =  (unsigned long*)0xFFFFF434;\
-							PIOSODR_ = (unsigned long*)0xFFFFF430; /* (PIOA) Set Output Data Register */\
+
+// See HW appendix page 1. Pin6 on port 1 is PA18 that is DIGIA1
+#define LEDVAL_ (1 << DIGIA1)
+// Little function to toggle a pin
+#define togglepin(toggle)	{/* GPIO register addresses */\
 							/* Register use */\
-							LEDVAL_ =  ((unsigned long) 1 << 18);/*(unsigned long)0x00000008;*/\
-							*PIOPER_ = LEDVAL_;\
-							*PIOOER_ = LEDVAL_;\
+							*AT91C_PIOA_PER = LEDVAL_;\
+							*AT91C_PIOA_OER = LEDVAL_;\
 							if(toggle == 0)\
-							  *PIOCODR_ = LEDVAL_;  /* port 1 pin 6 at 0.0 v (enable this line OR the next)*/\
+							  *AT91C_PIOA_CODR = LEDVAL_;  /* port 1 pin 6 at 0.0 v (enable this line OR the next)*/\
 							else\
-							  *PIOSODR_ = LEDVAL_;  /* port 1 pin 6 (blue) at 3.25-3.27 v (GND is on pin 2 (black)) */\
-							//while(1); /* stop here */
+							  *AT91C_PIOA_SODR = LEDVAL_;  /* port 1 pin 6 (blue) at 3.25-3.27 v (GND is on pin 2 (black)) */\
+							while(1); /* stop here */\
+						    }
 
 #endif //__NXTMOTE_HARDWARE_H__

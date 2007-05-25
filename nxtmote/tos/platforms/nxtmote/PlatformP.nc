@@ -9,35 +9,12 @@ module PlatformP{
   uses interface Init as PInit;
 }
 implementation{
-/*
-  // Little function to toggle a pin
-  void togglepin(){
-    unsigned long* PIOPER_;
-    unsigned long* PIOOER_;
-    unsigned long* PIOCODR_;
-    unsigned long* PIOSODR_;
-    unsigned long LEDVAL_;
 
-    // GPIO register addresses
-    PIOPER_ = (unsigned long*)0xFFFFF400;
-    PIOOER_ =  (unsigned long*)0xFFFFF410;
-    PIOCODR_ =  (unsigned long*)0xFFFFF434;
-    PIOSODR_ = (unsigned long*)0xFFFFF430; // (PIOA) Set Output Data Register
-    
-    // Register use
-    LEDVAL_ =  ((unsigned long) 1 << 18);//(unsigned long)0x00000008;
-    *PIOPER_ = LEDVAL_;
-    *PIOOER_ = LEDVAL_;
-    //*PIOCODR_ = LEDVAL_;   // port 1 pin 6 at 0.0 v (enable this line OR the next)
-    *PIOSODR_ = LEDVAL_; // port 1 pin 6 (blue) at 3.25-3.27 v (GND is on pin 2 (black))
-        
-    while(1);
-  }
-*/  
   command error_t Init.init() {
     // AT91F_LowLevelInit() in Cstartup_SAM7.c has been called
     // TODO: Move it so equivalent code is called from this place
     int            i;
+
     AT91PS_PMC     pPMC = AT91C_BASE_PMC;
 
     //* Set Flash Waite sate
@@ -52,7 +29,7 @@ implementation{
     // 1 Enabling the Main Oscillator:
     // SCK = 1/32768 = 30.51 uSecond
     // Start up time = 8 * 6 / SCK = 56 * 30.51 = 1,46484375 ms
-    pPMC->PMC_MOR = (( AT91C_CKGR_OSCOUNT & (0x06 <<8) | AT91C_CKGR_MOSCEN ));
+    pPMC->PMC_MOR = (( (AT91C_CKGR_OSCOUNT & (0x06 <<8)) | AT91C_CKGR_MOSCEN ));
 
     // Wait the startup time
     while(!(pPMC->PMC_SR & AT91C_PMC_MOSCS));
@@ -84,14 +61,21 @@ implementation{
     // Set up the default interrupts handler vectors
     // See CStartup.S. Fast interrupt and interrupt are mapped to 
     //   fiqhandler and irqhandler in HplInteruptM.nc
-    /*
-    AT91C_BASE_AIC->AIC_SVR[0] = (int) AT91F_Default_FIQ_handler ;
+    
+    // Enable the PIOA controller so the reading of AT91_PIOA_PDSR will
+    // work in the Led toggle call.
+    pPMC->PMC_PCER = (1<<AT91C_ID_PIOA);
+    
+    //AT91C_BASE_AIC->AIC_SVR[0] = (int) AT91F_Default_FIQ_handler ;
+    
     for (i=1;i < 31; i++)
     {
-      AT91C_BASE_AIC->AIC_SVR[i] = (int) AT91F_Default_IRQ_handler ;
+      //AT91C_BASE_AIC->AIC_SVR[i] = (int) AT91F_Default_IRQ_handler;
     }
-    */
-    AT91C_BASE_AIC->AIC_SPU  = (int) AT91F_Spurious_handler ;    
+    
+    AT91C_BASE_AIC->AIC_SPU  = (int) AT91F_Spurious_handler ;     
+   
+    call PInit.init();
 
     return SUCCESS;
   }

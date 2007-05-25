@@ -5,8 +5,6 @@
  
 #include "hardware.h"
 
-
-
 configuration PlatformLedsC
 {
   provides interface GeneralIO as Led0;
@@ -19,9 +17,10 @@ implementation
 {
   components PlatformP, GeneralIOC;
   Init = PlatformP.PInit;
-
-  Led0 = GeneralIOC.GeneralIO[1];
-  Led1 = GeneralIOC.GeneralIO[2];
-  Led2 = GeneralIOC.GeneralIO[4];
-
+  
+  // This can be changed (see hardware.h)
+  // Each led is mapped to pin 6 of port 1, 2, and 3
+  Led0 = GeneralIOC.GeneralIO[DIGIA1];
+  Led1 = GeneralIOC.GeneralIO[DIGIB1];
+  Led2 = GeneralIOC.GeneralIO[DIGIC1];
 }

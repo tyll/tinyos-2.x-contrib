@@ -23,17 +23,4 @@ implementation {
   components PlatformP;
   Init = PlatformP;
   
-  /* command error_t PInit.init() {
-    unsigned long* PIOPER_ = (unsigned long*)0xFFFFF400;
-    unsigned long* PIOOER_ =  (unsigned long*)0xFFFFF410;
-    unsigned long* PIOCODR_ =  (unsigned long*)0xFFFFF434;	
-    unsigned long LEDVAL_ =  (unsigned long)0x00000002;  
-
-    *PIOPER_ = LEDVAL_;
-    *PIOOER_ = LEDVAL_;
-    *PIOCODR_ = LEDVAL_;
-    return SUCCESS;
-  } */
-  
-  
 }

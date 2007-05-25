@@ -33,6 +33,7 @@
  */
 
 // @author Phil Buonadonna
+
 /**
  * Adapted for nxtmote.
  * @author Rasmus Pedersen
@@ -59,6 +60,8 @@ implementation
   uint32_t mTf;
   // Counts number of compare interrupts (fires)
   uint32_t mTc;
+  
+  bool flg = FALSE;
 
   task void lateAlarm() {
     atomic {
@@ -68,11 +71,13 @@ implementation
   }
   
   command error_t Init.init() {
-
+//    flg = TRUE;
     call OSTInit.init(); 
     // Continue on match, Non-periodic, w/ given resolution
     atomic {
       mfRunning = FALSE;
+      mTf = 0;      
+      mTc = 0;
       switch (resolution) {
         case 1: // 1/32768 second
   	      mMinDeltaT = 10;
@@ -91,12 +96,12 @@ implementation
   	      break;
       }
       call OSTChnl.open();
-      call OSTChnl.setTCRC(TICKSONEMSCLK2);
     }
     return SUCCESS;
   }
 
   async command void Alarm.start( uint32_t dt ) {
+  
     // TODO: pending alarm
 
     if (dt < mMinDeltaT) 
@@ -104,10 +109,20 @@ implementation
 
     atomic {
       mTf = dt;
+
       mTc = 0;
-      call OSTChnl.setICCR();
+      // 1 ms timer
+      call OSTChnl.setTCRC(TICKSONEMSCLK2);
+      // Clear status register
+      call OSTChnl.getTCSR();
+
+      // Enable AIC interrupt and Start it with the software trigger
+      // TODO: Too much 
+      call OSTChnl.open();
+
+      call OSTChnl.setTCCCR(AT91C_TC_SWTRG);
       call OSTChnl.setIECR();
-      call OSTChnl.setSWTRG();
+
       mfRunning = TRUE;
     }
 
@@ -119,11 +134,9 @@ implementation
     return;
   } 
 
-
   async command void Alarm.stop() {
     atomic {
       call OSTChnl.setIDCR();
-      call OSTChnl.setICCR();
       mfRunning = FALSE;
     }
     return;
@@ -144,15 +157,15 @@ implementation
   }
 
   async event void OSTChnl.fired() {
-    // Increment the counter
-    mTc++;
+    uint32_t dummy;
+    dummy = call OSTChnl.getTCSR();
     
     // Check the stop condition
     if(mTc < mTf){ // continue by restarting the timer
-      call OSTChnl.setSWTRG();      
+      mTc++;
     } 
     else{ //fire
-      call Alarm.stop();    
+      call Alarm.stop() ;   
       signal Alarm.fired();
     }
     return;
@@ -161,7 +174,5 @@ implementation
   default async event void Alarm.fired() {
     return;
   }
-
-
 }
 

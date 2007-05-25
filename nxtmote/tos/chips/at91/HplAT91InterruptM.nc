@@ -15,15 +15,13 @@ module HplAT91InterruptM
 
 implementation 
 {
-
-  void irqhandler() __attribute__ ((interrupt ("IRQ"))) @C() @atomic_hwevent() {
-
+  void irqhandler() __attribute__ ((C, spontaneous)) {
     uint32_t irqID;
-
+    
     irqID = AT91F_AIC_ActiveID(AT91C_BASE_AIC); // Current interrupt source number
     
-    signal AT91Irq.fired[irqID]();   // Handler is responsible for clearing interrupt
-
+    signal AT91Irq.fired[irqID]();   
+    
     return;
   }
 
@@ -34,8 +32,9 @@ implementation
 
   error_t allocate(uint8_t id, bool level, uint8_t priority)
   {
-
-    AT91F_AIC_ConfigureIt ( AT91C_BASE_AIC, id, priority, AT91C_AIC_SRCTYPE_INT_HIGH_LEVEL, irqhandler);
+    //AT91F_AIC_ConfigureIt ( AT91C_BASE_AIC, id, priority, AT91C_AIC_SRCTYPE_INT_HIGH_LEVEL, irqhandler);
+    //rup: what ahout the rc trigger???
+    AT91F_AIC_ConfigureIt ( AT91C_BASE_AIC, AT91C_ID_TC0, 2, AT91C_AIC_SRCTYPE_INT_HIGH_LEVEL, irqhandler);
 
     return TRUE;
   }
@@ -45,7 +44,8 @@ implementation
     atomic {
       if (id < 34) {
         AT91C_BASE_TC0->TC_IER = AT91C_TC_CPCS;        
-        AT91F_AIC_EnableIt(AT91C_BASE_AIC, id);
+        //AT91F_AIC_EnableIt(AT91C_BASE_AIC, id);
+AT91F_AIC_EnableIt(AT91C_BASE_AIC, AT91C_ID_TC0);
       }
     }
     return;

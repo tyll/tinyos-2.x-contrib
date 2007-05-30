@@ -18,7 +18,6 @@ implementation {
   CC2420SniffP.CC2420Power -> CC2420ControlC; 
   
   components CC2420ActiveMessageP as AM;
-  CC2420ControlC.AMPacket -> AM;
   AM.amAddress -> CC2420SniffP;
   
   
@@ -46,7 +45,5 @@ implementation {
   CC2420SniffP.RXFIFO -> Spi.RXFIFO;
   CC2420SniffP.SFLUSHRX -> Spi.SFLUSHRX;
   
-      
-  MainC.SoftwareInit -> CC2420ControlC;
   MainC.SoftwareInit -> CC2420SniffP;
 }

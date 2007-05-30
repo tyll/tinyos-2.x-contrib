@@ -1,0 +1,126 @@
+>> CC2420 Frame Filters
+    Length ~= "cc2420.length"
+    FCS ~= "cc2420.fcs"			(this includes crc, lqi and rssi values. see cc2420 manual)
+    Crc ~= "cc2420.crc"
+    Lqi ~= "cc2420.lqi"
+    Rssi ~= "cc2420.rssi"
+	};
+
+>> TinyOs2 Serial Frame Format Filters
+    Length ~= "t2sf.length"
+    Type ~= "t2sf.type"
+    Payload ~= "t2sf.payload_data"
+    
+
+>> TinyOs2 Serial Active Message Filters
+		Destination_Address ~= "t2am.dest"
+    Source_Address ~= "t2am.src"
+    Length ~= "t2am.length"
+    Group ~= "t2am.group"
+    Type ~= "t2am.type"
+    Payload ~= "t2am.payload_data"
+    
+    
+>> 802.15.4 MAC Frame Format Filters
+
+(for all packets / general filters)
+		
+		/* Frame Control Fields */
+    Frame_Control ~= "802_15_4.fc" 
+		Frame_Type ~= "802_15_4.fc.type"
+    Security_Enabled ~= "802_15_4.fc.security"
+    Frame_Pending ~= "802_15_4.fc.framepending"
+    Ack_Request ~= "802_15_4.fc.ackrequest"
+    Intra_PAN ~= "802_15_4.fc.intrapan"
+    Destination_Addressing_Mode ~= "802_15_4.fc.dstaddrmode"
+    Source_Addressing_Mode ~= "802_15_4.fc.srcaddrmode"
+    
+    /* DSN/BSN */
+    Sequence_Number ~= "802_15_4.seqno"
+    
+    /* Addressing fields */
+    Destination_PAN_ID ~= "802_15_4.dstPANID"
+    Destination_Address ~= "802_15_4.dst"
+    Source_PAN_ID ~= "802_15_4.srcPANID"
+    Source_Address ~= "802_15_4.src"
+
+    /* FCS bytes depend heavily on phy spec */
+    FCS ~= "802_15_4.fcs"				(this is the same as in cc2420 filters)
+
+
+(beacon specific field filters)
+    
+		/* supeframe spec fields */
+		Superframe_Specification ~= "802_15_4.beacon.superframe_spec"				
+		Beacon_Order ~= "802_15_4.beacon.superframe_spec.bo",
+		Superframe_Order ~= "802_15_4.beacon.superframe_spec.so"
+  	Final_CAP_Slot ~= "802_15_4.beacon.superframe_spec.final_cap_slot"
+  	Battery_Life_Extension" ~= "802_15_4.beacon.superframe_spec.ble"
+    PAN_Coordinator ~= "802_15_4.beacon.superframe_spec.pan_coord"
+    Association_Permit ~= "802_15_4.beacon.superframe_spec.ap"
+    
+    /* gts spec fields */
+    GTS_Fields ~= "802_15_4.gts"
+    GTS_Specification ~= "802_15_4.beacon.gts.spec"
+    Descriptor_Count ~= "802_15_4.beacon.gts.dc"
+    GTS_Permit ~= "802_15_4.beacon.gts.gp"
+    GTS_Directions ~= "802_15_4.beacon.gts.dirs"
+    Slot_0 ~= "802_15_4.beacon.gts.dir.slot0"
+    Slot_1 ~= "802_15_4.beacon.gts.dir.slot1"
+    Slot_2 ~= "802_15_4.beacon.gts.dir.slot2"
+    Slot_3 ~= "802_15_4.beacon.gts.dir.slot3"
+    Slot_4 ~= "802_15_4.beacon.gts.dir.slot4"
+    Slot_5 ~= "802_15_4.beacon.gts.dir.slot5"
+    Slot_6 ~= "802_15_4.beacon.gts.dir.slot6"
+    GTS_Descriptor ~= "802_15_4.beacon.gts.desc"
+    Short_Address ~= "802_15_4.beacon.gts.short_adr"
+    Start_Slot ~= "802_15_4.beacon.gts.start"
+    Length ~= "802_15_4.beacon.gts.length"
+    
+    /* pending address fields */
+    Pending_Address_Fields ~= "802_15_4.beacon.pending_adr"
+    Pending_Address_Specification ~= "802_15_4.beacon.pending_adr.spec"
+    Short_Address_Count ~= "802_15_4.beacon.pending_adr.spec.short_adr_count"
+		Extended_Address_Count ~= "802_15_4.beacon.pending_adr.spec.ext_adr_count"
+  	Pending_Short_Addresses ~= "802_15_4.beacon.pending_short_adr_list"
+    Pending_Ext_Addresses ~= "802_15_4.beacon.pending_ext_adr_list"
+  	Pending_Extended_Address ~= "802_15_4.beacon.pending_adr.ext_adr"
+  	Pending_Short_Address ~= "802_15_4.beacon.pending_adr.short_adr"
+  	
+  	/* payload */
+    Beacon_Payload ~= "802_15_4.beacon.payload"
+
+(command specific field filters)
+
+		/* general command frame fields */
+    Command_ID ~= "802_15_4.command.id"
+    
+ 		/* association request command frame fields */
+    Capability_Info ~= "802_15_4.command.associate.request.capability_info"
+    Alternate_PAN_Coordinator ~= "802_15_4.associate.request.alternate_pan_coord"
+		Device_Type ~= "802_15_4.associate.request.device_type"
+  	Power_Source ~= "802_15_4.associate.request.power_source"
+    Receiver_On_When_Idle ~= "802_15_4.associate.request.rx_on_when_idle"
+    Security_Capability ~= "802_15_4.associate.request.security_capability"
+    Allocate_Address ~= "802_15_4.associate.request.allocate_adr"
+    
+		/* association response command frame fields */
+		Assigned_Short_Address ~= "802_15_4.command.association.response.assigned_adr"
+		Association_Status ~= "802_15_4.command.association.response.status"
+		Association_Failure ~= "802_15_4command.association.response.failure"
+		
+		/* disassociation command frame fields */
+    Disassociation_Reason ~= "802_15_4.command.disassociation.reason"
+    
+    /* realignment command frame fields */
+		PAN_ID ~= "802_15_4.command.realignment.pan_id"
+    Coordinator_Short_Address ~= "802_15_4.command.realignment.coord_short_adr"
+		Logical_Channel ~= "802_15_4.command.realignment.channel"
+    Assigned_Short_Address ~= "802_15_4.command.realignment.assigned_short_adr"
+    
+    /* gts request command frame fields */
+    GTS_Characteristics ~= "802_15_4.command.gts.characteristic"
+    GTS_Length ~= "802_15_4.802_15_4.command.gts.length",
+    GTS_Direction ~= "802_15_4.command.gts.dir"
+    GTS_Type ~= "802_15_4.command.gts.type"
+

@@ -1,0 +1,26 @@
+Roadmap, with no priorities or timelines:
+
+* External Java support - 
+  - Ability to add in your own Java programs running on the computer side
+    to interact with the mote
+  - Those Java programs should interact with the test result collection system
+    to assert failures just like the embedded side can.
+  - This will help test serial integration issues.
+    > UartStream
+    > UartByte
+    > Serial Stack integration
+    > Application serial interaction
+
+* A layer that allows a test to easily intercept or inject messages in the
+  radio and serial stacks. Easy to do, it just takes time.
+
+* Better message exfil support while maintaining a low RAM footprint
+  - Tried a single-phase serial stack.  It worked, but not as well as I hoped.
+    > UartByte was broken on msp430, atm128 was just fixed.
+    > Using the actual serial stack breaks when using UartByte for single
+      phase serial access.
+  
+* Test bed support, but we need a test bed first to figure out how to do that.
+
+* Your thoughts?
+

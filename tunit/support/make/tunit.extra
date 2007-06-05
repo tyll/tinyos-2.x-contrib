@@ -1,0 +1,4 @@
+CFLAGS += -I%T/../tunit/tos/lib/tunit
+CFLAGS += -I%T/../tunit/tos/lib/tunitstats
+CFLAGS += -I%T/../tunit/tos/system/
+CFLAGS += -I%T/../tunit/tos/interfaces

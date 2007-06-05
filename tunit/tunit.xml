@@ -1,0 +1,12 @@
+<!-- PLEASE SETUP YOUR TUNIT.XML FILE TO MATCH YOUR SYSTEM'S CONNECTIONS -->
+
+<tunit>
+  <testrun name="1_telosb">
+    <mote target="telosb" motecom="serial@COM51:tmote" installextras="bsl,50"/>
+  </testrun> 
+   
+  <testrun name="2_telosb">
+    <mote target="telosb" motecom="serial@COM22:tmote" installextras="bsl,21"/>
+    <mote target="telosb" motecom="serial@COM51:tmote" installextras="bsl,50"/>
+  </testrun>
+</tunit>

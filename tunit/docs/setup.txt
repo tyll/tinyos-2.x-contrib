@@ -1,0 +1,113 @@
+
+1. Setting up TUnit
+====================================================================
+
+1.1 Java-side Dependencies
+--------------------------------------------------------------------
+Tunit has some dependencies that need to be in your classpath to 
+get the .jar file working:
+
+ * log4j
+    http://logging.apache.org/site/binindex.cgi
+    
+ * Xerces XML parser
+    http://xerces.apache.org/xerces-j/
+ 
+ * tinyos.jar
+    Compiled from source, latest CVS or tinyos-2.0.2 distribution
+ 
+ * Ant build system 
+    http://ant.apache.org/bindownload.cgi
+     - Follow the instructions.  It's pretty simple to setup, all I remember
+       having to do manually was define ANT_HOME somewhere on startup, like:
+         export PATH=${PATH}:/opt/msp430/bin:/opt/ant/bin:
+
+On my system, I setup the following classpaths to get ant/tunit 
+working happily (assuming all the tunit java stuff is located in
+tinyos-2.x/support/sdk/tunit/...)
+
+(My .tinyos-2.0 bash startup file):
+ export TINYOS="`cygpath -w $TOSROOT/support/sdk/java/tinyos.jar`"
+ export TUNIT="`cygpath -w $TOSROOT/support/sdk/tunit/tunit.jar`"
+ export XERCES="`cygpath -w $TOSROOT/support/sdk/tunit/depends/xerces.jar`"
+ export LOG4J="`cygpath -w $TOSROOT/support/sdk/tunit/depends/log4j.jar`"
+ export CLASSPATH="${TINYOS};${LOG4J};${TUNIT};${XERCES};."
+
+
+1.1 Embedded-side Dependencies
+--------------------------------------------------------------------
+There are also some dependencies to get the embedded side to compile:
+ * TUnit Base for embedded code
+     Containing /tos/lib/tunit/
+     Containing /tests/....
+     
+ * TUNIT_BASE definition
+    Define TUNIT_BASE somewhere.  This is the directory where all your tests
+    will go, where tunit embedded resides, and your reports and statistics
+    will go into.  For example, /opt/tinyos-2.x/tunit
+
+ * tunit.extra
+    Place tunit.extra into /support/make/.
+    It defines a few directories to include at compile time. You'll probably
+    need to edit it to point to those directories in your system:
+    
+      tunit.extra (assuming everything is in tinyos-2.x/tunit):
+       CFLAGS += -I%T/../tunit/tos/lib/tunit
+       CFLAGS += -I%T/../tunit/tos/lib/tunitstats
+       CFLAGS += -I%T/../tunit/tos/system/
+       CFLAGS += -I%T/../tunit/tos/interfaces
+    
+
+
+1.2 Setup your tunit.xml
+--------------------------------------------------------------------
+In your TUNIT_HOME directory, you'll find a file called tunit.xml.
+This file defines all the different motes that are connected to your
+system and how you want to install applications to those motes in
+different combinations.  Plug in a few motes to your system that
+you'll have every time you run tests, and setup your tunit.xml to match
+those connections.  The first mote defined in each test is mote 0 
+and runs the test.  The other motes are just there doing nothing,
+accepting commands and generating feedback as needed.
+
+Here's an example:
+
+<tunit>
+  <testrun name="1_tmote">
+    <mote target="tmote" motecom="serial@COM51:tmote" buildextras="whatever_at_compile_time" installextras="bsl,50"/>
+  </testrun> 
+   
+  <testrun name="2_tmote">
+    <mote target="tmote" motecom="serial@COM22:tmote" installextras="bsl,21"/>
+    <mote target="tmote" motecom="serial@COM51:tmote" installextras="bsl,50"/>
+  </testrun>
+  
+  <testrun name="micaz_and_tmote">
+    <mote target="micaz" motecom="serial@COM11:micaz" installextras="mib510,/dev/ttyS9">
+    <mote target="tmote" motecom="serial@COM22:tmote" installextras="bsl,21"/>
+  </testrun>
+  
+  <testrun name="mica2">
+    <mote target="mica2" motecom="serial@COM18:mica2" installextras="mib510,/dev/ttyS16">
+  </testrun>
+</tunit>
+
+
+
+1.3 Start writing tests
+--------------------------------------------------------------------
+To make a test:
+
+  > Add a directory for the test somewhere under /tunit/tests/..., 
+    following the standard TinyOS development tree format.
+  > We recommend you prefix your test with the word "Test"
+  > Make a compilable application, but make sure you include:
+    a) new TestCaseC() as WhateverYouAreTestingC;
+    b) #include "TUnit.h" at the top of your module.
+    c) After your WhateverYouAreTesting.run() event executes, make sure
+       you call back WhateverYouAreTesting.done() when that test is 
+       complete.  NesC and TinyOS are split-phase, so it's up to you 
+       to make sure you let it know your test is finished.
+
+There are also several examples of tests you can follow.
+

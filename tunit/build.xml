@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="TUnit" basedir="." default="tunit">
+
+  <property name="report.dir" value="./reports"/>
+  <property name="xml.dir" value="${report.dir}/xml"/>
+  <property name="htmlreport.dir" value="${report.dir}/html"/>
+  <property name="archive.dir" value="${report.dir}/archive"/>
+
+  <target name="clean">
+    <delete dir="${htmlreport.dir}"/>
+    <delete dir="${xml.dir}"/>
+  </target>
+
+  <target name="tunitrerun"> 
+    <java classname="com.rincon.tunit.TUnit">
+      <arg value="-rerun"/>
+    </java>
+    <antcall target="tunitreport"/>
+  </target>
+
+  <target name="tunit">
+    <delete dir="${xml.dir}"/>
+    <mkdir dir="${xml.dir}"/>
+    <java classname="com.rincon.tunit.TUnit"/>
+    <antcall target="tunitreport"/>
+    <antcall target="feedback"/>
+  </target>
+
+  <target name="tunitreport">
+    <mkdir dir="${htmlreport.dir}"/>
+    <mkdir dir="${archive.dir}"/>
+
+    <junitreport todir="${xml.dir}">
+      <fileset dir="${xml.dir}" includes="TEST-*.xml"/>
+      <report todir="${htmlreport.dir}"/>
+    </junitreport>
+   
+    <tstamp>
+      <format property="TIMESTAMP" pattern="d-MMMM-yyyy_hh-mm-aa"/>
+    </tstamp> 
+
+    <property name="archive.prefix" value="htmlreport_${TIMESTAMP}"/>
+
+    <tar tarfile="${archive.dir}/${archive.prefix}.tar" basedir="${htmlreport.dir}"/>
+    <gzip zipfile="${archive.dir}/${archive.prefix}.tar.gz" src="${archive.dir}/${archive.prefix}.tar"/>
+
+    <delete>
+      <fileset dir="${archive.dir}" includes="*.tar"/>
+    </delete>
+
+  </target>
+
+  <target name="feedback">
+    <java classname="com.rincon.tunitfeedback.TUnitFeedback"/>
+  </target>
+
+</project>
+

@@ -1,0 +1,5 @@
+* log4j source has been compiled in with the tinyos.jar file.
+Be sure to include log4j.jar in the classpath and download it separetely?
+
+* Xerces from apache - XML parser
+

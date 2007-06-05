@@ -1,0 +1,5 @@
+COMPONENT=BaseC
+CFLAGS += -DPACKET_LINK
+CFLAGS += -I../
+CFLAGS += -I../outlet
+include $(MAKERULES)

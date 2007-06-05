@@ -1,0 +1,2 @@
+COMPONENT=SizeofSerialC
+include $(MAKERULES)

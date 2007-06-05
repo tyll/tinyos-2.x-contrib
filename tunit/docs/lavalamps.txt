@@ -1,0 +1,56 @@
+
+1. Setting up Lava Lamps
+====================================================================
+
+1.1 Rambling Description
+--------------------------------------------------------------------
+Lava lamps (or anything that turns on and off) are easy to setup and
+integrate with your automatic build system, but only if you're an 
+elite hacker with some spare time.  It's really not a new idea, 
+you can find it here: 
+http://www.pragmaticprogrammer.com/pa/pa.html
+
+There are several ways to implement it. We've included source code
+for the embedded side as well as a way to send feedback to those
+applications through the ant build scripts.  On the Java side,
+since TUnit keeps track of the tests that failed last time in the
+tests-failed.log file, we have a separate application (tunitfeedback)
+that will read this log.  If the log isn't empty, turn on the red
+lava lamp (or turn on the smoke machine inside the server for added
+fun).
+
+You'd have a dedicated lava lamp controller (either the
+base or the actually controller binary) setup in your build system 
+that isn't altered by tunit.  Optionally, I've included a few hooks
+in the code to select and reprogram the mote.  Using that 
+method, the mote can be part of the tunit test system and then
+convert into the mote that talks to your lava lamps.  The binary
+is compiled once so changes to the radio stack won't break it.
+
+The way I have it setup right now on my system is the mote connected
+to the build computer is static - it is not part of the build process.
+It is dedicated to controlling our lava lamps.
+
+The two power controller embedded directories 
+(tunit/apps/PowerOutletFeedback) include "base" and "outlet". The
+base directory does not control GPIO's - it simply transmits
+messages to whatever mote is running the "outlet" program.
+The "outlet" application will accept messages over serial or radio.
+So you can control it directly plugged into the server, or your can
+control it wirelessly.  It will have the same effect.
+
+The "outlet" application is where all the magic happens. It was 
+written for a tmote, you can rewrite it for whatever you want.
+It uses two of the tmote GPIO's: GIO2 and GIO3, which are pins
+3 and 4 on the tmote's 6-pin header.  
+
+The application may need to be edited to meet your implementation.
+We actually used a separate wireless system because it was cheaper
+than using multiple motes:  http://www.outletpc.com/c5951.html
+Hacking the wireless remote, we added some solid state relays in
+place of the momentary switches: DM0063 by Crydom.
+
+The "outlet" mote then simulates someone pressing the momentary
+switches by toggling timers and what not.  It also keeps track
+of the state of the lava lamps so it doesn't toggle blindly.
+

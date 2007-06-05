@@ -1,0 +1,17 @@
+<tunit>
+  <testrun name="3_telosb">
+    <mote target="telosb" motecom="serial@COM15:tmote" installextras="bsl,14"/>
+    <mote target="telosb" motecom="serial@COM16:tmote" installextras="bsl,15"/>
+    <mote target="telosb" motecom="serial@COM17:tmote" installextras="bsl,16"/>
+  </testrun>
+  
+  <testrun name="2_micaz">
+    <mote target="micaz" motecom="serial@COM14:tmote" installextras="mib520"/>
+    <mote target="micaz" motecom="serial@COM13:tmote" installextras="mib520"/>
+  </testrun>
+    
+  <testrun name="telosb and micaz">
+    <mote target="telosb" motecom="serial@COM15:tmote" installextras="bsl,14"/>
+    <mote target="micaz" motecom="serial@COM13:tmote" installextras="mib520"/>
+  </testrun>
+</tunit>

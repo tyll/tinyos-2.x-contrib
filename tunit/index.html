@@ -1,17 +1,125 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-   <title>Index Placeholder</title>
+  <title>Index Placeholder</title>
 </head>
-<body TEXT="#000000" BGCOLOR="#FFFFFF" LINK="#0000EF" VLINK="#55188A" ALINK="#FF0000">
-
-<img src="http://www.tinyos.net/scoop/images/tos-jwall.jpg"></img>
-
-<h1>Index Placeholder</h1>
-
-<p>
-Will update this soon.
+<body alink="#ff0000" bgcolor="#ffffff" link="#0000ef" text="#000000"
+ vlink="#55188a">
+<h1 style="font-family: Arial Black;"><span style="font-weight: bold;">TUnit</span></h1>
+<br>
+<big><span style="font-weight: bold;">What is TUnit?</span></big><br>
+<p>TUnit is an embedded automated unit testing framework for TinyOS
+built by Rincon Research Corporation.&nbsp; The goal is to make
+building and running unit tests as easy as possible. <br>
 </p>
-
+<ul>
+  <li>TUnit automatically builds, installs, runs, cleans up, and
+reports results for TinyOS test unit applications.</li>
+  <li>Generates HTML reports using ant's junitreport task (pictures
+below)<br>
+  </li>
+  <li>Gathers statistics automatically on ROM, RAM, total tests/total
+failures, and any other performance attribute the embedded side needs
+logged over time.</li>
+  <li>Different test runs allows the developer to define multiple
+combinations of motes to run test suites.<br>
+  </li>
+  <li>Test suites can be filtered based on if they're applicable to the
+given mote combination in the current test run.</li>
+  <li>Lava lamps can be controlled wirelessly if the hardware is
+provided (software included, hardware implementation required)</li>
+</ul>
+Unit testing TinyOS requires a different philosophy than regular unit
+testing on a computer.&nbsp; Whereas something like JUnit can run all
+the tests quickly and on one platform, TinyOS has to worry about
+multiple platforms and different combinations of platform types working
+together.<br>
+<br>
+A clear distinction must be made between unit testing and
+integration/user testing.&nbsp; Although TUnit can be used to perform
+many types of integration testing, the focus here is on unit
+tests.&nbsp; Units are small, testable, independent pieces of
+code.&nbsp; TinyOS and nesC make unit testing easy because the code is
+already modular.&nbsp; We can easily take a module, isolate it, and
+unit test every aspect of it to assert the desired behavior.&nbsp;
+Isolation of some code may mean multiple nodes still need to be within
+RF vicinity to support it.<br>
+<br style="font-style: italic;">
+<span style="font-style: italic;">See the </span><a
+ style="font-style: italic;" href="docs/TUnit%20Intro.ppt">TUnit
+Introduction (powerpoint)</a><br>
+<br>
+<br>
+<big><span style="font-weight: bold;">Why should you unit test your
+code?</span></big><br>
+<ol>
+  <li><span style="font-weight: bold;">Unit testing is good for your
+soul.&nbsp; </span>Not only will your code function better, but you'll
+be a better programmer.&nbsp; <br>
+  </li>
+  <li><span style="font-weight: bold;">Designing is easier.</span>&nbsp;
+You will design code to be tested, and that implies modularity.&nbsp;
+Modularity is a good thing.</li>
+  <li><span style="font-weight: bold;">Implementation is easier.&nbsp; </span>Using
+some of the concept of <a href="http://www.extremeprogramming.com">Extreme
+Programming</a>, you can know when your implementation is finished
+based on the requirements you set out to meet.<br>
+  </li>
+  <li><span style="font-weight: bold;">Refactoring is easier.</span>&nbsp;
+Ever tried modified code, but something else breaks?&nbsp; Not anymore,
+now that you can unit test TinyOS effectively.</li>
+  <li><span style="font-weight: bold;">Tracking some types of TinyOS
+performance over time is now a possibility.</span>&nbsp; Using TUnit's
+Statistics, you can track how well a module behaves.&nbsp; For example,
+using TUnit, it's possible to keep a log over time of how much
+throughput a given radio stack sees, what its acknowledgement success
+rate is, etc.</li>
+  <li><span style="font-weight: bold;">Break TinyOS.</span>&nbsp; But
+don't re-break it.&nbsp; Be the first to break a module and know about
+it.<br>
+  </li>
+</ol>
+<br>
+<big><span style="font-weight: bold;">HTML Report Examples<br>
+</span></big>The HTML reports generated are your standard JUnit/Ant
+reports, but they're hooked into the embedded side.&nbsp; Just by
+making a new instance of the TestCaseC() component in your embedded
+code, TUnit will automatically extract information and fill in test
+names and whatever else it can find from that code, so you can focus on
+your test and forget about the rest.<br>
+<br>
+<div style="text-align: center;"><img
+ style="width: 887px; height: 543px;" alt="HTML Report"
+ src="docs/tunit_sample1.JPG"><br>
+<br>
+<img style="width: 804px; height: 604px;" alt="HTML Report"
+ src="docs/tunit_sample2.JPG"><br>
+<br>
+<br>
+<div style="text-align: left;">And... TUnit is currently running
+wireless lava lamps at Rincon Research Corporation.<br>
+</div>
+<img style="width: 412px; height: 129px;"
+ alt="Wireless Lava Lamp Controller Found"
+ src="docs/LavaLampUSBDescription.bmp"><br>
+</div>
+<br>
+<span style="font-weight: bold;">Links<br>
+</span>
+<ol>
+  <li>"Testing? Fun? Really?" <a
+ href="http://www.ibm.com/developerworks/library/j-test.html">http://www.ibm.com/developerworks/library/j-test.html</a></li>
+  <li>"Unit Testing - Wikipedia" <a
+ href="http://en.wikipedia.org/wiki/Unit_testing">http://en.wikipedia.org/wiki/Unit_testing</a></li>
+  <li>"Six Rules of Unit Testing" <a
+ href="http://radio.weblogs.com/0100190/stories/2002/07/25/sixRulesOfUnitTesting.html">http://radio.weblogs.com/0100190/stories/2002/07/25/sixRulesOfUnitTesting.html</a></li>
+  <li>"Extreme Programming" <a
+ href="http://www.extremeprogramming.org/">http://www.extremeprogramming.org/</a></li>
+  <li>"Pragmatic Automation: Lava Lamps" <a
+ href="http://www.pragmaticprogrammer.com/pa/pa.html">http://www.pragmaticprogrammer.com/pa/pa.html</a></li>
+  <li>"Big Visible Charts" <a
+ href="http://www.xprogramming.com/xpmag/BigVisibleCharts.htm">http://www.xprogramming.com/xpmag/BigVisibleCharts.htm</a><br>
+  </li>
+</ol>
 </body>
 </html>
-

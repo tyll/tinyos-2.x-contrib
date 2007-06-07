@@ -45,6 +45,7 @@ module TestTunitP {
     interface TestCase as TestNull;
     interface TestCase as TestNotNull;
     interface TestCase as TestFloatError;
+    interface TestCase as NoAssertion;
   }
 }
 
@@ -95,6 +96,10 @@ implementation {
     
     assertEquals("OK. Float error (123.4567 != 0.1234567)", val1, val2);
     call TestFloatError.done();
+  }
+  
+  event void NoAssertion.run() {
+    call NoAssertion.done();
   }
 }
 

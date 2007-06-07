@@ -38,7 +38,6 @@
 module TestTunitP {
   uses {
     interface TestCase as TestAssertEquals;
-    interface TestCase as NoAssertion;
     interface TestCase as TestBelow;
     interface TestCase as TestAbove;
     interface TestCase as TestAssertCompares;
@@ -63,10 +62,6 @@ implementation {
     assertEquals("float", (float) 1.001, (float) 1.001);
    
     call TestAssertEquals.done();
-  }
-  
-  event void NoAssertion.run() {
-    call NoAssertion.done();
   }
   
   event void TestBelow.run() {

@@ -44,7 +44,8 @@ implementation {
       new TestCaseC() as TestAboveC,
       new TestCaseC() as TestNullC,
       new TestCaseC() as TestNotNullC,
-      new TestCaseC() as TestFloatErrorC;
+      new TestCaseC() as TestFloatErrorC,
+      new TestCaseC() as NoAssertionC;
       
   TestTunitP.TestFailure -> TestFailureC;
   TestTunitP.TestLongFailMsg -> TestLongFailMsgC;
@@ -54,6 +55,7 @@ implementation {
   TestTunitP.TestNull -> TestNullC;
   TestTunitP.TestNotNull -> TestNotNullC;
   TestTunitP.TestFloatError -> TestFloatErrorC;
+  TestTunitP.NoAssertion -> NoAssertionC;
   
 }
 

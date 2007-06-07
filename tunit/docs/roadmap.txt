@@ -1,6 +1,17 @@
-Roadmap, with no priorities or timelines:
+Roadmap, with no  timelines:
 
-* External Java support - 
+** Bug:  Statistics does not get disconnected when java deregisters listeners
+
+
+1. Allow Java to drive the testing structure, and remove that logic from
+   TUnit.  This will not only decrease memory footprint, but will allow
+   all motes to move onto the next test at once, or clean up all at once
+   instead of having to guess or program extra stuff on the embedded side.
+
+2. Turn CSV files into charts and images, hack up JUnit's HTML reports to 
+   include those images.
+  
+3. External Java support - 
   - Ability to add in your own Java programs running on the computer side
     to interact with the mote
   - Those Java programs should interact with the test result collection system
@@ -10,6 +21,7 @@ Roadmap, with no priorities or timelines:
     > UartByte
     > Serial Stack integration
     > Application serial interaction
+
 
 * A layer that allows a test to easily intercept or inject messages in the
   radio and serial stacks. Easy to do, it just takes time.
@@ -21,6 +33,8 @@ Roadmap, with no priorities or timelines:
       phase serial access.
   
 * Test bed support, but we need a test bed first to figure out how to do that.
+
+
 
 * Your thoughts?
 

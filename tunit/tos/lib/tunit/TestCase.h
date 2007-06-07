@@ -44,7 +44,15 @@ static void assertEqualsFailed(char *failMsg, uint32_t expected, uint32_t actual
 static void assertNotEqualsFailed(char *failMsg, uint32_t actual);
 static void assertResultIsBelowFailed(char *failMsg, uint32_t upperbound, uint32_t actual);
 static void assertResultIsAboveFailed(char *failMsg, uint32_t lowerbound, uint32_t actual);
+
+/**
+ * Test was a success
+ */
 static void assertSuccess();
+
+/** 
+ * Test was a failure
+ */
 static void assertFail(char *failMsg);
 
 /**

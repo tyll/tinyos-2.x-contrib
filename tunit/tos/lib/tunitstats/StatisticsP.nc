@@ -84,7 +84,7 @@ implementation {
       }
     }
     
-    call AMSend.send(0, &myMsg, sizeof(StatisticsMsg));
+    return call AMSend.send(0, &myMsg, sizeof(StatisticsMsg));
   }
   
   /***************** AMSend Events ****************/

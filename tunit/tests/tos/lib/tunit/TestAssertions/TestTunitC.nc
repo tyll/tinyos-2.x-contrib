@@ -38,7 +38,6 @@ configuration TestTunitC {
 implementation {
   components TestTunitP,
       new TestCaseC() as TestAssertEqualsC,
-      new TestCaseC() as NoAssertionC,
       new TestCaseC() as TestBelowC,
       new TestCaseC() as TestAboveC,
       new TestCaseC() as TestAssertComparesC,
@@ -49,7 +48,6 @@ implementation {
       new TestCaseC() as TestAssertSuccessC;
             
   TestTunitP.TestAssertEquals -> TestAssertEqualsC;
-  TestTunitP.NoAssertion -> NoAssertionC;
   TestTunitP.TestBelow -> TestBelowC;
   TestTunitP.TestAbove -> TestAboveC;
   TestTunitP.TestAssertCompares -> TestAssertComparesC;

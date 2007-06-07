@@ -174,6 +174,7 @@ public class ResultCollector extends Thread implements Messenger,
     // 5. Disconnect our TUnitProcessing link
     log.debug("Shutting down sf socket sources");
     link.shutdown();
+    stats.shutdown();
 
     // 6. Shut down all sources before exiting
     for (Iterator it = phoenixSources.iterator(); it.hasNext();) {

@@ -1,0 +1,33 @@
+#!/bin/bash
+#nxtmote release packing script
+
+if [ ! $# = 1 ]; then
+  echo "Usage: $0 version such as 0.0.5"
+  exit
+fi
+
+#Constants
+RELDIR=/opt/release
+NMOTE=/opt/tinyos-2.x-contrib/nxtmote
+RELTAG=nxtmote-$1
+
+echo "Starting to pack for release"
+rm ${RELDIR}/*
+
+#RPM
+tar -cvf - ${NMOTE}/misc/src/specs/arm-elf-binutils.spec | gzip -c9 > ${RELDIR}/${RELTAG}-arm-elf-binutils.spec.tar.gz
+tar -cvf - ${NMOTE}/misc/src/specs/arm-elf-gcc.spec | gzip -c9 > ${RELDIR}/${RELTAG}-arm-elf-gcc.spec.tar.gz
+tar -cvf - /usr/src/rpm/RPMS/i386/arm-elf-binutils-2.17-1.cygwin.i386.rpm | gzip -c9 > ${RELDIR}/${RELTAG}-arm-elf-binutils-2.17-1.cygwin.i386.rpm.tar.gz
+tar -cvf - /usr/src/rpm/RPMS/i386/arm-elf-gcc-4.1.2-1.cygwin.i386.rpm | gzip -c9 > ${RELDIR}/${RELTAG}-arm-elf-gcc-4.1.2-1.cygwin.i386.rpm.tar.gz
+tar -cvf - /usr/src/rpm/RPMS/i386/arm-elf-binutils-2.17-1.i386.rpm | gzip -c9 > ${RELDIR}/${RELTAG}-arm-elf-binutils-2.17-1.i386.rpm.tar.gz
+tar -cvf - /usr/src/rpm/RPMS/i386/arm-elf-gcc-4.1.2-1.i386.rpm | gzip -c9 > ${RELDIR}/${RELTAG}-arm-elf-gcc-4.1.2-1.i386.rpm.tar.gz
+
+#LIBS
+tar -cvf - ${NMOTE}/misc/src/libnxt/ --exclude=CVS| gzip -c9 > ${RELDIR}/${RELTAG}-libnxt.tar.gz
+tar -cvf - ${NMOTE}/misc/src/libusb-win32/ --exclude=CVS| gzip -c9 > ${RELDIR}/${RELTAG}-libusb-win32.tar.gz
+
+#src
+#tar -cvf - ${NMOTE}/support/ ${NMOTE}/tos/ --exclude=CVS| gzip -c9 > ${RELDIR}/${RELTAG}-nxtmote-src.tar.gz
+
+#all
+tar -cvf - ${NMOTE}/ --exclude=CVS --exclude=${RELDIR}/${RELTAG}-nxtmote-all.tar.gz | gzip -c9 > ${RELDIR}/${RELTAG}-nxtmote-all.tar.gz

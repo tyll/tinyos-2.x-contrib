@@ -44,6 +44,9 @@
 #include <atm128hardware.h>
 #include <Atm128Adc.h>
 
+#ifndef MHZ
+#define MHZ 8
+#endif
 // A/D constants (channels, etc)
 enum {
   CHANNEL_RSSI       = ATM128_ADC_SNGL_ADC0,

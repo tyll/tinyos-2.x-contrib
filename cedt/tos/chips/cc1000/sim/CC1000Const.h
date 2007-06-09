@@ -66,6 +66,14 @@ uint8_t CC1KRegFile[TOSSIM_MAX_NODES][CC1K_MAX_REGS];
 //CC1000 Reg Access
 #define CC1K_REG_ACCESS(x) CC1KRegFile[sim_node()][x]
 
+// Bit operators using bit number
+#define CC1K_SET_BIT(reg, bit)    ((CC1K_REG_ACCESS(reg)) |= _BV(bit))
+#define CC1K_CLR_BIT(reg, bit)    ((CC1K_REG_ACCESS(reg)) &= ~_BV(bit))
+#define CC1K_READ_BIT(reg, bit)   (((CC1K_REG_ACCESS(reg)) & _BV(bit)) != 0)
+
+//Tx power mode values
+//will be initialized by HplCC1000P module
+int8_t CC1K_RADIO_PowerMode[256]; 
 /* Constants defined for CC1K */
 /* Register addresses */
 

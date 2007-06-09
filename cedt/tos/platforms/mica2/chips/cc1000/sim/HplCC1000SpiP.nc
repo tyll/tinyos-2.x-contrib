@@ -36,6 +36,7 @@
  * @author Philip buonadonna
  */
 
+#include <CC1000Const.h>
 
 module HplCC1000SpiP {
   provides interface Init as PlatformInit;
@@ -51,6 +52,25 @@ module HplCC1000SpiP {
 implementation
 {
   uint8_t outgoingByte;
+  
+  sim_event_t *SPIrw = NULL;
+  
+  enum {
+    RX= 0,
+    TX =1
+  };
+  
+  //event handlers for SPI reads
+  void spi_read_data_handle(sim_event_t* evt);
+  sim_event_t* allocate_spi_read();
+  void schedule_spi_read();
+  void readDone();
+  
+  //event handlers for SPI writes
+  void spi_write_data_handle(sim_event_t* evt);
+  sim_event_t *allocate_spi_write();
+  void schedule_spi_write();
+  void writeDone();  
 
   command error_t PlatformInit.init() {
     call SpiSck.makeInput();
@@ -69,6 +89,9 @@ implementation
 
   async command void HplCC1000Spi.writeByte(uint8_t data) {
     atomic outgoingByte = data;
+    if(READ_BIT(ATM128_DDRB,2) && READ_BIT(ATM128_DDRB,3)) {
+      schedule_spi_write();
+    }    
   }
 
   async command bool HplCC1000Spi.isBufBusy() {
@@ -105,10 +128,101 @@ implementation
   async command void HplCC1000Spi.txMode() {
     call SpiMiso.makeOutput();
     call SpiMosi.makeOutput();
+    schedule_spi_write();
+    dbg("HplCC1KSpi","Radio put to Tx state, GPIO set to %d, %d,\n",READ_BIT(ATM128_DDRB,3),READ_BIT(ATM128_DDRB,2));    
   }
 
   async command void HplCC1000Spi.rxMode() {
     call SpiMiso.makeInput();
     call SpiMosi.makeInput();
+    dbg("HplCC1KSpi","Radio put to Rx state, GPIO set to %d, %d,\n",READ_BIT(ATM128_DDRB,3),READ_BIT(ATM128_DDRB,2));
+    if(SPIrw != NULL) {
+      SPIrw->cancelled = 1;
+      readDone();
+    }
+    //Initially signal back an SPI event
+    SIG_SPI();    
   }
+  
+  /****** SPI Read Events generator ************/
+
+  void spi_read_data_handle(sim_event_t* evt) {
+    if (evt->cancelled) {
+      dbg("HplCC1KSpiRead","SPI event cancelled\n");
+      return;
+    }
+    else {
+      SPDR = outgoingByte;
+      dbg("HplCC1KSpiRead","Receiving a byte to read %hhx\n",outgoingByte);
+      SIG_SPI();
+    }
+  }
+
+  sim_event_t* allocate_spi_read() {
+    sim_event_t* newEvent = sim_queue_allocate_event();
+    newEvent->time = sim_time();
+    newEvent->handle = spi_read_data_handle;
+    newEvent->cleanup = sim_queue_cleanup_none;
+    return newEvent;
+  }
+
+  void schedule_spi_read() {
+    sim_event_t* newEvent = allocate_spi_read();
+    SPIrw = newEvent;
+    sim_queue_insert(newEvent);
+  }
+
+  void readDone() {
+    SPIrw->cleanup = sim_queue_cleanup_total;
+    WRITE_BIT(SPSR,SPIF,0);
+  }
+  
+  /******** SPI Write Events generator ********/
+  
+  void spi_write_data_handle(sim_event_t* evt) {
+    gain_entry_t* neighborEntry = sim_gain_first(sim_node());
+    if (evt->cancelled) {
+      return;
+    }
+    else {
+      SPDR = outgoingByte;
+      dbg("HplCC1KSpiWrite","Transmitting %hhx\n",SPDR);
+      //signal other nodes with the receive events
+      while (neighborEntry != NULL) {
+	    int other = neighborEntry->mote;
+		int currentNode = sim_node();
+		int Byte = outgoingByte;
+		sim_set_node(other);
+		outgoingByte = Byte;
+		//signal the event only if the radio is in receive state
+		//the 3rd bit represents the radio status, 0->Rx, 1->Tx
+		//see CC1000 data sheet pg(40)
+		if((CC1K_REG_ACCESS(CC1K_MAIN) & (1<<CC1K_RXTX)) == RX)
+	  	  schedule_spi_read();
+		sim_set_node(currentNode);
+		neighborEntry = sim_gain_next(neighborEntry);
+      }
+      SIG_SPI();
+    }
+  }
+
+  sim_event_t* allocate_spi_write() {
+    sim_event_t* newEvent = sim_queue_allocate_event();
+    newEvent->time = sim_time()+10002;
+    newEvent->handle = spi_write_data_handle;
+    newEvent->cleanup = sim_queue_cleanup_none;
+    return newEvent;
+  }
+
+  void schedule_spi_write() {
+    sim_event_t* newEvent = allocate_spi_write();
+    SPIrw = newEvent;
+    sim_queue_insert(newEvent);
+  }
+
+  void writeDone() {
+    SPIrw->cleanup = sim_queue_cleanup_total;
+    WRITE_BIT(SPSR,SPIF,0);
+  }
+    
 }

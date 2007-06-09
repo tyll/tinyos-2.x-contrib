@@ -35,6 +35,14 @@
  * @author Philip Buonadonna
  */
 
+/**
+ * Low lever hardware simulation for CC1000 chip.  This file implements the 
+ * functionality of CC1000 chip
+ *
+ * @author Venkatesh S
+ * @author Prabhakar T V 
+ *
+ */
 #include "Atm128Adc.h"
 #include "CC1000Const.h"
 
@@ -54,64 +62,29 @@ module HplCC1000P {
 }
 implementation
 {
+  
+  void CheckCC1KReg(uint8_t addr);
+  
+  command error_t PlatformInit.init() {
+    call CHP_OUT.makeInput();
+    call PALE.makeOutput();
+    call PCLK.makeOutput();
+    call PDATA.makeOutput();
+    call PALE.set();
+    call PDATA.set();
+    call PCLK.set();
 
-  void writeCC1000Defaults() {
-    /*call HplCC1000.write(CC1K_FREQ_2A,0x75);
-    call HplCC1000.write(CC1K_FREQ_1A,0xA0);
-    call HplCC1000.write(CC1K_FREQ_0A,0xCB);
-    call HplCC1000.write(CC1K_FREQ_2B,0x75);
-    call HplCC1000.write(CC1K_FREQ_1B,0xA5);
-    call HplCC1000.write(CC1K_FREQ_0B,0x4E);
-    call HplCC1000.write(CC1K_FSEP1,0x00);
-    call HplCC1000.write(CC1K_FSEP0,0x59);
-    call HplCC1000.write(CC1K_CURRENT,0xCA);
-    call HplCC1000.write(CC1K_FRONT_END,0x08);
-    call HplCC1000.write(CC1K_PA_POW,0x0F);
-    call HplCC1000.write(CC1K_PLL,0x10);
-    call HplCC1000.write(CC1K_LOCK,0x00);
-    call HplCC1000.write(CC1K_CAL,0x05);
-    call HplCC1000.write(CC1K_MODEM2,0x96);
-    call HplCC1000.write(CC1K_MODEM1,0x67);
-    call HplCC1000.write(CC1K_MODEM0,0x54);
-    call HplCC1000.write(CC1K_MATCH,0x00);
-    call HplCC1000.write(CC1K_FSCTRL,0x01);
-    call HplCC1000.write(CC1K_PRESCALER,0x00);
-    /*call HplCC1000.write(TEST6,);
-    call HplCC1000.write(TEST5,);
-    call HplCC1000.write(TEST4,);
-    call HplCC1000.write(TEST3,);
-    call HplCC1000.write(TEST2,);
-    call HplCC1000.write(TEST1,);
-    call HplCC1000.write(TEST0,);*/   
+    // MAIN register to power down mode. Shut everything off
+    call HplCC1000.write(CC1K_MAIN,
+			 1 << CC1K_RX_PD |
+			 1 << CC1K_TX_PD | 
+			 1 << CC1K_FS_PD |
+			 1 << CC1K_CORE_PD |
+			 1 << CC1K_BIAS_PD |
+			 1 << CC1K_RESET_N);
+    call HplCC1000.write(CC1K_PA_POW, 0);  // turn off rf amp
     
-    
-   //these are the values representing the current consumption for Tx
-
-	CC1K_RADIO_TxCURRENT[1] = 0.0053; //-20 dbm to -19 dbm
-	CC1K_RADIO_TxCURRENT[2] = 0.0071; //-18 dbm to -16dbm
-	CC1K_RADIO_TxCURRENT[3] = 0.0074; //-15 dbm to -13 dbm
-	CC1K_RADIO_TxCURRENT[4] = 0.0076; //-12 to -11 dbm
-	CC1K_RADIO_TxCURRENT[5] = 0.0079; //-10 to -9 dbm
-	CC1K_RADIO_TxCURRENT[6] = 0.0082;
-	CC1K_RADIO_TxCURRENT[7] = 0.0084;
-	CC1K_RADIO_TxCURRENT[8] = 0.0087;
-	CC1K_RADIO_TxCURRENT[9] = 0.0089;
-	CC1K_RADIO_TxCURRENT[0xA] = 0.0096;
-	CC1K_RADIO_TxCURRENT[0xB] = 0.0094;
-	CC1K_RADIO_TxCURRENT[0xC] = 0.0097;
-	CC1K_RADIO_TxCURRENT[0xE] = 0.0102;
-	CC1K_RADIO_TxCURRENT[0xF] = 0.0104; //0 dbm
-	CC1K_RADIO_TxCURRENT[0x40] = 0.0118; //1 dbm
-	CC1K_RADIO_TxCURRENT[0x50] = 0.0128;
-	CC1K_RADIO_TxCURRENT[0x60] = 0.0138;
-	CC1K_RADIO_TxCURRENT[0x70] = 0.0148;
-	CC1K_RADIO_TxCURRENT[0x80] = 0.0158;
-	CC1K_RADIO_TxCURRENT[0x90] = 0.0168;
-	CC1K_RADIO_TxCURRENT[0xC0] = 0.0200;
-	CC1K_RADIO_TxCURRENT[0xE0] = 0.0221;
-	CC1K_RADIO_TxCURRENT[0xFF] = 0.0267; //10 dbm
-
-//These values indicate the powerMode, 
+   //These values indicate the powerMode, 
 
 	CC1K_RADIO_PowerMode[1] = -20;
 	CC1K_RADIO_PowerMode[2] = -18;
@@ -136,53 +109,64 @@ implementation
 	CC1K_RADIO_PowerMode[0xC0] = 8;
 	CC1K_RADIO_PowerMode[0xE0] = 9;
 	CC1K_RADIO_PowerMode[0xFF] = 10;
-	
-  }
-
-  command error_t PlatformInit.init() {
-    call CHP_OUT.makeInput();
-    call PALE.makeOutput();
-    call PCLK.makeOutput();
-    call PDATA.makeOutput();
-    call PALE.set();
-    call PDATA.set();
-    call PCLK.set();
-
-    // MAIN register to power down mode. Shut everything off
-    call HplCC1000.write(CC1K_MAIN,
-			 1 << CC1K_RX_PD |
-			 1 << CC1K_TX_PD | 
-			 1 << CC1K_FS_PD |
-			 1 << CC1K_CORE_PD |
-			 1 << CC1K_BIAS_PD |
-			 1 << CC1K_RESET_N);
-    call HplCC1000.write(CC1K_PA_POW, 0);  // turn off rf amp
-    writeCC1000Defaults();
+	    
     return SUCCESS;
   }
   
   command void HplCC1000.init() {
   }
 
+  //********************************************************/
+  // function: write                                       */
+  // description: accepts a 7 bit address and 8 bit data,  */
+  //    creates an array of ones and zeros for each, and   */
+  //    uses a loop counting thru the arrays to get        */
+  //    consistent timing for the chipcon radio control    */
+  //    interface.  PALE active low, followed by 7 bits    */
+  //    msb first of address, then lsb high for write      */
+  //    cycle, followed by 8 bits of data msb first.  data */
+  //    is clocked out on the falling edge of PCLK.        */
+  // Input:  7 bit address, 8 bit data                     */
+  //********************************************************/
+
   async command void HplCC1000.write(uint8_t addr, uint8_t data) {
-    //assign for addr using CC1K_reg array
+    call PALE.set();
+    call PDATA.set();
+    call PCLK.set();
     CC1K_REG_ACCESS(addr) = data;
-    dbg("HplCC1kP","Writing to pAddr=%hX with data=%02hhx\n",addr,data);
+    //now check the addr and if any interrupts should be given, 
+    //just issue the same or set the appropriate register 
+    CheckCC1KReg(addr);
+    dbg("HplCC1000P","Written data %hhx to addr %hhx\n",data,addr);
   }
 
+  //********************************************************/
+  // function: read                                        */
+  // description: accepts a 7 bit address,                 */
+  //    creates an array of ones and zeros for each, and   */
+  //    uses a loop counting thru the arrays to get        */
+  //    consistent timing for the chipcon radio control    */
+  //    interface.  PALE active low, followed by 7 bits    */
+  //    msb first of address, then lsb low for read        */
+  //    cycle, followed by 8 bits of data msb first.  data */
+  //    is clocked in on the falling edge of PCLK.         */
+  // Input:  7 bit address                                 */
+  // Output:  8 bit data                                   */
+  //********************************************************/
+
   async command uint8_t HplCC1000.read(uint8_t addr) {
-    //returns the value of the reg array of specified addr
-    uint8_t data = 0;
+    uint8_t data;
+    call PALE.set();
+    call PDATA.makeOutput();
+    call PDATA.set();
     data = CC1K_REG_ACCESS(addr);
-    dbg("HplCC1kP","Reading the pAddr=%hX with data=%02hhx\n",addr,data);
+    dbg("HplCC1000P","Read data as %hx from %hhx\n",data,addr);
     return data;
   }
 
 
   async command bool HplCC1000.getLOCK() {
-    /*always false*/
-    return FALSE;
-    /*return call CHP_OUT.get();*/
+    return call CHP_OUT.get();
   }
 
   async command uint8_t RssiConfig.getChannel() {
@@ -195,6 +179,23 @@ implementation
 
   async command uint8_t RssiConfig.getPrescaler() {
     return ATM128_ADC_PRESCALE;
+  }
+  
+  void CheckCC1KReg(uint8_t addr) {
+    //This is just an example of how to set or unset the register
+    //Callibration:  During the initialization of the radio, the software 
+    //CC1000ControlP file, sets few parameters and then waits for a bit to 
+    //be set, which indicates the completion of the Callibration.  Here, 
+    //We donot really callibrate, but make that particular bit to high
+    switch (addr) {
+      case CC1K_CAL:
+      				dbg("HplCC1000P","CC1k_CAL reg check\n");
+      				CC1K_SET_BIT(CC1K_CAL,CC1K_CAL_COMPLETE);
+      				break;
+      default 	   :
+      				//do nothing
+    }
+  
   }
 }
   

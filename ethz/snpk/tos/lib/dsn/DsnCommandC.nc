@@ -11,6 +11,8 @@
  * valueType: type of parameters (only integers)
  * maxValueCount: upper bound of parameter count
  * 
+ * --> don't forget to wire every new DsnCommand to the DSNC component !
+ * 
  * @author Roman Lim <rlim@ee.ethz.ch>
  * 
  */
@@ -36,6 +38,12 @@ implementation
 	event void DSN.receive(void *msg, uint8_t len) {
 		uint8_t i=0, v=0;	
 		uint8_t * cmd = (uint8_t*)msg;
+		
+		/*
+		call DSN.logInt(len);
+		call DSN.appendLog("CMD[%i]:");
+		call DSN.log(msg);
+		*/
 		
 		while (key[i]!=0 && key[i]==cmd[i]) {
 			i++;

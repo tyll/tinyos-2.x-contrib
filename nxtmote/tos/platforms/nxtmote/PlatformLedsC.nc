@@ -20,7 +20,7 @@ implementation
   
   // This can be changed (see hardware.h)
   // Each led is mapped to pin 6 of port 1, 2, and 3
-  Led0 = GeneralIOC.GeneralIO[DIGIA1];
-  Led1 = GeneralIOC.GeneralIO[DIGIB1];
-  Led2 = GeneralIOC.GeneralIO[DIGIC1];
+  Led0 = GeneralIOC.GeneralIO[DIGIA0];
+  Led1 = GeneralIOC.GeneralIO[DIGIB0];
+  Led2 = GeneralIOC.GeneralIO[DIGIC0];
 }

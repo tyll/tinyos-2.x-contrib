@@ -145,7 +145,7 @@ nxt_in_reset_mode(nxt_t *nxt)
 nxt_error_t
 nxt_send_buf(nxt_t *nxt, char *buf, int len)
 {
-  int ret = usb_bulk_write(nxt->hdl, 0x1, buf, len, 0);
+  int ret = usb_bulk_write(nxt->hdl, 0x1, buf, len, 100);
   if (ret < 0)
     return NXT_USB_WRITE_ERROR;
 
@@ -163,7 +163,7 @@ nxt_send_str(nxt_t *nxt, char *str)
 nxt_error_t
 nxt_recv_buf(nxt_t *nxt, char *buf, int len)
 {
-  int ret = usb_bulk_read(nxt->hdl, 0x82, buf, len, 0);
+  int ret = usb_bulk_read(nxt->hdl, 0x82, buf, len, 100);
   if (ret < 0)
     return NXT_USB_READ_ERROR;
 

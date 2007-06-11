@@ -2,7 +2,8 @@ COMPONENT=HarvesterC
 CFLAGS += -I$(TOSDIR)/lib/net/ -I$(TOSDIR)/lib/net/ctp -I$(TOSDIR)/lib/net/le -I.
 CFLAGS += -I../../tos/lib/dsn
 CFLAGS += -DLOW_POWER_LISTENING
-CFLAGS += -I../../tos/chips/msp430/usart
+# include bugfixes for dma spi
+CFLAGS += -I../../tos/chips/msp430/usart -I../../tos/interfaces
 CFLAGS += -DCC2420_DEF_RFPOWER=31 -DCC2420_DEF_CHANNEL=23
 # CFLAGS += -DTOSH_DATA_LENGTH=33
 CFLAGS += -g

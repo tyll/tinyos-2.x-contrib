@@ -26,6 +26,9 @@ Roadmap, with no timelines:
 
 * Test bed support, but we need a test bed first to figure out how to do that.
 
+* Make the tests less linear and more threaded producer/consumer to cut down on test time:
+  - Producer compiling the next test(s) while the consumer is running the current test
+  - Installation to multiple motes simultaneously, instead of one at a time
 
 
 * Your thoughts?

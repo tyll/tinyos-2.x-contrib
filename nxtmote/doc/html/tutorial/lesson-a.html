@@ -31,25 +31,31 @@ As a prerequiThe TinyOS 2.0 build environment needs to be installed. There is a 
 </tr>
 <tr>
   <td>arm-elf-binutils</td>
-  <td><a href="http://www.tinyos.net/dist-2.0.0/tools/windows/avr-binutils-2.15tinyos-3.cygwin.i386.rpm">arm-elf-binutils-2.17-1.cygwin.i386.rpm</a></td>
-  <td><a href="http://www.tinyos.net/dist-2.0.0/tools/linux/avr-binutils-2.15tinyos-3.i386.rpm">arm-elf-binutils-2.17-1.i386.rpm</a></td>
+  <td><a href="http://downloads.sourceforge.net/nxtmote/nxtmote-0.0.5a-arm-elf-binutils-2.17-1.cygwin.i386.rpm.tar.gz?use_mirror=osdn">arm-elf-binutils-2.17-1.cygwin.i386.rpm</a></td>
+  <td><a href="http://downloads.sourceforge.net/nxtmote/nxtmote-0.0.5a-arm-elf-binutils-2.17-1.i386.rpm.tar.gz?use_mirror=osdn">arm-elf-binutils-2.17-1.i386.rpm</a></td>
 </tr>
 <tr>
   <td bgcolor="#dddddd">arm-elf-gcc</td>
-  <td bgcolor="#dddddd"><a href="http://www.tinyos.net/dist-2.0.0/tools/windows/avr-gcc-3.4.3-1.cygwin.i386.rpm">arm-elf-gcc-4.1.2-1.cygwin.i386.rpm</a></td>
-  <td bgcolor="#dddddd"><a href="http://www.tinyos.net/dist-2.0.0/tools/linux/avr-gcc-3.4.3-1.i386.rpm">arm-elf-gcc-4.1.2-1.i386.rpm</a></td>
+  <td bgcolor="#dddddd"><a href="http://downloads.sourceforge.net/nxtmote/nxtmote-0.0.5a-arm-elf-gcc-4.1.2-1.cygwin.i386.rpm.tar.gz?use_mirror=osdn">arm-elf-gcc-4.1.2-1.cygwin.i386.rpm</a></td>
+  <td bgcolor="#dddddd"><a href="http://downloads.sourceforge.net/nxtmote/nxtmote-0.0.5a-arm-elf-gcc-4.1.2-1.i386.rpm.tar.gz?use_mirror=osdn">arm-elf-gcc-4.1.2-1.i386.rpm</a></td>
 </tr>
 </tbody>
 </table>
 
-<p>To install the package we need to use the rpm command:</p>
+<p>To install the package we need to use the rpm command. The example is for the cygwin files. (To use on Linux you just remove the cygwin part of the name):</p>
 
 <pre>
-$ wget http://prdownloads.sourceforge.net/nxtmote/arm-elf-gcc-4.1.2-1.cygwin.i386.rpm
-$ wget http://prdownloads.sourceforge.net/nxtmote/arm-elf-gcc-4.1.2-1.i386.rpm
-$ rpm -Uvh elf-binutils-2.17-1.cygwin.i386.rpm
-$ rpm -Uvh arm-elf-gcc-4.1.2-1.i386.rpm
+$ wget http://downloads.sourceforge.net/nxtmote/nxtmote-0.0.5-arm-elf-binutils-2.17-1.cygwin.i386.rpm.tar.gz
+$ wget http://downloads.sourceforge.net/nxtmote/arm-elf-gcc-4.1.2-1.cygwin.i386.rpm.tar.gz
+$ gunzip nxtmote-0.0.5-arm-elf-binutils-2.17-1.cygwin.i386.rpm.tar.gz
+$ gunzip nxtmote-0.0.5-arm-elf-gcc-4.1.2-1.cygwin.i386.rpm.tar.gz
+$ tar -xvf nxtmote-0.0.5-arm-elf-binutils-2.17-1.cygwin.i386.rpm.tar
+$ tar -xvf nxtmote-0.0.5-arm-elf-gcc-4.1.2-1.cygwin.i386.rpm.tar
+$ rpm -Uvh usr/src/rpm/RPMS/i386/elf-binutils-2.17-1.cygwin.i386.rpm
+$ rpm -Uvh usr/src/rpm/RPMS/i386/arm-elf-gcc-4.1.2-1.i386.rpm
 </pre>
+
+<p>It may be necessary to use <code>--force</code> and/or <code>--ignoreos</code> when installing the RPMs.</p>
 
 <h2>Creating the arm-elf RPMs From Scratch</h2>
 
@@ -62,17 +68,26 @@ $ rpm -Uvh arm-elf-gcc-4.1.2-1.i386.rpm
 
 <tr>
   <td>arm-elf-binutils</td>
-  <td><a href="http://www.tinyos.net/dist-2.0.0/tools/windows/avr-binutils-2.15tinyos-3.cygwin.i386.rpm">arm-elf-binutils.spec</a></td>
+  <td><a href="http://downloads.sourceforge.net/nxtmote/nxtmote-0.0.5-arm-elf-binutils.spec.tar.gz?use_mirror=osdn">arm-elf-binutils.spec</a></td>
 </tr>
 
 <tr>
   <td bgcolor="#dddddd">arm-elf-gcc</td>
-  <td bgcolor="#dddddd"><a href="http://www.tinyos.net/dist-2.0.0/tools/windows/avr-gcc-3.4.3-1.cygwin.i386.rpm">arm-elf-gcc.spec</a></td>
+  <td bgcolor="#dddddd"><a href="http://downloads.sourceforge.net/nxtmote/nxtmote-0.0.5-arm-elf-gcc.spec.tar.gz?use_mirror=osdn">arm-elf-gcc.spec</a></td>
 </tr>
 </tbody>
 </table>
 
-<p>The RPM...</p>
+<p>The RPM files can be created using the spec files listed above. In order to do so, we use the <code>rpmbuild</code> command:</p>
+
+<pre>
+$ rpmbuild -ba arm-elf-binutils.spec
+$ rpm -Uvh /usr/src/rpm/RPMS/i386/arm-elf-binutils-2.17-1.cygwin.i386.rpm
+$ rpmbuild -ba arm-elf-gcc.spec
+$ rpm -Uvh usr/src/rpm/RPMS/i386/arm-elf-gcc-4.1.2-1.i386.rpm
+</pre>
+
+<p>The arm-elf-gcc RPM depends on the arm-elf-binutils package, so we are installing it before building the arm-elf-gcc package.</p>
 
 <h1>Compiling nxtmote Source Code</h1>
 
@@ -296,10 +311,38 @@ gcc -o error.o -c -Wall -std=gnu99 -g -ggdb -D_NXT_LITTLE_ENDIAN error.c
  int ret = usb_bulk_read(nxt->hdl, 0x82, buf, len, 100);
 </pre>
 
-<p>Now try to compile again by invoking <code>scons</code>. It should then be possible to verify that the firmware flasher works to testing it with the standard LEGO firmware image:</p>
+<p>Now try to compile again by invoking <code>scons</code>. It should produce a file named fwflash.exe in <code>/opt/tinyos-2.x-contrib/nxtmote/misc/src/libnxt/</code>. The build system is ready for a test using the TinyOS Blink application. </p>
+
+<h1>Compiling, Downloading, and Running the Blink app on nxtmote</h1>
+
+<p>Finally it is possible to test nxtmote with a basic application. It was the <code>Blink</code> application, which in TinyOS terms is equivalent to a "Hello World" application. In this section we will compile the Blink application, download it to NXT, and run it.</p>
+
+<h2>Compile the Blink application</h2>
+
+<p>Before we can download the Blink application, we need to compile it. It is done like this:</p>
 
 <pre>
- $ ./fwflash.exe LEGO_MINDSTORMS_NXT_Firmware_v1.03.bin
+$ cd /opt/tinyos-2.x/apps/Blink/
+$ make nxtmote
+$ cd build/nxtmote/
+$ ls
+Cstartup.o  app.c  main.exe  main.hex  nxtmote.bin
+</pre>
+
+<p>The build process is verbose now, but the important information is that the binary image named <code>nxtmote.bin</code> is produced as listed above. Now it it time to download it.</p>
+
+<h2>Downloading and Running the nxtmote.bin Image</h2>
+
+<p>The image named <code>nxtmote.bin</code> was produced. To see <code>nxtmote.bin</code> in action, we should reset nxtmote. Just follow the procedure outlined earlier in this tutorial to do this (press the reset pin for about 5 sec). In reset mode the light sensor is on constantly. The Blink application makes use of leds that blink at different intervals. The nxtmote platform maps the three leds to pin 5 on input port 1, 2, and 3. This mapping is done in the <code>PlatformLedsC.nc</code> file. The reason for this is that pin 5 is a general purpose io pins (GPIO) and we can attach the light sensor to NXT. Pin 5 drives the base of a NPN (see the red arrow in the image below) transistor in the light sensor, and thus allows us to blink the red LED (named D1 in the LEGO schematic "Appendix 3-LEGO MINDSTORMS NXT Light Sensor hardware schematic.pdf") below:</p>
+
+<img src="img/nxtmote-npn.jpg">
+
+<p>But first we should download and run <code>nxtmote.bin</code>:</p>
+
+<p>then be possible to verify that the firmware flasher works to testing it with the standard LEGO firmware image:</p>
+
+<pre>
+ $ /opt/tinyos-2.x-contrib/nxtmote/misc/src/libnxt/fwflash.exe nxtmote.bin
  Checking firmware... OK.
  NXT device in reset mode located and opened.
  Starting firmware flash procedure now...
@@ -307,15 +350,11 @@ gcc -o error.o -c -Wall -std=gnu99 -g -ggdb -D_NXT_LITTLE_ENDIAN error.c
  New firmware started!
 </pre>
 
-<p>In the case of a successful firmware loading, we should hear a characteristic melody from the now running LEGO MINDSTORMS.
+<p>In the case of a successful firmware loading, we should see the light sensor blink:</p>
 
-<h1>Compiling, Loading, and Running nxtmote</h1>
+<img src="img/nxtmote-blink.gif">
 
-<p>Finally it is possible to test nxtmote with a basic application. In the section on setting up the build environment, we compiled a firmware image. It was the <code>Blink</code> application we used for that purpose. The image named <code>nxtmote.bin</code> was produced. To see <code>nxtmote.bin</code> in action, we should reset nxtmote. Just follow the procedure outlined earlier in this tutorial to do this. The Blink application makes use of leds that blink at different intervals. The nxtmote platform maps the three leds to pin 5 and 6 on input port 1, 2, and 3. The reason for this is that pin 5 and 6 are general purpose io pins and we can attach a voltmeter to a cable that we salvage a little. But first we should download and run <code>nxtmote.bin</code>:</p>
-
-<pre>
-
-</pre>
+<p>The nxtmote is now running on NXT and the build environment is set up.</p>
 
 <h1>Related Documentation</h1>
 </a>

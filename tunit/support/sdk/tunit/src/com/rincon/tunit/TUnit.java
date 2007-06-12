@@ -33,16 +33,19 @@ package com.rincon.tunit;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import com.rincon.tunit.parsers.tunitproperties.TUnitPropertiesParser;
 import com.rincon.tunit.properties.TUnitTestRunProperties;
-import com.rincon.tunit.report.StatsReport;
+import com.rincon.tunit.report.StatisticsReport;
 import com.rincon.tunit.report.TestReport;
 import com.rincon.tunit.report.TestResult;
+import com.rincon.tunit.report.charts.StatisticsChart;
 import com.rincon.tunit.run.RerunRegistry;
 import com.rincon.tunit.run.TestRunManager;
 
@@ -85,6 +88,7 @@ public class TUnit {
    */
   public static void main(String[] args) {
     org.apache.log4j.BasicConfigurator.configure();
+    Logger.getRootLogger().setLevel((Level) Level.INFO);
     new TUnit().runTunit(args);
   }
 
@@ -97,6 +101,7 @@ public class TUnit {
     startTime = System.currentTimeMillis();
     rootDirectory = new File(System.getProperty("user.dir"));
     establishTunitDir();
+    establishReportDir();
   }
 
   /**
@@ -105,29 +110,27 @@ public class TUnit {
    * @param args
    */
   public void runTunit(String[] args) {
-    // 1. Verify the report xml directory exists
-    establishReportDir();
-
-    // 2. Locate the tunit.xml file from the TUNIT_BASE directory
+    
+    // 1. Locate the tunit.xml file from the TUNIT_BASE directory
     processTunitXml();
 
-    // 3. Now that everything is established, parse arguments and configure
+    // 2. Now that everything is established, parse arguments and configure
     // rerun settings
     rerunRegistry = new RerunRegistry(tunitDirectory);
     parseArgs(args);
     rerunRegistry.clean();
 
-    // 4. Initialize and run each test run that can be initialized.
+    // 3. Initialize and run each test run that can be initialized.
     // We create a test report for each test run initialization
     executeTestRuns();
 
-    // 5. Print all results to the screen.
+    // 4. Print all results to the screen.
     printResults();
 
-    // 6. Log all 
+    // 5. Log all
     logResults();
-    
-    // 7. If there was a problem anywhere, exit with error code 6 to tell
+
+    // 6. If there was a problem anywhere, exit with error code 6 to tell
     // external programs. We could detect this error code outside and
     // do something useful, like control some lava lamps.
     if (TestReport.getAllTunitProblems().size() > 0) {
@@ -160,7 +163,7 @@ public class TUnit {
   public static File getXmlReportDirectory() {
     return new File(baseReportDirectory, "/xml");
   }
-  
+
   /**
    * 
    * @return the directory to throw statistics reports into
@@ -170,14 +173,13 @@ public class TUnit {
   }
 
   /**
-   *  
+   * 
    * @return the base reports directory
    */
   public static File getBaseReportDirectory() {
     return baseReportDirectory;
   }
-  
-  
+
   /**
    * Establish the TUNIT Base directory
    * 
@@ -316,18 +318,24 @@ public class TUnit {
       }
     }
   }
-  
+
   /**
    * Log the results to a log file, so we have the option of keeping track of
-   * our testing status - like how many tests have been run each day, how
-   * many failures each day.  Makes for some nice graphs to get people
-   * motivated.
-   *
+   * our testing status - like how many tests have been run each day, how many
+   * failures each day. Makes for some nice graphs to get people motivated.
+   * 
    */
   private void logResults() {
     try {
-      StatsReport.log("", "TestingStatistics", "[Total Tests]", TestReport.getTotalTunitTests(), "[Total Problems]", TestReport.getTotalTunitErrors() + TestReport.getTotalTunitFailures());
+      StatisticsChart.write(StatisticsReport.log("", "TestingProgress",
+          "[Total Problems]", TestReport.getTotalTunitErrors()
+              + TestReport.getTotalTunitFailures(), "[Total Tests]", TestReport
+              .getTotalTunitTests()));
+
     } catch (IOException e) {
+      log.error(e.getMessage());
+
+    } catch (ParseException e) {
       log.error(e.getMessage());
     }
   }

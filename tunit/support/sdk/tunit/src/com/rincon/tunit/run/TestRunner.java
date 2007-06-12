@@ -33,6 +33,7 @@ package com.rincon.tunit.run;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -45,10 +46,11 @@ import com.rincon.tunit.properties.TUnitNodeProperties;
 import com.rincon.tunit.properties.TUnitSuiteProperties;
 import com.rincon.tunit.properties.TUnitTargetProperties;
 import com.rincon.tunit.properties.TUnitTestRunProperties;
-import com.rincon.tunit.report.StatsReport;
+import com.rincon.tunit.report.StatisticsReport;
 import com.rincon.tunit.report.TestReport;
 import com.rincon.tunit.report.TestResult;
 import com.rincon.tunit.report.WriteXmlReport;
+import com.rincon.tunit.report.charts.StatisticsChart;
 
 /**
  * Run the test in the current directory. This portion of it simply cleans and
@@ -56,8 +58,8 @@ import com.rincon.tunit.report.WriteXmlReport;
  * ResultCollector take over. After the ResultsCollector finishes, the serial
  * forwarders are disconnected and the report is written.
  * 
- * WARN: The architecture of the build system may need to be redone a bit
- * to support test beds and other methods of compiling/installing.  
+ * WARN: The architecture of the build system may need to be redone a bit to
+ * support test beds and other methods of compiling/installing.
  * 
  * @author David Moss
  * 
@@ -87,10 +89,10 @@ public class TestRunner {
 
   /** App.c parser results */
   private Map testMap;
-  
+
   /** App.c statistics parse results */
   private Map statsMap;
-  
+
   /** Package we're currently working in */
   private String packageId;
 
@@ -163,34 +165,39 @@ public class TestRunner {
 
     // 3. Connect serial forwarders, run the test, disconnect sf's.
     log.debug("Connecting serial forwarders");
-    if(!testManager.connectAll()) {
+    if (!testManager.connectAll()) {
       TestResult result = new TestResult("__ConnectSerialForwarders");
       result.error("SFError", "Could not connect all serial forwarders!");
       report.addResult(result);
       return;
     }
-    
+
     log.debug("Running test");
-    new ResultCollector(report, runProperties, suiteProperties, testMap, statsMap);
+    new ResultCollector(report, runProperties, suiteProperties, testMap,
+        statsMap);
     log.debug("Disconnecting serial forwarders");
     testManager.disconnectAll();
   }
 
   /**
-   * Write the XML report to the report directory
-   * We also keep a log of how well these tests are doing over time in the stats
+   * Write the XML report to the report directory We also keep a log of how well
+   * these tests are doing over time in the stats
    */
   private void writeReport() {
     WriteXmlReport xmlWrite = new WriteXmlReport(report, TUnit
         .getXmlReportDirectory());
     try {
       xmlWrite.write();
-      StatsReport.log(packageId, "TestingStatistics", "[Total Tests]", report.getTotalTests(), "[Total Problems]", report.getTotalErrors() + report.getTotalFailures());
+      StatisticsChart.write(StatisticsReport.log(packageId,
+          "TestingProgress", "[Total Problems]", report.getTotalErrors()
+              + report.getTotalFailures(), "[Total Tests]", report
+              .getTotalTests()));
     } catch (IOException e) {
-      log.error("Error writing XML report");
+      log.error("Error writing XML report: \n" + e.getMessage());
+    } catch (ParseException e) {
+      log.error(e.getMessage());
     }
-    
-    
+
   }
 
   /**
@@ -267,22 +274,27 @@ public class TestRunner {
 
           focusedResult = make.build(buildDirectory, focusedTarget
               .getTargetName(), extras + reinstallExtras);
-          
-          try {
-            StatsReport.log(packageId, "ROM", "[Bytes]", make.getRomSize());
-            StatsReport.log(packageId, "RAM", "[Bytes]", make.getRamSize());
-          } catch (IOException e) {
-            TestResult logResult = new TestResult("__LogMemoryUsage");
-            logResult.error("IOException", e.getMessage());
-            report.addResult(logResult);
-          }
-          
+
           report.addResult(focusedResult);
           if (!focusedResult.isSuccess()) {
             return false;
           }
         }
       }
+    }
+
+    try {
+      StatisticsChart.write(StatisticsReport.log(packageId, "Footprint",
+          "[RAM Bytes]", make.getRamSize(), "[ROM Bytes]", make.getRomSize()));
+    } catch (IOException e) {
+      TestResult logResult = new TestResult("__LogFootprintStats");
+      logResult.error("IOException", e.getMessage());
+      report.addResult(logResult);
+
+    } catch (ParseException e) {
+      TestResult logResult = new TestResult("__ParseFootprintHistory");
+      logResult.error("ParseException", e.getMessage());
+      report.addResult(logResult);
     }
 
     // Next we process any app.c file we can get our hands on to extract

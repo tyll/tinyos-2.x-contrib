@@ -1,4 +1,4 @@
-package com.rincon.tunit.link;
+package com.rincon.tunit.build;
 
 /*
  * Copyright (c) 2005-2006 Rincon Research Corporation
@@ -31,23 +31,47 @@ package com.rincon.tunit.link;
  * OF THE POSSIBILITY OF SUCH DAMAGE
  */
 
-/**
- * Automatically Generated
- */
-public class TUnitProcessing_Constants {
+import java.io.File;
 
-  public static final short TUNITPROCESSING_CMD_PING = 0;
-  public static final short TUNITPROCESSING_REPLY_PING = 1;
-  public static final short TUNITPROCESSING_CMD_RUN = 2;
-  public static final short TUNITPROCESSING_REPLY_RUN = 3;
-  public static final short TUNITPROCESSING_EVENT_PONG = 4;
-  public static final short TUNITPROCESSING_EVENT_TESTRESULT_SUCCESS = 5;
-  public static final short TUNITPROCESSING_EVENT_TESTRESULT_FAILED = 6;
-  public static final short TUNITPROCESSING_EVENT_TESTRESULT_EQUALS_FAILED = 7;
-  public static final short TUNITPROCESSING_EVENT_TESTRESULT_NOTEQUALS_FAILED = 8;
-  public static final short TUNITPROCESSING_EVENT_TESTRESULT_BELOW_FAILED = 9;
-  public static final short TUNITPROCESSING_EVENT_TESTRESULT_ABOVE_FAILED = 10;
-  public static final short TUNITPROCESSING_EVENT_ALLDONE = 11;
-  public static final short TUNITPROCESSING_CMD_TEARDOWNONETIME = 12;
+import com.rincon.tunit.report.TestResult;
+
+/**
+ * Implement different build methods by using this interface.
+ * The build implementation is not responsible for determining whether or not
+ * the target platform or arguments is valid.  It is responsible for running
+ * the command, building the project, gathering results as much as it can,
+ * and returning information about whether or not the compile was successful.
+ * @author David Moss
+ *
+ */
+public interface BuildInterface {
   
+  /**
+   * Compile the project for the given target with the given arguments
+   * from the current working directory
+   * @param buildDir The directory to build
+   * @param target The target to compile for
+   * @param extras Arguments to pass into the build process
+   * @return true if the project compiled correctly
+   */
+  public TestResult build(File buildDir, String target, String extras);
+  
+  /**
+   * 
+   * @return the approximate size of the compiled ROM, if it can be deduced
+   */
+  public long getRomSize();
+  
+  /**
+   * 
+   * @return the approximate size of the compiled RAM, if it can be deduced
+   */
+  public long getRamSize();
+  
+  /**
+   * Erase and clean up any previous builds
+   *
+   */
+  public TestResult clean(File buildDir);
+
 }

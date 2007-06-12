@@ -65,12 +65,13 @@ public class TUnitProcessing extends Thread implements
 
   /** Reply message received from the mote */
   private TUnitProcessingMsg replyMsg = new TUnitProcessingMsg();
-  
-  /** True if we sent a command and are waiting for a reply */
-  private boolean waitingForReply;
 
   /** The current fail message being constructed */
   private String currentFailMsg = "";
+  
+  /** True if this thread is running */
+  private boolean running;
+  
   
   /**
    * Constructor
@@ -81,6 +82,7 @@ public class TUnitProcessing extends Thread implements
     listeningComms = new ArrayList();
     listeningComms.add(originalComm);
     originalComm.registerListener(new TUnitProcessingMsg(), this);
+    running = true;
     start();
   }
   
@@ -113,7 +115,7 @@ public class TUnitProcessing extends Thread implements
    */
   public void run() {
     TUnitProcessingMsg inMsg;
-    while (true) {
+    while (running) {
       synchronized (receivedMessages){
         while (receivedMessages.isEmpty()){
           try {
@@ -223,8 +225,6 @@ public class TUnitProcessing extends Thread implements
     try {
       if(listeningComms.size() > destination) {
         ((MoteIF) listeningComms.get(destination)).send(destination, outMsg);
-      } else {
-        waitingForReply = false;
       }
     } catch (IOException e) {
     }
@@ -261,12 +261,10 @@ public class TUnitProcessing extends Thread implements
     
     switch(replyMsg.get_cmd()) {
     case TUnitProcessing_Constants.TUNITPROCESSING_REPLY_PING:
-      waitingForReply = false;
       notify();
       break;
 
     case TUnitProcessing_Constants.TUNITPROCESSING_REPLY_RUN:
-      waitingForReply = false;
       notify();
       break;
 
@@ -283,22 +281,20 @@ public class TUnitProcessing extends Thread implements
   public synchronized void runTest() {
     outMsg.set_cmd(TUnitProcessing_Constants.TUNITPROCESSING_CMD_RUN);
     send(0);
-    while(waitingForReply) {
-      try {
-        wait(50);
-      } catch (InterruptedException e) {
-      }
-    }
   }
 
   public void ping() {
     outMsg.set_cmd(TUnitProcessing_Constants.TUNITPROCESSING_CMD_PING);
     send(0);
-    while(waitingForReply) {
-      try {
-        wait(50);
-      } catch (InterruptedException e) {
-      }
+  }
+  
+  /**
+   * Tell all motes we're connected with to tear down one time
+   */
+  public void tearDownOneTime() {
+    outMsg.set_cmd(TUnitProcessing_Constants.TUNITPROCESSING_CMD_TEARDOWNONETIME);
+    for(int i = 0; i < listeningComms.size(); i++) {
+      send(i);
     }
   }
 
@@ -307,10 +303,11 @@ public class TUnitProcessing extends Thread implements
    *
    */
   public void shutdown() {
-    listeners.clear();
+    running = false;
     for(Iterator it = listeningComms.iterator(); it.hasNext(); ) {
       ((MoteIF) it.next()).deregisterListener(new TUnitProcessingMsg(), this);
     }
     listeningComms.clear();
+    listeners.clear();
   }
 }

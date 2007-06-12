@@ -1,0 +1,117 @@
+package com.rincon.tunit.report.charts;
+
+import java.awt.Color;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+
+import javax.imageio.ImageIO;
+
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.DateAxis;
+import org.jfree.chart.axis.ValueAxis;
+import org.jfree.chart.labels.StandardXYToolTipGenerator;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYItemRenderer;
+import org.jfree.data.time.Minute;
+import org.jfree.data.time.TimeSeries;
+import org.jfree.data.time.TimeSeriesCollection;
+
+/**
+ * Write statistical data to a .png file
+ * @author David Moss
+ *
+ */
+public class StatisticsChart {
+
+  /**
+   * Write statistical information to a .png file dictated by the data found in
+   * a StatisticsLogData object.
+   * @param data
+   * @throws IOException
+   */
+  public static void write(StatisticsLogData data) throws IOException {
+    final TimeSeries series1 = new TimeSeries(data.getUnits1(), Minute.class);
+
+    StatsEntry focusedEntry;
+    for (int i = 0; i < data.size(); i++) {
+      focusedEntry = data.get(i);
+      series1.add(new Minute(focusedEntry.getDate()), focusedEntry.getValue1());
+      
+      // So we can see this on the chart if there's only one point to plot...
+      if(data.size() == 1) {
+        series1.add(new Minute(focusedEntry.getDate()).next(), focusedEntry.getValue1());
+      }
+    }
+
+    final TimeSeriesCollection dataset = new TimeSeriesCollection(series1);
+    JFreeChart chart;
+    
+    if (data.hasTwoUnits()) {
+      final TimeSeries series2 = new TimeSeries(data.getUnits2(), Minute.class);
+      for (int i = 0; i < data.size(); i++) {
+        focusedEntry = data.get(i);
+        series2.add(new Minute(focusedEntry.getDate()), focusedEntry
+            .getValue2());
+        
+        // So we can see this on the chart if there's only one point to plot...
+        if(data.size() == 1) {
+          series2.add(new Minute(focusedEntry.getDate()).next(), focusedEntry.getValue2());
+        }
+      }
+      dataset.addSeries(series2);
+
+      chart = ChartFactory.createXYAreaChart(data.getTitle(),
+          "[Time]", "[Units]", dataset, PlotOrientation.VERTICAL, 
+          true, // legend
+          true, // tool tips
+          false // URLs
+          );
+
+    } else {
+      chart = ChartFactory.createXYLineChart(data.getTitle(),
+          "[Time]", data.getUnits1(), dataset, PlotOrientation.VERTICAL, 
+          false, // legend
+          true, // tool tips
+          false // URLs
+          );
+    }
+
+    chart = formatChart(chart);
+    chart.setBackgroundPaint(Color.white);
+    chart.setBorderPaint(Color.black);
+    chart.setBorderVisible(true);
+    BufferedImage bufImg = chart.createBufferedImage(500, 325);
+
+    ImageIO.write(bufImg, "png", new File(data.getReportDir(), data.getTitle() + ".png"));
+    
+  }
+
+  private static JFreeChart formatChart(final JFreeChart chart) {
+    final XYPlot plot = chart.getXYPlot();
+    plot.setBackgroundPaint(Color.WHITE);
+    plot.setForegroundAlpha(0.65f);
+    plot.setDomainGridlinePaint(Color.GRAY);
+    plot.setRangeGridlinePaint(Color.GRAY);
+
+    final ValueAxis domainAxis = new DateAxis("Time");
+    domainAxis.setLowerMargin(0.0);
+    domainAxis.setUpperMargin(0.0);
+    domainAxis.setTickMarkPaint(Color.black);
+    plot.setDomainAxis(domainAxis);
+    plot.setForegroundAlpha(0.9f);
+
+    final XYItemRenderer renderer = plot.getRenderer();
+    renderer.setToolTipGenerator(new StandardXYToolTipGenerator(
+        StandardXYToolTipGenerator.DEFAULT_TOOL_TIP_FORMAT,
+        new SimpleDateFormat("MM/dd/yyyy hh:mm a"), new DecimalFormat(
+            "#,##0.00")));
+
+    return chart;
+  }
+
+}

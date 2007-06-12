@@ -63,6 +63,8 @@ public class Statistics extends Thread implements MessageListener {
   @SuppressWarnings("unused")
   private StatisticsMsg inMsg;
 
+  /** True if this thread is running */
+  private boolean running;
 
   /**
    * Constructor
@@ -74,6 +76,7 @@ public class Statistics extends Thread implements MessageListener {
     listeningComms = new ArrayList();
     listeningComms.add(originalComm);
     originalComm.registerListener(new StatisticsMsg(), this);
+    running = true;
     start();
   }
   
@@ -107,9 +110,9 @@ public class Statistics extends Thread implements MessageListener {
    */
   public void run() {
     StatisticsMsg inMsg;
-    while (true) {
+    while (running) {
       synchronized (receivedMessages){
-        while (receivedMessages.isEmpty()){
+        while (receivedMessages.isEmpty() && running){
           try {
             receivedMessages.wait();
           } catch (InterruptedException ie){
@@ -118,9 +121,9 @@ public class Statistics extends Thread implements MessageListener {
         
         inMsg = (StatisticsMsg) receivedMessages.get(0);
 
-        if (inMsg != null) {
+        if (inMsg != null && running) {
           extractUnits(inMsg);
-            
+          
           for(Iterator it = listeners.iterator(); it.hasNext(); ) {
             ((StatisticsEvents) it.next()).statistics_log(inMsg.get_statsId(), extractUnits(inMsg), inMsg.get_value());
           }
@@ -129,6 +132,8 @@ public class Statistics extends Thread implements MessageListener {
         }
       }
     }
+    
+    listeners.clear();
   }
 
 
@@ -174,7 +179,7 @@ public class Statistics extends Thread implements MessageListener {
    *
    */
   public void shutdown() {
-    listeners.clear();
+    running = false;
     for(Iterator it = listeningComms.iterator(); it.hasNext(); ) {
       ((MoteIF) it.next()).deregisterListener(new StatisticsMsg(), this);
     }

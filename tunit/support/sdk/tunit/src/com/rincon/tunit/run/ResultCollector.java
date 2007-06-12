@@ -32,6 +32,7 @@ package com.rincon.tunit.run;
  */
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -49,9 +50,10 @@ import com.rincon.tunit.link.TUnitProcessing;
 import com.rincon.tunit.link.TUnitProcessing_Events;
 import com.rincon.tunit.properties.TUnitSuiteProperties;
 import com.rincon.tunit.properties.TUnitTestRunProperties;
-import com.rincon.tunit.report.StatsReport;
+import com.rincon.tunit.report.StatisticsReport;
 import com.rincon.tunit.report.TestReport;
 import com.rincon.tunit.report.TestResult;
+import com.rincon.tunit.report.charts.StatisticsChart;
 import com.rincon.tunit.stats.Statistics;
 import com.rincon.tunit.stats.StatisticsEvents;
 
@@ -170,6 +172,8 @@ public class ResultCollector extends Thread implements Messenger,
         }
       }
     }
+
+    link.tearDownOneTime();
 
     // 5. Disconnect our TUnitProcessing link
     log.debug("Shutting down sf socket sources");
@@ -346,9 +350,12 @@ public class ResultCollector extends Thread implements Messenger,
       }
 
       if (!found) {
-        // This test case didn't log a result.  Maybe it failed? We don't know.
+        // This test case didn't log a result. Maybe it failed? We don't know.
         result = new TestResult((String) testMap.get(new Integer(i)));
-        result.failure("NoAssertionError", "This test did not report any result.\nExplicitly assert some condition in the test to make it pass or fail correctly.");
+        result
+            .failure(
+                "NoAssertionError",
+                "This test did not report any result.\nExplicitly assert some condition in the test to make it pass or fail correctly.");
         report.addResult(result);
       }
     }
@@ -365,13 +372,21 @@ public class ResultCollector extends Thread implements Messenger,
    */
   public void statistics_log(short id, String units, long value) {
     try {
-      StatsReport.log(report.getPackage(), (String) statsMap
-          .get(new Integer(id)), units, value);
+      StatisticsChart.write(StatisticsReport.log(report.getPackage(),
+          (String) statsMap.get(new Integer(id)), units, value));
+      
     } catch (IOException e) {
-      TestResult result = new TestResult(
-          "__ResultCollector.statistics_log()");
-      result.error("IOException",
-          "Could not log statistics for " + (String) statsMap.get(new Integer(id)) + ": " + units + " = " + value);
+      TestResult result = new TestResult("__ResultCollector.statistics_log()");
+      result.error("IOException", "Could not log statistics for "
+          + (String) statsMap.get(new Integer(id)) + ": " + units + " = "
+          + value);
+      report.addResult(result);
+      
+    } catch (ParseException e) {
+      TestResult result = new TestResult("__ResultCollector.statistics_chart()");
+      result.error("ParseException", "Could parse chart statistics for "
+          + (String) statsMap.get(new Integer(id)) + ": " + units + " = "
+          + value);
       report.addResult(result);
     }
   }

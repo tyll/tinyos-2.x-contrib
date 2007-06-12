@@ -36,10 +36,23 @@ package com.rincon.tunit.link;
  */
 public interface TUnitProcessing_Commands {
 
+  /**
+   * Ping mote 0
+   *
+   */
   public void ping();
 
+  /**
+   * Tell mote 0 to run the test
+   *
+   */
   public void runTest();
 
+  /**
+   * Call this to all motes immediately after any allDone() event
+   *
+   */
+  public void tearDownOneTime();
 
   
 }

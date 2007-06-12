@@ -1,0 +1,4 @@
+COMPONENT=TestSpiArbitrationC
+CFLAGS += -DMAX_TUNIT_QUEUE=25
+include $(MAKERULES)
+

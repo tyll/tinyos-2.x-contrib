@@ -64,13 +64,14 @@ implementation {
   /** True if the receiver has seen that this test has started yet */
   bool hasStarted;
   
+  bool ackFailureSent;
   
   /**
    * Minimum number of packets we should be seeing per second
    */
   enum {
-    LOWER_BOUNDS = 16320,  // 136 packets/sec
-    TEST_DURATION = 122880,  // 2 minutes
+    LOWER_BOUNDS = 8160,  // 136 packets/sec
+    TEST_DURATION = 61440,  //  minutes
   };
   
   enum {
@@ -92,6 +93,7 @@ implementation {
   
   /***************** TearDownOneTime Events ****************/
   event void TearDownOneTime.run() {
+    call RunState.toIdle();
     call SplitControl.stop();
   }
   
@@ -106,20 +108,29 @@ implementation {
   
   /***************** TestThroughput Events ****************/
   event void TestThroughput.run() {
+    call RunState.forceState(S_RUNNING);
     post sendMsg();
   }
   
   /***************** Timer Events ****************/
   event void Timer.fired() {
     call RunState.toIdle();
-    call Statistics.log("[packets/sec]", (uint32_t) ((float) received / (float) 120));
+    call Statistics.log("[packets/sec]", (uint32_t) ((float) received / (float) 60));
     assertResultIsAbove("Throughput is too low", LOWER_BOUNDS, received);
     call TestThroughput.done();
   }
   
   /***************** AMSend Events ****************/
   event void AMSend.sendDone(message_t *msg, error_t error) {
-    post sendMsg();
+    if(call PacketAcknowledgements.wasAcked(msg) && !ackFailureSent) {
+      ackFailureSent = TRUE;
+      assertFail("Msg was ack'd but shouldn't have been.");
+    }
+    
+    
+    if(!call RunState.isIdle()) {
+      post sendMsg();
+    }
   }
   
   /**

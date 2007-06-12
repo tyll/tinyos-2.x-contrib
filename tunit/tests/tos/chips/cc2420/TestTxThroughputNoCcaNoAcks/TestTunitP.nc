@@ -48,6 +48,7 @@ module TestTunitP {
     interface Statistics;
     interface Timer<TMilli>;
     interface State as RunState;
+    interface RadioBackoff;
   }
 }
 
@@ -59,12 +60,15 @@ implementation {
   /** Number of messages sent */
   uint32_t sent;
   
+  /** Notify an ack failure only one time */
+  bool ackFailureSent;
+  
   /**
    * Minimum number of packets we should be seeing per second
    */
   enum {
-    LOWER_BOUNDS = 6640,  // 119+ packets per second
-    TEST_DURATION = 61440,  // 1 min
+    LOWER_BOUNDS = 21950,  // 365+ packets per second
+    TEST_DURATION = 61440,  // 1 minute
   };
   
   enum {
@@ -79,7 +83,7 @@ implementation {
   /***************** SetUpOneTime Events ****************/
   event void SetUpOneTime.run() {
     call SplitControl.start();
-    call PacketAcknowledgements.requestAck(&myMsg);
+    call PacketAcknowledgements.noAck(&myMsg);
   }
   
   /***************** TearDownOneTime Events ****************/
@@ -95,6 +99,21 @@ implementation {
   event void SplitControl.stopDone(error_t error) {
     call TearDownOneTime.done();
   }
+  
+  /***************** RadioBackoff Events ****************/
+  async event void RadioBackoff.requestInitialBackoff(message_t *msg) {
+  }
+  
+  async event void RadioBackoff.requestCongestionBackoff(message_t *msg) {
+  }
+  
+  async event void RadioBackoff.requestLplBackoff(message_t *msg) {
+  }
+  
+  async event void RadioBackoff.requestCca(message_t *msg) {
+    call RadioBackoff.setCca(FALSE);
+  }
+  
   
   /***************** TestThroughput Events ****************/
   event void TestThroughput.run() {
@@ -115,6 +134,11 @@ implementation {
   /***************** AMSend Events ****************/
   event void AMSend.sendDone(message_t *msg, error_t error) {
     sent++;
+    if(call PacketAcknowledgements.wasAcked(msg) && !ackFailureSent) {
+      ackFailureSent = TRUE;
+      assertFail("Msg was ack'd but shouldn't have been.");
+    }
+    
     if(!call RunState.isIdle()) {
       post sendMsg();
     }

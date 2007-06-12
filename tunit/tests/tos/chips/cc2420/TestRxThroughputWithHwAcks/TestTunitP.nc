@@ -69,8 +69,8 @@ implementation {
    * Minimum number of packets we should be seeing per second
    */
   enum {
-    LOWER_BOUNDS = 13280,  // 119+ packets per second
-    TEST_DURATION = 122880,  // 2 minutes
+    LOWER_BOUNDS = 6640,  // 119+ packets per second
+    TEST_DURATION = 61440,  // 1 minute
   };
   
   enum {
@@ -92,6 +92,7 @@ implementation {
   
   /***************** TearDownOneTime Events ****************/
   event void TearDownOneTime.run() {
+    call RunState.toIdle();
     call SplitControl.stop();
   }
   
@@ -106,20 +107,23 @@ implementation {
   
   /***************** TestThroughput Events ****************/
   event void TestThroughput.run() {
+    call RunState.forceState(S_RUNNING);
     post sendMsg();
   }
   
   /***************** Timer Events ****************/
   event void Timer.fired() {
     call RunState.toIdle();
-    call Statistics.log("[packets/sec]", (uint32_t) ((float) received / (float) 120));
+    call Statistics.log("[packets/sec]", (uint32_t) ((float) received / (float) 60));
     assertResultIsAbove("Throughput is too low", LOWER_BOUNDS, received);
     call TestThroughput.done();
   }
   
   /***************** AMSend Events ****************/
   event void AMSend.sendDone(message_t *msg, error_t error) {
-    post sendMsg();
+    if(!call RunState.isIdle()) {
+      post sendMsg();
+    }
   }
   
   /**

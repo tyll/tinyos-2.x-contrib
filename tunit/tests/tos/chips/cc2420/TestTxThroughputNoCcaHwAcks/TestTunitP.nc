@@ -30,8 +30,6 @@
  */
  
 /**
- * This test is initiated by the transmitter (mote 0) but the result is asserted
- * from the receiver (mote 1)
  * @author David Moss
  */
 
@@ -59,19 +57,15 @@ implementation {
   /** Message to send */
   message_t myMsg;
   
-  /** Number of messages received */
-  uint32_t received;
-  
-  /** True if the receiver has seen that this test has started yet */
-  bool hasStarted;
-  
+  /** Number of messages sent */
+  uint32_t sent;
   
   /**
    * Minimum number of packets we should be seeing per second
    */
   enum {
-    LOWER_BOUNDS = 34847, 
-    TEST_DURATION = 122880,  // 2 minutes
+    LOWER_BOUNDS = 21950,  // 365+ packets per second
+    TEST_DURATION = 61440,  // 1 minute
   };
   
   enum {
@@ -85,8 +79,6 @@ implementation {
   
   /***************** SetUpOneTime Events ****************/
   event void SetUpOneTime.run() {
-    received = 0;
-    hasStarted = FALSE;
     call SplitControl.start();
     call PacketAcknowledgements.requestAck(&myMsg);
   }
@@ -104,7 +96,7 @@ implementation {
   event void SplitControl.stopDone(error_t error) {
     call TearDownOneTime.done();
   }
-    
+  
   /***************** RadioBackoff Events ****************/
   async event void RadioBackoff.requestInitialBackoff(message_t *msg) {
   }
@@ -122,38 +114,30 @@ implementation {
   
   /***************** TestThroughput Events ****************/
   event void TestThroughput.run() {
+    sent = 0;
+    call RunState.forceState(S_RUNNING);
+    call Timer.startOneShot(TEST_DURATION);
     post sendMsg();
   }
   
   /***************** Timer Events ****************/
   event void Timer.fired() {
     call RunState.toIdle();
-    call Statistics.log("[packets/sec]", (uint32_t) ((float) received / (float) 120));
-    assertResultIsAbove("Throughput is too low", LOWER_BOUNDS, received);
-    call TestThroughput.done();
+    call Statistics.log("[packets/sec]", (uint32_t) ((float) sent / (float) 60));
+    assertResultIsAbove("Throughput is too low", LOWER_BOUNDS, sent);
+    call TestThroughput.done(); 
   }
   
   /***************** AMSend Events ****************/
   event void AMSend.sendDone(message_t *msg, error_t error) {
-    post sendMsg();
+    sent++;
+    if(!call RunState.isIdle()) {
+      post sendMsg();
+    }
   }
   
-  /**
-   * We start the timer on the first receive event
-   */
   event message_t *Receive.receive(message_t *msg, void *payload, error_t error) {
     call Leds.led1Toggle();
-    
-    if(!hasStarted) {
-      hasStarted = TRUE;
-      call RunState.forceState(S_RUNNING);
-      call Timer.startOneShot(TEST_DURATION);
-    }
-    
-    if(!call RunState.isIdle()) {
-      received++;
-    }
-    
     return msg;
   }
   

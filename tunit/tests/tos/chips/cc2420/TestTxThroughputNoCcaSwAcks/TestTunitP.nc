@@ -64,8 +64,8 @@ implementation {
    * Minimum number of packets we should be seeing per second
    */
   enum {
-    LOWER_BOUNDS = 43900,  // 365+ packets per second
-    TEST_DURATION = 122880,  // 2 minutes
+    LOWER_BOUNDS = 21950,  // 365+ packets per second
+    TEST_DURATION = 61440,  // 1 minute
   };
   
   enum {
@@ -123,7 +123,7 @@ implementation {
   /***************** Timer Events ****************/
   event void Timer.fired() {
     call RunState.toIdle();
-    call Statistics.log("[packets/sec]", (uint32_t) ((float) sent / (float) 120));
+    call Statistics.log("[packets/sec]", (uint32_t) ((float) sent / (float) 60));
     assertResultIsAbove("Throughput is too low", LOWER_BOUNDS, sent);
     call TestThroughput.done(); 
   }

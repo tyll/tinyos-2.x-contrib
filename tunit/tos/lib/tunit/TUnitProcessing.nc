@@ -58,4 +58,6 @@ interface TUnitProcessing {
   
   command void ping();
   
+  command void tearDownOneTime();
+  
 }

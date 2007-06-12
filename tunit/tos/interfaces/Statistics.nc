@@ -30,30 +30,14 @@
  */
 
 /**
- * We wire TUnit this way because we don't want wirings or modules duplicated
- * due to the generic TUnitC configuration.
+ * TUnit Statistics Interface
  * @author David Moss
  */
- 
-configuration WireTUnitC {
+interface Statistics {
+
+  command error_t log(char *units, uint32_t value);
+  
+  event void logDone();
+  
 }
 
-implementation {
-  components TUnitP,
-      Link_TUnitProcessingC,
-      new StateC() as TUnitStateC,
-      new StateC() as TestStateC,
-      SerialActiveMessageC,
-      ActiveMessageAddressC,
-      LedsC;
-  
-  TUnitP.TUnitState -> TUnitStateC;
-  TUnitP.TestState -> TestStateC;
-  TUnitP.SendState -> Link_TUnitProcessingC;
-  TUnitP.SerialSplitControl -> SerialActiveMessageC;
-  TUnitP.amAddress -> ActiveMessageAddressC;
-  TUnitP.Leds -> LedsC;
-  
-  Link_TUnitProcessingC.TUnitProcessing -> TUnitP;
-  
-}

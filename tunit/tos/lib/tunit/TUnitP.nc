@@ -48,6 +48,9 @@
  *     
  *     ... etc.
  *
+ *    >> Signal allDone() to the computer
+ *    >> The computer tells *all* nodes to tearDownOneTime...
+ * 
  *   8. TearDownOneTime - tears down the entire suite of tests
  *
  *
@@ -59,7 +62,6 @@
  * Assertion results for each test are passed back to the computer for report 
  * generation
  *
- * The StatsQuery
  * 
  * @author David Moss
  */
@@ -86,6 +88,7 @@ module TUnitP {
     interface SplitControl as SerialSplitControl;
     
     async command am_addr_t amAddress(); 
+    interface Leds;
   }
 }
 
@@ -165,6 +168,13 @@ implementation {
   command void TUnitProcessing.ping() {
     signal TUnitProcessing.pong();
   }
+  
+  command void TUnitProcessing.tearDownOneTime() {
+    call TUnitState.forceState(S_TEARDOWN_ONETIME);
+    signal TearDownOneTime.run();
+    // Execution completes when tearDownOneTimeDone()
+  }
+  
   
   /***************** TestCase Commands ****************/
   command void TestCase.done[uint8_t testId]() {
@@ -276,7 +286,6 @@ implementation {
   void tearDownOneTimeDone() {
     call TUnitState.forceState(S_READY);
     call TestState.toIdle();
-    signal TUnitProcessing.allDone();
     // Execution stops.
   }
   
@@ -289,9 +298,8 @@ implementation {
       }
       
     } else {
-      call TUnitState.forceState(S_TEARDOWN_ONETIME);
-      signal TearDownOneTime.run();
-      // Execution continues when tearDownOneTimeDone()
+      signal TUnitProcessing.allDone();
+      // Next, the computer gives the signal to all motes to tearDownOneTime()
     }
   }
   

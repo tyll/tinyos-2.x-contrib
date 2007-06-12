@@ -1,5 +1,3 @@
-<!-- EXAMPLE LAVA LAMP FEEDBACK SETUP -->
-
 <tunit>
   <testrun name="lavalamp">
     <mote target="telosb" motecom="serial@COM55:tmote" installextras="bsl,54"/>

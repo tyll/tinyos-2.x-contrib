@@ -1,7 +1,8 @@
-Roadmap, with no  timelines:
+Roadmap, with no timelines:
 
-** Bug:  Statistics does not get disconnected when java deregisters listeners
-
+** Bug: run done doesn't seem to wait for messages to exfil before running
+  the next test.
+  
 
 1. Allow Java to drive the testing structure, and remove that logic from
    TUnit.  This will not only decrease memory footprint, but will allow
@@ -32,6 +33,8 @@ Roadmap, with no  timelines:
     > Using the actual serial stack breaks when using UartByte for single
       phase serial access.
   
+* Power measurement and profiling during testing 
+
 * Test bed support, but we need a test bed first to figure out how to do that.
 
 

@@ -46,7 +46,6 @@ module Link_TUnitProcessingP {
     interface SplitControl as SerialSplitControl;
     interface State as SerialState;
     interface State as SendState;
-    interface Leds;
   }
 }
 
@@ -188,6 +187,10 @@ implementation {
         call TUnitProcessing.ping();
         break;
 
+      case TUNITPROCESSING_CMD_TEARDOWNONETIME:
+        call TUnitProcessing.tearDownOneTime();
+        break;
+        
       default:
     }
   }

@@ -64,7 +64,4 @@ implementation {
   
   TUnitProcessing = LinkP;
   SendState = SendStateC;
-  
-  components LedsC;
-  LinkP.Leds -> LedsC;
 }

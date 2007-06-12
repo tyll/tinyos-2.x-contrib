@@ -1,58 +1,68 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <project name="TUnit" basedir="." default="tunit">
 
-  <property name="report.dir" value="./reports"/>
-  <property name="xml.dir" value="${report.dir}/xml"/>
-  <property name="htmlreport.dir" value="${report.dir}/html"/>
-  <property name="archive.dir" value="${report.dir}/archive"/>
+	<property name="report.dir" value="./reports" />
+	<property name="xml.dir" value="${report.dir}/xml" />
+	<property name="htmlreport.dir" value="${report.dir}/html" />
+	<property name="archive.dir" value="${report.dir}/archive" />
+	<property name="stats.dir" value="${report.dir}/stats" />
+	
 
-  <target name="clean">
-    <delete dir="${htmlreport.dir}"/>
-    <delete dir="${xml.dir}"/>
-  </target>
+	<target name="tunit">
+		<delete dir="${xml.dir}" />
+		<mkdir dir="${xml.dir}" />
+		<java classname="com.rincon.tunit.TUnit" />
 
-  <target name="tunitrerun"> 
-    <java classname="com.rincon.tunit.TUnit">
-      <arg value="-rerun"/>
-    </java>
-    <antcall target="tunitreport"/>
-  </target>
+		<antcall target="tunitreport" />
+		<antcall target="feedback" />
+	</target>
 
-  <target name="tunit">
-    <delete dir="${xml.dir}"/>
-    <mkdir dir="${xml.dir}"/>
-    <java classname="com.rincon.tunit.TUnit"/>
-    <antcall target="tunitreport"/>
-    <antcall target="feedback"/>
-  </target>
+	<target name="tunitrerun">
+		<java classname="com.rincon.tunit.TUnit">
+			<arg value="-rerun" />
+		</java>
+		<antcall target="tunitreport" />
+	</target>
 
-  <target name="tunitreport">
-    <mkdir dir="${htmlreport.dir}"/>
-    <mkdir dir="${archive.dir}"/>
+	<target name="tunitreport">
+		<delete dir="${htmlreport.dir}" />
+		<mkdir dir="${htmlreport.dir}" />
+		<mkdir dir="${archive.dir}" />
 
-    <junitreport todir="${xml.dir}">
-      <fileset dir="${xml.dir}" includes="TEST-*.xml"/>
-      <report todir="${htmlreport.dir}"/>
-    </junitreport>
-   
-    <tstamp>
-      <format property="TIMESTAMP" pattern="d-MMMM-yyyy_hh-mm-aa"/>
-    </tstamp> 
+		<junitreport todir="${xml.dir}">
+			<fileset dir="${xml.dir}" includes="TEST-*.xml" />
+			<report todir="${htmlreport.dir}" />
+		</junitreport>
+		
+		<java classname="com.rincon.tunitposthtml.PostHtmlEdit" />
 
-    <property name="archive.prefix" value="htmlreport_${TIMESTAMP}"/>
+		<tstamp>
+			<format property="TIMESTAMP" pattern="d-MMMM-yyyy_hh-mm-aa" />
+		</tstamp>
 
-    <tar tarfile="${archive.dir}/${archive.prefix}.tar" basedir="${htmlreport.dir}"/>
-    <gzip zipfile="${archive.dir}/${archive.prefix}.tar.gz" src="${archive.dir}/${archive.prefix}.tar"/>
+		<property name="archive.prefix" value="htmlreport_${TIMESTAMP}" />
 
-    <delete>
-      <fileset dir="${archive.dir}" includes="*.tar"/>
-    </delete>
+		<tar tarfile="${archive.dir}/${archive.prefix}.tar" basedir="${htmlreport.dir}" />
+		<gzip zipfile="${archive.dir}/${archive.prefix}.tar.gz" src="${archive.dir}/${archive.prefix}.tar" />
 
-  </target>
+		<delete>
+			<fileset dir="${archive.dir}" includes="*.tar" />
+		</delete>
 
-  <target name="feedback">
-    <java classname="com.rincon.tunitfeedback.TUnitFeedback"/>
-  </target>
+	</target>
+
+	<target name="feedback">
+		<java classname="com.rincon.tunitfeedback.TUnitFeedback" />
+	</target>
+
+	<target name="clean">
+		<delete dir="${htmlreport.dir}" />
+		<delete dir="${xml.dir}" />
+	</target>
+
+	<target name="cleanstats">
+		<delete dir="${stats.dir}" />
+	</target>
 
 </project>
 

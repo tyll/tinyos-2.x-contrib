@@ -1,18 +1,7 @@
 Roadmap, with no timelines:
-
-** Bug: run done doesn't seem to wait for messages to exfil before running
-  the next test.
   
-
-1. Allow Java to drive the testing structure, and remove that logic from
-   TUnit.  This will not only decrease memory footprint, but will allow
-   all motes to move onto the next test at once, or clean up all at once
-   instead of having to guess or program extra stuff on the embedded side.
-
-2. Turn CSV files into charts and images, hack up JUnit's HTML reports to 
-   include those images.
   
-3. External Java support - 
+* External Java support - 
   - Ability to add in your own Java programs running on the computer side
     to interact with the mote
   - Those Java programs should interact with the test result collection system

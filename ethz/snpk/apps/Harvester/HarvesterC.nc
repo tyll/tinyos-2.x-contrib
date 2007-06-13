@@ -51,7 +51,7 @@ implementation {
   	
   LplCommand.DSN->DSNC;
   HarvesterP.DSN -> DSNC;
-  pHarvesterP.LplCommand->LplCommand;
+  HarvesterP.LplCommand->LplCommand;
 
   
   HarvesterP.Boot -> MainC;

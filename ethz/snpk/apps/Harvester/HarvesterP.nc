@@ -38,7 +38,7 @@ module HarvesterP {
     interface Leds;
     
     // DSN
-    interface DSNx;
+    interface DSN;
     interface DsnCommand<uint16_t> as LplCommand;
     
     // TreeInfo

@@ -4,6 +4,8 @@ CFLAGS += -I../../tos/lib/dsn
 CFLAGS += -DLOW_POWER_LISTENING
 # include bugfixes for dma spi
 CFLAGS += -I../../tos/chips/msp430/usart -I../../tos/interfaces
+# include trace scheduler
+CFLAGS += -I../../tos/system
 CFLAGS += -DCC2420_DEF_RFPOWER=31 -DCC2420_DEF_CHANNEL=23
 # CFLAGS += -DTOSH_DATA_LENGTH=33
 CFLAGS += -g

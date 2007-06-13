@@ -1,0 +1,4 @@
+/**
+ * Adapted for nxtmote.
+ * @author Rasmus Pedersen
+ */

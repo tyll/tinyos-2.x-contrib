@@ -1,0 +1,454 @@
+$ make nxtmote
+mkdir -p build/nxtmote
+arm-elf-gcc -c -mcpu=arm7tdmi -I. -Wa,-adhlns=Cstartup.lst,--gdwarf-2 -x assembler-with-cpp /opt/tin
+yos-2.x/tos/platforms/nxtmote/CStartup.S -o build/nxtmote/Cstartup.o
+ROM_MODE enabled
+Vectors at start of Code
+Vectors in section .vectorg -> .text
+IRQ_Handler_Entry in section .init -> .text
+    compiling BlinkAppC to a nxtmote binary
+    NXTMOTE INFO: ncc -v -o build/nxtmote/main.exe -Os -DCC1K_DEF_FREQ=916700000 -Wall -Wshadow -DDE
+F_TOS_AM_GROUP=0x7d -Wnesc-all -target=nxtmote -fnesc-cfile=build/nxtmote/app.c -T/opt/tinyos-2.x/to
+s/platforms/nxtmote/AT91SAM7S256-ROM.ld -Wall -g -mcpu=arm7tdmi -I. -Wa,-adhlns=app.lst  BlinkAppC.n
+c -lm -nostartfiles build/nxtmote/Cstartup.o
+    CFLAGS: -T/opt/tinyos-2.x/tos/platforms/nxtmote/AT91SAM7S256-ROM.ld -Wall -g -mcpu=arm7tdmi -I.
+-Wa,-adhlns=app.lst
+ncc  -save-temps -v -fnesc-verbose -o build/nxtmote/main.exe -Os -DCC1K_DEF_FREQ=916700000 -Wall -Ws
+hadow -DDEF_TOS_AM_GROUP=0x7d -Wnesc-all -target=nxtmote -fnesc-cfile=build/nxtmote/app.c -T/opt/tin
+yos-2.x/tos/platforms/nxtmote/AT91SAM7S256-ROM.ld -Wall -g -mcpu=arm7tdmi -I. -Wa,-adhlns=app.lst  B
+linkAppC.nc -lm -nostartfiles build/nxtmote/Cstartup.o
+/usr/bin/nescc -fnesc-include=tos -topdir=/opt/tinyos-2.x -DPLATFORM_NXTMOTE -save-temps -v -fnesc-v
+erbose -o build/nxtmote/main.exe -Os -DCC1K_DEF_FREQ=916700000 -Wall -Wshadow -DDEF_TOS_AM_GROUP=0x7
+d -Wnesc-all -fnesc-cfile=build/nxtmote/app.c -T/opt/tinyos-2.x/tos/platforms/nxtmote/AT91SAM7S256-R
+OM.ld -Wall -g -mcpu=arm7tdmi -Wa,-adhlns=app.lst BlinkAppC.nc -lm -nostartfiles build/nxtmote/Cstar
+tup.o -gcc=arm-elf-gcc -fnesc-no-debug -nostartfiles -fnesc-target=env -fnesc-scheduler=TinySchedule
+rC,TinySchedulerC.TaskBasic,TaskBasic,TaskBasic,runTask,postTask -I. -I/opt/tinyos-2.x/tos/platforms
+/nxtmote -I/opt/tinyos-2.x/tos/platforms/nxtmote -I/opt/tinyos-2.x/tos/chips/at91 -I/opt/tinyos-2.x/
+tos/chips/at91/gpio -I/opt/tinyos-2.x/tos/chips/at91/timer -I/opt/tinyos-2.x/tos/lib/timer -I/opt/ti
+nyos-2.x/tos/lib/serial -I/opt/tinyos-2.x/tos/interfaces -I/opt/tinyos-2.x/tos/types -I/opt/tinyos-2
+.x/tos/system
+nescc: 1.2.8a
+arm-elf-gcc -_fnesc-gcc=arm-elf-gcc -specs=/usr/lib/ncc/tdspecs -_fnesc-include=nesc_nx -I/usr/lib/n
+cc -_fnesc-include=tos -DPLATFORM_NXTMOTE -save-temps -v -_fnesc-verbose -o build/nxtmote/main.exe -
+Os -DCC1K_DEF_FREQ=916700000 -Wall -Wshadow -DDEF_TOS_AM_GROUP=0x7d -_Wnesc-all -_fnesc-cfile=build/
+nxtmote/app.c -T/opt/tinyos-2.x/tos/platforms/nxtmote/AT91SAM7S256-ROM.ld -Wall -g -mcpu=arm7tdmi -W
+a,-adhlns=app.lst BlinkAppC.nc -lm -nostartfiles build/nxtmote/Cstartup.o -_fnesc-no-debug -nostartf
+iles -_fnesc-target=env -_fnesc-scheduler=TinySchedulerC,TinySchedulerC.TaskBasic,TaskBasic,TaskBasi
+c,runTask,postTask -I. -I/opt/tinyos-2.x/tos/platforms/nxtmote -I/opt/tinyos-2.x/tos/platforms/nxtmo
+te -I/opt/tinyos-2.x/tos/chips/at91 -I/opt/tinyos-2.x/tos/chips/at91/gpio -I/opt/tinyos-2.x/tos/chip
+s/at91/timer -I/opt/tinyos-2.x/tos/lib/timer -I/opt/tinyos-2.x/tos/lib/serial -I/opt/tinyos-2.x/tos/
+interfaces -I/opt/tinyos-2.x/tos/types -I/opt/tinyos-2.x/tos/system -DNESC=128
+Using built-in specs.
+Reading specs from /usr/lib/ncc/tdspecs
+Target: arm-elf
+Configured with: /usr/src/rpm/BUILD/arm-elf-gcc-4.1.2/configure --target=arm-elf --prefix=/var/tmp/a
+rm-elf-gcc-root/usr --with-newlib --enable-languages=c --enable-interwork --enable-multilib --with-f
+loat=soft
+Thread model: single
+gcc version 4.1.2
+ perl -S nesc-compile -_fnesc-gcc=arm-elf-gcc -_fnesc-include=nesc_nx -_fnesc-include=tos -_fnesc-ve
+rbose -_Wnesc-all -_fnesc-cfile=build/nxtmote/app.c -_fnesc-no-debug -_fnesc-target=env -_fnesc-sche
+duler=TinySchedulerC,TinySchedulerC.TaskBasic,TaskBasic,TaskBasic,runTask,postTask -mcpu=arm7tdmi -m
+float-abi=soft -DPLATFORM_NXTMOTE -DCC1K_DEF_FREQ=916700000 -DDEF_TOS_AM_GROUP=0x7d -DNESC=128 -I/us
+r/lib/ncc -I. -I/opt/tinyos-2.x/tos/platforms/nxtmote -I/opt/tinyos-2.x/tos/platforms/nxtmote -I/opt
+/tinyos-2.x/tos/chips/at91 -I/opt/tinyos-2.x/tos/chips/at91/gpio -I/opt/tinyos-2.x/tos/chips/at91/ti
+mer -I/opt/tinyos-2.x/tos/lib/timer -I/opt/tinyos-2.x/tos/lib/serial -I/opt/tinyos-2.x/tos/interface
+s -I/opt/tinyos-2.x/tos/types -I/opt/tinyos-2.x/tos/system -g -Os -Wall -Wshadow -Wall -v -o BlinkAp
+pC.o BlinkAppC.nc -_ASM -adhlns=app.lst
+nesc1 -_fnesc-gcc=arm-elf-gcc -_fnesc-include=nesc_nx -_fnesc-include=tos -_fnesc-verbose -_Wnesc-al
+l -_fnesc-no-debug -_fnesc-target=env -_fnesc-scheduler=TinySchedulerC,TinySchedulerC.TaskBasic,Task
+Basic,TaskBasic,runTask,postTask -mcpu=arm7tdmi -mfloat-abi=soft -DPLATFORM_NXTMOTE -DCC1K_DEF_FREQ=
+916700000 -DDEF_TOS_AM_GROUP=0x7d -DNESC=128 -I/usr/lib/ncc -I. -I/opt/tinyos-2.x/tos/platforms/nxtm
+ote -I/opt/tinyos-2.x/tos/platforms/nxtmote -I/opt/tinyos-2.x/tos/chips/at91 -I/opt/tinyos-2.x/tos/c
+hips/at91/gpio -I/opt/tinyos-2.x/tos/chips/at91/timer -I/opt/tinyos-2.x/tos/lib/timer -I/opt/tinyos-
+2.x/tos/lib/serial -I/opt/tinyos-2.x/tos/interfaces -I/opt/tinyos-2.x/tos/types -I/opt/tinyos-2.x/to
+s/system -Wall -Wshadow -Wall -v BlinkAppC.nc -o build/nxtmote/app.c
+arm-elf-gcc -v
+preprocessing /usr/lib/ncc/nesc_nx.h
+arm-elf-gcc -I /usr/lib/ncc/ -I ./ -I /opt/tinyos-2.x/tos/platforms/nxtmote/ -I /opt/tinyos-2.x/tos/
+platforms/nxtmote/ -I /opt/tinyos-2.x/tos/chips/at91/ -I /opt/tinyos-2.x/tos/chips/at91/gpio/ -I /op
+t/tinyos-2.x/tos/chips/at91/timer/ -I /opt/tinyos-2.x/tos/lib/timer/ -I /opt/tinyos-2.x/tos/lib/seri
+al/ -I /opt/tinyos-2.x/tos/interfaces/ -I /opt/tinyos-2.x/tos/types/ -I /opt/tinyos-2.x/tos/system/
+-mcpu=arm7tdmi -mfloat-abi=soft -DPLATFORM_NXTMOTE -DCC1K_DEF_FREQ=916700000 -DDEF_TOS_AM_GROUP=0x7d
+ -DNESC=128 -E -C -dD -imacros /tmp/nesccppkk7y5rM /usr/lib/ncc/nesc_nx.h
+preprocessing /opt/tinyos-2.x/tos/system/tos.h
+arm-elf-gcc -I /usr/lib/ncc/ -I ./ -I /opt/tinyos-2.x/tos/platforms/nxtmote/ -I /opt/tinyos-2.x/tos/
+platforms/nxtmote/ -I /opt/tinyos-2.x/tos/chips/at91/ -I /opt/tinyos-2.x/tos/chips/at91/gpio/ -I /op
+t/tinyos-2.x/tos/chips/at91/timer/ -I /opt/tinyos-2.x/tos/lib/timer/ -I /opt/tinyos-2.x/tos/lib/seri
+al/ -I /opt/tinyos-2.x/tos/interfaces/ -I /opt/tinyos-2.x/tos/types/ -I /opt/tinyos-2.x/tos/system/
+-mcpu=arm7tdmi -mfloat-abi=soft -DPLATFORM_NXTMOTE -DCC1K_DEF_FREQ=916700000 -DDEF_TOS_AM_GROUP=0x7d
+ -DNESC=128 -E -C -dD -imacros /tmp/nesccppkk7y5rM -imacros /tmp/nesccppm1HqiFlb /opt/tinyos-2.x/tos
+/system/tos.h
+preprocessing /opt/tinyos-2.x/tos/system/TinySchedulerC.nc
+arm-elf-gcc -I /usr/lib/ncc/ -I ./ -I /opt/tinyos-2.x/tos/platforms/nxtmote/ -I /opt/tinyos-2.x/tos/
+platforms/nxtmote/ -I /opt/tinyos-2.x/tos/chips/at91/ -I /opt/tinyos-2.x/tos/chips/at91/gpio/ -I /op
+t/tinyos-2.x/tos/chips/at91/timer/ -I /opt/tinyos-2.x/tos/lib/timer/ -I /opt/tinyos-2.x/tos/lib/seri
+al/ -I /opt/tinyos-2.x/tos/interfaces/ -I /opt/tinyos-2.x/tos/types/ -I /opt/tinyos-2.x/tos/system/
+-mcpu=arm7tdmi -mfloat-abi=soft -DPLATFORM_NXTMOTE -DCC1K_DEF_FREQ=916700000 -DDEF_TOS_AM_GROUP=0x7d
+ -DNESC=128 -E -C -dD -x c -imacros /tmp/nesccppm2Mg6ouU /opt/tinyos-2.x/tos/system/TinySchedulerC.n
+c
+preprocessing /opt/tinyos-2.x/tos/interfaces/Scheduler.nc
+arm-elf-gcc -I /usr/lib/ncc/ -I ./ -I /opt/tinyos-2.x/tos/platforms/nxtmote/ -I /opt/tinyos-2.x/tos/
+platforms/nxtmote/ -I /opt/tinyos-2.x/tos/chips/at91/ -I /opt/tinyos-2.x/tos/chips/at91/gpio/ -I /op
+t/tinyos-2.x/tos/chips/at91/timer/ -I /opt/tinyos-2.x/tos/lib/timer/ -I /opt/tinyos-2.x/tos/lib/seri
+al/ -I /opt/tinyos-2.x/tos/interfaces/ -I /opt/tinyos-2.x/tos/types/ -I /opt/tinyos-2.x/tos/system/
+-mcpu=arm7tdmi -mfloat-abi=soft -DPLATFORM_NXTMOTE -DCC1K_DEF_FREQ=916700000 -DDEF_TOS_AM_GROUP=0x7d
+ -DNESC=128 -E -C -dD -x c -imacros /tmp/nesccppm1HqiFlb /opt/tinyos-2.x/tos/interfaces/Scheduler.nc
+
+preprocessing /opt/tinyos-2.x/tos/interfaces/TaskBasic.nc
+arm-elf-gcc -I /usr/lib/ncc/ -I ./ -I /opt/tinyos-2.x/tos/platforms/nxtmote/ -I /opt/tinyos-2.x/tos/
+platforms/nxtmote/ -I /opt/tinyos-2.x/tos/chips/at91/ -I /opt/tinyos-2.x/tos/chips/at91/gpio/ -I /op
+t/tinyos-2.x/tos/chips/at91/timer/ -I /opt/tinyos-2.x/tos/lib/timer/ -I /opt/tinyos-2.x/tos/lib/seri
+al/ -I /opt/tinyos-2.x/tos/interfaces/ -I /opt/tinyos-2.x/tos/types/ -I /opt/tinyos-2.x/tos/system/
+-mcpu=arm7tdmi -mfloat-abi=soft -DPLATFORM_NXTMOTE -DCC1K_DEF_FREQ=916700000 -DDEF_TOS_AM_GROUP=0x7d
+ -DNESC=128 -E -C -dD -x c -imacros /tmp/nesccppm2Mg6ouU /opt/tinyos-2.x/tos/interfaces/TaskBasic.nc
+
+preprocessing /opt/tinyos-2.x/tos/system/SchedulerBasicP.nc
+arm-elf-gcc -I /usr/lib/ncc/ -I ./ -I /opt/tinyos-2.x/tos/platforms/nxtmote/ -I /opt/tinyos-2.x/tos/
+platforms/nxtmote/ -I /opt/tinyos-2.x/tos/chips/at91/ -I /opt/tinyos-2.x/tos/chips/at91/gpio/ -I /op
+t/tinyos-2.x/tos/chips/at91/timer/ -I /opt/tinyos-2.x/tos/lib/timer/ -I /opt/tinyos-2.x/tos/lib/seri
+al/ -I /opt/tinyos-2.x/tos/interfaces/ -I /opt/tinyos-2.x/tos/types/ -I /opt/tinyos-2.x/tos/system/
+-mcpu=arm7tdmi -mfloat-abi=soft -DPLATFORM_NXTMOTE -DCC1K_DEF_FREQ=916700000 -DDEF_TOS_AM_GROUP=0x7d
+ -DNESC=128 -E -C -dD -x c -imacros /tmp/nesccppm1HqiFlb /opt/tinyos-2.x/tos/system/SchedulerBasicP.
+nc
+In file included from /opt/tinyos-2.x/tos/system/SchedulerBasicP.nc:41,
+                 from /opt/tinyos-2.x/tos/system/TinySchedulerC.nc:40:
+/opt/tinyos-2.x/tos/platforms/nxtmote/hardware.h:157: warning: initialization makes integer from poi
+nter without a cast
+/opt/tinyos-2.x/tos/platforms/nxtmote/hardware.h:158: warning: initialization makes integer from poi
+nter without a cast
+/opt/tinyos-2.x/tos/platforms/nxtmote/hardware.h:159: warning: initialization makes integer from poi
+nter without a cast
+preprocessing /opt/tinyos-2.x/tos/interfaces/McuSleep.nc
+arm-elf-gcc -I /usr/lib/ncc/ -I ./ -I /opt/tinyos-2.x/tos/platforms/nxtmote/ -I /opt/tinyos-2.x/tos/
+platforms/nxtmote/ -I /opt/tinyos-2.x/tos/chips/at91/ -I /opt/tinyos-2.x/tos/chips/at91/gpio/ -I /op
+t/tinyos-2.x/tos/chips/at91/timer/ -I /opt/tinyos-2.x/tos/lib/timer/ -I /opt/tinyos-2.x/tos/lib/seri
+al/ -I /opt/tinyos-2.x/tos/interfaces/ -I /opt/tinyos-2.x/tos/types/ -I /opt/tinyos-2.x/tos/system/
+-mcpu=arm7tdmi -mfloat-abi=soft -DPLATFORM_NXTMOTE -DCC1K_DEF_FREQ=916700000 -DDEF_TOS_AM_GROUP=0x7d
+ -DNESC=128 -E -C -dD -x c -imacros /tmp/nesccppm2Mg6ouU /opt/tinyos-2.x/tos/interfaces/McuSleep.nc
+
+preprocessing /opt/tinyos-2.x/tos/platforms/nxtmote/McuSleepC.nc
+arm-elf-gcc -I /usr/lib/ncc/ -I ./ -I /opt/tinyos-2.x/tos/platforms/nxtmote/ -I /opt/tinyos-2.x/tos/
+platforms/nxtmote/ -I /opt/tinyos-2.x/tos/chips/at91/ -I /opt/tinyos-2.x/tos/chips/at91/gpio/ -I /op
+t/tinyos-2.x/tos/chips/at91/timer/ -I /opt/tinyos-2.x/tos/lib/timer/ -I /opt/tinyos-2.x/tos/lib/seri
+al/ -I /opt/tinyos-2.x/tos/interfaces/ -I /opt/tinyos-2.x/tos/types/ -I /opt/tinyos-2.x/tos/system/
+-mcpu=arm7tdmi -mfloat-abi=soft -DPLATFORM_NXTMOTE -DCC1K_DEF_FREQ=916700000 -DDEF_TOS_AM_GROUP=0x7d
+ -DNESC=128 -E -C -dD -x c -imacros /tmp/nesccppm1HqiFlb /opt/tinyos-2.x/tos/platforms/nxtmote/McuSl
+eepC.nc
+preprocessing /opt/tinyos-2.x/tos/interfaces/McuPowerState.nc
+arm-elf-gcc -I /usr/lib/ncc/ -I ./ -I /opt/tinyos-2.x/tos/platforms/nxtmote/ -I /opt/tinyos-2.x/tos/
+platforms/nxtmote/ -I /opt/tinyos-2.x/tos/chips/at91/ -I /opt/tinyos-2.x/tos/chips/at91/gpio/ -I /op
+t/tinyos-2.x/tos/chips/at91/timer/ -I /opt/tinyos-2.x/tos/lib/timer/ -I /opt/tinyos-2.x/tos/lib/seri
+al/ -I /opt/tinyos-2.x/tos/interfaces/ -I /opt/tinyos-2.x/tos/types/ -I /opt/tinyos-2.x/tos/system/
+-mcpu=arm7tdmi -mfloat-abi=soft -DPLATFORM_NXTMOTE -DCC1K_DEF_FREQ=916700000 -DDEF_TOS_AM_GROUP=0x7d
+ -DNESC=128 -E -C -dD -x c -imacros /tmp/nesccppm2Mg6ouU /opt/tinyos-2.x/tos/interfaces/McuPowerStat
+e.nc
+preprocessing BlinkAppC.nc
+arm-elf-gcc -I /usr/lib/ncc/ -I ./ -I /opt/tinyos-2.x/tos/platforms/nxtmote/ -I /opt/tinyos-2.x/tos/
+platforms/nxtmote/ -I /opt/tinyos-2.x/tos/chips/at91/ -I /opt/tinyos-2.x/tos/chips/at91/gpio/ -I /op
+t/tinyos-2.x/tos/chips/at91/timer/ -I /opt/tinyos-2.x/tos/lib/timer/ -I /opt/tinyos-2.x/tos/lib/seri
+al/ -I /opt/tinyos-2.x/tos/interfaces/ -I /opt/tinyos-2.x/tos/types/ -I /opt/tinyos-2.x/tos/system/
+-mcpu=arm7tdmi -mfloat-abi=soft -DPLATFORM_NXTMOTE -DCC1K_DEF_FREQ=916700000 -DDEF_TOS_AM_GROUP=0x7d
+ -DNESC=128 -E -C -dD -x c -imacros /tmp/nesccppm1HqiFlb BlinkAppC.nc
+preprocessing /opt/tinyos-2.x/tos/system/MainC.nc
+arm-elf-gcc -I /usr/lib/ncc/ -I ./ -I /opt/tinyos-2.x/tos/platforms/nxtmote/ -I /opt/tinyos-2.x/tos/
+platforms/nxtmote/ -I /opt/tinyos-2.x/tos/chips/at91/ -I /opt/tinyos-2.x/tos/chips/at91/gpio/ -I /op
+t/tinyos-2.x/tos/chips/at91/timer/ -I /opt/tinyos-2.x/tos/lib/timer/ -I /opt/tinyos-2.x/tos/lib/seri
+al/ -I /opt/tinyos-2.x/tos/interfaces/ -I /opt/tinyos-2.x/tos/types/ -I /opt/tinyos-2.x/tos/system/
+-mcpu=arm7tdmi -mfloat-abi=soft -DPLATFORM_NXTMOTE -DCC1K_DEF_FREQ=916700000 -DDEF_TOS_AM_GROUP=0x7d
+ -DNESC=128 -E -C -dD -x c -imacros /tmp/nesccppm2Mg6ouU /opt/tinyos-2.x/tos/system/MainC.nc
+preprocessing /opt/tinyos-2.x/tos/interfaces/Boot.nc
+arm-elf-gcc -I /usr/lib/ncc/ -I ./ -I /opt/tinyos-2.x/tos/platforms/nxtmote/ -I /opt/tinyos-2.x/tos/
+platforms/nxtmote/ -I /opt/tinyos-2.x/tos/chips/at91/ -I /opt/tinyos-2.x/tos/chips/at91/gpio/ -I /op
+t/tinyos-2.x/tos/chips/at91/timer/ -I /opt/tinyos-2.x/tos/lib/timer/ -I /opt/tinyos-2.x/tos/lib/seri
+al/ -I /opt/tinyos-2.x/tos/interfaces/ -I /opt/tinyos-2.x/tos/types/ -I /opt/tinyos-2.x/tos/system/
+-mcpu=arm7tdmi -mfloat-abi=soft -DPLATFORM_NXTMOTE -DCC1K_DEF_FREQ=916700000 -DDEF_TOS_AM_GROUP=0x7d
+ -DNESC=128 -E -C -dD -x c -imacros /tmp/nesccppm1HqiFlb /opt/tinyos-2.x/tos/interfaces/Boot.nc
+preprocessing /opt/tinyos-2.x/tos/interfaces/Init.nc
+arm-elf-gcc -I /usr/lib/ncc/ -I ./ -I /opt/tinyos-2.x/tos/platforms/nxtmote/ -I /opt/tinyos-2.x/tos/
+platforms/nxtmote/ -I /opt/tinyos-2.x/tos/chips/at91/ -I /opt/tinyos-2.x/tos/chips/at91/gpio/ -I /op
+t/tinyos-2.x/tos/chips/at91/timer/ -I /opt/tinyos-2.x/tos/lib/timer/ -I /opt/tinyos-2.x/tos/lib/seri
+al/ -I /opt/tinyos-2.x/tos/interfaces/ -I /opt/tinyos-2.x/tos/types/ -I /opt/tinyos-2.x/tos/system/
+-mcpu=arm7tdmi -mfloat-abi=soft -DPLATFORM_NXTMOTE -DCC1K_DEF_FREQ=916700000 -DDEF_TOS_AM_GROUP=0x7d
+ -DNESC=128 -E -C -dD -x c -imacros /tmp/nesccppm2Mg6ouU /opt/tinyos-2.x/tos/interfaces/Init.nc
+preprocessing /opt/tinyos-2.x/tos/platforms/nxtmote/PlatformC.nc
+arm-elf-gcc -I /usr/lib/ncc/ -I ./ -I /opt/tinyos-2.x/tos/platforms/nxtmote/ -I /opt/tinyos-2.x/tos/
+platforms/nxtmote/ -I /opt/tinyos-2.x/tos/chips/at91/ -I /opt/tinyos-2.x/tos/chips/at91/gpio/ -I /op
+t/tinyos-2.x/tos/chips/at91/timer/ -I /opt/tinyos-2.x/tos/lib/timer/ -I /opt/tinyos-2.x/tos/lib/seri
+al/ -I /opt/tinyos-2.x/tos/interfaces/ -I /opt/tinyos-2.x/tos/types/ -I /opt/tinyos-2.x/tos/system/
+-mcpu=arm7tdmi -mfloat-abi=soft -DPLATFORM_NXTMOTE -DCC1K_DEF_FREQ=916700000 -DDEF_TOS_AM_GROUP=0x7d
+ -DNESC=128 -E -C -dD -x c -imacros /tmp/nesccppm1HqiFlb /opt/tinyos-2.x/tos/platforms/nxtmote/Platf
+ormC.nc
+preprocessing /opt/tinyos-2.x/tos/platforms/nxtmote/PlatformP.nc
+arm-elf-gcc -I /usr/lib/ncc/ -I ./ -I /opt/tinyos-2.x/tos/platforms/nxtmote/ -I /opt/tinyos-2.x/tos/
+platforms/nxtmote/ -I /opt/tinyos-2.x/tos/chips/at91/ -I /opt/tinyos-2.x/tos/chips/at91/gpio/ -I /op
+t/tinyos-2.x/tos/chips/at91/timer/ -I /opt/tinyos-2.x/tos/lib/timer/ -I /opt/tinyos-2.x/tos/lib/seri
+al/ -I /opt/tinyos-2.x/tos/interfaces/ -I /opt/tinyos-2.x/tos/types/ -I /opt/tinyos-2.x/tos/system/
+-mcpu=arm7tdmi -mfloat-abi=soft -DPLATFORM_NXTMOTE -DCC1K_DEF_FREQ=916700000 -DDEF_TOS_AM_GROUP=0x7d
+ -DNESC=128 -E -C -dD -x c -imacros /tmp/nesccppm2Mg6ouU /opt/tinyos-2.x/tos/platforms/nxtmote/Platf
+ormP.nc
+preprocessing /opt/tinyos-2.x/tos/system/RealMainP.nc
+arm-elf-gcc -I /usr/lib/ncc/ -I ./ -I /opt/tinyos-2.x/tos/platforms/nxtmote/ -I /opt/tinyos-2.x/tos/
+platforms/nxtmote/ -I /opt/tinyos-2.x/tos/chips/at91/ -I /opt/tinyos-2.x/tos/chips/at91/gpio/ -I /op
+t/tinyos-2.x/tos/chips/at91/timer/ -I /opt/tinyos-2.x/tos/lib/timer/ -I /opt/tinyos-2.x/tos/lib/seri
+al/ -I /opt/tinyos-2.x/tos/interfaces/ -I /opt/tinyos-2.x/tos/types/ -I /opt/tinyos-2.x/tos/system/
+-mcpu=arm7tdmi -mfloat-abi=soft -DPLATFORM_NXTMOTE -DCC1K_DEF_FREQ=916700000 -DDEF_TOS_AM_GROUP=0x7d
+ -DNESC=128 -E -C -dD -x c -imacros /tmp/nesccppm1HqiFlb /opt/tinyos-2.x/tos/system/RealMainP.nc
+preprocessing BlinkC.nc
+arm-elf-gcc -I /usr/lib/ncc/ -I ./ -I /opt/tinyos-2.x/tos/platforms/nxtmote/ -I /opt/tinyos-2.x/tos/
+platforms/nxtmote/ -I /opt/tinyos-2.x/tos/chips/at91/ -I /opt/tinyos-2.x/tos/chips/at91/gpio/ -I /op
+t/tinyos-2.x/tos/chips/at91/timer/ -I /opt/tinyos-2.x/tos/lib/timer/ -I /opt/tinyos-2.x/tos/lib/seri
+al/ -I /opt/tinyos-2.x/tos/interfaces/ -I /opt/tinyos-2.x/tos/types/ -I /opt/tinyos-2.x/tos/system/
+-mcpu=arm7tdmi -mfloat-abi=soft -DPLATFORM_NXTMOTE -DCC1K_DEF_FREQ=916700000 -DDEF_TOS_AM_GROUP=0x7d
+ -DNESC=128 -E -C -dD -x c -imacros /tmp/nesccppm2Mg6ouU BlinkC.nc
+preprocessing /opt/tinyos-2.x/tos/lib/timer/Timer.nc
+arm-elf-gcc -I /usr/lib/ncc/ -I ./ -I /opt/tinyos-2.x/tos/platforms/nxtmote/ -I /opt/tinyos-2.x/tos/
+platforms/nxtmote/ -I /opt/tinyos-2.x/tos/chips/at91/ -I /opt/tinyos-2.x/tos/chips/at91/gpio/ -I /op
+t/tinyos-2.x/tos/chips/at91/timer/ -I /opt/tinyos-2.x/tos/lib/timer/ -I /opt/tinyos-2.x/tos/lib/seri
+al/ -I /opt/tinyos-2.x/tos/interfaces/ -I /opt/tinyos-2.x/tos/types/ -I /opt/tinyos-2.x/tos/system/
+-mcpu=arm7tdmi -mfloat-abi=soft -DPLATFORM_NXTMOTE -DCC1K_DEF_FREQ=916700000 -DDEF_TOS_AM_GROUP=0x7d
+ -DNESC=128 -E -C -dD -x c -imacros /tmp/nesccppm1HqiFlb /opt/tinyos-2.x/tos/lib/timer/Timer.nc
+preprocessing /opt/tinyos-2.x/tos/interfaces/Leds.nc
+arm-elf-gcc -I /usr/lib/ncc/ -I ./ -I /opt/tinyos-2.x/tos/platforms/nxtmote/ -I /opt/tinyos-2.x/tos/
+platforms/nxtmote/ -I /opt/tinyos-2.x/tos/chips/at91/ -I /opt/tinyos-2.x/tos/chips/at91/gpio/ -I /op
+t/tinyos-2.x/tos/chips/at91/timer/ -I /opt/tinyos-2.x/tos/lib/timer/ -I /opt/tinyos-2.x/tos/lib/seri
+al/ -I /opt/tinyos-2.x/tos/interfaces/ -I /opt/tinyos-2.x/tos/types/ -I /opt/tinyos-2.x/tos/system/
+-mcpu=arm7tdmi -mfloat-abi=soft -DPLATFORM_NXTMOTE -DCC1K_DEF_FREQ=916700000 -DDEF_TOS_AM_GROUP=0x7d
+ -DNESC=128 -E -C -dD -x c -imacros /tmp/nesccppm2Mg6ouU /opt/tinyos-2.x/tos/interfaces/Leds.nc
+preprocessing /opt/tinyos-2.x/tos/system/LedsC.nc
+arm-elf-gcc -I /usr/lib/ncc/ -I ./ -I /opt/tinyos-2.x/tos/platforms/nxtmote/ -I /opt/tinyos-2.x/tos/
+platforms/nxtmote/ -I /opt/tinyos-2.x/tos/chips/at91/ -I /opt/tinyos-2.x/tos/chips/at91/gpio/ -I /op
+t/tinyos-2.x/tos/chips/at91/timer/ -I /opt/tinyos-2.x/tos/lib/timer/ -I /opt/tinyos-2.x/tos/lib/seri
+al/ -I /opt/tinyos-2.x/tos/interfaces/ -I /opt/tinyos-2.x/tos/types/ -I /opt/tinyos-2.x/tos/system/
+-mcpu=arm7tdmi -mfloat-abi=soft -DPLATFORM_NXTMOTE -DCC1K_DEF_FREQ=916700000 -DDEF_TOS_AM_GROUP=0x7d
+ -DNESC=128 -E -C -dD -x c -imacros /tmp/nesccppm1HqiFlb /opt/tinyos-2.x/tos/system/LedsC.nc
+preprocessing /opt/tinyos-2.x/tos/system/LedsP.nc
+arm-elf-gcc -I /usr/lib/ncc/ -I ./ -I /opt/tinyos-2.x/tos/platforms/nxtmote/ -I /opt/tinyos-2.x/tos/
+platforms/nxtmote/ -I /opt/tinyos-2.x/tos/chips/at91/ -I /opt/tinyos-2.x/tos/chips/at91/gpio/ -I /op
+t/tinyos-2.x/tos/chips/at91/timer/ -I /opt/tinyos-2.x/tos/lib/timer/ -I /opt/tinyos-2.x/tos/lib/seri
+al/ -I /opt/tinyos-2.x/tos/interfaces/ -I /opt/tinyos-2.x/tos/types/ -I /opt/tinyos-2.x/tos/system/
+-mcpu=arm7tdmi -mfloat-abi=soft -DPLATFORM_NXTMOTE -DCC1K_DEF_FREQ=916700000 -DDEF_TOS_AM_GROUP=0x7d
+ -DNESC=128 -E -C -dD -x c -imacros /tmp/nesccppm2Mg6ouU /opt/tinyos-2.x/tos/system/LedsP.nc
+preprocessing /opt/tinyos-2.x/tos/interfaces/GeneralIO.nc
+arm-elf-gcc -I /usr/lib/ncc/ -I ./ -I /opt/tinyos-2.x/tos/platforms/nxtmote/ -I /opt/tinyos-2.x/tos/
+platforms/nxtmote/ -I /opt/tinyos-2.x/tos/chips/at91/ -I /opt/tinyos-2.x/tos/chips/at91/gpio/ -I /op
+t/tinyos-2.x/tos/chips/at91/timer/ -I /opt/tinyos-2.x/tos/lib/timer/ -I /opt/tinyos-2.x/tos/lib/seri
+al/ -I /opt/tinyos-2.x/tos/interfaces/ -I /opt/tinyos-2.x/tos/types/ -I /opt/tinyos-2.x/tos/system/
+-mcpu=arm7tdmi -mfloat-abi=soft -DPLATFORM_NXTMOTE -DCC1K_DEF_FREQ=916700000 -DDEF_TOS_AM_GROUP=0x7d
+ -DNESC=128 -E -C -dD -x c -imacros /tmp/nesccppm1HqiFlb /opt/tinyos-2.x/tos/interfaces/GeneralIO.nc
+
+preprocessing /opt/tinyos-2.x/tos/platforms/nxtmote/PlatformLedsC.nc
+arm-elf-gcc -I /usr/lib/ncc/ -I ./ -I /opt/tinyos-2.x/tos/platforms/nxtmote/ -I /opt/tinyos-2.x/tos/
+platforms/nxtmote/ -I /opt/tinyos-2.x/tos/chips/at91/ -I /opt/tinyos-2.x/tos/chips/at91/gpio/ -I /op
+t/tinyos-2.x/tos/chips/at91/timer/ -I /opt/tinyos-2.x/tos/lib/timer/ -I /opt/tinyos-2.x/tos/lib/seri
+al/ -I /opt/tinyos-2.x/tos/interfaces/ -I /opt/tinyos-2.x/tos/types/ -I /opt/tinyos-2.x/tos/system/
+-mcpu=arm7tdmi -mfloat-abi=soft -DPLATFORM_NXTMOTE -DCC1K_DEF_FREQ=916700000 -DDEF_TOS_AM_GROUP=0x7d
+ -DNESC=128 -E -C -dD -x c -imacros /tmp/nesccppm2Mg6ouU /opt/tinyos-2.x/tos/platforms/nxtmote/Platf
+ormLedsC.nc
+preprocessing /opt/tinyos-2.x/tos/chips/at91/gpio/GeneralIOC.nc
+arm-elf-gcc -I /usr/lib/ncc/ -I ./ -I /opt/tinyos-2.x/tos/platforms/nxtmote/ -I /opt/tinyos-2.x/tos/
+platforms/nxtmote/ -I /opt/tinyos-2.x/tos/chips/at91/ -I /opt/tinyos-2.x/tos/chips/at91/gpio/ -I /op
+t/tinyos-2.x/tos/chips/at91/timer/ -I /opt/tinyos-2.x/tos/lib/timer/ -I /opt/tinyos-2.x/tos/lib/seri
+al/ -I /opt/tinyos-2.x/tos/interfaces/ -I /opt/tinyos-2.x/tos/types/ -I /opt/tinyos-2.x/tos/system/
+-mcpu=arm7tdmi -mfloat-abi=soft -DPLATFORM_NXTMOTE -DCC1K_DEF_FREQ=916700000 -DDEF_TOS_AM_GROUP=0x7d
+ -DNESC=128 -E -C -dD -x c -imacros /tmp/nesccppm1HqiFlb /opt/tinyos-2.x/tos/chips/at91/gpio/General
+IOC.nc
+preprocessing /opt/tinyos-2.x/tos/chips/at91/gpio/HalAT91_GeneralIOM.nc
+arm-elf-gcc -I /usr/lib/ncc/ -I ./ -I /opt/tinyos-2.x/tos/platforms/nxtmote/ -I /opt/tinyos-2.x/tos/
+platforms/nxtmote/ -I /opt/tinyos-2.x/tos/chips/at91/ -I /opt/tinyos-2.x/tos/chips/at91/gpio/ -I /op
+t/tinyos-2.x/tos/chips/at91/timer/ -I /opt/tinyos-2.x/tos/lib/timer/ -I /opt/tinyos-2.x/tos/lib/seri
+al/ -I /opt/tinyos-2.x/tos/interfaces/ -I /opt/tinyos-2.x/tos/types/ -I /opt/tinyos-2.x/tos/system/
+-mcpu=arm7tdmi -mfloat-abi=soft -DPLATFORM_NXTMOTE -DCC1K_DEF_FREQ=916700000 -DDEF_TOS_AM_GROUP=0x7d
+ -DNESC=128 -E -C -dD -x c -imacros /tmp/nesccppm2Mg6ouU /opt/tinyos-2.x/tos/chips/at91/gpio/HalAT91
+_GeneralIOM.nc
+preprocessing /opt/tinyos-2.x/tos/chips/at91/HplAT91_GPIOPin.nc
+arm-elf-gcc -I /usr/lib/ncc/ -I ./ -I /opt/tinyos-2.x/tos/platforms/nxtmote/ -I /opt/tinyos-2.x/tos/
+platforms/nxtmote/ -I /opt/tinyos-2.x/tos/chips/at91/ -I /opt/tinyos-2.x/tos/chips/at91/gpio/ -I /op
+t/tinyos-2.x/tos/chips/at91/timer/ -I /opt/tinyos-2.x/tos/lib/timer/ -I /opt/tinyos-2.x/tos/lib/seri
+al/ -I /opt/tinyos-2.x/tos/interfaces/ -I /opt/tinyos-2.x/tos/types/ -I /opt/tinyos-2.x/tos/system/
+-mcpu=arm7tdmi -mfloat-abi=soft -DPLATFORM_NXTMOTE -DCC1K_DEF_FREQ=916700000 -DDEF_TOS_AM_GROUP=0x7d
+ -DNESC=128 -E -C -dD -x c -imacros /tmp/nesccppm1HqiFlb /opt/tinyos-2.x/tos/chips/at91/HplAT91_GPIO
+Pin.nc
+preprocessing /opt/tinyos-2.x/tos/chips/at91/gpio/HplAT91_GPIOC.nc
+arm-elf-gcc -I /usr/lib/ncc/ -I ./ -I /opt/tinyos-2.x/tos/platforms/nxtmote/ -I /opt/tinyos-2.x/tos/
+platforms/nxtmote/ -I /opt/tinyos-2.x/tos/chips/at91/ -I /opt/tinyos-2.x/tos/chips/at91/gpio/ -I /op
+t/tinyos-2.x/tos/chips/at91/timer/ -I /opt/tinyos-2.x/tos/lib/timer/ -I /opt/tinyos-2.x/tos/lib/seri
+al/ -I /opt/tinyos-2.x/tos/interfaces/ -I /opt/tinyos-2.x/tos/types/ -I /opt/tinyos-2.x/tos/system/
+-mcpu=arm7tdmi -mfloat-abi=soft -DPLATFORM_NXTMOTE -DCC1K_DEF_FREQ=916700000 -DDEF_TOS_AM_GROUP=0x7d
+ -DNESC=128 -E -C -dD -x c -imacros /tmp/nesccppm2Mg6ouU /opt/tinyos-2.x/tos/chips/at91/gpio/HplAT91
+_GPIOC.nc
+preprocessing /opt/tinyos-2.x/tos/chips/at91/gpio/HplAT91_GPIOM.nc
+arm-elf-gcc -I /usr/lib/ncc/ -I ./ -I /opt/tinyos-2.x/tos/platforms/nxtmote/ -I /opt/tinyos-2.x/tos/
+platforms/nxtmote/ -I /opt/tinyos-2.x/tos/chips/at91/ -I /opt/tinyos-2.x/tos/chips/at91/gpio/ -I /op
+t/tinyos-2.x/tos/chips/at91/timer/ -I /opt/tinyos-2.x/tos/lib/timer/ -I /opt/tinyos-2.x/tos/lib/seri
+al/ -I /opt/tinyos-2.x/tos/interfaces/ -I /opt/tinyos-2.x/tos/types/ -I /opt/tinyos-2.x/tos/system/
+-mcpu=arm7tdmi -mfloat-abi=soft -DPLATFORM_NXTMOTE -DCC1K_DEF_FREQ=916700000 -DDEF_TOS_AM_GROUP=0x7d
+ -DNESC=128 -E -C -dD -x c -imacros /tmp/nesccppm1HqiFlb /opt/tinyos-2.x/tos/chips/at91/gpio/HplAT91
+_GPIOM.nc
+preprocessing /opt/tinyos-2.x/tos/system/TimerMilliC.nc
+arm-elf-gcc -I /usr/lib/ncc/ -I ./ -I /opt/tinyos-2.x/tos/platforms/nxtmote/ -I /opt/tinyos-2.x/tos/
+platforms/nxtmote/ -I /opt/tinyos-2.x/tos/chips/at91/ -I /opt/tinyos-2.x/tos/chips/at91/gpio/ -I /op
+t/tinyos-2.x/tos/chips/at91/timer/ -I /opt/tinyos-2.x/tos/lib/timer/ -I /opt/tinyos-2.x/tos/lib/seri
+al/ -I /opt/tinyos-2.x/tos/interfaces/ -I /opt/tinyos-2.x/tos/types/ -I /opt/tinyos-2.x/tos/system/
+-mcpu=arm7tdmi -mfloat-abi=soft -DPLATFORM_NXTMOTE -DCC1K_DEF_FREQ=916700000 -DDEF_TOS_AM_GROUP=0x7d
+ -DNESC=128 -E -C -dD -x c -imacros /tmp/nesccppm2Mg6ouU /opt/tinyos-2.x/tos/system/TimerMilliC.nc
+preprocessing /opt/tinyos-2.x/tos/system/TimerMilliP.nc
+arm-elf-gcc -I /usr/lib/ncc/ -I ./ -I /opt/tinyos-2.x/tos/platforms/nxtmote/ -I /opt/tinyos-2.x/tos/
+platforms/nxtmote/ -I /opt/tinyos-2.x/tos/chips/at91/ -I /opt/tinyos-2.x/tos/chips/at91/gpio/ -I /op
+t/tinyos-2.x/tos/chips/at91/timer/ -I /opt/tinyos-2.x/tos/lib/timer/ -I /opt/tinyos-2.x/tos/lib/seri
+al/ -I /opt/tinyos-2.x/tos/interfaces/ -I /opt/tinyos-2.x/tos/types/ -I /opt/tinyos-2.x/tos/system/
+-mcpu=arm7tdmi -mfloat-abi=soft -DPLATFORM_NXTMOTE -DCC1K_DEF_FREQ=916700000 -DDEF_TOS_AM_GROUP=0x7d
+ -DNESC=128 -E -C -dD -x c -imacros /tmp/nesccppm1HqiFlb /opt/tinyos-2.x/tos/system/TimerMilliP.nc
+preprocessing /opt/tinyos-2.x/tos/platforms/nxtmote/HilTimerMilliC.nc
+arm-elf-gcc -I /usr/lib/ncc/ -I ./ -I /opt/tinyos-2.x/tos/platforms/nxtmote/ -I /opt/tinyos-2.x/tos/
+platforms/nxtmote/ -I /opt/tinyos-2.x/tos/chips/at91/ -I /opt/tinyos-2.x/tos/chips/at91/gpio/ -I /op
+t/tinyos-2.x/tos/chips/at91/timer/ -I /opt/tinyos-2.x/tos/lib/timer/ -I /opt/tinyos-2.x/tos/lib/seri
+al/ -I /opt/tinyos-2.x/tos/interfaces/ -I /opt/tinyos-2.x/tos/types/ -I /opt/tinyos-2.x/tos/system/
+-mcpu=arm7tdmi -mfloat-abi=soft -DPLATFORM_NXTMOTE -DCC1K_DEF_FREQ=916700000 -DDEF_TOS_AM_GROUP=0x7d
+ -DNESC=128 -E -C -dD -x c -imacros /tmp/nesccppm2Mg6ouU /opt/tinyos-2.x/tos/platforms/nxtmote/HilTi
+merMilliC.nc
+preprocessing /opt/tinyos-2.x/tos/lib/timer/VirtualizeTimerC.nc
+arm-elf-gcc -I /usr/lib/ncc/ -I ./ -I /opt/tinyos-2.x/tos/platforms/nxtmote/ -I /opt/tinyos-2.x/tos/
+platforms/nxtmote/ -I /opt/tinyos-2.x/tos/chips/at91/ -I /opt/tinyos-2.x/tos/chips/at91/gpio/ -I /op
+t/tinyos-2.x/tos/chips/at91/timer/ -I /opt/tinyos-2.x/tos/lib/timer/ -I /opt/tinyos-2.x/tos/lib/seri
+al/ -I /opt/tinyos-2.x/tos/interfaces/ -I /opt/tinyos-2.x/tos/types/ -I /opt/tinyos-2.x/tos/system/
+-mcpu=arm7tdmi -mfloat-abi=soft -DPLATFORM_NXTMOTE -DCC1K_DEF_FREQ=916700000 -DDEF_TOS_AM_GROUP=0x7d
+ -DNESC=128 -E -C -dD -x c -imacros /tmp/nesccppm1HqiFlb /opt/tinyos-2.x/tos/lib/timer/VirtualizeTim
+erC.nc
+preprocessing /opt/tinyos-2.x/tos/lib/timer/AlarmToTimerC.nc
+arm-elf-gcc -I /usr/lib/ncc/ -I ./ -I /opt/tinyos-2.x/tos/platforms/nxtmote/ -I /opt/tinyos-2.x/tos/
+platforms/nxtmote/ -I /opt/tinyos-2.x/tos/chips/at91/ -I /opt/tinyos-2.x/tos/chips/at91/gpio/ -I /op
+t/tinyos-2.x/tos/chips/at91/timer/ -I /opt/tinyos-2.x/tos/lib/timer/ -I /opt/tinyos-2.x/tos/lib/seri
+al/ -I /opt/tinyos-2.x/tos/interfaces/ -I /opt/tinyos-2.x/tos/types/ -I /opt/tinyos-2.x/tos/system/
+-mcpu=arm7tdmi -mfloat-abi=soft -DPLATFORM_NXTMOTE -DCC1K_DEF_FREQ=916700000 -DDEF_TOS_AM_GROUP=0x7d
+ -DNESC=128 -E -C -dD -x c -imacros /tmp/nesccppm2Mg6ouU /opt/tinyos-2.x/tos/lib/timer/AlarmToTimerC
+.nc
+preprocessing /opt/tinyos-2.x/tos/lib/timer/Alarm.nc
+arm-elf-gcc -I /usr/lib/ncc/ -I ./ -I /opt/tinyos-2.x/tos/platforms/nxtmote/ -I /opt/tinyos-2.x/tos/
+platforms/nxtmote/ -I /opt/tinyos-2.x/tos/chips/at91/ -I /opt/tinyos-2.x/tos/chips/at91/gpio/ -I /op
+t/tinyos-2.x/tos/chips/at91/timer/ -I /opt/tinyos-2.x/tos/lib/timer/ -I /opt/tinyos-2.x/tos/lib/seri
+al/ -I /opt/tinyos-2.x/tos/interfaces/ -I /opt/tinyos-2.x/tos/types/ -I /opt/tinyos-2.x/tos/system/
+-mcpu=arm7tdmi -mfloat-abi=soft -DPLATFORM_NXTMOTE -DCC1K_DEF_FREQ=916700000 -DDEF_TOS_AM_GROUP=0x7d
+ -DNESC=128 -E -C -dD -x c -imacros /tmp/nesccppm1HqiFlb /opt/tinyos-2.x/tos/lib/timer/Alarm.nc
+preprocessing /opt/tinyos-2.x/tos/chips/at91/timer/HalAT91AlarmM.nc
+arm-elf-gcc -I /usr/lib/ncc/ -I ./ -I /opt/tinyos-2.x/tos/platforms/nxtmote/ -I /opt/tinyos-2.x/tos/
+platforms/nxtmote/ -I /opt/tinyos-2.x/tos/chips/at91/ -I /opt/tinyos-2.x/tos/chips/at91/gpio/ -I /op
+t/tinyos-2.x/tos/chips/at91/timer/ -I /opt/tinyos-2.x/tos/lib/timer/ -I /opt/tinyos-2.x/tos/lib/seri
+al/ -I /opt/tinyos-2.x/tos/interfaces/ -I /opt/tinyos-2.x/tos/types/ -I /opt/tinyos-2.x/tos/system/
+-mcpu=arm7tdmi -mfloat-abi=soft -DPLATFORM_NXTMOTE -DCC1K_DEF_FREQ=916700000 -DDEF_TOS_AM_GROUP=0x7d
+ -DNESC=128 -E -C -dD -x c -imacros /tmp/nesccppm2Mg6ouU /opt/tinyos-2.x/tos/chips/at91/timer/HalAT9
+1AlarmM.nc
+preprocessing /opt/tinyos-2.x/tos/chips/at91/timer/HplAT91OSTimer.nc
+arm-elf-gcc -I /usr/lib/ncc/ -I ./ -I /opt/tinyos-2.x/tos/platforms/nxtmote/ -I /opt/tinyos-2.x/tos/
+platforms/nxtmote/ -I /opt/tinyos-2.x/tos/chips/at91/ -I /opt/tinyos-2.x/tos/chips/at91/gpio/ -I /op
+t/tinyos-2.x/tos/chips/at91/timer/ -I /opt/tinyos-2.x/tos/lib/timer/ -I /opt/tinyos-2.x/tos/lib/seri
+al/ -I /opt/tinyos-2.x/tos/interfaces/ -I /opt/tinyos-2.x/tos/types/ -I /opt/tinyos-2.x/tos/system/
+-mcpu=arm7tdmi -mfloat-abi=soft -DPLATFORM_NXTMOTE -DCC1K_DEF_FREQ=916700000 -DDEF_TOS_AM_GROUP=0x7d
+ -DNESC=128 -E -C -dD -x c -imacros /tmp/nesccppm1HqiFlb /opt/tinyos-2.x/tos/chips/at91/timer/HplAT9
+1OSTimer.nc
+preprocessing /opt/tinyos-2.x/tos/chips/at91/timer/HalAT91OSTimerMapC.nc
+arm-elf-gcc -I /usr/lib/ncc/ -I ./ -I /opt/tinyos-2.x/tos/platforms/nxtmote/ -I /opt/tinyos-2.x/tos/
+platforms/nxtmote/ -I /opt/tinyos-2.x/tos/chips/at91/ -I /opt/tinyos-2.x/tos/chips/at91/gpio/ -I /op
+t/tinyos-2.x/tos/chips/at91/timer/ -I /opt/tinyos-2.x/tos/lib/timer/ -I /opt/tinyos-2.x/tos/lib/seri
+al/ -I /opt/tinyos-2.x/tos/interfaces/ -I /opt/tinyos-2.x/tos/types/ -I /opt/tinyos-2.x/tos/system/
+-mcpu=arm7tdmi -mfloat-abi=soft -DPLATFORM_NXTMOTE -DCC1K_DEF_FREQ=916700000 -DDEF_TOS_AM_GROUP=0x7d
+ -DNESC=128 -E -C -dD -x c -imacros /tmp/nesccppm2Mg6ouU /opt/tinyos-2.x/tos/chips/at91/timer/HalAT9
+1OSTimerMapC.nc
+preprocessing /opt/tinyos-2.x/tos/chips/at91/timer/HplAT91OSTimerC.nc
+arm-elf-gcc -I /usr/lib/ncc/ -I ./ -I /opt/tinyos-2.x/tos/platforms/nxtmote/ -I /opt/tinyos-2.x/tos/
+platforms/nxtmote/ -I /opt/tinyos-2.x/tos/chips/at91/ -I /opt/tinyos-2.x/tos/chips/at91/gpio/ -I /op
+t/tinyos-2.x/tos/chips/at91/timer/ -I /opt/tinyos-2.x/tos/lib/timer/ -I /opt/tinyos-2.x/tos/lib/seri
+al/ -I /opt/tinyos-2.x/tos/interfaces/ -I /opt/tinyos-2.x/tos/types/ -I /opt/tinyos-2.x/tos/system/
+-mcpu=arm7tdmi -mfloat-abi=soft -DPLATFORM_NXTMOTE -DCC1K_DEF_FREQ=916700000 -DDEF_TOS_AM_GROUP=0x7d
+ -DNESC=128 -E -C -dD -x c -imacros /tmp/nesccppm1HqiFlb /opt/tinyos-2.x/tos/chips/at91/timer/HplAT9
+1OSTimerC.nc
+preprocessing /opt/tinyos-2.x/tos/chips/at91/timer/HplAT91OSTimerM.nc
+arm-elf-gcc -I /usr/lib/ncc/ -I ./ -I /opt/tinyos-2.x/tos/platforms/nxtmote/ -I /opt/tinyos-2.x/tos/
+platforms/nxtmote/ -I /opt/tinyos-2.x/tos/chips/at91/ -I /opt/tinyos-2.x/tos/chips/at91/gpio/ -I /op
+t/tinyos-2.x/tos/chips/at91/timer/ -I /opt/tinyos-2.x/tos/lib/timer/ -I /opt/tinyos-2.x/tos/lib/seri
+al/ -I /opt/tinyos-2.x/tos/interfaces/ -I /opt/tinyos-2.x/tos/types/ -I /opt/tinyos-2.x/tos/system/
+-mcpu=arm7tdmi -mfloat-abi=soft -DPLATFORM_NXTMOTE -DCC1K_DEF_FREQ=916700000 -DDEF_TOS_AM_GROUP=0x7d
+ -DNESC=128 -E -C -dD -x c -imacros /tmp/nesccppm2Mg6ouU /opt/tinyos-2.x/tos/chips/at91/timer/HplAT9
+1OSTimerM.nc
+preprocessing /opt/tinyos-2.x/tos/chips/at91/HplAT91Interrupt.nc
+arm-elf-gcc -I /usr/lib/ncc/ -I ./ -I /opt/tinyos-2.x/tos/platforms/nxtmote/ -I /opt/tinyos-2.x/tos/
+platforms/nxtmote/ -I /opt/tinyos-2.x/tos/chips/at91/ -I /opt/tinyos-2.x/tos/chips/at91/gpio/ -I /op
+t/tinyos-2.x/tos/chips/at91/timer/ -I /opt/tinyos-2.x/tos/lib/timer/ -I /opt/tinyos-2.x/tos/lib/seri
+al/ -I /opt/tinyos-2.x/tos/interfaces/ -I /opt/tinyos-2.x/tos/types/ -I /opt/tinyos-2.x/tos/system/
+-mcpu=arm7tdmi -mfloat-abi=soft -DPLATFORM_NXTMOTE -DCC1K_DEF_FREQ=916700000 -DDEF_TOS_AM_GROUP=0x7d
+ -DNESC=128 -E -C -dD -x c -imacros /tmp/nesccppm1HqiFlb /opt/tinyos-2.x/tos/chips/at91/HplAT91Inter
+rupt.nc
+preprocessing /opt/tinyos-2.x/tos/chips/at91/HplAT91InterruptM.nc
+arm-elf-gcc -I /usr/lib/ncc/ -I ./ -I /opt/tinyos-2.x/tos/platforms/nxtmote/ -I /opt/tinyos-2.x/tos/
+platforms/nxtmote/ -I /opt/tinyos-2.x/tos/chips/at91/ -I /opt/tinyos-2.x/tos/chips/at91/gpio/ -I /op
+t/tinyos-2.x/tos/chips/at91/timer/ -I /opt/tinyos-2.x/tos/lib/timer/ -I /opt/tinyos-2.x/tos/lib/seri
+al/ -I /opt/tinyos-2.x/tos/interfaces/ -I /opt/tinyos-2.x/tos/types/ -I /opt/tinyos-2.x/tos/system/
+-mcpu=arm7tdmi -mfloat-abi=soft -DPLATFORM_NXTMOTE -DCC1K_DEF_FREQ=916700000 -DDEF_TOS_AM_GROUP=0x7d
+ -DNESC=128 -E -C -dD -x c -imacros /tmp/nesccppm2Mg6ouU /opt/tinyos-2.x/tos/chips/at91/HplAT91Inter
+ruptM.nc
+/opt/tinyos-2.x/tos/chips/at91/timer/HalAT91AlarmM.nc(HilTimerMilliC.PhysAlarmMilli32):60: warning:
+non-atomic accesses to shared variable `mTf':
+/opt/tinyos-2.x/tos/chips/at91/timer/HalAT91AlarmM.nc(HilTimerMilliC.PhysAlarmMilli32):156: warning:
+   non-atomic read
+/opt/tinyos-2.x/tos/chips/at91/timer/HalAT91AlarmM.nc(HilTimerMilliC.PhysAlarmMilli32):164: warning:
+   non-atomic read
+/opt/tinyos-2.x/tos/chips/at91/timer/HalAT91AlarmM.nc(HilTimerMilliC.PhysAlarmMilli32):62: warning:
+non-atomic accesses to shared variable `mTc':
+/opt/tinyos-2.x/tos/chips/at91/timer/HalAT91AlarmM.nc(HilTimerMilliC.PhysAlarmMilli32):152: warning:
+   non-atomic read
+/opt/tinyos-2.x/tos/chips/at91/timer/HalAT91AlarmM.nc(HilTimerMilliC.PhysAlarmMilli32):164: warning:
+   non-atomic read
+/opt/tinyos-2.x/tos/chips/at91/timer/HalAT91AlarmM.nc(HilTimerMilliC.PhysAlarmMilli32):165: warning:
+   non-atomic r/w
+arm-elf-gcc -B/usr/lib/ncc -mcpu=arm7tdmi -mfloat-abi=soft -g -Os -Wall -Wshadow -Wall -v -Wa,-adhln
+s=app.lst -o BlinkAppC.o -c -fdollars-in-identifiers build/nxtmote/app.c
+Using built-in specs.
+Target: arm-elf
+Configured with: /usr/src/rpm/BUILD/arm-elf-gcc-4.1.2/configure --target=arm-elf --prefix=/var/tmp/a
+rm-elf-gcc-root/usr --with-newlib --enable-languages=c --enable-interwork --enable-multilib --with-f
+loat=soft
+Thread model: single
+gcc version 4.1.2
+ /var/tmp/arm-elf-gcc-root/usr/libexec/gcc/arm-elf/4.1.2/cc1.exe -quiet -v -iprefix /usr/bin/../lib/
+gcc/arm-elf/4.1.2/ -D__USES_INITFINI__ build/nxtmote/app.c -quiet -dumpbase app.c -mcpu=arm7tdmi -mf
+loat-abi=soft -auxbase-strip BlinkAppC.o -g -Os -Wall -Wshadow -Wall -version -fdollars-in-identifie
+rs -o /cygdrive/c/DOCUME~1/RUPINF~1.RUP/LOCALS~1/Temp/cczpjNbN.s
+ignoring nonexistent directory "/usr/bin/../lib/gcc/arm-elf/4.1.2/../../../../arm-elf/sys-include"
+ignoring nonexistent directory "/var/tmp/arm-elf-gcc-root/usr/lib/gcc/arm-elf/4.1.2/../../../../arm-
+elf/sys-include"
+#include "..." search starts here:
+#include <...> search starts here:
+ /usr/bin/../lib/gcc/arm-elf/4.1.2/include
+ /usr/bin/../lib/gcc/arm-elf/4.1.2/../../../../arm-elf/include
+ /var/tmp/arm-elf-gcc-root/usr/lib/gcc/arm-elf/4.1.2/include
+ /var/tmp/arm-elf-gcc-root/usr/lib/gcc/arm-elf/4.1.2/../../../../arm-elf/include
+End of search list.
+GNU C version 4.1.2 (arm-elf)
+        compiled by GNU C version 3.3.3 (cygwin special).
+GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+Compiler executable checksum: a2808b3a59e9c5351d0fb47adf3b12b3
+/opt/tinyos-2.x/tos/platforms/nxtmote/hardware.h:157: warning: initialization makes integer from poi
+nter without a cast
+/opt/tinyos-2.x/tos/platforms/nxtmote/hardware.h:158: warning: initialization makes integer from poi
+nter without a cast
+/opt/tinyos-2.x/tos/platforms/nxtmote/hardware.h:159: warning: initialization makes integer from poi
+nter without a cast
+/opt/tinyos-2.x/tos/platforms/nxtmote/hardware.h: In function '__nesc_atomic_start':
+/opt/tinyos-2.x/tos/platforms/nxtmote/hardware.h:50: warning: unused variable 'temp'
+/opt/tinyos-2.x/tos/platforms/nxtmote/hardware.h: In function '__nesc_atomic_end':
+/opt/tinyos-2.x/tos/platforms/nxtmote/hardware.h:64: warning: unused variable 'statusReg'
+ /usr/bin/../lib/gcc/arm-elf/4.1.2/../../../../arm-elf/bin/as.exe -mcpu=arm7tdmi -mfloat-abi=soft -a
+dhlns=app.lst -o BlinkAppC.o /cygdrive/c/DOCUME~1/RUPINF~1.RUP/LOCALS~1/Temp/cczpjNbN.s
+ /usr/bin/../libexec/gcc/arm-elf/4.1.2/collect2.exe -X -o build/nxtmote/main.exe -L/usr/bin/../lib/g
+cc/arm-elf/4.1.2 -L/usr/bin/../lib/gcc -L/var/tmp/arm-elf-gcc-root/usr/lib/gcc/arm-elf/4.1.2 -L/usr/
+lib/gcc/arm-elf/4.1.2 -L/usr/bin/../lib/gcc/arm-elf/4.1.2/../../../../arm-elf/lib -L/var/tmp/arm-elf
+-gcc-root/usr/lib/gcc/arm-elf/4.1.2/../../../../arm-elf/lib BlinkAppC.o -lm build/nxtmote/Cstartup.o
+ --start-group -lgcc -lg -lc --end-group -T/opt/tinyos-2.x/tos/platforms/nxtmote/AT91SAM7S256-ROM.ld
+
+    compiled BlinkAppC to build/nxtmote/main.exe
+    Converting from ELF to hex and binary
+arm-elf-objcopy -O ihex build/nxtmote/main.exe build/nxtmote/main.hex
+arm-elf-objcopy -O binary -v build/nxtmote/main.exe build/nxtmote/main.bin
+copy from `build/nxtmote/main.exe' [elf32-littlearm] to `build/nxtmote/main.bin' [binary]
+            2372 bytes in ROM
+             204 bytes in RAM

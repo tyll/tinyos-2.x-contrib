@@ -1,0 +1,109 @@
+                  LibNXT and FwFlash
+                        v0.2
+                    David Anderson
+                 ====================
+
+What?
+=====
+
+LibNXT is setting out to be a full NXT control library for a host
+computer to talk a Lego Mindstorms NXT intelligent brick.  This
+includes:
+
+ - Handling USB communication and locating the NXT in the USB tree,
+ - Interaction with the Atmel AT91SAM boot assistant; especially:
+ - Flashing of a firmware image to the NXT
+
+Currently planned features:
+
+ - Interaction with the official firmware (called NxtOS here)
+ - Language bindings to various higher-level languages (C++, Perl,
+   Python, Java, Lua, ...)
+
+(If you have ideas of other stuff, please send it in!)
+
+LibNXT is targetted at the platforms that the official Lego Minstorms
+NXT software overlooks. Specifically, it will work on any
+POSIX-compliant operating system where libusb 0.1
+(http://libusb.sf.net/) is supported.
+
+The design of LibNXT is layered, meaning you can plug into it at any
+level of complexity or abstraction you desire, from the lowest level
+USB bulk bit-pushing interface, to an API exposing the SAM-BA
+commandset, right up to just calling nxt_firmware_flash() and having
+everything taken care of!
+
+
+FwFlash is the first utility program that uses LibNXT. As its name
+hints, its purpose is to take a NXT firmware image file and flash it
+to a connected NXT device.
+
+
+Who?
+====
+
+Uh, that would be me. David Anderson, linux/open source developer and
+enthusiast, and an MDP participant :-).
+
+When?
+=====
+
+Started the day after receiving the NXT kit, I started by working out
+the firmware flashing procedure from the specs and a USB dump of the
+windows software at work. Since then, after obtaining a
+proof-of-concept application, I've been implementing this library to
+abstract the horrors of low-level USB chatter into a nice, clean
+library.
+
+ - Release 0.2 (17/03/2006) : firmware flashing is now done entirely
+                with open source code. The flash driver routine has
+                been replaced with open source code implementing the
+                flashing procedure.
+
+ - Release 0.1.1 (10/03/2006) : add big-endian host arch support, and
+                make the firmware image reading process a little less
+                linux-centric (use of the posix open/read/close API
+                instead of mmap).
+
+ - Release 0.1 (10/03/2006) : featuring the FwFlash utility and a
+                LibNXT with just enough API in it to get FwFlash
+                working :-)
+
+How?
+====
+
+To compile all of this you'll need a copy of libusb 0.1 on your
+system, as well as the scons project manager.
+
+ - Libusb 0.1: http://libusb.sf.net/
+ - Scons: http://www.scons.org/
+
+When you have all that, just run 'scons' in the libnxt directory, and
+compilation should follow. Once you're done, you can try fwflash out
+by resetting your NXT (see your user manual for details on this) and
+running:
+
+./fwflash nxtos.bin
+
+nxtos.bin is the official Lego Mindstorms NXT firmware RC0, bundled in
+this package for convenience. You can take the one on your current
+installation of the Mindstorms software, they are the same file.
+
+If all goes well, fwflash should inform you that it has found the NXT
+on your USB device bus, and that flashing has started. After a few
+seconds, it should announce successful flashing, and say that it has
+booted the new firmware, which should be answered by the greeting
+sound of NxtOS as the brick starts up :-).
+
+If it doesn't, well it's either a problem with your USB device
+permissions (if fwflash can't find the NXT), or it's a bug (if the brick
+doesn't reboot properly, or if some weird error is reported by fwflash
+and it bombs out.
+
+The release tarball comes with a 'flash.bin'. This file is the
+compiled version of the open onboard flash driver. If you want to
+rebuild this file yourself, you'll need an ARM cross-compiling
+toolchain, such as the one provided by the excellent Scratchbox
+project (http://www.scratchbox.org/). Once you have it set up one way
+or another, cd to the flash_write directory and type 'make' to produce
+the flash driver binary.

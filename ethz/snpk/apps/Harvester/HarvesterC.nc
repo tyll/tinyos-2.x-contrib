@@ -24,16 +24,21 @@ implementation {
   	LedsC,
   	new TimerMilliC(), 
   	new TimerMilliC() as TreeInfoTimer,
-  	new TimerMilliC() as SendWatchdogTimer,
-    new DemoSensorC() as Sensor,
-  	DSNC;
-
+    //new DemoSensorC() as Sensor,
+    //new SensirionSht11C() as Sensor,
+    new SensirionSht71C() as Sensor,
+  	DSNC,
+  	new DsnCommandC("set lpl", uint16_t , 1) as LplCommand;
+  	
+  LplCommand.DSN->DSNC;
   HarvesterP.DSN -> DSNC;
+  HarvesterP.LplCommand->LplCommand;
+
   
   HarvesterP.Boot -> MainC;
   HarvesterP.Timer -> TimerMilliC;
   HarvesterP.TreeInfoTimer -> TreeInfoTimer;
-  HarvesterP.Read -> Sensor;
+  HarvesterP.Read -> Sensor.Temperature;
   HarvesterP.Leds -> LedsC;
 
   //
@@ -90,5 +95,8 @@ implementation {
   	new TimerMilliC() as LoadTimer;
   HarvesterP.ReadCpuLoad->TraceSchedulerC;
   HarvesterP.LoadTimer->LoadTimer;
+  
+  components CC2420DutyCycleC;
+  HarvesterP.CC2420DutyCycle->CC2420DutyCycleC;
 
 }

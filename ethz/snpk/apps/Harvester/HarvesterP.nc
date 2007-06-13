@@ -38,7 +38,8 @@ module HarvesterP {
     interface Leds;
     
     // DSN
-    interface DSN;
+    interface DSNx;
+    interface DsnCommand<uint16_t> as LplCommand;
     
     // TreeInfo
     interface CtpInfo;
@@ -52,6 +53,7 @@ module HarvesterP {
     
     interface Read<uint16_t> as ReadCpuLoad;
     interface Timer<TMilli> as LoadTimer;
+    interface CC2420DutyCycle;
   }
 }
 
@@ -87,11 +89,13 @@ implementation {
   bool backoff_signaled=FALSE;
   uint32_t packet_send, packet_backoff, packet_senddone;
   
+  uint32_t cpuLoadSum=0;
+  uint16_t cpuLoadSamples=0;
+  
   enum {
   	S_BOOTUP,
   	S_RUNNING
   };
-  
   uint8_t state=S_BOOTUP;
   
   //tasks
@@ -106,9 +110,7 @@ implementation {
   // own state variables.
   //
   event void Boot.booted() {
-    local.interval = DEFAULT_INTERVAL;
     local.id = TOS_NODE_ID;
-    local.version = 0;
     
     call DSN.logInt(call AMPacket.address());
     call DSN.logInfo("Node %i booted");
@@ -155,26 +157,23 @@ implementation {
     }
 
     // This is how to set yourself as a root to the collection layer:
-    if (local.id == 0) {
+    if (local.id == 0 || local.id == 111 ) {
       call RootControl.setRoot();
       call LowPowerListening.setLocalSleepInterval(0);
-#if USART==1
-	  call DSN.stopLog();
-#endif
     }
     else
     	call SerialControl.stop();
 	state=S_RUNNING;
 	// start periodic actions
-	// startTimer();
+	//startTimer();
     call TreeInfoTimer.startPeriodic(TREEINFO_INT);
-    call LoadTimer.startPeriodic(2048);
+    //call LoadTimer.startPeriodic(2048);
   }
 
   static void startTimer() {
   	m_state=__FUNCTION__;
     if (call Timer.isRunning()) call Timer.stop();
-    call Timer.startPeriodic(local.interval);
+    call Timer.startPeriodic(SAMPLING_INTERVAL);
     reading = 0;
   }
 
@@ -227,11 +226,11 @@ implementation {
 
   task void uartSendTask() {
   // get packet from queue and send it
-	message_t * uartMsg=call UARTQueue.dequeue();
+  message_t * uartMsg=call UARTQueue.dequeue();
 	m_state=__FUNCTION__; 
 	if (uartMsg!=NULL) {
 		uint8_t type=call SerialAMPacket.type(uartMsg);
-		e=call SerialSend.send[type](0xffff, uartMsg, call SerialPacket.payloadLength(uartMsg));
+		e=call SerialSend.send[type](local.id, uartMsg, call SerialPacket.payloadLength(uartMsg));
 	    if (e != SUCCESS) {
     	  report_problem();
     	  call DSN.logError("UART msg to stack failed");
@@ -277,29 +276,20 @@ implementation {
      - read next sample
   */
   event void Timer.fired() {
-  	m_state=__FUNCTION__;
-    if (reading == NREADINGS) {
-    	if (!sendbusy) {
-			harvester_t *o = (harvester_t *)call Send.getPayload(&sendbuf);
-			memcpy(o, &local, sizeof(local));
-			if (call Send.send(&sendbuf, sizeof(local)) == SUCCESS)
-	  			sendbusy = TRUE;
-        	else {
-        		report_problem();
-      	  		call DSN.logError("Send Sensordata radio stack failed");
-        	}
-      	}
-      	else {
-  			call DSN.logError("Radio busy while sending SensorData");
-      	}  	
-      	reading = 0;
-      	/* Part 2 of cheap "time sync": increment our count if we didn't
-         jump ahead. */
-      	if (!suppress_count_change)
-        	local.count++;
-      	suppress_count_change = FALSE;
+   	if (!sendbusy) {
+		harvester_t *o = (harvester_t *)call Send.getPayload(&sendbuf);
+		local.dsn++;
+		memcpy(o, &local, sizeof(local));
+		if (call Send.send(&sendbuf, sizeof(local)) == SUCCESS)
+	  		sendbusy = TRUE;
+        else {
+        	report_problem();
+      		call DSN.logError("Send Sensordata radio stack failed");
+        }
     }
-
+    else {
+  		call DSN.logError("Radio busy while sending SensorData");
+    }  	
     if (call Read.read() != SUCCESS)
     	fatal_problem();
   }
@@ -322,9 +312,9 @@ implementation {
       report_problem();
   	  call DSN.logError("reading Sensordata failed");
     }
-    local.readings[reading++] = data;
-    //call DSN.logInt(data - 3960); // temp is now give times 100
-    //call DSN.logDebug("Sensor value %i");
+    local.value = data;
+    call DSN.logInt(data - 3960); // temp is now give times 100
+    call DSN.logDebug("Sensor value %i");
   }
   
 // #######################################
@@ -369,7 +359,7 @@ implementation {
     	}
   	}
   	else {
-  		call DSN.logError("Tinf busy");
+  		//call DSN.logError("Tinf busy");
   		report_problem();
   	}
   }
@@ -436,12 +426,12 @@ implementation {
 
   static void report_problem() { 
   	m_state=__FUNCTION__;
-  	call Leds.led0Toggle();
+  	//call Leds.led0Toggle();
   	}
   
   static void report_sent(message_t* msg) {
   	m_state=__FUNCTION__;
-  	call Leds.led1Toggle();
+  	//call Leds.led1Toggle();
   	/*
   	atomic {
   		call DSN.logInt(packet_backoff-packet_send); 
@@ -455,7 +445,7 @@ implementation {
   
   static void report_received(message_t* msg) {
   	m_state=__FUNCTION__;
-  	call Leds.led2Toggle();
+  	//call Leds.led2Toggle();
   	
   	/*
   	call DSN.logInt(call AMPacket.source(msg)); 
@@ -466,8 +456,20 @@ implementation {
   
   // DSN specific
   event void DSN.receive(void *msg, uint8_t len) {
-  	m_state=__FUNCTION__;
+  	//call Leds.led2Toggle(); 
+  	//call DSN.logInfo(msg);
   }
+  
+  event void LplCommand.detected(uint16_t * values, uint8_t n) {
+  	//call Leds.led2Toggle(); 
+  	call DSN.logInt(n);
+  	call DSN.log("detected command with %i parameters");
+  }
+  
+  event void CC2420DutyCycle.detected() {
+  	// call DSN.log("wakeup");
+  }
+  
   
   //*************************
   // statistics
@@ -488,8 +490,14 @@ implementation {
    }
    
    event void ReadCpuLoad.readDone(error_t result, uint16_t val) {
-   		call DSN.logInt(((uint32_t)val*100)/0xffff);
+   	  cpuLoadSum+=val;
+      cpuLoadSamples++;
+      if (cpuLoadSamples==30) { // calculate average each minute
+      	call DSN.logInt((cpuLoadSum*10/3)/0xffff);
    		call DSN.logInfo("l %i");
+      	cpuLoadSum=0;
+        cpuLoadSamples=0;
+      }
    }
     
   task void stopradio() {

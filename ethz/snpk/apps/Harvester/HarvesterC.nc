@@ -43,7 +43,7 @@ implementation {
   	LedsC,
   	new TimerMilliC(), 
   	new TimerMilliC() as TreeInfoTimer,
-    //new DemoSensorC() as Sensor,
+    new DemoSensorC() as Sensor,
     //new SensirionSht11C() as Sensor,
     new SensirionSht71C() as Sensor,
   	DSNC,

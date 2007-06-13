@@ -32,6 +32,7 @@ package com.rincon.tunit.stats;
  */
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -42,22 +43,24 @@ import net.tinyos.message.MessageListener;
 import net.tinyos.message.MoteIF;
 
 /**
- * Connection to the mote, listening for statistics messages and passing them
- * to whatever object that cares.
+ * Connection to the mote, listening for statistics messages and passing them to
+ * whatever object that cares.
+ * 
  * @author David Moss
- *
+ * 
  */
 public class Statistics extends Thread implements MessageListener {
 
   /** MoteIF's that we're registered with */
   private List listeningComms;
-  
+
   /** List of FileTransferEvents listeners */
-  private static List listeners = new ArrayList();
+  @SuppressWarnings("unchecked")
+  private static List listeners = Collections.synchronizedList(new ArrayList());
 
   /** List of received messages */
   @SuppressWarnings("unchecked")
-  private List receivedMessages = java.util.Collections.synchronizedList( new ArrayList());
+  private List receivedMessages = Collections.synchronizedList(new ArrayList());
 
   /** Reply message received from the mote */
   @SuppressWarnings("unused")
@@ -79,63 +82,66 @@ public class Statistics extends Thread implements MessageListener {
     running = true;
     start();
   }
-  
+
   /**
    * Listen to another MoteIF communicator
-   * @param 
+   * 
+   * @param
    */
   @SuppressWarnings("unchecked")
   public void addMoteIf(MoteIF comm) {
     listeningComms.add(comm);
     comm.registerListener(new StatisticsMsg(), this);
   }
-  
+
   /**
    * @param inMsg
    */
   private String extractUnits(StatisticsMsg inMsg) {
-    if(inMsg.get_unitLength() > 0) {
+    if (inMsg.get_unitLength() > 0) {
       short[] message = new short[inMsg.get_unitLength()];
-      for(int i = 0; i < message.length; i++) {
+      for (int i = 0; i < message.length; i++) {
         message[i] = inMsg.get_units()[i];
       }
       return Util.dataToString(message);
     }
-    
+
     return "";
   }
-  
+
   /**
    * Thread to handle events
    */
   public void run() {
     StatisticsMsg inMsg;
     while (running) {
-      synchronized (receivedMessages){
-        while (receivedMessages.isEmpty() && running){
+      synchronized (receivedMessages) {
+        while (receivedMessages.isEmpty() && running) {
           try {
             receivedMessages.wait();
-          } catch (InterruptedException ie){
+          } catch (InterruptedException ie) {
           }
         }
-        
+
         inMsg = (StatisticsMsg) receivedMessages.get(0);
 
         if (inMsg != null && running) {
           extractUnits(inMsg);
-          
-          for(Iterator it = listeners.iterator(); it.hasNext(); ) {
-            ((StatisticsEvents) it.next()).statistics_log(inMsg.get_statsId(), extractUnits(inMsg), inMsg.get_value());
+
+          synchronized (listeners) {
+            for (Iterator it = listeners.iterator(); it.hasNext();) {
+              ((StatisticsEvents) it.next()).statistics_log(
+                  inMsg.get_statsId(), extractUnits(inMsg), inMsg.get_value());
+            }
           }
-            
+
           receivedMessages.remove(inMsg);
         }
       }
     }
-    
+
     listeners.clear();
   }
-
 
   /**
    * Add a TUnitProcessing listener
@@ -159,30 +165,34 @@ public class Statistics extends Thread implements MessageListener {
   }
 
   /**
-   * Message received, handle replies immediately and handle events in a
-   * thread
+   * Message received, handle replies immediately and handle events in a thread
    */
   @SuppressWarnings("unchecked")
   public synchronized void messageReceived(int to, Message m) {
     inMsg = (StatisticsMsg) m;
-    
+
     System.out.println("RECEIVED A STATISTICS MESSAGE");
-    synchronized(receivedMessages){
-        receivedMessages.add(m);
-        receivedMessages.notify();
+    synchronized (receivedMessages) {
+      receivedMessages.add(m);
+      receivedMessages.notify();
     }
   }
 
-
   /**
    * Shutdown this TUnitProcessing listener
-   *
+   * 
    */
   public void shutdown() {
     running = false;
-    for(Iterator it = listeningComms.iterator(); it.hasNext(); ) {
+
+    synchronized (listeners) {
+      listeners.clear();
+    }
+    
+    for (Iterator it = listeningComms.iterator(); it.hasNext();) {
       ((MoteIF) it.next()).deregisterListener(new StatisticsMsg(), this);
     }
     listeningComms.clear();
+    
   }
 }

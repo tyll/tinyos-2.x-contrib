@@ -80,7 +80,7 @@ module HarvesterP {
     interface Send as TreeInfoSend;
     
     // for statistics
-    //interface AsyncNotify;
+    interface AsyncNotify;
     interface Counter<T32khz,uint32_t>;
     interface PacketAcknowledgements;
     

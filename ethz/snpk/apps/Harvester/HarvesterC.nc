@@ -106,7 +106,7 @@ implementation {
   components
   	CC2420TransmitP,
   	Counter32khz32C;
-  //HarvesterP.AsyncNotify->CC2420TransmitP;
+  HarvesterP.AsyncNotify->CC2420TransmitP;
   HarvesterP.Counter->Counter32khz32C;
 
   components

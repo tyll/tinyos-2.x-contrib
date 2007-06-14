@@ -49,7 +49,7 @@ enum {
   AM_TREEINFO = 0x94,
   TREEINFO_INT = 30000,
   LPL_INT = 150UL,
-  NEIGHBOR_TABLE_SIZE = 3,
+  NEIGHBOR_TABLE_SIZE = 1,
 //  TX_POWER=3, /* 0 - 31, use lower values to generate multihop network in a smaller place */
 };
 

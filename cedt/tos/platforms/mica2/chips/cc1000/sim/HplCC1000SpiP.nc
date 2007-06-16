@@ -35,6 +35,13 @@
  * @author Jaein Jeong
  * @author Philip buonadonna
  */
+ 
+/**
+ * Low-level cc1000 radio simulation support for TOSSIM.
+ *
+ * @author Venkatesh S
+ * @author Prabhakar T V
+ */
 
 #include <CC1000Const.h>
 
@@ -53,34 +60,34 @@ implementation
 {
   uint8_t outgoingByte;
   
-  sim_event_t *SPIrw = NULL;
+  //start the radio ticks, RADIO_DATA_RATE 19200 bps and the RADIO_OSC_FREQ = 14Mhz
+  uint64_t radio_ticks = 14000000/19200;
+  
+  //event handlers for SPI 
+  sim_event_t *allocate_spi_event();  
+  
+  bool radioState;
   
   enum {
-    RX= 0,
-    TX =1
+    rx = 0,
+    tx = 1,
   };
   
-  //event handlers for SPI reads
-  void spi_read_data_handle(sim_event_t* evt);
-  sim_event_t* allocate_spi_read();
-  void schedule_spi_read();
-  void readDone();
-  
-  //event handlers for SPI writes
-  void spi_write_data_handle(sim_event_t* evt);
-  sim_event_t *allocate_spi_write();
-  void schedule_spi_write();
-  void writeDone();  
-
   command error_t PlatformInit.init() {
     call SpiSck.makeInput();
     call OC1C.makeInput();
     call HplCC1000Spi.rxMode();
+    spi_event = NULL;
+    spi_flag = FALSE;
     return SUCCESS;
   }
 
   AVR_ATOMIC_HANDLER(SIG_SPI) {
-    register uint8_t temp = SPDR;
+    /*the lower level FIFO is such it hold the compliment result of the
+     *received bits. So just compliment the SPDR register contents in 
+     *the simulation
+     */
+    register uint8_t temp = ~SPDR;
     SPDR = outgoingByte;
     signal HplCC1000Spi.dataReady(temp);
   }
@@ -89,9 +96,7 @@ implementation
 
   async command void HplCC1000Spi.writeByte(uint8_t data) {
     atomic outgoingByte = data;
-    if(READ_BIT(ATM128_DDRB,2) && READ_BIT(ATM128_DDRB,3)) {
-      schedule_spi_write();
-    }    
+    dbg("HplCC1000Spi","Writing %hhx\n",data);
   }
 
   async command bool HplCC1000Spi.isBufBusy() {
@@ -122,107 +127,99 @@ implementation
       CLR_BIT(SPCR, CPHA);		// ...and phase
       SET_BIT(SPCR, SPIE);	// enable spi port
       SET_BIT(SPCR, SPE);
-    } 
+    }
+    /**********start the spi event loop************/
+    if(spi_event != NULL) {
+      spi_event->cancelled = 1;
+    }
+    else {
+      dbg("HplCC1000SpiP","Allocating SPI event\n");
+      spi_event = allocate_spi_event();
+      sim_queue_insert(spi_event);
+
+    }
   }
 	
   async command void HplCC1000Spi.txMode() {
     call SpiMiso.makeOutput();
     call SpiMosi.makeOutput();
-    schedule_spi_write();
-    dbg("HplCC1KSpi","Radio put to Tx state, GPIO set to %d, %d,\n",READ_BIT(ATM128_DDRB,3),READ_BIT(ATM128_DDRB,2));    
+    radioState = tx;
+    dbg("HplCC1000SpiP","Radio state is %s\n",(RADIO_STATE)?"tx":"rx");  
   }
 
   async command void HplCC1000Spi.rxMode() {
-    call SpiMiso.makeInput();
-    call SpiMosi.makeInput();
-    dbg("HplCC1KSpi","Radio put to Rx state, GPIO set to %d, %d,\n",READ_BIT(ATM128_DDRB,3),READ_BIT(ATM128_DDRB,2));
-    if(SPIrw != NULL) {
-      SPIrw->cancelled = 1;
-      readDone();
-    }
-    //Initially signal back an SPI event
-    SIG_SPI();    
-  }
-  
-  /****** SPI Read Events generator ************/
-
-  void spi_read_data_handle(sim_event_t* evt) {
-    if (evt->cancelled) {
-      dbg("HplCC1KSpiRead","SPI event cancelled\n");
-      return;
-    }
-    else {
-      SPDR = outgoingByte;
-      dbg("HplCC1KSpiRead","Receiving a byte to read %hhx\n",outgoingByte);
-      SIG_SPI();
-    }
-  }
-
-  sim_event_t* allocate_spi_read() {
-    sim_event_t* newEvent = sim_queue_allocate_event();
-    newEvent->time = sim_time();
-    newEvent->handle = spi_read_data_handle;
-    newEvent->cleanup = sim_queue_cleanup_none;
-    return newEvent;
-  }
-
-  void schedule_spi_read() {
-    sim_event_t* newEvent = allocate_spi_read();
-    SPIrw = newEvent;
-    sim_queue_insert(newEvent);
-  }
-
-  void readDone() {
-    SPIrw->cleanup = sim_queue_cleanup_total;
-    WRITE_BIT(SPSR,SPIF,0);
-  }
-  
-  /******** SPI Write Events generator ********/
-  
-  void spi_write_data_handle(sim_event_t* evt) {
     gain_entry_t* neighborEntry = sim_gain_first(sim_node());
-    if (evt->cancelled) {
-      return;
-    }
-    else {
-      SPDR = outgoingByte;
-      dbg("HplCC1KSpiWrite","Transmitting %hhx\n",SPDR);
-      //signal other nodes with the receive events
+    call SpiMiso.makeInput();
+    call SpiMosi.makeInput();    
+    if(radioState == tx) {
+      //release the spi lock of the receiver nodes
       while (neighborEntry != NULL) {
-	    int other = neighborEntry->mote;
-		int currentNode = sim_node();
-		int Byte = outgoingByte;
-		sim_set_node(other);
-		outgoingByte = Byte;
-		//signal the event only if the radio is in receive state
-		//the 3rd bit represents the radio status, 0->Rx, 1->Tx
-		//see CC1000 data sheet pg(40)
-		if((CC1K_REG_ACCESS(CC1K_MAIN) & (1<<CC1K_RXTX)) == RX)
-	  	  schedule_spi_read();
-		sim_set_node(currentNode);
+	    int dest = neighborEntry->mote;
+	    int src = sim_node();	
+	    sim_set_node(dest);       
+	    if(sim_gain_connected(src,dest)){
+          spi_flag = FALSE;
+	    }
+		sim_set_node(src);	     
 		neighborEntry = sim_gain_next(neighborEntry);
       }
-      SIG_SPI();
     }
+    radioState = rx;
+    dbg("HplCC1000SpiP","Radio state is %s\n",(RADIO_STATE)?"tx":"rx");    
   }
+ 
+  /*********** SPI events ***********/
 
-  sim_event_t* allocate_spi_write() {
+  
+  void spi_byte_event_handle(sim_event_t* evt) {
+    //radio state = 0 -> Rx
+    //radio state = 1 -> Tx
+    if(RADIO_STATE == 1) {
+      gain_entry_t* neighborEntry = sim_gain_first(sim_node());
+      while (neighborEntry != NULL) {
+	    int dest = neighborEntry->mote;
+	    int src = sim_node();
+	    int temp = SPDR;
+	    sim_set_node(dest);
+        if(sim_gain_connected(src,dest)) { 		
+	      /* signal the event only if the radio is in receive state
+	       * and if the radio is ON
+  		   */
+		  if(RADIO_STATE == rx && RADIO_CORE_ON && RADIO_BIAS_ON) {
+	        SPDR = temp;
+	        spi_flag = TRUE;
+	        SIG_SPI();
+	      }
+	    }
+		sim_set_node(src);
+		neighborEntry = sim_gain_next(neighborEntry);
+      }      
+    }
+    else if(RADIO_STATE == 0) {
+      
+    }
+    else {
+      //some nasty bug
+    }
+    if(!spi_flag) {
+      SPDR = 0;
+      SIG_SPI();
+    }else {
+    
+    }
+    dbg("HplCC1000SpiP","Event handled for SPI at %s\n",sim_time_string());
+    evt->time += sim_ticks_per_sec()/radio_ticks;
+    sim_queue_insert(evt);
+  
+  }
+  
+  sim_event_t *allocate_spi_event() {
     sim_event_t* newEvent = sim_queue_allocate_event();
-    newEvent->time = sim_time()+10002;
-    newEvent->handle = spi_write_data_handle;
+    newEvent->time = radio_ticks;
+    newEvent->handle = spi_byte_event_handle;
     newEvent->cleanup = sim_queue_cleanup_none;
     return newEvent;
   }
-
-  void schedule_spi_write() {
-    sim_event_t* newEvent = allocate_spi_write();
-    SPIrw = newEvent;
-    sim_queue_insert(newEvent);
-  }
-
-  void writeDone() {
-    SPIrw->cleanup = sim_queue_cleanup_total;
-    WRITE_BIT(SPSR,SPIF,0);
-  }
+  
     
 }

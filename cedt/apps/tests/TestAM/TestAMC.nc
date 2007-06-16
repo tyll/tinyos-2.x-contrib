@@ -59,26 +59,28 @@ implementation {
 
   bool locked;
   uint8_t counter = 0;
-  
+  uint8_t rxcounter = 0;
   event void Boot.booted() {
     call SplitControl.start();
   }
   
   event void MilliTimer.fired() {
-    counter++;
+    dbg("TestAM","Timer Fired %d at %s\n",counter,sim_time_string());
     if (locked) {
       return;
      }
     else {
       uint16_t nodeid;
-      switch(TOS_NODE_ID) {
-        case 0 : nodeid = 1; break;
-        case 1 : nodeid = 0; break;
-        default : nodeid = AM_BROADCAST_ADDR;
+      switch (TOS_NODE_ID){
+        case 0: nodeid = 1;break;
+        case 1: nodeid = 0;break;
+        default: nodeid = AM_BROADCAST_ADDR;
       }
-      if (call AMSend.send(AM_BROADCAST_ADDR, &packet, 0) == SUCCESS) {
+      packet.data[1] = counter;
+      packet.data[0] = TOS_NODE_ID;
+      if (call AMSend.send(nodeid,&packet, 2) == SUCCESS) {
         call Leds.led0On();
-        dbg("TestAM","Packet sent to lower layer\n");
+	counter++;
         locked = TRUE;
       }
       else {
@@ -89,15 +91,16 @@ implementation {
 
   event message_t* Receive.receive(message_t* bufPtr, 
 				   void* payload, uint8_t len) {
+    rxcounter++;
+    dbg("TestAM","%d Packets Received\n",rxcounter);
     call Leds.led1Toggle();
-    dbg("TestAM","Packet Received\n");
     return bufPtr;
   }
 
   event void AMSend.sendDone(message_t* bufPtr, error_t error) {
     if (&packet == bufPtr) {
+      dbg("TestAM","%d Packets Sent\n",counter);
       locked = FALSE;
-      dbg("TestAM","SendDone for the packet\n");
       call Leds.led0Off();
     }
   }

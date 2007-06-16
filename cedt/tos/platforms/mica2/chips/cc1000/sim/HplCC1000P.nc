@@ -37,7 +37,7 @@
 
 /**
  * Low lever hardware simulation for CC1000 chip.  This file implements the 
- * functionality of CC1000 chip
+ * functionality of CC1000 chip read and write to the internal cc1000 registers
  *
  * @author Venkatesh S
  * @author Prabhakar T V 
@@ -182,16 +182,19 @@ implementation
   }
   
   void CheckCC1KReg(uint8_t addr) {
-    //This is just an example of how to set or unset the register
-    //Callibration:  During the initialization of the radio, the software 
-    //CC1000ControlP file, sets few parameters and then waits for a bit to 
-    //be set, which indicates the completion of the Callibration.  Here, 
-    //We donot really callibrate, but make that particular bit to high
     switch (addr) {
+      /* Callibration:  During the initialization of the radio, the software 
+       * CC1000ControlP file, sets few parameters and then waits for a bit to 
+       * be set, which indicates the completion of the Callibration.  Here, 
+       * We donot really callibrate, but make that particular bit to high
+       */
       case CC1K_CAL:
       				dbg("HplCC1000P","CC1k_CAL reg check\n");
       				CC1K_SET_BIT(CC1K_CAL,CC1K_CAL_COMPLETE);
       				break;
+      case CC1K_MAIN:
+					dbg("HplCC1000P","Main reg value is %hhx\n",CC1K_REG_ACCESS(CC1K_MAIN));
+					break;
       default 	   :
       				//do nothing
     }

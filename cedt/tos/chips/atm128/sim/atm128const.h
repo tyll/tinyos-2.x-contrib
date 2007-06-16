@@ -15,7 +15,13 @@
  * This file defines the ATmega128 version of these types and functions.
  * @author David Gay
  */
-
+ 
+ /*
+  * Added the pgm_read functionality
+  *
+  * @author Venkatesh S
+  * @author Prabhakar T V
+  */
 #ifndef ATMEGA128CONST_H
 #define ATMEGA128CONST_H
 

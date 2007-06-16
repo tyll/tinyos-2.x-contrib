@@ -1,0 +1,61 @@
+Usage for Mica2 radio Simulation
+
+Description:
+
+  TestAM application is used to test the CC1000 radio simulation.  
+The application has been modified to include the unicast packet transmission
+and also to include extra 2 bytes in transmission, the count and the TOS_NODE_ID.
+Just change AM_BROADCAST_ADDR to nodeid to have a unicast transmission.
+If TOS_NODE_ID is 1, it sends a unicast packet to 0 
+If TOS_NODE_ID is 0, it sends a unicast packet to 1.  
+
+For rest, its just Broadcast address.
+
+Tools:
+
+test.py :
+  This python script is used to run the simulation.  There are different 
+debug channels as mentioned below to know know the status of the CC1000 simulation.
+
+topo.txt :
+  The topology file which has 5 nodes for the simulation. 
+  0 <-> 1
+  0 <-> 4
+  
+  1 <-> 2
+  1 <-> 4
+  
+  2 <-> 3
+  2 <-> 4
+  
+  3 <-> 4
+
+Debug Channels:
+
+TestAM:  This is application debug channel.
+
+HplCC1000P: Displays the radio internal register writes and reads 
+
+HplCC1000SpiP: Displays the radio transmission and event scheduling
+
+CC1000SendReceiveP: Displays the transmitted and received packets along with ack.
+
+HplAtm128AdcP:  Displays the ADC sampled value from the generated RSSI(dBm)
+
+CC1000CsmaP:  Radio status, On or OFF, whether there is congestion or not
+
+CC1000Channel:  Displays the channel status, channel acquired and released by a node
+
+output:
+
+Node_ID 	Packets Sent	Packets Received	Packets Received
+							 (with UNICAST)		(with only BROADCAST addr)
+	0			10					19 				19		
+	1			10					29				28
+	2			10					20				29
+	3			10					20				18
+	4			10					20				39
+
+The variations of 1 or 2 packets less is due to the fact that the simulation ends
+while there is still a packet to be transmitted by other nodes (due to the shift 
+of the boot time of the nodes).

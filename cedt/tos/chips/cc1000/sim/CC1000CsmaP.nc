@@ -49,18 +49,16 @@
  * @author Joe Polastre
  * @author David Gay
  */
-  
+
 /**
- * The actual radio seems to receive something over the 
- * channel and then signals the same through the SPI event.  During this
- * event the node goes to listen state and if any Tx is pending, it signals
- * the ByteRadio.rts(). So this file is tweaked to signal the ByteRadio.cts
- * if any transmission is pending by the node.
+ * Added the channel support.  Each node acquires the channel before transmission
+ * and releases the channel after transmission
  *
  * @author Venkatesh S
  * @author Prabhakar T V
  */ 
  
+#include <sim_channel.c>  
 module CC1000CsmaP {
   provides {
     interface Init;
@@ -117,9 +115,7 @@ implementation
   uint16_t rssiForSquelch;
 
   task void setWakeupTask();
-  
-  void ByteRadioidleByte();
-  
+
   cc1000_metadata_t *getMetadata(message_t *amsg) {
     return (cc1000_metadata_t *)((uint8_t *)amsg->footer + sizeof(cc1000_footer_t));
   }
@@ -166,11 +162,14 @@ implementation
     call CC1000Control.biasOn();
     call BusyWait.wait(200);
     atomic call ByteRadio.listen();
+    sim_channel_init();
+    dbg("CC1000CsmaP","Radio ON\n");
   }
 
   void radioOff() {
     call CC1000Control.off();
     call ByteRadio.off();
+    dbg("CC1000CsmaP","Radio OFF\n");
   }
 
   void setPreambleLength(message_t *msg);
@@ -280,7 +279,6 @@ implementation
 		call cancelRssi();
 		call RssiNoiseFloor.read();
 	      }
-   		  ByteRadioidleByte();
 	    break;
 
 	  case POWERDOWN_STATE:
@@ -373,20 +371,21 @@ implementation
     atomic
       {
 	f.txPending = TRUE;
-    dbg("CC1000CsmaP","ByteRadio.rts called\n");
+
 	if (radioState == POWERDOWN_STATE)
 	  post sleepCheck();
 	if (!f.ccaOff)
 	  macDelay = signal CsmaBackoff.initial(call ByteRadio.getTxMessage());
 	else
 	  macDelay = 1;
-    dbg("CC1000CsmaP","Got Backoff delay as %d\n",macDelay);
+
 	setPreambleLength(msg);
       }
   }
 
   async event void ByteRadio.sendDone() {
     f.txPending = FALSE;
+    sim_channel_release();
     enterIdleStateSetWakeup();
   }
 
@@ -397,8 +396,10 @@ implementation
   async event void ByteRadio.idleByte(bool preamble) {
     if (f.txPending)
       {
-	if (!f.ccaOff && preamble)
+	if (!f.ccaOff && preamble) {
 	  congestion();
+	  dbg("CC1000CsmaP","Congestion\n");
+	}
 	else if (macDelay && !--macDelay)
 	  {
 	    call cancelRssi();
@@ -407,22 +408,6 @@ implementation
 	  }
       }
   }
-  
-  void ByteRadioidleByte() {
-    dbg("CC1000CsmaP","ByteRadioidleByte() called\n");
-    if (f.txPending)
-      {
-/*	if (!f.ccaOff)
-	  congestion();
-	else */if (macDelay && !--macDelay)
-	  {
-	    dbg("CC1000CsmaP","Calling Rssi channel Check\n");
-	    call cancelRssi();
-	    count = 0;
-	    call RssiCheckChannel.read();
-	  }
-      }
-  }  
 
   async event void RssiCheckChannel.readDone(error_t result, uint16_t data) {
     if (result != SUCCESS)
@@ -431,7 +416,7 @@ implementation
 	atomic macDelay = 1;
 	return;
       }
-    dbg("CC1000CsmaP","Read RSSI Channel as %d\n",data);
+
     count++;
     if (data > call CC1000Squelch.get() + CC1K_SquelchBuffer)
       clearCount++;
@@ -439,10 +424,10 @@ implementation
       clearCount = 0;
 
     // if the channel is clear or CCA is disabled, GO GO GO!
-    if (clearCount >= 1 || f.ccaOff)
+    if ((clearCount >= 1 || f.ccaOff) && !sim_channel_get())
       {
-    dbg("CC1000CsmaP","Medium is free Go. Go. Go!\n");
 	enterTxState();
+	sim_channel_acquire();
 	call ByteRadio.cts();
       }
     else if (count == CC1K_MaxRSSISamples)
@@ -480,7 +465,7 @@ implementation
 	post sleepCheck();
 	return;
       }
-    dbg("CC1000CsmaP","Read Noise Floor as %d\n",data);
+
     rssiForSquelch = data;
     post adjustSquelch();
     post sleepCheck();

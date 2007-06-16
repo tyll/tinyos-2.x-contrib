@@ -269,6 +269,14 @@ implementation
 
   async command void ByteRadio.cts() {
     /* We're set to go! Start with our exciting preamble... */
+    uint8_t *ptr,i;
+    cc1000_header_t *pHeader = getHeader(txBufPtr);
+    ptr = (uint8_t*)txBufPtr;
+    dbg("CC1000SendReceiveP","Transmitting packet\n");
+    for(i=0;i<pHeader->length+sizeof(cc1000_header_t);i++) {
+      dbg_clear("CC1000SendReceiveP","%hhx ",ptr[i]);
+    }
+    dbg_clear("CC1000SendReceiveP","\n");    
     enterTxPreambleState();
     call HplCC1000Spi.writeByte(0xaa);
     call CC1000Control.txMode();
@@ -362,6 +370,7 @@ implementation
 	if (rxShiftBuf == ACK_WORD)
 	  {
 	    getMetadata(txBufPtr)->ack = 1;
+	    dbg("CC1000SendReceiveP","Received Ack\n");
 	    enterTxDoneState();
 	    return;
 	  }
@@ -369,6 +378,7 @@ implementation
     if (count >= MAX_ACK_WAIT)
       {
 	getMetadata(txBufPtr)->ack = 0;
+	  dbg("CC1000SendReceiveP","Ack failed\n");
 	enterTxDoneState();
       }
   }
@@ -460,7 +470,6 @@ implementation
 	    // check for sync bytes
 	    if (tmp == SYNC_WORD)
 	      {
-	    dbg("CC1000SendReceiveP","Received Sync Byte\n");
 		enterRxState();
 		signal ByteRadio.rx();
 		f.rxBitOffset = 7 - i;
@@ -486,7 +495,6 @@ implementation
     uint8_t nextByte;
     cc1000_header_t *rxHeader = getHeader(rxBufPtr);
     uint8_t rxLength = rxHeader->length;
-    dbg("CC1000SendReceiveP","RxData()\n");
     // Reject invalid length packets
     if (rxLength > TOSH_DATA_LENGTH)
       {
@@ -520,7 +528,6 @@ implementation
     // Packet filtering based on bad CRC's is done at higher layers.
     // So sayeth the TOS weenies.
     rxFooter->crc = (rxFooter->crc == runningCrc);
-    dbg("CC1000SendReceiveP","Packet Received\n");
     if (f.ack &&
 	rxFooter->crc &&
 	rxHeader->dest == call amAddress())
@@ -548,6 +555,7 @@ implementation
   task void signalPacketReceived() {
     message_t *pBuf;
     cc1000_header_t *pHeader;
+    uint8_t *ptr,i;
     atomic
       {
 	if (radioState != RECEIVED_STATE)
@@ -556,6 +564,12 @@ implementation
 	pBuf = rxBufPtr;
       }
     pHeader = getHeader(pBuf);
+    ptr = (uint8_t*) pBuf;
+    dbg("CC1000SendReceiveP","Received packet\n");
+    for(i=0;i<pHeader->length+sizeof(cc1000_header_t);i++) {
+      dbg_clear("CC1000SendReceiveP","%hhx ",ptr[i]);
+    }
+    dbg_clear("CC1000SendReceiveP","\n");    
     pBuf = signal Receive.receive(pBuf, pBuf->data, pHeader->length);
     atomic
       {
@@ -572,10 +586,32 @@ implementation
     enterReceivedState();
   }
 
+  void printState() {
+    switch(radioState)
+      {
+      default: break;
+      case TXPREAMBLE_STATE: dbg("CC1000SendReceiveP","TxPreamble()\n"); break;
+      case TXSYNC_STATE: dbg("CC1000SendReceiveP","txSync()\n"); break;
+      case TXDATA_STATE: dbg("CC1000SendReceiveP","txData()\n"); break;
+      case TXCRC_STATE: dbg("CC1000SendReceiveP","txCrc()\n"); break;
+      case TXFLUSH_STATE: dbg("CC1000SendReceiveP","txFlush()\n"); break;
+      case TXWAITFORACK_STATE: dbg("CC1000SendReceiveP","txWaitForAck()\n"); break;
+      case TXREADACK_STATE: dbg("CC1000SendReceiveP","txReadAck(data)\n"); break;
+      case TXDONE_STATE: dbg("CC1000SendReceiveP","txDone()\n"); break;
+
+      case LISTEN_STATE: dbg("CC1000SendReceiveP","listenData(data)\n"); break;
+      case SYNC_STATE: dbg("CC1000SendReceiveP","syncData(data)\n"); break;
+      case RX_STATE: dbg("CC1000SendReceiveP","rxData(data)\n"); break;
+      case SENDING_ACK: dbg("CC1000SendReceiveP","ackData(data)\n"); break;
+      }
+  }
+  
   async event void HplCC1000Spi.dataReady(uint8_t data) {
-/*    if (f.invert)
+    if (f.invert)
       data = ~data;
-  */    
+  
+//    dbg("CC1000SendReceiveP","SPI data %hhx \n",data,sim_time_string());
+//    printState();
     switch (radioState)
       {
       default: break;

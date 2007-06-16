@@ -74,6 +74,38 @@ uint8_t CC1KRegFile[TOSSIM_MAX_NODES][CC1K_MAX_REGS];
 //Tx power mode values
 //will be initialized by HplCC1000P module
 int8_t CC1K_RADIO_PowerMode[256]; 
+
+//Macro which returns 0 if the node is in RX state else 1 if TX state
+//checks for the DDRB which is connected to the radio to know the 
+//status of the radio
+
+#define RADIO_STATE (READ_BIT(ATM128_DDRB,2) && READ_BIT(ATM128_DDRB,3))?(1):(0)
+
+//Macro which informs the status of the radio
+
+#define RADIO_CORE_ON ((CC1K_REG_ACCESS(CC1K_MAIN) & (1 << CC1K_CORE_PD))?(0):(1))
+
+
+#define RADIO_BIAS_ON ((CC1K_REG_ACCESS(CC1K_MAIN) & (1 << CC1K_BIAS_PD))?(0):(1))
+
+#define RADIO_OFF (((CC1K_REG_ACCESS(CC1K_MAIN) & (1 << CC1K_RX_PD | \
+															   1 << CC1K_TX_PD | \
+		  											 		   1 << CC1K_FS_PD | \
+															   1 << CC1K_CORE_PD | \
+															   1 << CC1K_BIAS_PD | \
+			  											 	   1 << CC1K_RESET_N))?(0):(1))
+
+//Macro to find the radio ticks based on Buadrate settings  and 
+//the XLAT freq settings , for mica2 its 14 Mhz
+#define RADIO_TICKS 14745600/(6000*(uint32_t)pow(2,(CC1K_REG_ACCESS(CC1K_MODEM0) >> CC1K_BAUDRATE & 0X7))) 
+
+
+//SPI event handler for all then nodes
+sim_event_t* spi_event_t[TOSSIM_MAX_NODES];
+bool spi_event_flags[TOSSIM_MAX_NODES];
+
+#define spi_event spi_event_t[sim_node()]
+#define spi_flag spi_event_flags[sim_node()]
 /* Constants defined for CC1K */
 /* Register addresses */
 

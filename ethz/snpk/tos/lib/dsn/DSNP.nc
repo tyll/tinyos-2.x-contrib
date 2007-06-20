@@ -5,7 +5,6 @@
  * and receive commands.
  *
  * @author Roman Lim <rlim@ee.ethz.ch>
- * @modified 10/3/2006 Added documentation.
  *
  **/
 
@@ -459,7 +458,6 @@ implementation
   				post sendBuf();
   			else
   				stop();
-  			rxbuffer[rxlen++]=LOG_DELIMITER;
   			post ReceivedTask();
   		}
   		else {

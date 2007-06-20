@@ -9,9 +9,10 @@ implementation
 {
 	components ActiveMessageAddressC;
 	components noDSNP as DSNP;
+	components RealMainP;
 	
+	RealMainP.PlatformInit -> DSNP.NodeIdInit;
 	DSN = DSNP.DSN;
-	Init = DSNP.Init;
 	DSNP.setAmAddress -> ActiveMessageAddressC;
 	
 }

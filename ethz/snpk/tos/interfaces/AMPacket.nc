@@ -163,7 +163,7 @@ interface AMPacket {
    * @return the AM group of this packet
    */
   
-  command am_group_t groups(message_t* amsg);
+  command am_group_t group(message_t* amsg);
 
   /**
    * Set the AM group field of a packet. Note that most data link

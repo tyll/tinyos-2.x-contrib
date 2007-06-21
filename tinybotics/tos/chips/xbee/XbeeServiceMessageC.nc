@@ -29,3 +29,42 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
+/**
+ * Sending service messages over the serial port to the XBee
+ * @author Mirko Bordignon <mirko.bordignon@ieee.org>
+ */
+
+#include "Xbee.h"
+
+configuration XbeeServiceMessageC {
+  provides {
+    interface SplitControl;
+    interface AMSend[am_id_t id];
+    interface Receive[am_id_t id];
+    interface Packet;
+    interface AMPacket;
+    interface PacketAcknowledgements;
+  }
+  uses interface Leds;
+}
+
+implementation {
+  components XbeeServiceMessageP as SM, XbeeDispatcherC;
+  components XbeeServiceMessagePacketInfoP as Info, MainC;
+
+  MainC.SoftwareInit -> XbeeDispatcherC;
+  Leds = XbeeDispatcherC;
+  SplitControl = XbeeDispatcherC;
+
+  AMSend = SM;
+  Receive = SM;
+  Packet = SM;
+  AMPacket = SM;
+  PacketAcknowledgements = SM;
+
+  SM.SubSend -> XbeeDispatcherC.Send[XBEE_SERVICE_MESSAGE_ID];
+  SM.SubReceive -> XbeeDispatcherC.Receive[XBEE_SERVICE_MESSAGE_ID];
+
+  XbeeDispatcherC.SerialPacketInfo[XBEE_SERVICE_MESSAGE_ID] -> Info;
+}

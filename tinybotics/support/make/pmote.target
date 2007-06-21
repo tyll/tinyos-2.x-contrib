@@ -1,0 +1,17 @@
+# pmote.target
+# mirko.bordignon@ieee.org
+
+PLATFORM = pmote
+PROGRAMMER_PART ?= -dpart=ATmega128
+PFLAGS += -finline-limit=100000 -I$(TOSROOT)/../tinyos-2.x-contrib/tinybotics/tos/platforms/$(PLATFORM)
+
+AVR_FUSE_H ?= 0xc4
+
+DEFAULT_PROGRAM ?= stk500
+
+$(call TOSMake_include_platform,avr)
+$(call TOSMake_include_platform,avr_extras)
+
+pmote: $(BUILD_DEPS)
+	@:
+

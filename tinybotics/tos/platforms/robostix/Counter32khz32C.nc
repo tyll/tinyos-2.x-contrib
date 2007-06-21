@@ -1,4 +1,12 @@
 /*
+ * Copyright (c) 2005-2006 Intel Corporation
+ * All rights reserved.
+ *
+ * This file is distributed under the terms in the attached INTEL-LICENSE     
+ * file. If you do not find these files, copies can be found by writing to
+ * Intel Research Berkeley, 2150 Shattuck Avenue, Suite 1300, Berkeley, CA, 
+ * 94704.  Attention:  Intel License Inquiry.
+ *
  * Copyright (c) 2007 University of Padova
  * Copyright (c) 2007 Orebro University
  * All rights reserved.
@@ -29,3 +37,26 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
+/**
+ * 32-bit 1khz counter, built from hardware timer 2
+ * @author David Gay <dgay@intel-research.net>
+ * @author Mirko Bordignon <mirko.bordignon@ieee.org>
+ */
+
+#include <RobostixTimer.h>
+
+configuration Counter32khz32C
+{
+  provides interface Counter<T32khz, uint32_t>;
+}
+implementation
+{
+  components CounterTwo8C as Counter8, 
+    new TransformCounterC(T32khz, uint32_t, TTwo, uint8_t,
+			  ROBOSTIX_DIVIDE_TWO_FOR_32KHZ_LOG2,
+			  counter_two_overflow_t) as Transform32;
+
+  Counter = Transform32;
+  Transform32.CounterFrom -> Counter8;
+}

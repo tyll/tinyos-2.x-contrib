@@ -29,3 +29,17 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
+/*
+ * @author Mirko Bordignon <mirko.bordignon@ieee.org>
+ */
+
+#ifndef FLOWCONTROL_H
+#define FLOWCONTROL_H
+
+enum {
+  XON_BYTE	= 0x11,
+  XOFF_BYTE	= 0x13,
+};
+
+#endif

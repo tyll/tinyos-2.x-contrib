@@ -1,0 +1,19 @@
+# dt006.extra
+# mirko.bordignon@ieee.org
+
+PROGRAM = dt006
+PROGRAMMER_FLAGS = -dprog=dt006 --wr_fuse_h=$(AVR_FUSE_H) $(PROGRAMMER_PART) $(PROGRAMMER_EXTRA_FLAGS)
+
+program: FORCE
+	@echo "    installing $(PLATFORM) binary with dt006"
+	$(PROGRAMMER) $(PROGRAMMER_FLAGS) --erase 
+	sleep 1	     
+	$(PROGRAMMER) $(PROGRAMMER_FLAGS) --upload if=$(INSTALL_SREC)
+	sleep 1	     
+	$(PROGRAMMER) $(PROGRAMMER_FLAGS) --verify if=$(INSTALL_SREC)
+
+program_bl: FORCE
+	@echo "    installing $(PLATFORM) bootloader with dt006"
+	$(PROGRAMMER) $(PROGRAMMER_FLAGS) --upload if=$(BOOTLOADER)
+	sleep 1	     
+	$(PROGRAMMER) $(PROGRAMMER_FLAGS) --verify if=$(BOOTLOADER)

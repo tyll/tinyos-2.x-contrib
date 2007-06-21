@@ -1,0 +1,18 @@
+# stk500.extra
+# mirko.bordignon@ieee.org
+
+STK500 ?= /dev/ttyS0
+
+PROGRAM = stk500
+PROGRAMMER_FLAGS = -dprog=stk500 -dserial=$(STK500) $(PROGRAMMER_PART) $(PROGRAMMER_EXTRA_FLAGS)
+
+program: FORCE
+	@echo "    installing $(PLATFORM) binary using stk500"
+	@echo "    reset now if you are using a bootloader"
+	sleep 3
+	$(PROGRAMMER) $(PROGRAMMER_FLAGS) --erase --upload if=$(INSTALL_SREC)
+
+program_bl: FORCE
+	@echo "    installing $(PLATFORM) bootloader using stk500"
+	$(PROGRAMMER) $(PROGRAMMER_FLAGS) --upload if=$(BOOTLOADER)
+

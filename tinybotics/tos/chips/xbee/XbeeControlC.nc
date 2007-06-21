@@ -29,3 +29,31 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
+/** 
+ * @author Mirko Bordignon <mirko.bordignon@ieee.org>
+ */
+
+
+configuration XbeeControlC {
+
+  provides interface SplitControl as XbeeControl;
+  provides interface XbeeConfig;
+ 
+}
+
+implementation {
+  
+  components XbeeControlP, XbeeDispatcherC,
+    XbeeSMPacketInfoP as SMInfo, ActiveMessageAddressC;
+
+  XbeeControl = XbeeControlP;
+  XbeeConfig = XbeeControlP;
+
+  XbeeControlP.Send      -> XbeeDispatcherC.Send[XBEE_AT_STATUS_MESSAGE_ID];
+  XbeeControlP.Receive   -> XbeeDispatcherC.Receive[XBEE_AT_STATUS_MESSAGE_ID];
+  XbeeControlP.amAddress -> ActiveMessageAddressC;
+
+  XbeeDispatcherC.SerialPacketInfo[XBEE_AT_STATUS_MESSAGE_ID] -> SMInfo;
+}
+

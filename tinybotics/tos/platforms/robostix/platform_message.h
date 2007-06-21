@@ -29,3 +29,24 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
+/*
+ *  @author Mirko Bordignon <mirko.bordignon@ieee.org>
+ */
+
+#ifndef PLATFORM_MESSAGE_H
+#define PLATFORM_MESSAGE_H
+
+#include "Serial.h"
+
+typedef union message_header {
+  serial_header_t serial;
+} message_header_t;
+
+typedef union message_footer {
+} message_footer_t;
+
+typedef union message_metadata {
+} message_metadata_t;
+
+#endif

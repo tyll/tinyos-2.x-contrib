@@ -29,3 +29,28 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
+/*
+ *  @author Mirko Bordignon <mirko.bordignon@ieee.org>
+ */
+
+#ifndef PLATFORM_MESSAGE_H
+#define PLATFORM_MESSAGE_H
+
+#include "Xbee.h"
+#include "Serial.h"
+
+typedef union message_header {
+  xbee_header_t xbee;
+  xbee_service_header_t xbee_service;
+  serial_header_t serial;
+} message_header_t;
+
+typedef union message_footer {
+} message_footer_t;
+
+typedef union message_metadata {
+  xbee_metadata_t xbee;
+} message_metadata_t;
+
+#endif

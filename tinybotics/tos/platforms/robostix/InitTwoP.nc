@@ -1,4 +1,12 @@
 /*
+ * Copyright (c) 2005-2006 Intel Corporation
+ * All rights reserved.
+ *
+ * This file is distributed under the terms in the attached INTEL-LICENSE     
+ * file. If you do not find these files, copies can be found by writing to
+ * Intel Research Berkeley, 2150 Shattuck Avenue, Suite 1300, Berkeley, CA, 
+ * 94704.  Attention:  Intel License Inquiry.
+ *
  * Copyright (c) 2007 University of Padova
  * Copyright (c) 2007 Orebro University
  * All rights reserved.
@@ -29,3 +37,24 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
+/**
+ * Internal robostix timer component. Sets up hardware timer 2 to run
+ * at cpu clock / ROBOSTIX_PRESCALER_TWO, at boot time.
+ * The actual implementatation assumes an ~16MHz CPU clock,
+ * extend RobostixTimer.h if you are running at a different frequency.
+ *
+ * @author David Gay
+ * @author Mirko Bordignon <mirko.bordignon@ieee.org>
+ */
+
+#include <RobostixTimer.h>
+
+configuration InitTwoP { }
+implementation {
+  components PlatformC, HplAtm128Timer2C as HWTimer,
+    new Atm128TimerInitC(uint8_t, ROBOSTIX_PRESCALER_TWO) as InitTwo;
+
+  PlatformC.SubInit -> InitTwo;
+  InitTwo.Timer -> HWTimer;
+}

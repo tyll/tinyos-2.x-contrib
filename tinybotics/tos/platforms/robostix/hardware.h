@@ -29,3 +29,23 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
+/*
+ *  @author Mirko Bordignon <mirko.bordignon@ieee.org>
+ */
+
+#ifndef HARDWARE_H
+#define HARDWARE_H
+
+#ifndef MHZ
+#define MHZ 16 			//usual clock rate of a stock robostix
+#endif
+
+#include <atm128hardware.h>
+#include <Atm128Adc.h>
+
+enum {
+  PLATFORM_BAUDRATE = 38400L 	//most suitable baud rate when clocked at 16MHz
+};
+
+#endif 				//HARDWARE_H

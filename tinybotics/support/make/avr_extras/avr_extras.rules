@@ -1,0 +1,22 @@
+# avr_extras.rules
+# mirko.bordignon@ieee.org
+
+define AVR_EXTRAS_HELP
+
+ TinyBotics AVR extras:
+
+   dt006        : use a DT006 compatible parallel port programmer
+
+   stk500,<dev> : use STK500 serial port programming board at port <dev>
+                  (default for robostix and pmote targets)
+   The dev parameter need not be specified, in which case it is expected
+   to be defined either as in the environment variable STK500 or on the
+   command line. If unspecified, it will default to /dev/ttyS0.
+
+endef
+
+HELP += $(AVR_EXTRAS_HELP)
+
+# the same as in avr.rules
+$(if $(PROGRAM),,$(call TOSMake_include,avr_extras/$(DEFAULT_PROGRAM).extra))
+

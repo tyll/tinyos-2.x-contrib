@@ -1,0 +1,34 @@
+# .platform file for the PEIS-mote (pmote)
+# mirko.bordignon@ieee.org
+
+push( @includes, qw(
+
+  %T/../../tinyos-2.x-contrib/tinybotics/tos/platforms/pmote
+  %T/../../tinyos-2.x-contrib/tinybotics/tos/platforms/robostix
+  %T/../../tinyos-2.x-contrib/tinybotics/tos/platforms/robostix/system
+  %T/../../tinyos-2.x-contrib/tinybotics/tos/platforms/robostix/chips/atm128
+  %T/../../tinyos-2.x-contrib/tinybotics/tos/chips/xbee
+  %T/chips/atm128
+  %T/chips/atm128/adc
+  %T/chips/atm128/i2c
+  %T/chips/atm128/pins
+  %T/chips/atm128/spi
+  %T/chips/atm128/timer
+  %T/lib/timer
+  %T/lib/serial
+  %T/lib/power
+
+) );
+
+@opts = qw(
+
+  -gcc=avr-gcc
+  -mmcu=atmega128
+  -fnesc-target=avr
+  -fnesc-no-debug
+  -fnesc-scheduler=TinySchedulerC,TinySchedulerC.TaskBasic,TaskBasic,TaskBasic,runTask,postTask
+
+);
+
+push @opts, "-mingw-gcc" if $cygwin;
+

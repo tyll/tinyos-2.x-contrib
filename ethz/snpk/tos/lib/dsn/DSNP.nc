@@ -17,6 +17,8 @@ module DSNP
 	provides interface Init;
 	provides interface Init as NodeIdInit;
 	
+	uses interface Boot;
+	
 	uses interface UartStream;
 	uses interface HplMsp430Usart;
 	uses interface Resource;
@@ -114,6 +116,17 @@ implementation
 		bufferEnd=&ringbuffer[0];
 		
 		return SUCCESS;
+	}
+	
+	event void Boot.booted() {
+#ifdef NOSHARE
+		atomic {
+			if (m_state==S_INIT) {
+				call Resource.request();
+				m_state=S_STARTED;
+			}
+		}
+#endif
 	}
 	
 	/***************************************

@@ -55,6 +55,7 @@ implementation
 	
 	DSN = DSNP.DSN;
 	MainC.SoftwareInit->DSNP.Init;
+	DSNP.Boot -> MainC;
 	DSNP.setAmAddress -> ActiveMessageAddressC;
 	
 	components ActiveMessageC;

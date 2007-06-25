@@ -31,7 +31,7 @@
 * 
 */
 
-#include "DSN.h"
+// #include "DSN.h"
 
 /**
  * This modules detects dsn commands with following format:
@@ -65,6 +65,7 @@ implementation
 	
 	enum {
 		SEPARATOR=' ',
+		LOG_DELIMITER=0,
 		LOG_DELIMITER2='\r',
 	};
 	

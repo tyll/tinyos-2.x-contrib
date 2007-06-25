@@ -504,6 +504,7 @@ implementation
   				post sendBuf();
   			else
   				stop();
+  			rxbuffer[rxlen]=0;
   			post ReceivedTask();
   		}
   		else {

@@ -52,6 +52,7 @@ implementation
 	bool enabled=FALSE;
 
 	task void stoptimer();
+	task void starttimer();
 
     // ************* SoftIrq Interrupt handlers and dispatch *************
   
@@ -60,7 +61,7 @@ implementation
 			 state.final = TRUE;
 		}    // save state we await
 		state.last = call IrqPin.get();          // get current state
-		call IrqTimer.startOneShot(interval); // wait interval in msec
+		post starttimer(); // wait interval in msec
 		return SUCCESS;
   	}
   
@@ -69,7 +70,7 @@ implementation
 		 	 state.final = FALSE;
 		}    // save state we await
 		state.last = call IrqPin.get();          // get current state
-		call IrqTimer.startOneShot(interval); // wait interval in msec
+		post starttimer(); // wait interval in msec
 		return SUCCESS;
   	}
 
@@ -99,6 +100,13 @@ implementation
 		atomic {
 			if (!enabled)
 				call IrqTimer.stop();
+		}
+	}
+	
+	task void starttimer() {
+		atomic {
+			if (enabled)
+				call IrqTimer.startOneShot(interval);
 		}
 	}
 }

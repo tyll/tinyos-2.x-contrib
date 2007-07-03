@@ -6,7 +6,13 @@
 
 module PlatformP{
   provides interface Init;
-  uses interface Init as PInit;
+  uses {
+      interface Init as InitL0;
+      interface Init as InitL1;
+      interface Init as InitL2;
+      interface Init as InitL3;
+      interface Init as PInit;
+  }
 }
 implementation{
 
@@ -14,6 +20,7 @@ implementation{
     // AT91F_LowLevelInit() in Cstartup_SAM7.c has been called
     // TODO: Move it so equivalent code is called from this place
     int            i;
+uint32_t TmpReset;
 
     AT91PS_PMC     pPMC = AT91C_BASE_PMC;
 
@@ -73,14 +80,28 @@ implementation{
       //AT91C_BASE_AIC->AIC_SVR[i] = (int) AT91F_Default_IRQ_handler;
     }
     
-    AT91C_BASE_AIC->AIC_SPU  = (int) AT91F_Spurious_handler ;     
-   
+    AT91C_BASE_AIC->AIC_SPU  = (int) AT91F_Spurious_handler ;    
+    
+
+    *AT91C_RSTC_RMR  = 0xA5000401;
+    *AT91C_AIC_DCR   = 1;
+    // PIT timer is for 1 ms intervals
+    *AT91C_PITC_PIMR = (0x000FFFFF | 0x01000000);
+    TmpReset         = *AT91C_PITC_PIVR;
+    TmpReset         = TmpReset;/* Suppress warning*/
+
+    call InitL0.init();
+    call InitL1.init();
+    call InitL2.init();
+    call InitL3.init();
     call PInit.init();
 
     return SUCCESS;
   }
- 
-  default command error_t PInit.init() { 
-    return SUCCESS; 
-  }
+  
+  default command error_t InitL0.init() { return SUCCESS; }
+  default command error_t InitL1.init() { return SUCCESS; }
+  default command error_t InitL2.init() { return SUCCESS; }
+  default command error_t InitL3.init() { return SUCCESS; } 
+  default command error_t PInit.init()  { return SUCCESS; }
 }

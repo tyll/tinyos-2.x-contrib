@@ -44,4 +44,30 @@ implementation {
   {
     return ((*AT91C_PIOA_PDSR & GPIO_pin_bit(pin)) != 0);
   }
+  
+  //PIO set selection of A peripheral
+  async command void HplAT91_GPIOPin.setPIOASR[uint8_t pin]()
+  {
+    *AT91C_PIOA_ABSR = GPIO_pin_bit(pin);
+  }
+  
+  //PIO disable (to let a peripheral control the pin)
+  async command void HplAT91_GPIOPin.setPIOPDR[uint8_t pin]()
+  {
+    *AT91C_PIOA_PDR = GPIO_pin_bit(pin);
+  }
+  
+  //PIO open drain (multiple drivers)
+  async command void HplAT91_GPIOPin.setPIOMDER[uint8_t pin]()
+  {
+    *AT91C_PIOA_MDER = GPIO_pin_bit(pin);
+  }  
+
+  //PIO pull up disable
+  async command void HplAT91_GPIOPin.setPIOPPUDR[uint8_t pin]()
+  {
+    *AT91C_PIOA_PPUDR = GPIO_pin_bit(pin);
+  }  
+
+  
 }

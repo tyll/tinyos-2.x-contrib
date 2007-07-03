@@ -17,9 +17,9 @@ implementation
 {
   void irqhandler() __attribute__ ((C, spontaneous)) {
     uint32_t irqID;
-    
+
     irqID = AT91F_AIC_ActiveID(AT91C_BASE_AIC); // Current interrupt source number
-    
+
     signal AT91Irq.fired[irqID]();   
     
     return;
@@ -29,33 +29,38 @@ implementation
     return;
   }
 
-
-  error_t allocate(uint8_t id, bool level, uint8_t priority)
-  {
-    //AT91F_AIC_ConfigureIt ( AT91C_BASE_AIC, id, priority, AT91C_AIC_SRCTYPE_INT_HIGH_LEVEL, irqhandler);
-    //rup: what ahout the rc trigger???
-    AT91F_AIC_ConfigureIt ( AT91C_BASE_AIC, AT91C_ID_TC0, 2, AT91C_AIC_SRCTYPE_INT_HIGH_LEVEL, irqhandler);
-
-    return TRUE;
-  }
-
+  // Peripheral clock and AIC
   void enable(uint8_t id)
   {
     atomic {
       if (id < 34) {
         AT91C_BASE_TC0->TC_IER = AT91C_TC_CPCS;        
-        //AT91F_AIC_EnableIt(AT91C_BASE_AIC, id);
-AT91F_AIC_EnableIt(AT91C_BASE_AIC, AT91C_ID_TC0);
+        // Enable peripheral clock (TODO: is this the place)
+        AT91F_PMC_EnablePeriphClock(AT91C_BASE_PMC, id);
+        // Enable interrupt on AIC
+        AT91F_AIC_EnableIt(AT91C_BASE_AIC, id);
+      //AT91F_AIC_EnableIt(AT91C_BASE_AIC, AT91C_ID_TC0);
       }
     }
     return;
   }
-  
+
+  error_t allocate(uint8_t id, bool level, uint8_t priority)
+  {
+    // TODO: level or edge
+    
+    //AT91F_AIC_ConfigureIt ( AT91C_BASE_AIC, id, priority, AT91C_AIC_SRCTYPE_INT_HIGH_LEVEL, irqhandler);
+    AT91F_AIC_ConfigureIt ( AT91C_BASE_AIC, id, priority, AT91C_AIC_SRCTYPE_INT_EDGE_TRIGGERED, irqhandler);
+    //AT91F_AIC_ConfigureIt ( AT91C_BASE_AIC, AT91C_ID_TC0, 2, AT91C_AIC_SRCTYPE_INT_HIGH_LEVEL, irqhandler);
+
+    return TRUE;
+  }
 
   void disable(uint8_t id)
   {
     atomic {
       if (id < 34) {
+        //TODO: replace
         AT91C_BASE_TC0->TC_IDR = AT91C_TC_CPCS;
         AT91F_AIC_DisableIt(AT91C_BASE_AIC, id);
       }

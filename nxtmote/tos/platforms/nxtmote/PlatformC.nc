@@ -20,7 +20,8 @@ configuration PlatformC {
   provides interface Init;
 }
 implementation {
-  components PlatformP;
+  components PlatformP, NxtAvrC;
   Init = PlatformP;
-  
+
+  PlatformP.InitL2 -> NxtAvrC.Init;  
 }

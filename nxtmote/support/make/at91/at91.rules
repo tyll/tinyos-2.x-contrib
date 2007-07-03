@@ -23,6 +23,8 @@ OBJDUMP = arm-elf-objdump
 NCC = ncc
 LIBS = -lm
 
+FLASHEXE = fwflash.exe
+
 BUILDDIR = build/$(PLATFORM)
 MAIN_EXE = $(BUILDDIR)/main.exe
 MAIN_SREC = $(BUILDDIR)/main.srec

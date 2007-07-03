@@ -94,7 +94,6 @@ __nesc_enable_interrupt();
           while(1){
             uint16_t cv = AT91C_BASE_TC0->TC_CV;
             if(cv == (TICKSONEMSCLK2-1)){
-                //togglepin(0);
             }
           }
 */          

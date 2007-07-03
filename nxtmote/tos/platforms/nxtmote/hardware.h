@@ -11,6 +11,33 @@
 #include "lib_AT91SAM7S256.h"
 #include "lib_extra_AT91SAM7S256.h"
 
+#define   OSC                           48054850L
+
+typedef   unsigned char                 UCHAR;  //uint8_t
+typedef   unsigned short                USHORT; //uint16_t
+typedef   unsigned char                 UBYTE;  //uint8_t
+typedef   signed char                   SBYTE;  //int8_t
+typedef   unsigned short int            UWORD;  //uint16_t
+typedef   signed short int              SWORD;  //int16_t
+typedef   unsigned long                 ULONG;  //uint32_t
+typedef   signed long                   SLONG;  //int32_t
+/*
+typedef signed char int8_t;
+typedef unsigned char uint8_t;
+
+typedef short int16_t;
+typedef unsigned short uint16_t;
+
+typedef int int32_t;
+typedef unsigned int uint32_t;
+
+typedef long long int64_t;
+typedef unsigned long long uint64_t;
+
+typedef int32_t intptr_t;
+typedef uint32_t uintptr_t;
+*/
+
 extern void AT91F_Spurious_handler(void);
 extern void AT91F_Default_IRQ_handler(void);
 extern void AT91F_Default_FIQ_handler(void);
@@ -88,20 +115,7 @@ inline void __nesc_atomic_sleep() {
 #define TICKSONEMSCLK2 (24028)
 //#define TICKTOMSCLK2(ticks)
 
-// GPIO pins
-// See AT91SAM7S256 LEGO MINDSTORMS HW sheet 1
-// and J7, J8, J9, and J6 on sheet 3
-#define DIGIA0 (23) // Port 1 pin 5 (yellow)
-#define DIGIA1 (18) // Port 1 pin 6 (blue)
 
-#define DIGIB0 (28) // Port 2 pin 5
-#define DIGIB1 (19) // Port 2 pin 6
-
-#define DIGIC0 (29) // Port 3 pin 5
-#define DIGIC1 (20) // Port 3 pin 6
-
-#define DIGID0 (30) // Port 4 pin 5
-#define DIGID1 (2)  // Port 4 pin 6
 
 // priorities which are used in HplAt91InterruptM
 const uint8_t TOSH_IRP_TABLE[] = {
@@ -114,7 +128,7 @@ const uint8_t TOSH_IRP_TABLE[] = {
   0xFF, // AT91C_ID_US0         ID  6, USART 0
   0xFF, // AT91C_ID_US1         ID  7, USART 1
   0xFF, // AT91C_ID_SSC         ID  8, Serial Synchronous Controller
-  0xFF, // AT91C_ID_TWI         ID  9, Two-Wire Interface
+  AT91C_AIC_PRIOR_HIGHEST, // AT91C_ID_TWI         ID  9, Two-Wire Interface
   0xFF, // AT91C_ID_PWMC        ID 10, PWM Controller
   0xFF, // AT91C_ID_UDP         ID 11, USB Device Port
   0x04, // AT91C_ID_TC0         ID 12, Timer Counter 0
@@ -187,18 +201,33 @@ AT91_REG PID_ADR_TABLE[] = {
 //  TC_CLKS_MCK1024 = 0x4
 //};
 
+// GPIO pins
+// See AT91SAM7S256 LEGO MINDSTORMS HW sheet 1
+// and J7, J8, J9, and J6 on sheet 3
+#define DIGIA0 (23) // Port 1 pin 5 (yellow)
+#define DIGIA1 (18) // Port 1 pin 6 (blue)
 
-// See HW appendix page 1. Pin6 on port 1 is PA18 that is DIGIA1
-#define LEDVAL_ (1 << DIGIA1)
+#define DIGIB0 (28) // Port 2 pin 5
+#define DIGIB1 (19) // Port 2 pin 6
+
+#define DIGIC0 (29) // Port 3 pin 5
+#define DIGIC1 (20) // Port 3 pin 6
+
+#define DIGID0 (30) // Port 4 pin 5
+#define DIGID1 (2)  // Port 4 pin 6
+// See HW appendix page 1. Pin5 on port 1 is PA18 that is DIGIA1
+#define LEDVAL_ (1 << DIGIA0)
 // Little function to toggle a pin
+// Usage: write {toggle(0);}
+//   in your code to turn off the led
 #define togglepin(toggle)	{/* GPIO register addresses */\
 							/* Register use */\
 							*AT91C_PIOA_PER = LEDVAL_;\
 							*AT91C_PIOA_OER = LEDVAL_;\
 							if(toggle == 0)\
-							  *AT91C_PIOA_CODR = LEDVAL_;  /* port 1 pin 6 at 0.0 v (enable this line OR the next)*/\
+							  *AT91C_PIOA_CODR = LEDVAL_;  /* port 1 pin 5 at 0.0 v (enable this line OR the next)*/\
 							else\
-							  *AT91C_PIOA_SODR = LEDVAL_;  /* port 1 pin 6 (blue) at 3.25-3.27 v (GND is on pin 2 (black)) */\
+							  *AT91C_PIOA_SODR = LEDVAL_;  /* port 1 pin 5 (blue) at 3.25-3.27 v (GND is on pin 2 (black)) */\
 							while(1); /* stop here */\
 						    }
 

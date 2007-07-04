@@ -70,8 +70,8 @@ implementation {
    * Minimum number of packets we should be seeing per second
    */
   enum {
-    LOWER_BOUNDS = 17423, 
-    TEST_DURATION = 61440,  // 2 minutes
+    LOWER_BOUNDS = 8710,  
+    TEST_DURATION = 30720,  // 30 seconds
   };
   
   enum {
@@ -112,10 +112,7 @@ implementation {
   
   async event void RadioBackoff.requestCongestionBackoff(message_t *msg) {
   }
-  
-  async event void RadioBackoff.requestLplBackoff(message_t *msg) {
-  }
-  
+    
   async event void RadioBackoff.requestCca(message_t *msg) {
     call RadioBackoff.setCca(FALSE);
   }
@@ -130,7 +127,8 @@ implementation {
   /***************** Timer Events ****************/
   event void Timer.fired() {
     call RunState.toIdle();
-    call Statistics.log("[packets/sec]", (uint32_t) ((float) received / (float) 60));
+    call Leds.set(7);
+    call Statistics.log("[packets/sec]", (uint32_t) ((float) received / (float) 30));
     assertResultIsAbove("Throughput is too low", LOWER_BOUNDS, received);
     call TestThroughput.done();
   }

@@ -38,7 +38,7 @@ interface TestCase {
 
   event void run();
   
-  command void done();
+  async command void done();
   
 }
 

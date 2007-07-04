@@ -118,6 +118,7 @@ implementation {
  
   /***************** Functions ****************/ 
   void send(uint8_t byte) {
+    // TODO add the escape bytes for 0x7E's
     myCrc = crcByte(myCrc, byte);
     call UartByte.send(byte);
   }

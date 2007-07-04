@@ -113,10 +113,7 @@ implementation {
   
   async event void RadioBackoff.requestCongestionBackoff(message_t *msg) {
   }
-  
-  async event void RadioBackoff.requestLplBackoff(message_t *msg) {
-  }
-  
+    
   async event void RadioBackoff.requestCca(message_t *msg) {
     call RadioBackoff.setCca(FALSE);
   }

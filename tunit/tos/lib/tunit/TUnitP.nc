@@ -71,6 +71,7 @@
 
 module TUnitP {
   provides {
+    interface Init;
     interface TestCase[uint8_t testId];
     interface TestControl as SetUpOneTime @atmostonce();
     interface TestControl as SetUp @atmostonce();
@@ -86,8 +87,7 @@ module TUnitP {
     interface State as TestState;
     interface State as SendState;
     interface SplitControl as SerialSplitControl;
-    
-    async command am_addr_t amAddress(); 
+    interface ActiveMessageAddress;
     interface Leds;
   }
 }
@@ -95,7 +95,13 @@ module TUnitP {
 implementation {
 
   /** ID of the current test we're running */
-  uint8_t currentTest;
+  norace uint8_t currentTest;
+  
+  /** 
+   * TRUE if this node is the driver of the test.  We set it here because
+   * the node's address may change as part of the test.
+   */
+  bool driver;
   
   /**
    * TUnit State
@@ -123,13 +129,20 @@ implementation {
   
   /***************** Prototypes ****************/
   task void waitForSendDone();
-  
+  task void runDone();
+    
   void setUpOneTimeDone();
   void setUpDone();
-  void runDone();
   void tearDownDone();
   void tearDownOneTimeDone();
   void attemptTest();
+  
+  /***************** Init Commands ****************/
+  command error_t Init.init() {  
+    driver = (call ActiveMessageAddress.amAddress() == 0);
+    return SUCCESS;
+  }
+  
   
   /***************** SerialSplitControl Events ****************/
   /**
@@ -139,7 +152,7 @@ implementation {
     if(call TUnitState.getState() == S_NOT_BOOTED) {
       call TUnitState.forceState(S_READY);
       
-      if(call amAddress() != 0) {
+      if(!driver) {
         // This is not the base node driving the test.
         // SetUpOneTime and don't touch anything else, unless we get notified
         // that the test is complete.  Then we let the computer know
@@ -177,8 +190,8 @@ implementation {
   
   
   /***************** TestCase Commands ****************/
-  command void TestCase.done[uint8_t testId]() {
-    runDone();
+  async command void TestCase.done[uint8_t testId]() {
+    post runDone();
   }
 
   /***************** Assertions ****************/
@@ -250,7 +263,7 @@ implementation {
   void setUpOneTimeDone() {
     if(call TestState.getState() == S_SETUP_ONETIME) {
       call TestState.toIdle();
-      if(call amAddress() != 0) {
+      if(!driver) {
         call TestState.forceState(S_RUN);
         
       } else {
@@ -264,14 +277,6 @@ implementation {
       call TestState.forceState(S_RUN);
       signal TestCase.run[currentTest]();
       // Execution continues when runDone()
-    }
-  }
-  
-  void runDone() {
-    if(call TestState.getState() == S_RUN) {
-      call TestState.forceState(S_TEARDOWN);
-      signal TearDown.run();
-      // Execution continues when tearDownDone()
     }
   }
   
@@ -303,6 +308,10 @@ implementation {
     }
   }
   
+  /***************** ActiveMessageAddress Events ****************/
+  async event void ActiveMessageAddress.changed() {
+  }
+  
   /***************** Tasks ****************/
   task void waitForSendDone() {
     if(call SendState.isIdle() && signal StatsQuery.isIdle()) {
@@ -316,6 +325,14 @@ implementation {
     }
   }
     
+  task void runDone() {
+    if(call TestState.getState() == S_RUN) {
+      call TestState.forceState(S_TEARDOWN);
+      signal TearDown.run();
+      // Execution continues when tearDownDone()
+    }
+  }
+  
   /***************** Defaults ****************/
   default event void SetUpOneTime.run() {
     setUpOneTimeDone();
@@ -326,7 +343,7 @@ implementation {
   }
   
   default event void TestCase.run[uint8_t testId]() {
-    runDone();
+    post runDone();
   }
   
   default event void TearDown.run() {

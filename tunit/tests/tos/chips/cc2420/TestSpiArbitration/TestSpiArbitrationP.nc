@@ -13,10 +13,12 @@ module TestSpiArbitrationP {
     interface TestCase as TestReleaseAndHold;
     interface TestCase as TestImmediateRequest;
     interface TestCase as TestReleaseAbortAcquire;
+    interface TestCase as TestAbortImmediateRequest;
     
     interface Resource as Resource1;
     interface Resource as Resource2;
     interface Resource as Resource3;
+    interface Resource as Resource4;
     interface ChipSpiResource;
     
     interface State;
@@ -29,6 +31,7 @@ implementation {
   
   norace bool inUse;
   uint8_t platformRequests;
+  bool resource4Granted;
   
   enum {
     S_IDLE,
@@ -37,22 +40,30 @@ implementation {
     S_TESTRELEASEANDHOLD,
     S_TESTIMMEDIATEREQUEST,
     S_TESTRELEASEABORTACQUIRE,
+    S_TESTABORTIMMEDIATEREQUEST,
   };
   
   
   /***************** Prototypes ****************/
+  task void immediateRequest_finish();
+  
   task void releaseAndHold_attemptRelease();
   task void releaseAndHold_finish();
   
   task void releaseAbortAcquire_attemptRelease();
   task void releaseAbortAcquire_finish();
   
+  task void abortImmediateRequest_immediateRequest();
+  task void abortImmediateRequest_finish();
+  
   /***************** SetUp Events ****************/
   event void SetUp.run() {
     call Resource1.release();
     call Resource2.release();
     call Resource3.release();
+    call Resource4.release();
     inUse = FALSE;
+    resource4Granted = FALSE;
     platformRequests = 0;
     call Leds.set(0);
     call SetUp.done();
@@ -104,14 +115,25 @@ implementation {
     }
   }
   
+  /**
+   * Immediately request resource 4.  Verify we got it. Imm.Request another
+   * resource, verify we didn't get it.  Post a task to verify 
+   * Resource4.granted() was never signaled.
+   */
   event void TestImmediateRequest.run() {
     call State.forceState(S_TESTIMMEDIATEREQUEST);
-    assertEquals("Imm.Req.(3) failed", SUCCESS, call Resource3.immediateRequest());
+    resource4Granted = FALSE;
+    assertEquals("Imm.Req.(3) failed", SUCCESS, call Resource4.immediateRequest());
     assertTrue("Platform SPI not in use", inUse);
     assertNotEquals("Imm.Req.(2) was granted", SUCCESS, call Resource2.immediateRequest());
-    call TestImmediateRequest.done();
+    post immediateRequest_finish();
   }
   
+  /**
+   * Acquire the SPI with resource 1.  Release it, abort the chip release.
+   * Acquire the SPI with resource 3. Verify we acquired it correctly and
+   * that the chip only made one request to the platform SPI.
+   */
   event void TestReleaseAbortAcquire.run() {
     call State.forceState(S_TESTRELEASEABORTACQUIRE);
     if(call Resource1.request() != SUCCESS) {
@@ -120,7 +142,22 @@ implementation {
       call TestReleaseAbortAcquire.done();
     }
   }
-    
+  
+  /**
+   * Acquire, Release & Abort, immediately request.  No granted() should be
+   * signaled for the immediate request at any time.
+   */
+  event void TestAbortImmediateRequest.run() {
+    call State.forceState(S_TESTABORTIMMEDIATEREQUEST);
+    resource4Granted = FALSE;
+    if(call Resource1.request() != SUCCESS) {
+      assertFail("Request 1 Failed");
+      call State.toIdle();
+      call TestAbortImmediateRequest.done();
+    }
+  }
+  
+  
   /***************** ChipSpiResource Events ****************/
   async event void ChipSpiResource.releasing() {
     if(call State.getState() == S_TESTRELEASEANDHOLD) {
@@ -130,6 +167,10 @@ implementation {
     } else if(call State.getState() == S_TESTRELEASEABORTACQUIRE) {
       call ChipSpiResource.abortRelease();
       post releaseAbortAcquire_attemptRelease();
+    
+    } else if(call State.getState() == S_TESTABORTIMMEDIATEREQUEST) {
+      call ChipSpiResource.abortRelease();
+      post abortImmediateRequest_immediateRequest();
     }
   }
   
@@ -186,6 +227,14 @@ implementation {
       }
       // ChipSpiResource.releasing() is signaled, test continues there.
     
+    } else if(call State.getState() == S_TESTABORTIMMEDIATEREQUEST) {
+      if(call Resource1.release() != SUCCESS) {
+        assertFail("Resource1 release failed");
+        call State.toIdle();
+        call TestAbortImmediateRequest.done();
+      }
+      // ChipSpiResource.releasing() continues
+      
     }
   }
   
@@ -216,7 +265,16 @@ implementation {
     post releaseAbortAcquire_finish();
   }
   
+  event void Resource4.granted() {
+    resource4Granted = TRUE;
+  }
+  
   /***************** Tasks ****************/  
+  task void immediateRequest_finish() {
+    assertFalse("Resource 4 was granted on an imm.req!", resource4Granted);
+    call TestImmediateRequest.done();
+  }
+  
   task void releaseAndHold_attemptRelease() {
     assertTrue("Platform SPI was released", inUse);
     assertResultIsBelow("Too many platform requests", 2, platformRequests);
@@ -247,6 +305,21 @@ implementation {
     assertResultIsBelow("Too many platform requests", 2, platformRequests);
     call State.toIdle();
     call TestReleaseAbortAcquire.done();
+  }
+  
+  
+  task void abortImmediateRequest_immediateRequest() {
+    if(call Resource4.immediateRequest() != SUCCESS) {
+      assertFail("Imm.Req to 4 failed");
+      call TestAbortImmediateRequest.done();
+    }
+    
+    post abortImmediateRequest_finish();
+  }
+  
+  task void abortImmediateRequest_finish() {
+    assertFalse("Resource 4 was granted on an imm.req", resource4Granted);
+    call TestAbortImmediateRequest.done();
   }
   
   

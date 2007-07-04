@@ -42,7 +42,13 @@
 
 		<property name="archive.prefix" value="htmlreport_${TIMESTAMP}" />
 
-		<tar tarfile="${archive.dir}/${archive.prefix}.tar" basedir="${htmlreport.dir}" />
+            <tar destfile="${archive.dir}/${archive.prefix}.tar" longfile="gnu">
+              <tarfileset dir="${report.dir}" preserveLeadingSlashes="true">
+                <include name="html/**"/>
+                <include name="stats/**"/>
+              </tarfileset>
+            </tar>
+
 		<gzip zipfile="${archive.dir}/${archive.prefix}.tar.gz" src="${archive.dir}/${archive.prefix}.tar" />
 
 		<delete>

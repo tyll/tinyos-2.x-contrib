@@ -64,7 +64,7 @@ implementation {
    * Minimum number of packets we should be seeing per second
    */
   enum {
-    LOWER_BOUNDS = 21950,  // 365+ packets per second
+    LOWER_BOUNDS = 21050,  // 350+ packets per second
     TEST_DURATION = 61440,  // 1 minute
   };
   
@@ -103,10 +103,7 @@ implementation {
   
   async event void RadioBackoff.requestCongestionBackoff(message_t *msg) {
   }
-  
-  async event void RadioBackoff.requestLplBackoff(message_t *msg) {
-  }
-  
+    
   async event void RadioBackoff.requestCca(message_t *msg) {
     call RadioBackoff.setCca(FALSE);
   }

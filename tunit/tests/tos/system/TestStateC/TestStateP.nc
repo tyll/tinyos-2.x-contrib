@@ -36,6 +36,10 @@
  */
  
 module TestStateP {
+  provides {
+    async command void runTestAsync();
+  }
+  
   uses {
     interface State;
     
@@ -45,6 +49,7 @@ module TestStateP {
     interface TestCase as TestForce;
     interface TestCase as TestRequest;
     interface TestCase as TestToIdle;
+    interface TestCase as TestAsync;
   }
 }
 
@@ -59,6 +64,8 @@ implementation {
     S_STATE2,
     S_STATE3,
   };
+  
+  /***************** Prototypes ****************/
   
   /***************** SetUpOneTime Events ***************/
   event void SetUpOneTime.run() {
@@ -78,8 +85,11 @@ implementation {
     assertTrue("TestForce: S_STATE1 not forced correctly", call State.getState() == S_STATE1);
     call State.forceState(S_STATE2);
     assertEquals("TestForce: S_STATE2 not forced correctly", call State.getState(), S_STATE2);
+    assertTrue("TestForce: 1. isState() failed", call State.isState(S_STATE2));
+    
     call State.forceState(S_IDLE);
     assertFalse("TestForce: State was supposed to be idle", call State.getState() == S_STATE3);
+    assertFalse("TestForce: 2. isState() failed", call State.isState(S_STATE2));
     
     call TestForce.done();
   }
@@ -105,6 +115,22 @@ implementation {
     assertTrue("TestToIdle: toIdle()/isIdle() didn't work", call State.isIdle());
     
     call TestToIdle.done();
+  }
+  
+  event void TestAsync.run() {
+    call runTestAsync();
+  }
+  
+  
+  async command void runTestAsync() {
+    call State.forceState(S_STATE3);
+    assertTrue("Async: force/getState failed", call State.getState() == S_STATE3);
+    assertTrue("Async: force/isState failed", call State.isState(S_STATE3));
+    assertFalse("Async: isIdle failed", call State.isIdle());
+    assertTrue("Async: Req succeeded improperly", call State.requestState(S_STATE2) != SUCCESS);
+    call State.toIdle();
+    assertTrue("Async: toIdle failed", call State.isIdle());
+    call TestAsync.done();
   }
   
 }

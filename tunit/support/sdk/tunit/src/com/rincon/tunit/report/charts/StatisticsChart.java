@@ -17,20 +17,23 @@ import org.jfree.chart.labels.StandardXYToolTipGenerator;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
+import org.jfree.data.general.SeriesException;
 import org.jfree.data.time.Minute;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 
 /**
  * Write statistical data to a .png file
+ * 
  * @author David Moss
- *
+ * 
  */
 public class StatisticsChart {
 
   /**
    * Write statistical information to a .png file dictated by the data found in
    * a StatisticsLogData object.
+   * 
    * @param data
    * @throws IOException
    */
@@ -40,42 +43,51 @@ public class StatisticsChart {
     StatsEntry focusedEntry;
     for (int i = 0; i < data.size(); i++) {
       focusedEntry = data.get(i);
-      series1.add(new Minute(focusedEntry.getDate()), focusedEntry.getValue1());
-      
-      // So we can see this on the chart if there's only one point to plot...
-      if(data.size() == 1) {
-        series1.add(new Minute(focusedEntry.getDate()).next(), focusedEntry.getValue1());
+      try {
+        series1.add(new Minute(focusedEntry.getDate()), focusedEntry.getValue1());
+      } catch (SeriesException e) {
+        // Don't add two results for the same minute
+      }
+
+      // Duplicate this point so we can see it if it's the only point
+      if (data.size() == 1) {
+        series1.add(new Minute(focusedEntry.getDate()).next(), focusedEntry
+            .getValue1());
       }
     }
 
     final TimeSeriesCollection dataset = new TimeSeriesCollection(series1);
     JFreeChart chart;
-    
+
     if (data.hasTwoUnits()) {
       final TimeSeries series2 = new TimeSeries(data.getUnits2(), Minute.class);
       for (int i = 0; i < data.size(); i++) {
         focusedEntry = data.get(i);
-        series2.add(new Minute(focusedEntry.getDate()), focusedEntry
-            .getValue2());
-        
-        // So we can see this on the chart if there's only one point to plot...
-        if(data.size() == 1) {
-          series2.add(new Minute(focusedEntry.getDate()).next(), focusedEntry.getValue2());
+        try {
+          series2.add(new Minute(focusedEntry.getDate()), focusedEntry
+              .getValue2());
+
+        } catch (SeriesException e) {
+          // Don't add two results for the same minute
+        }
+
+        // Duplicate this point so we can see it if it's the only point
+        if (data.size() == 1) {
+          series2.add(new Minute(focusedEntry.getDate()).next(), focusedEntry
+              .getValue2());
         }
       }
       dataset.addSeries(series2);
 
-      chart = ChartFactory.createXYAreaChart(data.getTitle(),
-          "[Time]", "[Units]", dataset, PlotOrientation.VERTICAL, 
-          true, // legend
+      chart = ChartFactory.createXYAreaChart(data.getTitle(), "[Time]",
+          "[Units]", dataset, PlotOrientation.VERTICAL, true, // legend
           true, // tool tips
           false // URLs
           );
 
     } else {
-      chart = ChartFactory.createXYLineChart(data.getTitle(),
-          "[Time]", data.getUnits1(), dataset, PlotOrientation.VERTICAL, 
-          false, // legend
+      chart = ChartFactory.createXYLineChart(data.getTitle(), "[Time]", data
+          .getUnits1(), dataset, PlotOrientation.VERTICAL, false, // legend
           true, // tool tips
           false // URLs
           );
@@ -87,8 +99,9 @@ public class StatisticsChart {
     chart.setBorderVisible(true);
     BufferedImage bufImg = chart.createBufferedImage(500, 325);
 
-    ImageIO.write(bufImg, "png", new File(data.getReportDir(), data.getTitle() + ".png"));
-    
+    ImageIO.write(bufImg, "png", new File(data.getReportDir(), data.getTitle()
+        + ".png"));
+
   }
 
   private static JFreeChart formatChart(final JFreeChart chart) {

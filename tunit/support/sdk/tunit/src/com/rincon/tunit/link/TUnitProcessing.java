@@ -44,21 +44,23 @@ import net.tinyos.message.MoteIF;
 
 /**
  * Automatically Generated
+ * 
  * @author David Moss
- *
+ * 
  */
 public class TUnitProcessing extends Thread implements
     TUnitProcessing_Commands, MessageListener {
 
   /** MoteIF's that we're registered with */
   private List listeningComms;
-  
+
   /** List of FileTransferEvents listeners */
   private static List listeners = new ArrayList();
 
   /** List of received messages */
   @SuppressWarnings("unchecked")
-  private List receivedMessages = java.util.Collections.synchronizedList( new ArrayList());
+  private List receivedMessages = java.util.Collections
+      .synchronizedList(new ArrayList());
 
   /** Message to send */
   private TUnitProcessingMsg outMsg = new TUnitProcessingMsg();
@@ -68,11 +70,10 @@ public class TUnitProcessing extends Thread implements
 
   /** The current fail message being constructed */
   private String currentFailMsg = "";
-  
+
   /** True if this thread is running */
   private boolean running;
-  
-  
+
   /**
    * Constructor
    * 
@@ -85,125 +86,145 @@ public class TUnitProcessing extends Thread implements
     running = true;
     start();
   }
-  
+
   /**
    * Listen to another MoteIF communicator
-   * @param 
+   * 
+   * @param
    */
   @SuppressWarnings("unchecked")
   public void addMoteIf(MoteIF comm) {
     listeningComms.add(comm);
     comm.registerListener(new TUnitProcessingMsg(), this);
   }
-  
+
   /**
    * Append some data to our current fail message
+   * 
    * @param inMsg
    */
   private void appendFailMsg(TUnitProcessingMsg inMsg) {
-    if(inMsg.get_failMsgLength() > 0) {
+    if (inMsg.get_failMsgLength() > 0) {
       short[] message = new short[inMsg.get_failMsgLength()];
-      for(int i = 0; i < message.length; i++) {
+      for (int i = 0; i < message.length; i++) {
         message[i] = inMsg.get_failMsg()[i];
       }
       currentFailMsg += Util.dataToString(message);
     }
   }
-  
+
   /**
    * Thread to handle events
    */
   public void run() {
     TUnitProcessingMsg inMsg;
+    List currentListeners;
     while (running) {
-      synchronized (receivedMessages){
-        while (receivedMessages.isEmpty()){
+      synchronized (receivedMessages) {
+        while (receivedMessages.isEmpty()) {
           try {
             receivedMessages.wait();
-          } catch (InterruptedException ie){
+          } catch (InterruptedException ie) {
           }
         }
+
+        currentListeners = new ArrayList();
+        currentListeners.addAll(listeners);
         
         inMsg = (TUnitProcessingMsg) receivedMessages.get(0);
 
         if (inMsg != null) {
-          switch(inMsg.get_cmd()) {
+          switch (inMsg.get_cmd()) {
           case TUnitProcessing_Constants.TUNITPROCESSING_EVENT_PONG:
-            for(Iterator it = listeners.iterator(); it.hasNext(); ) {
+            for (Iterator it = currentListeners.iterator(); it.hasNext();) {
               ((TUnitProcessing_Events) it.next()).tUnitProcessing_pong();
             }
             break;
 
           case TUnitProcessing_Constants.TUNITPROCESSING_EVENT_TESTRESULT_SUCCESS:
-            for(Iterator it = listeners.iterator(); it.hasNext(); ) {
-              ((TUnitProcessing_Events) it.next()).tUnitProcessing_testSuccess(inMsg.get_id());
-            } 
+            for (Iterator it = currentListeners.iterator(); it.hasNext();) {
+              ((TUnitProcessing_Events) it.next())
+                  .tUnitProcessing_testSuccess(inMsg.get_id());
+            }
             currentFailMsg = "";
             break;
-            
+
           case TUnitProcessing_Constants.TUNITPROCESSING_EVENT_TESTRESULT_FAILED:
             appendFailMsg(inMsg);
-            
-            if(inMsg.get_lastMsg() == 1) {
-              for(Iterator it = listeners.iterator(); it.hasNext(); ) {
-                ((TUnitProcessing_Events) it.next()).tUnitProcessing_testFailed(inMsg.get_id(), currentFailMsg);
-              } 
+
+            if (inMsg.get_lastMsg() == 1) {
+              for (Iterator it = currentListeners.iterator(); it.hasNext();) {
+                ((TUnitProcessing_Events) it.next())
+                    .tUnitProcessing_testFailed(inMsg.get_id(), currentFailMsg);
+              }
               currentFailMsg = "";
             }
             break;
 
           case TUnitProcessing_Constants.TUNITPROCESSING_EVENT_TESTRESULT_EQUALS_FAILED:
             appendFailMsg(inMsg);
-            
-            if(inMsg.get_lastMsg() == 1) {
-              for(Iterator it = listeners.iterator(); it.hasNext(); ) {
-                ((TUnitProcessing_Events) it.next()).tUnitProcessing_testFailed(inMsg.get_id(), currentFailMsg + "; Expected [" + inMsg.get_expected() + "] but got [" + inMsg.get_actual() + "] (unsigned 32-bit form)");
-              } 
+
+            if (inMsg.get_lastMsg() == 1) {
+              for (Iterator it = currentListeners.iterator(); it.hasNext();) {
+                ((TUnitProcessing_Events) it.next())
+                    .tUnitProcessing_testFailed(inMsg.get_id(), currentFailMsg
+                        + "; Expected [" + inMsg.get_expected() + "] but got ["
+                        + inMsg.get_actual() + "] (unsigned 32-bit form)");
+              }
               currentFailMsg = "";
             }
             break;
-            
+
           case TUnitProcessing_Constants.TUNITPROCESSING_EVENT_TESTRESULT_NOTEQUALS_FAILED:
             appendFailMsg(inMsg);
-            
-            if(inMsg.get_lastMsg() == 1) {
-              for(Iterator it = listeners.iterator(); it.hasNext(); ) {
-                ((TUnitProcessing_Events) it.next()).tUnitProcessing_testFailed(inMsg.get_id(), currentFailMsg + "; Shouldn't have gotten [" + inMsg.get_actual() + "] (unsigned 32-bit form)");
-              } 
+
+            if (inMsg.get_lastMsg() == 1) {
+              for (Iterator it = currentListeners.iterator(); it.hasNext();) {
+                ((TUnitProcessing_Events) it.next())
+                    .tUnitProcessing_testFailed(inMsg.get_id(), currentFailMsg
+                        + "; Shouldn't have gotten [" + inMsg.get_actual()
+                        + "] (unsigned 32-bit form)");
+              }
               currentFailMsg = "";
             }
             break;
-            
+
           case TUnitProcessing_Constants.TUNITPROCESSING_EVENT_TESTRESULT_BELOW_FAILED:
             appendFailMsg(inMsg);
-            
-            if(inMsg.get_lastMsg() == 1) {
-              for(Iterator it = listeners.iterator(); it.hasNext(); ) {
-                ((TUnitProcessing_Events) it.next()).tUnitProcessing_testFailed(inMsg.get_id(), currentFailMsg + "; Actual result [" + inMsg.get_actual() + "] was not below [" + inMsg.get_expected() + "] (unsigned 32-bit form)");
-              } 
+
+            if (inMsg.get_lastMsg() == 1) {
+              for (Iterator it = currentListeners.iterator(); it.hasNext();) {
+                ((TUnitProcessing_Events) it.next())
+                    .tUnitProcessing_testFailed(inMsg.get_id(), currentFailMsg
+                        + "; Actual result [" + inMsg.get_actual()
+                        + "] was not below [" + inMsg.get_expected()
+                        + "] (unsigned 32-bit form)");
+              }
               currentFailMsg = "";
             }
             break;
-            
+
           case TUnitProcessing_Constants.TUNITPROCESSING_EVENT_TESTRESULT_ABOVE_FAILED:
             appendFailMsg(inMsg);
-            
-            if(inMsg.get_lastMsg() == 1) {
-              for(Iterator it = listeners.iterator(); it.hasNext(); ) {
-                ((TUnitProcessing_Events) it.next()).tUnitProcessing_testFailed(inMsg.get_id(), currentFailMsg + "; Actual result [" + inMsg.get_actual() + "] was not above [" + inMsg.get_expected() + "] (unsigned 32-bit form)");
-              } 
+
+            if (inMsg.get_lastMsg() == 1) {
+              for (Iterator it = currentListeners.iterator(); it.hasNext();) {
+                ((TUnitProcessing_Events) it.next())
+                    .tUnitProcessing_testFailed(inMsg.get_id(), currentFailMsg
+                        + "; Actual result [" + inMsg.get_actual()
+                        + "] was not above [" + inMsg.get_expected()
+                        + "] (unsigned 32-bit form)");
+              }
               currentFailMsg = "";
             }
             break;
-            
+
           case TUnitProcessing_Constants.TUNITPROCESSING_EVENT_ALLDONE:
-            for(Iterator it = listeners.iterator(); it.hasNext(); ) {
+            for (Iterator it = currentListeners.iterator(); it.hasNext();) {
               ((TUnitProcessing_Events) it.next()).tUnitProcessing_allDone();
             }
             break;
 
-
-          
           default:
           }
 
@@ -215,15 +236,15 @@ public class TUnitProcessing extends Thread implements
 
   /**
    * Send a message to the given destination. For TUnit, it is assumed that the
-   * destination addresses start at 0 (base node) and go on up to however
-   * many nodes are connected for the given test run
+   * destination addresses start at 0 (base node) and go on up to however many
+   * nodes are connected for the given test run
    * 
    * @param dest
    * @param m
    */
   private synchronized void send(int destination) {
     try {
-      if(listeningComms.size() > destination) {
+      if (listeningComms.size() > destination) {
         ((MoteIF) listeningComms.get(destination)).send(destination, outMsg);
       }
     } catch (IOException e) {
@@ -252,14 +273,13 @@ public class TUnitProcessing extends Thread implements
   }
 
   /**
-   * Message received, handle replies immediately and handle events in a
-   * thread
+   * Message received, handle replies immediately and handle events in a thread
    */
   @SuppressWarnings("unchecked")
   public synchronized void messageReceived(int to, Message m) {
     replyMsg = (TUnitProcessingMsg) m;
-    
-    switch(replyMsg.get_cmd()) {
+
+    switch (replyMsg.get_cmd()) {
     case TUnitProcessing_Constants.TUNITPROCESSING_REPLY_PING:
       notify();
       break;
@@ -268,12 +288,11 @@ public class TUnitProcessing extends Thread implements
       notify();
       break;
 
-
     default:
       // Events get handled by a separate thread
-      synchronized(receivedMessages){
-          receivedMessages.add(m);
-          receivedMessages.notify();
+      synchronized (receivedMessages) {
+        receivedMessages.add(m);
+        receivedMessages.notify();
       }
     }
   }
@@ -287,24 +306,24 @@ public class TUnitProcessing extends Thread implements
     outMsg.set_cmd(TUnitProcessing_Constants.TUNITPROCESSING_CMD_PING);
     send(0);
   }
-  
+
   /**
    * Tell all motes we're connected with to tear down one time
    */
   public void tearDownOneTime() {
     outMsg.set_cmd(TUnitProcessing_Constants.TUNITPROCESSING_CMD_TEARDOWNONETIME);
-    for(int i = 0; i < listeningComms.size(); i++) {
+    for (int i = 0; i < listeningComms.size(); i++) {
       send(i);
     }
   }
 
   /**
    * Shutdown this TUnitProcessing listener
-   *
+   * 
    */
   public void shutdown() {
     running = false;
-    for(Iterator it = listeningComms.iterator(); it.hasNext(); ) {
+    for (Iterator it = listeningComms.iterator(); it.hasNext();) {
       ((MoteIF) it.next()).deregisterListener(new TUnitProcessingMsg(), this);
     }
     listeningComms.clear();

@@ -53,10 +53,10 @@ implementation {
   
   PacketLinkP.SendState -> StateC;
   PacketLinkP.PacketAcknowledgements -> CC2420PacketC;
-  PacketLinkP.CC2420Packet -> CC2420PacketC;
+  PacketLinkP.CC2420PacketBody -> CC2420PacketC;
   PacketLinkP.DelayTimer -> TimerMilliC;
   PacketLinkP.AMPacket -> WirePacketLinkP;
   
-  WirePacketLinkP.CC2420Packet -> CC2420PacketC;
+  WirePacketLinkP.CC2420PacketBody -> CC2420PacketC;
   WirePacketLinkP.amAddress -> ActiveMessageAddressC;
 }

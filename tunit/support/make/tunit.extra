@@ -1,4 +1,5 @@
-CFLAGS += -I%T/../tunit/tos/lib/tunit
-CFLAGS += -I%T/../tunit/tos/lib/tunitstats
-CFLAGS += -I%T/../tunit/tos/system/
-CFLAGS += -I%T/../tunit/tos/interfaces
+CFLAGS += -I%T/../programs/tunit/tos/lib/tunit
+CFLAGS += -I%T/../programs/tunit/tos/lib/tunitstats
+CFLAGS += -I%T/../programs/tunit/tos/system/
+CFLAGS += -I%T/../programs/tunit/tos/interfaces
+CFLAGS += -I%T/../programs/tunit/tos/lib/directserial

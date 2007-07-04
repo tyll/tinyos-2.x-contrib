@@ -188,8 +188,8 @@ public class TestRunner {
         .getXmlReportDirectory());
     try {
       xmlWrite.write();
-      StatisticsChart.write(StatisticsReport.log(packageId,
-          "TestingProgress", "[Total Problems]", report.getTotalErrors()
+      StatisticsChart.write(StatisticsReport.log(packageId, "TestingProgress",
+          "[Total Problems]", report.getTotalErrors()
               + report.getTotalFailures(), "[Total Tests]", report
               .getTotalTests()));
     } catch (IOException e) {
@@ -275,8 +275,8 @@ public class TestRunner {
           focusedResult = make.build(buildDirectory, focusedTarget
               .getTargetName(), extras + reinstallExtras);
 
-          report.addResult(focusedResult);
           if (!focusedResult.isSuccess()) {
+            report.addResult(focusedResult);
             return false;
           }
         }

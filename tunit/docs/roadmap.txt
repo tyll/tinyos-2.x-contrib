@@ -1,5 +1,6 @@
 Roadmap, with no timelines:
   
+* Installation script/program?  Or keep it manual?
   
 * External Java support - 
   - Ability to add in your own Java programs running on the computer side
@@ -11,7 +12,7 @@ Roadmap, with no timelines:
     > UartByte
     > Serial Stack integration
     > Application serial interaction
-
+  - There are security issues involved
 
 * A layer that allows a test to easily intercept or inject messages in the
   radio and serial stacks. Easy to do, it just takes time.

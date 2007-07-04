@@ -40,6 +40,7 @@ configuration WireTUnitC {
 
 implementation {
   components TUnitP,
+      MainC,
       Link_TUnitProcessingC,
       new StateC() as TUnitStateC,
       new StateC() as TestStateC,
@@ -47,11 +48,13 @@ implementation {
       ActiveMessageAddressC,
       LedsC;
   
+  MainC.SoftwareInit -> TUnitP;
+  
   TUnitP.TUnitState -> TUnitStateC;
   TUnitP.TestState -> TestStateC;
   TUnitP.SendState -> Link_TUnitProcessingC;
   TUnitP.SerialSplitControl -> SerialActiveMessageC;
-  TUnitP.amAddress -> ActiveMessageAddressC;
+  TUnitP.ActiveMessageAddress -> ActiveMessageAddressC;
   TUnitP.Leds -> LedsC;
   
   Link_TUnitProcessingC.TUnitProcessing -> TUnitP;

@@ -62,8 +62,8 @@ implementation {
   
   
   enum {
-    TOTAL_PACKETS = 1000,
-    LOWER_BOUNDS = 994,  // 99.4% success
+    TOTAL_PACKETS = 10000,
+    LOWER_BOUNDS = 9980,  // 99.4% success
   };
   
   
@@ -113,7 +113,7 @@ implementation {
       
     } else {
       assertResultIsAbove("Missed too many acks", LOWER_BOUNDS, acksReceived);
-      call Statistics.log("[# acks/1000 msgs]", acksReceived);
+      call Statistics.log("[# acks/10000 msgs]", acksReceived);
       call TestRf.done();
     }
   }

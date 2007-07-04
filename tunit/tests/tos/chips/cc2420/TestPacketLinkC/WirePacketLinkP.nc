@@ -35,7 +35,7 @@ module WirePacketLinkP {
   }
   
   uses {
-    interface CC2420Packet;
+    interface CC2420PacketBody;
     command am_addr_t amAddress();
   }
 }
@@ -48,22 +48,22 @@ implementation {
   }
  
   command am_addr_t AMPacket.destination(message_t* amsg) {
-    cc2420_header_t* header = call CC2420Packet.getHeader(amsg);
+    cc2420_header_t* header = call CC2420PacketBody.getHeader(amsg);
     return header->dest;
   }
  
   command am_addr_t AMPacket.source(message_t* amsg) {
-    cc2420_header_t* header = call CC2420Packet.getHeader(amsg);
+    cc2420_header_t* header = call CC2420PacketBody.getHeader(amsg);
     return header->src;
   }
 
   command void AMPacket.setDestination(message_t* amsg, am_addr_t addr) {
-    cc2420_header_t* header = call CC2420Packet.getHeader(amsg);
+    cc2420_header_t* header = call CC2420PacketBody.getHeader(amsg);
     header->dest = addr;
   }
 
   command void AMPacket.setSource(message_t* amsg, am_addr_t addr) {
-    cc2420_header_t* header = call CC2420Packet.getHeader(amsg);
+    cc2420_header_t* header = call CC2420PacketBody.getHeader(amsg);
     header->src = addr;
   }
 
@@ -73,14 +73,24 @@ implementation {
   }
 
   command am_id_t AMPacket.type(message_t* amsg) {
-    cc2420_header_t* header = call CC2420Packet.getHeader(amsg);
+    cc2420_header_t* header = call CC2420PacketBody.getHeader(amsg);
     return header->type;
   }
 
   command void AMPacket.setType(message_t* amsg, am_id_t type) {
-    cc2420_header_t* header = call CC2420Packet.getHeader(amsg);
+    cc2420_header_t* header = call CC2420PacketBody.getHeader(amsg);
     header->type = type;
   }
+
+  command am_group_t AMPacket.group(message_t* amsg) {
+    return TOS_AM_GROUP;
+  }
   
+  command void AMPacket.setGroup(message_t* amsg, am_group_t grp) {
+  }
+
+  command am_group_t AMPacket.localGroup() {
+    return TOS_AM_GROUP;
+  }
 }
 

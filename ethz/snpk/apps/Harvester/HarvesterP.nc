@@ -86,7 +86,7 @@ module HarvesterP {
     
     interface Read<uint16_t> as ReadCpuLoad;
     interface Timer<TMilli> as LoadTimer;
-    interface CC2420DutyCycle;
+    interface PowerCycle;
   }
 }
 
@@ -499,7 +499,7 @@ implementation {
   	call DSN.log("detected command with %i parameters");
   }
   
-  event void CC2420DutyCycle.detected() {
+  event void PowerCycle.detected() {
   	// call DSN.log("wakeup");
   }
   

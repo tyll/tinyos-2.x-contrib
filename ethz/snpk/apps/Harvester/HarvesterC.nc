@@ -115,7 +115,7 @@ implementation {
   HarvesterP.ReadCpuLoad->TraceSchedulerC;
   HarvesterP.LoadTimer->LoadTimer;
   
-  components CC2420DutyCycleC;
-  HarvesterP.CC2420DutyCycle->CC2420DutyCycleC;
+  components PowerCycleC;
+  HarvesterP.PowerCycle->PowerCycleC;
 
 }

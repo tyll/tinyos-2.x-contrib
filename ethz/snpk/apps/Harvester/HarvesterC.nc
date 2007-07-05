@@ -49,7 +49,7 @@ implementation {
   	DSNC,
   	new DsnCommandC("set lpl", uint16_t , 1) as LplCommand;
   	
-//  HarvesterP.DSN -> DSNC;
+  HarvesterP.DSN -> DSNC;
   HarvesterP.LplCommand->LplCommand;
 
   

@@ -49,8 +49,7 @@ implementation {
   	DSNC,
   	new DsnCommandC("set lpl", uint16_t , 1) as LplCommand;
   	
-  LplCommand.DSN->DSNC;
-  HarvesterP.DSN -> DSNC;
+//  HarvesterP.DSN -> DSNC;
   HarvesterP.LplCommand->LplCommand;
 
   
@@ -72,6 +71,7 @@ implementation {
  // lpl
    components CC2420ActiveMessageC as Lpl;
    HarvesterP.LowPowerListening->Lpl;
+   //HarvesterP.CollectionLowPowerListening->Collector;
 
   HarvesterP.RadioControl -> ActiveMessageC;
   HarvesterP.AMPacket -> ActiveMessageC;
@@ -115,7 +115,4 @@ implementation {
   HarvesterP.ReadCpuLoad->TraceSchedulerC;
   HarvesterP.LoadTimer->LoadTimer;
   
-  components PowerCycleC;
-  HarvesterP.PowerCycle->PowerCycleC;
-
 }

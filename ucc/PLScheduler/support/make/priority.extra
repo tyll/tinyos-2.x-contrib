@@ -1,0 +1,2 @@
+CFLAGS += -I%T/lib/PreemptivePriorityScheduler/Priorities
+CFLAGS += -I%T/lib/PreemptivePriorityScheduler

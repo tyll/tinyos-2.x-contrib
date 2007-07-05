@@ -1,0 +1,8 @@
+RELEASE INFORMATION
+
+
+0.1 -- Fixed inlining code problem
+	-- CRITICAL bug fixed Tasks posted atomically
+	-- bug fix to allow multiple uninstanciated priorities without compiler errors and warnings
+
+0.0 -- Problems with inlinging code

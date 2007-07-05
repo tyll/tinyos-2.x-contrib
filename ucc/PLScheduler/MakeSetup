@@ -1,0 +1,49 @@
+install:
+	mkdir temp
+	echo "copying apps over"
+	cp -r ./apps temp
+	echo "copying make support over"
+	cp -r ./support temp
+		echo "copying tos over"
+	cp -r ./tos temp
+	rm -rf ./temp/.svn
+	rm -rf ./temp/*/.svn
+	rm -rf ./temp/*/*/.svn
+	rm -rf ./temp/*/*/*/.svn
+	rm -rf ./temp/*/*/*/*/.svn
+	cp -r temp/* $(TOSROOT)
+	rm -rf temp
+
+web:
+	mkdir tinyos-2.x
+	echo "copying apps over"
+	cp -r ./apps tinyos-2.x
+	echo "copying make support over"
+	cp -r ./support tinyos-2.x
+		echo "copying tos over"
+	cp -r ./tos tinyos-2.x
+	cp ./RELEASE tinyos-2.x
+	cp ./MakeSetup tinyos-2.x
+	cp ./PL_DESIGN.pdf tinyos-2.x
+	cp ./README.txt tinyos-2.x	
+	cp ./RELEASE tinyos-2.x	
+	cp ./index.html tinyos-2.x	
+	rm -rf ./tinyos-2.x/.svn
+	rm -rf ./tinyos-2.x/*/.svn
+	rm -rf ./tinyos-2.x/*/*/.svn
+	rm -rf ./tinyos-2.x/*/*/*/.svn
+	rm -rf ./tinyos-2.x/*/*/*/*/.svn
+	tar zcvf PLScheduler.tar.gz ./tinyos-2.x 
+	scp PLScheduler.tar.gz csmail:./public_html/
+	rm PLScheduler.tar.gz
+	rm -rf tinyos-2.x
+	
+uninstall:
+	rm -r $(TOSROOT)/apps/PriorityTestApps
+	rm $(TOSROOT)/support/make/priority.extra
+	rm $(TOSROOT)/tos/chips/atm128/context_switch.h
+	rm $(TOSROOT)/tos/chips/msp430/context_switch.h
+	rm -r $(TOSROOT)/tos/lib/PreemptivePriorityScheduler
+go: 
+	./uploadAll
+	

@@ -1,0 +1,76 @@
+<html>
+<body>
+<h1>The Preemptive Priority Scheduler (PL Scheduler)</h1>
+
+<p>This contrib project provides preemptive task scheduling capabilities for TinyOS-2.x.
+5 priority tasks queues are provided to facilitate programmers with more fine-grained control over
+their tasks.</p>
+<p>This research is based on a publication "Adding Preemption to TinyOS", <a href="http://www.cs.ucc.ie/~cd5/publications/duffy-emnets07.pdf">[download]</a><br>
+For more information, please visit my website <a href="http://www.cs.ucc.ie/~cd5/PLScheduler.html">http://www.cs.ucc.ie/~cd5</a>.
+
+<h3>Usage</h3>
+define priority tasks using by wiring up interfaces, an example can be seen in the apps directory,
+compile with:<br>
+<code>
+make telosb <i>priority</i></code>
+
+<h3>Install</h3>
+<p>MakeSetup will copy all the files to your tinyos directory if you have the TOSROOT variable defined,
+and you must also have write permission.
+<br>
+To use type <i>make -f MakeSetup install</i>
+</p>
+
+
+<h3>Project Structure</h3>
+<pre>
+skel
++--apps
+|  +--PriorityTestApps
+|  |  +--PreemptingLeds
+|  |     +--FakeTask.h
+|  |     +--Makefile
+|  |     +--README
+|  |     +--PriorityTestC.nc
+|  |     +--ExampleApp.nc
+|  |  +--PreemptingLeds2
+|  |     +--FakeTask.h
+|  |     +--Makefile
+|  |     +--README
+|  |     +--PriorityTestC.nc
+|  |     +--ExampleApp.nc
+|  |  +--RadioCountToLeds
+|  |     +--FakeTask.h
+|  |     +--Makefile
+|  |     +--README
+|  |     +--RadioCountToLedsAppC.nc
+|  |     +--RadioCountToLedsC.nc
+|  |     +--RadioCountToLeds.h
++--support
+|  +--make
+|  |  +--priority.extra
++--tos
+|  +--chips
+|  |  +--msp430
+|  |     +--context-switch.h
+|  |  +--atm128
+|  |     +--context-switch.h
+|  +--lib
+|  |  +--PreemptivePriorityScheduler
+|  |     +--Priorities
+|  |        +--HighTaskC.nc
+|  |        +--HighTaskImplP.nc
+|  |        +--LowTaskC.nc
+|  |        +--VeryHighTaskC.nc
+|  |        +--VeryHighTaskImplP.nc
+|  |        +--VeryLowTaskC.nc
+|  |        +--VeryLowImplP.nc
+|  |     +--TaskPriority.h
+|  |     +--PrioritySchedulerC.nc
+|  |     +--TaskQueueContol.nc
+|  |     +--TaskQueueP.nc
+|  |     +--TinySchedulerC.nc
++--system
+</pre>
+</body>
+</html>

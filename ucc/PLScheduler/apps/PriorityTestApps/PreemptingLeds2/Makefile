@@ -1,0 +1,2 @@
+include $(MAKERULES)
+COMPONENT=ExampleApp

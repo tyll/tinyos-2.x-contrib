@@ -1,0 +1,15 @@
+OVERVIEW:
+This application is used to test the context switching proceedure.
+The application posts a verylow priority task, which in turn is preempted by a millisecond timer.
+The TimerMilliC uses tasks to signal timer event occurs (in this way event dont have to be async).
+
+However a long task will delay timer events. This application demonstrates the ability of basic tasks like 
+the task in TimerMilliC to preempt long processing tasks.
+
+Each task must process a task that tasks about half a second. A led is turned on 
+before executing and off after. 
+
+USAGE:
+to compile you must add the priority extra target
+eg
+make telosb priority

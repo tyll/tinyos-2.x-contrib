@@ -72,6 +72,7 @@ inspiration on how to setup a new project.
 <a href="#rtqe_lib">Real_Time_Query_Service</a>&nbsp;&nbsp;&nbsp;
 <a href="#mote_scope">Mote_Scope</a>&nbsp;&nbsp;&nbsp;
 <a href="#802154_sniffer">802.15.4_Network_Sniffer</a>&nbsp;&nbsp;&nbsp;
+<a href="#ucc_priority_scheduler">Priority_Based_Scheduler</a>&nbsp;&nbsp;&nbsp;
 </center>
 </p>
 <h2><center>PLATFORMS</center></h2>
@@ -86,7 +87,7 @@ inspiration on how to setup a new project.
 
 <h2><center>TOOLS</center></h2>
 <center>
-<a href="#powertossim2">PowerTOSSIM-2 - PowerTOSSIM for TinyOS2</a>&nbsp;&nbsp;&nbsp;
+<a href="#powertossim2">PowerTOSSIM</a>&nbsp;&nbsp;&nbsp;
 </center>
 
 <!--
@@ -1037,6 +1038,58 @@ computer.  Useful for testing the <a href="#blackbook_file_system">Blackbook Fil
     <td align="left", valign="top"><b>Description:</b></td>
     <td>
      802.15.4 Packet Sniffer
+    </td>
+  </tr>
+</table>
+<a href="#the_top">Back to top</a>
+<br><br>
+<!--------------------------->
+<!--------------------------->
+<!--------------------------->
+
+<!--------------------------->
+<!-------- Project ---------->
+<!--------------------------->
+<a name="ucc_priority_scheduler"></a>
+<table>
+  <tr>
+    <td align="left", NOWRAP><b>Project Name:</b></td>
+    <td>
+      <a href="http://tinyos.cvs.sourceforge.net/*checkout*/tinyos/tinyos-2.x-contrib/ucc/index.html">Priority Based Scheduler
+      </a>
+    </td>
+  </tr>
+  <tr>
+    <td align="left"><b>Contact:</b></td>
+    <td>
+      <a href="mailto:cormacduffy@gmail.com">Cormac Duffy</a>
+    </td>
+  </tr>
+  <tr>
+    <td align="left"><b>Institution:</b></td>
+    <td>
+      <a href="http://www.cs.ucc.ie/">University College Cork</a>
+    </td>
+  </tr>
+  <tr>
+    <td align="left"><b>License:</b></td>
+    <td>
+      <a href="http://tinyos.cvs.sourceforge.net/*checkout*/tinyos/tinyos-2.x-contrib/ucc/license.txt">TinyOS license</a>
+    </td>
+  </tr>
+  <tr>
+    <td align="left", NOWRAP><b>Date Modified:</b></td>
+    <td> July 5th, 2007</td>
+  </tr>
+  <tr>
+    <td align="left", valign="top"><b>Description:</b></td>
+    <td>
+     The Priority Based Scheduler, is a 5 queue FIFO scheduler. Applications can achieve 
+     greater performance control by designating each task to a specific priority.
+     Based on the original TinyOS-2.x scheduler, this scheduler uses up to five basic FIFO 
+     task queues. Each Queue stores only the number of tasks required by the TinyOS application. 
+     Furthermore the Priority Scheduler will only allocate the number of task Queues 
+     required by your application. 
     </td>
   </tr>
 </table>

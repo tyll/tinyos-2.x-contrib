@@ -11,7 +11,7 @@ module TestRadioP {
     interface Statistics as AveragePktStats;
     interface Statistics as DetectRateStats;
     
-    interface TestCase as TestPeriodicDelivery;
+    interface TestCase as TestContinuousDelivery;
     interface LowPowerListening;
     interface SplitControl;
     interface PacketAcknowledgements;
@@ -100,7 +100,7 @@ implementation {
   }
   
   /***************** Tests ****************/
-  event void TestPeriodicDelivery.run() {
+  event void TestContinuousDelivery.run() {
     int i;
     for(i = 0; i < MAX_NODES; i++) {
       received[i] = 0;
@@ -160,7 +160,7 @@ implementation {
     call State.toIdle();
     
     assertResultIsAbove("No sources detected", 0, totalSources);
-    assertResultIsAbove("Unreliable detections", (float) attempts - ((float) 0.05 * (float) attempts), (float) detects);
+    assertResultIsAbove("Unreliable detections", 0, detects);
 
     for(i = 0; i < totalSources; i++) {
       average += (float) received[i];
@@ -187,7 +187,7 @@ implementation {
     }
     
     call AveragePktStats.log("[Avg # Pkt Rx]", average);
-    call TestPeriodicDelivery.done();
+    call TestContinuousDelivery.done();
   }
   
   event void WaitTimer.fired() {

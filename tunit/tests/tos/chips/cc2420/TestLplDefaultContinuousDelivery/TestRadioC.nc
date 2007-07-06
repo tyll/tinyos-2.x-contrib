@@ -9,7 +9,7 @@ configuration TestRadioC {
 
 implementation {
   components
-      new TestCaseC() as TestPeriodicDeliveryC,
+      new TestCaseC() as TestContinuousDeliveryC,
       new StatisticsC() as AveragePktStatsC,
       new StatisticsC() as DetectRateStatsC;
       
@@ -25,9 +25,9 @@ implementation {
       new StateC(),
       LedsC;
 
-  TestRadioP.SetUpOneTime -> TestPeriodicDeliveryC.SetUpOneTime;
-  TestRadioP.TestPeriodicDelivery -> TestPeriodicDeliveryC;
-  TestRadioP.TearDownOneTime -> TestPeriodicDeliveryC.TearDownOneTime;
+  TestRadioP.SetUpOneTime -> TestContinuousDeliveryC.SetUpOneTime;
+  TestRadioP.TestContinuousDelivery -> TestContinuousDeliveryC;
+  TestRadioP.TearDownOneTime -> TestContinuousDeliveryC.TearDownOneTime;
   TestRadioP.AveragePktStats -> AveragePktStatsC;
   TestRadioP.DetectRateStats -> DetectRateStatsC;
   

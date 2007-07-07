@@ -23,6 +23,7 @@ implementation {
       new TimerMilliC(),
       new TimerMilliC() as WaitTimerC,
       new StateC(),
+      PowerCycleC,
       LedsC;
 
   TestRadioP.SetUpOneTime -> TestPeriodicDeliveryC.SetUpOneTime;
@@ -33,6 +34,7 @@ implementation {
   
   TestRadioP.LowPowerListening -> CC2420ActiveMessageC;
   TestRadioP.RadioPowerControl -> CC2420CsmaC.SplitControl;
+  TestRadioP.RadioPowerState -> PowerCycleC.RadioPowerState;
   TestRadioP.ActiveMessageAddress -> ActiveMessageAddressC;
   TestRadioP.SplitControl -> ActiveMessageC;
   TestRadioP.PacketAcknowledgements -> ActiveMessageC;

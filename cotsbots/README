@@ -1,0 +1,111 @@
+README for CotsBots Platform
+Author/Contact: cotsbots-help@millennium.berkeley.edu
+
+As I am only one person, and not a very computer science-oriented one at that,
+I am counting on the users of the CotsBots robots to help debug and expand
+the current interfaces and components.
+
+If you run into any problems, please email the above address.  It doesn't
+matter how small they may seem to you -- if nothing else, it will help
+me clarify the included documentation.  If you have any suggestions, please
+email those as well.
+
+In addition, I will refer you to the ReadThisFirst.htm file in the 
+contrib/cotsbots/doc directory for some changes since the CotsBots were 
+handed out at the January 2003 PI Meeting.
+
+Have fun!
+
+Appended for PlayerStage:
+
+To be able to use playerstage for installation, please install Player and Stage.
+Be sure to be installing with python bindings, you will be required to install
+various other dev packages.
+
+The /opt/tinyos-2.x/tos/lib/tossim/* files has to be edited, the edited version
+will be included in a extractable tarball or a zip.
+
+ADD FILES:
+
+$TOSROOT/lib/tossim/SimTriggerable.nc
+$TOSROOT/lib/tossim/SimTriggerableP.nc
+
+All the edits should have 
+//CotsBots
+//End CotsBots
+around them
+
+Edits are in:
+[tossim.h]
+  void trig(int itemID);
+[tossim.i]
+  void trig(int itemID);
+[tossim.c]
+void Mote::trig(int itemID) {
+  sim_mote_enqueue_trig_event(nodeID, itemID);
+}
+[sim_mote.h]
+void sim_mote_enqueue_trig_event(int mote, int itemID);
+void sim_trig_signal(int itemID);  //This is defined in the SimTriggerable
+[SimMoteP.nc]
+  sim_event_t* trigEvent;
+  int * itemIDPointer;
+
+  void sim_mote_trig_handle(sim_event_t* e) {
+
+  int itemID = *((int * ) trigEvent->data); //Get the triggerable item's ID
+
+  dbg("SimMoteP", "Triggering mote %d's item %d.\n", (int)sim_node(), itemID);
+  sim_trig_signal(itemID);
+ }
+
+
+  void sim_mote_enqueue_trig_event(int mote,int itemID) __attribute__ ((C, spontaneous)) {
+    int tmp = sim_node();
+    sim_set_node(mote);
+
+    itemIDPointer = (int *) malloc(sizeof(int)); //Should be freed when being nulled
+    *itemIDPointer = itemID;
+
+    trigEvent = (sim_event_t*) malloc(sizeof(sim_event_t));
+    trigEvent->time = sim_time();
+    trigEvent->mote = mote;
+    trigEvent->force = FALSE; //Item can't be triggered if its OFF
+    trigEvent->data = (void *) itemIDPointer;
+    trigEvent->handle = sim_mote_trig_handle;
+    trigEvent->cleanup = sim_queue_cleanup_total;
+    sim_queue_insert(trigEvent);
+
+    sim_set_node(tmp);
+  }
+
+
+**************************
+* Things done to Program *
+**************************
+
+insert Triggerable.trig() to where Boot.Booted() is (prefereably)
+
+insert the definition:
+
+ void sim_trig_signal(int itemID) __attribute__ ((C, spontaneous)){
+  signal Triggerable.trig();
+}
+
+In Actual Implementation there should a component that Covers Triggerables,
+Example "Whiskers" which would hold many Whiskers with Unique IDs, and from
+sim_trig_signal, would be sent Whiskers.trig(whiskerID), which would then in turn
+trigger the actual Whisker to do things.
+
+
+----
+TODO:
+----
+Implelment the while(true): loop in the simulation to signal a trigger of an event(in this case a bumper/whisker) from playerstage to the simulation mote.  Look into splitting a thread dedicated to this task! (CPU INTENSIVE!)
+--
+d = c.read();
+if(d == b && b.bumpers[0]):
+  //find the owner of the bumper by ID
+  //might have to force set the ID of the Playerstage drone
+  //then trigger the mote of the proper...
+  motes[id].trig()

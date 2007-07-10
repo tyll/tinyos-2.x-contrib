@@ -44,36 +44,51 @@ implementation
 {
   int8_t pIndex=0;
   volatile uint16_t *stack_addr;
-  volatile uint8_t idex;
+  volatile uint8_t idex, oldWaiting;
   volatile norace uint8_t lowerPriorityContext=0;
   volatile norace uint8_t tasksWaiting=0;
   volatile norace uint8_t tasksProcessing;
   norace static context_t contexts[NUM_CONTEXTS]; // Our array of system thread data structs
 
   
-  void something()__attribute__ ((C, spontaneous)){
+  void preemption_handler()__attribute__ ((C, spontaneous)){
   	
-  	if(tasksWaiting>= (1<<HIGHER_PREEMPTIVE_INDEX)){
-  		while(call TaskQueueControl.runNextTask[HIGHER_PREEMPTIVE_INDEX]() != FALSE);
-  		tasksWaiting &= ~(1<<HIGHER_PREEMPTIVE_INDEX);
-  		tasksProcessing &= ~(1<<HIGHER_PREEMPTIVE_INDEX);
+  	if(tasksWaiting>= (1<<VERYHIGH)){
+  		while(call TaskQueueControl.runNextTask[VERYHIGH]() != FALSE);
+  		tasksWaiting &= ~(1<<VERYHIGH);
+  		tasksProcessing &= ~(1<<VERYHIGH);
   		if(lowerPriorityContext){
 		  	POP_CONTEXT(PREEMPTING_CONTEXT);
-		}
+ 		}
 		else{
 		  	POP_CONTEXT(BASE_CONTEXT);
 		}
   	}else{
   		
   		pIndex = MAX_NON_PREEMPTIVE;
-		for(pIndex=MAX_NON_PREEMPTIVE;pIndex>0;pIndex--){
-  			while(call TaskQueueControl.runNextTask[pIndex]() != FALSE);
-  			tasksWaiting &= ~(1<<pIndex);
-  			tasksProcessing &= ~(1<<pIndex);
+	
+		while(tasksWaiting & MASK){
+  			switch(tasksWaiting & MASK){
+  				case 8: case 9: case 10: case 11: case 12: case 13: case 14: case 15:
+  			     	if(call TaskQueueControl.runNextTask[3]() == FALSE)
+  			     		tasksWaiting &= ~(1<<3);
+  			     	tasksProcessing &= ~(1<<3);
+  			     break;
+  			    case 4: case 5: case 6: case 7:   
+  			     	if(call TaskQueueControl.runNextTask[2]() == FALSE)
+  			     		tasksWaiting &= ~(1<<2);
+  			     	tasksProcessing &= ~(1<<2);
+  			  	 break;
+  			    case 2: case 3: 
+  			    	if(call TaskQueueControl.runNextTask[1]() == FALSE)
+  			     		tasksWaiting &= ~(1<<1);
+  			     	tasksProcessing &= ~(1<<1);
+  			  	 break;
+  			}
   		}
   		lowerPriorityContext=0;
   		POP_CONTEXT(BASE_CONTEXT);
-  	}
+	}
   }
   
   command void Scheduler.init()__attribute__((noinline))
@@ -132,7 +147,11 @@ implementation
   
   void SwitchMe(uint8_t id)__attribute__((noinline)){
   	atomic{
+  	oldWaiting = tasksWaiting;
   	tasksWaiting|=(1<<id);
+  	if(oldWaiting ==tasksWaiting)//if task already waiting then return
+  		return;
+  		
   	switch(id){
 	  		//preempts all other tasks 
 		  	case VERYHIGHCASE:

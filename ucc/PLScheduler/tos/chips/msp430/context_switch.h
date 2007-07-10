@@ -14,7 +14,7 @@
 		:: "r"(stack_addr) );              \
                                                    \
    asm volatile("push %0\n\t"                      \
-        ::"r"(something));					\
+        ::"r"(preemption_handler));					\
                                                    \
    for(idex = 0; idex < 13; idex++)                         \
       asm volatile("push r3\n\t");                 \

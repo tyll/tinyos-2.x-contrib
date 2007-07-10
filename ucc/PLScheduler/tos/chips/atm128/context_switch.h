@@ -5,7 +5,7 @@
    {							\
       asm volatile("in %A0, __SP_L__\n\t in %B0, __SP_H__\n\t" : "=r" (contexts[FROM].sp) : );		\
 	  asm volatile("out __SP_H__, %B0\n\t out __SP_L__, %A0\n\t" :: "r" (stack_addr) );				\
-	  asm volatile("push %A0\n\t push %B0\n\t" :: "r" (something) );			\
+	  asm volatile("push %A0\n\t push %B0\n\t" :: "r" (preemption_handler) );			\
 							\
       for(i = 0; i < 31; i++)				\
 	asm volatile("push __zero_reg__\n\t" ::);	\

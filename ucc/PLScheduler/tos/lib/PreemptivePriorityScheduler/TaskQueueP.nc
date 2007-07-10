@@ -82,6 +82,8 @@ implementation
 			tail = NO_TASK;
 	      }
 	      next[id] = NO_TASK;
+	      //process started is called here over runNextTask function, so that it stays in atomic
+	      signal TaskQueueControl.processStarted();
 	      return id;
 	    }    
 	    else
@@ -97,7 +99,8 @@ implementation
 	    }
 	    else{
 	    	dbg("Scheduler", "Run Priority %hhu\n", PRIORITY);
-	 		signal TaskQueueControl.processStarted();
+	    	//move this statement into POP task so that it runs atomically!
+	 		//signal TaskQueueControl.processStarted();
 	 		signal PTask.runTask[nextTask]();
 	    }
 		return TRUE;

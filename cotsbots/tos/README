@@ -1,0 +1,124 @@
+For help, contact cotsbots-help@millennium.berkeley.edu
+
+MotorBoard.h
+-- Defines commands/message types used in motor messages between the base
+   mote (generally a mica variant) and the motor board.  Also defines
+   the MOTOR_Msg type (similar to TOS_Msg) used in the messaging 
+   components below.
+
+Robot Message Types
+-------------------
+BeepDiffusionMsg.h
+-- Defines the BeepDiffusionMsg and BeepDiffusionResetMsg types for the
+   BeepDiffusion application.
+
+NavigationMsg.h
+-- Defines the NavigationMsg and NavigationDbgMsg types for the Navigation
+   component.
+
+RobotMsg.h
+-- Defines a standard robot command message (types listed in MotorBoard.h)
+
+Robot Messaging Components and Interfaces
+-----------------------------------------
+MotorPacket.nc
+-- Provides abstract byte-level implementation of MotorSend and 
+   MotorReceive interfaces.
+
+MotorReceiveMsg.nc
+-- Interface provides a receive event implemented by MotorPacket.
+
+MotorSendMsg.nc
+-- Interface provides a send command and sendDone event implemented by
+   MotorPacket.
+
+UARTMotorPacket.nc
+-- Interface directly used for communication.  Standard use is something like
+   component UARTMotorPacket as Packet
+   where other communication methods may be substituted (such as I2C below)
+
+I2CMotorPacket.nc
+-- not yet implemented and tested
+
+Other Robot-related Interfaces
+------------------------
+Robot.nc
+-- Provides setSpeed, setTurn, setDirection and setSpeedTurnDirection commands.
+   It should be noted that since this involves sending data over the UART
+   that there is some delay involved (which is why the setSpeedTurnDirection
+   command is included).  Abstracts details of robot implementations from
+   the application programmer.
+
+ServoCalibration.nc
+-- Provides an interface in which to calibrate the control loop for the 
+   Mini-Z servo.  Allows the user to set the Kp, Ki and Straight parameters.
+   See tos/platform/motor/README for more details.
+
+Servo.nc
+-- Provides a general servo interface.  The key command is setTurn which
+   takes a value from 0-60 (30=straight, 0=left, 60=right).  It also requires
+   an initialization and provides a debug event if needed.
+
+EEPROM.nc
+-- Provides read, write and init commands as well as a writeDone event.
+
+Figure8Calibration.nc
+-- Provides a calibration interface for a Figure8.  Allows the user to set
+   the right turn time, the first straight turn time, the left turn time, the
+   second straight turn time, and the speed.  Because the Figure8 component
+   implemented here is open-loop, calibration is necessary to get anything
+   that even resembles a figure8.
+
+Navigation.nc
+-- Provides a navigate command which takes an initial point and heading
+   as well as a second point.
+
+Accel.nc
+-- Provides an init, startSensing and stopSensing command.  Also fires a fire
+   event when x and y accelerations are captured and provides a debug event.
+
+HPLMotor.nc
+-- Provides an init command as well as setSpeed and setDir for a lower level
+   motor driver.  Also allows for retrieving the current speed and direction
+   setting of the motor.
+
+Other Robot-related Components
+----------------------
+RobotC.nc
+-- The top-level configuration component for the robot.
+
+RobotM.nc
+-- Implements the robot interface.  RobotM sends messages to the MotorBoard
+   using the MotorPacket component described above.  The actual robot
+   platform (Mini-Z Racer, tank, etc) is entirely abstracted here.  All 
+   specific settings for the Robot interface are located on the MotorBoard in
+   MotorBoardTopM.
+
+Figure8M.nc
+-- Implements the Figure8 interface and runs a figure8.
+
+MotorClock.nc
+-- Implements the Clock interface using Timer0 (which only has an overflow
+   interrupt).
+
+MotorTestC.nc
+-- Runs through a set sequence of speeds to control and test both motors.  This
+   configuration is set to use the motor board-specific components.
+
+MotorTestM.nc
+-- Runs through a set sequence of speeds to control and test both motors.
+
+NavigationC.nc
+-- A top level configuration for the Navigation component.  This component
+   should drive the robot from one point to another given the correct
+   locations and the current robot heading.
+
+NavigationM.nc
+-- Implementation of the Navigation component.  This component
+   drives the robot from one point to another given the correct
+   locations and the current robot heading.  This component is still in its 
+   early development.  Currently the component uses trig functions from 
+   the math.h file and assumes the robot may only move forward.  Several 
+   optimizations may be performed on the calculations in this component.
+
+

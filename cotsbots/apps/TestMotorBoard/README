@@ -1,0 +1,28 @@
+README for TestMotorBoard
+Author/Contact: cotsbots-help@millennium.berkeley.edu
+
+Description:
+
+TestMotorBoard tests the interface to the motorboard.  It receives and
+sends messages over the radio interface as well as over the motor board
+interface.  Incoming radio packets are transformed into motor packets.  In
+addition, packets sent from the motor board (which may contain accelerometer
+or servo debugging information) are relayed back over the radio.
+
+LED Debugging:
+RED_LED -- toggles when a message is received from the motor board.
+GREEN_LED -- toggles when a message is sent to the motor board.
+YELLOW_LED -- can be toggled from a motor board command or externally to
+  test communication.
+
+Tools:
+
+tools/java/net/tinyos/cotsbots/RobotCmdGUI provides an excelling GUI with
+which to test and calibrate various properties on the motor board.
+
+Known bugs/limitations:
+
+As hardware drivers and new capabilities are added to the motor board, 
+they should also be added to this component for testing as well as 
+commands/message types in tos/lib/Robot/MotorBoard.h.  The current 
+implementation of this component is by no means complete.

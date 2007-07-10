@@ -1,0 +1,3 @@
+# Makelocal file
+
+DEFAULT_LOCAL_GROUP = 0x19

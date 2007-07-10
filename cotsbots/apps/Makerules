@@ -1,0 +1,456 @@
+#-*-Makefile-*-
+# Base Makefile for nesC apps.
+#
+# Created: 6/2002,  Philip Levis <pal@cs.berkeley.edu>
+#
+# Updated: 6/18/2002 Rob von Behren <jrvb@cs.berkeley.edu>
+#          Multi-platform support
+#
+# Updated: 6/20/2002 David Gay <dgay@intel-research.net>
+#          Compile via gcc, make tos.th system-wide, not app-wide
+#          (still need to ponder group selection)
+#
+# Updated: 6/27/2003 Jaein Jeong <jaein@cs.berkeley.edu>
+#          In-network programming support for mica2, mica2dot platforms
+#
+######################################################################
+
+# this needs to be -dlpt=3 on thinkpads
+# PROGRAMMER_EXTRA_FLAGS :=
+# We don't actually set it here, so you can either set the 
+# PROGRAMMER_EXTRA_FLAGS environment variable (recommended) or
+# define it in ../Makelocal
+
+-include $(shell ncc -print-tosdir)/../apps/Makelocal
+
+# User configuration:
+# Specify user values in Makelocal to override the defaults here
+
+ifndef DEFAULT_LOCAL_GROUP
+DEFAULT_LOCAL_GROUP := 0x7d
+endif
+
+ifndef OPTFLAGS
+OPTFLAGS := -Os
+endif
+
+ifndef NESC_FLAGS
+NESC_FLAGS := -Wnesc-all
+endif
+
+# configure the base for the app dirs.  This is used to generate more
+# useful package names in the documentation.
+ifeq ($(BASEDIR)_x, _x)
+BASEDIR := $(shell pwd | sed 's@\(.*\)/apps.*$$@\1@' )
+endif
+
+# The output directory for generated documentation
+ifeq ($(DOCDIR)_x, _x)
+DOCDIR := $(BASEDIR)/doc/nesdoc
+endif
+
+##################################################
+#
+##################################################
+
+ifeq ($(PLATFORMS)_x, _x)
+PLATFORMS = mica mica2 mica2dot pc atmega8
+endif
+
+OBJCOPY        = avr-objcopy
+SET_ID         = set-mote-id
+PROGRAMER      = uisp
+
+ifdef MSG_SIZE
+PFLAGS := -DTOSH_DATA_LENGTH=$(MSG_SIZE) $(PFLAGS)
+endif
+
+#ifdef APP_DIR
+#PFLAGS := -I$(APP_DIR) $(PFLAGS)
+#endif
+
+# This is for network reprogramming
+# If XNP is defined, add the network reprogramming related files
+# to the search path and generate a timestamp to make each build unique.
+XNP_DIR := ../../tos/lib/Xnp
+ifdef XNP
+PFLAGS := -I$(XNP_DIR) $(shell $(XNP_DIR)/ident.pl .ident_install_id $(COMPONENT)) $(PFLAGS)
+endif
+
+PFLAGS         := $(PFLAGS) -Wall -Wshadow -DDEF_TOS_AM_GROUP=$(DEFAULT_LOCAL_GROUP) $(NESC_FLAGS)
+
+NCC            = ncc
+LIBS	       = -lm
+
+######################################################################
+# Choose platform options, based on MAKECMDGOALS
+######################################################################
+
+
+# be quieter....
+#ifeq ($(VERBOSE_MAKE)_x, _x)
+#MAKEFLAGS += -s
+#endif
+#export VERBOSE_MAKE
+
+define USAGE
+
+
+Usage:   make <platform>
+         make all
+         make clean
+         make install[.n] <platform>
+         make reinstall[.n] <platform> # no rebuild of target
+         make docs <platform>
+
+         Valid platforms are: $(PLATFORMS)
+
+
+endef
+
+
+PLATAUX=$(PLATFORMS) all
+PLATFORM := $(filter $(PLATAUX), $(MAKECMDGOALS))
+PFLAGS := -target=$(PLATFORM) $(PFLAGS)
+MAKECMDGOALS := $(filter-out $(PLATAUX), $(MAKECMDGOALS))
+
+#########################################################################
+# TinySec processing
+#########################################################################
+ifndef TINYSEC
+TINYSEC        := false # default: disable tinysec
+endif
+# The tinysec keyfile to use and the default key name (this re matches the
+# first key. you can explicitly list keys by: make mica KEYNAME=mykeyname
+KEYFILE        := $(HOME)/.tinyos_keyfile
+KEYNAME        := '\w+'
+
+ifeq ($(TINYSEC),true)
+TINYSEC_KEY    := $(shell mote-key -kf $(KEYFILE) -kn $(KEYNAME))
+ifeq ($(TINYSEC_KEY),)
+$(error tinysec key has not been properly set. It is needed for tinysec. \
+	Check to make sure that the script exists)
+endif
+PFLAGS         := $(PFLAGS) -I%T/lib/TinySec -I%T/platform/%p/TinySec -DTINYSEC_KEY="$(TINYSEC_KEY)" -DTINYSEC_KEYSIZE=8
+ifeq ($(PLATFORM),mica2dot)
+PFLAGS         := $(PFLAGS) -I%T/platform/mica2/TinySec
+endif
+endif
+
+#########################################################################
+# Programming Boards : flags
+#########################################################################
+PROGRAMMER_FLAGS=-dprog=dapa $(PROGRAMMER_PART) $(PROGRAMMER_EXTRA_FLAGS)
+PROGRAMMER := DAPA
+
+#########################################################################
+# Programming Boards : command line input
+# Command line input for programmers: 
+#   none	 : default to parallel programming board
+#   MIB510=<dev> : use mib510 serial port programming board at port <dev>
+#   EPRB=<host>	 : use eprb at hostname <host>
+#   AVRISP=<dev> : use AVRISP serial programmer at port <dev>
+#########################################################################
+
+### If MIB510 then
+MIB5100 := $(subst MIB510=,,$(filter MIB510=%,$(MAKECMDGOALS)))
+ifneq ($(MIB510_),)
+  MIB510 := $(MIB5100)
+endif
+MAKECMDGOALS := $(filter-out MIB510=%,$(MAKECMDGOALS))
+
+### If STK is a set environment variable or if STK=xxx appears on the command
+### line, then take it to be a network address and program assuming an stk500
+### module.
+EPRB0 := $(subst EPRB=,,$(filter EPRB=%,$(MAKECMDGOALS)))
+ifneq ($(EPRB_),)
+  EPRB := $(EPRB0)
+endif
+MAKECMDGOALS := $(filter-out EPRB=%,$(MAKECMDGOALS))
+
+ifneq (x$(MIB510),x)
+   PROGRAMMER := STK
+   PROGRAMMER_FLAGS=-dprog=mib510 -dserial=$(MIB510) $(PROGRAMMER_PART) $(PROGRAMMER_EXTRA_FLAGS_MIB)
+endif
+ifneq (x$(EPRB),x)
+  PROGRAMMER := STK
+  PROGRAMMER_FLAGS=-dprog=stk500 -dhost=$(EPRB) $(PROGRAMMER_PART) $(PROGRAMMER_EXTRA_FLAGS_STK)
+endif
+ifdef AVRISP
+  PROGRAMMER := STK
+  PROGRAMMER_FLAGS=-dprog=stk500 -dserial=$(AVRISP) $(PROGRAMMER_PART) $(PROGRAMMER_EXTRA_FLAGS_AVRISP)
+endif
+
+#Sensor Board Defaults
+ifeq ($(SENSORBOARD),)
+	ifeq ($(PLATFORM),mica)
+		SENSORBOARD = micasb
+	endif
+	ifeq ($(PLATFORM),mica2)
+		SENSORBOARD = micasb
+	endif
+	ifeq ($(PLATFORM),mica128)
+		SENSORBOARD = micasb
+	endif
+	ifeq ($(PLATFORM),rene2)
+		SENSORBOARD = basicsb
+	endif
+	ifeq ($(PLATFORM),pc)
+		SENSORBOARD = micasb
+	endif
+	ifeq ($(PLATFORM),mica2dot)
+		SENSORBOARD = basicsb
+	endif
+endif
+
+BUILDDIR = build/$(PLATFORM)
+MAIN_EXE = $(BUILDDIR)/main.exe
+MAIN_SREC = $(BUILDDIR)/main.srec
+
+ifeq ($(PLATFORM), pc)
+OPTFLAGS := -g -O0
+PFLAGS := -pthread $(PFLAGS) -fnesc-nido-tosnodes=1000 -fnesc-cfile=$(BUILDDIR)/app.c
+MAIN_TARGET = $(MAIN_EXE)
+else
+PFLAGS := $(PFLAGS) -finline-limit=100000 -fnesc-cfile=$(BUILDDIR)/app.c
+MAIN_TARGET = $(MAIN_SREC)
+endif
+
+PFLAGS := -board=$(SENSORBOARD) $(PFLAGS)
+
+# added options to support network reprogramming. This sets the correct bootloader
+# for mica2 and mica2dot platforms. And this also sets the programmer flag for
+# native ATmega128.
+ifeq ($(PLATFORM), mica) 
+PROGRAMMER_PART=-dpart=ATmega103 --wr_fuse_e=fd
+PROGRAMMER_FLAGS_INP=-dprog=dapa $(PROGRAMMER_EXTRA_FLAGS)
+ifdef AVRISP
+  PROGRAMMER_FLAGS_INP=-dprog=stk500 -dserial=$(AVRISP_DEV) -dpart=ATmega103
+endif
+endif
+ifeq ($(PLATFORM), mica128) 
+PROGRAMMER_PART=-dpart=ATmega128 --wr_fuse_e=ff
+PROGRAMMER_FLAGS_INP=-dprog=dapa $(PROGRAMMER_EXTRA_FLAGS)
+ifdef AVRISP
+  PROGRAMMER_FLAGS_INP=-dprog=stk500 -dserial=$(AVRISP_DEV) -dpart=ATmega128
+endif
+endif
+ifeq ($(PLATFORM), mica2)
+BOOTLOADER=$(XNP_DIR)/inpispm2.srec
+PROGRAMMER_PART=-dpart=ATmega128 --wr_fuse_e=ff
+PROGRAMMER_FLAGS_INP=-dprog=dapa $(PROGRAMMER_EXTRA_FLAGS)
+ifdef AVRISP
+  PROGRAMMER_FLAGS_INP=-dprog=stk500 -dserial=$(AVRISP_DEV) -dpart=ATmega128
+endif
+endif
+ifeq ($(PLATFORM), mica2dot)
+BOOTLOADER =$(XNP_DIR)/inpispm2d.srec
+PROGRAMMER_PART=-dpart=ATmega128 --wr_fuse_e=ff
+PROGRAMMER_FLAGS_INP=-dprog=dapa $(PROGRAMMER_EXTRA_FLAGS)
+ifdef AVRISP
+  PROGRAMMER_FLAGS_INP=-dprog=stk500 -dserial=$(AVRISP_DEV) -dpart=ATmega128
+endif
+endif
+
+######################################################################
+# Rules for documentation generation
+######################################################################
+
+# add documentation flags to ncc, if requested
+DOCS := $(filter docs, $(MAKECMDGOALS))
+MAKECMDGOALS := $(filter-out docs, $(MAKECMDGOALS))
+ifeq ($(DOCS)_x, docs_x)
+build: FORCE
+	@echo "    Making documentation for $(COMPONENT) on $(PLATFORM)"
+	nesdoc $(DOCDIR)/$(PLATFORM) -fnesc-is-app $(PFLAGS) $(CFLAGS) $(COMPONENT).nc
+endif
+
+# dummy rule for 'docs' target - so make won't complain about it
+docs:
+	@true
+
+
+
+######################################################################
+# Rules for debugging
+######################################################################
+
+# add documentation flags to ncc, if requested
+DBG := $(filter debug, $(MAKECMDGOALS))
+MAKECMDGOALS := $(filter-out debug, $(MAKECMDGOALS))
+ifeq ($(DBG)_x, debug_x)
+OPTFLAGS := -O1 -g -fnesc-no-inline
+endif
+
+# dummy rule for 'debug' target - so make won't complain about it
+debug:
+	@true
+
+
+# For those who like debugging optimised code, there's debugopt
+DBGOPT := $(filter debugopt, $(MAKECMDGOALS))
+MAKECMDGOALS := $(filter-out debugopt, $(MAKECMDGOALS))
+ifeq ($(DBGOPT)_x, debugopt_x)
+OPTFLAGS := $(OPTFLAGS) -g
+endif
+
+# dummy rule for 'debug' target - so make won't complain about it
+debugopt:
+	@true
+
+
+
+######################################################################
+# top-level rules.  switch based on MAKECMDGOALS
+######################################################################
+
+#
+# rules for make clean
+#
+ifeq ($(MAKECMDGOALS)_x, clean_x)
+
+PLATFORM=
+
+$(PLATAUX):
+	@echo ""
+
+else
+
+ifeq ($(PLATFORM)_x,_x)
+$(error $(PLATAUX) $(MAKECMDGOALS) $(USAGE))
+endif
+
+MAKECMDGOALS := $(patsubst install.%,install,$(MAKECMDGOALS))
+MAKECMDGOALS := $(patsubst reinstall.%,reinstall,$(MAKECMDGOALS))
+
+#
+# rules for make install <platform>
+#
+ifeq ($(MAKECMDGOALS)_x, install_x)
+
+$(PLATAUX):
+	@true
+
+else
+ifeq ($(MAKECMDGOALS)_x, reinstall_x)
+
+$(PLATAUX):
+	@true
+
+else
+ifeq ($(MAKECMDGOALS)_x, inp_x)
+
+$(PLATAUX):
+	@true
+
+else
+ifeq ($(MAKECMDGOALS)_x, reset_x)
+
+$(PLATAUX):
+	@true
+
+else
+ifneq ($(filter $(BUILDLESS_DEPS),$(MAKECMDGOALS)), )
+
+$(PLATAUX):
+	@true
+
+else
+all:
+	for platform in $(PLATFORMS); do \
+		$(MAKE) $$platform $(DOCS) || exit 1; \
+	done
+
+$(PLATFORMS): build
+
+endif
+endif
+endif
+endif
+endif
+endif
+
+######################################################################
+######################################################################
+##                                                                  ##
+##                      Begin main rules                            ##
+##                                                                  ##
+######################################################################
+######################################################################
+
+ifneq ($(DOCS)_x, docs_x)
+build: $(MAIN_TARGET)
+endif
+
+install: $(MAIN_SREC) FORCE
+	@$(MAKE) $(PLATFORM) re$@ PROGRAMMER="$(PROGRAMMER)" PROGRAMMER_FLAGS="$(PROGRAMMER_FLAGS)"
+
+install.%: $(MAIN_SREC) FORCE
+	$(MAKE) $(PLATFORM) re$@ PROGRAMMER="$(PROGRAMMER)" PROGRAMMER_FLAGS="$(PROGRAMMER_FLAGS)"
+
+ifeq ($(PROGRAMMER),DAPA)  ### program via parallel port
+
+reinstall: FORCE
+	@echo "    installing $(PLATFORM) binary"
+	$(PROGRAMER) $(PROGRAMMER_FLAGS) --erase 
+	sleep 1	     
+	$(PROGRAMER) $(PROGRAMMER_FLAGS) --upload if=$(MAIN_SREC)
+	sleep 1	     
+	$(PROGRAMER) $(PROGRAMMER_FLAGS) --verify if=$(MAIN_SREC)
+
+reinstall.%: FORCE
+	@echo "    installing $(PLATFORM) binary"
+	$(SET_ID) $(MAIN_SREC) $(MAIN_SREC).out `echo $@ |perl -pe 's/^reinstall.//; $$_=hex if /^0x/i;'`
+	$(PROGRAMER) $(PROGRAMMER_FLAGS) --erase 
+	sleep 1	     
+	$(PROGRAMER) $(PROGRAMMER_FLAGS) --upload if=$(MAIN_SREC).out
+	sleep 1	     
+	$(PROGRAMER) $(PROGRAMMER_FLAGS) --verify if=$(MAIN_SREC).out
+
+reset: FORCE
+	@echo "    resetting $(PLATFORM)"
+	$(PROGRAMER) $(PROGRAMMER_FLAGS)
+
+else  ### Otherwise, program via the stk500 where STK specifies a network address
+
+reinstall: FORCE
+	@echo "    installing $(PLATFORM) binary"
+	$(PROGRAMER) $(PROGRAMMER_FLAGS) --erase --upload  if=$(MAIN_SREC)
+
+reinstall.%: FORCE
+	@echo "    installing $(PLATFORM) binary"
+	$(SET_ID) $(MAIN_SREC) $(MAIN_SREC).$*.out `echo $@ |perl -pe 's/^reinstall.//; $$_=hex if /^0x/i;'`
+	$(PROGRAMER) $(PROGRAMMER_FLAGS) --erase --upload  if=$(MAIN_SREC).$*.out
+
+reset: FORCE
+	@echo "    resetting $(PLATFORM)"
+	$(PROGRAMER) $(PROGRAMMER_FLAGS)
+
+endif  ### Done programming
+
+
+$(MAIN_EXE): $(BUILDDIR) $(BUILD_EXTRA_DEPS) FORCE
+	@echo "    compiling $(COMPONENT) to a $(PLATFORM) binary"
+	$(NCC) -o $(MAIN_EXE) $(OPTFLAGS) $(PFLAGS) $(CFLAGS) $(COMPONENT).nc $(LIBS) $(LDFLAGS)
+	@echo "    compiled $(COMPONENT) to $@"
+	@objdump -h $(MAIN_EXE) | perl -ne '$$b{$$1}=hex $$2 if /^\s*\d+\s*\.(text|data|bss)\s+(\S+)/; END { printf("%16d bytes in ROM\n%16d bytes in RAM\n",$$b{text}+$$b{data},$$b{bss}); }'
+
+$(MAIN_SREC): $(MAIN_EXE)
+	$(OBJCOPY) --output-target=srec $(MAIN_EXE) $(MAIN_SREC)
+
+$(BUILDDIR):
+	mkdir -p $(BUILDDIR)
+
+clean: FORCE
+	rm -rf $(BUILDDIR) 
+	rm -f core.*
+	rm -f *~
+
+# uploading boot loader for network reprogramming. Do this after loading app srec file.
+# using either 'make install' or 'make reinstall'
+inp: FORCE
+	$(PROGRAMER) $(PROGRAMMER_FLAGS_INP) --upload if=$(BOOTLOADER)
+
+FORCE:
+
+.phony: FORCE

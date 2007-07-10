@@ -1,0 +1,49 @@
+README for MotorBoardTop
+Author/Contact: cotsbots-help@millennium.berkeley.edu
+
+Description:
+
+It is expected that this component run on the UC Berkeley motor board equipped
+with an Atmel ATmega8L microcontroller.  MotorBoardTop provides access to
+all of the robot-specific hardware drivers as well as the communication
+interface to the master mote.
+
+MotorBoardTopM provides a top-level message parser to implement the
+commands provided by tos/lib/Robot/MotorBoard.h.  It also has the ability
+to send messages to the master mote (debug or otherwise).
+
+If a platform other than the Mini-Z is used (differential drive robot for
+example), the implementation details of how the robot turns should be
+provided here.  For example, my current setTurn message sets the turning
+angle of the Mini-Z servo.  However, for a differential-drive robot, setting
+the turning angle would involve moving the two motors at different speeds
+and directions.
+
+Alternate Implementations:
+
+  MotorBoardTopTestComm -- This component is primarily used while testing
+    the communication between the master mote and the motor board.  It sends
+    a MICA_TOGGLE_LED message two times per second to the master mote.  This
+    message may be used to measure the bit rate and adjust the clock
+    calibration value (in EEPROM address 0) appropriately.  Since the motor
+    board uses the internal reference clock in the ATmega8L, it is relatively
+    inaccurate.  For communication between boards to work properly, this 
+    value must be calibrated.  At the current 19.2kbps setting, one bit
+    should be approximately 52 usec.  Increasing the calibration value will
+    make the UART slower and vice versa.
+
+    In addition, this testing component sets the motors to a constant speed
+    and changes their direction at the same clock rate.  This also tests
+    the motor driving functionality of the motor board (i.e. makes sure
+    everything is soldered properly).
+
+Tools:
+
+Known bugs/limitations:
+
+As hardware drivers are added to the motor board, they should also be added
+to this component as well as commands/message types in 
+tos/lib/Robot/MotorBoard.h.  The current implementation is by no means
+complete.
+
+

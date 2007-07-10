@@ -1,0 +1,23 @@
+README for Figure8
+Author/Contact: cotsbots-help@millennium.berkeley.edu
+
+Description:
+
+Figure8 runs the tos/lib/Robot/Figure8M component with the default values.
+The robot should move in a figure8 pattern, although this depends 
+tremendously on surface, battery voltage, etc.  Because there is no position
+feedback currently being used, this pattern is completely open-loop and
+must be calibrated.
+
+Tools:
+
+Calibration is possible through tools/java/net/tinyos/cotsbots/RobotCmdGUI 
+and the TestMotorBoard application.
+
+Known bugs/limitations:
+
+It would be nice if the calibration values obtained above were stored in
+EEPROM, but currently they are not.
+
+Many features could be added to help close the loop (localization, a battery/
+speed lookup table, etc.).

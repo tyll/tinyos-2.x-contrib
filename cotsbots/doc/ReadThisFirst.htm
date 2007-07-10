@@ -1,0 +1,87 @@
+<HTML><HEAD><TITLE>CotsBots: Read this FIRST!</TITLE>
+<BODY vLink=#005bb7 link=#005bb7 bgColor=#f8f8ff>
+<TABLE cellSpacing=2 cellPadding=3 width="100%" border=0 hspace="4">
+  <TBODY>
+  <TR bgColor=#e0e0ff>
+    <TD width="100%"><FONT 
+      face=tahoma,arial,helvetica><B><BIG><BIG>CotsBots Setup
+      </BIG></BIG></B> 
+      <P>Last updated 31 Jan. 2003 </FONT></P></TD></TR></TBODY></TABLE>
+<P>
+<TABLE cellSpacing=2 cellPadding=3 width="100%" border=0 hspace="4">
+  <TBODY>
+  <TR bgColor=#e0e0ff>
+    <TD width="100%"><NOBR><B><FONT face=arial,helvetica>Introduction</FONT> 
+      </B></NOBR></TD></TR></TBODY></TABLE></P>
+There are a couple important setup parameters in using CotsBots that you
+should read first before doing any CotsBots programming.
+
+<P>
+<TABLE cellSpacing=2 cellPadding=3 width="100%" border=0 hspace="4">
+  <TBODY>
+  <TR bgColor=#e0e0ff>
+    <TD width="100%"><NOBR><B><FONT face=arial,helvetica>
+    Programming the MotorBoard</FONT> 
+      </B></NOBR></TD></TR></TBODY></TABLE></P>
+
+Several things have changed since the MotorBoard was last programmed, so
+it is important to do this first.  The MotorBoard uses the ATmega8L
+microcontroller, a relatively recent addition to the Atmel family.  Therefore,
+in order to program, you must be using <b>avr-gcc3.2 or higher</b>.  
+<p>
+<b>Please re-program your MotorBoards first!</b>  Many things have been
+added since code was last downloaded to the motorboards.
+
+<p>You will notice that you may need to add a sensorboard in the 
+programming board stack as shown below.  In addition, a 3V power supply 
+(available from Radio Shack) needs to be used while programming.  This
+is taken care of when using the latest mica2 programming board.
+<p>
+<center>
+<img src="imgs/ProgrammingStack.jpg" width="320" height="240">
+</center>
+<P>
+<TABLE cellSpacing=2 cellPadding=3 width="100%" border=0 hspace="4">
+  <TBODY>
+  <TR bgColor=#e0e0ff>
+    <TD width="100%"><NOBR><B><FONT face=arial,helvetica>
+    Setting up the Makefiles</FONT> 
+      </B></NOBR></TD></TR></TBODY></TABLE></P>
+Because the CotsBots software is placed in the separate tinyos-1.x/contrib
+directory, one small addition must be made if using a Makelocal file in your 
+standard tinyos-1.x/apps directory.  You may be using this if you are
+working on an IBM Thinkpad, where you need to set the extra -dlpt=3 flag.  Just
+modify the Makelocal file in tinyos-1.x/contrib/cotsbots/apps/ to be the
+same as that in your primary apps directory.
+
+<P>
+<TABLE cellSpacing=2 cellPadding=3 width="100%" border=0 hspace="4">
+  <TBODY>
+  <TR bgColor=#e0e0ff>
+    <TD width="100%"><NOBR><B><FONT face=arial,helvetica>
+    Running RobotCmdGUI</FONT> 
+      </B></NOBR></TD></TR></TBODY></TABLE></P>
+
+If you would like to have external control of the robot (for the TestMotorBoard
+and TestNavigation applications), you will need to use the RobotCmdGUI
+provided in the tinyos-1.x/contrib/cotsbots/tools directory.  Once again,
+because the software is installed in the contrib directory, you will need
+to modify your CLASSPATH environment variable.  Often you need to be
+a computer administrator to do this.  Add the following directory to the
+CLASSPATH.
+<p><pre>
+{INSTALL DRIVE}/tinyos-1.x/contrib/cotsbots/tools;
+</pre>
+
+And that should be it!  You are ready to play with the CotsBots!
+
+<p>
+If you have problems with any of the above, please email:<br>
+<i>cotsbots-help@millennium.berkeley.edu</i>
+
+<p>
+<hr>
+
+</body>
+
+</html>

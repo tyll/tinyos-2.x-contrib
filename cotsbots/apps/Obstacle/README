@@ -1,0 +1,24 @@
+README for Obstacle
+Author/Contact: cotsbots-help@millennium.berkeley.edu
+
+Description:
+
+This is an obstacle-avoidance program that utilizes the accelerometer on
+the mica sensorboard to determine the presence of an obstacle.  When
+an obstacle is detected, the robot will back up, turn, and go in a
+new direction.
+
+Tools:
+
+No tools are required for this application.
+
+Known bugs/limitations:
+
+Depending on the surface this is running on and the speed at which this is 
+running, the thresholds on the obstacle component may need to be adjusted.
+Some more filtering could be used to reduce the number of false positives.
+In addition, if the car is coming into a wall at a relatively shallow angle 
+the obstacle avoidance may not trigger.
+
+
+

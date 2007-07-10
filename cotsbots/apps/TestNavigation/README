@@ -1,0 +1,30 @@
+README for TestNavigation
+Author/Contact: cotsbots-help@millennium.berkeley.edu
+
+Description:
+
+TestNavigation tests the NavigationC/M component.  It accepts a radio
+message that tells the robot its current x-y position in cm, its current
+heading in radians (-pi,pi) and the position it should go to.  TestNavigation
+calls the Navigation.navigate command to move the robot from point A to point
+B.  In addition, debugging capability is provided in the Navigation component
+to check the calculations at various steps.
+
+Currently there are no debugging LEDs in this application.
+
+Tools:
+To send coordinates to the TestNavigation application, use 
+tools/java/net/tinyos/cotsbots/RobotCmd
+
+It is hoped in the future that this functionality may also be provided through
+the GUI in tools/java/net/tinyos/cotsbots/RobotCmdGUI
+
+Known bugs/limitations:
+
+Navigation is an open-loop component in its current implementation.  The speed
+needs to be set so that it corresponds to approximately 40cm/sec on whatever
+surface is being used at whatever battery voltage you are currently at.
+
+I am currently working on an automatic speed calibration component so that
+you can set the robot down with a couple motes and it will calibrate itself
+for speed before you use the Navigation component.

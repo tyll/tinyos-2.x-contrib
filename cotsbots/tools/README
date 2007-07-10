@@ -1,0 +1,41 @@
+README for Tools Directory
+Author/Contact: cotsbots-help@millennium.berkeley.edu
+
+IMPORTANT NOTE: In order to successfully make the java files in this
+directory, add the following to your classpath:
+$TINYOS/contrib/cotsbots/tools
+where $TINYOS is your main tinyos-1.x diretory.
+
+This directory currently includes two applications: RobotCmdGUI (used
+as an interface to the robots -- remote control or debugging/packet injection)
+and BeepDiffusion (used to inject packets for the BeepDiffusion application).
+
+RobotCmdGUI:
+
+This application requires the SerialForwarder to run, so it must already
+be running.  Make sure that you set the appropriate bit rate for
+mica/mica2 while openening SerialForwarder.
+
+usage: java RobotCmd/RobotCmdGUI [group_id]
+
+A window should appear that gives various slider bar/button interfaces
+to drive the robot, calibrate it, test/debug, etc.  This application
+also includes a section for sending Navigation packets for the 
+TestNavigation application.
+
+BeepDiffusion:
+
+This is based on BcastInject and the syntax is similar.
+
+usage: java RobotCmd/BeepDiffusion <command> [arguments[
+	where <command> and [arguments] are
+	1) tick_length (ms)
+	2) go
+
+This application is used to inject packets to start the BeepDiffusion
+application.  The StartDiffusion mote may also be used for this purpose
+(code in apps/BeepDiffusion).
+
+
+
+

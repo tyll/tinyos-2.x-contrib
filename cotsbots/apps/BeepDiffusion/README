@@ -1,0 +1,36 @@
+README for BeepDiffusion
+Author/Contact: cotsbots-help@millennium.berkeley.edu
+
+Description:
+
+The goal of BeepDiffusion is to spread robots out in a confined space.  Each
+robot beeps in turn and if the other robots hear it, they move forward.  It
+uses obstacle avoidance through the accelerometer component (Obstacle
+above).  In this way, the robots act as gas particles diffusing throughout
+a space -- bouncing off walls.  In this case though, if no robots can hear
+the others, they stop and consider themselves spread far enough.  There are
+still some problems with this application -- namely getting consistent beep
+radii.  BeepDiffusion has two components -- BeepDiffusionC and StartDiffusion.
+BeepDiffusion is the main application to be run on the robots and 
+StartDiffusion injects packets into the network to start the application.
+
+Tools:
+
+BeepDiffusion requires a base mote to be programmed with the StartDiffusion
+code (or these packets may also be injected using the BeepDiffusion application
+in tools.  Since BeepDiffusion uses a TDMA-like scheme for syncing the robots
+and giving them beep slots, it must first initialize and detect all of its 
+neighbors.  Therefore, a packet changing the tick length is first injected
+(depending on the number of robots and how long you want them to drive) and
+following that a "go" packet is injected telling them to start beeping.
+
+Known bugs/limitations:
+
+The "beep radius" is incredibly inconsistent using the mica sensorboard
+hardware.  Sometimes robots can hear the beeps five meters away and not
+two meters or one meter away.  In addition, this application has all of the
+limitations of Obstacle.
+
+
+
+

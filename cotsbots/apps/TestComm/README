@@ -1,0 +1,40 @@
+README for TestComm
+Author/Contact: cotsbots-help@millennium.berkeley.edu
+
+Description:
+
+TestComm provides a test platform for sending and receiving motor packets.
+This program runs on the mica(2) mote and sends messages to the motor
+board periodically telling it to turn on its LED.  TestCommMotor does
+the same thing from the motor board.  It periodically sends messages
+to the mica mote to toggle its LED.
+
+LED Debugging:
+RED_LED -- toggles when a message is received 
+GREEN_LED -- toggles when a message is sent
+YELLOW_LED -- toggled when it receives an LED_TOGGLE command from the
+	motor board
+MOTOR_LED -- toggles when a message is sent or an LED_TOGGLE message
+	is received
+
+NOTE: I2C is not currently implemented on the Motor Board.  The I2C protocol
+requires pull-up resistors on the I2C clock and data lines which do not
+exist in our current schematic.  These may be added manually if I2C is
+desired, or UART communication will suffice for most applications.  The 
+resistors may exist anywhere and are not limited to the motorboard, so if
+you are using another board that has these pull-up resistors, you should
+be okay.
+
+Tools:
+
+No tools needed.
+
+Known bugs/limitations:
+
+This component is primarily used to calibrate the internal RC oscillator
+so that I can reliably send packets over the UART.  By timing a bit
+period with an oscilloscope, I can adjust the calibration constant stored
+in the EEPROM accordingly (see ATmega8L documentation for more details).
+
+
+

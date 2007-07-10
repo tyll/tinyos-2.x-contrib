@@ -1,0 +1,534 @@
+<HTML><HEAD><TITLE>CotsBots: Getting Started</TITLE>
+<BODY vLink=#005bb7 link=#005bb7 bgColor=#f8f8ff>
+<TABLE cellSpacing=2 cellPadding=3 width="100%" border=0 hspace="4">
+  <TBODY>
+  <TR bgColor=#e0e0ff>
+    <TD width="100%"><FONT 
+      face=tahoma,arial,helvetica><B><BIG><BIG>CotsBots</BIG><BR><B>
+      A Platform for Distributed Mobile Robotics</B></BIG></B> 
+      <P>Last updated 29 Jan. 2003 </FONT></P></TD></TR></TBODY></TABLE>
+<P>
+<TABLE cellSpacing=2 cellPadding=3 width="100%" border=0 hspace="4">
+  <TBODY>
+  <TR bgColor=#e0e0ff>
+    <TD width="100%"><NOBR><B><FONT face=arial,helvetica>Introduction</FONT> 
+      </B></NOBR></TD></TR></TBODY></TABLE></P>
+In this lesson, you will learn to use the CotsBots distributed robot platform.
+The lesson assumes you are already familiar with the TinyOS toolset, and will
+walk you through the Figure8 application (and a bit of the nesC nomenclature).
+Hopefully by the end, you will
+be ready to start writing your own CotsBots applications! 
+<P>
+<TABLE cellSpacing=2 cellPadding=3 width="100%" border=0 hspace="4">
+  <TBODY>
+  <TR bgColor=#e0e0ff>
+    <TD width="100%"><NOBR><B><FONT face=arial,helvetica>
+    About the CotsBots</FONT> 
+      </B></NOBR></TD></TR></TBODY></TABLE></P>
+The goal of the CotsBots project is to use commercial off-the-shelf (COTS) 
+components to build and deploy inexpensive and modular robots.  These robots 
+provide a convenient platform to investigate algorithms, cooperation and 
+distributed sensing in large (> 50) robot networks.
+
+<P>Each robot is small (5"x2.5"x3") and costs approximately $200 each (in 
+quantity 50).  Each is equipped with on-board processing and wireless radio 
+communication (through the Mica Mote).  Currently, sensing boards associated 
+with the TinyOS/NEST project, including a board equipped with light, 
+temperature, buzzer/microphone, 2-axis magnetometer and accelerometer, are 
+available commercially.  A common bus allows for the design and addition of 
+robot-oriented sensor boards (for odometry, obstacle avoidance, mapping, 
+etc.).  A MotorBoard has been designed to interface boards developed through 
+the NEST project to an off-the-shelf RC toy car.  All parts are commercially 
+available and require only minor modifications to build the robot.
+
+<P>The CotsBots platform consists of both a hardware and a software component.
+This lesson describes a very simple example of using the software.  For
+more information, please see the CotsBotsSpecifications in the 
+<tt>contrib/cotsbots/doc</tt> directory.
+
+<p>
+<table border=0 hspace=4 cellspacing=2 width="100%" cellpadding=3>
+<tr bgcolor="#e0e0ff">
+<td width="100%"><nobr><b><font
+face="arial,helvetica">An example application: Figure8</font></b></nobr></td>
+</tr></table>
+
+<p>
+<i>Note that this description is based on Tutorial, Lesson 1.  Apologies
+if it looks the same.</i>
+
+<p>
+Let's look at a concrete example:
+the simple test program "Figure8" found in contrib.cotsbots.apps.Figure8.
+This application will run the robot in a figure8-like pattern.
+
+<p>
+Figure8 consists of two <b>components</b>: a <b>module</b>, called
+"<tt>Figure8M.nc</tt>", and a <b>configuration</b>, called
+"<tt>Figure8C.nc</tt>". Remember that all applications require a single
+top-level configuration, which is typically named after the
+application itself. In this case <tt>Figure8.nc</tt> is the
+configuration for the Figure8 application and the source file that the
+NesC compiler uses to generate the executable for the
+mote. <tt>Figure8M.nc</tt> provides the
+<em>implementation</em> of the Figure8 application. As you might guess,
+<tt>Figure8C.nc</tt> is used to wire the <tt>Figure8M.nc</tt> module to
+other components that the Figure8 application requires.
+
+<p>
+The reason for the distinction between modules and configurations is to
+allow a system designer to quickly "snap together" applications. For
+example, a designer could provide a configuration that simply wires
+together one or more modules, none of which she actually designed.
+Likewise, another developer can provide a new set of "library" modules 
+that can be used in a range of applications.  A concrete example of this is
+when <tt>Figure8C.nc</tt> is re-used in the TestMotorBoard application.
+
+<p>
+<table border=0 hspace=4 cellspacing=2 width="100%" cellpadding=3>
+<tr bgcolor="#e0e0ff">
+<td width="100%"><nobr><b><font
+face="arial,helvetica">The Figure8M.nc module</font></b></nobr></td>
+</tr></table>
+
+<p>
+Let's look first at the module <tt>Figure8M.nc</tt>:
+
+<p>
+<center>
+<table border=0 hspace=4 cellspacing=2 width="80%" cellpadding=3>
+<tr bgcolor="#e0e0e0">
+<td width="100%">
+<b>Figure8M.nc</b>
+<pre>
+module Figure8M {
+  provides interface StdControl;
+  provides interface Figure8Calibration;
+  uses {
+    interface Robot;
+    interface Clock;
+    interface Leds;
+  }
+}
+// Continued below...
+</pre></td></tr></table></center>
+
+<p>
+The first part of the code states that this is a module called
+<tt>Figure8M</tt>. <tt>Figure8M</tt> <b>provides</b> two interfaces:
+<tt>StdControl</tt> and <tt>Figure8Calibration</tt>.  It <b>uses</b> three
+interfaces:
+<tt>Robot</tt>, <tt>Clock</tt>, and <tt>Leds</tt>.
+
+<p>
+The idea of providing and requiring interfaces should be familiar to
+anyone who has programmed in an object-oriented language such as Java.
+First consider the clause 
+"<tt>provides interface StdControl</tt>". This means that
+<tt>Figure8M</tt> implements the <tt>StdControl</tt> interface.
+<tt>StdControl</tt> is a common interface used to initialize and
+start TinyOS components. If we look at
+<tt>tos/interfaces/StdControl.nc</tt>:
+
+<p>
+<center>
+<table border=0 hspace=4 cellspacing=2 width="80%" cellpadding=3>
+<tr bgcolor="#e0e0e0">
+<td width="100%">
+<b>StdControl.nc</b>
+<pre>
+interface StdControl {
+  command result_t init();
+  command result_t start();
+  command result_t stop();
+}
+</pre></td></tr></table></center>
+
+<p>
+We see that <tt>StdControl</tt> defines three <b>commands</b>,
+<tt>init()</tt>, <tt>start()</tt>, and <tt>stop()</tt>. 
+<tt>init()</tt> is called when a
+component is first initialized, and <tt>start()</tt> when it is started,
+that is, actually executed for the first time. 
+<tt>stop()</tt> is called when the component is stopped, for example, in
+order to power off the device that it is controlling.
+<tt>init()</tt> can be called multiple times, but will never be called 
+after either <tt>start()</tt> or <tt>stop</tt> are called.
+Specifically, the valid call patterns of StdControl are <tt>init* 
+(start | stop)*</tt> 
+All three of these commands have "deep" semantics; calling <tt>init()</tt> 
+on a component will make it call <tt>init()</tt> on all of its subcomponents. 
+A good example is the component controlling the mote radio:
+<tt>init()</tt> is called when the component is initialized, 
+<tt>start()</tt> is called to enable power to the radio, and 
+<tt>stop()</tt> to shut off power. Because the radio power is only
+needed when communicating, <tt>start()</tt> and <tt>stop()</tt> may be
+called multiple times to power on or power off the radio.
+
+<p>
+A <b>command</b> is just a function that may be defined in an interface.
+If an interface defines a command, then any component that
+<b>provides</b> that interface must implement that function.
+In the case of <tt>Figure8M</tt>, then, we expect this module to
+implement the <tt>init()</tt>, <tt>start()</tt>, and <tt>stop()</tt> 
+commands, which it does as we will see below.
+
+<p>
+Likewise, if an interface defines a command, then any component
+that <b>uses</b> that interface may call the function.
+<tt>Figure8M</tt> uses three interfaces, <tt>Robot</tt>, <tt>Clock</tt>, and
+<tt>Leds</tt>. (The code for these can be found in 
+<tt>tos/interfaces</tt>.) 
+For example, <tt>Robot.nc</tt> defines a bunch of commands like
+<tt>setSpeed(speed)</tt>, <tt>setTurn(turn)</tt>, and so forth, which set the
+speed and turning angle of the robot.  Because <tt>Figure8M</tt> uses the
+<tt>Robot</tt> interface, it can invoke any of these commands.
+(Keep in mind, however, that <tt>Robot</tt>
+is just an interface: it specifies no implementation. We will see
+later how the configuration, <tt>Figure8C.nc</tt>, is used to wire 
+<tt>Figure8M</tt>'s use of the <tt>Robot</tt> interface to a concrete
+implementation of that interface.)
+
+<p>
+Let's look at the rest of <tt>Figure8M.nc</tt> to see how this all fits
+together:
+
+<p>
+<center>
+<table border=0 hspace=4 cellspacing=2 width="80%" cellpadding=3>
+<tr bgcolor="#e0e0e0">
+<td width="100%">
+<b>Figure8M.nc, continued</b>
+<pre>
+implementation {
+
+  uint8_t ticks;
+  uint8_t TurnRight;
+  uint8_t TurnStraight1;
+  uint8_t TurnLeft;
+  uint8_t TurnStraight2;
+  uint8_t Speed;
+
+  command result_t StdControl.init() {
+
+    /* Set default constants -- could store on EEPROM for Mica*/
+    Speed = 70;
+    TurnRight = 3;
+    TurnStraight1 = 8;
+    TurnLeft = 11;
+    TurnStraight2 = 16;
+
+    ticks = 0;
+    call Robot.init();
+    return SUCCESS;
+  }
+
+  /* Start timer to fire once/sec */
+  command result_t StdControl.start() {
+    call Clock.setRate(TOS_I8PS, TOS_S8PS);
+    call Robot.setSpeedTurnDirection(Speed, STRAIGHT, FORWARD);
+    return SUCCESS;
+  }
+
+  /* Stop timer and reset ticks, speed, direction and turn */ 
+  command result_t StdControl.stop() {
+    call Clock.setRate(TOS_I0PS, TOS_S0PS);
+    ticks = 0;
+    call Robot.setSpeedTurnDirection(OFF,STRAIGHT,FORWARD);
+    return SUCCESS;
+  }
+
+  /* Determine if I should turn */
+  event result_t Clock.fire() {
+    ticks++;
+    
+    if (ticks == 1)
+      call Robot.setSpeedTurnDirection(Speed, STRAIGHT, FORWARD);
+    else if (ticks == TurnRight)
+      call Robot.setSpeedTurnDirection(Speed, RIGHT, FORWARD);
+    else if (ticks == TurnStraight1)
+      call Robot.setSpeedTurnDirection(Speed, STRAIGHT, FORWARD);
+    else if (ticks == TurnLeft)
+      call Robot.setSpeedTurnDirection(Speed, LEFT, FORWARD);
+    else if (ticks == TurnStraight2) {
+      call Robot.setSpeedTurnDirection(Speed, STRAIGHT, FORWARD);
+      ticks = 0;
+    }
+
+    return SUCCESS;
+  }
+// Continued below...
+</pre></td></tr></table></center>
+
+<p>
+This is simple enough. As we see the <tt>Figure8M</tt> module implements
+the <tt>StdControl.init()</tt>, 
+<tt>StdControl.start()</tt>, and <tt>StdControl.stop()</tt> commands,
+since it provides the <tt>StdControl</tt> interface. It also implements
+the <tt>Clock.fire()</tt> event, which is necessary since
+<tt>BlinkM</tt> uses the <tt>Clock</tt> interface.  Several variables are 
+also declared for use throughout the module.
+
+<p>
+<tt>init()</tt> simply initializes the internal state of the module and
+initializes the Robot sub-module.
+<tt>start()</tt> invokes <tt>Clock.setRate()</tt> to set the clock
+rate to 8 ticks per second and uses <tt>Robot.setSpeedTurnDirection()</tt>
+to initialize the state of the robot. <tt>stop()</tt> sets the clock rate to 
+zero ticks per second, which is equivalent to disabling the clock and stops
+the robot as well.
+Each time <tt>fire()</tt> is invoked, the <tt>ticks</tt> variable is compared
+with the times at which we would like to to turn and the robot state is
+set appropriately. Voila!
+
+<p>
+If you look at the application code, you will notice that the implementation
+of the <tt>Figure8Calibration</tt> interface in <tt>Figure8M</tt> as well.  
+Because the Figure8 component is open-loop (i.e. there is no feedback on what
+the robot's current position is -- everything is based on time only), it is
+often necessary to calibrate the Figure8 -- setting the proper speed and 
+turn times.  Because the <tt>Figure8Calibration</tt> interface is not actually
+used in <tt>Figure8.nc</tt>, we will not concern ourselves with it here. 
+
+<p>
+<table border=0 hspace=4 cellspacing=2 width="100%" cellpadding=3>
+<tr bgcolor="#e0e0ff">
+<td width="100%"><nobr><b><font
+face="arial,helvetica">The Figure8C.nc configuration</font></b></nobr></td>
+</tr></table>
+
+<p>
+Now let's look at <tt>Figure8C.nc</tt>, the configuration for this
+application:
+
+<p>
+<center>
+<table border=0 hspace=4 cellspacing=2 width="80%" cellpadding=3>
+<tr bgcolor="#e0e0e0">
+<td width="100%">
+<b>Figure8C.nc</b>
+<pre>
+configuration Figure8C {
+  provides interface StdControl;
+  provides interface Figure8Calibration;
+}
+implementation {
+  components Figure8M, RobotC, ClockC, LedsC;
+
+  StdControl = Figure8M.StdControl;
+  Figure8Calibration = Figure8M.Figure8Calibration;
+
+  Figure8M.Robot -> RobotC;
+  Figure8M.Clock -> ClockC;
+  Figure8M.Leds -> LedsC;
+}
+</pre></td></tr></table></center>
+
+<p>
+The first thing to notice is that the syntax of a configuration is
+slightly different, in that it doesn't contain any code.
+The first four lines, 
+<pre>
+  configuration Figure8C {
+    provides interface StdControl;
+    provides interface Figure8Calibration;
+  }
+</pre>
+simply state that this is a configuration called <tt>Figure8C</tt>. In this
+case, our configuration also provides the <tt>StdControl</tt> and <tt>
+Figure8Calibration</tt> interfaces.  This is important, because it allows
+a separate application (such as TestMotorBoard) to use the 
+<tt>Figure8C.StdControl</tt>
+interface without knowing the components underneath it.  This is 
+important to keep in mind: a configuration can require and provide interfaces! 
+
+<p>
+The "<tt>components</tt>" line specifies the set of components that this
+configuration references, in this case <tt>Figure8M</tt>, <tt>RobotC</tt>,
+<tt>ClockC</tt>, and <tt>LedsC</tt>. 
+In many ways this line is redundant since it's obvious from the rest of
+the file which components are referenced by the configuration. 
+The <tt>components</tt> line is included only for completeness, but is
+required by the NesC compiler. 
+
+<p>
+The lines
+<pre>
+  StdControl = Figure8M.StdControl;
+  Figure8Calibration = Figure8M.Figure8Calibration;
+</pre>
+are used to essentially "pass through" these interfaces from their 
+respective implementations in <tt>Figure8M</tt>.
+
+<p>
+<pre>
+  Figure8M.Robot -> RobotC;
+  Figure8M.Clock -> ClockC;
+  Figure8M.Leds -> LedsC;
+</pre>
+are used to bind the use of the <tt>Robot</tt>, <tt>Clock</tt>, and 
+<tt>Leds</tt>
+interfaces in <tt>Figure8M</tt> to their respective implementations.
+
+<p>
+There are two confusing things about these lines. First of all, 
+the <tt>Clock</tt> on the left side of the arrow is referring
+to the <em>interface</em> called <tt>Clock</tt>
+(<tt>tos/interfaces/Clock.nc</tt>), while the <tt>ClockC</tt>
+on the right side of the arrow is refering to
+the <em>implementation module</em> called <tt>ClockC</tt>, found in
+<tt>tos/system/Clock.nc</tt>. Remember that the arrow always binds
+interfaces (on the left) to implementations (on the right).
+<tt>ClockC</tt> is a mnemonic for "clock component".
+
+<p> 
+The second confusing point is that the line
+<pre>
+  Figure8M.Clock -> ClockC;
+</pre>
+is really shorthand for
+<pre>
+  Figure8M.Clock -> ClockC.Clock;
+</pre>
+That is, because <tt>Figure8M</tt> is using the interface <tt>Clock.nc</tt>,
+we are trying to bind it to an implementation (in the module
+<tt>ClockC.nc</tt>) of the same interface.
+If no interface name is given on the right side of the arrow, the NesC 
+compiler tries to bind to the same interface as on the left side of 
+the arrow.
+
+<p>
+<table border=0 hspace=4 cellspacing=2 width="100%" cellpadding=3>
+<tr bgcolor="#e0e0ff">
+<td width="100%"><nobr><b><font
+face="arial,helvetica">Compiling the Figure8 application</font></b></nobr></td>
+</tr></table>
+
+<p>
+If you are in the TinyOS source tree, compiling the <tt>Figure8</tt>
+application is as simple as typing
+<pre>
+  make mica
+</pre>
+in the <tt>contrib/cotsbots/apps/Figure8</tt>
+directory. Of course this doesn't tell you anything about how the NesC
+compiler is invoked.
+
+<p>&nbsp;</p>
+
+<p>
+<table border=0 hspace=4 cellspacing=2 width="100%" cellpadding=3>
+<tr bgcolor="#e0e0ff">
+<td width="100%"><nobr><b><font
+face="arial,helvetica">Programming the mote and running Figure8</font></b></nobr></td>
+</tr></table>
+
+<p>
+Now that we've compiled the application it's time to program the mote
+and run it. To download your program into the mote, place the
+mote board (or mote and sensor stack) into the bay on the programming
+board.
+
+<p>
+Plug the 32-pin connector into the parallel port of a
+computer configured with the TOS tools, using a standard 
+DB32 parallel port cable.  
+
+<p>
+Type: <tt>make install mica</tt>. If you get the error:
+<pre>
+  uisp -dprog=dapa --erase 
+  pulse
+  An error has occurred during the AVR initialization.
+   * Target status:
+      Vendor Code = 0xff, Part Family = 0xff, Part Number = 0xff
+
+  Probably the wiring is incorrect or target might be `damaged'.
+  make: *** [install] Error 2
+</pre>
+check whether the power is on. You can also get this error message if
+the mote is low on batteries (if you are using batteries), or if the
+wrong version of the <tt>uisp</tt> programming utility is installed
+(be sure to use the version in the NEST distribution).
+
+<p>
+If you are using an IBM ThinkPad, it may be necessary to tell the tools
+to use a different parallel port. You can do this by adding the
+line 
+<pre>
+  HOST = THINKPAD
+</pre>
+before the <tt>include</tt> statement in 
+contrib/cotsbots/apps/Figure8/Makefile</tt>.
+
+<p>
+If the installation is successful you should see something like the
+following:
+<pre>
+  compiling Figure8 to a mica binary
+  ncc -board=micasb -o build/mica/main.exe -Os -target=mica  -Wall -Wshadow -DDEF_TOS_AM_GROUP=0x7d -finline-limit=200 -fnesc-cfile=build/mica/app.c  Figure8.nc -lm
+  avr-objcopy --output-target=srec build/mica/main.exe
+  build/mica/main.srec
+      compiled Figure8 to build/mica/main.srec
+      installing mica binary
+  uisp -dprog=dapa  --erase 
+  pulse
+  Atmel AVR ATmega128 is found.
+  Erasing device ...
+  pulse
+  Reinitializing device
+  Atmel AVR ATmega128 is found.
+  sleep 1              
+  uisp -dprog=dapa  --upload if=build/mica/main.srec
+  pulse
+  Atmel AVR ATmega128 is found.
+  Uploading: flash
+  sleep 1              
+  uisp -dprog=dapa  --verify if=build/mica/main.srec
+  pulse
+  Atmel AVR ATmega128 is found.
+  Verifying: flash
+</pre>
+
+<p>
+You can now test the program by unplugging the mote from the programming
+board, attaching it to the CotsBots robot as shown below, and turning on the power switch for both the robot and the Mica. 
+
+<p>
+<center>
+<table cellpadding=3 border=0 hspace=4 cellspacing=2>
+<tr> 
+<td><img src="imgs/CotsBots.jpg" width="240" height="240"></td>
+<td><img src="imgs/PowerSwitch.jpg" width="320" height="240"></td>
+</tr>
+<tr>
+<td><em>Mica mote attached to the CotsBots Platform</em></td>
+<td><em>Power Switch for the CotsBots</em></td>
+</tr>
+</table>
+</center>
+
+<p>
+Typing <tt>make clean</tt> in the <tt>Figure8</tt> directory will clean up
+the compiled binary files.
+
+<p>
+<table border=0 hspace=4 cellspacing=2 width="100%" cellpadding=3>
+<tr bgcolor="#e0e0ff">
+<td width="100%"><nobr><b><font
+face="arial,helvetica">Conclusion</font></b></nobr></td>
+</tr></table>
+
+<p>
+This tutorial has just scratched the surface of NesC's syntax and
+CotsBots features. Please see the CotsBots Specifications in 
+<tt>contrib/cotsbots/doc</tt> to get a more thorough introduction to CotsBots.
+Have fun!
+
+<p>
+<hr>
+<b><a href="RobotCmdGUI.html">Using the RobotCmdGUI &gt;</a></b>
+
+</body>
+
+</html>

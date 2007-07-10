@@ -1,0 +1,66 @@
+Current CotsBots Applications
+Author/Contact: cotsbots-help@millennium.berkeley.edu
+
+If using a Makelocal file in tinyOS-1.x/apps, make sure to copy that file into 
+this directory before installing applications in this folder.
+
+Figure8:
+Figure8 runs the tos/lib/Robot/Figure8M component with the default values.
+The robot should move in a figure8 pattern, although this depends 
+tremendously on surface, battery voltage, etc.  Because there is no position
+feedback currently being used, this pattern is completely open-loop and
+must be calibrated.
+
+MotorBoardTop:
+It is expected that this component run on the UC Berkeley motor board equipped
+with an Atmel ATmega8L microcontroller.  MotorBoardTop provides access to
+all of the robot-specific hardware drivers as well as the communication
+interface to the master mote.
+
+MotorBoardTopM provides a top-level message parser to implement the
+commands provided by tos/lib/Robot/MotorBoard.h.  It also has the ability
+to send messages to the master mote (debug or otherwise).
+
+If a platform other than the Mini-Z is used (differential drive robot for
+example), the implementation details of how the robot turns should be
+provided here.  For example, the current setTurn message sets the turning
+angle of the Mini-Z servo.  However, for a differential-drive robot, setting
+the turning angle would involve moving the two motors at different speeds
+and directions.  It might also be better to write a "controller" interface
+here instead that takes in velocity and rate of rotation (and then map
+this to control of the motors).
+
+Obstacle:
+This is an obstacle-avoidance program that utilizes the accelerometer on
+the mica sensorboard to determine the presence of an obstacle.  When
+an obstacle is detected, the robot will back up, turn, and go in a
+new direction.
+
+TestMotorBoard:
+TestMotorBoard tests the interface to the motorboard.  It receives and
+sends messages over the radio interface as well as over the motor board
+interface.  Incoming radio packets are transformed into motor packets.  In
+addition, packets sent from the motor board (which may contain accelerometer
+or servo debugging information) are relayed back over the radio.
+
+TestNavigation:
+TestNavigation tests the NavigationC/M component.  It accepts a radio
+message that tells the robot its current x-y position in cm, its current
+heading in radians (-pi,pi) and the position it should go to.  TestNavigation
+calls the Navigation.navigate command to move the robot from point A to point
+B.  In addition, debugging capability is provided in the Navigation component
+to check the calculations at various steps.
+
+BeepDiffusion:
+The goal of BeepDiffusion is to spread robots out in a confined space.  Each
+robot beeps in turn and if the other robots hear it, they move forward.  It
+uses obstacle avoidance through the accelerometer component (Obstacle
+above).  In this way, the robots act as gas particles diffusing throughout
+a space -- bouncing off walls.  In this case though, if no robots can hear
+the others, they stop and consider themselves spread far enough.  There are
+still some problems with this application -- namely getting consistent beep
+radii.  BeepDiffusion has two components -- BeepDiffusionC and StartDiffusion.
+BeepDiffusion is the main application to be run on the robots and 
+StartDiffusion injects packets into the network to start the application.
+
+

@@ -32,7 +32,7 @@
 #
 # Install or clean out the sim-sf.extra file into $TOSROOT
 
-all:
+install:
 	ln -sf $(PWD)/sim-sf.extra $(TOSROOT)/support/make
 
 clean:

@@ -62,7 +62,14 @@ public class MakefileParser {
   
 
   /**
-   * 
+   * Three Makefile options are allowed:
+   *  > COMPONENT=xyzC
+   *  > CFLAGS += ...  // same as the next one..
+   *  > CFLAGS = ...
+   *  > $include (Makerules)
+   *  
+   *  No semicolons (;) are allowed.
+   *  
    * @return true if we can compile this Makefile directly into a single build
    */
   @SuppressWarnings("unchecked")
@@ -71,21 +78,55 @@ public class MakefileParser {
       return false;
     }
     
+    if(new File("Makerules").exists()) {
+      return false;
+    }
+    
     try {
       BufferedReader in = new BufferedReader(new FileReader(makeFile));
       String line;
 
+      boolean fileOk = true;
+      boolean componentFound = false;
+      boolean makerulesFound = false;
       while ((line = in.readLine()) != null) {
-        if (line.contains("COMPONENT")) {
-          in.close();
-          return true;
+        if(line.contains((";"))) {
+          // No semicolons allowed
+          fileOk = false;
+          break;
+        }
+        
+        if (line.startsWith("COMPONENT=")
+            || line.startsWith("COMPONENT =")) {
+          componentFound = true;
+          continue;
+        }
+        
+        if(line.trim().matches("include $(MAKERULES)")) {
+          makerulesFound = true;
+          continue;
+        }
+        
+        if(line.startsWith("CFLAGS=")
+            || line.startsWith("CFLAGS+=")
+            || line.startsWith("CFLAGS =")
+            || line.startsWith("CFLAGS +=")) {
+          // CFLAGS is ok.
+          continue;
+        }
+
+        if(line.trim().length() > 0) {
+          // This line isn't empty and we don't know what it is.
+          fileOk = false;
+          break;
         }
       }
+
+      in.close();
+      return componentFound && makerulesFound && fileOk;
       
     } catch (IOException e) {
       return false;
     }
-    
-    return false;
   }
 }

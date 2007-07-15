@@ -84,9 +84,6 @@ implementation {
         return SUCCESS;
     }
 
-    default event void SplitControl.startDone(error_t error) { return; }
-    default event void SplitControl.stopDone(error_t error) { return; }
-
     command error_t AMSend.send[am_id_t id](am_addr_t addr,
                                             message_t* amsg,
                                             uint8_t len) {

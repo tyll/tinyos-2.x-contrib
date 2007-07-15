@@ -32,8 +32,8 @@
 #
 # Author: Chad Metcalf
 
-SF_SERIAL_DIR=$(TOSCONTRIB)/csm/tos/lib/serial
 SF_DIR=$(TOSCONTRIB)/csm/tos/lib/tossim
+SF_SERIAL_DIR=$(SF_DIR)/sf
 SF_FLAGS=-I$(SF_SERIAL_DIR) -I$(SF_DIR)
 
 GCC=gcc
@@ -59,7 +59,7 @@ THROTTLEOBJFILE = $(BUILDDIR)/throttle.o
 PYFILE          = $(SF_DIR)/tossim_wrap.cxx
 PYOBJFILE       = $(BUILDDIR)/pytossim.o
 
-CXXFILE     = $(TOSDIR)/lib/tossim/tossim.c
+CXXFILE     = $(SF_DIR)/tossim.c
 CXXOBJFILE  = $(BUILDDIR)/tossim.o
 HASHFILE    = $(TOSDIR)/lib/tossim/hashtable.c
 HASHOBJFILE = $(BUILDDIR)/c-support.o

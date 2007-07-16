@@ -25,7 +25,7 @@ class Throttle {
 
         double simStartTime;
         double simEndTime;
-        double simPace;
+        sim_time_t simPace;
 
         Tossim* sim;
 

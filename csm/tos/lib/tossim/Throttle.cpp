@@ -40,10 +40,11 @@
 #include "Throttle.h"
 
 Throttle::Throttle(Tossim* tossim, const int ms = 10) : 
-    sim(tossim), simStartTime(0.0), simEndTime(0.0), simPace(0.0), throttleCount(0) {
+    sim(tossim), simStartTime(0.0), simEndTime(0.0), simPace(0), throttleCount(0) {
 
-        // Convert milliseconds to seconds
-        simPace = ms / 1e3;
+        // Convert milliseconds to sim_time_t 10,000,000,000 10,000,000,000;
+
+        simPace =  ms * 10000000ULL;
 }
 
 Throttle::~Throttle() {}
@@ -59,11 +60,14 @@ void Throttle::finalize() {
 void Throttle::checkThrottle() {
     
     double secondsElasped = getTime() - simStartTime;
-    double ticksElasped = (sim->time()/sim->ticksPerSecond()) - secondsElasped;
+    sim_time_t ticksElasped = secondsElasped*sim->ticksPerSecond();
 
-    if (ticksElasped > simPace) {
+    sim_time_t difference = sim->time() - ticksElasped;
+
+    if (difference > simPace) {
         throttleCount++;
-        simSleep(ticksElasped);
+        double sleepDifference = (double) difference / sim->ticksPerSecond();
+        simSleep(sleepDifference);
     }
 
 }

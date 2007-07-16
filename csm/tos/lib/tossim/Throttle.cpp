@@ -42,8 +42,7 @@
 Throttle::Throttle(Tossim* tossim, const int ms = 10) : 
     sim(tossim), simStartTime(0.0), simEndTime(0.0), simPace(0), throttleCount(0) {
 
-        // Convert milliseconds to sim_time_t 10,000,000,000 10,000,000,000;
-
+        // Convert milliseconds to sim_time_t 
         simPace =  ms * 10000000ULL;
 }
 

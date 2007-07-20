@@ -249,7 +249,7 @@ public class TestRunner {
             + "-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/system "
             + "-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/interfaces "
             + "-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/lib/directserial "
-            + "-DTUNIT_TOTAL_NODES=" + runProperties.totalNodes() + " "
+            //+ "-DTUNIT_TOTAL_NODES=" + runProperties.totalNodes() + " "
             + "\" ";
 
           focusedResult = make.build(buildDirectory, focusedTarget
@@ -271,7 +271,7 @@ public class TestRunner {
           + "-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/system "
           + "-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/interfaces "
           + "-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/lib/directserial "
-          + "-DTUNIT_TOTAL_NODES=" + runProperties.totalNodes() + " "
+          //+ "-DTUNIT_TOTAL_NODES=" + runProperties.totalNodes() + " "
           + "\" ";
 
         focusedResult = make.build(buildDirectory, focusedTarget

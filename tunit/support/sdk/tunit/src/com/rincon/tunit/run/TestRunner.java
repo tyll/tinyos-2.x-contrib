@@ -188,8 +188,8 @@ public class TestRunner {
         .getXmlReportDirectory());
     try {
       xmlWrite.write();
-      StatisticsChart.write(StatisticsReport.log(packageId, "TestingProgress",
-          "[Total Problems]", report.getTotalErrors()
+      StatisticsChart.write(StatisticsReport.log(packageId,
+          "TestingProgress", "[Total Problems]", report.getTotalErrors()
               + report.getTotalFailures(), "[Total Tests]", report
               .getTotalTests()));
     } catch (IOException e) {
@@ -243,7 +243,14 @@ public class TestRunner {
           extras = "install." + focusedNode.getId() + " ";
           extras += focusedNode.getInstallExtras() + " ";
           extras += suiteProperties.getExtras() + " ";
-          extras += "tunit";
+          extras += "CFLAGS=\""
+            + "-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/lib/tunit "
+            + "-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/lib/tunitstats "
+            + "-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/system "
+            + "-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/interfaces "
+            + "-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/lib/directserial "
+            + "-DTUNIT_TOTAL_NODES=" + runProperties.totalNodes() + " "
+            + "\" ";
 
           focusedResult = make.build(buildDirectory, focusedTarget
               .getTargetName(), extras);
@@ -257,7 +264,16 @@ public class TestRunner {
         log.debug("Build properties are identical for nodes using target "
             + focusedTarget.getTargetName());
         extras = suiteProperties.getExtras() + " ";
-        extras += "tunit";
+        //extras += "tunit";
+        extras += "CFLAGS=\""
+          + "-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/lib/tunit "
+          + "-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/lib/tunitstats "
+          + "-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/system "
+          + "-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/interfaces "
+          + "-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/lib/directserial "
+          + "-DTUNIT_TOTAL_NODES=" + runProperties.totalNodes() + " "
+          + "\" ";
+
         focusedResult = make.build(buildDirectory, focusedTarget
             .getTargetName(), extras);
         report.addResult(focusedResult);
@@ -275,8 +291,8 @@ public class TestRunner {
           focusedResult = make.build(buildDirectory, focusedTarget
               .getTargetName(), extras + reinstallExtras);
 
+          report.addResult(focusedResult);
           if (!focusedResult.isSuccess()) {
-            report.addResult(focusedResult);
             return false;
           }
         }

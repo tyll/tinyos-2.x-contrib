@@ -243,15 +243,15 @@ public class TestRunner {
           extras = "install." + focusedNode.getId() + " ";
           extras += focusedNode.getInstallExtras() + " ";
           extras += suiteProperties.getExtras() + " ";
-          extras += "CFLAGS=\""
-            + "-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/lib/tunit "
-            + "-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/lib/tunitstats "
-            + "-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/system "
-            + "-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/interfaces "
-            + "-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/lib/directserial "
-            //+ "-DTUNIT_TOTAL_NODES=" + runProperties.totalNodes() + " "
+          extras += ""
+            + "CFLAGS+=-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/lib/tunit "
+            + "CFLAGS+=-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/lib/tunitstats "
+            + "CFLAGS+=-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/system "
+            + "CFLAGS+=-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/interfaces "
+            + "CFLAGS+=-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/lib/directserial "
+            + "CFLAGS+=-DTUNIT_TOTAL_NODES=" + runProperties.totalNodes() + " "
             + "\" ";
-
+          
           focusedResult = make.build(buildDirectory, focusedTarget
               .getTargetName(), extras);
           report.addResult(focusedResult);
@@ -264,15 +264,15 @@ public class TestRunner {
         log.debug("Build properties are identical for nodes using target "
             + focusedTarget.getTargetName());
         extras = suiteProperties.getExtras() + " ";
-        //extras += "tunit";
-        extras += "CFLAGS=\""
-          + "-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/lib/tunit "
-          + "-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/lib/tunitstats "
-          + "-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/system "
-          + "-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/interfaces "
-          + "-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/lib/directserial "
-          //+ "-DTUNIT_TOTAL_NODES=" + runProperties.totalNodes() + " "
+        extras += ""
+          + "CFLAGS+=-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/lib/tunit "
+          + "CFLAGS+=-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/lib/tunitstats "
+          + "CFLAGS+=-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/system "
+          + "CFLAGS+=-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/interfaces "
+          + "CFLAGS+=-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/lib/directserial "
+          + "CFLAGS+=-DTUNIT_TOTAL_NODES=" + runProperties.totalNodes() + " "
           + "\" ";
+        
 
         focusedResult = make.build(buildDirectory, focusedTarget
             .getTargetName(), extras);

@@ -69,6 +69,10 @@ public class TUnitCli implements TUnitProcessing_Events {
         System.out.println("Running tests...");
         tUnit.runTest();
         
+      } else if (args[i].equalsIgnoreCase("-stop")) {
+        System.out.println("Tearing down...");
+        tUnit.tearDownOneTime();
+        
       } else {
         reportError("Unknown command");
       }
@@ -86,6 +90,7 @@ public class TUnitCli implements TUnitProcessing_Events {
     usage += "  TUnitCli <command>\n";
     usage += "\t-ping\n";
     usage += "\t-run\n";
+    usage += "\t-stop\n";
     return usage;
   }
   

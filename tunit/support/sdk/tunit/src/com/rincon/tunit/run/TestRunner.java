@@ -273,6 +273,7 @@ public class TestRunner {
           + "CFLAGS+=-DTUNIT_TOTAL_NODES=" + runProperties.totalNodes() + " "
           + "";
         
+        System.out.println("Build Extras: " + extras);
 
         focusedResult = make.build(buildDirectory, focusedTarget
             .getTargetName(), extras);

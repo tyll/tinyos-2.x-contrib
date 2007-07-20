@@ -250,7 +250,7 @@ public class TestRunner {
             + "CFLAGS+=-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/interfaces "
             + "CFLAGS+=-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/lib/directserial "
             + "CFLAGS+=-DTUNIT_TOTAL_NODES=" + runProperties.totalNodes() + " "
-            + "\" ";
+            + "";
           
           focusedResult = make.build(buildDirectory, focusedTarget
               .getTargetName(), extras);
@@ -271,7 +271,7 @@ public class TestRunner {
           + "CFLAGS+=-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/interfaces "
           + "CFLAGS+=-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/lib/directserial "
           + "CFLAGS+=-DTUNIT_TOTAL_NODES=" + runProperties.totalNodes() + " "
-          + "\" ";
+          + "";
         
 
         focusedResult = make.build(buildDirectory, focusedTarget

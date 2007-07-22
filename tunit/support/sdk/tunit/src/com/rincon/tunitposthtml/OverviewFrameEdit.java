@@ -62,7 +62,6 @@ public class OverviewFrameEdit {
 
       while ((line = in.readLine()) != null) {
         if(line.contains("Home</a>")) {
-          System.out.println("MATCH FOUND");
           line += "<br><br>"
             + "<a href=\"http://www.lavalampmotemasters.com\" target=\"classFrame\">TUnit Home</a><br>"
             + "<a href=\"http://www.lavalampmotemasters.com/reports/archive/\" target=\"classFrame\">Online Archives</a>";

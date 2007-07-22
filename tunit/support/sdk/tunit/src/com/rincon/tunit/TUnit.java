@@ -64,7 +64,7 @@ public class TUnit {
   private static Logger log = Logger.getLogger(TUnit.class);
 
   /** Base directory of TUnit tests */
-  private String tunitBase;
+  private static String tunitBase;
 
   /** List of TUnitTestRunProperties to execute */
   private List testRuns;
@@ -183,6 +183,17 @@ public class TUnit {
     return baseReportDirectory;
   }
 
+
+  /**
+   * Get a friendly string version of the TUNIT_BASE directory, with the 
+   * correct slashies.
+   * @return
+   */
+  public static String getTunitBase() {
+    return tunitBase;
+  }
+  
+  
   /**
    * Establish the TUNIT Base directory
    * 
@@ -359,7 +370,7 @@ public class TUnit {
           truncatedSet.addEntry(dataSet.get(i));
         }
       }
-      StatisticsChart.write(truncatedSet, 200, 400);
+      StatisticsChart.write(truncatedSet, 200, 250);
 
     } catch (IOException e) {
       log.error(e.getMessage());

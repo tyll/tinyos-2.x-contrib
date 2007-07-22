@@ -67,9 +67,11 @@ public class StatisticsChart {
    * a StatisticsLogData object.
    * 
    * @param data
+   * @param width TODO
+   * @param height TODO
    * @throws IOException
    */
-  public static void write(StatisticsLogData data) throws IOException {
+  public static void write(StatisticsLogData data, int width, int height) throws IOException {
     final TimeSeries series1 = new TimeSeries(data.getUnits1(), Minute.class);
 
     StatsEntry focusedEntry;
@@ -129,7 +131,7 @@ public class StatisticsChart {
     chart.setBackgroundPaint(Color.white);
     chart.setBorderPaint(Color.black);
     chart.setBorderVisible(true);
-    BufferedImage bufImg = chart.createBufferedImage(500, 325);
+    BufferedImage bufImg = chart.createBufferedImage(width, height);
 
     ImageIO.write(bufImg, "png", new File(data.getReportDir(), data.getTitle()
         + ".png"));

@@ -373,7 +373,7 @@ public class ResultCollector extends Thread implements Messenger,
   public void statistics_log(short id, String units, long value) {
     try {
       StatisticsChart.write(StatisticsReport.log(report.getPackage(),
-          (String) statsMap.get(new Integer(id)), units, value));
+          (String) statsMap.get(new Integer(id)), units, value), 500, 325);
       
     } catch (IOException e) {
       TestResult result = new TestResult("__ResultCollector.statistics_log()");

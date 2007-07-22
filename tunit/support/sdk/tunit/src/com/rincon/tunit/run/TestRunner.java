@@ -191,7 +191,7 @@ public class TestRunner {
       StatisticsChart.write(StatisticsReport.log(packageId, "TestingProgress",
           "[Total Problems]", report.getTotalErrors()
               + report.getTotalFailures(), "[Total Tests]", report
-              .getTotalTests()));
+              .getTotalTests()), 500, 325);
     } catch (IOException e) {
       log.error("Error writing XML report: \n" + e.getMessage());
     } catch (ParseException e) {
@@ -285,7 +285,7 @@ public class TestRunner {
 
     try {
       StatisticsChart.write(StatisticsReport.log(packageId, "Footprint",
-          "[RAM Bytes]", make.getRamSize(), "[ROM Bytes]", make.getRomSize()));
+          "[RAM Bytes]", make.getRamSize(), "[ROM Bytes]", make.getRomSize()), 500, 325);
     } catch (IOException e) {
       TestResult logResult = new TestResult("__LogFootprintStats");
       logResult.error("IOException", e.getMessage());

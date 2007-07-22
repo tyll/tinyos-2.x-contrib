@@ -34,6 +34,8 @@ package com.rincon.tunit;
 import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -46,6 +48,7 @@ import com.rincon.tunit.report.StatisticsReport;
 import com.rincon.tunit.report.TestReport;
 import com.rincon.tunit.report.TestResult;
 import com.rincon.tunit.report.charts.StatisticsChart;
+import com.rincon.tunit.report.charts.StatisticsLogData;
 import com.rincon.tunit.run.RerunRegistry;
 import com.rincon.tunit.run.TestRunManager;
 
@@ -327,10 +330,36 @@ public class TUnit {
    */
   private void logResults() {
     try {
-      StatisticsChart.write(StatisticsReport.log("", "TestingProgress",
+      // Write out all our results for our test reports.
+      StatisticsLogData dataSet = StatisticsReport.log("", "TotalProgress",
           "[Total Problems]", TestReport.getTotalTunitErrors()
-              + TestReport.getTotalTunitFailures(), "[Total Tests]", TestReport
-              .getTotalTunitTests()));
+          + TestReport.getTotalTunitFailures(), "[Total Tests]", TestReport
+          .getTotalTunitTests());
+      StatisticsChart.write(dataSet, 500, 325);
+      
+      // Write out our results for just the past 5 days.
+      Calendar cal = Calendar.getInstance();
+      cal.add(Calendar.DATE, -5);
+      Date severalDaysAgo = cal.getTime();
+      StatisticsLogData truncatedSet = new StatisticsLogData("RecentProgress", getStatsReportDirectory(), "[# Problems]", "[# Tests]");
+      for(int i = 0; i < dataSet.size(); i++) {
+        if(dataSet.get(i).getDate().after(severalDaysAgo)) {
+          truncatedSet.addEntry(dataSet.get(i));
+        }
+      }
+      StatisticsChart.write(truncatedSet, 500, 325);
+      
+      // And.. write out results for the past 5 days with a different name
+      cal = Calendar.getInstance();
+      cal.add(Calendar.DATE, -5);
+      severalDaysAgo = cal.getTime();
+      truncatedSet = new StatisticsLogData("Progress", getStatsReportDirectory().getParentFile(), "[# Problems]", "[# Tests]");
+      for(int i = 0; i < dataSet.size(); i++) {
+        if(dataSet.get(i).getDate().after(severalDaysAgo)) {
+          truncatedSet.addEntry(dataSet.get(i));
+        }
+      }
+      StatisticsChart.write(truncatedSet, 200, 400);
 
     } catch (IOException e) {
       log.error(e.getMessage());

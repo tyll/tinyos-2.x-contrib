@@ -370,7 +370,7 @@ public class TUnit {
           truncatedSet.addEntry(dataSet.get(i));
         }
       }
-      StatisticsChart.write(truncatedSet, 200, 250);
+      StatisticsChart.write(truncatedSet, 200, 300);
 
     } catch (IOException e) {
       log.error(e.getMessage());

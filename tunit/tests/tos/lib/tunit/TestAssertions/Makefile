@@ -1,3 +1,4 @@
 COMPONENT=TestTunitC
+CFLAGS += -DMAX_TUNIT_QUEUE=10
 include $(MAKERULES)
 

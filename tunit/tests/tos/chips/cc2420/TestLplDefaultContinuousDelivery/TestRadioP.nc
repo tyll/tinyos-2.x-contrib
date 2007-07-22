@@ -160,7 +160,7 @@ implementation {
     call State.toIdle();
     
     assertResultIsAbove("No sources detected", 0, totalSources);
-    assertEquals("Wrong number of detects", 1, detects);
+    assertResultIsAbove("Unreliable detections", 0, detects);
 
     for(i = 0; i < totalSources; i++) {
       average += (float) received[i];

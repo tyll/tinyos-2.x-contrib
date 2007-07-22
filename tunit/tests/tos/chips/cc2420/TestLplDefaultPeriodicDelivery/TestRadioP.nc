@@ -23,7 +23,6 @@ module TestRadioP {
     interface Timer<TMilli> as WaitTimer;
     interface SplitControl as RadioPowerControl;
     interface State;
-    interface State as RadioPowerState;
     interface Leds;
   }
 }
@@ -63,14 +62,6 @@ implementation {
     S_SETUPONETIME,
     S_RUNNING,
   };
-  
-  /**
-   * Radio power state
-   */
-  enum {
-    S_OFF,
-    S_ON,
-  };
 
   
 
@@ -97,6 +88,7 @@ implementation {
   /***************** SplitControl Events ****************/
   event void SplitControl.startDone(error_t error) {
     if(transmitter) { 
+      call Leds.led1On();
       call State.forceState(S_RUNNING);
       post send();
     }
@@ -122,7 +114,7 @@ implementation {
     
   /***************** AMSend Events ****************/
   event void AMSend.sendDone(message_t *msg, error_t error) {
-    call Leds.led1Off();
+    call Leds.led2Off();
     if(call State.isState(S_RUNNING)) {
       // Send another
       call WaitTimer.startOneShot(256);
@@ -167,7 +159,6 @@ implementation {
     bool pass;
     call State.toIdle();
     
-    assertResultIsAbove("Too few Rx checks", 15, attempts);
     assertResultIsAbove("No sources detected", 0, totalSources);
     assertResultIsAbove("Unreliable detections", (float) attempts - ((float) 0.05 * (float) attempts), (float) detects);
 
@@ -217,10 +208,7 @@ implementation {
   
   /***************** Tasks ****************/
   task void send() {
-    call Leds.led1On();
-    if(!call RadioPowerState.isState(S_OFF)) {
-      assertTrue("Radio power isn't off", call RadioPowerState.isState(S_OFF));
-    }
+    call Leds.led2On();
     if(call AMSend.send(0, &myMsg, TOSH_DATA_LENGTH) != SUCCESS) {
       post send();
     }

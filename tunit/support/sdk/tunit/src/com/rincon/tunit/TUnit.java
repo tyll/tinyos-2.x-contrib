@@ -61,7 +61,7 @@ public class TUnit {
   private static Logger log = Logger.getLogger(TUnit.class);
 
   /** Base directory of TUnit tests */
-  private static String tunitBase;
+  private String tunitBase;
 
   /** List of TUnitTestRunProperties to execute */
   private List testRuns;
@@ -149,15 +149,6 @@ public class TUnit {
   }
 
   /**
-   * Get a friendly string version of the TUNIT_BASE directory, with the 
-   * correct slashies.
-   * @return
-   */
-  public static String getTunitBase() {
-    return tunitBase;
-  }
-  
-  /**
    * 
    * @return the root directory we're testing from
    */
@@ -195,13 +186,9 @@ public class TUnit {
    * @return the tunit directory, so external apps can figure it out.
    */
   private void establishTunitDir() {
-    tunitBase = ((String) System.getenv().get("TUNIT_BASE"));
-    
-    if(tunitBase != null) {
-      tunitBase = tunitBase.replace('\\',
-          File.separatorChar).replace('/', File.separatorChar);
-    }
-    
+    tunitBase = ((String) System.getenv().get("TUNIT_BASE")).replace('\\',
+        File.separatorChar).replace('/', File.separatorChar);
+
     if (tunitBase == null) {
       File buildXml = new File("build.xml");
       if (buildXml.exists()) {

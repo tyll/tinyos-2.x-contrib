@@ -1,3 +1,4 @@
 COMPONENT=TestFifoQueueC
+CFLAGS += -DMAX_TUNIT_QUEUE=20
 include $(MAKERULES)
 

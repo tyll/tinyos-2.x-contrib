@@ -1,13 +1,15 @@
 #ifndef __context_switch_h__
 #define __context_switch_h__
 
+#define GET_SP(sp) {asm volatile("in %A0, __SP_L__\n\t in %B0, __SP_H__\n\t" : "=r" (sp) : );}
+
 #define CONTEXT_SWITCH_PREAMBLE(FROM, TO)			\
-   {							\
+   {						\
       asm volatile("in %A0, __SP_L__\n\t in %B0, __SP_H__\n\t" : "=r" (contexts[FROM].sp) : );		\
 	  asm volatile("out __SP_H__, %B0\n\t out __SP_L__, %A0\n\t" :: "r" (stack_addr) );				\
 	  asm volatile("push %A0\n\t push %B0\n\t" :: "r" (preemption_handler) );			\
 							\
-      for(i = 0; i < 31; i++)				\
+      for(idex = 0; idex < 31; idex++)				\
 	asm volatile("push __zero_reg__\n\t" ::);	\
     asm volatile("in %A0, __SP_L__\n\t in %B0, __SP_H__\n\t" : "=r" (contexts[TO].sp) : );			\
 							\
@@ -19,8 +21,8 @@
  * Save SREG
  * Push the stack pointer
  */
-#define PUSH_THREAD_STACK(ID)			\
-   {						\
+#define PUSH_CONTEXT(ID)			\
+   {					\	
       asm volatile("push r24\n\t in r24, __SREG__\n\t cli\n\t push r24\n\t");					\
       asm volatile(				\
 	 "push r31\n\t"				\
@@ -55,14 +57,14 @@
 	 );					\
       asm volatile(				\
 	 "in %A0, __SP_L__\n\t in %B0, __SP_H__\n\t" : "=r" (contexts[ID].sp) : );	\
-   }
+  }
 
 /** @brief retrieve a thread and context from the stack
  * Restore the stack pointer
  * Restore SREG
  * Restore the other registers
  */
-#define POP_THREAD_STACK()			\
+#define POP_CONTEXT(ID)			\
    {						\
       asm volatile("out __SP_H__, %B0\n\t out __SP_L__, %A0\n\t" :: "r" (contexts[ID].sp));		\
       asm volatile(	"pop r2\n\t"				\

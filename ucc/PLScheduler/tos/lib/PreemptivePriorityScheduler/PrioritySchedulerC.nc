@@ -161,7 +161,7 @@ implementation
 		  	 * TASKSPROCESSING LESS THAN 1<<VERYHIGH
 		  	 * TASKSPROCESSING > 0*/		  		
 		  		if(tasksProcessing < (1<<HIGHER_PREEMPTIVE_INDEX)&&tasksProcessing > 0 ){
-		  			asm volatile("mov.w r1, %0\n\t":"=r"(stack_addr) : );
+		  			GET_SP(stack_addr);
 					stack_addr -=CONTEXT_DIFF;    
 					
 					/* check if any LOW/BASIC/HIGH tasks have preempted a VERYLOW TASK
@@ -192,7 +192,7 @@ implementation
 		  		if(VERYLOW!=255){
 		  			if(tasksProcessing == LOWER_PREEMPTIVE_INDEX){
 		  				lowerPriorityContext=1;
-			  			asm volatile("mov.w r1, %0\n\t":"=r"(stack_addr) : );
+						GET_SP(stack_addr);			  			
 						stack_addr -=CONTEXT_DIFF;    
 						CONTEXT_SWITCH_PREAMBLE(BASE_CONTEXT,PREEMPTING_CONTEXT);
 						PUSH_CONTEXT(BASE_CONTEXT);

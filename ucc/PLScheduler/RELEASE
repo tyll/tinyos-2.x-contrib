@@ -1,6 +1,7 @@
 RELEASE INFORMATION
 
-
+0.2 -- Some msp430 assembly code removed from main scheduler
+		problems still exist with preemption on AVR platforms but scheduler is compiling
 0.1 -- Fixed inlining code problem
 	-- CRITICAL bug fixed Tasks posted atomically
 	-- bug fix to allow multiple uninstanciated priorities without compiler errors and warnings

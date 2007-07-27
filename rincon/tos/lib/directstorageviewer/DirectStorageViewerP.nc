@@ -48,11 +48,12 @@ module DirectStorageViewerP {
     interface Packet;
     interface SplitControl as SerialControl;
     interface DirectStorage;
-    interface MessagePool;
   }
 }
 
 implementation { 
+  
+  message_t myMsg;
   
   /** Outbound allocated payload */
   ViewerMsg *outMsg;
@@ -64,7 +65,7 @@ implementation {
 
   /***************** Prototypes ****************/
   /** Allocate a new message to send */
-  bool newMessage();
+  void newMessage();
   
   /** Execute the received command */
   void execute(ViewerMsg *message);
@@ -120,9 +121,9 @@ implementation {
    */
   event void DirectStorage.readDone(uint32_t addr, void *buf, uint32_t len, error_t error) {
     if(!error) {
-      outMsg->cmd = REPLY_READ;
+      outMsg->cmd = DIRECTSTORAGEVIEWER_REPLY_READ;
     } else {
-      outMsg->cmd = REPLY_READ_FAILED;
+      outMsg->cmd = DIRECTSTORAGEVIEWER_REPLY_READ_FAILED;
     }
     outMsg->addr = addr;
     outMsg->len = len;
@@ -138,9 +139,9 @@ implementation {
    */
   event void DirectStorage.writeDone(uint32_t addr, void *buf, uint32_t len, error_t error) {
     if(!error) {
-      outMsg->cmd = REPLY_WRITE;
+      outMsg->cmd = DIRECTSTORAGEVIEWER_REPLY_WRITE;
     } else {
-      outMsg->cmd = REPLY_WRITE_FAILED;
+      outMsg->cmd = DIRECTSTORAGEVIEWER_REPLY_WRITE_FAILED;
     }
     outMsg->addr = addr;
     outMsg->len = len;
@@ -154,9 +155,9 @@ implementation {
    */
   event void DirectStorage.eraseDone(uint16_t sector, error_t error) {
     if(!error) {
-      outMsg->cmd = REPLY_ERASE;
+      outMsg->cmd = DIRECTSTORAGEVIEWER_REPLY_ERASE;
     } else {
-      outMsg->cmd = REPLY_ERASE_FAILED;
+      outMsg->cmd = DIRECTSTORAGEVIEWER_REPLY_ERASE_FAILED;
     }
     outMsg->addr = sector;
     sendMessage();
@@ -168,9 +169,9 @@ implementation {
    */
   event void DirectStorage.flushDone(error_t error) {
     if(!error) {
-      outMsg->cmd = REPLY_FLUSH;
+      outMsg->cmd = DIRECTSTORAGEVIEWER_REPLY_FLUSH;
     } else {
-      outMsg->cmd = REPLY_FLUSH_FAILED;
+      outMsg->cmd = DIRECTSTORAGEVIEWER_REPLY_FLUSH_FAILED;
     }
     sendMessage();
   }
@@ -184,9 +185,9 @@ implementation {
    */
   event void DirectStorage.crcDone(uint16_t crc, uint32_t addr, uint32_t len, error_t error) {
     if(!error) {
-      outMsg->cmd = REPLY_CRC;
+      outMsg->cmd = DIRECTSTORAGEVIEWER_REPLY_CRC;
     } else {
-      outMsg->cmd = REPLY_CRC_FAILED;
+      outMsg->cmd = DIRECTSTORAGEVIEWER_REPLY_CRC_FAILED;
     }
     outMsg->len = crc;
     sendMessage();
@@ -196,13 +197,9 @@ implementation {
   /**
    * Allocate and define a new message
    */
-  bool newMessage() { 
-    if(call MessagePool.getMessage() != NULL) {
-      outMsg = (ViewerMsg *) call MessagePool.getPayload();
-      memset(outMsg, 0x0, sizeof(ViewerMsg));
-      return TRUE;
-    }
-    return FALSE;
+  void newMessage() { 
+    outMsg = (ViewerMsg *) call AMSend.getPayload(&myMsg);
+    memset(outMsg, 0x0, sizeof(ViewerMsg));
   }
   
   /**
@@ -210,7 +207,7 @@ implementation {
    * was received
    */
   void sendMessage() {
-    call AMSend.send(0, call MessagePool.getMessage(), sizeof(ViewerMsg));
+    call AMSend.send(0, &myMsg, sizeof(ViewerMsg));
   }
   
   /**
@@ -218,17 +215,14 @@ implementation {
    */
   void execute(ViewerMsg *message) {
     error_t error;
-    if(!newMessage()) {
-      call State.toIdle();
-      return;
-    }
+    newMessage();
     
     if(message->len > call Packet.maxPayloadLength()) {
       message->len = call Packet.maxPayloadLength();
     }
         
     switch(message->cmd) {
-      case CMD_READ:
+      case DIRECTSTORAGEVIEWER_CMD_READ:
         if((error = call DirectStorage.read(message->addr, outMsg->data, message->len))
             != SUCCESS) {
           
@@ -240,44 +234,44 @@ implementation {
             call Leds.led2On();
           }
           
-          outMsg->cmd = REPLY_READ_CALL_FAILED;
+          outMsg->cmd = DIRECTSTORAGEVIEWER_REPLY_READ_CALL_FAILED;
           sendMessage();
         }
         break;
         
-      case CMD_WRITE:
+      case DIRECTSTORAGEVIEWER_CMD_WRITE:
         memcpy(outMsg->data, message->data, message->len);
         if(call DirectStorage.write(message->addr, message->data, message->len) 
             != SUCCESS) {
-          outMsg->cmd = REPLY_WRITE_CALL_FAILED;
+          outMsg->cmd = DIRECTSTORAGEVIEWER_REPLY_WRITE_CALL_FAILED;
           sendMessage();
         }
         break;
       
-      case CMD_ERASE:
+      case DIRECTSTORAGEVIEWER_CMD_ERASE:
         if(call DirectStorage.erase(message->addr) != SUCCESS) {
           outMsg->addr = message->addr;
-          outMsg->cmd = REPLY_ERASE_CALL_FAILED;
+          outMsg->cmd = DIRECTSTORAGEVIEWER_REPLY_ERASE_CALL_FAILED;
           sendMessage();
         }
         break;
         
-      case CMD_FLUSH:
+      case DIRECTSTORAGEVIEWER_CMD_FLUSH:
         if(call DirectStorage.flush() != SUCCESS) {
-          outMsg->cmd = REPLY_FLUSH_CALL_FAILED;
+          outMsg->cmd = DIRECTSTORAGEVIEWER_REPLY_FLUSH_CALL_FAILED;
           sendMessage();
         }
         break;
         
-     case CMD_CRC:
+     case DIRECTSTORAGEVIEWER_CMD_CRC:
         if(call DirectStorage.crc(message->addr, message->len, 0) != SUCCESS) {
-          outMsg->cmd = REPLY_CRC_CALL_FAILED;
+          outMsg->cmd = DIRECTSTORAGEVIEWER_REPLY_CRC_CALL_FAILED;
           sendMessage();
         }
         break;
         
-      case CMD_PING:
-        outMsg->cmd = REPLY_PING;
+      case DIRECTSTORAGEVIEWER_CMD_PING:
+        outMsg->cmd = DIRECTSTORAGEVIEWER_REPLY_PING;
         sendMessage();
         break;
         

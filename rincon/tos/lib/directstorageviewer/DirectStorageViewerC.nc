@@ -46,23 +46,22 @@ generic configuration DirectStorageViewerC(volume_id_t volume_id) {
 implementation {
   components MainC,
       DirectStorageViewerP, 
-      new SerialTransceiverC(AM_VIEWERMSG),
+      new SerialAMSenderC(AM_VIEWERMSG),
+      new SerialAMReceiverC(AM_VIEWERMSG),
       new DirectStorageC(volume_id),
       new StateC(),
       SerialActiveMessageC,
       LedsC;
   
-  // TODO make the am_id_t a parameter and bind it to the volume
-  
   DirectStorageViewerP.Boot -> MainC;
   DirectStorageViewerP.DirectStorage -> DirectStorageC;
   DirectStorageViewerP.Leds -> LedsC;
   DirectStorageViewerP.State -> StateC;
-  DirectStorageViewerP.MessagePool -> SerialTransceiverC;
-  DirectStorageViewerP.AMSend -> SerialTransceiverC;
-  DirectStorageViewerP.Receive -> SerialTransceiverC;
-  DirectStorageViewerP.SerialControl -> SerialTransceiverC;
-  DirectStorageViewerP.Packet -> SerialTransceiverC;
+  
+  DirectStorageViewerP.AMSend -> SerialAMSenderC;
+  DirectStorageViewerP.Receive -> SerialAMReceiverC;
+  DirectStorageViewerP.SerialControl -> SerialActiveMessageC;
+  DirectStorageViewerP.Packet -> SerialActiveMessageC;
   
 }
 

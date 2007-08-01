@@ -249,11 +249,15 @@ public class ResultCollector extends Thread implements Messenger,
         } else {
           log.error("Timeout occured in " + runProperties.getName() + " "
               + suiteProperties.getTestName());
-          TestResult result = new TestResult((String) testMap.get(new Integer(
-              lastTestResult + 1)));
-          result
-              .error(
-                  "Timeout",
+          TestResult result;
+          
+          if(testMap.get(new Integer(lastTestResult + 1)) != null) {
+            result = new TestResult((String) testMap.get(new Integer(lastTestResult + 1)));
+          } else {
+            result = new TestResult("Test " + lastTestResult + 1 + "; (couldn't extract test name)");
+          }
+              
+          result.error("Timeout",
                   "Timeout occured!\nIf this is incorrect, add a \"@timeout [minutes]\" definition to your suite.properties file for this test.");
           report.addResult(result);
           allDone = true;
@@ -308,29 +312,47 @@ public class ResultCollector extends Thread implements Messenger,
   /**
    * A test result from an individual test
    */
-  @SuppressWarnings("unchecked")
+@SuppressWarnings("unchecked")
   public void tUnitProcessing_testFailed(short testId, String failMsg) {
     failMsg = failMsg.replace('&', ' '); // XML doesn't like &'s.
-    log.warn("Test " + testId + " ("
-        + (String) testMap.get(new Integer(testId)) + ") failed: " + failMsg);
-
+    failMsg = failMsg.replace('<', '[');
+    failMsg = failMsg.replace('>', ']');
+    
+    TestResult result;
+    
+    if(testMap.get(new Integer(testId)) != null) {
+    	log.warn("Test " + testId + " ("
+    	        + (String) testMap.get(new Integer(testId)) + ") failed: " + failMsg);
+    	
+    	result = new TestResult((String) testMap.get(new Integer(testId)));
+    	
+    } else {
+    	log.warn("Test " + testId + " failed: " + failMsg + "; (couldn't extract test name)");
+    	result = new TestResult("Test " + testId + " (couldn't extract test name)"); 
+    }
+    
     testIdResponses.add(new Integer(testId));
     lastTestResult = testId;
-    TestResult result = new TestResult((String) testMap
-        .get(new Integer(testId)));
     result.failure("EmbeddedTest", failMsg);
     report.addResult(result);
   }
 
   @SuppressWarnings("unchecked")
   public void tUnitProcessing_testSuccess(short testId) {
-    log.info("Test " + testId + " ("
-        + (String) testMap.get(new Integer(testId)) + ") passed");
-
+    TestResult result;
+    
+    if(testMap.get(new Integer(testId)) != null) {
+      log.info("Test " + testId + " ("
+          + (String) testMap.get(new Integer(testId)) + ") passed"); 
+      result = new TestResult((String) testMap.get(new Integer(testId)));
+      
+    } else {
+      log.info("Test " + testId + " passed; (couldn't extract test name)");
+      result = new TestResult("Test " + testId + "; (couldn't extract test name)");
+    }
+    
     testIdResponses.add(new Integer(testId));
     lastTestResult = testId;
-    TestResult result = new TestResult((String) testMap
-        .get(new Integer(testId)));
     report.addResult(result);
   }
 
@@ -351,10 +373,13 @@ public class ResultCollector extends Thread implements Messenger,
 
       if (!found) {
         // This test case didn't log a result. Maybe it failed? We don't know.
-        result = new TestResult((String) testMap.get(new Integer(i)));
-        result
-            .failure(
-                "NoAssertionError",
+        if(testMap.get(new Integer(i)) != null) {
+          result = new TestResult((String) testMap.get(new Integer(i)));  
+        } else {
+          result = new TestResult("Test " + i + "; (couldn't extract test name)");
+        }
+        
+        result.failure("NoAssertionError",
                 "This test did not report any result.\nExplicitly assert some condition in the test to make it pass or fail correctly.");
         report.addResult(result);
       }
@@ -374,14 +399,14 @@ public class ResultCollector extends Thread implements Messenger,
     try {
       StatisticsChart.write(StatisticsReport.log(report.getPackage(),
           (String) statsMap.get(new Integer(id)), units, value), 500, 325);
-      
+
     } catch (IOException e) {
       TestResult result = new TestResult("__ResultCollector.statistics_log()");
       result.error("IOException", "Could not log statistics for "
           + (String) statsMap.get(new Integer(id)) + ": " + units + " = "
           + value);
       report.addResult(result);
-      
+
     } catch (ParseException e) {
       TestResult result = new TestResult("__ResultCollector.statistics_chart()");
       result.error("ParseException", "Could parse chart statistics for "

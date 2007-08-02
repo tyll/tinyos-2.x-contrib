@@ -99,6 +99,9 @@ public class Make implements BuildInterface {
         // Or, how can we test to see if it wasn't?
         compileSuccessful = true;
         result = new TestResult("__Reinstall " + target + " " + extras);
+        for (int i = 0; i < display.length; i++) {
+          largeOutput += display[i] + "\n";
+        }
         
       } else {
         for (int i = 0; i < display.length; i++) {
@@ -117,7 +120,9 @@ public class Make implements BuildInterface {
         result = new TestResult("__Build " + target + " " + extras + " (ROM="
             + romBytes + "; RAM=" + ramBytes + ")");
       }
-
+      
+      log.info(largeOutput);
+      
       if (!compileSuccessful) {
         result.error("Compile Error", largeOutput);
       }

@@ -127,15 +127,15 @@ public class TUnit {
     // We create a test report for each test run initialization
     executeTestRuns();
 
-    // 4. Print all results to the screen.
-    printResults();
-
-    // 5. Log all
+    // 4. Log results
     logResults();
+
+    // 5. Print all results to the screen.
+    printResults();
 
     // 6. If there was a problem anywhere, exit with error code 6 to tell
     // external programs. We could detect this error code outside and
-    // do something useful, like control some lava lamps.
+    // do something useful?
     if (TestReport.getAllTunitProblems().size() > 0) {
       System.exit(6);
     }
@@ -328,9 +328,11 @@ public class TUnit {
         problemResult = (TestResult) it.next();
         System.out.println(problemResult.getTestName() + " ("
             + problemResult.getProblemType() + "): "
-            + problemResult.getFailMsg());
+            + problemResult.getFailMsg() + "\n");
       }
     }
+    
+    System.out.println("\n");
   }
 
   /**

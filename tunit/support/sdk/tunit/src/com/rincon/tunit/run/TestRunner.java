@@ -272,8 +272,6 @@ public class TestRunner {
           + "CFLAGS+=-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/lib/directserial "
           + "CFLAGS+=-DTUNIT_TOTAL_NODES=" + runProperties.totalNodes() + " "
           + "";
-        
-        System.out.println("Build Extras: " + extras);
 
         focusedResult = make.build(buildDirectory, focusedTarget
             .getTargetName(), extras);
@@ -290,7 +288,7 @@ public class TestRunner {
           reinstallExtras += focusedNode.getInstallExtras();
 
           focusedResult = make.build(buildDirectory, focusedTarget
-              .getTargetName(), extras + reinstallExtras);
+              .getTargetName(), reinstallExtras);
 
           report.addResult(focusedResult);
           if (!focusedResult.isSuccess()) {
@@ -323,18 +321,27 @@ public class TestRunner {
 
     File appcFile = new File(buildDirectory, "/build/"
         + focusedTarget.getTargetName() + "/app.c");
-    log.debug("Parsing app.c file " + appcFile.getAbsolutePath());
+    log.info("Parsing app.c file " + appcFile.getAbsolutePath());
+    
+    // Attempt to find and parse the app.c file
+    AppCParser appcParser = new AppCParser(appcFile);
     if (appcFile.exists()) {
-      AppCParser appcParser = new AppCParser(appcFile);
       focusedResult = appcParser.parse();
-      testMap = appcParser.getTestCaseMap();
-      statsMap = appcParser.getStatisticsMap();
       if (!focusedResult.isSuccess()) {
         report.addResult(focusedResult);
         return false;
       }
+      
+    } else {
+      log.warn("Cannot find app.c file " + appcFile.getAbsolutePath());
+      focusedResult = new TestResult("__ParseAppC");
+      focusedResult.error("App.c Parser", "app.c file not found in " + appcFile.getAbsolutePath());
+      report.addResult(focusedResult);
     }
 
+
+    testMap = appcParser.getTestCaseMap();
+    statsMap = appcParser.getStatisticsMap();
     return true;
   }
 

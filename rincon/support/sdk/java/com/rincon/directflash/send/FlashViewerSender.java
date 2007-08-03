@@ -1,6 +1,5 @@
 package com.rincon.directflash.send;
 
-
 /*
  * Copyright (c) 2005-2006 Rincon Research Corporation
  * All rights reserved.
@@ -41,7 +40,6 @@ import net.tinyos.util.Messenger;
 
 import com.rincon.directflash.ViewerCommands;
 import com.rincon.directflash.messages.ViewerMsg;
-import com.rincon.transfer.TransferCommands;
 
 public class FlashViewerSender implements FlashViewerCommands {
 	

@@ -59,6 +59,9 @@ public class Make implements BuildInterface {
   /** Bytes in RAM */
   private long ramBytes = 0;
 
+  /** Text that was printed to the screen on make */
+  private String appcLocation;
+  
   /**
    * Constructor
    * 
@@ -84,13 +87,13 @@ public class Make implements BuildInterface {
     TestResult result;
 
     String buildArgs = target + " " + extras;
-
+    String largeOutput;
     try {
       String[] display = CmdExec.runCommand("make -C "
           + buildDir.getAbsolutePath().replace(File.separatorChar, '/') + " "
           + buildArgs);
 
-      String largeOutput = "";
+      largeOutput = "";
       // int exitVal = CmdExec.lastExitVal;
       boolean compileSuccessful = false;
 
@@ -122,6 +125,16 @@ public class Make implements BuildInterface {
       }
       
       log.info(largeOutput);
+      
+      
+      String[] word = largeOutput.replace("="," ").split(" ");
+      for(int i = 0; i < word.length; i++) {
+        if(word[i].contains("app.c")) {
+          log.info("Found app.c in " + word[i]);
+          appcLocation = word[i];
+          break;
+        }
+      }
       
       if (!compileSuccessful) {
         result.error("Compile Error", largeOutput);
@@ -193,5 +206,13 @@ public class Make implements BuildInterface {
   private long parseBytes(String compileLine) {
     return Long.decode(new StringTokenizer(compileLine).nextToken())
         .longValue();
+  }
+  
+  /**
+   * 
+   * @return "build/telosb/app.c" so you can tack it onto your build directory
+   */
+  public String getAppcLocation() {
+    return appcLocation;
   }
 }

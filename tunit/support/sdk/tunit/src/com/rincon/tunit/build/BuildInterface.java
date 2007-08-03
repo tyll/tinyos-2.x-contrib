@@ -69,6 +69,12 @@ public interface BuildInterface {
   public long getRamSize();
   
   /**
+   * 
+   * @return "build/telosb/app.c" so you can tack it onto your build directory
+   */
+  public String getAppcLocation();
+  
+  /**
    * Erase and clean up any previous builds
    *
    */

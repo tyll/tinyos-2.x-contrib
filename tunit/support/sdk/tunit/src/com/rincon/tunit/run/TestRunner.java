@@ -302,6 +302,7 @@ public class TestRunner {
       StatisticsChart.write(StatisticsReport.log(packageId, "Footprint",
           "[RAM Bytes]", make.getRamSize(), "[ROM Bytes]", make.getRomSize()), 
            500, 325);
+      
     } catch (IOException e) {
       TestResult logResult = new TestResult("__LogFootprintStats");
       logResult.error("IOException", e.getMessage());
@@ -318,9 +319,8 @@ public class TestRunner {
     if (focusedTarget == null) {
       return false;
     }
-
-    File appcFile = new File(buildDirectory, "/build/"
-        + focusedTarget.getTargetName() + "/app.c");
+    
+    File appcFile = new File(buildDirectory, "/" + make.getAppcLocation());
     log.info("Parsing app.c file " + appcFile.getAbsolutePath());
     
     // Attempt to find and parse the app.c file

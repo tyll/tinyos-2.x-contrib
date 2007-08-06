@@ -10,8 +10,6 @@ implementation
 	components new TimerMilliC() as Timer;
 	components new TimerMilliC() as BlinkTimer;
 	components ActiveMessageC;
-
-	MainC.SoftwareInit -> DSNC.Init;
 	
 	App.Boot -> MainC.Boot;
 	App.DSN -> DSNC;

@@ -1,3 +1,3 @@
 COMPONENT = DSNTestC
 include $(MAKERULES)
-CFLAGS += -I../../../lib/dsn
+CFLAGS += -I../../../tos/lib/dsn

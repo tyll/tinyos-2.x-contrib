@@ -55,6 +55,9 @@ import com.rincon.tunit.run.TestRunManager;
 /**
  * Main entry point to TUnit TinyOS Embedded testing.
  * 
+ * TODO:
+ *   > Add command line input to choose a tunit.xml file
+ * 
  * @author David Moss
  * 
  */
@@ -226,7 +229,9 @@ public class TUnit {
     tunitDirectory = new File(tunitBase);
     if (!tunitDirectory.exists()) {
       log.fatal(tunitBase + " does not exist.");
-      log.fatal("Please set your TUNIT_BASE directory properly");
+      log.fatal("Please set your TUNIT_BASE directory properly.\n"
+          + "Make sure it's an absolute path. If you're in cygwin, this\n"
+          + "means it must start with something like C:/cygwin/...\n");
       System.exit(2);
     }
 

@@ -339,7 +339,7 @@ public class TestRunner {
       report.addResult(focusedResult);
     }
 
-
+    log.info("Parse complete, running test...");
     testMap = appcParser.getTestCaseMap();
     statsMap = appcParser.getStatisticsMap();
     return true;

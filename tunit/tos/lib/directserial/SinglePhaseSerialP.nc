@@ -56,7 +56,8 @@ implementation {
   nx_uint16_t myCrc;
   
   /***************** Prototypes ****************/
-  void send(uint8_t byte);
+  void send(uint8_t byte, bool crc);
+  void sendEscaped(uint8_t byte, bool crc);
   serial_header_t* getHeader(message_t* msg);
   
   /***************** Send Commands ****************/
@@ -66,37 +67,37 @@ implementation {
     uint8_t *payload = (uint8_t *) msg->data;
     
     // SYNC
-    send(0x7E);
+    send(0x7E, FALSE);
     
     // HDLC HEADER
     // Begin CRC checking after the sync byte is sent.
     myCrc = 0;
     
     // No Ack:
-    send(0x45);
+    send(0x45, TRUE);
     
     // TOS_SERIAL_ACTIVE_MESSAGE type:
-    send(0x0);
+    send(0x0, TRUE);
     
     
     // HEADER
     for(i = 0; i < sizeof(serial_header_t); i++) {
-      send((uint8_t) *(header));
+      sendEscaped((uint8_t) *(header), TRUE);
       header++;
     }
     
     // PAYLOAD
     for(i = 0; i < len; i++) {
-      send((uint8_t) *(payload));
+      sendEscaped((uint8_t) *(payload), TRUE);
       payload++;
     }
     
     // CRC
-    call UartByte.send(myCrc);
-    call UartByte.send(myCrc>>8);
+    sendEscaped(myCrc, FALSE);
+    sendEscaped(myCrc >> 8, FALSE);
     
     // SYNC
-    call UartByte.send(0x7E);
+    send(0x7E, FALSE);
     
     // DONE
     signal Send.sendDone(msg, SUCCESS);
@@ -117,9 +118,38 @@ implementation {
   
  
   /***************** Functions ****************/ 
-  void send(uint8_t byte) {
-    // TODO add the escape bytes for 0x7E's
-    myCrc = crcByte(myCrc, byte);
+  /**
+   * Escape bytes that affect HDLC, and send the data
+   *  0x7E becomes 0x7D 0x5E
+   *  0x7D becomes 0x7D 0x5D
+   * 
+   * @param byte the byte to send escaped
+   * @param crc add this byte to our running crc
+   */
+  void sendEscaped(uint8_t byte, bool crc) {
+    if(byte == 0x7E) {
+      send(0x7D, crc);
+      send(0x5E, crc);
+      
+    } else if(byte == 0x7D) {
+      send(0x7D, crc);
+      send(0x5D, crc);
+      
+    } else {
+      send(byte, crc);
+    }
+  }
+  
+  /**
+   * Send a byte of data, unescaped
+   * @param byte the byte to send escaped
+   * @param crc add this byte to our running crc
+   */
+  void send(uint8_t byte, bool crc) {
+    if(crc) {
+      myCrc = crcByte(myCrc, byte);
+    }
+    
     call UartByte.send(byte);
   }
   

@@ -156,6 +156,22 @@ implementation {
     serial_header_t* header = getHeader(amsg);
     header->type = type;
   }
+
+  command void AMPacket.setGroup(message_t* msg, am_group_t group) {
+    serial_header_t* header = getHeader(msg);
+    header->group = group;
+  }
+
+  command am_group_t AMPacket.group(message_t* msg) {
+    serial_header_t* header = getHeader(msg);
+    return header->group;
+  }
+
+  command am_group_t AMPacket.localGroup() {
+    return TOS_AM_GROUP;
+  }
+
+
   
   /***************** Defaults ****************/
   default event void AMSend.sendDone[uint8_t id](message_t* msg, error_t result) {

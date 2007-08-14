@@ -1,0 +1,33 @@
+PLATFORM = micro4
+
+#MSP_MCU = msp430x1611
+
+# Disable MSP430 hardware multiply because it makes MSPGCC die
+CFLAGS += -mdisable-hwmul
+OPTFLAGS += -O
+
+//MSP_BSL ?= tos-bsl
+//MSP_BSL_FLAGS = --telosb
+
+//VOLUME_FILE = volumes-stm25p.xml
+//VOLUME_ALLOCATOR = tos-storage-stm25p
+
+MSP_BSL_FLAGS = 
+
+ifdef CONTRIBROOT
+CFLAGS += -I$(CONTRIBROOT)/diku/sensinode/tos/platforms/$(PLATFORM)
+endif
+
+ifdef CC2420_CHANNEL
+PFLAGS += -DCC2420_DEF_CHANNEL=$(CC2420_CHANNEL)
+endif
+
+ifdef PLATFORM
+PFLAGS += -D__$(PLATFORM)__=1
+endif
+
+$(call TOSMake_include_platform,msp_micro4)
+$(call TOSMake_include_dir,msp) # Pull the .extra files
+
+micro4: $(BUILD_DEPS)
+	@:

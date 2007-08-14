@@ -1,0 +1,3 @@
+COMPONENT=SampleForward
+include $(MAKERULES)
+

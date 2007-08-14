@@ -1,0 +1,32 @@
+
+This simple demo samples an accelerometer forwards it to a PC and
+displays fever curves on a screen. It has 3 parts:
+ * PC_display
+ * SampleForwardNode
+ * SampleForwardBase
+
+SampleForward
+=============
+
+The node samples continuously and forwards the packets using the
+radio. The node currently only runs on Sensinode Nano with
+accelerometer board.
+
+The base receives the packets and prints them on the serial port for
+the display app.
+
+
+PC_display
+==========
+
+Runs 3 graphs that read from a fifo each and a perl script that reads
+from the serial port and writes to the fifos. Start by starting the
+graphs with "start_meter" and the reader with "ttxdemo.pl"
+
+trend: with the -f d it reasds "binary doubles" with no delimiter from
+ the fifo
+
+start_meter.sh
+ creates n fifos and starts a trend window for each
+
+ 

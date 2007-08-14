@@ -1,0 +1,60 @@
+
+======================================================================
+CompressionTest
+======================================================================
+
+This application tests the the compression algorithms in the
+compression library. It has a node side (CompressionTest) and PC side
+(node-comm). The PC side reads data from a text file, transmits it to
+the mote using a UART. The mote stores it in a buffer, compressed it
+and sends it back. The default chunk size that CompressionTest reads
+is 256 bytes.
+
+The data read by node-comm must be stored in a simple but specific
+file format (see below).
+
+* CompessionTest
+
+In order to build this application setup an algorithm by linking one
+of the algorithm ".h" files to compressor.h in lib/compression (see
+lib/compression/README for more). Compile and upload your application
+to the mote.
+
+To test if the beast is a live open a termninal and type "p" it should
+respond with "pong".
+
+* node-comm
+
+The PC side of the CompressionTest application it transmits the data
+read from the data file. It accepts a few parameters to controll the
+process. For exaple one could run the following:
+
+  ./node-comm data.csv -d /dev/ttyUSB1 -s230400 -r 10
+
+Available options are:
+
+./node-comm -h
+Usage: node-comm input-file [-d device] [-s speed] [-r runs] [-o ouput file]
+
+ -h             This help message
+ -d             The serial device to communicate with the mote
+ -s             The transfer rate of the serial device (speed) 
+ -r             Maximum number of blocks to compress
+ -o             Output file
+
+
+* File format
+The format consists of 7 fields separated by ;
+  1.   Timestamp of the form \d+\.\d{3}
+  2.   Sequence number: \d+
+  3-7. 5 RAW adc samples: -?\d+
+
+1045334311.383;0;-53;872;-41;388;420
+1045334311.627;1;-284;1039;-156;401;431
+1045334311.871;2;-416;1026;-51;405;430
+1045334312.115;3;-364;855;-147;404;422
+1045334312.359;4;-400;901;88;403;424
+1045334312.604;5;-434;844;-57;405;422
+1045334312.848;6;-432;971;-167;406;426
+1045334313.092;7;-139;993;-327;392;428
+1045334313.336;8;179;1086;-410;379;432

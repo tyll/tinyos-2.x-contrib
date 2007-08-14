@@ -1,0 +1,13 @@
+PLATFORM = cc2430em
+#SENSORBOARD ?= micasb
+#PROGRAMMER_PART ?= -dpart=ATmega128 --wr_fuse_e=ff
+#PFLAGS += -finline-limit=100000
+
+ifdef PLATFORM
+PFLAGS += -D__$(PLATFORM)__=1
+endif
+
+$(call TOSMake_include_platform,mcs51)
+
+cc2430em: $(BUILD_DEPS)
+	@:

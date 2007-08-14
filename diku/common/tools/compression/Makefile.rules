@@ -1,0 +1,15 @@
+# Emacs, this is a -*- Makefile -*-
+
+CLEAN= *.o *.lo *.so *~
+
+%_decomp.so: %_decomp.lo 
+	ld -g -shared -o $@ $^
+
+%_comp.so: %_comp.lo $(BACKSTEPDIR)/buffer.lo $(BACKSTEPDIR)/buffer_pc.lo
+	ld -g -shared -o $@ $^
+
+%.lo: %.c
+	gcc -g -o $@ -c $^ -fPIC -Wall $(DEBUG)
+
+clean:
+	rm -rf $(CLEAN)

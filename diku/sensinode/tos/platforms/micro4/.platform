@@ -1,0 +1,54 @@
+
+if (defined ($ENV{'CONTRIBROOT'}) ) {
+    push( @includes, "$ENV{'CONTRIBROOT'}/diku/sensinode/tos/system");
+
+    @dirs = `find $ENV{'CONTRIBROOT'}/diku/sensinode/tos/platforms/micro4 -type d`;
+    chomp(@dirs);
+    push(@includes, @dirs);
+
+    @dirs = `find $ENV{'CONTRIBROOT'}/diku/common -type d`;
+    chomp(@dirs);
+    push(@includes, @dirs);
+}
+
+push( @includes, qw(
+
+# same as telosb
+	%T/platforms/telosb
+	%T/platforms/telosb/chips/stm25p
+	%T/platforms/telosa
+	%T/platforms/telosa/chips/cc2420
+	%T/chips/cc2420
+	%T/chips/msp430
+	%T/chips/msp430/adc12
+	%T/chips/msp430/dma
+	%T/chips/msp430/pins
+	%T/chips/msp430/timer
+	%T/chips/msp430/usart
+	%T/chips/stm25p
+	%T/lib/timer
+	%T/lib/serial
+	%T/lib/adc
+	%T/lib/power
+
+	// micro.4 does not have these components
+	// %T/platforms/telosa/chips/s10871
+	// %T/platforms/telosa/chips/sht11
+	// %T/platforms/telosa/chips/s1087
+	// %T/chips/msp430/sensors
+	// %T/chips/sht11
+
+) );
+
+@opts = qw(
+
+	-gcc=msp430-gcc
+	-mmcu=msp430x1611
+	-fnesc-target=msp430
+	-fnesc-no-debug
+	-fnesc-scheduler=TinySchedulerC,TinySchedulerC.TaskBasic,TaskBasic,TaskBasic,runTask,postTask
+
+);
+
+push @opts, "-mingw-gcc" if $cygwin;
+

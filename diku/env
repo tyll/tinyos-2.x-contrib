@@ -1,0 +1,4 @@
+export TOSDIR=/opt/tinyos-2.x/tos/
+export MAKERULES=$TOSDIR/../support/make/Makerules
+export CONTRIBROOT=/opt/tinyos-2.x-contrib
+export TOSMAKE_PATH="$TOSMAKEPATH $CONTRIBROOT/diku/sensinode/support/make $CONTRIBROOT/diku/mcs51/support/make"

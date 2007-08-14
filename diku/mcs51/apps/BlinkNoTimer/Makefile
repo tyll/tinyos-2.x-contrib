@@ -1,0 +1,3 @@
+COMPONENT=BlinkNoTimerAppC
+include $(MAKERULES)
+

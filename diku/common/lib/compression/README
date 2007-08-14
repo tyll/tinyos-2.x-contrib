@@ -1,0 +1,33 @@
+
+======================================================================
+Compression
+======================================================================
+
+This is a simple library to compress 3 samples using one of 4
+algorihms. It uses an internal buffer that must be copies to a
+separate location for transmission, storrate, etc.
+
+You can include this in your own applications and test it using
+CompressionTest (apps/CompresisonTest). See readme file in this
+directory for more.
+
+To use this compression library:
+ * link "compressor.h" to one of the available algorithms (in the lib
+   directory):
+     lz77.h simple.h huffman.h huffman_diff.h huffman_whole.h passthru.h
+
+ * Include the interface "Compressor" in your application and wire it
+   to CompressorM.nc
+
+ * Call Compressor.Init() from "Booted"
+
+ * Each consecutive call to "Compress" stores the samples in an
+   interneal buffer until its full (default size = 256 bytes).
+
+    * When the buffer is full the Compressor.bufferFull event is
+      signaled. In this event the content must be copied since it will
+      be overwritten by Compress on the next call.
+
+    * To return the buffer earlier call "Compressor.flush" - its
+      unclear how to figure out how many bytes are present in the
+      buffer in this case

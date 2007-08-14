@@ -1,0 +1,88 @@
+define MCS51_HELP
+
+  MCS51 extras:
+
+   clean   : includes original clean and removes Keil temporaries
+   inline  : compiles using the University of Utah CIL inliner
+
+endef
+
+HELP += $(MCS51_HELP)
+
+NCC = ncc
+
+BUILDDIR = build/$(PLATFORM)
+MAIN_EXE = $(BUILDDIR)/APP
+MAIN_SREC = $(BUILDDIR)/main.srec
+MAIN_IHEX = $(BUILDDIR)/app.hex
+APP_C = $(BUILDDIR)/app.c
+APP_C_TMP = $(BUILDDIR)/app.orig.c
+INSTALL_SREC = $(MAIN_SREC).out$(if $(NODEID),-$(NODEID),)
+VOLUMEFILE = volumes-at45db.xml
+
+CFLAGS += -I$(CONTRIBROOT)/diku/mcs51/tos/platforms/$(PLATFORM)
+
+NESC_FLAGS += -conly
+PFLAGS += -Wall -Wshadow -DDEF_TOS_AM_GROUP=$(DEFAULT_LOCAL_GROUP) $(NESC_FLAGS)
+PFLAGS += -target=$(PLATFORM) -fnesc-cfile=$(APP_C) -board=$(SENSORBOARD)
+ifdef MSG_SIZE
+PFLAGS += -DTOSH_DATA_LENGTH=$(MSG_SIZE)
+endif
+
+BUILDLESS_DEPS += bytes
+
+MCS51_MAKE_PATH = $(CONTRIBROOT)/diku/mcs51/support/make
+
+ifndef BUILD_DEPS
+  ifeq ($(filter $(BUILDLESS_DEPS),$(GOALS)),)
+    BUILD_DEPS = exe
+  endif
+endif
+
+
+# old:
+#	$(NCC) -o $(MAIN_EXE) $(OPTFLAGS) $(PFLAGS) $(CFLAGS) $(WIRING_CHECK_FLAGS) $(COMPONENT).nc $(LIBS) $(LDFLAGS)
+#$(NCC) -S $(OPTFLAGS) $(PFLAGS) $(CFLAGS) $(WIRING_CHECK_FLAGS) $(COMPONENT).nc $(LIBS)
+
+
+#####
+# $(APP_C) moves to app.preMangle.c
+# mangles to app.c
+# Build to .hex using CC2430-F128.bat
+
+tosimage: ihex FORCE
+	@:
+
+ihex: exe FORCE
+	@:
+
+exe: ncc $(POST_NCC_DEPS) $(BUILDDIR)/startup.OBJ FORCE
+	@echo "    compiling $(COMPONENT) to a $(PLATFORM) binary"
+	mv $(APP_C) $(BUILDDIR)/app.preMangle.c
+	perl -w $(MCS51_MAKE_PATH)/mcs51/mangleAppC.pl --KEIL --file=$(BUILDDIR)/app.preMangle.c > $(APP_C)
+	cp $(MCS51_MAKE_PATH)/mcs51/CC2430-F128.bat $(BUILDDIR)
+	cd $(BUILDDIR) && env WINEPREFIX=$(HOME)/.wine.keil LC_ALL=en_US wine wcmd /c ./CC2430-F128.bat
+	@bash -c "if [ -f $(COMPONENT).s ]; then mv $(COMPONENT).s build/cc2430em/; fi"
+	@echo "    compiled $(COMPONENT) to a $(PLATFORM) binary"
+	@echo "Code size of app.o"
+	@grep -A 7 "MODULE INFORMATION:   STATIC OVERLAYABLE" $(BUILDDIR)/app.lst
+	@echo "Total sizes"
+	@grep "Program Size:" $(BUILDDIR)/app.map
+
+$(BUILDDIR)/startup.OBJ: $(MCS51_MAKE_PATH)/mcs51/startup.a51
+	cp $(MCS51_MAKE_PATH)/mcs51/startup.a51 $(BUILDDIR)
+	cp $(MCS51_MAKE_PATH)/mcs51/startup.bat $(BUILDDIR)
+	cd $(BUILDDIR) && env WINEPREFIX=$(HOME)/.wine.keil LC_ALL=en_US wine wcmd /c ./startup.bat
+
+# app.c:  FORCE
+.PHONY: ncc
+ncc: builddir $(BUILD_EXTRA_DEPS)
+	$(NCC) -S $(OPTFLAGS) $(CFLAGS) $(PFLAGS) $(WIRING_CHECK_FLAGS) $(COMPONENT).nc 2>&1 | \
+		grep -v "attribute directive ignored"
+ifdef WIRING_CHECK_FILE
+	@nescc-wiring $(WIRING_CHECK_FILE)
+endif
+	@echo "    compiled $(COMPONENT) to $(APP_C)"
+
+builddir: FORCE
+	mkdir -p $(BUILDDIR)

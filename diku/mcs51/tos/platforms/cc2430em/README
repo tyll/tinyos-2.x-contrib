@@ -1,0 +1,3 @@
+This platform actually assumes that the the cc2430em board has been attached
+to the RF04EB. Who knows they might be split up some day, say if someone
+wants to use the RF04EB with say a cc1010...

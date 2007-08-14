@@ -1,0 +1,93 @@
+<html>
+<head>
+   <title>DIKU TinyOS projects</title>
+</head>
+<body TEXT="#000000" BGCOLOR="#FFFFFF" LINK="#0000EF" VLINK="#55188A" ALINK="#FF0000">
+
+<img src="http://www.tinyos.net/scoop/images/tos-jwall.jpg"></img>
+
+<h1>University of Copenhagen, Department of Computer Science (DIKU) TinyOS projects</h1>
+
+<p>
+This page contains a list of the currently available DIKU
+projects. Each are an extension to the core TinyOS 2 distribution and
+requires that you obtain and install this first.
+
+
+<table>
+<tr><td><a href="#mcs51">MCS51</a>
+    <td>TinyOS 2 support for MCS51 (8051) based architectures (cc2430,
+    nRF24E1, etc.). Visit the project website for more information
+    <a
+    href="http://www.tinyos8051wg.net/">http://www.tinyos8051wg.net/</a>
+
+<tr><td><a href="#sensinode">Sensinode</a>
+     <td>TinyOS 2 support for <a href="http://www.sensinode.com">Sensinode</a> motes (Micro.4, Nano).
+<tr><td><a href="#common">Common</a>
+    <td>Libraries share among the above projects (SimpleMac, StdOut, etc.)
+<tr>
+</table>
+</p>
+
+<a name="mcs51">
+<h3>Mcs51 (8051)</h3>
+
+TinyOS 2 support for MCS51 (8051) based architectures including Texas
+Instruments CC2430 and Nordic Semiconductor nRF24E1. Installtion
+instructions, mailing list instructions, and documentation can be
+found on the project website:
+<a href="http://www.tinyos8051wg.net/">http://www.tinyos8051wg.net/</a>
+
+<a name="sensinode">
+<h3>Sensinode</h3>
+
+TinyOS 2 support for <a href="Sensinode">Sensinode</a> platforms:
+Micro.4 and Nano. The Micro.4 is based on the MSP 430 and most of the
+code is pulled from the main TinyOS 2 tree or replaced with modified
+versions. The Nano is based on the CC2430 and all non platform dependt
+code resides there.
+
+<pre>
+sensinode
++--apps
+|  +--TestMicro4                  - Simple test app. printing a few registers
+|  +--TestMicro4Radio             - Radio test app
++--support
+|  +--make
+|     +--micro4.target            - T2 .target definition (recursively includes msp.rules)
+|     +--msp_micro4
+|        +--msp_micro4.rules
++--tos
+|  +--platforms
+|     +--micro4                    - Micro4 platform definition
+|     +--nano                      - Nano platform definition
+</pre>
+
+
+<a name="common">
+<h3>Common</h3>
+
+Contains projects shared among the above projects. This includes
+interfaces, libraries and more:
+
+<pre>
+common
++--apps
+   +--TestSimpleMac                 - SimpleMac test application for Nano/Micro.4 platforms
+   +--CompressionTest               - Compressed data received via uart
++--lib
+   +--stdout                        - A general purpose print library that accepts multiple chars
+   +--simplemac                     - An extremely simple mac layer
++--tools
+   +--compression                   - PC side compression tools as well as general purpose algorithms (lz77, huffmann, simple, passthru)
++--tos
+   +--interfaces
+      +--GpioCounterCapture.nc      - A parametrized GpioCapture (allows other widths than 16 bit)
+   +--system
+      +--tos.h                      - Replaces T2 tos.h with ecombine with bool type
+
+</pre>
+
+
+</body>
+</html>

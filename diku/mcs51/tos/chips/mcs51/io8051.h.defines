@@ -1,0 +1,233 @@
+/*
+ * These definitions must be turned into compiler specific register
+ * definitions at a later point in the compile process (the mangle
+ * script). For Keil the format is:
+ *   sfr P0_dir at 0xFD
+ *
+ * This file defines properties shared among 8051 variants. Chip
+ * specific additions are found in the directories for those chips
+ *
+ * The special function register definitions are created in a slightly
+ * odd way in order to allow special attributes to pass through nescc
+ * unchanged and then be modified by a mangle script later.
+ *
+ * The __attribute(()) will be removed by the mangle script and
+ * the content x will be used to construct:
+ *   sfr at x ...
+ *
+ * Alternative to stay within ANSI-C one could imagine using a
+ * structure with bit fields say struct { int P0:1 }, however the
+ * silly architecture of the 8051 forces us to controll whether code
+ * using direct or indirect addressing is generated. I can't se how
+ * this could be done using ANSI-C.
+ *
+ * The above scheme allows nescc to parse the code and sdcc to to
+ * generate the appropriate code.
+ *
+ * Authors:	Martin Leopold, Sidsel Jensen & Anders Egeskov Petersen, 
+ *		Dept of Computer Science, University of Copenhagen
+ * Date last modified: Nov 2005
+ */
+
+#ifndef _H_io8051_H
+#define _H_io8051_H
+
+// Interrupt numbers according to 8051/8052
+// __vector might be an AVR-thing
+
+#define SIG_INTERRUPT0          __vector_0
+#define SIG_TIMER0              __vector_1
+#define SIG_INTERRUPT1          __vector_2
+#define SIG_TIMER1              __vector_3
+#define SIG_SERIAL              __vector_4
+#define SIG_TIMER2              __vector_5
+#define SIG_ADC                 __vector_8
+
+// Dummy typdefs that will be removed by mangle script later
+typedef uint8_t sfr_mangle_t;
+typedef uint8_t sbit_mangle_t;
+
+#define SFR_P0 0x80
+#define SFR_SP 0x81
+#define SFR_DPL 0x82
+#define SFR_DPH 0x83
+#define SFR_DPL1 0x84
+#define SFR_DPH1 0x85
+#define SFR_DPS 0x86
+#define SFR_PCON 0x87
+#define SFR_TCON 0x88
+#define SFR_TMOD 0x89
+#define SFR_TL0 0x8A
+#define SFR_TL1 0x8B
+#define SFR_TH0 0x8C
+#define SFR_TH1 0x8D
+#define SFR_CKCON 0x8E
+#define SFR_P1 0x90
+#define SFR_EXIF 0x91
+#define SFR_MPAGE 0x92
+#define SFR_SCON 0x98
+#define SFR_SBUF 0x99
+#define SFR_IE 0xA8
+#define SFR_IP 0xB8
+#define SFR_T2CON 0xC8
+#define SFR_RCAP2L 0xCA 
+#define SFR_RCAP2H 0xCB
+#define SFR_TL2 0xCC
+#define SFR_TH2 0xCD
+#define SFR_PSW 0xD0
+#define SFR_EICON 0xD8
+#define SFR_ACC 0xE0
+#define SFR_B 0xF0
+#define SFR_EIE 0xE8
+#define SFR_P2 0xA0
+#define SFR_ADCCON 0xA1
+#define SFR_ADCDATAH 0xA2
+#define SFR_ADCDATAL 0xA3
+#define SFR_ADCSTATIC 0xA4
+#define SFR_PWMCON 0xA9
+#define SFR_PWMDUTY 0xAA
+#define SFR_REGX_MSB 0xAB
+#define SFR_REGX_LSB 0xAC
+#define SFR_REGX_CTRL 0xAD
+#define SFR_RSTREAS 0xB1
+#define SFR_SPI_DATA 0xB2
+#define SFR_SPI_CTRL 0xB3
+#define SFR_SPICLK 0xB4
+#define SFR_TICK_DV 0xB5
+#define SFR_CK_CTRL 0xB6
+
+
+/*  BIT Registers  */
+
+/*  PSW */
+#define SBIT_CY 0xD7
+#define SBIT_AC 0xD6
+#define SBIT_F0 0xD5
+#define SBIT_RS1 0xD4
+#define SBIT_RS0 0xD3
+#define SBIT_OV 0xD2
+#define SBIT_F1 0xD1
+#define SBIT_P 0xD0
+
+/*  TCON  */
+
+#define SBIT_TF1 0x8F
+#define SBIT_TR1 0x8E
+#define SBIT_TF0 0x8D
+#define SBIT_TR0 0x8C
+#define SBIT_IE1 0x8B
+#define SBIT_IT1 0x8A
+#define SBIT_IE0 0x89
+#define SBIT_IT0 0x88
+
+/*  IE  */ 
+
+#define SBIT_EA 0xAF
+#define SBIT_ET2 0xAD
+#define SBIT_ES 0xAC
+#define SBIT_ET1 0xAB
+#define SBIT_EX1 0xAA
+#define SBIT_ET0 0xA9
+#define SBIT_EX0 0xA8
+
+/*  IP  */
+
+#define SBIT_PT2 0xBD
+#define SBIT_PS 0xBC
+#define SBIT_PT1 0xBB
+#define SBIT_PX1 0xBA
+#define SBIT_PT0 0xB9
+#define SBIT_PX0 0xB8
+
+
+/*  P0 bit adressable locations */
+ 
+#define SBIT_P0_0 0x80
+#define SBIT_P0_1 0x81
+#define SBIT_P0_2 0x82
+#define SBIT_P0_3 0x83
+#define SBIT_P0_4 0x84
+#define SBIT_P0_5 0x85
+#define SBIT_P0_6 0x86
+#define SBIT_P0_7 0x87
+
+/*  P0 alternate functions */
+
+#define SBIT_T1 0x86
+#define SBIT_T0 0x85
+#define SBIT_INT1 0x84
+#define SBIT_INT0 0x83
+
+/*  P1 bit adressable locations */
+
+#define SBIT_P1_0 0x90
+#define SBIT_P1_1 0x91
+#define SBIT_P1_2 0x92
+#define SBIT_P1_3 0x93
+#define SBIT_P1_4 0x94
+#define SBIT_P1_5 0x95
+#define SBIT_P1_6 0x96
+#define SBIT_P1_7 0x97
+
+/*  P1  alternate functions*/
+
+#define SBIT_T2 0x90
+
+/*  P2 bit adressable locations */
+
+#define SBIT_P2_0 0xA0
+#define SBIT_P2_1 0xA1
+#define SBIT_P2_2 0xA2
+#define SBIT_P2_3 0xA3
+#define SBIT_P2_4 0xA4
+#define SBIT_P2_5 0xA5
+#define SBIT_P2_6 0xA6
+#define SBIT_P2_7 0xA7
+
+/*  SCON  */
+
+#define SBIT_SM0 0x9F
+#define SBIT_SM1 0x9E
+#define SBIT_SM2 0x9D
+#define SBIT_REN 0x9C
+#define SBIT_TB8 0x9B
+#define SBIT_RB8 0x9A
+#define SBIT_TI 0x99
+#define SBIT_RI 0x98
+
+/*  T2CON  */
+
+#define SBIT_TF2 0xCF
+#define SBIT_EXF2 0xCE
+#define SBIT_RCLK 0xCD
+#define SBIT_TCLK 0xCC
+#define SBIT_EXEN2 0xCB
+#define SBIT_TR2 0xCA
+#define SBIT_C_T2 0xC9
+#define SBIT_CP_RL2 0xC8
+
+/*  EICON  */
+
+#define SBIT_SMOD1 0xDF
+#define SBIT_WDTI 0xDB
+
+/*  EIE  */
+
+#define SBIT_EWDI 0xEC
+#define SBIT_EX5 0xEB
+#define SBIT_EX4 0xEA
+#define SBIT_EX3 0xE9
+#define SBIT_EX2 0xE8
+
+/*  EIP  */
+
+#define SBIT_PWDI 0xFC
+#define SBIT_PX5 0xFB
+#define SBIT_PX4 0xFA
+#define SBIT_PX3 0xF9
+#define SBIT_PX2 0xF8
+
+
+#pragma WARN replace
+
+#endif // _H_io8051_H

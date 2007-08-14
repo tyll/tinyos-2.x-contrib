@@ -1,0 +1,29 @@
+======================================================================
+Stand alone CIL C-to-C inline utility
+======================================================================
+
+The cilly.utah is a C-to-C transformation tool developed using CIL. It
+does a number of transformations including inline.
+
+It is developed by Will Archer and Nathan Cooprider from John Regehr's
+research group at University of Utah.
+  http://www.cs.utah.edu/~coop/research/tools/
+ 
+It consists of two parts: a wrapper script and a CIL-executable. The
+wrapper script (utah-inliner.pl) marks the names of interrupt handler
+functions for CIL and passes arguments to the CIL-executable
+(cil.utah.exe).
+
+The inline.extra rules file looks for the variable "INLINE_FLAGS" and
+any argument for CIL can be passed to CIL through this variable. It
+defaults to "--8051 --auto --clean --shorten". The "--auto" option
+follows NesC compiler hints on what to inline while "--smart" uses a
+heuristic to decide when the code size will decrease as result of
+inlining.
+
+To use the inliner compile using the extra flag "inline":
+ make cc2430em inline
+
+To set non default flags, for example:
+ export INLINE_FLAGS="--8051 --smart --clean"
+ make cc2430em inline

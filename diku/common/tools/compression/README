@@ -1,0 +1,6 @@
+======================================================================
+PC side compression tools
+======================================================================
+
+This is the PC-side of the compression util. See and
+apps/CompressionTest/README and lib/compression/README for more.

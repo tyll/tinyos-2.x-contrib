@@ -1,0 +1,51 @@
+#
+# FILE: nRF24E1_EVBOARD/.platform
+# 
+# Includes that should take precedence come first.  Platforms come before
+# chips because they may override files.  These must be specified as
+# @includes instead of -I's to @opts, otherwise the %T won't be processed
+# by ncc. 
+#
+#
+
+# A starting point.. The compiler and posibly mangler should probably
+# end up here at some point
+#  - Martin Leopold (Sep 4, 2006)
+
+$CR = $ENV{"CONTRIBROOT"} if defined($ENV{"CONTRIBROOT"});
+
+#qw doesn't replace variable so build list manually
+@LIST=(
+  "$CR/diku/mcs51/tos/platforms/nRF24E1_EVBOARD",
+  "$CR/diku/mcs51/tos/chips/nRF24E1",
+  "$CR/diku/mcs51/tos/chips/nRF24E1/mcs8051",
+  "$CR/diku/mcs51/tos/chips/mcs51",
+  "$CR/diku/mcs51/tos/chips/mcs51/pins",
+  "%T/lib/timer",
+  "%T/lib/serial",
+  "%T/lib/power"
+);
+
+push( @includes, @LIST);
+
+# None of these seems to end up as commandline options!? In particular
+# target is povided by the Makefile
+
+#@opts = qw(
+#  -gcc=avr-gcc
+#  -mmcu=atmega128
+#  -fnesc-target=avr
+#  -fnesc-no-debug
+#  -fnesc-scheduler=TinySchedulerC,TinySchedulerC.TaskBasic,TaskBasic,TaskBasic,runTask,postTask
+#
+#);
+
+#push @opts, "-mingw-gcc" if $cygwin;
+
+push (
+    @opts, qw(
+	      -gcc=/opt/tinyos-2.x/support/make/mcs51/Keil.bat
+	      -fnesc-no-debug
+	      -fnesc-scheduler=TinySchedulerC,TinySchedulerC.TaskBasic,TaskBasic,TaskBasic,runTask,postTask
+	      )
+    ) if defined ($cygwin);

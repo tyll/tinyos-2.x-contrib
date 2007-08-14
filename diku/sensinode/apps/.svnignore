@@ -1,0 +1,4 @@
+build
+*.so
+*.s
+#svn propset svn:ignore -F ../.svnignore  .

@@ -1,0 +1,12 @@
+Planned features
+================
+
+	* Multiple trends in a single graph. I'd appreciate comments on that
+	(how the interface should respond, where to place the values, etc:
+	I don't feel the idea "intuitive" or very convenient anymore).
+
+	* More optimisations can be done for: different shading modes,
+	different input types.
+
+	* Maybe some basic oscilloscope controls like: graph offsetting,
+	zooming, value skipping.

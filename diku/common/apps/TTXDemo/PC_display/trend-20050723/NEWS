@@ -1,0 +1,100 @@
+Rev #40 15/04/2005 to Rev #44 23/07/2005
+========================================
+
+	* Solaris build fixes.
+
+	* Ported to OS X.
+
+
+Rev #35 14/12/2004 to Rev #40 15/04/2005
+========================================
+
+	* Correctly align X grid lines in scrolling mode.
+
+	* hist-spec now uses "x" instead of "*".
+
+	* Support for direct binary input.
+
+	* New example (see timeq) and cleanup.
+
+	* DEPRECATES: N*M hist-specs should no longer be used, use NxM
+	instead. -i and -r flags should no longer be used, use -ci -cd.
+
+
+Rev #27 02/11/2004 to Rev #35 14/12/2004
+========================================
+
+	* An "history specification" can be used on the command line as a
+	simplified alternative to the hist-sz/x-div pair.
+
+	* Visual latency sampling/visualisation.
+
+	* Differential input.
+
+	* Grid enhancements/offsetting.
+
+
+Rev #23 29/10/2004 to Rev #27 02/11/2004
+========================================
+
+	* Incorrectly initialised buffers could cause interactive
+	indicators to malfunction for first values.
+
+	* Visualisation can be paused while still consuming data.
+
+	* 'A' re-scales the graph without activating auto-scaling.
+
+
+Rev #20 21/10/2004 to Rev #23 29/10/2004
+========================================
+
+	* Optimisations and huge internal latency reductions.
+
+	* Fixed precision truncation in auto-scaling.
+
+	* Fixed scrolling mode for "history" non multiple of "divisions".
+
+	* Created a support/testing mailing list. See README for details.
+
+
+Rev #15 27/09/2004 to Rev #20 21/10/2004
+========================================
+
+	* Implemented distribution graph.
+
+	* Fixed trend for plain files.
+
+	* Fixed parsing bug (unterminated buffer).
+
+	* Fixed precision truncation in drawing code.
+
+
+Rev #11 21/09/2004 to Rev #15 27/09/2004
+========================================
+
+	* Fixed standard X11/GLUT options
+	(-display, -geometry, etc)
+
+	* Implemented interactive indicators.
+
+
+Rev #4 09/09/2004 to Rev #11 21/09/2004
+=======================================
+
+	* Several optimisations. Code cleanup.
+
+	* Colours are configurable.
+
+	* All options have a command line flag now.
+
+	* current/min/max values can be shown on the graph.
+
+	* New shading mode.
+
+	* Input can be an incremental counter.
+
+	* Grid positioning was fixed.
+
+	* The grid now disables itself when it's too dense to be drawn.
+
+	* Auto-scaling can be toggled dynamically.

@@ -1,0 +1,20 @@
+==============================================
+Directory Description:     tos/chips/mcs8051
+==============================================
+
+:TinyOS-Version: 2.0
+:Author: Martin Leopold <leopold@diku.dk>
+
+:Created: 04-Sep-2006
+
+1. Description
+====================================================================
+
+This directory contains a generic implementation of the most commenly 
+seen devices shared among many 8051 variants. At the time of writing this
+one of the popular availabe software blocks for SoC production is the
+the DW8051 MacroCell from Synopsys. This is known to be used by the nRF24E1
+devcie, and is likely to be used in other devices.
+
+In addition there is a bunch of dummy system includes to provent NescC
+from including the ones from libc (which won't work with Keil).

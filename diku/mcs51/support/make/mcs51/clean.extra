@@ -1,0 +1,6 @@
+# Cleanup Keil mess
+CLEAN_EXTRA += *.m51 *.Opt *.plg  *_Uv2.Bak *.lst *.LST
+
+$(call TOSMake_include,clean.target)
+
+BUILD_DEPS = clean

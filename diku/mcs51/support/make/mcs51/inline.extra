@@ -1,0 +1,19 @@
+BUILD_DEPS += inline_target exe 
+
+ifndef INLINE_FLAGS
+	INLINE_FLAGS = --8051 --auto --clean --shorten
+endif
+
+.PHONY: inline
+inline_target: ncc
+	@echo "    Inlining $(BUILDDIR)/app.preInline.c to $(APP_C)"
+	cp $(APP_C) $(BUILDDIR)/app.preInline.c
+#	$(MCS51_MAKE_PATH)/mcs51/cilly.utah.linux.8051.valueset.may.exe --out $(APP_C) $(CIL_FLAGS) $(BUILDDIR)/app.preInline.c
+	$(MCS51_MAKE_PATH)/mcs51/utah-inliner.pl --cilly-path=$(MCS51_MAKE_PATH)/mcs51 $(INLINE_FLAGS) --out=$(APP_C) $(BUILDDIR)/app.preInline.c
+	@mv $(APP_C) $(APP_C).tmp
+	@echo "/* Inline flags $(INLINE_FLAGS) */" > $(APP_C)
+	@cat $(APP_C).tmp >> $(APP_C)
+	@rm $(APP_C).tmp
+
+#	cp $(APP_C) $(BUILDDIR)/app.preNoInline.c
+#	$(MCS51_MAKE_PATH)/mcs51/noInline.pl -file $(BUILDDIR)/app.preNoInline.c > $(BUILDDIR)/app.preInline.c

@@ -5,12 +5,9 @@
  * and receive commands.
  *
  * @author Roman Lim <rlim@ee.ethz.ch>
- * @modified 10/3/2006 Added documentation.
- * @modified 10/15/2006 Added Emergency logging.
- *
  **/
 #include <message.h>
-interface DSN {
+interface DsnSend {
 /**
 *	logging messages can contain following sequences:
 *	<p>%i: 	replaces %i with the logged integer in decimal format
@@ -85,12 +82,4 @@ interface DSN {
 *	starts active logging. After this command, the log buffer is sent first.
 */  
   command error_t startLog();
-
-/**
-*	this event is signaled when a command is received
-*	@param msg pointer to the command string
-*	@param len length of the command string (including trailing \n)
-*/  
-  event void receive(void * msg, uint8_t len);
-
 }

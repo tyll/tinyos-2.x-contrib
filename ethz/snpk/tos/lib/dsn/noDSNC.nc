@@ -30,23 +30,26 @@
 *  $Id$
 * 
 */
-
-#include <AM.h>
 #include "DSN.h"
 
 configuration noDSNC
 {
-	provides interface DSN;	
+	provides interface DSN;
+	provides interface DsnSend;
+	provides interface DsnReceive;
 }
 implementation
 {
-	components ActiveMessageAddressC;
 	components noDSNP as DSNP;
 	components RealMainP;
+	components DsnPlatformC;
 	
 	RealMainP.PlatformInit -> DSNP.NodeIdInit;
 	DSN = DSNP.DSN;
-	DSNP.setAmAddress -> ActiveMessageAddressC;
+	DsnSend = DSNP.DsnSend;
+	DsnReceive = DSNP.DsnReceive;
+	DSNP.DsnPlatform -> DsnPlatformC;
+	DSNP.UartStream->DsnPlatformC;
 	
 }
 

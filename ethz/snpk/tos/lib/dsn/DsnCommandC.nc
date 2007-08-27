@@ -62,5 +62,5 @@ implementation
 		new DsnCommandP(key, valueType, maxValueCount);
 		
 	DsnCommand=DsnCommandP;
-	DsnCommandP.DSN->DSNC;
+	DsnCommandP.DsnReceive->DSNC;
 }

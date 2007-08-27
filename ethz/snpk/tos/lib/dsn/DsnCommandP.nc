@@ -42,7 +42,6 @@
  * valueType: type of parameters (only integers)
  * maxValueCount: upper bound of parameter count
  * 
- * --> don't forget to wire every new DsnCommand to the DSNC component !
  * 
  * @author Roman Lim <rlim@ee.ethz.ch>
  * @author Mischa Weise <mweise@ee.ethz.ch>
@@ -56,7 +55,7 @@ generic module DsnCommandP(
 	uint8_t maxValueCount)
 {
   provides interface DsnCommand<valueType>;
-  uses interface DSN;	
+  uses interface DsnReceive;	
 }
 
 implementation
@@ -69,7 +68,7 @@ implementation
 		LOG_DELIMITER2='\r',
 	};
 	
-	event void DSN.receive(void *msg, uint8_t len) {
+	event void DsnReceive.receive(void *msg, uint8_t len) {
 		uint8_t i=0, v=0;	
 		uint8_t * cmd = (uint8_t*)msg;
 		

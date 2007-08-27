@@ -42,31 +42,20 @@
  **/
 
 #include "DSN.h"
-#include <Timer.h>
 
 module DSNP
 {
 	provides interface DSN;	
+	provides interface DsnSend;
+	provides interface DsnReceive;
 	provides interface Init;
 	provides interface Init as NodeIdInit;
 	
 	uses interface Boot;
-	
 	uses interface UartStream;
-	uses interface HplMsp430Usart;
 	uses interface Resource;
-	uses interface GeneralIO as TxPin;
-#ifndef 	NOSHARE
-	uses interface GeneralIO as RxRTSPin;
-	uses interface GeneralIO as RxCTSPin;
-	uses interface GpioInterrupt as RxRTSInt;
-#endif
-	uses command void setAmAddress(am_addr_t a);
-	uses interface Packet;
-	uses interface SplitControl as RadioControl;
-	uses interface Timer<TMilli> as EmergencyTimer;
-	uses interface LocalTime<T32khz>;
-			
+	uses interface DsnPlatform;
+	
 	uses interface Leds;
 }
 
@@ -75,9 +64,8 @@ implementation
 	uint8_t ringbuffer[BUFFERSIZE];
 	uint8_t * bufferStart;
 	uint8_t * bufferEnd;
-	uint8_t rxlen;
+	uint8_t rxlen=0;
 	uint8_t rxbuffer[RXBUFFERSIZE];
-	volatile uint16_t *IdAddr;
 	uint32_t n[LOG_NR_BUFFERSIZE]; // buffer for ints to print out
 	uint8_t nptr=0;
 	
@@ -93,27 +81,18 @@ implementation
 	bool running=TRUE;
 	bool rxreq=FALSE;
 	
-	// emergency variables
-	bool emergencyLogEnabled=FALSE;
-	uint8_t numEmergencyVars=0;
-	VarStruct emergencyVar[255];
-	uint32_t emergencyTimeout;
-	
 	/* prototype */
 	void stop();
-	void adjustEmergencytimeout();
 	void requestUSART();
 	
 	/**
 	 * Initialization (before SoftwareInit)
 	 */
-	 
 	command error_t NodeIdInit.init() {
 		// setup node id
-		IdAddr=(uint16_t *)ID_ADDR;
-		if (*IdAddr!=NO_ID) {
-			TOS_NODE_ID=*IdAddr;
-			call setAmAddress(TOS_NODE_ID);
+		am_addr_t flashId = call DsnPlatform.getSavedId(); 
+		if (flashId!=NO_ID) {
+			call DsnPlatform.setNodeId(flashId); 
 		}
 		return SUCCESS;
 	}
@@ -123,43 +102,15 @@ implementation
 	* Sets up pins, buffer and node id
 	**/
 	command error_t Init.init() {
-#ifndef NOSHARE		
-		volatile uint32_t i;        /* declare i as volatile int */
-#endif
-		// set TxPin high
-		// a low pin would cause framing errors in the dsn uart
-		call TxPin.makeOutput();
-		call TxPin.set();
-		
-#ifndef NOSHARE
-		// setup pin for rx RTS interrupt
-		call RxRTSPin.makeInput();
-		call RxRTSInt.enableRisingEdge();
-		// setup CTS pin
-		call RxCTSPin.makeOutput();
-		call RxCTSPin.set();		// default hi = not ready to receive
+		call DsnPlatform.init();
 		m_state=S_STARTED;
-		// set startup time (a few ms, all output is buffered)
-		// loop
-		for(i = 0; i < 0x00ffff; i++)
-   		;
-#endif
-		// setup ringbuffer
 		bufferStart=&ringbuffer[0];
-		bufferEnd=&ringbuffer[0];
-		
+		bufferEnd=&ringbuffer[1];
+		ringbuffer[0]=LOG_DELIMITER;
 		return SUCCESS;
 	}
 	
 	event void Boot.booted() {
-#ifdef NOSHARE
-		atomic {
-			if (m_state==S_INIT) {
-				call Resource.request();
-				m_state=S_STARTED;
-			}
-		}
-#endif
 	}
 	
 	/***************************************
@@ -234,7 +185,7 @@ implementation
 					}
 					storedNr=TRUE;
     			}
-    			else if (msg[msgPtr+1]=='h') {	// hexadecimal output
+    			else if (msg[msgPtr+1]=='h' || msg[msgPtr+1]=='x') {	// hexadecimal output
 	    			for (i=4;i>0;i--) {
     					storeMsgHex(((uint8_t *) (&tmpN))+i-1, 1);
     				}
@@ -354,16 +305,12 @@ implementation
     }
   	
   	
-  	radio_header_t* getHeader( message_t* msg ) {
-    	return (radio_header_t*)( msg->data - sizeof(radio_header_t) );
-	}
-
-	command error_t DSN.logPacket(message_t * msg) {
-		radio_header_t * header = getHeader( msg );
+  	command error_t DSN.logPacket(message_t * msg) {
+		void * header = call DsnPlatform.getHeader( msg );
    		storeMsgNr("D ",2); // log as debug message
-		storeMsgHex( (uint8_t *) header, sizeof(radio_header_t));
+		storeMsgHex( (uint8_t *) header, call DsnPlatform.getHeaderLength());
 		storeMsgNr("|",1);
-		storeMsgHex( (uint8_t *) msg->data, call Packet.payloadLength(msg));
+		storeMsgHex( (uint8_t *) msg->data, call DsnPlatform.getPayloadLength(msg));
 		return call DSN.log("\n");
 	}
 	
@@ -389,59 +336,19 @@ implementation
 		}
 	}
 	
-	void startRxTx() {
-		// start sending or receiving
-		atomic {
-			if (!rxreq) {
-				post sendBuf();
-			}
-#ifndef	NOSHARE
-			else
-				call RxCTSPin.clr();
-#endif
-		}
-	}
-
-	/**
-	* we have the UART
-	* start sending / receiving
-	**/
-	event void Resource.granted() {
-		//call Leds.led0On();
-		atomic m_state=S_SENDING;
-		adjustEmergencytimeout();
-		startRxTx();
-	}
-	
-	void stop() {
-#ifndef NOSHARE
-		while (!call HplMsp430Usart.isTxEmpty());
-		atomic {
-			if (m_state==S_SENDING) {
-				call Resource.release();
-				m_state=S_STARTED;
-				// call Leds.led0Off();
-			}
-		}
-		// signal DSN.led(0);
-#endif
-	}
-	
-  	async event void UartStream.sendDone(uint8_t * buf, uint16_t len, error_t error) {
+	async event void UartStream.sendDone(uint8_t * buf, uint16_t len, error_t error) {
   		if (error==SUCCESS) {
   			bufferStart+=len;
   			if (bufferStart==&ringbuffer[BUFFERSIZE])
   				bufferStart=&ringbuffer[0];
   			atomic {
   				if (bufferStart == bufferEnd) { // check, if there is more data to be sent
-  					if (!rxreq) { // if not, is there something to be received?
+  					if (!call DsnPlatform.isHandshake() || !rxreq) { // if not, is there something to be received?
 						stop();
 					}
-#ifndef 	NOSHARE
 					else {
-						call RxCTSPin.clr();
+						call DsnPlatform.rxGrant();
 					}
-#endif
   				}
   				else {
 					// send next chunk of message
@@ -452,31 +359,41 @@ implementation
   		}
   	}
 
+	void stop() {
+		call DsnPlatform.flushUart();
+		atomic {
+			if (m_state==S_SENDING) {
+				call Resource.release();
+				m_state=S_STARTED;
+			}
+		}
+	}
 	
+	/**
+	* we have the UART
+	* start sending / receiving
+	**/
+	event void Resource.granted() {
+		atomic m_state=S_SENDING;
+		// start sending or receiving
+		atomic {
+			if (!call DsnPlatform.isHandshake() || !rxreq) {
+				post sendBuf();
+			}
+			else
+				call DsnPlatform.rxGrant();
+		}
+	}
+		
 	/**
 	* this function makes sure that the USART resource is requested only once
 	*
 	**/
 	void requestUSART() {
-#ifdef NOSHARE
 		atomic {
-			if (m_state==S_INIT) {
-				call Resource.request();
-				m_state=S_STARTED;
-			}
-			else {
-				startRxTx();
-			}
+			if (m_state==S_STARTED && call Resource.request()==SUCCESS)
+				m_state=S_REQUEST_PENDING;
 		}
-#else
-		atomic {
-			if (m_state==S_STARTED) {
-				if (call Resource.request()==SUCCESS)
-					m_state=S_REQUEST_PENDING;
-					//call Leds.led0On();
-			}
-		}
-#endif
 	}
 	
 	  
@@ -486,23 +403,21 @@ implementation
   			rxlen_tmp=rxlen;
   			rxlen=0;
   		}
+  		signal DsnReceive.receive(rxbuffer, rxlen_tmp);
 	  	signal DSN.receive(rxbuffer, rxlen_tmp);
 	}
   
 	/**
 	* A byte of data has been received.
 	*/
-   
   	async event void UartStream.receivedByte(uint8_t data) {
   		if (data==LOG_DELIMITER) {
   			// last byte received
   			rxreq=FALSE;
-#ifndef NOSHARE
-	  		call RxCTSPin.set();
-#endif
+  			call DsnPlatform.rxRelease();
   			if ((bufferStart != bufferEnd) && running)
   				post sendBuf();
-  			else
+  			else if (call DsnPlatform.isHandshake())
   				stop();
   			rxbuffer[rxlen]=0;
   			post ReceivedTask();
@@ -512,88 +427,44 @@ implementation
   		}
 	}
 
-#ifndef	NOSHARE
-	async event void RxRTSInt.fired() {
+	async event void DsnPlatform.rxRequest() { // this event is only signaled when handshake is enabled
 		rxreq=TRUE;
-		rxlen=0;
-		// call Leds.led0Toggle();
 		requestUSART();
 	}
-#endif
 	
 	command error_t DSN.stopLog(){
-#ifndef PERMANENT_LOGGING
 		atomic {
 			running=FALSE;
 		}
-		// stop();
-#endif
 		return SUCCESS;
 	}
 	
 	command error_t DSN.startLog(){
-#ifndef PERMANENT_LOGGING
 		atomic {
 			running=TRUE;
 			if (bufferStart != bufferEnd)
 				requestUSART();
 		}
-#endif
 		return SUCCESS;
 	}
-	
-	/***************************************
-	 * Emergency output
-	 * *************************************/
-	
-	void adjustEmergencytimeout () {
-		if (emergencyLogEnabled) {
-			call EmergencyTimer.startOneShot(emergencyTimeout);
-		}
-	}
-	
-	command void DSN.emergencyLogEnable(uint32_t timeout) {
-		emergencyLogEnabled=TRUE;
-		emergencyTimeout=timeout;
-		call EmergencyTimer.startOneShot(emergencyTimeout);
-	}
-	
-	command void DSN.emergencyLogDisable() {
-		emergencyLogEnabled=FALSE;
-		call EmergencyTimer.stop();
-	}
-	
-	command error_t DSN.emergencyLogAdd(void * pointer, uint8_t numBytes, uint8_t * description) {
-		if (numEmergencyVars<255) {
-			emergencyVar[numEmergencyVars].pointer=pointer;
-			emergencyVar[numEmergencyVars].length=numBytes;
-			emergencyVar[numEmergencyVars].description=description;
-			numEmergencyVars++;
-			return SUCCESS;
-		}
-		else {
-			return FAIL;
-		}
-	}
-	
-	event void EmergencyTimer.fired() {
-		uint8_t i;
-		// log all registered variables
-		call DSN.emergencyLogDisable();
-		call DSN.startLog();
-		call DSN.logInt(call LocalTime.get());
-		call DSN.log("Emergency dump at %i:\n");
-		for (i=0;i<numEmergencyVars;i++) {
-			storeMsgNull(emergencyVar[i].description);
-			storeMsgNull(" [");
-			storeMsgHex((uint8_t *) emergencyVar[i].pointer, emergencyVar[i].length);
-			call DSN.log("]");
-		}
-	}	
-	
+		
 	async event void UartStream.receiveDone( uint8_t* buf, uint16_t len, error_t error ) {
 	}
 	
-	event void RadioControl.startDone(error_t error) {}
-	event void RadioControl.stopDone(error_t error) {}
+ /****************** DsnSend commands *******************/
+	command error_t DsnSend.log(void * msg) {return call DSN.log(msg); }
+	command error_t DsnSend.appendLog(void * msg){return call DSN.appendLog(msg); }
+	command error_t DsnSend.logHexStream(uint8_t* msg, uint8_t len){return call DSN.logHexStream(msg, len); }
+	command error_t DsnSend.logLen(void * msg, uint8_t len){return call DSN.logLen(msg, len); }
+	command error_t DsnSend.logError(void * msg){return call DSN.logError(msg); }
+	command error_t DsnSend.logWarning(void * msg){return call DSN.logWarning(msg); }
+	command error_t DsnSend.logInfo(void * msg){return call DSN.logInfo(msg); }
+	command error_t DsnSend.logDebug(void * msg){return call DSN.logDebug(msg); }
+	async command void DsnSend.logInt(uint32_t _n){return call DSN.logInt(_n); }
+	command error_t DsnSend.logPacket(message_t * msg){return call DSN.logPacket(msg); }
+	command error_t DsnSend.stopLog(){return call DSN.stopLog(); }
+	command error_t DsnSend.startLog() 	{return call DSN.startLog(); }
+ /****************** receive default events *************/
+	default event void DSN.receive(void * msg, uint8_t len) {}
+	default event void DsnReceive.receive(void * msg, uint8_t len) {}
 }

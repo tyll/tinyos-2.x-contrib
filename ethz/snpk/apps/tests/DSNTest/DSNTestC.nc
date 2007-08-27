@@ -12,7 +12,8 @@ implementation
 	components ActiveMessageC;
 	
 	App.Boot -> MainC.Boot;
-	App.DSN -> DSNC;
+	App.DSN -> DSNC.DsnSend;
+	App.DsnReceive -> DSNC;
  	App.Leds -> LedsC;
 	App.Timer -> Timer;
 	App.BlinkTimer -> BlinkTimer;

@@ -5,7 +5,8 @@ module DSNTestP
 {
 	uses interface Leds;
 	uses interface Boot;
-	uses interface DSN;
+	uses interface DsnSend as DSN;
+	uses interface DsnReceive;
 	uses interface Timer<TMilli> as Timer;
 	uses interface Timer<TMilli> as BlinkTimer;
 	uses interface AMPacket;
@@ -77,7 +78,7 @@ implementation
 			call BlinkTimer.startOneShot(100);
 	}
 	
-	event void DSN.receive(void * msg, uint8_t len)
+	event void DsnReceive.receive(void * msg, uint8_t len)
 	{
 		call Leds.led1Toggle();
 		startBlink(2);

@@ -71,7 +71,6 @@ implementation
 	DsnSend = DSNP.DsnSend;
 	DsnReceive = DSNP.DsnReceive;
 	MainC.SoftwareInit->DSNP.Init;
-	DSNP.Boot -> MainC;
 		
 	// wire uart stuff
 	DSNP.DsnPlatform -> DsnPlatformC;

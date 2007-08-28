@@ -1,7 +1,8 @@
 /**
  * Interface to platform specific functions
  * 
- * */ 
+ * */
+#include <message.h>
 interface DsnPlatform {
 	command void init();
 	async command void flushUart();

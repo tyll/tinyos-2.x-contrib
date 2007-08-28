@@ -51,7 +51,6 @@ module DSNP
 	provides interface Init;
 	provides interface Init as NodeIdInit;
 	
-	uses interface Boot;
 	uses interface UartStream;
 	uses interface Resource;
 	uses interface DsnPlatform;
@@ -109,10 +108,7 @@ implementation
 		ringbuffer[0]=LOG_DELIMITER;
 		return SUCCESS;
 	}
-	
-	event void Boot.booted() {
-	}
-	
+		
 	/***************************************
 	 * Output Processing: Helper functions
 	 * *************************************/
@@ -411,19 +407,21 @@ implementation
 	* A byte of data has been received.
 	*/
   	async event void UartStream.receivedByte(uint8_t data) {
-  		if (data==LOG_DELIMITER) {
-  			// last byte received
-  			rxreq=FALSE;
-  			call DsnPlatform.rxRelease();
-  			if ((bufferStart != bufferEnd) && running)
-  				post sendBuf();
-  			else if (call DsnPlatform.isHandshake())
-  				stop();
-  			rxbuffer[rxlen]=0;
-  			post ReceivedTask();
-  		}
-  		else {
-  			rxbuffer[rxlen++]=data;
+  		atomic {
+  			if (data==LOG_DELIMITER) {
+  				// last byte received
+  				rxreq=FALSE;
+  				call DsnPlatform.rxRelease();
+  				if ((bufferStart != bufferEnd) && running)
+  					post sendBuf();
+  				else if (call DsnPlatform.isHandshake())
+	  				stop();
+  				rxbuffer[rxlen]=0;
+  				post ReceivedTask();
+  			}
+  			else {
+  				rxbuffer[rxlen++]=data;
+  			}
   		}
 	}
 

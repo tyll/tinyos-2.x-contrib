@@ -116,6 +116,7 @@ public class TUnit {
    * @param args
    */
   public void runTunit(String[] args) {
+    System.out.println("Running TUnit from " + rootDirectory.getAbsolutePath());
     
     // 1. Locate the tunit.xml file from the TUNIT_BASE directory
     processTunitXml();

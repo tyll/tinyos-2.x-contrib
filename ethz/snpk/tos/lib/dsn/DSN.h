@@ -2,7 +2,6 @@
 #define DSN_H
 
 enum {
-	MAX_LEN = 1024,
 	LOG_DELIMITER = '\n',
 	MSP430_ID_ADDR = 0xfe00,
 	RXBUFFERSIZE = 128,

@@ -54,8 +54,6 @@ module DSNP
 	uses interface UartStream;
 	uses interface Resource;
 	uses interface DsnPlatform;
-	
-	uses interface Leds;
 }
 
 implementation
@@ -79,6 +77,7 @@ implementation
 	
 	bool running=TRUE;
 	bool rxreq=FALSE;
+	bool UartStreamBusy=FALSE;
 	
 	/* prototype */
 	void stop();
@@ -318,21 +317,20 @@ implementation
 	* Sends all messages until end of ringbuffer
 	**/
 	task void sendBuf() {
-		bool wraparound;
-		uint8_t * start;
 		atomic {
-			wraparound=bufferEnd<bufferStart;
-			start = bufferStart;
-			if (m_state==S_SENDING) {
-				if (wraparound) // check wether end of message is before end of ringbuffer
-					call UartStream.send(start, &ringbuffer[BUFFERSIZE] - start);
-    			else
-					call UartStream.send(start, bufferEnd - start);
+			if (!UartStreamBusy && m_state==S_SENDING) {
+				UartStreamBusy=TRUE;
+				if (bufferEnd<bufferStart) {// check wether end of message is before end of ringbuffer
+					call UartStream.send(bufferStart, &ringbuffer[BUFFERSIZE] - bufferStart);
+				}
+   				else
+					call UartStream.send(bufferStart, bufferEnd - bufferStart);
 			}
 		}
 	}
 	
 	async event void UartStream.sendDone(uint8_t * buf, uint16_t len, error_t error) {
+		UartStreamBusy=FALSE;
   		if (error==SUCCESS) {
   			bufferStart+=len;
   			if (bufferStart==&ringbuffer[BUFFERSIZE])
@@ -420,7 +418,8 @@ implementation
   				post ReceivedTask();
   			}
   			else {
-  				rxbuffer[rxlen++]=data;
+  				if (rxlen < RXBUFFERSIZE-1) // last byte is reserved for LOG_DELIMITER
+  					rxbuffer[rxlen++]=data;
   			}
   		}
 	}

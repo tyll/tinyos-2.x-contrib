@@ -36,6 +36,9 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
+import com.rincon.tunit.link.TUnitProcessing;
 import com.rincon.util.Util;
 
 import net.tinyos.message.Message;
@@ -51,12 +54,15 @@ import net.tinyos.message.MoteIF;
  */
 public class Statistics extends Thread implements MessageListener {
 
+  /** Logging */
+  private static Logger log = Logger.getLogger(TUnitProcessing.class);
+
   /** MoteIF's that we're registered with */
   private List listeningComms;
 
   /** List of FileTransferEvents listeners */
   @SuppressWarnings("unchecked")
-  private static List listeners = Collections.synchronizedList(new ArrayList());
+  private List listeners = Collections.synchronizedList(new ArrayList());
 
   /** List of received messages */
   @SuppressWarnings("unchecked")
@@ -75,6 +81,7 @@ public class Statistics extends Thread implements MessageListener {
    */
   @SuppressWarnings("unchecked")
   public Statistics(MoteIF originalComm) {
+    log = Logger.getLogger(getClass());
     inMsg = new StatisticsMsg();
     listeningComms = new ArrayList();
     listeningComms.add(originalComm);
@@ -114,33 +121,33 @@ public class Statistics extends Thread implements MessageListener {
    */
   public void run() {
     StatisticsMsg inMsg;
+    List currentListeners;
     while (running) {
       synchronized (receivedMessages) {
-        while (receivedMessages.isEmpty() && running) {
+        while (receivedMessages.isEmpty()) {
           try {
             receivedMessages.wait();
           } catch (InterruptedException ie) {
           }
         }
 
+        currentListeners = new ArrayList();
+        currentListeners.addAll(listeners);
+
         inMsg = (StatisticsMsg) receivedMessages.get(0);
 
-        if (inMsg != null && running) {
+        if (inMsg != null) {
           extractUnits(inMsg);
 
-          synchronized (listeners) {
-            for (Iterator it = listeners.iterator(); it.hasNext();) {
-              ((StatisticsEvents) it.next()).statistics_log(
-                  inMsg.get_statsId(), extractUnits(inMsg), inMsg.get_value());
-            }
+          for (Iterator it = currentListeners.iterator(); it.hasNext();) {
+            ((StatisticsEvents) it.next()).statistics_log(inMsg.get_statsId(),
+                extractUnits(inMsg), inMsg.get_value());
           }
 
           receivedMessages.remove(inMsg);
         }
       }
     }
-
-    listeners.clear();
   }
 
   /**
@@ -171,7 +178,7 @@ public class Statistics extends Thread implements MessageListener {
   public synchronized void messageReceived(int to, Message m) {
     inMsg = (StatisticsMsg) m;
 
-    System.out.println("RECEIVED A STATISTICS MESSAGE");
+    log.info("RECEIVED A STATISTICS MESSAGE");
     synchronized (receivedMessages) {
       receivedMessages.add(m);
       receivedMessages.notify();
@@ -183,16 +190,15 @@ public class Statistics extends Thread implements MessageListener {
    * 
    */
   public void shutdown() {
+    log.debug("Shutting down statistics listeners");
     running = false;
-
-    synchronized (listeners) {
-      listeners.clear();
-    }
-    
     for (Iterator it = listeningComms.iterator(); it.hasNext();) {
       ((MoteIF) it.next()).deregisterListener(new StatisticsMsg(), this);
     }
+    log.debug("Clearing statistics communications");
     listeningComms.clear();
-    
+    log.debug("Clearing statistics listeners");
+    listeners.clear();
+    log.debug("Statistics communications shutdown complete");
   }
 }

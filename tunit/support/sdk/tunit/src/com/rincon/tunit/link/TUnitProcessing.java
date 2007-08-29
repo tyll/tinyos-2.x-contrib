@@ -36,6 +36,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
+import com.rincon.tunit.run.ResultCollector;
 import com.rincon.util.Util;
 
 import net.tinyos.message.Message;
@@ -51,11 +54,14 @@ import net.tinyos.message.MoteIF;
 public class TUnitProcessing extends Thread implements
     TUnitProcessing_Commands, MessageListener {
 
+  /** Logging */
+  private static Logger log = Logger.getLogger(TUnitProcessing.class);
+  
   /** MoteIF's that we're registered with */
   private List listeningComms;
 
   /** List of FileTransferEvents listeners */
-  private static List listeners = new ArrayList();
+  private List listeners = new ArrayList();
 
   /** List of received messages */
   @SuppressWarnings("unchecked")
@@ -80,6 +86,7 @@ public class TUnitProcessing extends Thread implements
    */
   @SuppressWarnings("unchecked")
   public TUnitProcessing(MoteIF originalComm) {
+    log = Logger.getLogger(getClass());
     listeningComms = new ArrayList();
     listeningComms.add(originalComm);
     originalComm.registerListener(new TUnitProcessingMsg(), this);
@@ -323,10 +330,14 @@ public class TUnitProcessing extends Thread implements
    */
   public void shutdown() {
     running = false;
+    log.debug("Shutting down TUnit listeners");
     for (Iterator it = listeningComms.iterator(); it.hasNext();) {
       ((MoteIF) it.next()).deregisterListener(new TUnitProcessingMsg(), this);
     }
+    log.debug("Clearing TUnit comms");
     listeningComms.clear();
+    log.debug("Clearing TUnit listeners");
     listeners.clear();
+    log.debug("TUnit communications shutdown complete");
   }
 }

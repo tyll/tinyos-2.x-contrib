@@ -162,45 +162,53 @@ implementation
 		while (((msgPtr==0) | (msg[msgPtr-1]!=LOG_DELIMITER)) & (msg[msgPtr]!=0)) {
     		if (msg[msgPtr]=='%') {
     			atomic tmpN=n[nrPtr];
-    			if (msg[msgPtr+1]=='i') {
-		    		storedNr=FALSE;
-    				if (tmpN==0) {
-    					storeByte('0');
-    				}
-    				else {
-						for (i=10;i>0;i--) {
-							if (tmpN/pow(10,i-1)>0) {
-								storedNr=TRUE;
-								storeByte(tmpN/pow(10,i-1)+48);
-								tmpN=tmpN % pow(10,i-1);
+    			storedNr=FALSE;
+    			switch (msg[msgPtr+1]) {
+    				case 'i':
+    					if (tmpN==0) {
+    						storeByte('0');
+    					}
+    					else {
+							for (i=10;i>0;i--) {
+								if (tmpN/pow(10,i-1)>0) {
+									storedNr=TRUE;
+									storeByte(tmpN/pow(10,i-1)+48);
+									tmpN=tmpN % pow(10,i-1);
+								}
+								else if (storedNr)
+									storeByte('0');
 							}
-							else if (storedNr)
-								storeByte('0');
 						}
-					}
-					storedNr=TRUE;
-    			}
-    			else if (msg[msgPtr+1]=='h' || msg[msgPtr+1]=='x') {	// hexadecimal output
-	    			for (i=4;i>0;i--) {
-    					storeMsgHex(((uint8_t *) (&tmpN))+i-1, 1);
-    				}
-    				storedNr=TRUE;
-    			}
-    			else if (msg[msgPtr+1]=='b') {	// binary output
-    				if ((msg[msgPtr+2]!='1') & (msg[msgPtr+2]!='2') & (msg[msgPtr+2]!='3') & (msg[msgPtr+2]!='4')) {
-    					i=32;
-    				}
-    				else {
-    					i = (msg[msgPtr+2]-48)*8;
+						storedNr=TRUE;
+    					break;
+    				case 'h':// hexadecimal output
+    				case 'x':// hexadecimal output
+    					for (i=4;i>0;i--) {
+    						storeMsgHex(((uint8_t *) (&tmpN))+i-1, 1);
+    					}
+    					storedNr=TRUE;
+    					break;
+    				case 'b':// binary output
+    					if ((msg[msgPtr+2]!='1') & (msg[msgPtr+2]!='2') & (msg[msgPtr+2]!='3') & (msg[msgPtr+2]!='4')) {
+    						i=32;
+    					}
+    					else {
+    						i = (msg[msgPtr+2]-48)*8;
+    						msgPtr++;
+    					}
+    					for (;i>0;i--) {
+    						if ((tmpN >> (i-1)) & 0x01)
+  								storeByte('1');
+  							else
+  								storeByte('0');
+    					}
+    					storedNr=TRUE;
+    					break;
+    				case '%':// escaped %
     					msgPtr++;
-    				}
-    				for (;i>0;i--) {
-    					if ((tmpN >> (i-1)) & 0x01)
-  							storeByte('1');
-  						else
-  							storeByte('0');
-    				}
-    				storedNr=TRUE;
+    				default:
+    					storeByte('%');
+    					break;
     			}
     			msgPtr++;
     			if (storedNr) {
@@ -392,6 +400,7 @@ implementation
 	
 	  
 	task void ReceivedTask() {
+		// PAY ATTENTION: rxbuffer is not copied, it might be overriden during this task
   		uint8_t rxlen_tmp;
   		atomic {
   			rxlen_tmp=rxlen;

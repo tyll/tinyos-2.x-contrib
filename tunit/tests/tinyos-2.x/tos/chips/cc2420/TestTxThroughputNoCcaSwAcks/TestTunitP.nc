@@ -64,7 +64,7 @@ implementation {
    * Minimum number of packets we should be seeing per second
    */
   enum {
-    LOWER_BOUNDS = 17500,  // 291+ packets per second
+    LOWER_BOUNDS = 15000, 
     TEST_DURATION = 61440,  // 1 minute
   };
   

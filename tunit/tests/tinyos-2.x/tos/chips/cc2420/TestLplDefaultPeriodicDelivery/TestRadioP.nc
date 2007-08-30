@@ -187,7 +187,6 @@ implementation {
     }
     
     call AveragePktStats.log("[Avg # Pkt Rx]", average);
-    call TestPeriodicDelivery.done();
   }
   
   event void WaitTimer.fired() {
@@ -201,6 +200,8 @@ implementation {
   }
   
   event void DetectRateStats.logDone() {
+    // Now that our stats are logged, we're done!
+    call TestPeriodicDelivery.done();
   }
   
   async event void ActiveMessageAddress.changed() {

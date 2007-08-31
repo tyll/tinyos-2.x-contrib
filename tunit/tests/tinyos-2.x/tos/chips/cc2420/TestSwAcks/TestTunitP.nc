@@ -63,7 +63,7 @@ implementation {
   
   enum {
     TOTAL_PACKETS = 10000,
-    LOWER_BOUNDS = 9980,  // 99.4% success
+    LOWER_BOUNDS = 9900, 
   };
   
   

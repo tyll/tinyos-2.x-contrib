@@ -128,9 +128,10 @@ implementation {
   
   
   /***************** Prototypes ****************/
+  task void begin();
   task void waitForSendDone();
   task void runDone();
-    
+  
   void setUpOneTimeDone();
   void setUpDone();
   void tearDownDone();
@@ -169,13 +170,9 @@ implementation {
   
   /***************** TUnitProcessing Commands ****************/
   command void TUnitProcessing.run() {
-    if(call TUnitState.getState() == S_READY) {
-      call TUnitState.forceState(S_RUNNING);
-      call TestState.forceState(S_SETUP_ONETIME);
-      currentTest = 0;
-      signal SetUpOneTime.run();
-      // Execution continues when setUpOneTimeDone()
-    }
+    // We post a task to allow the serial ack to be sent back that we
+    // got the message, in case the test locks up the microcontroller
+    post begin();
   }
   
   command void TUnitProcessing.ping() {
@@ -313,6 +310,16 @@ implementation {
   }
   
   /***************** Tasks ****************/
+  task void begin() {
+    if(call TUnitState.getState() == S_READY) {
+      call TUnitState.forceState(S_RUNNING);
+      call TestState.forceState(S_SETUP_ONETIME);
+      currentTest = 0;
+      signal SetUpOneTime.run();
+      // Execution continues when setUpOneTimeDone()
+    }
+  }
+  
   task void waitForSendDone() {
     if(call SendState.isIdle() && signal StatsQuery.isIdle()) {
       // Comms available, run the next test

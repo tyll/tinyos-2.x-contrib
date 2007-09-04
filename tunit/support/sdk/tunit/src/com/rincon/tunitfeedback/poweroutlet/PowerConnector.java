@@ -182,7 +182,7 @@ public class PowerConnector implements Messenger, PhoenixError {
 
     // We do another tunit here because we don't know that something else took
     // care of it.
-    TUnit tunit = new TUnit();
+    TUnit tunit = new TUnit(new String[]{});
     File buildDirectory = new File(TUnit.getTunitDirectory(),
         "/apps/PowerOutletFeedback/base");
 

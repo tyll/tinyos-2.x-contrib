@@ -50,7 +50,7 @@ public class PostHtmlEdit {
    */
   public PostHtmlEdit() {
     System.out.println("Post-editing HTML reports");
-    TUnit tunit = new TUnit();
+    TUnit tunit = new TUnit(new String[]{});
     new TraverseHtml(new File(TUnit.getBaseReportDirectory(), "/html"));
     System.out.println("TUnit Post HTML Edit Done");
   }

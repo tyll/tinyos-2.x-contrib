@@ -95,21 +95,52 @@ public class TUnit {
   public static void main(String[] args) {
     org.apache.log4j.BasicConfigurator.configure();
     Logger.getRootLogger().setLevel((Level) Level.INFO);
-    new TUnit().runTunit(args);
+    new TUnit(args).runTunit(args);
   }
 
   /**
    * Constructor
    * 
    */
-  public TUnit() {
+  public TUnit(String[] args) {
+    for(int i = 0; i < args.length; i++) {
+      if(args[i].equalsIgnoreCase("-tunitbase") && args.length > i + 1) {
+        i++;
+        tunitBase = args[i];
+        log.debug("Using TUnit at: " + tunitBase);
+        
+      } else if(args[i].equalsIgnoreCase("-testdir") && args.length > i + 1) {
+        i++;
+        rootDirectory = new File(args[i]);
+        log.debug("Testing at directory: " + rootDirectory.getAbsolutePath());
+        
+      } else if(args[i].contains("?")) {
+        syntax();
+        System.exit(1);
+      }
+    }
+    
+    
     log = Logger.getLogger(getClass());
     startTime = System.currentTimeMillis();
-    rootDirectory = new File(System.getProperty("user.dir"));
+    
+    if(rootDirectory == null) {
+      rootDirectory = new File(System.getProperty("user.dir"));
+    }
+    
     establishTunitDir();
     establishReportDir();
   }
 
+  private void syntax() {
+    System.out.println("TUnit Syntax: java com.rincon.tunit.TUnit (options)");
+    System.out.println("\nOptions are:");
+    System.out.println("\t-tunitbase [absolute tunit_base directory]");
+    System.out.println("\t-testdir [absolute test directory]");
+    System.out.println("\n\t-? for help");
+  }
+  
+  
   /**
    * Run TUnit tests
    * 
@@ -204,8 +235,10 @@ public class TUnit {
    * @return the tunit directory, so external apps can figure it out.
    */
   private void establishTunitDir() {
-    tunitBase = ((String) System.getenv().get("TUNIT_BASE")).replace('\\',
-        File.separatorChar).replace('/', File.separatorChar);
+    if(tunitBase == null) {
+      tunitBase = ((String) System.getenv().get("TUNIT_BASE")).replace('\\',
+          File.separatorChar).replace('/', File.separatorChar);
+    }
 
     if (tunitBase == null) {
       File buildXml = new File("build.xml");
@@ -223,7 +256,7 @@ public class TUnit {
       }
 
     } else {
-      log.debug("Found TUNIT_BASE environment variable: " + tunitBase);
+      log.debug("Found TUNIT_BASE defined as: " + tunitBase);
     }
 
     // 2. Verify it is a valid, existing directory

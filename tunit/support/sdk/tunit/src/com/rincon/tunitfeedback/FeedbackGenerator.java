@@ -60,7 +60,7 @@ public class FeedbackGenerator {
   @SuppressWarnings("static-access")
   public FeedbackGenerator() {
     feedback = new PowerOutletFeedback();
-    tunit = new TUnit();
+    tunit = new TUnit(new String[]{});
   }
   
   /**
@@ -69,7 +69,7 @@ public class FeedbackGenerator {
    */
   public FeedbackGenerator(FeedbackHandler feedbackHandler) {
     feedback = feedbackHandler;
-    tunit = new TUnit();
+    tunit = new TUnit(new String[]{});
   }
 
   /**

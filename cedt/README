@@ -1,0 +1,19 @@
+Installation Instructions:
+  To install, type "make install" at the shell prompt.
+  To uninstall, type "make uninstall" at the shell prompt.
+  Note: 
+       1) Make sure you have the write permissions to tinyos-2.x directory
+       2) It was tested using tinyos-2.0.2_3 version of tinyos.  For previous versions, the files in tos/lib/tossim/energy/tos.h, tos/lib/tossim/tossim.c and tos/lib/tossim/tossim.h may have to be replaced with certain modifications.  (Not tested so far!).
+
+Energy Estimation:
+
+  The platform that is currently being supported is mica2.  
+
+  To compile type "make mica2 sim-energy" instead of "make mica2 sim".  
+  
+  Once the application is compiled, create an object ee=t. newEnergyEstimator() where t is tossim object.  
+  To get the EnergyEstimation of each node, call ee.getNodeEnergy(NODE_ID), where NODE_ID are the node id's that are being simulated.  This call, will print the energy estimated over the time of the simulation to a file Node_(NODE_ID)_Energy within the current directory.  
+  
+  An example python script to get the energy estimate is in apps/tests/TestMCU/test.py
+
+  Also make sure to provide the mica2 rssi values as the noise file to the simulator. 

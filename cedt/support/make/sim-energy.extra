@@ -1,0 +1,113 @@
+#-*-Makefile-*- vim:syntax=make
+#$Id$
+
+TOSCONTRIB=/opt/tinyos-2.x-contrib
+
+#ATMEGA support
+ATM128_SIM = $(TOSCONTRIB)/cedt/tos/chips/atm128
+ATM128_PINS_SIM = $(TOSCONTRIB)/cedt/tos/chips/atm128/pins
+ATM128_ADC_SIM = $(TOSCONTRIB)/cedt/tos/chips/atm128/adc
+ATM128_SIM_FLAGS = -I$(ATM128_SIM) -I$(ATM128_PINS_SIM) -I$(ATM128_ADC_SIM)
+
+#cc1000 Radio support
+CC1000_SIM = $(TOSCONTRIB)/cedt/tos/chips/cc1000
+CC1000_SIM_HPL = $(TOSCONTRIB)/cedt/tos/platforms/mica2/chips/cc1000
+CC1000_SIM_FLAGS = -I$(CC1000_SIM) -I$(CC1000_SIM_HPL)
+
+#External Flash support
+AT45DB_SIM = $(TOSCONTRIB)/cedt/tos/chips/at45db
+AT45DB_SIM_HPL_MICA = $(TOSCONTRIB)/cedt/tos/platforms/mica/chips/at45db
+AT45DB_SIM_HPL_MICA2 = $(TOSCONTRIB)/cedt/tos/platforms/mica2/chips/at45db
+AT45DB_SIM_FLAGS = -I$(AT45DB_SIM) -I$(AT45DB_SIM_HPL_MICA) -I$(AT45DB_SIM_HPL_MICA2)
+
+#mica2 Simulation support
+MICA_SIM = $(TOSCONTRIB)/cedt/tos/platforms/mica
+MICA2_SIM = $(TOSCONTRIB)/cedt/tos/platforms/mica2
+
+SIM_ENERGY_DIR = $(TOSCONTRIB)/cedt/tos/lib/tossim/energy
+SIM_DIR = $(TOSCONTRIB)/cedt/tos/lib/tossim
+
+MICA2_ENERGY_FLAGS = -I$(MICA_SIM) -I$(MICA2_SIM) $(ATM128_SIM_FLAGS) $(CC1000_SIM_FLAGS) $(AT45DB_SIM_FLAGS)
+
+SIM_ENERGY_FLAGS = -I$(SIM_ENERGY_DIR) -I$(SIM_DIR)
+
+GCC=gcc
+GPP=g++
+OPTFLAGS = -g -O0
+LIBS = -lm -lstdc++ 
+PFLAGS += -tossim -fnesc-nido-tosnodes=1000 -fnesc-simulate -fnesc-nido-motenumber=sim_node\(\)  $(SIM_ENERGY_FLAGS) $(MICA2_ENERGY_FLAGS)
+WFLAGS = -Wno-nesc-data-race
+PYTHON_VERSION=2.4
+
+BUILDDIR   = simbuild/$(PLATFORM)
+
+CEEFILE = $(SIM_DIR)/sim_energy_estimate.c
+CEEOBJFILE = $(BUILDDIR)/sim_energy_estimate.o
+
+CFILE    = $(BUILDDIR)/sim.c
+OBJFILE    = $(BUILDDIR)/sim.o
+CXXFILE    = $(SIM_DIR)/tossim.c
+CXXOBJFILE = $(BUILDDIR)/tossim.o
+HASHFILE    = $(TOSDIR)/lib/tossim/hashtable.c
+HASHOBJFILE = $(BUILDDIR)/c-support.o
+PYFILE     = $(SIM_DIR)/tossim_wrap.cxx
+PYOBJFILE  = $(BUILDDIR)/pytossim.o
+PYDIR      =/usr/include/python$(PYTHON_VERSION)
+SIMDIR     =$(TOSDIR)/lib/tossim
+XML        = app.xml
+DUMPTYPES = -fnesc-dump=components -fnesc-dump=variables -fnesc-dump=constants -fnesc-dump=typedefs -fnesc-dump=interfacedefs -fnesc-dump=tags
+
+ifeq ($(findstring cygwin, $(OSTYPE)),cygwin)
+  PLATFORM_FLAGS=-DUSE_DL_IMPORT -fpic
+  SHARED_OBJECT=_TOSSIM.dll
+  PLATFORM_BUILD_FLAGS= -fpic -W1,--enabled-auto-image-base 
+  PLATFORM_LIB_FLAGS = -L/usr/lib/python$(PYTHON_VERSION)/config -L/$(PYDIR)/config -lstdc++ -lpython$(PYTHON_VERSION)
+else 
+ifeq ($(OS), Windows_NT) # Some TinyOS installs are like this
+  PLATFORM_FLAGS=-DUSE_DL_IMPORT -fpic 
+  SHARED_OBJECT=_TOSSIM.dll
+  PLATFORM_BUILD_FLAGS= -fpic -W1,--enabled-auto-image-base 
+  PLATFORM_LIB_FLAGS =-shared -L/usr/lib/python$(PYTHON_VERSION)/config -L/$(PYDIR)/config -lstdc++ -lpython$(PYTHON_VERSION)
+else 
+ifeq ($(findstring darwin, $(OSTYPE)), darwin)
+  PLATFORM_FLAGS=-fPIC
+  PLATFORM_CC_FLAGS=-bundle
+  SHARED_OBJECT=_TOSSIMmodule.so
+  PLATFORM_BUILD_FLAGS=-flat_namespace -undefined suppress 
+  PLATFORM_LIB_FLAGS = -lstdc++ 
+else # linux
+  PLATFORM_FLAGS=-shared -fPIC
+  SHARED_OBJECT=_TOSSIMmodule.so
+  PLATFORM_LIB_FLAGS = -lstdc++ 
+  PLATFORM_BUILD_FLAGS= -shared -fPIC
+endif
+endif
+endif
+ 
+BUILD_DEPS = sim-exe
+
+# lib/tossim has to come at the end in order to ensure basic TOSSIM
+# implementations are the last resort, so put it directly in the call
+
+sim-exe: builddir $(BUILD_EXTRA_DEPS) FORCE
+	@echo "  placing object files in $(BUILDDIR)"
+	@echo "  writing XML schema to $(XML)"
+	@echo "  compiling $(COMPONENT) to object file sim.o"
+	$(NCC) -c $(PLATFORM_FLAGS) -o $(OBJFILE) $(OPTFLAGS) $(PFLAGS) $(CFLAGS) $(WFLAGS) $(COMPONENT).nc $(LDFLAGS)  $(DUMPTYPES) -fnesc-dumpfile=$(XML)
+
+	@echo "  compiling Python support and C libraries into pytossim.o, tossim.o, and c-support.o"
+	$(GPP) -c $(PLATFORM_CC_FLAGS) $(PLATFORM_FLAGS) -o $(PYOBJFILE) $(OPTFLAGS) $(CFLAGS) $(PYFILE) -I$(PYDIR) -I$(SIM_DIR) -I$(SIMDIR) -I$(SIM_ENERGY_DIR) -DHAVE_CONFIG_H 
+	$(GPP) -c $(PLATFORM_CC_FLAGS) $(PLATFORM_FLAGS) -o $(CXXOBJFILE) $(OPTFLAGS) $(CFLAGS) $(CXXFILE) -I$(PYDIR) -I$(SIM_DIR) -I$(SIMDIR) -I$(SIM_ENERGY_DIR) 
+	$(GPP) -c $(PLATFORM_CC_FLAGS) $(PLATFORM_FLAGS) -o $(HASHOBJFILE) $(OPTFLAGS) $(CFLAGS) $(HASHFILE) -I$(PYDIR) -I$(SIM_DIR) -I$(SIMDIR) -I$(SIM_ENERGY_DIR) 
+	
+	@echo "  compiling energy estimator support into cee.o"
+	$(GPP) -c $(PLATFORM_CC_FLAGS) $(PLATFORM_FLAGS) -o $(CEEOBJFILE) $(OPTFLAGS) $(CFLAGS) $(SIM_ENERGY_FLAGS) $(CEEFILE) -I$(PYDIR)  -I$(SIMDIR)
+	
+	@echo "  linking into shared object ./$(SHARED_OBJECT)"
+	$(GPP) $(PLATFORM_BUILD_FLAGS) $(PLATFORM_CC_FLAGS) $(PYOBJFILE) $(OBJFILE) $(CXXOBJFILE) $(HASHOBJFILE) $(CEEOBJFILE) $(PLATFORM_LIB_FLAGS) $(LIBS) -o $(SHARED_OBJECT)
+
+	@echo "  copying Python script interface TOSSIM.py from $(TOSCONTRIB)/cedt/tos/lib/tossim to local directory"
+	@cp $(SIM_DIR)/TOSSIM.py .
+	@echo " "
+	@echo "*** Successfully built $(PLATFORM) TOSSIM library. "
+

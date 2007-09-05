@@ -56,6 +56,11 @@ enum {
   CHANNEL_GND        = 31,
 //  ATM128_ADC_PRESCALE = ATM128_ADC_PRESCALE_64,  // normal mica2 prescaler value
   ATM128_TIMER0_TICKSPPS = 32768,
+  //port mapping of Leds connected to ATM128 microcontroller.
+  LED_PORTA = 27,
+  LED_PORTA_1 = 0, //led 0 connected to pinA1
+  LED_PORTA_2 = 1, //led 1 connected to pinA2
+  LED_PORTA_3 = 2, //led 2 connected to pinA3
 };
 
 

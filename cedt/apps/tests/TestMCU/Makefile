@@ -1,0 +1,4 @@
+COMPONENT=TestMCUAppC
+
+include $(MAKERULES)
+

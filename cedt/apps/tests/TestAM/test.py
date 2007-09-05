@@ -4,6 +4,7 @@ import sys
 
 t = Tossim([])
 r = t.radio()
+ee = t.newEnergyEstimator();
 f = open("topo.txt", "r")
 
 lines = f.readlines()
@@ -49,6 +50,9 @@ time = t.time();
 
 while(time+1*10*t.ticksPerSecond() > t.time()) :
     t.runNextEvent()
+
+for i in range (0,5):
+	ee.getNodeEnergy(i);
 
 print "Completed simulation for",t.time()/t.ticksPerSecond(),"sec." 
 

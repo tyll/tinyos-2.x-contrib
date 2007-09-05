@@ -1,0 +1,50 @@
+/**
+ * "Copyright (c) 2007 CENTRE FOR ELECTRONICS AND DESIGN TECHNOLOGY,IISc.
+ *  All rights reserved.
+ *
+ * Permission to use, copy, modify, and distribute this software and
+ * its documentation for any purpose, without fee, and without written
+ * agreement is hereby granted, provided that the above copyright
+ * notice, the following two paragraphs and the author appear in all
+ * copies of this software.
+ *
+ * IN NO EVENT SHALL CENTRE FOR ELECTRONICS AND DESIGN TECHNOLOGY,IISc BE LIABLE TO
+ * ANY PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES
+ * ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN
+ * IF CENTRE FOR ELECTRONICS AND DESIGN TECHNOLOGY,IISc HAS BEEN ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ * CENTRE FOR ELECTRONICS AND DESIGN TECHNOLOGY,IISc SPECIFICALLY DISCLAIMS
+ * ANY WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.  THE SOFTWARE
+ * PROVIDED HEREUNDER IS ON AN "AS IS" BASIS, AND CENTRE FOR ELECTRONICS
+ * AND DESIGN TECHNOLOGY,IISc HAS NO OBLIGATION TO PROVIDE MAINTENANCE,
+ * SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS."
+ *
+ */
+ 
+/**
+ *
+ * @author Venkatesh S
+ * @author Prabhakar T V
+ */
+
+#ifndef ATMEGA128POWER_H
+#define ATMEGA128POWER_H
+
+//used for energy computation of the MCU
+#define MCU_POWER_IDLE_CURRENT 0.0033  //3.3 mA
+#define MCU_POWER_ADC_NR_CURRENT 0.001 //1 mA
+#define MCU_POWER_EXT_STANDBY_CURRENT 0.000243 //243 uA
+#define MCU_POWER_SAVE_CURRENT 0.000124  //124 uA
+#define MCU_POWER_STANDBY_CURRENT 0.000237 //237 uA
+#define MCU_POWER_DOWN_CURRENT 0.000116  //116 uA
+#define MCU_POWER_ON_CURRENT 1 //  0.0076 //7.6 mA
+
+//predefine the voltage to a average value (3 + 2.5)/2
+#define VOLTAGE 3
+
+//other peripheral
+#define LED_CURRENT 0.0022
+
+#endif

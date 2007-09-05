@@ -29,25 +29,13 @@
  * @author Prabhakar T V
  */
 
-#ifndef SIM_CHANNEL_H
-#define SIM_CHANNEL_H
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-typedef struct sim_channel_t {
-  bool channel;
-  int nodeId;
-}sim_channel_t;
-
-void sim_channel_init();
-void sim_channel_acquire();
-bool sim_channel_get();
-void sim_channel_release();
-
-#ifdef __cplusplus
+configuration CC1000SimEnergyEstimatorC {
+  provides interface CC1000SimEnergyEstimator;
 }
-#endif
 
-#endif
+implementation {
+
+  components CC1000SimEnergyEstimatorP;
+  CC1000SimEnergyEstimator = CC1000SimEnergyEstimatorP;
+
+}

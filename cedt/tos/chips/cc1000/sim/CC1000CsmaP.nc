@@ -585,6 +585,7 @@ implementation
       plen = 6;
     else
       plen = ((s * 614UL) >> 8) + 22; /* ~ s * 2.4 + 22 */
+    dbg("CC1000CsmaP","Preamble Length set to %d\n",plen);
     call ByteRadio.setPreambleLength(plen);
   }
 }

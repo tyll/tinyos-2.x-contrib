@@ -29,25 +29,14 @@
  * @author Prabhakar T V
  */
 
-#ifndef SIM_CHANNEL_H
-#define SIM_CHANNEL_H
+interface CC1000SimEnergyEstimator {
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+  async command void crysOscEnergy(sim_time_t diff);
+  async command void crysOscBiasEnergy(sim_time_t diff);
+  async command void crysOscBiasSynEnergy(sim_time_t diff);
+  async command void rxEnergy(sim_time_t diff);  
+  async command void txEnergy(uint8_t bytes,float current,uint32_t baudrate);
+  async command void rxPacketEnergy(uint8_t bytes, float current, uint32_t baudrate);
 
-typedef struct sim_channel_t {
-  bool channel;
-  int nodeId;
-}sim_channel_t;
 
-void sim_channel_init();
-void sim_channel_acquire();
-bool sim_channel_get();
-void sim_channel_release();
-
-#ifdef __cplusplus
 }
-#endif
-
-#endif

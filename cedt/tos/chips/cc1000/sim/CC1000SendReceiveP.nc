@@ -610,8 +610,7 @@ implementation
     if (f.invert)
       data = ~data;
   
-//    dbg("CC1000SendReceiveP","SPI data %hhx \n",data,sim_time_string());
-//    printState();
+    //printState();
     switch (radioState)
       {
       default: break;

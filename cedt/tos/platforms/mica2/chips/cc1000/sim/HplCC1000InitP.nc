@@ -52,9 +52,8 @@ implementation {
   HplCC1000SpiP.SpiMosi -> IO.PortB2;
   HplCC1000SpiP.OC1C -> IO.PortB7;
   
-  //components SimPowerManagementC;
-  //HplCC1000SpiP.HplCC1000 -> HplCC1000P;
-  //added by venky
-  //HplCC1000SpiP.SimPowerControl -> SimPowerManagementC;
-  
+  //added by venky  
+  components CC1000SimEnergyEstimatorC;
+  HplCC1000SpiP.CC1000SimEnergyEstimator -> CC1000SimEnergyEstimatorC;
+  HplCC1000P.CC1000SimEnergyEstimator -> CC1000SimEnergyEstimatorC;
 }

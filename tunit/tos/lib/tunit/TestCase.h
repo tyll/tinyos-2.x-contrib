@@ -59,8 +59,8 @@ static void assertFail(char *failMsg);
  * Assert expected == actual
  */
 #define assertEquals(msg, expected, actual)\
-  if (expected != actual) {\
-    assertEqualsFailed(msg, (uint32_t) expected, (uint32_t) actual);\
+  if ((expected) != (actual)) {\
+    assertEqualsFailed(msg, ((uint32_t) expected), ((uint32_t) actual));\
   } else {\
     assertSuccess();\
   }
@@ -69,8 +69,8 @@ static void assertFail(char *failMsg);
  * Assert expected != actual
  */
 #define assertNotEquals(msg, expected, actual)\
-  if (expected == actual) {\
-    assertNotEqualsFailed(msg, (uint32_t) actual);\
+  if ((expected) == (actual)) {\
+    assertNotEqualsFailed(msg, ((uint32_t) actual));\
   } else {\
     assertSuccess();\
   }
@@ -79,8 +79,8 @@ static void assertFail(char *failMsg);
  * Assert upperbound > actual
  */
 #define assertResultIsBelow(msg, upperbound, actual)\
-  if (upperbound <= actual) {\
-    assertResultIsBelowFailed(msg, (uint32_t) upperbound, (uint32_t) actual);\
+  if ((upperbound) <= (actual)) {\
+    assertResultIsBelowFailed(msg, ((uint32_t) upperbound), ((uint32_t) actual));\
   } else {\
     assertSuccess();\
   } 
@@ -89,8 +89,8 @@ static void assertFail(char *failMsg);
  * Assert lowerbound < actual
  */
 #define assertResultIsAbove(msg, lowerbound, actual)\
-  if (lowerbound >= actual) {\
-    assertResultIsAboveFailed(msg, (uint32_t) lowerbound, (uint32_t) actual);\
+  if ((lowerbound) >= (actual)) {\
+    assertResultIsAboveFailed(msg, ((uint32_t) lowerbound), ((uint32_t) actual));\
   } else {\
     assertSuccess();\
   } 
@@ -99,13 +99,13 @@ static void assertFail(char *failMsg);
  * Assert array1 === array2
  */
 #define assertCompares(msg, array1, array2, size)\
-  assertEquals(msg, 0, memcmp(array1, array2, size))
+  assertEquals(msg, 0, memcmp((array1), (array2), size))
 
 /**
  * Assert condition == TRUE
  */
 #define assertTrue(message, condition)\
-  if(!condition) {\
+  if(!(condition)) {\
     assertFail(message);\
   } else {\
     assertSuccess();\
@@ -115,7 +115,7 @@ static void assertFail(char *failMsg);
  * Assert condition == FALSE
  */
 #define assertFalse(message, condition)\
-  if(condition) {\
+  if((condition)) {\
     assertFail(message);\
   } else {\
     assertSuccess();\
@@ -125,7 +125,7 @@ static void assertFail(char *failMsg);
  * Assert pointer == NULL
  */
 #define assertNull(pointer)\
-  if(pointer != NULL) {\
+  if((pointer) != NULL) {\
     assertFail(#pointer " was not null.");\
   } else {\
     assertSuccess();\
@@ -135,7 +135,7 @@ static void assertFail(char *failMsg);
  * Assert pointer != NULL
  */
 #define assertNotNull(pointer)\
-  if(pointer == NULL) {\
+  if((pointer) == NULL) {\
     assertFail(#pointer " was null");\
   } else {\
     assertSuccess();\

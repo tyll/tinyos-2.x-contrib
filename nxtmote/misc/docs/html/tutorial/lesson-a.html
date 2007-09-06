@@ -12,7 +12,7 @@
 <p>This lesson describe the steps that are involved when setting up the TinyOS 2.0 toolchain for nxtmote. Nxtmote is runs on an ARM MCU. Accordingly, it is necessary to install the ARM toolchain on your PC. There are good commercial compilers available, but in this tutorial the open source compiler gcc is used. Upon successful installation, we end up with a compiler that can be invoked with <code>arm-elf-gcc</code> from the command line.</p>
 
 <h1>Prerequisite: Install TinyOS Environment</h1>
-As a prerequiThe TinyOS 2.0 build environment needs to be installed. There is a good description available, which is named <a href="http://www.tinyos.net/tinyos-2.x/doc/html/install-tinyos.html">Installing TinyOS 2.0</a>. Step 3 in that documentation concerns the native compilers. It can be skipped because we just need the compiler for the arm target.
+The TinyOS 2.0 build environment needs to be installed. There is a good description available, which is named <a href="http://www.tinyos.net/tinyos-2.x/doc/html/install-tinyos.html">Installing TinyOS 2.0</a>. Step 3 in that documentation concerns the native compilers. It can be skipped because we just need the compiler for the arm target.
 
 <h1>Install ARM-ELF GCC Toolchain for nxtmote</h1>
 
@@ -88,6 +88,12 @@ $ rpm -Uvh usr/src/rpm/RPMS/i386/arm-elf-gcc-4.1.2-1.i386.rpm
 </pre>
 
 <p>The arm-elf-gcc RPM depends on the arm-elf-binutils package, so we are installing it before building the arm-elf-gcc package.</p>
+
+<h2>MAC Users</h2>
+There are ready-to-install packages at <a href="http://darwinports.com/">http://darwinports.com</a>. To install use
+<pre>
+'sudo port install arm-elf-binutils'.
+</pre>
 
 <h1>Compiling nxtmote Source Code</h1>
 
@@ -375,10 +381,21 @@ Cstartup.o  app.c  main.exe  main.hex  nxtmote.bin
 
 <p>The nxtmote is now running on NXT and the build environment is set up.</p>
 
+<h2>Debugging</h2>
+<p>There is a small utility named <code>togglepin(0)</code>, which can turn off the Blink sensor when it reaches this function. The function is defined in <code>hardware.h</code>. The Blink sensor is turned on by default, so turning it off will show that the a certain point in the code has been reached.
+<p>The display is also useful for debugging using code like this:</p>
+<pre>
+uint8_t str[100];
+sprintf(str,"NXTMOTE was here!");
+call HalLCD.displayString(str,0);
+togglepin(0);
+</pre>
+
 <h1>Related Documentation</h1>
 </a>
 <ul>
 <li><a href="http://www.atmel.com/dyn/resources/prod_documents/doc6175.pdf">ARM AT91</a>: the comprehensive description of the AT91SAM7S256 MCU from Atmel</li>
+<li><a href="http://www.pacificdisplay.com/ics_app%20notes/ultra-chip/UC1606.pdf">Ultra Chip Documentation</a>: for UC1606 (close to UC1601)</li>
 <li><a href="http://code.google.com/p/libnxt/">libnxt</a>: utility program for nxtmote flash programming</li>
 <li><a href="http://libusb.sourceforge.net">libusb</a> and <a href="http://libusb-win32.sourceforge.net/">libusb-win32</a>: library to access USB devices</li>
 <li><a href="http://mindstorms.lego.com/Overview/NXTreme.aspx">LEGO MINDSTORMS NXT</a>: LEGO's open source software and hardware schematics</li>

@@ -23,7 +23,7 @@ implementation{
 uint32_t TmpReset;
 
     AT91PS_PMC     pPMC = AT91C_BASE_PMC;
-
+//togglepin(0);
     //* Set Flash Waite sate
     //  Single Cycle Access at Up to 30 MHz, or 40
     //  if MCK = 47923200 I have 72 Cycle for 1,5 usecond ( flied MC_FMR->FMCN

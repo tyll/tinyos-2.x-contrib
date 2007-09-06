@@ -10,6 +10,8 @@ push( @includes, qw(
   %T/chips/at91/gpio
   %T/chips/at91/timer
   %T/chips/at91/i2c
+  %T/chips/uc1601
+  %T/chips/at91/spi
   %T/lib/timer
   %T/lib/serial
 

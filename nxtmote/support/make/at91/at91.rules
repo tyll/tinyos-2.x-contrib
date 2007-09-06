@@ -85,7 +85,7 @@ hex: FORCE
 #--change-start=0x100000  --pad-to=0x200000
 
 bytes: FORCE
-	@objdump -h $(MAIN_EXE) | perl -ne '$$b{$$1}=hex $$2 if /^\s*\d+\s*\.(text|data|bss)\s+(\S+)/; END { printf("%16d bytes in ROM\n%16d bytes in RAM\n",$$b{text}+$$b{data},$$b{data}+$$b{bss}); }'
+	@arm-elf-objdump -h $(MAIN_EXE) | perl -ne '$$b{$$1}=hex $$2 if /^\s*\d+\s*\.(text|data|bss)\s+(\S+)/; END { printf("%16d bytes in ROM\n%16d bytes in RAM\n",$$b{text}+$$b{data},$$b{data}+$$b{bss}); }'
 
 asms: 
 	$(CC) -c -mcpu=arm7tdmi -I. -Wa,-adhlns=Cstartup.lst,--gdwarf-2 -x assembler-with-cpp $(ASSEMBLY_FILES) -o $(BUILDDIR)/Cstartup.o 

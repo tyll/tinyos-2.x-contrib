@@ -136,7 +136,7 @@ implementation
       if (mCurFlags & I2C_STOP) {
 	//call I2C.setTWICR(AT91C_TWI_STOP);
 	//*AT91C_TWI_CR = AT91C_TWI_STOP; //because it is not in the interrupthandler
-//{togglepin(0);}	  
+
       }
       
     }

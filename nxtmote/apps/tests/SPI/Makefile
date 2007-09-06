@@ -1,0 +1,2 @@
+COMPONENT=TestSPIC
+include $(MAKERULES)

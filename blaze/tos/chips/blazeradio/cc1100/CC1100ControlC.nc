@@ -2,14 +2,14 @@
 #include "Blaze.h"
 #include "IEEE802154.h"
 #include "BlazeControl.h"
-#include "CC2500.h"
+#include "CC1100.h"
 
 /**
  * @author Jared Hill
  * @author David Moss
  */
  
-configuration CC2500ControlC {
+configuration CC1100ControlC {
 
   provides {
     interface SplitControl;
@@ -22,18 +22,18 @@ configuration CC2500ControlC {
 
 implementation {
 
-  components CC2500InitC;
-  BlazePower = CC2500InitC;
+  components CC1100InitC;
+  BlazePower = CC1100InitC;
     
   components BlazeControlC;
-  SplitControl = BlazeControlC.SplitControl[ CC2500_RADIO_ID ];
-  Rssi = BlazeControlC.Rssi[ CC2500_RADIO_ID ];
+  SplitControl = BlazeControlC.SplitControl[ CC1100_RADIO_ID ];
+  Rssi = BlazeControlC.Rssi[ CC1100_RADIO_ID ];
 
-  components HplCC2500PinsC as Pins;
-  BlazeControlC.Csn[ CC2500_RADIO_ID ] -> Pins.Csn;
+  components HplCC1100PinsC as Pins;
+  BlazeControlC.Csn[ CC1100_RADIO_ID ] -> Pins.Csn;
   
   components new StateC();
-  BlazeControlC.State[ CC2500_RADIO_ID ] -> StateC;
+  BlazeControlC.State[ CC1100_RADIO_ID ] -> StateC;
   RadioState = StateC;
   
 }

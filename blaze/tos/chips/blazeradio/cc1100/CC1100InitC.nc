@@ -1,18 +1,18 @@
 
 #include "Blaze.h"
 #include "BlazeInit.h"
-#include "CC2500.h"
+#include "CC1100.h"
 
 /**
- * This configuration is responsible for wiring in the CC2500 pins to the 
- * main BlazeInitC component, and provides default values for the CC2500 
+ * This configuration is responsible for wiring in the CC1100 pins to the 
+ * main BlazeInitC component, and provides default values for the CC1100 
  * registers.
  * 
  * @author Jared Hill
  * @author David Moss
  */
 
-configuration CC2500InitC {
+configuration CC1100InitC {
   provides {
     interface BlazePower;
   }
@@ -21,32 +21,32 @@ configuration CC2500InitC {
 implementation {
   
   components MainC,
-      CC2500InitP,
-      HplCC2500PinsC as Pins;
+      CC1100InitP,
+      HplCC1100PinsC as Pins;
       
-  MainC.SoftwareInit -> CC2500InitP;
+  MainC.SoftwareInit -> CC1100InitP;
   
-  CC2500InitP.Csn -> Pins.Csn;
-  CC2500InitP.Power -> Pins.Power;
-  CC2500InitP.Gdo0_io -> Pins.Gdo0_io;
-  CC2500InitP.Gdo2_io -> Pins.Gdo2_io;
+  CC1100InitP.Csn -> Pins.Csn;
+  CC1100InitP.Power -> Pins.Power;
+  CC1100InitP.Gdo0_io -> Pins.Gdo0_io;
+  CC1100InitP.Gdo2_io -> Pins.Gdo2_io;
  
   components BlazeInitC;
-  BlazePower = BlazeInitC.BlazePower[ CC2500_RADIO_ID ];
-  BlazeInitC.Csn[ CC2500_RADIO_ID ] -> Pins.Csn;
-  BlazeInitC.Power[ CC2500_RADIO_ID ] -> Pins.Power;
-  BlazeInitC.BlazeRegSettings[ CC2500_RADIO_ID ] -> CC2500InitP;
-  BlazeInitC.Gdo0_io[ CC2500_RADIO_ID ] -> Pins.Gdo0_io;
-  BlazeInitC.Gdo2_io[ CC2500_RADIO_ID ] -> Pins.Gdo2_io;
+  BlazePower = BlazeInitC.BlazePower[ CC1100_RADIO_ID ];
+  BlazeInitC.Csn[ CC1100_RADIO_ID ] -> Pins.Csn;
+  BlazeInitC.Power[ CC1100_RADIO_ID ] -> Pins.Power;
+  BlazeInitC.BlazeRegSettings[ CC1100_RADIO_ID ] -> CC1100InitP;
+  BlazeInitC.Gdo0_io[ CC1100_RADIO_ID ] -> Pins.Gdo0_io;
+  BlazeInitC.Gdo2_io[ CC1100_RADIO_ID ] -> Pins.Gdo2_io;
   
   components BlazeTransmitC;
-  BlazeTransmitC.Csn[ CC2500_RADIO_ID ] -> Pins.Csn;
+  BlazeTransmitC.Csn[ CC1100_RADIO_ID ] -> Pins.Csn;
   
   components BlazeReceiveC;
-  BlazeReceiveC.Csn[ CC2500_RADIO_ID ] -> Pins.Csn;
+  BlazeReceiveC.Csn[ CC1100_RADIO_ID ] -> Pins.Csn;
   
   components LedsC;
-  CC2500InitP.Leds -> LedsC;
+  CC1100InitP.Leds -> LedsC;
   
 }
 

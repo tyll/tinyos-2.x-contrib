@@ -1,9 +1,17 @@
 /**
  * @author Jared Hill
+ * @author David Moss
  */
  
 #ifndef CC1100_H
 #define CC1100_H
+
+#include "Blaze.h"
+
+enum {
+  CC1100_RADIO_ID = unique( UQ_BLAZE_RADIO ),
+};
+
 
 enum cc1100_config_reg_state_enums {
 

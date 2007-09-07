@@ -1,0 +1,2 @@
+COMPONENT=ContinuousTransmitC
+include $(MAKERULES)

@@ -1,16 +1,93 @@
-<html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-   <title>Index Placeholder</title>
-</head>
-<body TEXT="#000000" BGCOLOR="#FFFFFF" LINK="#0000EF" VLINK="#55188A" ALINK="#FF0000">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Project Blaze :: TinyOS</title>
+<style type="text/css">
+<!--
+body {
+	margin-left: 0px;
+	margin-top: 0px;
+}
+.style2 {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 18px;
+	font-weight: bold;
+}
+.style3 {font-size: 18px; font-family: Verdana, Arial, Helvetica, sans-serif;}
+.style7 {
+	font-size: 14;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-weight: bold;
+}
+.style9 {font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 16px;}
+.style12 {
+	font-size: 14;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+}
+.style13 {font-weight: bold; font-family: Verdana, Arial, Helvetica, sans-serif;}
+.style15 {font-size: 14px; font-family: Verdana, Arial, Helvetica, sans-serif; }
+-->
+</style></head>
 
-<img src="http://www.tinyos.net/scoop/images/tos-jwall.jpg"></img>
-
-<h1>Index Placeholder</h1>
-
-<p>
-This file is a placeholder for your personal index file.  It is linked to from your entry in the main index file found in <i>tinyos-2.x-contrib/index.html</i>.  It should be used to document any projects contained in this directory.  Please update it as appropriate. 
-</p>
-
+<body>
+<div align="center">
+  <p><img src="cc2500.gif" alt="http://www.tdc.co.uk/datasite/wireless/lp_rf_zigbee/_images/cc2500.gif" /></p>
+  <p class="style2">Project Blaze</p>
+  <p class="style3">CC1100 and CC2500 Dual Radio Stack Development</p>
+  <p class="style2">&nbsp;</p>
+  <table width="640" border="0" cellspacing="0" cellpadding="0">
+    <tr>
+      <td><table width="100%" border="1" cellpadding="0" cellspacing="0" bordercolor="#000000">
+        <tr>
+          <td><p align="center" class="style9">&nbsp;</p>
+            <p align="center" class="style9">There are many compelling reasons for moving to the<br />
+              <a href="http://focus.ti.com/docs/prod/folders/print/cc1100.html">CC1100</a> / <a href="http://focus.ti.com/docs/prod/folders/print/cc1101.html">CC1101</a> / <a href="http://focus.ti.com/docs/prod/folders/print/cc2500.html">CC2500</a> radios.</p>
+            <p align="center" class="style9">We are spearheading this effort by creating a software radio stack capable of supporting both single- and dual-radio platforms. This software is dubbed the &quot;Blaze&quot; radio stack.</p>
+            <p align="center" class="style12">If you would like to help with this development or have a platform that features CC1100 or CC2500 radios, please contact David Moss at <strong>dmm <em>at</em> rincon<em> dot</em> com</strong>.</p>
+            <p align="center" class="style12">&nbsp;</p></td>
+        </tr>
+      </table>
+      <p align="center" class="style9">&nbsp;</p>
+      <p align="center" class="style12">These new TI/Chipcon radios offer significant advantages over the  archaic designs of the CC1000 and CC2420. Below is a comparison.</p>
+        <table width="80%" border="0" align="center" cellpadding="0" cellspacing="0">
+          <tr>
+            <td bgcolor="#EEEEEE"><p align="center" class="style7">1. Software and Pin Compatibility</p>
+              <p align="center" class="style12">The CC1100 and CC2500 radios are completely software driver and pin compatible. We can reach 315 MHz, 433 MHz, 900 MHz, and 2.4 GHz by only replacing the chip and its matching network. Everything else, including software, stays the same. </p>
+              <p align="center" class="style12">We can run two radios using one software stack.</p>
+              <p align="center" class="style7">&nbsp;</p>
+              <p align="center" class="style7">2. Power Consumption</p>
+              <p align="center" class="style12">The CC1100 and CC2500 support a hardware-driven low power listening implementation, or Wake-on-Radio (WoR). Your microcontroller can remain in the deepest sleep possible while the radio takes care of its own duty cycling.</p>
+              <p align="center" class="style12">Our Blaze Radio stack will also support platforms that feature a power pin to the radios. Instead of putting the radio into a deep sleep mode, we can  completely shut it off to the tune of 5 nanoamps.</p>
+              <p align="center" class="style12">&nbsp;</p>
+              <p align="center" class="style12"><span class="style13">3. Throughput</span></p>
+              <p align="center" class="style12">The CC1100 and CC2500 are capable of communicating at 500 kbps maximum.</p>
+              <p align="center" class="style12">Compare that to the CC2420 which reaches a maximum of 250 kbps, or the CC1000 which exhibits a lazy 76.8 kbps.</p>
+              <p align="center" class="style12">The faster you communicate, the less time your radio has to be consuming power to get messages through your network.</p>
+              <p align="center" class="style12">Finally, these radios also support Forward Error Correction (FEC) and data whitening.</p>
+              <p>&nbsp;</p>
+              <p align="center" class="style12"><span class="style13">4. Modulation Techniques</span></p>
+              <p align="center" class="style12">The CC2420 only supports DSSS. The CC1000 only supports FSK and OOK.</p>
+              <p align="center" class="style12">The CC1100 and CC2500 radios support FSK, OOK, MSK, and GFSK, giving you more options to choose from. </p>
+              <p align="center" class="style12">Plus, with everyone using DSSS in the 2.4 GHz spectrum, the CC2500 has room to grow. DSSS is no longer a limitation.</p>
+              <p>&nbsp;</p>
+              <p align="center" class="style12"><span class="style13">5. Packaging</span></p>
+              <p align="center" class="style12">The CC1100 and CC2500 come in a 4 mm x 4 mm package.</p>
+              <p align="center" class="style12">Something that size is ridiculously small in comparison to the CC2420 and CC1000 radios.</p>
+            <p align="center" class="style12"></p></td>
+          </tr>
+        </table>
+        <div align="center"></div>
+        <p align="center" class="style12">&nbsp;</p>
+        <p align="center" class="style2">Development</p>
+        <p align="center" class="style12"><span class="style15">Development so far has taken place on hacked up <a href="http://www.moteiv.com">TMotes</a>. We have obtained some CC1100EM and CC2500EM evaluation modules and wired them by hand to our nodes, calling it a &quot;tmote blaze&quot;. This gives us a stable platform on which to build and test our software radio drivers.</span></p>
+        <p align="center" class="style15">Development has proceeded through a continuous integration process, where unit tests are written using <a href="http://tinyos.cvs.sourceforge.net/*checkout*/tinyos/tinyos-2.x-contrib/tunit/index.html">TUnit</a> to verify code integrity running on actual hardware. This has proven to be an invaluable tool to the development process, and the quality and robustness of our code reflects it.</p>
+        <p align="center" class="style15">All code is available under the BSD license found <a href="license.txt">here</a>.</p>
+      </td>
+    </tr>
+  </table>
+  <p class="style7">&nbsp;</p>
+  <p class="style12">&nbsp;</p>
+</div>
 </body>
 </html>

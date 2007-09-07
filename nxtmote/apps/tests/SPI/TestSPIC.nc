@@ -41,5 +41,6 @@ implementation {
   components MainC, TestSPIM, HalLCDC;
   
   TestSPIM        -> MainC.Boot;
+  
   TestSPIM.HalLCD -> HalLCDC.HalLCD;
 }

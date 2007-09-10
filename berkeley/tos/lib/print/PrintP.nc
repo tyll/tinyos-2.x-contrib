@@ -44,7 +44,7 @@ module PrintP {
 }
 implementation {
 
-  uint8_t m_state = S_FREE;
+  uint8_t m_state;
   uint8_t m_buf[PRINT_BUF_SIZE];
 
   error_t print_rsvp() __attribute__((C)) {
@@ -77,11 +77,12 @@ implementation {
   }
 
   event void Boot.booted() {
+    atomic m_state = S_FREE;
     call UartControl.start();
   }
 
   async event void UartStream.sendDone(uint8_t* buf, uint16_t len, error_t e) {
-    m_state = S_FREE;
+    atomic m_state = S_FREE;
   }
 
   async event void UartStream.receivedByte(uint8_t byte) {

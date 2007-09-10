@@ -32,6 +32,7 @@
  */
 #ifndef PRINT_H
 #define PRINT_H
+#include <stdio.h>
 #include <stdarg.h>
 
 enum {
@@ -54,51 +55,22 @@ error_t print_spool(uint8_t *buf, uint16_t len);
  *         FAIL    if the call failed for an indeterminate reason.
  */
 error_t print(const char *fmt, ...) {
-  char *s;
-  const char *p;
-  int i;
-  uint16_t len = 0;
   error_t rval;
-  uint8_t buf[PRINT_BUF_SIZE];
+  char buf[PRINT_BUF_SIZE];
+  int len = 0;
   va_list ap;
 
   if (print_rsvp() == SUCCESS) {
     va_start(ap, fmt);
-    p = fmt;
-    while(*p != '\0') {
-      if (*p != '%') {
-        buf[len++] = *p;
-      }
-      else {
-        switch(*(++p)) {
-        case 'c':
-          i = va_arg(ap, int);
-          buf[len++] = i;
-          break;
-        case 'd':
-          i = va_arg(ap, int);
-          s = itoa(i, &buf[len], 10);
-          len += strlen(s);
-          break;
-        case 's':
-          s = va_arg(ap, char*);
-          strcpy(&buf[len], s);
-          len += strlen(s);
-	  break;
-        case 'x':
-          i = va_arg(ap, int);
-          s = itoa(i, &buf[len], 16);
-          len += strlen(s);
-          break;
-        case '%':
-          buf[len++] = '%';
-          break;
-        }
-      }
-      p++;
-    }
+    len = vsnprintf(buf, PRINT_BUF_SIZE, fmt, ap);
     va_end(ap);
-    rval = print_spool(buf, len);
+    if (len > -1 && len < PRINT_BUF_SIZE) {
+      // Fits in the buffer
+    }
+    else {
+      // Will get truncated
+    }
+    rval = print_spool((uint8_t*)buf, len);
   }
   else {
     rval = EBUSY;

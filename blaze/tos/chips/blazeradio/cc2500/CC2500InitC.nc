@@ -22,6 +22,7 @@ implementation {
   
   components MainC,
       CC2500InitP,
+      ActiveMessageAddressC,
       HplCC2500PinsC as Pins;
       
   MainC.SoftwareInit -> CC2500InitP;
@@ -30,7 +31,8 @@ implementation {
   CC2500InitP.Power -> Pins.Power;
   CC2500InitP.Gdo0_io -> Pins.Gdo0_io;
   CC2500InitP.Gdo2_io -> Pins.Gdo2_io;
- 
+  CC2500InitP.ActiveMessageAddress -> ActiveMessageAddressC;
+  
   components BlazeInitC;
   BlazePower = BlazeInitC.BlazePower[ CC2500_RADIO_ID ];
   BlazeInitC.Csn[ CC2500_RADIO_ID ] -> Pins.Csn;

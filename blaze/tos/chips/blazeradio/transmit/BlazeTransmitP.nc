@@ -16,25 +16,30 @@
 
 module BlazeTransmitP {
 
-  provides interface AsyncSend[ radio_id_t id ];
+  provides {
+    interface AsyncSend[ radio_id_t id ];
+  }
   
-  uses interface GeneralIO as Csn[ radio_id_t id ];
+  uses {
+    interface GeneralIO as Csn[ radio_id_t id ];
+    interface BlazePacketBody;
+   
+    interface BlazeFifo as TXFIFO;
   
-  uses interface BlazeFifo as TXFIFO;
+    interface BlazeStrobe as SNOP;
+    interface BlazeStrobe as STX;
+    interface BlazeStrobe as SFTX;
+    interface BlazeStrobe as SFRX;
+    interface BlazeStrobe as SIDLE;
+    interface BlazeStrobe as SRX;
   
-  uses interface BlazeStrobe as SNOP;
-  uses interface BlazeStrobe as STX;
-  uses interface BlazeStrobe as SFTX;
-  uses interface BlazeStrobe as SFRX;
-  uses interface BlazeStrobe as SIDLE;
-  uses interface BlazeStrobe as SRX;
+    interface BlazeRegister as TxReg;
   
-  uses interface BlazeRegister as TxReg;
-  
-  uses interface CheckRadio;
-  uses interface RadioStatus;
-  
-  uses interface Leds;
+    interface CheckRadio;
+    interface RadioStatus;
+
+    interface Leds;
+  }
 }
 
   
@@ -50,8 +55,7 @@ implementation {
 
   /***************** AsyncSend Commands ****************/
   async command error_t AsyncSend.send[ radio_id_t id ](message_t* msg) {
-    uint8_t txLength = 20; // TODO
-    
+  
     atomic{
       if(m_sending){
         return FAIL;
@@ -71,7 +75,7 @@ implementation {
 
     call Csn.clr[ id ]();
     initSend();
-    call TXFIFO.write((uint8_t *) msg, txLength);
+    call TXFIFO.write((uint8_t *) msg, (call BlazePacketBody.getHeader(msg))->length);
     return SUCCESS;
   }
   

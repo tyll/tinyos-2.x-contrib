@@ -1,8 +1,7 @@
 #ifndef __BLAZE_H__
 #define __BLAZE_H__
 
-#include "AM.h"
-#include "message.h"
+#warning "INCLUDING BLAZE.H"
 
 typedef uint8_t blaze_status_t;
 typedef uint8_t radio_id_t;
@@ -54,9 +53,6 @@ enum {
   
   // size of the footer (FCS field)
   MAC_FOOTER_SIZE = sizeof( uint16_t ),
-  
-  // MDU
-  // MAC_PACKET_SIZE = MAC_HEADER_SIZE + TOSH_DATA_LENGTH + MAC_FOOTER_SIZE,
 };
 
 enum blaze_radio_enums{

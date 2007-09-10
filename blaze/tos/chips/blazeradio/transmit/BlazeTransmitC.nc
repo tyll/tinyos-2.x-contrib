@@ -45,6 +45,9 @@ implementation {
   BlazeTransmitP.SRX -> Spi.SRX;
   BlazeTransmitP.TxReg -> Spi.TXREG;
   
+  components BlazePacketC;
+  BlazeTransmitP.BlazePacketBody -> BlazePacketC;
+  
   components LedsC;
   BlazeTransmitP.Leds -> LedsC;
   

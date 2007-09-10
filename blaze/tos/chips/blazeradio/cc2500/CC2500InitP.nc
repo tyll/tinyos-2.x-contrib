@@ -20,6 +20,7 @@ module CC2500InitP {
     interface GeneralIO as Power;
     interface GeneralIO as Gdo0_io;
     interface GeneralIO as Gdo2_io;
+    interface ActiveMessageAddress;
     interface Leds;
   }
 }
@@ -71,6 +72,9 @@ implementation {
   
   /***************** SoftwareInit Commands ****************/
   command error_t SoftwareInit.init() {
+    // TODO the struct is an nxle. Do we put the MSB's in the ADDR reg?
+    regValues[BLAZE_ADDR] = (call ActiveMessageAddress.amAddress()) >> 8;
+    
     call Csn.makeOutput();
     call Power.makeOutput();
     
@@ -88,4 +92,8 @@ implementation {
     return regValues;
   }
 
+  /***************** ActiveMessageAddress Events ****************/
+  async event void ActiveMessageAddress.changed() {   
+    regValues[BLAZE_ADDR] = (call ActiveMessageAddress.amAddress()) >> 8;
+  }
 }

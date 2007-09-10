@@ -28,6 +28,9 @@ implementation {
   ReceiveController = BlazeReceiveP;
   Csn = BlazeReceiveP.Csn;
   
+  components MainC;
+  MainC.SoftwareInit -> BlazeReceiveP;
+  
   components BlazePacketC,
       BlazeSpiC as Spi;
       

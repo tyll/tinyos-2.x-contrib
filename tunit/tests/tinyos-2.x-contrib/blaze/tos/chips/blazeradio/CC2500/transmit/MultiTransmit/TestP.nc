@@ -54,7 +54,7 @@ implementation {
     }
   }
   
-  async event void AsyncSend.sendDone(message_t* msg, error_t error) {
+  async event void AsyncSend.sendDone(void *msg, error_t error) {
     error_t sendError;
     times++;
     

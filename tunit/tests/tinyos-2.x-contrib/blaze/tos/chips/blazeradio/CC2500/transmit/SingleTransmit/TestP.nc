@@ -52,7 +52,7 @@ implementation {
     }
   }
   
-  async event void AsyncSend.sendDone(message_t* msg, error_t error) {
+  async event void AsyncSend.sendDone(void *msg, error_t error) {
     assertNotNull(msg);
     assertEquals("AsyncSend.sendDone() wasn't SUCCESS", SUCCESS, error);
     call TestTransmit.done();

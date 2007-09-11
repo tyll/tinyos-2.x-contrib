@@ -234,7 +234,7 @@ implementation {
   
   event void ADDR_Test.run() {
     call ADDR.read(&readBuffer);
-    assertEquals("Wrong value", CC2500_CONFIG_ADDR, readBuffer);
+    assertEquals("Wrong value", 0, readBuffer);
     call ADDR_Test.done();
   }
   

@@ -3,8 +3,8 @@
 
 interface AsyncSend {
 
-  async command error_t send(message_t* msg);
+  async command error_t send(void *msg);
   
-  async event void sendDone(message_t* msg, error_t error);
+  async event void sendDone(void *msg, error_t error);
 }
 

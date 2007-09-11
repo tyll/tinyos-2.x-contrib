@@ -19,6 +19,7 @@ configuration BlazeTransmitC {
 
   provides {
     interface AsyncSend[ radio_id_t id ];
+    interface AsyncSend as AckSend[ radio_id_t id ];
   }
   
   uses {
@@ -30,6 +31,8 @@ implementation {
 
   components BlazeTransmitP;
   AsyncSend = BlazeTransmitP.AsyncSend;
+  AckSend = BlazeTransmitP.AckSend;
+  
   Csn = BlazeTransmitP.Csn;
   
   components BlazeSpiC as Spi;
@@ -44,6 +47,9 @@ implementation {
   BlazeTransmitP.SIDLE -> Spi.SIDLE;
   BlazeTransmitP.SRX -> Spi.SRX;
   BlazeTransmitP.TxReg -> Spi.TXREG;
+  
+  components new StateC();
+  BlazeTransmitP.State -> StateC;
   
   components BlazePacketC;
   BlazeTransmitP.BlazePacketBody -> BlazePacketC;

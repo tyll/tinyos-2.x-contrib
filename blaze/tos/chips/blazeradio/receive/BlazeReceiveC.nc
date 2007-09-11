@@ -13,7 +13,7 @@ configuration BlazeReceiveC {
   provides {
     interface Receive[ radio_id_t id ];
     interface ReceiveController[ radio_id_t id ];
-    
+    interface AckReceive;    
   }
   
   uses {
@@ -26,6 +26,7 @@ implementation {
   components BlazeReceiveP;
   Receive = BlazeReceiveP;
   ReceiveController = BlazeReceiveP;
+  AckReceive = BlazeReceiveP;
   Csn = BlazeReceiveP.Csn;
   
   components MainC;
@@ -50,6 +51,9 @@ implementation {
 
   BlazeReceiveP.BlazePacket -> BlazePacketC;
   BlazeReceiveP.BlazePacketBody -> BlazePacketC;
+  
+  components BlazeTransmitC;
+  BlazeReceiveP.AckSend -> BlazeTransmitC.AckSend;
   
   components new StateC();
   BlazeReceiveP.State -> StateC;

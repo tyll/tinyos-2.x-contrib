@@ -8,10 +8,10 @@ typedef uint8_t radio_id_t;
 
 typedef nx_struct blaze_header_t {
   nxle_uint8_t length;
+  nxle_uint16_t dest;
   nxle_uint16_t fcf;
   nxle_uint8_t dsn;
   nxle_uint16_t destpan;
-  nxle_uint16_t dest;
   nxle_uint16_t src;
   nxle_uint8_t type;
 } blaze_header_t;
@@ -35,9 +35,9 @@ typedef nx_struct blaze_metadata_t {
 
 typedef nx_struct blaze_ack_t {
   nxle_uint8_t length;
+  nxle_uint16_t dest;
   nxle_uint16_t fcf;
   nxle_uint8_t dsn;
-  nxle_uint16_t dest;
   nxle_uint16_t src;
 } blaze_ack_t;
 
@@ -53,6 +53,9 @@ enum {
   
   // size of the footer (FCS field)
   MAC_FOOTER_SIZE = sizeof( uint16_t ),
+  
+  // size of the acknowledgement frame, not including the length byte
+  ACK_FRAME_LENGTH = sizeof( blaze_ack_t ) - 1,
 };
 
 enum blaze_radio_enums{

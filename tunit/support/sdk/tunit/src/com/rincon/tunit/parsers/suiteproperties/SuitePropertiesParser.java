@@ -110,6 +110,9 @@ public class SuitePropertiesParser {
         } else if(line.toLowerCase().startsWith("@ignore")) {
           suiteProperties.addIgnore(line.replace("@ignore","").trim());
           
+        } else if(line.toLowerCase().startsWith("@only")) {
+          suiteProperties.addOnlyTarget(line.replace("@only","").trim());
+          
         } else if(line.toLowerCase().startsWith("@skip")) {
           suiteProperties.setSkip(true);
           

@@ -1,14 +1,12 @@
 
 
 /**
- * @author Jared Hill
- */
-
-/**
  * This module assumes it already has full access to the Spi Bus
+ * @author Jared Hill
+ * @author David Moss
  */
  
- #include "Blaze.h"
+#include "Blaze.h"
  
 module BlazeReceiveP {
 
@@ -137,7 +135,11 @@ implementation {
   
   
   /***************** AckSend Events ****************/
-  async event void AckSend.sendDone[ radio_id_t id ](void *msg, error_t error) {
+  async event void AckSend.loadDone[ radio_id_t id ](void *msg, error_t error) {
+    call AckSend.send[id]();
+  }
+  
+  async event void AckSend.sendDone[ radio_id_t id ](error_t error) {
     blaze_header_t *header = call BlazePacketBody.getHeader( m_msg );
     uint8_t rxFrameLength = header->length;
     uint8_t *buf = (uint8_t*) header;
@@ -230,7 +232,7 @@ implementation {
             acknowledgement.dsn = header->dsn;
             acknowledgement.src = call ActiveMessageAddress.amAddress();
   
-            call AckSend.send[ m_id ](&acknowledgement);
+            call AckSend.load[ m_id ](&acknowledgement);
             // Continues at AckSend.sendDone()
             return;
           }
@@ -335,7 +337,7 @@ implementation {
     return; 
   }
   
-  /*************** Defaults ********************/
+  /***************** Defaults ****************/
   default event message_t *Receive.receive[ radio_id_t id ](message_t* msg, void* payload, uint8_t len){
     return msg;
   }
@@ -343,11 +345,16 @@ implementation {
   default async event void ReceiveController.receiveFailed[ radio_id_t id ]() {
   }
   
-  default async command error_t AckSend.send[ radio_id_t id ](void *msg) {
+  default async event void AckReceive.receive( blaze_ack_t *ack ) {
+  }
+  
+    
+  default async command error_t AckSend.load[ radio_id_t id ](void *msg) {
     return FAIL;
   }
   
-  default async event void AckReceive.receive( blaze_ack_t *ack ) {
+  default async command error_t AckSend.send[ radio_id_t id ]() {
+    return FAIL;
   }
   
   default async command void Csn.set[ radio_id_t id ](){}

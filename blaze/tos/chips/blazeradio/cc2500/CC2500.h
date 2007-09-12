@@ -37,7 +37,9 @@ enum cc2500_config_reg_state_enums {
   CC2500_CONFIG_MDMCFG0 = 0xF8,
   CC2500_CONFIG_DEVIATN = 0x00,
   CC2500_CONFIG_MCSM2 = 0x07,
-  CC2500_CONFIG_MCSM1 = 0x30, //Switch RX to TX only if not receiving and channel is clear, Idle after TX/RX
+  
+  /** Switch to TX only on CCA; When done with Tx or Rx, stay in Rx */
+  CC2500_CONFIG_MCSM1 = 0x3F,
   CC2500_CONFIG_MCSM0 = 0x18,
   CC2500_CONFIG_FOCCFG = 0x1D,
   CC2500_CONFIG_BSCFG = 0x1C,

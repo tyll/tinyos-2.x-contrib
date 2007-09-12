@@ -25,6 +25,7 @@ module BlazeInitP {
     interface Init;
     interface SplitControl[ radio_id_t id ];
     interface BlazePower[ radio_id_t id ];
+    interface BlazeCommit;
   }
   
   uses {
@@ -34,10 +35,16 @@ module BlazeInitP {
     interface GeneralIO as Gdo2_io[ radio_id_t id ];
     
     interface BlazeRegSettings[ radio_id_t id ];
-    interface RadioInit;
+    interface RadioStatus;
+    
+    interface RadioInit as RadioInit;
     interface BlazeStrobe as Idle;
     interface BlazeStrobe as SRES;
     interface BlazeStrobe as SXOFF;
+    interface BlazeStrobe as SFRX;
+    interface BlazeStrobe as SFTX;
+    interface BlazeStrobe as SRX;
+    
     interface CheckRadio;
     interface Leds;
   }
@@ -51,6 +58,14 @@ implementation {
 
   uint8_t m_id = NO_RADIO;
   
+  uint8_t state;
+  
+  enum {
+    S_IDLE,
+    S_STARTING,
+    S_COMMITTING,
+  };
+  
   /***************** Prototypes ****************/
   void sleep(uint8_t id);
   void shutdown(uint8_t id);
@@ -62,6 +77,7 @@ implementation {
     for(i = 0; i < uniqueCount(UQ_BLAZE_RADIO); i++) {
       call BlazePower.shutdown[i]();
     }
+    state = S_IDLE;
     return SUCCESS;
   }
     
@@ -80,11 +96,12 @@ implementation {
     }
     
     m_id = id;
-    
+
     call Power.set[ m_id ]();
     call Csn.clr[ m_id ]();
     call CheckRadio.waitForWakeup();
     
+    state = S_STARTING;
     post init();
     
     return SUCCESS;
@@ -102,6 +119,22 @@ implementation {
     
     return SUCCESS;
   }
+  
+  /***************** BlazeCommit Commands ****************/
+  /** 
+   * Commit register changes in RAM to hardware.
+   * Note that this is not parameterized by radio to save footprint.  
+   * The only radio we can commit changes to is the one that's currently 
+   * turned on, indicated by m_id.
+   *
+   * It is up to higher layers to make sure we aren't trying to commit
+   * registers to a different radio than the one currently turned on
+   */
+  command void BlazeCommit.commit() {
+    state = S_COMMITTING;
+    post init();
+  }
+  
   
   /***************** BlazePower Commands ****************/
 
@@ -143,14 +176,35 @@ implementation {
   
   /***************** RadioInit Events ****************/
   event void RadioInit.initDone() { 
-    call Csn.set[ m_id ]();
-    call Csn.clr[ m_id ]();
-        
+
     call Gdo0_io.makeInput[ m_id ]();
     call Gdo2_io.makeInput[ m_id ]();
     
+    
     call Csn.set[ m_id ]();
-    signal SplitControl.startDone[ m_id ](SUCCESS);
+    call Csn.clr[ m_id ]();
+        
+    // Startup the radio in Rx mode by default
+    call Idle.strobe();
+    while (call RadioStatus.getRadioStatus() != BLAZE_S_IDLE);
+    
+    // While we're IDLE, clear our the FIFOs and set the radio into Rx mode
+    call SFRX.strobe();
+    call SFTX.strobe();
+    call SRX.strobe();
+    while (call RadioStatus.getRadioStatus() != BLAZE_S_RX);
+    
+    call Csn.set[ m_id ]();
+    
+    
+    if(state == S_STARTING) {
+      signal SplitControl.startDone[ m_id ](SUCCESS);
+    
+    } else {
+      signal BlazeCommit.commitDone();
+    }
+    
+    state = S_IDLE;
   }
   
   /***************** Functions ****************/
@@ -218,4 +272,5 @@ implementation {
   
   default command blaze_init_t *BlazeRegSettings.getDefaultRegisters[ radio_id_t id ]() { return NULL; }
   
+  default event void BlazeCommit.commitDone() {}
 }

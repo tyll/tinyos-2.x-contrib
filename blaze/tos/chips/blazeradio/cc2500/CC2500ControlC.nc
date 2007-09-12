@@ -14,6 +14,7 @@ configuration CC2500ControlC {
   provides {
     interface SplitControl;
     interface BlazePower;
+    interface BlazeConfig;
     interface BlazeRegister as Rssi;
     interface State as RadioState;
   }
@@ -24,6 +25,7 @@ implementation {
 
   components CC2500InitC;
   BlazePower = CC2500InitC;
+  BlazeConfig = CC2500InitC;
     
   components BlazeControlC;
   SplitControl = BlazeControlC.SplitControl[ CC2500_RADIO_ID ];

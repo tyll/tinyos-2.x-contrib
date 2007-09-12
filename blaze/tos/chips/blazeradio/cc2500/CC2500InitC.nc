@@ -15,6 +15,7 @@
 configuration CC2500InitC {
   provides {
     interface BlazePower;
+    interface BlazeConfig;
   }
 }
 
@@ -26,6 +27,8 @@ implementation {
       HplCC2500PinsC as Pins;
       
   MainC.SoftwareInit -> CC2500InitP;
+  
+  BlazeConfig = CC2500InitP;
   
   CC2500InitP.Csn -> Pins.Csn;
   CC2500InitP.Power -> Pins.Power;
@@ -40,6 +43,7 @@ implementation {
   BlazeInitC.BlazeRegSettings[ CC2500_RADIO_ID ] -> CC2500InitP;
   BlazeInitC.Gdo0_io[ CC2500_RADIO_ID ] -> Pins.Gdo0_io;
   BlazeInitC.Gdo2_io[ CC2500_RADIO_ID ] -> Pins.Gdo2_io;
+  CC2500InitP.BlazeCommit -> BlazeInitC;
   
   components BlazeTransmitC;
   BlazeTransmitC.Csn[ CC2500_RADIO_ID ] -> Pins.Csn;

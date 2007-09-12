@@ -80,19 +80,6 @@ implementation {
         
     call State.forceState[ id ](S_RADIO_ON);
     
-    // Startup the radio in Rx mode by default
-    // First, ensure our radio is in IDLE mode
-    
-    call Csn.clr [ id ]();
-    call Idle.strobe();
-    while ((status = call RadioStatus.getRadioStatus()) != BLAZE_S_IDLE);
-    
-    // While we're IDLE, clear our the Rx FIFO and set the radio into Rx mode
-    call SFRX.strobe();
-    call SRX.strobe();
-    while ((status = call RadioStatus.getRadioStatus()) != BLAZE_S_RX);
-    call Csn.set[ id ]();
-    
     signal SplitControl.startDone[ id ](error);
     
   }

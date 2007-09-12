@@ -50,6 +50,10 @@ implementation {
 
   enum {
     S_IDLE,
+    
+    S_LOAD_PACKET,
+    S_LOAD_ACK,
+    
     S_TX_PACKET,
     S_TX_ACK,
   };
@@ -59,32 +63,68 @@ implementation {
   bool m_sending;
   
   /***************** Local Functions ****************/
-  error_t transmit(uint8_t id, void *msg);
+  error_t load(uint8_t id, void *msg);
+  error_t transmit(uint8_t id, bool force);
 
   /***************** AsyncSend Commands ****************/
   /**
-   * Transmit a regular packet through the given parameterized radio id
+   * Load a packet into the TX FIFO
+   * @param msg Any type of message where the first byte is the length
+   *    of the rest of the bytes in the message not including the length byte
    */
-  async command error_t AsyncSend.send[ radio_id_t id ](void *msg) {
+  async command error_t AsyncSend.load[ radio_id_t id ](void *msg) {
+    if(call State.requestState(S_LOAD_PACKET) != SUCCESS) {
+      return FAIL;
+    }
+    
+    return load(id, msg);
+  }
+  
+  /**
+   * Transmit the packet loaded into the TX FIFO.
+   * @return SUCCESS if the packet is being sent. 
+   *     FAIL if we're doing something else
+   *     EBUSY if the channel is busy (when hardware CCA is enabled)
+   */
+  async command error_t AsyncSend.send[ radio_id_t id ]() {
   
     if(call State.requestState(S_TX_PACKET) != SUCCESS) {
       return FAIL;
     }
     
-    return transmit(id, msg);
+    return transmit(id, FALSE);
   }
+  
   
   /***************** AsyncSend Commands ****************/
   /**
-   * Only used to transmit acknowledgements
+   * Load a packet into the TX FIFO.  Should only be accessed by BlazeReceiveP
+   * This will force the packet to go through, even if hardware CCA is enabled.
+   * @param msg Any type of message where the first byte is the length
+   *    of the rest of the bytes in the message not including the length byte
    */
-  async command error_t AckSend.send[ radio_id_t id ](void *msg) {
+  async command error_t AckSend.load[ radio_id_t id ](void *msg) {
+    if(call State.requestState(S_LOAD_ACK) != SUCCESS) {
+      return FAIL;
+    }
+    
+    return load(id, msg);
+  }
+  
+  /**
+   * Transmit the acknowledgement already in the TX FIFO.  
+   * Should only be accessed by BlazeReceiveP
+   */
+  async command error_t AckSend.send[ radio_id_t id ]() {
     if(call State.requestState(S_TX_ACK) != SUCCESS) {
       return FAIL;
     }
     
-    return transmit(id, msg);
+    return transmit(id, TRUE);
   }
+  
+
+  
   
   /***************** TXFIFO Events ****************/
   async event void TXFIFO.writeDone( uint8_t* tx_buf, uint8_t tx_len,
@@ -93,39 +133,18 @@ implementation {
     uint8_t id;
     uint8_t state;
     
-    atomic{
-      id = m_id;
-    }
-    
-    // Done writing to the TXFIFO:
-    call Csn.set[ id ]();   
-    call Csn.clr[ id ]();
-    
-    // Rx mode by default:
-    //call SRX.strobe();
-    
-    /////////////
-    // TODO how do we know when it's done transmitting to put it back into Rx?
-    // we need to delay the sendDone event signals until Tx is complete.
-    call STX.strobe();
-    while (call RadioStatus.getRadioStatus() != BLAZE_S_TX) {
-      // need to keep strobing in case the first one didn't work due to cca problems
-      call STX.strobe();
-    }
-    /////////////
-    
+    atomic id = m_id;
     
     call Csn.set[ id ]();
-    
     
     state = call State.getState();
     call State.toIdle();
     
-    if(state == S_TX_PACKET) {
-      signal AsyncSend.sendDone[ id ](tx_buf, error);
+    if(state == S_LOAD_PACKET) {
+      signal AsyncSend.loadDone[ id ](tx_buf, error);
     
-    } else if(state == S_TX_ACK) {
-      signal AckSend.sendDone[ id ](tx_buf, error);
+    } else if(state == S_LOAD_ACK) {
+      signal AckSend.loadDone[ id ](tx_buf, error);
     }
   }
 
@@ -136,16 +155,11 @@ implementation {
   
   /***************** Local Functions ****************/
   /**
-   * Transmit the given message through the given radio ID
-   * @param id the radio id
-   * @param msg the message to send, no modifications required.
+   * Load a message into the TX FIFO
    */
-  error_t transmit(uint8_t id, void *msg) {
-    atomic {
-      m_id = id;
-    }
+  error_t load(uint8_t id, void *msg) {
+    atomic m_id = id;
     
-
     call Csn.clr[ id ]();
     
     if (call RadioStatus.getRadioStatus() == BLAZE_S_RXFIFO_OVERFLOW) {
@@ -156,19 +170,7 @@ implementation {
       call SFTX.strobe();
     }
     
-    /*
-    // TODO putting the radio into TX mode right now will cause a TXFIFO 
-    // underflow very quickly into the packet, and the end of the packet
-    // will not transmit. We need to load up the TX FIFO *before* putting
-    // the radio into TX mode, and then know when the pull the radio out
-    // of TX mode back into RX.  How?
-    
-    call STX.strobe();
-    while (call RadioStatus.getRadioStatus() != BLAZE_S_TX) {
-      // need to keep strobing in case the first one didn't work due to cca problems
-      call STX.strobe();
-    }
-    */
+    call SRX.strobe();
     
     /* 
      * The length byte in the packet is already correct - it represents the
@@ -183,6 +185,66 @@ implementation {
     return SUCCESS;
   }
   
+  
+  /**
+   * Transmit the given message through the given radio ID
+   * @param id the radio id
+   * @param force TRUE to force the packet to go through, even if CCA fails the
+   *     first few times
+   */
+  error_t transmit(uint8_t id, bool force) {
+    uint8_t state;
+    atomic m_id = id;
+    
+    call Csn.clr[ id ]();
+    
+    /*
+     * Put the radio in RX mode if it's not already. This covers the
+     * frequency / synthesizer startup and calibration
+     */
+    
+    while(call RadioStatus.getRadioStatus() != BLAZE_S_RX) {
+      call SRX.strobe();
+    }
+    
+    
+    call STX.strobe();
+    
+    if(force) {
+      while(call RadioStatus.getRadioStatus() != BLAZE_S_TX) {
+        // Keep trying until the channel is clear enough for this to go through
+        call STX.strobe();
+      }
+    
+    } else {
+      if(call RadioStatus.getRadioStatus() != BLAZE_S_TX) {
+        // CCA failed
+        call State.toIdle();
+        return EBUSY;
+      }
+    }
+    
+    /*
+     * The radio will automatically enter RX mode when it is done transmitting
+     * Do this in a while loop instead of a task so we can transmit faster
+     * and save memory footprint
+     */
+    while(call RadioStatus.getRadioStatus() != BLAZE_S_RX);
+    
+    
+    state = call State.getState();
+    call State.toIdle();
+    
+    if(state == S_TX_PACKET) {
+      signal AsyncSend.sendDone[ id ](SUCCESS);
+    
+    } else if(state == S_TX_ACK) {
+      signal AckSend.sendDone[ id ](SUCCESS);
+    }
+    
+    return SUCCESS;
+  }
+  
   /***************** Defaults ****************/
   default async command void Csn.set[ radio_id_t id ](){}
   default async command void Csn.clr[ radio_id_t id ](){}
@@ -190,8 +252,11 @@ implementation {
   default async command void Csn.makeInput[ radio_id_t id ](){}
   default async command void Csn.makeOutput[ radio_id_t id ](){}
   
-  default async event void AsyncSend.sendDone[ radio_id_t id ](void *msg, error_t error) {}
-  default async event void AckSend.sendDone[ radio_id_t id ](void *msg, error_t error) {}
+  default async event void AsyncSend.sendDone[ radio_id_t id ](error_t error) {}
+  default async event void AsyncSend.loadDone[ radio_id_t id ](void *msg, error_t error) {}
+  
+  default async event void AckSend.sendDone[ radio_id_t id ](error_t error) {}
+  default async event void AckSend.loadDone[ radio_id_t id ](void *msg, error_t error) {}
   
 }
 

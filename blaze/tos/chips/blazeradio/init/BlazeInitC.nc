@@ -8,6 +8,7 @@ configuration BlazeInitC {
   provides {
     interface SplitControl[ radio_id_t id ];
     interface BlazePower[ radio_id_t id ];
+    interface BlazeCommit;
   }
   
   uses {
@@ -32,12 +33,18 @@ implementation {
   SplitControl = BlazeInitP;
   BlazePower = BlazeInitP;
   BlazeRegSettings = BlazeInitP;
+  BlazeCommit = BlazeInitP;
+  
   Gdo0_io = BlazeInitP.Gdo0_io;
   Gdo2_io = BlazeInitP.Gdo2_io;
   
   BlazeInitP.Idle -> BlazeSpiC.SIDLE;
   BlazeInitP.SRES -> BlazeSpiC.SRES;
   BlazeInitP.SXOFF -> BlazeSpiC.SXOFF;
+  BlazeInitP.SFRX -> BlazeSpiC.SFRX;
+  BlazeInitP.SFTX -> BlazeSpiC.SFTX;
+  BlazeInitP.SRX -> BlazeSpiC.SRX;
+  BlazeInitP.RadioStatus -> BlazeSpiC.RadioStatus;
   
   BlazeInitP.RadioInit -> BlazeSpiC;
   BlazeInitP.CheckRadio -> BlazeSpiC;

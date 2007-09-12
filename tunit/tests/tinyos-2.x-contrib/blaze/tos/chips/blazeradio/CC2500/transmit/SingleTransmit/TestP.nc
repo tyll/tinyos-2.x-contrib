@@ -44,7 +44,7 @@ implementation {
     
     error_t error;
 
-    error = call AsyncSend.send(&myMsg);
+    error = call AsyncSend.load(&myMsg);
     
     if(error) {
       assertEquals("Error calling AsyncSend.send()", SUCCESS, error);
@@ -52,9 +52,18 @@ implementation {
     }
   }
   
-  async event void AsyncSend.sendDone(void *msg, error_t error) {
+  async event void AsyncSend.loadDone(void *msg, error_t error) {
+    assertEquals("loadDone(ERROR)", SUCCESS, error);
     assertNotNull(msg);
-    assertEquals("AsyncSend.sendDone() wasn't SUCCESS", SUCCESS, error);
+    if((error = call AsyncSend.send()) != SUCCESS) {
+      assertEquals("Couldn't send()", SUCCESS, error);
+      call TestTransmit.done();
+    }
+    
+  }
+   
+  async event void AsyncSend.sendDone(error_t error) {
+    assertEquals("AsyncSend.sendDone(ERROR)", SUCCESS, error);
     call TestTransmit.done();
   }
   

@@ -118,7 +118,7 @@ implementation {
   event void TestReceive.run() {
     error_t error;
 
-    error = call AsyncSend.send(&myMsg);
+    error = call AsyncSend.load(&myMsg);
     
     if(error) {
       assertEquals("Error calling AsyncSend.send()", SUCCESS, error);
@@ -127,11 +127,15 @@ implementation {
   }
  
   /***************** AsyncSend Events ****************/
-  async event void AsyncSend.sendDone(void *msg, error_t error) {
+  async event void AsyncSend.loadDone(void *msg, error_t error) {
+    call AsyncSend.send();
+  }
+  
+  async event void AsyncSend.sendDone(error_t error) {
     timesSent++;
     call Leds.led2Toggle();
     if(timesSent < 5) {
-      call AsyncSend.send(&myMsg);
+      call AsyncSend.load(&myMsg);
     }
     
     // The receiver must stop the test by receiving one of those or we timeout

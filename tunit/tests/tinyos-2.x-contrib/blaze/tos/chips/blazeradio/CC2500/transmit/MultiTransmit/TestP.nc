@@ -46,32 +46,47 @@ implementation {
   event void TestTransmit.run() {
     error_t error;
     
-    error = call AsyncSend.send(&myMsg);
+    call Leds.led2On();
+    error = call AsyncSend.load(&myMsg);
     
     if(error) {
-      assertEquals("Error calling AsyncSend.send()", SUCCESS, error);
+      assertEquals("Error on load()", SUCCESS, error);
       call TestTransmit.done();
     }
   }
   
-  async event void AsyncSend.sendDone(void *msg, error_t error) {
+  async event void AsyncSend.loadDone(void *msg, error_t error) {
+    error_t error;
+    call Leds.led2Off();
+    call Leds.led1On();
+    if((error = call AsyncSend.send()) != SUCCESS) {
+      assertEquals("Error on send()", SUCCESS, error);
+      assertEquals("Too few Tx's", 1000, times);
+      call TestTransmit.done();
+    }
+  }
+  
+  async event void AsyncSend.sendDone(error_t error) {
     error_t sendError;
     times++;
     
-    call Leds.led2Toggle();
+    
+    call Leds.led1Off();
     if(error) {
       assertEquals("AsyncSend.sendDone() wasn't SUCCESS", SUCCESS, error);
     }
     
     // Arbitrary amount of times to resend.
     if(times < 1000) {
-      sendError = call AsyncSend.send(&myMsg);
+      call  Leds.led2On();
+      sendError = call AsyncSend.load(&myMsg);
       
       if(sendError == SUCCESS) {
         return;
 
       } else {      
-        assertEquals("Multi-send error", SUCCESS, sendError);
+        assertEquals("Multi-load error", SUCCESS, sendError);
+        assertEquals("Too few Tx's", 1000, times);
         // Fall through and clean up below.
       }
       

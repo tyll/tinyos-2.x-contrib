@@ -25,7 +25,6 @@ module BlazeReceiveP {
     interface GeneralIO as Csn[ radio_id_t id ];
    
     interface BlazeFifo as RXFIFO;
-    interface BlazeFifo as TXFIFO;
   
     interface BlazeStrobe as SFRX;
     interface BlazeStrobe as SFTX;
@@ -43,6 +42,7 @@ module BlazeReceiveP {
     interface CheckRadio;
     interface RadioStatus;
     
+    interface ActiveMessageAddress;
     interface State;
     interface Leds;
   }
@@ -51,22 +51,24 @@ module BlazeReceiveP {
 
 implementation {
 
+  /** ID of the radio being serviced */
   uint8_t m_id;
   
+  /** Pointer to a message buffer, used for double buffering */
   message_t* m_msg;
   
+  /** Acknowledgement frame */
   blaze_ack_t acknowledgement;
   
+  /** Default message buffer */
   message_t myMsg;
 
   
   enum receive_states{
     S_IDLE,
     S_RX_LENGTH,
-    S_REC_HEADER,
-    S_REC_PKT,
-    S_TX_ACK,
-    S_REC_ACK,  
+    S_RX_FCF,
+    S_RX_PAYLOAD,
   };
   
   enum {
@@ -77,6 +79,8 @@ implementation {
   
   
   /***************** Prototypes ****************/
+  task void receiveDone();
+  
   void receive();
   void initReceive();
   uint8_t getStatus();
@@ -134,6 +138,12 @@ implementation {
   
   /***************** AckSend Events ****************/
   async event void AckSend.sendDone[ radio_id_t id ](void *msg, error_t error) {
+    blaze_header_t *header = call BlazePacketBody.getHeader( m_msg );
+    uint8_t rxFrameLength = header->length;
+    uint8_t *buf = (uint8_t*) header;
+    
+    call RXFIFO.beginRead(buf + 1 + SACK_HEADER_LENGTH, 
+          rxFrameLength - SACK_HEADER_LENGTH);
   }
   
   /***************** RXFIFO Events ****************/
@@ -141,118 +151,163 @@ implementation {
                                     error_t error ) {
 
     uint8_t id;
-    blaze_header_t* header;
+    blaze_header_t *header = call BlazePacketBody.getHeader( m_msg );
+    uint8_t rxFrameLength = header->length;
+    uint8_t *buf = (uint8_t*) header;
+    
+    
     uint8_t* msg;
     atomic{ 
       id = m_id; 
-      msg = (uint8_t*)m_msg;
+      msg = (uint8_t*)m_msg; // TODO remove
     }
     
-    call Csn.set[ id ]();  //toggle csn to show done reading
+    //toggle csn to show done reading
+    call Csn.set[ id ]();  
     call Csn.clr[ id ]();
     
-    if(call State.isState(S_RX_LENGTH)) {
-      call State.forceState(S_REC_HEADER);
+    switch (call State.getState()) {
+    case S_RX_LENGTH:
+      call State.forceState(S_RX_FCF);
     
-      if((msg[0] > sizeof(message_t)) || (msg[0] == 0)) {
-        call State.toIdle();
+      if(rxFrameLength + 1 > BLAZE_RXFIFO_LENGTH) {
+        // Flush everything if the length is bigger than our FIFO
         failReceive();
         return;
-      }
       
-      call RXFIFO.beginRead((msg + 1), msg[0]);
-    
-    } else if(call State.isState(S_REC_PKT)){
-      initReceive(); //put the radio back in receive mode
-      call Csn.set[ id ]();  //unselect the radio
-      call State.toIdle();
-      signal Receive.receive[ id ]((message_t*) msg, rx_buf, msg[0]);
-    
-    } else if(call State.getState() == S_REC_HEADER) {
-      header = call BlazePacketBody.getHeader(m_msg);
-      //call Leds.led0Toggle();
-      //check and see if it is for me or bcast, if not, fail
-      /*
-      if((header->dest != TOS_NODE_ID) && (header->dest != AM_BROADCAST_ADDR)){
-        failReceive();
-        return;
-      }
-      */
-      if((header->fcf) & (1 << IEEE154_FCF_ACK_REQ)){
-        call State.forceState(S_TX_ACK);
-        acknowledgement.length = sizeof(blaze_ack_t) - 1;
-        acknowledgement.fcf = ( ( IEEE154_TYPE_ACK << IEEE154_FCF_FRAME_TYPE ) |
-		     ( 1 << IEEE154_FCF_INTRAPAN ) |
-		     ( IEEE154_ADDR_SHORT << IEEE154_FCF_DEST_ADDR_MODE ) |
-		     ( IEEE154_ADDR_SHORT << IEEE154_FCF_SRC_ADDR_MODE ) );
-        acknowledgement.dsn = header -> dsn;
-        acknowledgement.dest = header -> src;
-        acknowledgement.src = header -> dest; 
-        call STX.strobe();
-        while(call RadioStatus.getRadioStatus() != BLAZE_S_TX);
-        call TXFIFO.write(((uint8_t*)&acknowledgement), acknowledgement.length);  
-      }
-      else{
-        //finish reading the RXFIFO
-        //call State.forceState(S_REC_PKT);
-        //call RXFIFO.beginRead((uint8_t*)(msg + sizeof(blaze_header_t)), ((uint8_t*)msg)[0] - (sizeof(blaze_header_t) - 1)); 
-        initReceive(); //put the radio back in receive mode
+      } else {
+        if(rxFrameLength <= MAC_PACKET_SIZE) {
+          if(rxFrameLength > 0) {
+            if(rxFrameLength > SACK_HEADER_LENGTH) {
+              // This packet has an FCF byte plus at least one more byte to read
+              call RXFIFO.beginRead(buf + 1, SACK_HEADER_LENGTH);
+            
+            } else {
+              // This is really a bad packet, skip FCF and get it out of here.
+              call State.forceState(S_RX_PAYLOAD);
+              call RXFIFO.beginRead(buf + 1, rxFrameLength);
+            }
+                          
+          } else {
+            // Length == 0; start reading the next packet
+            failReceive();
+          }
         
-        call Csn.set[ id ]();  //unselect the radio
-        call State.toIdle();
-        signal Receive.receive[ id ]((message_t*)msg, m_msg->data, msg[0]);  
+        } else {
+          // Length is too large; we have to flush the entire Rx FIFO
+          failReceive();
+        }
+      }
+      break;
+            
+    case S_RX_FCF:
+      call State.forceState(S_RX_PAYLOAD);
+      
+        /*
+         * Since the GDO2 goes high only when the end of the packet is reached,
+         * we can safely turn into Tx mode to acknowledge reception of the
+         * packet if an ack request was made.
+         *
+         * Our local address may have changed from the last packet received,
+         * so set the outbound acknowledgement frame's source address each time
+         *
+         * Note that the destpan address is not checked before ack'ing.
+         * To add in the destpan check, increase SACK_HEADER_LENGTH by 2 to
+         * include reading in the destpan as part of the ack check, and
+         * add the necessary logic to the horrendous if-statement below to
+         * check the destpan.  Finally, add in a destpan address to the ack
+         * frame if you want and set/check it appropriately.
+         */
+      
+        if(FALSE) { //call BlazeConfig.isAutoAckEnabled()) {  // TODO
+          if (((( header->fcf >> IEEE154_FCF_ACK_REQ ) & 0x01) == 1)
+              && ((header->dest == call ActiveMessageAddress.amAddress())
+                  || (header->dest == AM_BROADCAST_ADDR))
+              && ((( header->fcf >> IEEE154_FCF_FRAME_TYPE ) & 7) == IEEE154_TYPE_DATA)) {
+            // CSn flippage cuts off our FIFO; SACK and begin reading again
+            
+            acknowledgement.dest = header->src;
+            acknowledgement.dsn = header->dsn;
+            acknowledgement.src = call ActiveMessageAddress.amAddress();
+  
+            call AckSend.send[ m_id ](&acknowledgement);
+            // Continues at AckSend.sendDone()
+            return;
+          }
+        }
+        
+      call RXFIFO.beginRead(buf + 1 + SACK_HEADER_LENGTH, 
+            rxFrameLength - SACK_HEADER_LENGTH);
+      break;
+      
+      
+    case S_RX_PAYLOAD:
+      // Put the radio back in receive mode and deselect it
+      initReceive();
+      call Csn.set[ id ](); 
+     
+      // TODO check to see if we even want to do address recognition
+      if((header->dest != TOS_NODE_ID) && (header->dest != AM_BROADCAST_ADDR)) {
+        failReceive();
+        return;
       }
       
-    }else if(call State.getState() == S_REC_ACK){
-      initReceive(); //put the radio back in receive mode
-      call Csn.set[ id ]();  //unselect the radio
-      call State.toIdle();
-      //if the packet isn't meant for me, don't pass it up
-      if(acknowledgement.dest != TOS_NODE_ID){
-        return;    
-      }   
-      //increment the length of the packet back to the proper size;
-      (uint8_t)(acknowledgement.length)++;
-      signal Receive.receive[ id ]((message_t*)(&acknowledgement), ((message_t*)(&acknowledgement)), rx_len);
+      // The FCF_FRAME_TYPE bit in the FCF byte tells us 
+      // if this is an ack or data
+      if ((( header->fcf >> IEEE154_FCF_FRAME_TYPE ) & 7) == IEEE154_TYPE_ACK) {
+        signal AckReceive.receive( &acknowledgement );
+        call State.toIdle();
+     
+      } else {
+        // IEEE_TYPE_DATA frame
+        post receiveDone();
+      }
+      break;
+      
+    default:
+      break;
     }
-
-    
   }
 
   async event void RXFIFO.writeDone( uint8_t* tx_buf, uint8_t tx_len, error_t error ) {
   }  
   
-  /******************* TXFIFO EVENTS *****************************/
-  async event void TXFIFO.readDone(uint8_t* rx_buf, uint8_t rx_len,
-                                    error_t error ) {}
-                                    
-  async event void TXFIFO.writeDone( uint8_t* tx_buf, uint8_t tx_len, error_t error ) {
+
+  /***************** ActiveMessageAddress Events ****************/
+  async event void ActiveMessageAddress.changed() {
+  }
   
-    message_t* msg;
-    if(call State.getState() != S_TX_ACK){
-      return;
-    }
-    atomic{
-      msg = m_msg;
-    }
-    // finish reading the RX fifo
-    call State.forceState(S_REC_PKT);
-    call RXFIFO.beginRead((uint8_t*)(msg + sizeof(blaze_header_t)), ((uint8_t*)(msg))[0] - (sizeof(blaze_header_t) - 1));
-  }                                 
+  /***************** Tasks and Functions ****************/
+  task void receiveDone() {
+    blaze_metadata_t *metadata = call BlazePacketBody.getMetadata( m_msg );
+    uint8_t *buf = (uint8_t*) call BlazePacketBody.getHeader( m_msg );
+    uint8_t rxFrameLength = buf[0];
+    message_t *atomicMsg;
+    uint8_t atomicId;
+    
+    atomic atomicId = m_id;
+    
+    metadata->crc = buf[ rxFrameLength ] >> 7;
+    metadata->rssi = buf[ rxFrameLength - 1 ];
+    metadata->lqi = buf[ rxFrameLength ] & 0x7f;
+    
+    atomicMsg = signal Receive.receive[atomicId]( m_msg, m_msg->data, rxFrameLength );
+    atomic m_msg = atomicMsg;
+    
+    call State.toIdle();
+  }
   
-  /************Local Functions*******************/
   
   void receive() {
-    uint8_t* msg; 
     uint8_t status = call RadioStatus.getRadioStatus();
     
-    if(status == BLAZE_S_TXFIFO_UNDERFLOW){
+    if(status == BLAZE_S_TXFIFO_UNDERFLOW) {
       // SFTX puts us back into IDLE.  Take us out of IDLE and back into Rx
       call SFTX.strobe();
       initReceive();
     }
       
-    if(status == BLAZE_S_RXFIFO_OVERFLOW){
+    if(status == BLAZE_S_RXFIFO_OVERFLOW) {
       // RXFIFO is corrupted, don't try and read it in.
       // need to service the interrupt or future ones won't fire
       call State.toIdle();

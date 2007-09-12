@@ -42,7 +42,6 @@ implementation {
   BlazeReceiveP.SFTX -> Spi.SFTX;
   BlazeReceiveP.STX -> Spi.STX;
   BlazeReceiveP.RXFIFO -> Spi.RXFIFO;
-  BlazeReceiveP.TXFIFO -> Spi.TXFIFO;
   BlazeReceiveP.SIDLE -> Spi.SIDLE;
   BlazeReceiveP.RxReg -> Spi.RXREG;
   BlazeReceiveP.PktStatus -> Spi.PKTSTATUS;
@@ -54,6 +53,9 @@ implementation {
   
   components BlazeTransmitC;
   BlazeReceiveP.AckSend -> BlazeTransmitC.AckSend;
+  
+  components ActiveMessageAddressC;
+  BlazeReceiveP.ActiveMessageAddress -> ActiveMessageAddressC;
   
   components new StateC();
   BlazeReceiveP.State -> StateC;

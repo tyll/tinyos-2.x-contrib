@@ -102,8 +102,21 @@ implementation {
     call Csn.clr[ id ]();
     
     // Rx mode by default:
-    call SRX.strobe();
+    //call SRX.strobe();
+    
+    /////////////
+    // TODO how do we know when it's done transmitting to put it back into Rx?
+    // we need to delay the sendDone event signals until Tx is complete.
+    call STX.strobe();
+    while (call RadioStatus.getRadioStatus() != BLAZE_S_TX) {
+      // need to keep strobing in case the first one didn't work due to cca problems
+      call STX.strobe();
+    }
+    /////////////
+    
+    
     call Csn.set[ id ]();
+    
     
     state = call State.getState();
     call State.toIdle();
@@ -132,14 +145,6 @@ implementation {
       m_id = id;
     }
     
-    /* 
-     * The length byte in the packet is already correct - it represents the
-     * number of bytes in the packet *AFTER* the length byte.
-     *
-     * So in order to also get that length byte transmitted (or the LSB of the
-     * CRC, whichever way you look at it) we gotta add one byte to the transmit
-     * length.
-     */
 
     call Csn.clr[ id ]();
     
@@ -151,13 +156,30 @@ implementation {
       call SFTX.strobe();
     }
     
+    /*
+    // TODO putting the radio into TX mode right now will cause a TXFIFO 
+    // underflow very quickly into the packet, and the end of the packet
+    // will not transmit. We need to load up the TX FIFO *before* putting
+    // the radio into TX mode, and then know when the pull the radio out
+    // of TX mode back into RX.  How?
+    
     call STX.strobe();
     while (call RadioStatus.getRadioStatus() != BLAZE_S_TX) {
       // need to keep strobing in case the first one didn't work due to cca problems
       call STX.strobe();
     }
+    */
     
-    call TXFIFO.write(msg, (call BlazePacketBody.getHeader(msg))->length);
+    /* 
+     * The length byte in the packet is already correct - it represents the
+     * number of bytes in the packet *AFTER* the length byte.
+     *
+     * So in order to also get that length byte transmitted (or the LSB of the
+     * CRC, whichever way you look at it) we gotta add one byte to the transmit
+     * length.
+     */
+    
+    call TXFIFO.write(msg, (call BlazePacketBody.getHeader(msg))->length + 1);
     return SUCCESS;
   }
   

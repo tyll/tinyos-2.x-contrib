@@ -41,12 +41,6 @@ typedef nx_struct blaze_ack_t {
   nxle_uint16_t src;
 } blaze_ack_t;
 
-typedef nx_struct blaze_packet_t {
-  blaze_header_t packet;
-  nx_uint8_t data[];
-} blaze_packet_t;
-
-
 enum {
   // size of the header not including the length byte
   MAC_HEADER_SIZE = sizeof( blaze_header_t ) - 1,

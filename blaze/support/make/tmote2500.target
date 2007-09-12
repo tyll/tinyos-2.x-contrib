@@ -1,5 +1,5 @@
-
-PLATFORM ?= tmoteblaze
+`
+PLATFORM ?= tmote2500
 
 #MSP_MCU = msp430x1611
 
@@ -15,5 +15,5 @@ VOLUME_ALLOCATOR = tos-storage-stm25p
 
 $(call TOSMake_include_platform,msp)
 
-tmoteblaze: $(BUILD_DEPS)
+tmote2500: $(BUILD_DEPS)
 	@:

@@ -30,21 +30,17 @@
  */
 
 /**
- * NXT AVR initialization.
+ * Test of I2C. 
  *
  * @author Rasmus Ulslev Pedersen
  */
 
-configuration NxtAvrC{
-  provides interface Init;
-}
+configuration TestALLC{}
 implementation {
-  components HalAT91I2CMasterC, HplAT91_GPIOC, NxtAvrM;
+  components MainC, TestALLM, HalLCDC;
   
-  Init = NxtAvrM.Init;
+  TestALLM.Boot   -> MainC.Boot;
   
-  NxtAvrM.I2CPacket -> HalAT91I2CMasterC.I2CPacket;
-  
-  HalAT91I2CMasterC.I2CSCL -> HplAT91_GPIOC.HplAT91_GPIOPin[AT91C_PA4_TWCK];
-  HalAT91I2CMasterC.I2CSDA -> HplAT91_GPIOC.HplAT91_GPIOPin[AT91C_PA3_TWD];
+  TestALLM.HalLCD -> HalLCDC.HalLCD; 
+
 }

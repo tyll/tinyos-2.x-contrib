@@ -57,7 +57,7 @@ implementation
     if (!isInited) {
       // called in HalAT91I2CMasterP Init.inits
       //call I2C.setTWICWGR(0); //TODO: fix
-      
+
       AT91C_BASE_PMC->PMC_PCER = (1<<AT91C_ID_TWI);
       call I2CIrq.allocate();
       call I2CIrq.enable();
@@ -99,7 +99,10 @@ implementation
   }
 
   async event void I2CIrq.fired() {
+
     signal I2C.interruptI2C();
+//problem
+
     return;
   }
 

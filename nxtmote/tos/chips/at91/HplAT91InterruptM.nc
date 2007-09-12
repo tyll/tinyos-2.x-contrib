@@ -3,7 +3,6 @@
  * @author Rasmus Pedersen
  */
 #include "hardware.h"
-
 module HplAT91InterruptM
 {
   provides {
@@ -11,15 +10,20 @@ module HplAT91InterruptM
     interface HplAT91Interrupt as AT91Irq[uint8_t id];
     interface HplAT91Interrupt as AT91Fiq[uint8_t id];
   }
+  
 }
 
 implementation 
 {
+
+  // We save the registers in the assembler interrupt control code, so this
+  // __attribute__ ((interrupt ("IRQ"))) @C() @atomic_hwevent() 
+  // will work. Instead tell the compiler it is a "plain" C function.
   void irqhandler() __attribute__ ((C, spontaneous)) {
     uint32_t irqID;
 
     irqID = AT91F_AIC_ActiveID(AT91C_BASE_AIC); // Current interrupt source number
-
+    
     signal AT91Irq.fired[irqID]();   
     
     return;
@@ -35,7 +39,6 @@ implementation
     atomic {
       if (id < 34) {
         AT91C_BASE_TC0->TC_IER = AT91C_TC_CPCS;        
-        // Enable peripheral clock (TODO: is this the place)
         AT91F_PMC_EnablePeriphClock(AT91C_BASE_PMC, id);
         // Enable interrupt on AIC
         AT91F_AIC_EnableIt(AT91C_BASE_AIC, id);
@@ -47,11 +50,12 @@ implementation
 
   error_t allocate(uint8_t id, bool level, uint8_t priority)
   {
-    // TODO: level or edge
-    
-    //AT91F_AIC_ConfigureIt ( AT91C_BASE_AIC, id, priority, AT91C_AIC_SRCTYPE_INT_HIGH_LEVEL, irqhandler);
-    AT91F_AIC_ConfigureIt ( AT91C_BASE_AIC, id, priority, AT91C_AIC_SRCTYPE_INT_EDGE_TRIGGERED, irqhandler);
-    //AT91F_AIC_ConfigureIt ( AT91C_BASE_AIC, AT91C_ID_TC0, 2, AT91C_AIC_SRCTYPE_INT_HIGH_LEVEL, irqhandler);
+    if(level) {
+      AT91F_AIC_ConfigureIt( AT91C_BASE_AIC, id, priority, AT91C_AIC_SRCTYPE_INT_HIGH_LEVEL, irqhandler);
+    }
+    else {
+      AT91F_AIC_ConfigureIt( AT91C_BASE_AIC, id, priority, AT91C_AIC_SRCTYPE_INT_EDGE_TRIGGERED, irqhandler);
+    }
 
     return TRUE;
   }
@@ -60,7 +64,6 @@ implementation
   {
     atomic {
       if (id < 34) {
-        //TODO: replace
         AT91C_BASE_TC0->TC_IDR = AT91C_TC_CPCS;
         AT91F_AIC_DisableIt(AT91C_BASE_AIC, id);
       }

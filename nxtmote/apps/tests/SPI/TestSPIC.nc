@@ -30,17 +30,17 @@
  */
 
 /**
- * Test of SPI. 
+ * Test of "ALL". 
  *
  * @author Rasmus Ulslev Pedersen
  */
 
-configuration TestSPIC{}
+configuration TestALLC{}
 
 implementation {
-  components MainC, TestSPIM, HalLCDC;
+  components MainC, TestALLM, HalLCDC;
   
-  TestSPIM        -> MainC.Boot;
+  TestALLM        -> MainC.Boot;
   
-  TestSPIM.HalLCD -> HalLCDC.HalLCD;
+  TestALLM.HalLCD -> HalLCDC.HalLCD;
 }

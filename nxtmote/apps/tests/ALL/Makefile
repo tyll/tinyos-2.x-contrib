@@ -1,0 +1,2 @@
+COMPONENT=TestALLC
+include $(MAKERULES)

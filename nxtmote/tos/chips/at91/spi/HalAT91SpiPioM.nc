@@ -47,7 +47,10 @@
  * 
  * @author Phil Buonadonna
  */
-
+/**
+ * Adapted for nxtmote.
+ * @author Rasmus Ulslev Pedersen
+ */
 module HalAT91SpiPioM 
 {
   provides {

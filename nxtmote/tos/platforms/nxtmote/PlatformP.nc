@@ -19,11 +19,11 @@ implementation{
   command error_t Init.init() {
     // AT91F_LowLevelInit() in Cstartup_SAM7.c has been called
     // TODO: Move it so equivalent code is called from this place
-    int            i;
-uint32_t TmpReset;
+    //int            i;
+    uint32_t TmpReset;
 
     AT91PS_PMC     pPMC = AT91C_BASE_PMC;
-//togglepin(0);
+
     //* Set Flash Waite sate
     //  Single Cycle Access at Up to 30 MHz, or 40
     //  if MCK = 47923200 I have 72 Cycle for 1,5 usecond ( flied MC_FMR->FMCN
@@ -75,13 +75,7 @@ uint32_t TmpReset;
     
     //AT91C_BASE_AIC->AIC_SVR[0] = (int) AT91F_Default_FIQ_handler ;
     
-    for (i=1;i < 31; i++)
-    {
-      //AT91C_BASE_AIC->AIC_SVR[i] = (int) AT91F_Default_IRQ_handler;
-    }
-    
     AT91C_BASE_AIC->AIC_SPU  = (int) AT91F_Spurious_handler ;    
-    
 
     *AT91C_RSTC_RMR  = 0xA5000401;
     *AT91C_AIC_DCR   = 1;
@@ -89,6 +83,8 @@ uint32_t TmpReset;
     *AT91C_PITC_PIMR = (0x000FFFFF | 0x01000000);
     TmpReset         = *AT91C_PITC_PIVR;
     TmpReset         = TmpReset;/* Suppress warning*/
+    
+    *AT91C_PMC_PCER  = (1L<<AT91C_ID_TWI);/* Enable TWI Clock        */
 
     call InitL0.init();
     call InitL1.init();

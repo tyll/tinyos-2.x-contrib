@@ -44,11 +44,13 @@
   uint32_t waitj;
 
   #define waitspin(count)	{\
-    waiti = 0;\
-		while(++waiti < count){\
-		  waitj=0;\
-		  while(++waitj < count);\
-    }\
+    atomic{\
+			waiti = 0;\
+			while(++waiti < count){\
+				waitj=0;\
+				while(++waitj < count);\
+			}\
+	  }\
   }
 
 	uint8_t initStr[] =

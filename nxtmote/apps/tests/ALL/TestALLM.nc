@@ -30,21 +30,33 @@
  */
 
 /**
- * NXT AVR initialization.
+ * Test of "ALL". Something flexible that can be used to show some new functionality.
  *
  * @author Rasmus Ulslev Pedersen
  */
 
-configuration NxtAvrC{
-  provides interface Init;
+module TestALLM
+{
+  uses interface HalLCD;
+
+  uses interface Boot;
 }
-implementation {
-  components HalAT91I2CMasterC, HplAT91_GPIOC, NxtAvrM;
+
+implementation
+{
+
+  uint8_t str[100];
   
-  Init = NxtAvrM.Init;
+  event void Boot.booted() {
+    
+    sprintf(str,"NXTMOTE was here!");
+    call HalLCD.displayString(str,0);
+
+    sprintf(str,"-----------------");
+    call HalLCD.displayString(str,1);
+    
+    togglepin(0); 
   
-  NxtAvrM.I2CPacket -> HalAT91I2CMasterC.I2CPacket;
+  }
   
-  HalAT91I2CMasterC.I2CSCL -> HplAT91_GPIOC.HplAT91_GPIOPin[AT91C_PA4_TWCK];
-  HalAT91I2CMasterC.I2CSDA -> HplAT91_GPIOC.HplAT91_GPIOPin[AT91C_PA3_TWD];
 }

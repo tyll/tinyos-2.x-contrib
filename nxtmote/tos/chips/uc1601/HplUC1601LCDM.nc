@@ -83,7 +83,7 @@ implementation {
       call SpiControl.setSPIParams();  
    
       // Give it time 
-		  {waitspin(10000);} //10000 ok
+		  {waitspin(100000);} //10000 ok
     }
     
     return SUCCESS;

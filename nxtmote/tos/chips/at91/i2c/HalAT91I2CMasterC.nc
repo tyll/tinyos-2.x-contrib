@@ -50,13 +50,16 @@ implementation
   components HalAT91I2CMasterP;
   components HplAT91I2CC;
   components PlatformP;
+  components HalLCDC;
 
-  I2CPacket = HalAT91I2CMasterP;
+  HalAT91I2CMasterP.HalLCD -> HalLCDC.HalLCD;
 
-  HalAT91I2CMasterP.Init <- PlatformP.InitL2;
+  I2CPacket                = HalAT91I2CMasterP;
+
+  HalAT91I2CMasterP.Init   <- PlatformP.InitL2;
 
   HalAT91I2CMasterP.I2C -> HplAT91I2CC.I2C;
 
-  I2CSCL = HalAT91I2CMasterP.I2CSCL;
-  I2CSDA = HalAT91I2CMasterP.I2CSDA;
+  I2CSCL                   = HalAT91I2CMasterP.I2CSCL;
+  I2CSDA                   = HalAT91I2CMasterP.I2CSDA;
 }

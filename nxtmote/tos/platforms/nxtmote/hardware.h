@@ -74,8 +74,9 @@ typedef uint32_t __nesc_atomic_t;
 //TODO: enable
 inline __nesc_atomic_t __nesc_atomic_start(void) @spontaneous() {
   uint32_t result = 0;
-  uint32_t temp = 0;
 /*
+  uint32_t temp = 0;
+
   asm volatile (
 		"mrs %0,CPSR\n\t"
 		"orr %1,%2,%4\n\t"
@@ -88,7 +89,7 @@ inline __nesc_atomic_t __nesc_atomic_start(void) @spontaneous() {
 }
 
 inline void __nesc_atomic_end(__nesc_atomic_t oldState) @spontaneous() {
-  uint32_t  statusReg = 0;
+  //uint32_t  statusReg = 0;
 
   oldState &= ARM_CPSR_INT_MASK;
 /*

@@ -1,0 +1,2 @@
+COMPONENT=TestI2CC
+include $(MAKERULES)

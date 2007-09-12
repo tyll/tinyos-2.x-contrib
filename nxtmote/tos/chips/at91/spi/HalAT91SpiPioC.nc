@@ -33,7 +33,11 @@
  * @author Kaisen Lin
  * @author Phil Buonadonna
  */
-
+/**
+ * Adapted for nxtmote.
+ * @author Rasmus Ulslev Pedersen
+ */
+ 
 configuration HalAT91SpiPioC
 {
   provides interface Init;

@@ -32,7 +32,10 @@
  * @author Kaisen Lin
  * @author Phil Buonadonna
  */
-
+/**
+ * Adapted for nxtmote.
+ * @author Rasmus Ulslev Pedersen
+ */
 #include "SPI.h"
 
 module HalAT91SPIControlP {

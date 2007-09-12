@@ -21,6 +21,7 @@ module BlazeReceiveP {
   uses {
     interface AsyncSend as AckSend[ radio_id_t id ];
     interface GeneralIO as Csn[ radio_id_t id ];
+    interface BlazeConfig[ radio_id_t id ];
    
     interface BlazeFifo as RXFIFO;
   
@@ -89,6 +90,11 @@ implementation {
     m_msg = &myMsg;
     acknowledgement.length = ACK_FRAME_LENGTH;
     acknowledgement.fcf = IEEE154_TYPE_ACK;
+    
+    // TODO REMOVE:
+    acknowledgement.dsn = 0xAA;
+    acknowledgement.src = 0xBB;
+    
     return SUCCESS;
   }
   
@@ -144,6 +150,7 @@ implementation {
     uint8_t rxFrameLength = header->length;
     uint8_t *buf = (uint8_t*) header;
     
+    call Csn.clr[ id ]();
     call RXFIFO.beginRead(buf + 1 + SACK_HEADER_LENGTH, 
           rxFrameLength - SACK_HEADER_LENGTH);
   }
@@ -185,7 +192,8 @@ implementation {
               call RXFIFO.beginRead(buf + 1, SACK_HEADER_LENGTH);
             
             } else {
-              // This is really a bad packet, skip FCF and get it out of here.
+              // This is a bad packet because it doesn't have enough
+              // bytes for a real header. Skip FCF and get it out of here.
               call State.forceState(S_RX_PAYLOAD);
               call RXFIFO.beginRead(buf + 1, rxFrameLength);
             }
@@ -221,7 +229,8 @@ implementation {
          * frame if you want and set/check it appropriately.
          */
       
-        if(FALSE) { //call BlazeConfig.isAutoAckEnabled()) {  // TODO
+        if(call BlazeConfig.isAutoAckEnabled[ m_id ]()) {
+          
           if (((( header->fcf >> IEEE154_FCF_ACK_REQ ) & 0x01) == 1)
               && ((header->dest == call ActiveMessageAddress.amAddress())
                   || (header->dest == AM_BROADCAST_ADDR))
@@ -233,7 +242,7 @@ implementation {
             acknowledgement.src = call ActiveMessageAddress.amAddress();
   
             call AckSend.load[ m_id ](&acknowledgement);
-            // Continues at AckSend.sendDone()
+            // Continues at AckSend.loadDone() and AckSend.sendDone()
             return;
           }
         }
@@ -257,8 +266,9 @@ implementation {
       // The FCF_FRAME_TYPE bit in the FCF byte tells us 
       // if this is an ack or data
       if ((( header->fcf >> IEEE154_FCF_FRAME_TYPE ) & 7) == IEEE154_TYPE_ACK) {
-        signal AckReceive.receive( &acknowledgement );
+        signal AckReceive.receive( header->src, header->dest, header->dsn );
         call State.toIdle();
+        // TODO receive the next packet in the RX FIFO?
      
       } else {
         // IEEE_TYPE_DATA frame
@@ -277,6 +287,10 @@ implementation {
 
   /***************** ActiveMessageAddress Events ****************/
   async event void ActiveMessageAddress.changed() {
+  }
+  
+  /***************** BlazeConfig Events ****************/
+  event void BlazeConfig.commitDone[radio_id_t id]() {
   }
   
   /***************** Tasks and Functions ****************/
@@ -345,7 +359,7 @@ implementation {
   default async event void ReceiveController.receiveFailed[ radio_id_t id ]() {
   }
   
-  default async event void AckReceive.receive( blaze_ack_t *ack ) {
+  default async event void AckReceive.receive( am_addr_t source, am_addr_t destination, uint8_t dsn ) {
   }
   
     
@@ -365,6 +379,47 @@ implementation {
   default async command bool Csn.isInput[ radio_id_t id ](){}
   default async command void Csn.makeOutput[ radio_id_t id ](){}
   default async command bool Csn.isOutput[ radio_id_t id ](){}
+  
+  
+  
+  default command error_t BlazeConfig.commit[ radio_id_t id ]() {
+    return FAIL;
+  }
+  
+  default command void BlazeConfig.setChannel[ radio_id_t id ]( uint16_t channel ) {
+  }
+  
+  default command uint16_t BlazeConfig.getChannel[ radio_id_t id ]() {
+    return 0;
+  }
+  
+  default async command uint16_t BlazeConfig.getPanAddr[ radio_id_t id ]() {
+    return 0;
+  }
+  
+  default command void BlazeConfig.setPanAddr[ radio_id_t id ]( uint16_t address ) {
+  }
+  
+  default command void BlazeConfig.setAddressRecognition[ radio_id_t id ](bool on) {
+  }
+  
+  default async command bool BlazeConfig.isAddressRecognitionEnabled[ radio_id_t id ]() {
+    return TRUE;
+  }
+  
+  default command void BlazeConfig.setPanRecognition[ radio_id_t id ](bool on) {
+  }
+  
+  default async command bool BlazeConfig.isPanRecognitionEnabled[ radio_id_t id ]() {
+    return TRUE;
+  }
+  
+  default command void BlazeConfig.setAutoAck[ radio_id_t id ](bool enableAutoAck) {
+  }
+  
+  default async command bool BlazeConfig.isAutoAckEnabled[ radio_id_t id ]() {
+    return TRUE;
+  }
   
 }
 

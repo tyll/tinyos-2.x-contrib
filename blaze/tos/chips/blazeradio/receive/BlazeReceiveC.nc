@@ -18,6 +18,7 @@ configuration BlazeReceiveC {
   
   uses {
     interface GeneralIO as Csn[ radio_id_t id ];
+    interface BlazeConfig[ radio_id_t id ];
   }
 }
 
@@ -28,6 +29,7 @@ implementation {
   ReceiveController = BlazeReceiveP;
   AckReceive = BlazeReceiveP;
   Csn = BlazeReceiveP.Csn;
+  BlazeConfig = BlazeReceiveP;
   
   components MainC;
   MainC.SoftwareInit -> BlazeReceiveP;

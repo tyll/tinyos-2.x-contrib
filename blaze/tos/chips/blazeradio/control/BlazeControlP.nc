@@ -76,12 +76,9 @@ implementation {
   
   /***************** SubControl Events ****************/
   event void SubControl.startDone[ radio_id_t id ](error_t error) {
-    uint8_t status;
-        
     call State.forceState[ id ](S_RADIO_ON);
     
     signal SplitControl.startDone[ id ](error);
-    
   }
   
   event void SubControl.stopDone[ radio_id_t id ](error_t error) {

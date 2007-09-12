@@ -50,6 +50,7 @@ implementation {
   
   components BlazeReceiveC;
   BlazeReceiveC.Csn[ CC2500_RADIO_ID ] -> Pins.Csn;
+  BlazeReceiveC.BlazeConfig[ CC2500_RADIO_ID ] -> CC2500InitP.BlazeConfig;
   
   components LedsC;
   CC2500InitP.Leds -> LedsC;

@@ -231,6 +231,7 @@ implementation {
      */
     while(call RadioStatus.getRadioStatus() != BLAZE_S_RX);
     
+    call Csn.set[ id ]();
     
     state = call State.getState();
     call State.toIdle();

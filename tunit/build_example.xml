@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <project name="TUnit" basedir="." default="tunit">
 
-    <!-- Reports, archives, statistics, etc. locations -->
-    <property name="tunit_base.dir" value="." />
+	<!-- Reports, archives, statistics, etc. locations -->
+	<property name="tunit_base.dir" value="." />
 	<property name="report.dir" value="${tunit_base.dir}/reports" />
 	<property name="xml.dir" value="${report.dir}/xml" />
 	<property name="htmlreport.dir" value="${report.dir}/html" />
@@ -10,13 +10,13 @@
 	<property name="stats.dir" value="${report.dir}/stats" />
 	
 	<!-- Java locations -->
-    <property name="java.dir" value="${tunit_base.dir}/support/sdk/tunit" />
+	<property name="java.dir" value="${tunit_base.dir}/support/sdk/tunit" />
 	<property name="tinyos.dir" value="/opt/tinyos-2.x" />
 
-    <!-- Jar definitions -->
+	<!-- Jar definitions -->
 	<property name="tinyos.jar" value="${tinyos.dir}/support/sdk/java/tinyos.jar" />
 	<property name="tunit.jar" value="${java.dir}/tunit.jar" />
-    <property name="jcommon.jar" value="${java.dir}/depends/jcommon-1.0.9.jar" />
+	<property name="jcommon.jar" value="${java.dir}/depends/jcommon-1.0.9.jar" />
 	<property name="jfreechart.jar" value="${java.dir}/depends/jfreechart-1.0.5.jar" />
 	<property name="log4j.jar" value="${java.dir}/depends/log4j.jar" />
 	<property name="xerces.jar" value="${java.dir}/depends/xerces.jar" />
@@ -105,4 +105,5 @@
 	</target>
 
 </project>
+
 

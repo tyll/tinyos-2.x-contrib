@@ -59,10 +59,16 @@ implementation {
     error_t error;
     call Leds.led2Off();
     call Leds.led1On();
-    if((error = call AsyncSend.send()) != SUCCESS) {
-      assertEquals("Error on send()", SUCCESS, error);
-      assertEquals("Too few Tx's", 1000, times);
-      call TestTransmit.done();
+    
+    while((error = call AsyncSend.send()) != SUCCESS) {
+      if(error == EBUSY) {
+        // Then we couldn't send because of CCA
+        // Try again.
+      } else {
+        assertEquals("Error on send()", SUCCESS, error);
+        assertEquals("Too few Tx's", 1000, times);
+        call TestTransmit.done();
+      }
     }
   }
   

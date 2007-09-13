@@ -376,12 +376,16 @@ public class TUnitSuiteProperties {
       aggregate.setSkip(true);
     }
     
+    aggregate.ignore.addAll(subset.ignore);
+    aggregate.only.addAll(subset.only);
+    
     return aggregate;
   }
   
   /**
    * Make a clone of this TUnitSuiteProperties
    */
+  @SuppressWarnings("unchecked")
   public TUnitSuiteProperties clone() {
     TUnitSuiteProperties clone = new TUnitSuiteProperties();
     clone.addAuthor(new String(getAuthor()));
@@ -410,13 +414,8 @@ public class TUnitSuiteProperties {
       clone.setTimeout(timeout);
     }
 
-    for(Iterator it = only.iterator(); it.hasNext(); ) {
-      clone.addOnlyTarget(new String((String) it.next()));
-    }
-    
-    for(Iterator it = ignore.iterator(); it.hasNext(); ) {
-      clone.addIgnore(new String((String) it.next()));
-    }
+    clone.ignore.addAll(ignore);
+    clone.only.addAll(only);
     
     return clone;
   }

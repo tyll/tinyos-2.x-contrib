@@ -254,7 +254,9 @@ public class TUnitSuiteProperties {
     
     // 1. Does our test run contain targets that we should ignore?
     for(Iterator it = ignore.iterator(); it.hasNext(); ) {
-      if(testRun.containsTarget((String) it.next())) {
+      
+      String target = (String) it.next(); 
+      if(testRun.containsTarget(target)) {
         log.debug("This test is invalid for the given test run targets");
         return false;
       }
@@ -266,11 +268,12 @@ public class TUnitSuiteProperties {
     Iterator it;
     
     for(int i = 0; i < testRun.totalTargets(); i++) {
-      targetOk = true;
+      // If our "only" array is greater than 0, the target might not be ok
+      targetOk = (only.size() == 0);
       for(it = only.iterator(); it.hasNext(); ) {
         focusedTarget = (String) it.next();
-        if(!testRun.getTarget(i).getTargetName().matches(focusedTarget)) {
-          targetOk = false;
+        if(testRun.getTarget(i).getTargetName().matches(focusedTarget)) {
+          targetOk = true;
           break; // into outer for-loop
         }
       }
@@ -326,6 +329,7 @@ public class TUnitSuiteProperties {
    * @param subset
    * @return a new TUnitSuiteProperties with the aggregated results
    */
+  @SuppressWarnings("unchecked")
   public TUnitSuiteProperties apply(TUnitSuiteProperties subset) {
     TUnitSuiteProperties aggregate = clone();
     
@@ -404,6 +408,10 @@ public class TUnitSuiteProperties {
     
     if(timeout != null) {
       clone.setTimeout(timeout);
+    }
+
+    for(Iterator it = only.iterator(); it.hasNext(); ) {
+      clone.addOnlyTarget(new String((String) it.next()));
     }
     
     for(Iterator it = ignore.iterator(); it.hasNext(); ) {

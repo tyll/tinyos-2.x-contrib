@@ -5,10 +5,10 @@
 
 push( @includes, qw(
 
-  ## Tmoteblaze Platform
-  %T/platforms/tmoteblaze
-  %T/platforms/tmoteblaze/chips/ccxx00
-  #%T/platforms/tmoteblaze/chips/msp430/usart
+  ## tmote2500 Platform
+  %T/platforms/tmote2500
+  %T/platforms/tmote2500/chips/ccxx00
+  #%T/platforms/tmote2500/chips/msp430/usart
 
   ## Rincon CCxx00 Dual Radio Stack
   %T/../../blaze/tos/chips/blazeradio
@@ -47,7 +47,7 @@ push( @includes, qw(
   %T/lib/power
 
   ## TinyOS Interfaces
-  %T/../../tmoteblaze/tos/interfaces
+  %T/../../tmote2500/tos/interfaces
 
 ) );
 

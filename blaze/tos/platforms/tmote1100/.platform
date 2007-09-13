@@ -5,15 +5,15 @@
 
 push( @includes, qw(
 
-  ## Tmoteblaze Platform
-  %T/platforms/tmoteblaze
-  %T/platforms/tmoteblaze/chips/ccxx00
-  #%T/platforms/tmoteblaze/chips/msp430/usart
+  ## tmote1100 Platform
+  %T/platforms/tmote1100
+  %T/platforms/tmote1100/chips/ccxx00
+  #%T/platforms/tmote1100/chips/msp430/usart
 
   ## Rincon CCxx00 Dual Radio Stack
   %T/../../blaze/tos/chips/blazeradio
   %T/../../blaze/tos/chips/blazeradio/cc1100
-  %T/../../blaze/tos/chips/blazeradio/cc2500
+  %T/../../blaze/tos/chips/blazeradio/cc1100
   %T/../../blaze/tos/chips/blazeradio/control
   %T/../../blaze/tos/chips/blazeradio/csma
   %T/../../blaze/tos/chips/blazeradio/init
@@ -47,7 +47,7 @@ push( @includes, qw(
   %T/lib/power
 
   ## TinyOS Interfaces
-  %T/../../tmoteblaze/tos/interfaces
+  %T/../../tmote1100/tos/interfaces
 
 ) );
 

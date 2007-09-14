@@ -15,9 +15,15 @@ enum {
 
 enum cc1100_config_reg_state_enums {
 
-  CC1100_CONFIG_IOCFG2 = 0x01, //High on Received packet, low when packet is read from buffer
+  /** GDO2 goes high when we've received a packet until the buffer is empty */
+  CC1100_CONFIG_IOCFG2 = 0x01,
+  
+  /** GDO1 is High Impedance */
   CC1100_CONFIG_IOCFG1 = 0x2E,
-  CC1100_CONFIG_IOCFG0 = 0x09, //High when there is noise above a thresh hold on the channel
+  
+  /** GDO0 goes high when the channel is clear */
+  CC1100_CONFIG_IOCFG0 = 0x09, 
+
   CC1100_CONFIG_FIFOTHR = 0x07,
   CC1100_CONFIG_SYNC1 = 0xD3,
   CC1100_CONFIG_SYNC0 = 0x91,
@@ -38,7 +44,9 @@ enum cc1100_config_reg_state_enums {
   CC1100_CONFIG_MDMCFG0 = 0xF8,
   CC1100_CONFIG_DEVIATN = 0x00,
   CC1100_CONFIG_MCSM2 = 0x07,
-  CC1100_CONFIG_MCSM1 = 0x30, //Switch RX to TX only if not receiving and channel is clear, Idle after TX/RX
+
+  /** Switch to TX only on CCA; When done with Tx or Rx, stay in Rx */
+  CC1100_CONFIG_MCSM1 = 0x3F,
   CC1100_CONFIG_MCSM0 = 0x18,
   CC1100_CONFIG_FOCCFG = 0x1D,
   CC1100_CONFIG_BSCFG = 0x1C,

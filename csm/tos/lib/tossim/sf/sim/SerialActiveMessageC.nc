@@ -108,24 +108,8 @@ implementation {
         return call Packet.maxPayloadLength();
     }
 
-    command void* AMSend.getPayload[am_id_t id](message_t* m) {
-        return call Packet.getPayload(m, NULL);
-    }
-
-    command void* Receive.getPayload[am_id_t id](message_t* m, uint8_t* len) {
+    command void* AMSend.getPayload[am_id_t id](message_t* m, uint8_t len) {
         return call Packet.getPayload(m, len);
-    }
-
-    command uint8_t Receive.payloadLength[am_id_t id](message_t* m) {
-        return call Packet.payloadLength(m);
-    }
-
-    command void* Snoop.getPayload[am_id_t id](message_t* m, uint8_t* len) {
-        return call Packet.getPayload(m, len);
-    }
-
-    command uint8_t Snoop.payloadLength[am_id_t id](message_t* m) {
-        return call Packet.payloadLength(m);
     }
 
     event void Model.sendDone(message_t* msg, error_t result) {
@@ -157,7 +141,7 @@ implementation {
         void* payload;
 
         memcpy(bufferPointer, msg, sizeof(message_t));
-        payload = call Packet.getPayload(bufferPointer, &len);
+        payload = call Packet.getPayload(bufferPointer, len);
 
         dbg("Serial", "Received serial message (%p) of type %hhu and length %hhu @ %s.\n",
             bufferPointer, call AMPacket.type(bufferPointer), len, sim_time_string());
@@ -228,8 +212,12 @@ implementation {
     }
     command void Packet.clear(message_t* msg) {}
 
-    command uint8_t Packet.payloadLength(message_t* msg) {
-        return getHeader(msg)->length;
+    command void* Packet.getPayload(message_t* msg, uint8_t len) {
+        if (len <= TOSH_DATA_LENGTH) {
+            return msg->data;
+        } else {
+            return NULL;
+        }
     }
 
     command void Packet.setPayloadLength(message_t* msg, uint8_t len) {
@@ -240,11 +228,8 @@ implementation {
         return TOSH_DATA_LENGTH;
     }
 
-    command void* Packet.getPayload(message_t* msg, uint8_t* len) {
-        if (len != NULL) {
-            *len = call Packet.payloadLength(msg);
-        }
-        return msg->data;
+    command uint8_t Packet.payloadLength(message_t* msg) {
+        return getHeader(msg)->length;
     }
 
     async command error_t Acks.requestAck(message_t* msg) {

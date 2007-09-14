@@ -12,6 +12,9 @@ push( @includes, qw(
 
   ## Rincon CCxx00 Dual Radio Stack
   %T/../../blaze/tos/chips/blazeradio
+  %T/../../blaze/tos/chips/blazeradio/acks
+  %T/../../blaze/tos/chips/blazeradio/alarm
+  %T/../../blaze/tos/chips/blazeradio/arbiter
   %T/../../blaze/tos/chips/blazeradio/cc1100
   %T/../../blaze/tos/chips/blazeradio/cc2500
   %T/../../blaze/tos/chips/blazeradio/control

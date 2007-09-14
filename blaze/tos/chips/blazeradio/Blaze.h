@@ -1,7 +1,6 @@
 #ifndef __BLAZE_H__
 #define __BLAZE_H__
 
-#warning "INCLUDING BLAZE.H"
 
 typedef uint8_t blaze_status_t;
 typedef uint8_t radio_id_t;
@@ -24,7 +23,7 @@ typedef nx_struct blaze_footer_t {
 } blaze_footer_t;
 
 typedef nx_struct blaze_metadata_t {
-  nx_uint8_t tx_power;
+  nx_uint8_t txPower;
   nx_uint8_t rssi;
   nx_uint8_t lqi;
   nx_bool crc;
@@ -132,7 +131,7 @@ enum blaze_config_reg_addr_enums {
   BLAZE_MDMCFG3 = 0x11,
   BLAZE_MDMCFG2 = 0x12,
   BLAZE_MDMCFG1 = 0x13,
-  BLAZE_MDMCFG0 = 014,
+  BLAZE_MDMCFG0 = 0x14,
   BLAZE_DEVIATN = 0x15,
   BLAZE_MCSM2 = 0x16,
   BLAZE_MCSM1 = 0x17,

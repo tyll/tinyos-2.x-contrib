@@ -2,6 +2,7 @@
 
 #include "Blaze.h"
 
+
 /**
  * CCxx00 SPI bus wiring
  * @author Jared Hill
@@ -10,7 +11,6 @@
  
 configuration BlazeSpiC {
 
-  provides interface Resource;
   provides interface RadioInit;
   
   // commands
@@ -104,99 +104,99 @@ configuration BlazeSpiC {
 }
 
 implementation {
-
-  components BlazeSpiWireC as Spi;
   
-  Resource = Spi.Resource;
-  RadioInit = Spi;
+  components BlazeSpiP,
+      BlazeSpiWireC;
+ 
+  RadioInit = BlazeSpiWireC;
   
   // commands
-  SIDLE = Spi.Strobe[ BLAZE_SIDLE ];
-  SNOP = Spi.Strobe[ BLAZE_SNOP ];
-  SFRX = Spi.Strobe[ BLAZE_SFRX ];
-  SFTX = Spi.Strobe[ BLAZE_SFTX ];
-  SRX = Spi.Strobe[ BLAZE_SRX ];
-  STX = Spi.Strobe[ BLAZE_STX ];
-  SRES = Spi.Strobe[ BLAZE_SRES ];
-  SFSTXON = Spi.Strobe[ BLAZE_SFSTXON ];
-  SXOFF = Spi.Strobe[ BLAZE_SXOFF ];
-  SCAL = Spi.Strobe[ BLAZE_SCAL ];
-  SWOR = Spi.Strobe[ BLAZE_SWOR ];
-  SPWD = Spi.Strobe[ BLAZE_SPWD ];
-  SWORRST = Spi.Strobe[ BLAZE_SWORRST ];
+  SIDLE = BlazeSpiWireC.Strobe[ BLAZE_SIDLE ];
+  SNOP = BlazeSpiWireC.Strobe[ BLAZE_SNOP ];
+  SFRX = BlazeSpiWireC.Strobe[ BLAZE_SFRX ];
+  SFTX = BlazeSpiWireC.Strobe[ BLAZE_SFTX ];
+  SRX = BlazeSpiWireC.Strobe[ BLAZE_SRX ];
+  STX = BlazeSpiWireC.Strobe[ BLAZE_STX ];
+  SRES = BlazeSpiWireC.Strobe[ BLAZE_SRES ];
+  SFSTXON = BlazeSpiWireC.Strobe[ BLAZE_SFSTXON ];
+  SXOFF = BlazeSpiWireC.Strobe[ BLAZE_SXOFF ];
+  SCAL = BlazeSpiWireC.Strobe[ BLAZE_SCAL ];
+  SWOR = BlazeSpiWireC.Strobe[ BLAZE_SWOR ];
+  SPWD = BlazeSpiWireC.Strobe[ BLAZE_SPWD ];
+  SWORRST = BlazeSpiWireC.Strobe[ BLAZE_SWORRST ];
   
   // registers
-  IOCFG2 = Spi.Reg[ BLAZE_IOCFG2];
-  IOCFG1 = Spi.Reg[ BLAZE_IOCFG1 ];
-  IOCFG0 = Spi.Reg[ BLAZE_IOCFG0 ];
-  FIFOTHR = Spi.Reg[ BLAZE_FIFOTHR ];
-  SYNC1 = Spi.Reg[ BLAZE_SYNC1 ];
-  SYNC0 = Spi.Reg[ BLAZE_SYNC0 ];
-  PKTLEN = Spi.Reg[ BLAZE_PKTLEN ];
-  PKTCTRL1 = Spi.Reg[ BLAZE_PKTCTRL1 ];
-  PKTCTRL0 = Spi.Reg[ BLAZE_PKTCTRL0 ];
-  ADDR = Spi.Reg[ BLAZE_ADDR ]; 
-  CHANNR = Spi.Reg[ BLAZE_CHANNR ];
-  FSCTRL1 = Spi.Reg[ BLAZE_FSCTRL1 ];
-  FSCTRL0 = Spi.Reg[ BLAZE_FSCTRL0 ];
-  FREQ2 = Spi.Reg[ BLAZE_FREQ2 ]; 
-  FREQ1 = Spi.Reg[ BLAZE_FREQ1 ]; 
-  FREQ0 = Spi.Reg[ BLAZE_FREQ0 ];
-  MDMCFG4 = Spi.Reg[ BLAZE_MDMCFG4 ]; 
-  MDMCFG3 = Spi.Reg[ BLAZE_MDMCFG3 ]; 
-  MDMCFG2 = Spi.Reg[ BLAZE_MDMCFG2 ]; 
-  MDMCFG1 = Spi.Reg[ BLAZE_MDMCFG1 ]; 
-  MDMCFG0 = Spi.Reg[ BLAZE_MDMCFG0 ]; 
-  DEVIATN = Spi.Reg[ BLAZE_DEVIATN ]; 
-  MCSM2 = Spi.Reg[ BLAZE_MCSM2 ]; 
-  MCSM1 = Spi.Reg[ BLAZE_MCSM1 ]; 
-  MCSM0 = Spi.Reg[ BLAZE_MCSM0 ]; 
-  FOCCFG = Spi.Reg[ BLAZE_FOCCFG ];
-  BSCFG = Spi.Reg[ BLAZE_BSCFG ]; 
-  AGCTRL2 = Spi.Reg[ BLAZE_AGCTRL2 ]; 
-  AGCTRL1 = Spi.Reg[ BLAZE_AGCTRL1 ]; 
-  AGCTRL0 = Spi.Reg[ BLAZE_AGCTRL0 ]; 
-  WOREVT1 = Spi.Reg[ BLAZE_WOREVT1 ]; 
-  WOREVT0 = Spi.Reg[ BLAZE_WOREVT0 ]; 
-  WORCTRL = Spi.Reg[ BLAZE_WORCTRL ]; 
-  FREND1 = Spi.Reg[ BLAZE_FREND1 ]; 
-  FREND0 = Spi.Reg[ BLAZE_FREND0 ]; 
-  FSCAL3 = Spi.Reg[ BLAZE_FSCAL3 ]; 
-  FSCAL2 = Spi.Reg[ BLAZE_FSCAL2 ]; 
-  FSCAL1 = Spi.Reg[ BLAZE_FSCAL1 ]; 
-  FSCAL0 = Spi.Reg[ BLAZE_FSCAL0 ]; 
-  RCCTRL1 = Spi.Reg[ BLAZE_RCCTRL1 ]; 
-  RCCTRL0 = Spi.Reg[ BLAZE_RCCTRL0 ]; 
-  FSTEST = Spi.Reg[ BLAZE_FSTEST ];
-  PTEST = Spi.Reg[ BLAZE_PTEST ]; 
-  AGCTEST = Spi.Reg[ BLAZE_AGCTEST ];
-  TEST2 = Spi.Reg[ BLAZE_TEST2 ]; 
-  TEST1 = Spi.Reg[ BLAZE_TEST1 ]; 
-  TEST0 = Spi.Reg[ BLAZE_TEST0 ]; 
-  PARTNUM = Spi.Reg[ BLAZE_PARTNUM ];
-  VERSION = Spi.Reg[ BLAZE_VERSION ];
-  FREQEST = Spi.Reg[ BLAZE_FREQEST ];
-  LQI = Spi.Reg[ BLAZE_LQI ]; 
-  RSSI = Spi.Reg[ BLAZE_RSSI ];
-  MARCSTATE = Spi.Reg[ BLAZE_MARCSTATE ]; 
-  WORTIME1 = Spi.Reg[ BLAZE_WORTIME1 ]; 
-  WORTIME0 = Spi.Reg[ BLAZE_WORTIME0 ]; 
-  PKTSTATUS = Spi.Reg[ BLAZE_PKSTATUS ]; 
-  VCO_VC_DAC = Spi.Reg[ BLAZE_VCO_VC_DAC ];
-  TXBYTES = Spi.Reg[ BLAZE_TXBYTES ]; 
-  RXBYTES = Spi.Reg[ BLAZE_RXBYTES ]; 
-  RXREG = Spi.Reg[ BLAZE_RXFIFO ];
-  TXREG = Spi.Reg[ BLAZE_TXFIFO ];
-  PA = Spi.Reg[ BLAZE_PATABLE ];
+  IOCFG2 = BlazeSpiWireC.Reg[ BLAZE_IOCFG2];
+  IOCFG1 = BlazeSpiWireC.Reg[ BLAZE_IOCFG1 ];
+  IOCFG0 = BlazeSpiWireC.Reg[ BLAZE_IOCFG0 ];
+  FIFOTHR = BlazeSpiWireC.Reg[ BLAZE_FIFOTHR ];
+  SYNC1 = BlazeSpiWireC.Reg[ BLAZE_SYNC1 ];
+  SYNC0 = BlazeSpiWireC.Reg[ BLAZE_SYNC0 ];
+  PKTLEN = BlazeSpiWireC.Reg[ BLAZE_PKTLEN ];
+  PKTCTRL1 = BlazeSpiWireC.Reg[ BLAZE_PKTCTRL1 ];
+  PKTCTRL0 = BlazeSpiWireC.Reg[ BLAZE_PKTCTRL0 ];
+  ADDR = BlazeSpiWireC.Reg[ BLAZE_ADDR ]; 
+  CHANNR = BlazeSpiWireC.Reg[ BLAZE_CHANNR ];
+  FSCTRL1 = BlazeSpiWireC.Reg[ BLAZE_FSCTRL1 ];
+  FSCTRL0 = BlazeSpiWireC.Reg[ BLAZE_FSCTRL0 ];
+  FREQ2 = BlazeSpiWireC.Reg[ BLAZE_FREQ2 ]; 
+  FREQ1 = BlazeSpiWireC.Reg[ BLAZE_FREQ1 ]; 
+  FREQ0 = BlazeSpiWireC.Reg[ BLAZE_FREQ0 ];
+  MDMCFG4 = BlazeSpiWireC.Reg[ BLAZE_MDMCFG4 ]; 
+  MDMCFG3 = BlazeSpiWireC.Reg[ BLAZE_MDMCFG3 ]; 
+  MDMCFG2 = BlazeSpiWireC.Reg[ BLAZE_MDMCFG2 ]; 
+  MDMCFG1 = BlazeSpiWireC.Reg[ BLAZE_MDMCFG1 ]; 
+  MDMCFG0 = BlazeSpiWireC.Reg[ BLAZE_MDMCFG0 ]; 
+  DEVIATN = BlazeSpiWireC.Reg[ BLAZE_DEVIATN ]; 
+  MCSM2 = BlazeSpiWireC.Reg[ BLAZE_MCSM2 ]; 
+  MCSM1 = BlazeSpiWireC.Reg[ BLAZE_MCSM1 ]; 
+  MCSM0 = BlazeSpiWireC.Reg[ BLAZE_MCSM0 ]; 
+  FOCCFG = BlazeSpiWireC.Reg[ BLAZE_FOCCFG ];
+  BSCFG = BlazeSpiWireC.Reg[ BLAZE_BSCFG ]; 
+  AGCTRL2 = BlazeSpiWireC.Reg[ BLAZE_AGCTRL2 ]; 
+  AGCTRL1 = BlazeSpiWireC.Reg[ BLAZE_AGCTRL1 ]; 
+  AGCTRL0 = BlazeSpiWireC.Reg[ BLAZE_AGCTRL0 ]; 
+  WOREVT1 = BlazeSpiWireC.Reg[ BLAZE_WOREVT1 ]; 
+  WOREVT0 = BlazeSpiWireC.Reg[ BLAZE_WOREVT0 ]; 
+  WORCTRL = BlazeSpiWireC.Reg[ BLAZE_WORCTRL ]; 
+  FREND1 = BlazeSpiWireC.Reg[ BLAZE_FREND1 ]; 
+  FREND0 = BlazeSpiWireC.Reg[ BLAZE_FREND0 ]; 
+  FSCAL3 = BlazeSpiWireC.Reg[ BLAZE_FSCAL3 ]; 
+  FSCAL2 = BlazeSpiWireC.Reg[ BLAZE_FSCAL2 ]; 
+  FSCAL1 = BlazeSpiWireC.Reg[ BLAZE_FSCAL1 ]; 
+  FSCAL0 = BlazeSpiWireC.Reg[ BLAZE_FSCAL0 ]; 
+  RCCTRL1 = BlazeSpiWireC.Reg[ BLAZE_RCCTRL1 ]; 
+  RCCTRL0 = BlazeSpiWireC.Reg[ BLAZE_RCCTRL0 ]; 
+  FSTEST = BlazeSpiWireC.Reg[ BLAZE_FSTEST ];
+  PTEST = BlazeSpiWireC.Reg[ BLAZE_PTEST ]; 
+  AGCTEST = BlazeSpiWireC.Reg[ BLAZE_AGCTEST ];
+  TEST2 = BlazeSpiWireC.Reg[ BLAZE_TEST2 ]; 
+  TEST1 = BlazeSpiWireC.Reg[ BLAZE_TEST1 ]; 
+  TEST0 = BlazeSpiWireC.Reg[ BLAZE_TEST0 ]; 
+  PARTNUM = BlazeSpiWireC.Reg[ BLAZE_PARTNUM ];
+  VERSION = BlazeSpiWireC.Reg[ BLAZE_VERSION ];
+  FREQEST = BlazeSpiWireC.Reg[ BLAZE_FREQEST ];
+  LQI = BlazeSpiWireC.Reg[ BLAZE_LQI ]; 
+  RSSI = BlazeSpiWireC.Reg[ BLAZE_RSSI ];
+  MARCSTATE = BlazeSpiWireC.Reg[ BLAZE_MARCSTATE ]; 
+  WORTIME1 = BlazeSpiWireC.Reg[ BLAZE_WORTIME1 ]; 
+  WORTIME0 = BlazeSpiWireC.Reg[ BLAZE_WORTIME0 ]; 
+  PKTSTATUS = BlazeSpiWireC.Reg[ BLAZE_PKSTATUS ]; 
+  VCO_VC_DAC = BlazeSpiWireC.Reg[ BLAZE_VCO_VC_DAC ];
+  TXBYTES = BlazeSpiWireC.Reg[ BLAZE_TXBYTES ]; 
+  RXBYTES = BlazeSpiWireC.Reg[ BLAZE_RXBYTES ]; 
+  RXREG = BlazeSpiWireC.Reg[ BLAZE_RXFIFO ];
+  TXREG = BlazeSpiWireC.Reg[ BLAZE_TXFIFO ];
+  PA = BlazeSpiWireC.Reg[ BLAZE_PATABLE ];
   
   // fifos
-  RXFIFO = Spi.Fifo[ BLAZE_RXFIFO ];
-  TXFIFO = Spi.Fifo[ BLAZE_TXFIFO ];
-  PATABLE = Spi.Fifo[ BLAZE_PATABLE ];
+  RXFIFO = BlazeSpiWireC.Fifo[ BLAZE_RXFIFO ];
+  TXFIFO = BlazeSpiWireC.Fifo[ BLAZE_TXFIFO ];
+  PATABLE = BlazeSpiWireC.Fifo[ BLAZE_PATABLE ];
 
   //radio control
-  CheckRadio = Spi.CheckRadio;
-  RadioStatus = Spi.RadioStatus;
+  CheckRadio = BlazeSpiWireC.CheckRadio;
+  RadioStatus = BlazeSpiWireC.RadioStatus;
 
 }
 

@@ -1,16 +1,14 @@
 
 
 /**
- * This module assumes it already owns the SPI bus
- * 
  * Due to hardware design and battery considerations, we can only have one radio
- * on at a time.  BlazeInit will protect this rule by storing the enabled
- * radio's ID.
+ * on at a time.  BlazeInit will protect this rule by storing and checking
+ * the enabled radio's ID.
  *
  * Also, some platforms might support the Power pin, which controls a FET
  * switch that turns off the radio.  For platforms that don't have a Power pin,
  * the radio should go into a deep sleep mode.  On platforms that do have a 
- * power pin, the radio will turn off completely after entering deep sleep.
+ * power pin, the radio will enter deep sleep then turn off completely.
  * 
  * @author Jared Hill 
  * @author David Moss
@@ -29,6 +27,9 @@ module BlazeInitP {
   }
   
   uses {
+    interface Resource as ResetResource;
+    interface Resource as DeepSleepResource;
+   
     interface GeneralIO as Power[ radio_id_t id ];
     interface GeneralIO as Csn[ radio_id_t id ];
     interface GeneralIO as Gdo0_io[ radio_id_t id ];
@@ -56,7 +57,9 @@ implementation {
     NO_RADIO = 0xFF,
   };
 
-  uint8_t m_id = NO_RADIO;
+  uint8_t m_id;
+  
+  uint8_t blazePowerClient;
   
   uint8_t state;
   
@@ -67,9 +70,6 @@ implementation {
   };
   
   /***************** Prototypes ****************/
-  void sleep(uint8_t id);
-  void shutdown(uint8_t id);
-  task void init();  
 
   /************** SoftwareInit Commands *****************/
   command error_t Init.init() {
@@ -77,17 +77,22 @@ implementation {
     for(i = 0; i < uniqueCount(UQ_BLAZE_RADIO); i++) {
       call BlazePower.shutdown[i]();
     }
+    m_id = NO_RADIO;
     state = S_IDLE;
     return SUCCESS;
   }
     
   /************** SplitControl Commands**************/
   /**
-   * Upper layers implement TEP 117 compliance. This layer simply prevents
-   * two radios from being on simulatenously
+   * This layer prevents two radios from being on simulatenously
+   * When doing a SplitControl.start(), the radio is reset before bursting
+   * in register values.  Tests show that not restarting the radio
+   * somehow, even with different applications loaded on, will prevent
+   * SplitControl.start from completing properly.  
+   * 
+   * It may have something to do with the corrupted register writes on burst.
    */
-  command error_t SplitControl.start[ radio_id_t id ](){
-   
+  command error_t SplitControl.start[ radio_id_t id ]() {
     if(m_id != NO_RADIO) {
       return EBUSY;
       
@@ -95,16 +100,17 @@ implementation {
       return EALREADY;
     }
     
-    m_id = id;
+    atomic m_id = id;
 
     call Power.set[ m_id ]();
     call Csn.clr[ m_id ]();
     call CheckRadio.waitForWakeup();
     
     state = S_STARTING;
-    post init();
     
-    return SUCCESS;
+    // Since we're in control of BlazeSpiP, we know this next command will only
+    // return SUCCESS. Therefore, there is no need to create code to undo above.
+    return call BlazePower.reset[id]();
   }
   
   command error_t SplitControl.stop[ radio_id_t id ](){
@@ -132,7 +138,7 @@ implementation {
    */
   command void BlazeCommit.commit() {
     state = S_COMMITTING;
-    post init();
+    call BlazePower.reset[m_id]();
   }
   
   
@@ -140,24 +146,22 @@ implementation {
 
   /**
    * Restart the chip.  All registers come up in their default settings.
+   * We don't confirm the radio ID, so be careful.  This is because
+   * we may want to call BlazePower.reset() on some radio, and then call
+   * SplitControl.start() afterwards.
    */
-  async command void BlazePower.reset[ radio_id_t id ]() {
-    call Csn.set[id]();
-    call Csn.clr[id]();
-    call Idle.strobe();
-    call SRES.strobe();
-    call Csn.set[id]();
+  async command error_t BlazePower.reset[ radio_id_t id ]() {
+    atomic blazePowerClient = id;
+    return call ResetResource.request();
   }
   
   /**
    * Stop the oscillator.
+   * We don't confirm the radio ID, so be careful
    */
-  async command void BlazePower.deepSleep[ radio_id_t id ]() {
-    call Csn.set[id]();
-    call Csn.clr[id]();
-    call Idle.strobe();
-    call SXOFF.strobe();
-    call Csn.set[id]();
+  async command error_t BlazePower.deepSleep[ radio_id_t id ]() {
+    atomic blazePowerClient = id;
+    return call DeepSleepResource.request();
   }
 
   /**
@@ -176,26 +180,25 @@ implementation {
   
   /***************** RadioInit Events ****************/
   event void RadioInit.initDone() { 
-
+  
     call Gdo0_io.makeInput[ m_id ]();
     call Gdo2_io.makeInput[ m_id ]();
     
-    
     call Csn.set[ m_id ]();
     call Csn.clr[ m_id ]();
-        
+    
     // Startup the radio in Rx mode by default
+    call SFRX.strobe();
+    call SFTX.strobe();
     call Idle.strobe();
     while (call RadioStatus.getRadioStatus() != BLAZE_S_IDLE);
     
-    // While we're IDLE, clear our the FIFOs and set the radio into Rx mode
-    call SFRX.strobe();
-    call SFTX.strobe();
     call SRX.strobe();
     while (call RadioStatus.getRadioStatus() != BLAZE_S_RX);
     
     call Csn.set[ m_id ]();
     
+    call ResetResource.release();
     
     if(state == S_STARTING) {
       signal SplitControl.startDone[ m_id ](SUCCESS);
@@ -203,32 +206,53 @@ implementation {
     } else {
       signal BlazeCommit.commitDone();
     }
-    
-    state = S_IDLE;
   }
   
-  /***************** Functions ****************/
-  
-  /**
-   * Proper shutdown procedure. GDO's become output and cleared so lines don't
-   * float when the chip is physically off.
-   */
-  void shutdown(uint8_t id) {
-
-  }
-  
-  /***************** Tasks ****************/
-  task void init() {
-    call Csn.set[m_id]();
-    call Csn.clr[m_id]();
+  /***************** Resource Events ****************/
+  event void ResetResource.granted() {
+    uint8_t id;
+    atomic id = blazePowerClient;
+    call Csn.set[id]();
+    call Csn.clr[id]();
     call Idle.strobe();
+    call SRES.strobe();
+    call Csn.set[id]();
+
+    if(state == S_STARTING || state == S_COMMITTING) {
+      call Csn.set[id]();
+      call Csn.clr[id]();
+      call Idle.strobe();
     
-    if(call RadioInit.init(BLAZE_IOCFG2, 
-        call BlazeRegSettings.getDefaultRegisters[ m_id ](), 
-            BLAZE_TOTAL_INIT_REGISTERS) != SUCCESS) {
-      post init();
+      // TODO Is it safe to assume this will always succeed?
+      call RadioInit.init(BLAZE_IOCFG2, 
+          call BlazeRegSettings.getDefaultRegisters[ id ](), 
+              BLAZE_TOTAL_INIT_REGISTERS);
+              
+      // Hang onto the ResetResource until RadioInit has completed
+              
+    } else {
+      call ResetResource.release();
+      signal BlazePower.resetComplete[id]();
     }
   }
+  
+  event void DeepSleepResource.granted() {
+    uint8_t id;
+    atomic id = blazePowerClient;
+    call Csn.set[id]();
+    call Csn.clr[id]();
+    call Idle.strobe();
+    call SXOFF.strobe();
+    call Csn.set[id]();
+    call DeepSleepResource.release();
+    signal BlazePower.deepSleepComplete[id]();
+  }
+  
+  
+  /***************** Functions ****************/
+    
+  /***************** Tasks ****************/
+
   
   /***************** Defaults ******************/
   default async command void Csn.set[ radio_id_t id ](){}
@@ -266,6 +290,9 @@ implementation {
   default async command bool Gdo2_io.isInput[ radio_id_t id ](){return FALSE;}
   default async command void Gdo2_io.makeOutput[ radio_id_t id ](){}
   default async command bool Gdo2_io.isOutput[ radio_id_t id ](){return FALSE;}
+  
+  default event void BlazePower.resetComplete[ radio_id_t id ]() {}
+  default event void BlazePower.deepSleepComplete[ radio_id_t id ]() {}
   
   default event void SplitControl.startDone[ radio_id_t id ](error_t error){}
   default event void SplitControl.stopDone[ radio_id_t id ](error_t error){}

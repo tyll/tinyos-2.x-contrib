@@ -42,11 +42,11 @@ implementation {
   async command void BlazePacket.setPower( message_t* p_msg, uint8_t power ) {
     if ( power > 31 )
       power = 31;
-    getMetadata( p_msg )->tx_power = power;
+    getMetadata( p_msg )->txPower = power;
   }
 
   async command uint8_t BlazePacket.getPower( message_t* p_msg ) {
-    return getMetadata( p_msg )->tx_power;
+    return getMetadata( p_msg )->txPower;
   }
    
   async command int8_t BlazePacket.getRssi( message_t* p_msg ) {

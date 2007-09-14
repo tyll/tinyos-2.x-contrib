@@ -1,49 +1,76 @@
 
 
 #include "Blaze.h"
- 
+#include "BlazeSpiResource.h"
+
 /**
  * @author Jared Hill
  * @author David Moss
  */ 
 module BlazeSpiP {
 
-  provides interface BlazeFifo as Fifo[ uint8_t id ];
-  provides interface BlazeRegister as Reg[ uint8_t id ];
-  provides interface BlazeStrobe as Strobe[ uint8_t id ];
-  provides interface RadioInit;
-  provides interface RadioStatus;
+  provides {
+    interface Resource[ uint8_t id ];
+    interface BlazeFifo as Fifo[ uint8_t id ];
+    interface BlazeRegister as Reg[ uint8_t id ];
+    interface BlazeStrobe as Strobe[ uint8_t id ];
+    interface ChipSpiResource;
+    interface RadioInit;
+    interface RadioStatus;
+  }
   
-  uses interface SpiByte;
-  uses interface SpiPacket;
-  uses interface Leds;
-  uses interface State;
- 
+  uses {
+    interface Resource as SpiResource;
+    interface SpiByte;
+    interface SpiPacket;
+    interface Leds;
+    interface State;
+    interface State as SpiResourceState;
+  }
 }
 
 implementation {
 
   enum {
-    S_IDLE = 0,
-    S_READ_FIFO = 1,
-    S_STOPPED = 2,
-    S_INIT = 3,
-    S_WRITE_FIFO = 4,
-    S_WRITE_REG = 5,
-    S_READ_REG = 6,
+    RESOURCE_COUNT = uniqueCount( UQ_BLAZE_SPI_RESOURCE ),
+    NO_HOLDER = 0xFF,
+  };
+
+  enum {
+    S_IDLE,
+    S_BUSY,
+    
+    S_READ_FIFO,
+    S_INIT,
+    S_WRITE_FIFO,
   };
 
   /** Address to read / write */
   uint16_t m_addr;
   
+  /** Each bit represents a client ID that is requesting SPI bus access */
+  uint32_t m_requests = 0;
+  
+  /** The current client that owns the SPI bus */
+  uint8_t m_holder = NO_HOLDER;
+  
+  /** TRUE if it is safe to release the SPI bus after all users say ok */
+  bool release;
+  
   /***************** Prototypes ****************/
   uint8_t getRadioStatus();
+  error_t attemptRelease();
+  task void grant();
   task void radioInitDone();
-    
-  /***************RadioInit Commands*************************/
+  
+  /***************** RadioInit Commands ****************/
   command error_t RadioInit.init(uint8_t startAddr, uint8_t* regs, 
       uint8_t len) {
       
+    if(!call SpiResource.isOwner()) {
+      return ERESERVE;
+    }
+    
     if(call State.requestState(S_INIT) != SUCCESS) {
       return FAIL;
     }
@@ -51,11 +78,107 @@ implementation {
     call SpiByte.write(startAddr | BLAZE_BURST | BLAZE_WRITE);
     call SpiPacket.send(regs, NULL, len);
     
-    
     return SUCCESS;  
   }
   
-  /************************** Fifo Commands ******************************/
+  
+  /***************** ChipSpiResource Commands ****************/
+  /**
+   * Abort the release of the SPI bus.  This must be called only with the
+   * releasing() event
+   */
+  async command void ChipSpiResource.abortRelease() {
+    atomic release = FALSE;
+  }
+  
+  /**
+   * Release the SPI bus if there are no objections
+   */
+  async command error_t ChipSpiResource.attemptRelease() {
+    return attemptRelease();
+  }
+  
+  /***************** Resource Commands *****************/
+  async command error_t Resource.request[ uint8_t id ]() {
+        
+    atomic {
+      if ( call SpiResourceState.requestState(S_BUSY) == SUCCESS ) {
+        m_holder = id;
+        if(call SpiResource.isOwner()) {
+          post grant();
+          
+        } else {
+          call SpiResource.request();
+        }
+        
+      } else {
+        m_requests |= 1 << id;
+      }
+    }
+    return SUCCESS;
+  }
+  
+  async command error_t Resource.immediateRequest[ uint8_t id ]() {
+    error_t error;
+        
+    atomic {
+      if ( call SpiResourceState.requestState(S_BUSY) != SUCCESS ) {
+        return EBUSY;
+      }
+      
+      if(call SpiResource.isOwner()) {
+        m_holder = id;
+        error = SUCCESS;
+      
+      } else if ((error = call SpiResource.immediateRequest()) == SUCCESS ) {
+        m_holder = id;
+        
+      } else {
+        call SpiResourceState.toIdle();
+      }
+    }
+    return error;
+  }
+
+  async command error_t Resource.release[ uint8_t id ]() {
+    uint8_t i;
+    atomic {
+      if ( m_holder != id ) {
+        return FAIL;
+      }
+
+      m_holder = NO_HOLDER;
+      if ( !m_requests ) {
+        call SpiResourceState.toIdle();
+        attemptRelease();
+        
+      } else {
+        for ( i = m_holder + 1; ; i++ ) {
+          i %= RESOURCE_COUNT;
+          
+          if ( m_requests & ( 1 << i ) ) {
+            m_holder = i;
+            m_requests &= ~( 1 << i );
+            post grant();
+            return SUCCESS;
+          }
+        }
+      }
+    }
+    
+    return SUCCESS;
+  }
+  
+  async command uint8_t Resource.isOwner[ uint8_t id ]() {
+    atomic return (m_holder == id);
+  }
+
+  /***************** SpiResource Events ****************/
+  event void SpiResource.granted() {
+    post grant();
+  }
+  
+  /***************** Fifo Commands ****************/
   async command blaze_status_t Fifo.beginRead[ uint8_t addr ]( uint8_t* data, 
       uint8_t len ) {
       
@@ -88,7 +211,7 @@ implementation {
     return status;
   }
   
-  /********************SpiPacket Events***************************/
+  /***************** SpiPacket Events ****************/
   async event void SpiPacket.sendDone( uint8_t* tx_buf, uint8_t* rx_buf, 
       uint16_t len, error_t error ) {
       
@@ -104,11 +227,10 @@ implementation {
       
     } else if( status == S_WRITE_FIFO) {
       signal Fifo.writeDone[ m_addr ]( tx_buf, len, error );
-    }  
-    
+    }
   }
 
-  /*************** Reg Commands ***************/
+  /***************** Reg Commands ****************/
   async command blaze_status_t Reg.read[ uint8_t addr ](uint8_t* data ) {
 	blaze_status_t status;
 	status = call SpiByte.write(addr | BLAZE_READ | BLAZE_SINGLE); 
@@ -121,7 +243,7 @@ implementation {
     return call SpiByte.write(data);
   }
 
-  /******************Strobe Commands***********************/
+  /***************** Strobe Commands ****************/
   async command blaze_status_t Strobe.strobe[ uint8_t addr ]() {
     return call SpiByte.write( addr );
   }
@@ -139,19 +261,67 @@ implementation {
     return ret;
   }
 
+
+  /***************** Tasks ***************/
+  task void radioInitDone() {
+    signal RadioInit.initDone(); 
+  }
+  
+  task void grant() {
+    uint8_t holder;
+    atomic { 
+      holder = m_holder;
+    }
+    signal Resource.granted[ holder ]();
+  }
+
+
   /***************** Functions ****************/
   uint8_t getRadioStatus(){
     return ((call SpiByte.write(BLAZE_SNOP) >> 4) & 0x07);
   }
 
-  task void radioInitDone() {
-    signal RadioInit.initDone(); 
-  }
+  error_t attemptRelease() {
+    uint8_t atomicRequests;
+    uint8_t atomicHolder;
     
-  /***************** Defaults ***************/
+    atomic {
+      atomicRequests = m_requests;
+      atomicHolder = m_holder;
+    }
+    
+    if(atomicRequests > 0 
+        || atomicHolder != NO_HOLDER 
+        || !call SpiResourceState.isIdle()) {
+      return FAIL;
+    }
+    
+    atomic release = TRUE;
+    // Users call back with ChipSpiResource.abortRelease() if needed:
+    signal ChipSpiResource.releasing();
+    atomic {
+      if(release) {
+        call SpiResource.release();
+        return SUCCESS;
+      }
+    }
+    
+    return EBUSY;
+  }
+  
+  /***************** Defaults ****************/
+  default event void Resource.granted[ uint8_t id ]() { 
+    call SpiResource.release();
+  }
+  
   default async event void Fifo.readDone[ uint8_t addr ]( uint8_t* rx_buf, uint8_t rx_len, error_t error ) {}
   default async event void Fifo.writeDone[ uint8_t addr ]( uint8_t* tx_buf, uint8_t tx_len, error_t error ) {}
   
   default event void RadioInit.initDone() {}
+  
+  
+  default async event void ChipSpiResource.releasing() {
+  }
+  
   
 }

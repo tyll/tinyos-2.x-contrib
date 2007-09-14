@@ -237,10 +237,10 @@ implementation {
     call State.toIdle();
     
     if(state == S_TX_PACKET) {
-      signal AsyncSend.sendDone[ id ](SUCCESS);
+      signal AsyncSend.sendDone[ id ]();
     
     } else if(state == S_TX_ACK) {
-      signal AckSend.sendDone[ id ](SUCCESS);
+      signal AckSend.sendDone[ id ]();
     }
     
     return SUCCESS;
@@ -253,10 +253,10 @@ implementation {
   default async command void Csn.makeInput[ radio_id_t id ](){}
   default async command void Csn.makeOutput[ radio_id_t id ](){}
   
-  default async event void AsyncSend.sendDone[ radio_id_t id ](error_t error) {}
+  default async event void AsyncSend.sendDone[ radio_id_t id ]() {}
   default async event void AsyncSend.loadDone[ radio_id_t id ](void *msg, error_t error) {}
   
-  default async event void AckSend.sendDone[ radio_id_t id ](error_t error) {}
+  default async event void AckSend.sendDone[ radio_id_t id ]() {}
   default async event void AckSend.loadDone[ radio_id_t id ](void *msg, error_t error) {}
   
 }

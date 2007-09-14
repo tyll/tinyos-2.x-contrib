@@ -35,8 +35,10 @@ implementation {
   MainC.SoftwareInit -> BlazeReceiveP;
   
   components BlazePacketC,
-      BlazeSpiC as Spi;
+      BlazeSpiC as Spi,
+      new BlazeSpiResourceC();
       
+  BlazeReceiveP.Resource -> BlazeSpiResourceC;
   BlazeReceiveP.CheckRadio -> Spi.CheckRadio;
   BlazeReceiveP.SNOP -> Spi.SNOP;
   BlazeReceiveP.SRX -> Spi.SRX;

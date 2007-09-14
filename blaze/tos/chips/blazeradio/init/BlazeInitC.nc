@@ -24,7 +24,10 @@ implementation {
 
   components MainC,
       BlazeInitP,
-      BlazeSpiC;
+      BlazeSpiC,
+      new BlazeSpiResourceC() as ResetResourceC,
+      new BlazeSpiResourceC() as DeepSleepResourceC;
+      
   
   MainC.SoftwareInit -> BlazeInitP;
   
@@ -37,6 +40,9 @@ implementation {
   
   Gdo0_io = BlazeInitP.Gdo0_io;
   Gdo2_io = BlazeInitP.Gdo2_io;
+  
+  BlazeInitP.ResetResource -> ResetResourceC;
+  BlazeInitP.DeepSleepResource -> DeepSleepResourceC;
   
   BlazeInitP.Idle -> BlazeSpiC.SIDLE;
   BlazeInitP.SRES -> BlazeSpiC.SRES;

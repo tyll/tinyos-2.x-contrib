@@ -25,6 +25,7 @@ module BlazeReceiveP {
    
     interface BlazeFifo as RXFIFO;
   
+    interface Resource;
     interface BlazeStrobe as SFRX;
     interface BlazeStrobe as SFTX;
     interface BlazeStrobe as STX;
@@ -90,15 +91,13 @@ implementation {
     m_msg = &myMsg;
     acknowledgement.length = ACK_FRAME_LENGTH;
     acknowledgement.fcf = IEEE154_TYPE_ACK;
-    
-    // TODO REMOVE:
-    acknowledgement.dsn = 0xAA;
-    acknowledgement.src = 0xBB;
-    
     return SUCCESS;
   }
   
   /***************** Receive Commands ****************/
+  /**
+   * TODO THIS IS GONE
+   */
   command void* Receive.getPayload[radio_id_t id](message_t* msg, uint8_t* len) {
     if (len != NULL) {
       *len = ((uint8_t*) (call BlazePacketBody.getHeader( msg )))[0];
@@ -106,6 +105,9 @@ implementation {
     return msg->data;
   }
 
+  /**
+   * TODO THIS IS GONE
+   */
   command uint8_t Receive.payloadLength[radio_id_t id](message_t* m) {
     uint8_t* buf = (uint8_t*)(call BlazePacketBody.getHeader( m ));
     return buf[0];
@@ -114,29 +116,35 @@ implementation {
   /*************** ReceiveController Commands ***********************/
   async command error_t ReceiveController.beginReceive[ radio_id_t id ](){
     
-    uint8_t status;
     if(call State.requestState(S_RX_LENGTH) != SUCCESS) {
       return EBUSY;
     }
     
-    call Csn.clr[ id ]();
-    atomic{
+    atomic {
       m_id = id;
       m_msg = &myMsg;
     }
     
+    call Resource.request();
+    
+    return SUCCESS;
+  }
+  
+  /***************** Resource Events ****************/
+  event void Resource.granted() {
+    uint8_t status;
+    
+    call Csn.clr[ m_id ]();
+    
     //crc check on the packet that was just received
-    if((call PktStatus.read(&status)) >> 7) {
+    call PktStatus.read(&status);
+    if(status >> 7) {
       // return SUCCESS because failReceive signals an event
       call State.toIdle();
       failReceive();
-      return SUCCESS;
     }
     
-    // Anything after receive() returns an event, so signal SUCCESS
     receive();
-    
-    return SUCCESS;
   }
   
   
@@ -145,7 +153,7 @@ implementation {
     call AckSend.send[id]();
   }
   
-  async event void AckSend.sendDone[ radio_id_t id ](error_t error) {
+  async event void AckSend.sendDone[ radio_id_t id ]() {
     blaze_header_t *header = call BlazePacketBody.getHeader( m_msg );
     uint8_t rxFrameLength = header->length;
     uint8_t *buf = (uint8_t*) header;
@@ -266,8 +274,10 @@ implementation {
       // The FCF_FRAME_TYPE bit in the FCF byte tells us 
       // if this is an ack or data
       if ((( header->fcf >> IEEE154_FCF_FRAME_TYPE ) & 7) == IEEE154_TYPE_ACK) {
-        signal AckReceive.receive( header->src, header->dest, header->dsn );
+        call Resource.release();
         call State.toIdle();
+        signal AckReceive.receive( header->src, header->dest, header->dsn );
+
         // TODO receive the next packet in the RX FIFO?
      
       } else {
@@ -309,7 +319,8 @@ implementation {
     
     atomicMsg = signal Receive.receive[atomicId]( m_msg, m_msg->data, rxFrameLength );
     atomic m_msg = atomicMsg;
-    
+
+    call Resource.release();    
     call State.toIdle();
   }
   
@@ -347,6 +358,7 @@ implementation {
     atomic id = m_id;
     call Csn.set[ id ]();
     
+    call Resource.release();
     signal ReceiveController.receiveFailed[m_id]();
     return; 
   }

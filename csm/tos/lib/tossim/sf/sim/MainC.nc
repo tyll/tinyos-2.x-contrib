@@ -61,7 +61,7 @@ implementation {
   // the application does not wire this up to, e.g., ActiveMessageC,
   // the default handlers make sure nothing happens when a script
   // tries to deliver a packet to a node that has no radio stack.
-  components TossimActiveMessageP;
+  components TossimActiveMessageC;
   components SerialActiveMessageC;
   
 }

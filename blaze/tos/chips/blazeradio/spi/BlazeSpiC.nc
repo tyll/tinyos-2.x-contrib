@@ -12,6 +12,7 @@
 configuration BlazeSpiC {
 
   provides interface RadioInit;
+  provides interface ChipSpiResource;
   
   // commands
   provides interface BlazeStrobe as SIDLE;
@@ -109,6 +110,7 @@ implementation {
       BlazeSpiWireC;
  
   RadioInit = BlazeSpiWireC;
+  ChipSpiResource = BlazeSpiWireC;
   
   // commands
   SIDLE = BlazeSpiWireC.Strobe[ BLAZE_SIDLE ];

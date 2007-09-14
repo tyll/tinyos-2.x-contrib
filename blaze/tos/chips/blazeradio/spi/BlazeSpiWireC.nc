@@ -16,6 +16,7 @@ configuration BlazeSpiWireC {
   provides interface BlazeRegister as Reg[ uint8_t id ];
   provides interface BlazeStrobe as Strobe[ uint8_t id ];
   provides interface RadioInit;
+  provides interface ChipSpiResource;
   provides interface CheckRadio;
   provides interface RadioStatus;
   
@@ -24,7 +25,7 @@ configuration BlazeSpiWireC {
 implementation {
 
   components BlazeSpiP;
-
+  ChipSpiResource = BlazeSpiP;
   Fifo = BlazeSpiP;
   Reg = BlazeSpiP;
   Strobe = BlazeSpiP;

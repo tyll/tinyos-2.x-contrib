@@ -10,6 +10,7 @@ generic configuration BlazeSpiResourceC() {
 
   provides interface Resource;
   provides interface ChipSpiResource;
+  
 }
 
 implementation {
@@ -19,12 +20,10 @@ implementation {
     CLIENT_ID = unique( UQ_BLAZE_SPI_RESOURCE ),
   };
   
-  // We want to write up BlazeSpiP here, but also include BlazeSpiC so that
-  // configuration gets included 
-  components BlazeSpiC,
+  components BlazeSpiWireC,
       BlazeSpiP;
   Resource = BlazeSpiP.Resource[ CLIENT_ID ];
-  ChipSpiResource = BlazeSpiP;
+  ChipSpiResource = BlazeSpiWireC;
 
 }
 

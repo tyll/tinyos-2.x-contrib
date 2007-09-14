@@ -24,20 +24,13 @@ module AcknowledgementsP {
     interface ChipSpiResource;
     interface Alarm<T32khz,uint32_t> as AckWaitTimer;
     interface AckReceive;
+    
+    interface Leds;
   }
 }
 
 implementation {
 
-  /** Message currently being sent if it requires an ack */
-  message_t *myMsg;
-  
-  /** Need a state to know if the timer fire is ours, and for Chip SPI abort */
-  uint8_t state;
-  
-  /** Current radio ID we're servicing */
-  uint8_t radioId;
-  
   enum {
     S_IDLE,
     S_SENDING_ACK,
@@ -45,6 +38,16 @@ implementation {
     S_ACK_WAIT,
     S_SEND_DONE,
   };
+  
+  
+  /** Message currently being sent if it requires an ack */
+  message_t *myMsg;
+  
+  /** Need a state to know if the timer fire is ours, and for Chip SPI abort */
+  uint8_t state = S_IDLE;
+  
+  /** Current radio ID we're servicing */
+  uint8_t radioId;
   
   /***************** Prototypes ****************/
   task void sendDone();
@@ -65,24 +68,26 @@ implementation {
       return EBUSY;
     }
     
-    state = S_SENDING;
-    radioId = id;
-    myMsg = msg;
-    
-    (call BlazePacketBody.getHeader(msg))->fcf |= 
-        ( ( IEEE154_TYPE_DATA << IEEE154_FCF_FRAME_TYPE ) |
-	    ( 1 << IEEE154_FCF_INTRAPAN ) |
-	    ( IEEE154_ADDR_SHORT << IEEE154_FCF_DEST_ADDR_MODE ) |
-	    ( IEEE154_ADDR_SHORT << IEEE154_FCF_SRC_ADDR_MODE ) );
-    
-    (call BlazePacketBody.getMetadata(msg))->ack = FALSE;
-    
     if(((call BlazePacketBody.getHeader(msg))->fcf >> IEEE154_FCF_ACK_REQ) & 0x1) {
       state = S_SENDING_ACK;
       
     } else {
       state = S_SENDING_NOACK;
     }
+    
+    radioId = id;
+    myMsg = msg;
+    
+    (call BlazePacketBody.getHeader(msg))->fcf |=
+        ( IEEE154_TYPE_DATA << IEEE154_FCF_FRAME_TYPE );
+        
+        /* |
+	    ( 1 << IEEE154_FCF_INTRAPAN ) |
+	    ( IEEE154_ADDR_SHORT << IEEE154_FCF_DEST_ADDR_MODE ) |
+	    ( IEEE154_ADDR_SHORT << IEEE154_FCF_SRC_ADDR_MODE ) );
+        */
+        
+    (call BlazePacketBody.getMetadata(msg))->ack = FALSE;
     
     error = call SubSend.send[id](msg, len);
     
@@ -134,12 +139,14 @@ implementation {
   
   /***************** SubSend Events ****************/
   event void SubSend.sendDone[radio_id_t id](message_t *msg, error_t error) {
+    
     if(state == S_SENDING_NOACK) {
       post sendDone();
       
     } else if(state == S_SENDING_ACK) {
       state = S_ACK_WAIT;
       call AckWaitTimer.start(BLAZE_ACK_WAIT);
+      
     }
   }
   
@@ -170,7 +177,7 @@ implementation {
     if(state == S_SENDING_ACK || state == S_ACK_WAIT) {
       // Csma is trying to release the SPI bus. Let the chip own the SPI bus
       // so it's immediately available when Receive needs it.
-      call ChipSpiResource.abort();
+      call ChipSpiResource.abortRelease();
     }
   }
   
@@ -182,19 +189,19 @@ implementation {
   
   
   /***************** Defaults ****************/
-  default command error_t Send.send[radio_id_t id](message_t* msg, uint8_t len) {
+  default command error_t SubSend.send[radio_id_t id](message_t* msg, uint8_t len) {
     return FAIL;
   }
 
-  default command error_t Send.cancel[radio_id_t id](message_t* msg) {
+  default command error_t SubSend.cancel[radio_id_t id](message_t* msg) {
     return FAIL;
   }
 
-  default command uint8_t Send.maxPayloadLength[radio_id_t id]() { 
+  default command uint8_t SubSend.maxPayloadLength[radio_id_t id]() { 
     return 0;
   }
 
-  default command void *Send.getPayload[radio_id_t id](message_t* msg) {
+  default command void *SubSend.getPayload[radio_id_t id](message_t* msg) {
     return NULL;
   }
   

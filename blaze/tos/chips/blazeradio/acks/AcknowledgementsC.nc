@@ -38,6 +38,9 @@ implementation {
   components BlazeReceiveC;
   AcknowledgementsP.AckReceive -> BlazeReceiveC;
   
+  components LedsC;
+  AcknowledgementsP.Leds -> LedsC;
+  
 }
 
 

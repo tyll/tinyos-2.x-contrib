@@ -3,10 +3,7 @@
 # This is a quick and dirty example of how to use the MoteIF interface in
 # Python
 
-import os,sys
-import time
 from TestSerialMsg import *
-from threading import Thread, Lock, Timer
 from tinyos.message import MoteIF
 
 class MyClass:

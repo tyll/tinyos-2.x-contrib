@@ -20,24 +20,6 @@ for i in range(0, 2):
   m = t.getNode(i);
   m.bootAtTime((31 + t.ticksPerSecond() / 10) * i + 1);
 
-f = open("topo.txt", "r")
-lines = f.readlines()
-for line in lines:
-  s = line.split()
-  if (len(s) > 0):
-    if (s[0] == "gain"):
-      r.add(int(s[1]), int(s[2]), float(s[3]))
-
-noise = open("meyer-heavy.txt", "r")
-lines = noise.readlines()
-for line in lines:
-  str = line.strip()
-  if (str != ""):
-    val = int(str)
-    for i in range(0, 2):
-      t.getNode(i).addNoiseTraceReading(val)
-
-
 sf.process();
 throttle.initialize();
 

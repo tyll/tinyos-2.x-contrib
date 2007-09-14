@@ -5,7 +5,7 @@ SFDIR=$(TOSCONTRIB)/csm/tos/lib/tossim
 all:
 	make micaz sim-sf
 	g++ -g -c -o Driver.o Driver.c -I../../../tos/lib/tossim -I$(SFDIR) 
-	g++ -o Driver $(DRIVER_OBJS)  Driver.o -lpython2.4 
+	g++ -o Driver $(DRIVER_OBJS)  Driver.o -lpython2.5 
 
 clean:
 	make clean

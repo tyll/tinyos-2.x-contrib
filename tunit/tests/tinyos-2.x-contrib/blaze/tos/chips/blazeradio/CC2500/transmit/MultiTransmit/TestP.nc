@@ -8,7 +8,6 @@ module TestP {
     interface TestCase as TestTransmit;
     
     interface Resource;
-    interface BlazePower;
     interface SplitControl;
     interface AsyncSend;
     interface Leds;
@@ -20,7 +19,7 @@ implementation {
   /** Message to transmit */
   message_t myMsg;
 
-  uint32_t times;
+  norace uint32_t times;
   
   blaze_header_t *getHeader( message_t* msg ) {
     return (blaze_header_t *)( msg->data - sizeof( blaze_header_t ) );
@@ -30,8 +29,6 @@ implementation {
   event void SetUpOneTime.run() {
     times = 0;
     getHeader(&myMsg)->length = 20;
-    call Resource.immediateRequest();
-    call BlazePower.reset();
     call SplitControl.start();
   }
   
@@ -46,6 +43,8 @@ implementation {
   event void TestTransmit.run() {
     error_t error;
     
+    call Resource.immediateRequest();
+    
     call Leds.led2On();
     error = call AsyncSend.load(&myMsg);
     
@@ -56,9 +55,19 @@ implementation {
   }
   
   async event void AsyncSend.loadDone(void *msg, error_t error) {
-    error_t error;
     call Leds.led2Off();
     call Leds.led1On();
+    
+    if(msg != &myMsg) {
+      assertFail("msg!=&myMsg");
+    }
+    
+    if(error != SUCCESS) {
+      assertEquals("loadDone() error", SUCCESS, error);
+      assertEquals("Too few Tx's", 1000, times);
+      call TestTransmit.done();
+      return;
+    }
     
     while((error = call AsyncSend.send()) != SUCCESS) {
       if(error == EBUSY) {
@@ -72,16 +81,13 @@ implementation {
     }
   }
   
-  async event void AsyncSend.sendDone(error_t error) {
+  async event void AsyncSend.sendDone() {
     error_t sendError;
     times++;
     
     
     call Leds.led1Off();
-    if(error) {
-      assertEquals("AsyncSend.sendDone() wasn't SUCCESS", SUCCESS, error);
-    }
-    
+
     // Arbitrary amount of times to resend.
     if(times < 1000) {
       call  Leds.led2On();
@@ -102,8 +108,7 @@ implementation {
     
     call TestTransmit.done();
   }
-  
-  
+
   event void Resource.granted() {
   }
 }

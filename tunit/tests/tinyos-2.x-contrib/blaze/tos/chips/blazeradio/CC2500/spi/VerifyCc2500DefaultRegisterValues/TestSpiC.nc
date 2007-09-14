@@ -2,8 +2,7 @@
 #include "TestCase.h"
 
 /** 
- * TWO REGISTERS DO NOT MATCH WITH THE DATASHEET:
- *  MDMCFG0: Default value is 0x0 (datasheet says 0xF8)
+ * MISMATCH:
  *  FREND1: Default value is 0x56 (datasheet says 0xA6)
  *
  * @author David Moss
@@ -76,15 +75,17 @@ implementation {
 
 
   components TestSpiP,
+      new BlazeSpiResourceC(),
       BlazeSpiC,
       HplCC2500PinsC,
       LedsC;
   
   TestSpiP.SetUpOneTime -> IOCFG2_TestC.SetUpOneTime;
   
+  TestSpiP.SIDLE -> BlazeSpiC.SIDLE;
   TestSpiP.CSN -> HplCC2500PinsC.Csn;
   TestSpiP.SRES -> BlazeSpiC.SRES;
-  TestSpiP.Resource -> BlazeSpiC;
+  TestSpiP.Resource -> BlazeSpiResourceC;
   TestSpiP.Leds -> LedsC;
   
   /***************** Register Connections ****************/

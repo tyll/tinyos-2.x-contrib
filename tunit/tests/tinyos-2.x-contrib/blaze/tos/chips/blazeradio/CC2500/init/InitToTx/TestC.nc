@@ -14,13 +14,15 @@ implementation {
   components TestP,
       BlazeInitC,
       BlazeSpiC,
-      CC2500InitC;
+      new BlazeSpiResourceC(),
+      CC2500ControlC;
 
   TestP.TestTurnOn -> TestTurnOnC;
-  TestP.Resource -> BlazeSpiC;
+  TestP.Resource -> BlazeSpiResourceC;
     
   // Always connected to 0, because we're only testing one radio
-  TestP.SplitControl -> BlazeInitC.SplitControl[0];
+  TestP.BlazePower -> CC2500ControlC.BlazePower;
+  TestP.SplitControl -> CC2500ControlC.SplitControl;
   
   TestP.SFTX -> BlazeSpiC.SFTX;
   TestP.STX -> BlazeSpiC.STX;

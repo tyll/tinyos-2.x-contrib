@@ -1,47 +1,49 @@
 
-/**
- * @author David Moss
- */
- 
 #include "TestCase.h"
 
 module TestP {
   uses {
-    interface TestCase as TestCC2500Control;
-    interface SplitControl;
-    interface Resource;
+    interface TestCase as TestTurnOn;
+    
     interface BlazePower;
-    interface GeneralIO as Csn;
+    interface Resource;
+    interface SplitControl;
   }
 }
 
 implementation {
 
-  event void TestCC2500Control.run() {
-    call BlazePower.reset();
-  }
-  
-  event void BlazePower.resetComplete() {
+  void start() {
     error_t error;
     error = call SplitControl.start();
     
     if(error) {
       assertEquals("SplitControl didn't work", SUCCESS, error);
-      call TestCC2500Control.done();
+      call TestTurnOn.done();
       return;
     }
   }
   
+  event void TestTurnOn.run() {
+    start();
+  }
+  
+  event void BlazePower.resetComplete() {
+    start();
+  }
+  
   event void SplitControl.startDone(error_t error) {
-    assertTrue("Csn is low after startDone", call Csn.get());
     assertSuccess();
-    call TestCC2500Control.done();
+    call TestTurnOn.done();
   }
   
   event void SplitControl.stopDone(error_t error) {
   }
   
+  
   event void Resource.granted() {
   }
   
+  event void BlazePower.deepSleepComplete() {
+  }
 }

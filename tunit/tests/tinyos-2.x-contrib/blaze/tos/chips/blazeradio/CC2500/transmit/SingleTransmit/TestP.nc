@@ -8,7 +8,6 @@ module TestP {
     interface TestCase as TestTransmit;
     
     interface Resource;
-    interface BlazePower;
     interface SplitControl;
     interface AsyncSend;
     interface Leds;
@@ -27,12 +26,12 @@ implementation {
   
   event void SetUpOneTime.run() {
     getHeader(&myMsg)->length = 20;
-    call Resource.immediateRequest();
-    call BlazePower.reset();
+    call Leds.led0On();
     call SplitControl.start();
   }
   
   event void SplitControl.startDone(error_t error) { 
+    call Leds.led1On();
     call SetUpOneTime.done();
   }
   
@@ -43,7 +42,10 @@ implementation {
   event void TestTransmit.run() {
     
     error_t error;
-
+  
+    call Leds.led2On();
+    call Resource.immediateRequest();
+    
     error = call AsyncSend.load(&myMsg);
     
     if(error) {
@@ -62,12 +64,12 @@ implementation {
     
   }
    
-  async event void AsyncSend.sendDone(error_t error) {
-    assertEquals("AsyncSend.sendDone(ERROR)", SUCCESS, error);
+  async event void AsyncSend.sendDone() {
+    call Resource.release();
     call TestTransmit.done();
   }
   
-  
   event void Resource.granted() {
   }
+  
 }

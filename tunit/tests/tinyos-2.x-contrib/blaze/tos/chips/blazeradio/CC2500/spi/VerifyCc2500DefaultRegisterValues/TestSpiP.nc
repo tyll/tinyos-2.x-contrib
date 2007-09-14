@@ -2,8 +2,7 @@
 #include "TestCase.h"
 
 /**
- * TWO REGISTERS DO NOT MATCH WITH THE DATASHEET:
- *  MDMCFG0: Default value is 0x0 (datasheet says 0xF8)
+ * ONE REGISTER DOES NOT MATCH WITH THE DATASHEET:
  *  FREND1: Default value is 0x56 (datasheet says 0xA6)
  *
  * @author David Moss
@@ -12,6 +11,7 @@ module TestSpiP {
   uses {
     interface TestControl as SetUpOneTime;
     interface BlazeStrobe as SRES;
+    interface BlazeStrobe as SIDLE;
     interface GeneralIO as CSN;
     interface Resource;
     interface Leds;
@@ -161,6 +161,7 @@ implementation {
     
     // Keep the resource and keep the CSN pin low so we can access registers
     call CSN.clr();
+    call SIDLE.strobe();
     call SetUpOneTime.done();
   }
   
@@ -291,9 +292,7 @@ implementation {
   
   event void MDMCFG0_Test.run() {
     call MDMCFG0.read(&readBuffer);
-    // WARNING: DATASHEET SAYS VALUE SHOULD BE 0xF8, BUT HARDWARE SHOWS 0x0
-    // assertEquals("Wrong value", 0xF8, readBuffer);
-    assertEquals("Wrong value", 0x0, readBuffer);
+    assertEquals("Wrong value", 0xF8, readBuffer);
     call MDMCFG0_Test.done();
   }
   

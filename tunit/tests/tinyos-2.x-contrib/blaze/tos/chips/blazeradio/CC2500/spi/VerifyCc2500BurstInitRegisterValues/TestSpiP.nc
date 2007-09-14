@@ -17,6 +17,7 @@ module TestSpiP {
     interface Resource;
     interface Leds;
     interface SplitControl;
+    interface BlazePower;
     
     /***************** Register Interfaces ****************/
     interface BlazeRegister as IOCFG2;
@@ -146,33 +147,36 @@ implementation {
 
   uint8_t readBuffer;
   
+  /***************** SetUpOneTime Procedure ****************/
   event void SetUpOneTime.run() {
     call CSN.set();
-    call Resource.request();
+    call BlazePower.reset();
   }
   
-  event void Resource.granted() {
-    // Dance the CSN pin and Reset
-    call CSN.clr();
-    call CSN.set();
-    call CSN.set();
-    call CSN.clr();
-    call CSN.clr();
-    //call SRES.strobe();
-    call CSN.set();
-    
-    // Keep the resource and keep the CSN pin low so we can access registers
-    call CSN.clr();
+  event void BlazePower.resetComplete() {
+    call Leds.led0On();
     call SplitControl.start();
   }
   
   event void SplitControl.startDone(error_t error) {
+    call Leds.led1On();
+    call Resource.request();
+  }
+  
+  event void Resource.granted() {
+    call Leds.led2On();
     call CSN.set();
     call CSN.clr();
     call SetUpOneTime.done();
   }
   
+  
+  /***************** Throw aways ****************/
   event void SplitControl.stopDone(error_t error) {
+  }
+  
+  
+  event void BlazePower.deepSleepComplete() {
   }
   
   

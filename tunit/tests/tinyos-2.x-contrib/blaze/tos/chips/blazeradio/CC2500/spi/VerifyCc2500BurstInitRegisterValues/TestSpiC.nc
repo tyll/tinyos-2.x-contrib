@@ -76,17 +76,19 @@ implementation {
 
 
   components TestSpiP,
+      new BlazeSpiResourceC(),
       BlazeSpiC,
       HplCC2500PinsC,
       LedsC,
       BlazeInitC,
-      CC2500InitC;
+      CC2500ControlC;
   
   TestSpiP.SetUpOneTime -> IOCFG2_TestC.SetUpOneTime;
   
   TestSpiP.CSN -> HplCC2500PinsC.Csn;
   TestSpiP.SRES -> BlazeSpiC.SRES;
-  TestSpiP.Resource -> BlazeSpiC;
+  TestSpiP.Resource -> BlazeSpiResourceC;
+  TestSpiP.BlazePower -> BlazeInitC.BlazePower[0];
   TestSpiP.Leds -> LedsC;
   
   // Always connected to 0, because we're only testing one radio

@@ -12,15 +12,17 @@ implementation {
   components new TestCaseC() as SpiTestC;
   
   components TestSpiP,
+      new BlazeSpiResourceC(),
       BlazeSpiC,
       HplCC2500PinsC,
       LedsC;
-      
+  
   TestSpiP.CSN -> HplCC2500PinsC.Csn;
+  TestSpiP.Idle -> BlazeSpiC.SIDLE;
   TestSpiP.PARTNUM -> BlazeSpiC.PARTNUM;
   TestSpiP.SNOP -> BlazeSpiC.SNOP;
   TestSpiP.SpiTest -> SpiTestC;
-  TestSpiP.Resource -> BlazeSpiC;
+  TestSpiP.Resource -> BlazeSpiResourceC;
   TestSpiP.Leds -> LedsC;
   
 }

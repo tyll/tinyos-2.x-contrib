@@ -18,11 +18,10 @@ module TestP {
     
     interface TestCase as TestReceive;
     
-    interface Resource;
+    interface Send;
     interface SplitControl;
     interface BlazePacketBody;
     interface GpioInterrupt as CC2500ReceiveInterrupt;
-    interface AsyncSend;
     interface Receive;
     interface ReceiveController;
     interface Leds;
@@ -89,11 +88,7 @@ implementation {
     call SplitControl.stop();
   }
   
-  
-  /***************** Resource Events ****************/
-  event void Resource.granted() {
-  }
-  
+    
   /***************** SplitControl Events ****************/
   event void SplitControl.startDone(error_t error) {
     call CC2500ReceiveInterrupt.enableRisingEdge();
@@ -101,7 +96,6 @@ implementation {
   }
   
   event void SplitControl.stopDone(error_t error) {
-    call Resource.release();
     call TearDownOneTime.done();
   }
   
@@ -114,29 +108,17 @@ implementation {
   event void TestReceive.run() {
     error_t error;
 
-    call Resource.immediateRequest();
-    
-    error = call AsyncSend.load(&myMsg);
+    error = call Send.send(&myMsg, MY_PACKET_LENGTH);
     
     if(error) {
-      assertEquals("Error calling AsyncSend.send()", SUCCESS, error);
+      assertEquals("Error calling Send.send()", SUCCESS, error);
       call TestReceive.done();
     }
   }
  
-  /***************** AsyncSend Events ****************/
-  async event void AsyncSend.loadDone(void *msg, error_t error) {
-    call AsyncSend.send();
-  }
-  
-  async event void AsyncSend.sendDone() {
-    timesSent++;
-    call Leds.led2Toggle();
-    if(timesSent < 5) {
-      call AsyncSend.load(&myMsg);
-    }
-    
-    // The receiver must stop the test by receiving one of those or we timeout
+  /***************** Send Events ****************/
+  event void Send.sendDone(message_t* msg, error_t error) {
+    call Leds.led2On();
   }
   
   

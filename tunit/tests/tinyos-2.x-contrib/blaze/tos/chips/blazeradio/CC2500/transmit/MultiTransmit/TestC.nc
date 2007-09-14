@@ -16,18 +16,15 @@ implementation {
   components TestP,
       CC2500ControlC,
       BlazeTransmitC,
-      BlazeSpiC,
+      new BlazeSpiResourceC(),
       HplCC2500PinsC;
   
   TestP.SetUpOneTime -> TestTransmitC.SetUpOneTime;
   TestP.TestTransmit -> TestTransmitC;
 
-  TestP.Resource -> BlazeSpiC;  
-  TestP.BlazePower -> CC2500ControlC;
+  TestP.Resource -> BlazeSpiResourceC;
   TestP.SplitControl -> CC2500ControlC;
   TestP.AsyncSend -> BlazeTransmitC.AsyncSend[ CC2500_RADIO_ID ];
-
-  BlazeTransmitC.Csn[ CC2500_RADIO_ID ] -> HplCC2500PinsC.Csn;
   
   components LedsC;
   TestP.Leds -> LedsC;

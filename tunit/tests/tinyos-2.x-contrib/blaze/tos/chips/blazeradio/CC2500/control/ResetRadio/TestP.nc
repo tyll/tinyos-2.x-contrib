@@ -14,6 +14,7 @@ module TestP {
     interface BlazeStrobe as SRES;
     interface GeneralIO as CSN;
     interface Resource;
+    interface Resource as Resource2;
     interface BlazePower;
     interface Leds;
     
@@ -30,39 +31,54 @@ implementation {
   uint8_t readBuffer;
   
   event void SetUpOneTime.run() {
-    call CSN.set();
-    call Resource.request();
-  }
-  
-  event void Resource.granted() {
-    // Keep the resource and keep the CSN pin low so we can access registers
-    call CSN.set();
-    call CSN.clr();
     call SetUpOneTime.done();
   }
   
   
   /***************** TestCases ****************/
   event void ResetRadioTest.run() {
+    call Resource.request();
+  }
+  
+  event void Resource.granted() {
+    call CSN.clr();
     call IOCFG2.write(0x29);
     call IOCFG2.read(&readBuffer);
-    assertEquals("Wrong value", 0x29, readBuffer);
+    assertEquals("Wrong init value", 0x29, readBuffer);
     
     call IOCFG2.write(0x0);
     call IOCFG2.read(&readBuffer);
-    assertEquals("Couldn't write", 0x0, readBuffer);
-    
-    // RESET
-    call BlazePower.reset();
-    assertTrue("Csn is low after reset", call CSN.get());
-    
-    call CSN.clr();
-    call IOCFG2.read(&readBuffer);
-    assertEquals("Wrong value", 0x29, readBuffer);
+    assertEquals("Couldn't write over init", 0x0, readBuffer);
     
     call CSN.set();
+    call Resource.release();
+    
+    // RESET
+    assertEquals("reset() failed", SUCCESS, call BlazePower.reset());
+    
+  }
+  
+  
+  event void BlazePower.resetComplete() {
+    assertTrue("Csn is low after reset", call CSN.get());
+    
+    call Resource2.request();
+  }
+  
+  event void Resource2.granted() {
+    call CSN.clr();
+    call IOCFG2.read(&readBuffer);
+    assertEquals("Wrong reset value", 0x29, readBuffer);
+    
+    call CSN.set();
+    call Resource2.release();
     call ResetRadioTest.done();
   }
+  
+  
+  event void BlazePower.deepSleepComplete() {
+  }
+  
   
   
 }

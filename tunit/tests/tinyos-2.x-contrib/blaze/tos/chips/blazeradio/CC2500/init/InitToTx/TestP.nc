@@ -6,6 +6,7 @@ module TestP {
     interface TestCase as TestTurnOn;
     
     interface Resource;
+    interface BlazePower;
     interface SplitControl;
     
     interface BlazeStrobe as Idle;
@@ -19,14 +20,11 @@ module TestP {
 implementation {
 
   event void TestTurnOn.run() {
-    error_t error = call Resource.immediateRequest();
-
-    if(error != SUCCESS) {
-      assertFail("Resource immediate request failed");
-      call TestTurnOn.done();
-      return;
-    }
-    
+    call BlazePower.reset();
+  }
+  
+  event void BlazePower.resetComplete() {
+    error_t error;    
     error = call SplitControl.start();
     
     if(error) {
@@ -39,8 +37,11 @@ implementation {
   event void SplitControl.startDone(error_t error) {
     int i;
     
+    call Resource.immediateRequest();
+    
     call Csn.set();
     call Csn.clr();
+    call Idle.strobe();
     
     assertEquals("Radio isn't IDLE", (uint8_t) BLAZE_S_IDLE, (uint8_t) call RadioStatus.getRadioStatus());
       
@@ -58,6 +59,7 @@ implementation {
     assertEquals("Radio isn't in TX", (uint8_t) BLAZE_S_TX, (uint8_t) call RadioStatus.getRadioStatus());
       
     call Csn.set();
+    call Resource.release();
     call TestTurnOn.done();
   }
   
@@ -68,4 +70,6 @@ implementation {
   event void Resource.granted() {
   }
   
+  event void BlazePower.deepSleepComplete() {
+  }
 }

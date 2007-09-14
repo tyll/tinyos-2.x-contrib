@@ -18,14 +18,7 @@ module TestP {
 implementation {
 
   event void TestCC2500Control.run() {
-    error_t error = call Resource.immediateRequest();
-    if(error != SUCCESS) {
-      assertFail("Resource immediate request failed");
-      call TestCC2500Control.done();
-      return;
-    }
-    
-    call BlazePower.reset();
+    error_t error;
     error = call SplitControl.start();
     
     if(error) {
@@ -33,6 +26,12 @@ implementation {
       call TestCC2500Control.done();
       return;
     }
+  }
+  
+  event void BlazePower.resetComplete() {
+  }
+  
+  event void BlazePower.deepSleepComplete() {
   }
   
   event void SplitControl.startDone(error_t error) {

@@ -13,7 +13,6 @@ module TestP {
     
     interface Resource;
     interface SplitControl;
-    interface BlazePower;
     interface GpioInterrupt as CC2500ReceiveInterrupt;
     interface AsyncSend;
     interface Receive;
@@ -50,19 +49,18 @@ implementation {
     getHeader(&myMsg)->length = MY_PACKET_LENGTH;
     getHeader(&myMsg)->dest = 1;
     getHeader(&myMsg)->src = 0;
-    
-    call Resource.request();
+    call SplitControl.start();
   }
   
   event void TearDownOneTime.run() {
+    call Resource.release();
     call SplitControl.stop();
   }
   
   
   /***************** Resource Events ****************/
   event void Resource.granted() {
-    call BlazePower.reset();
-    call SplitControl.start();
+    
   }
   
   /***************** SplitControl Events ****************/
@@ -72,8 +70,6 @@ implementation {
   }
   
   event void SplitControl.stopDone(error_t error) {
-    call BlazePower.reset();
-    call Resource.release();
     call TearDownOneTime.done();
   }
   
@@ -88,6 +84,8 @@ implementation {
 
     runningTest = TRUE;
     
+    call Resource.immediateRequest();
+    
     error = call AsyncSend.load(&myMsg);
     
     if(error) {
@@ -101,13 +99,15 @@ implementation {
     call AsyncSend.send();
   }
   
-  async event void AsyncSend.sendDone(error_t error) {
+  async event void AsyncSend.sendDone() {
     timesSent++;
     call Leds.led2Toggle();
     if(timesSent < 5) {
       call AsyncSend.load(&myMsg);
+      return;
     }
     
+    call Resource.release();
     // The receiver must stop the test by receiving one of those or we timeout
   }
   

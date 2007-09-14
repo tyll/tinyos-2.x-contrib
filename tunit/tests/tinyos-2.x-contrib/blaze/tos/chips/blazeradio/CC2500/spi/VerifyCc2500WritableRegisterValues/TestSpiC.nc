@@ -13,7 +13,7 @@ configuration TestSpiC {
 
 implementation {
   // Including this module failed the test at one point.
-  components CC2500InitC;
+  components CC2500ControlC;
   
   components 
     new TestCaseC() as IOCFG2_TestC,
@@ -78,6 +78,7 @@ implementation {
 
 
   components TestSpiP,
+      new BlazeSpiResourceC(),
       BlazeSpiC,
       HplCC2500PinsC,
       LedsC;
@@ -86,7 +87,7 @@ implementation {
   
   TestSpiP.CSN -> HplCC2500PinsC.Csn;
   TestSpiP.SRES -> BlazeSpiC.SRES;
-  TestSpiP.Resource -> BlazeSpiC;
+  TestSpiP.Resource -> BlazeSpiResourceC;
   TestSpiP.Leds -> LedsC;
   
   /***************** Register Connections ****************/

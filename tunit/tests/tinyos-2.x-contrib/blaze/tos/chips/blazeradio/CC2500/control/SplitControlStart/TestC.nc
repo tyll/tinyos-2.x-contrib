@@ -13,10 +13,11 @@ implementation  {
   
   components TestP,
       BlazeSpiC,
+      new BlazeSpiResourceC(),
       CC2500ControlC,
       HplCC2500PinsC;
   
-  TestP.Resource -> BlazeSpiC;
+  TestP.Resource -> BlazeSpiResourceC;
   TestP.TestCC2500Control -> TestCC2500ControlC;
   TestP.BlazePower -> CC2500ControlC;
   TestP.SplitControl -> CC2500ControlC;

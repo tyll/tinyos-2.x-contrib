@@ -20,7 +20,6 @@ module TestP {
     
     interface Resource;
     interface SplitControl;
-    interface BlazePower;
     interface BlazePacketBody;
     interface GpioInterrupt as CC2500ReceiveInterrupt;
     interface AsyncSend;
@@ -87,7 +86,7 @@ implementation {
     myPayload->h = 0xBB;
     myPayload->i = 0xCC;
     
-    call Resource.request();
+    call SplitControl.start();
   }
   
   event void TearDownOneTime.run() {
@@ -97,7 +96,6 @@ implementation {
   
   /***************** Resource Events ****************/
   event void Resource.granted() {
-    call BlazePower.reset();
     call SplitControl.start();
   }
   
@@ -108,7 +106,6 @@ implementation {
   }
   
   event void SplitControl.stopDone(error_t error) {
-    call BlazePower.reset();
     call Resource.release();
     call TearDownOneTime.done();
   }
@@ -122,6 +119,8 @@ implementation {
   event void TestReceive.run() {
     error_t error;
 
+    call Resource.immediateRequest();
+    
     error = call AsyncSend.load(&myMsg);
     
     if(error) {
@@ -141,12 +140,9 @@ implementation {
     }
   }
   
-  async event void AsyncSend.sendDone(error_t error) {
-    assertEquals("sendDone(ERROR)", SUCCESS, error);
-    
+  async event void AsyncSend.sendDone() {
     call Leds.led2Toggle();
-    
-        
+    call Resource.release();
     // The receiver must stop the test by receiving one of those or we timeout
   }
   

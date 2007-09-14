@@ -19,6 +19,8 @@ implementation {
 
   components TestP,
       BlazeSpiC,
+      new BlazeSpiResourceC(),
+      new BlazeSpiResourceC() as BlazeSpiResource2C,
       HplCC2500PinsC,
       CC2500ControlC,
       LedsC;
@@ -27,7 +29,8 @@ implementation {
   
   TestP.CSN -> HplCC2500PinsC.Csn;
   TestP.SRES -> BlazeSpiC.SRES;
-  TestP.Resource -> BlazeSpiC;
+  TestP.Resource -> BlazeSpiResourceC;
+  TestP.Resource2 -> BlazeSpiResource2C;
   TestP.Leds -> LedsC;
   TestP.BlazePower -> CC2500ControlC;
   

@@ -236,7 +236,7 @@ implementation {
    	    call DSN.logError("UART pool full");
         return msg;
     }
-    out = call SerialPacket.getPayload(newmsg, NULL);
+    out = (message_t*)call SerialPacket.getPayload(newmsg, NULL);
 	memcpy(out, payload, len);
     call SerialAMPacket.setType(newmsg, AM_HARVESTER);
 	call SerialPacket.setPayloadLength(newmsg, len);

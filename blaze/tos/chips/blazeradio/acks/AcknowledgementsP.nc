@@ -201,7 +201,7 @@ implementation {
     return 0;
   }
 
-  default command void *SubSend.getPayload[radio_id_t id](message_t* msg) {
+  default command void *SubSend.getPayload[radio_id_t id](message_t* msg, uint8_t len) {
     return NULL;
   }
   

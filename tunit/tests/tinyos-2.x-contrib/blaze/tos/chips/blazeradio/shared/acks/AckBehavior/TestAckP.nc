@@ -288,7 +288,7 @@ implementation {
     return 0;
   }
 
-  command void* SubSend.getPayload[radio_id_t id](message_t* msg) {
+  command void* SubSend.getPayload[radio_id_t id](message_t* msg, uint8_t len) {
     return NULL;
   }
   
@@ -301,6 +301,7 @@ implementation {
   async command error_t ChipSpiResource.attemptRelease() {
     chipSpiResourceReleases++;
     spiResourceHeld = FALSE;
+    return SUCCESS;
   }
   
   
@@ -329,8 +330,8 @@ implementation {
     switch(call State.getState()) {
       case S_TESTACKWITHRESPONSE:
         signal SubSend.sendDone[sendRadioId](sendMsg, SUCCESS);
-        ackSrc = MY_SOURCE;
-        ackDest = MY_DEST;
+        ackSrc = MY_DEST;
+        ackDest = MY_SOURCE;
         ackDsn = MY_DSN;
         post receiveAck();
         break;

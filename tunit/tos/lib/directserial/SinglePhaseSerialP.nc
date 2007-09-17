@@ -112,8 +112,12 @@ implementation {
     return TOSH_DATA_LENGTH;
   }
 
-  command void *Send.getPayload(message_t* msg) {
-    return msg->data;
+  command void *Send.getPayload(message_t* msg, uint8_t len) {
+    if(len <= TOSH_DATA_LENGTH) {
+      return msg->data;
+    } else {
+      return NULL;
+    }
   }
   
  

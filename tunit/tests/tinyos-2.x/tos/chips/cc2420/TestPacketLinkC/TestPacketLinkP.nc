@@ -232,7 +232,7 @@ implementation {
     return TOSH_DATA_LENGTH;
   }
 
-  command void *SubSend.getPayload(message_t* msg) {
+  command void *SubSend.getPayload(message_t* msg, uint8_t len) {
     return msg->data;
   }
   

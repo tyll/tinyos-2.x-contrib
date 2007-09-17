@@ -72,7 +72,7 @@ implementation {
     
     currentClient = id;
     
-    statsMsg = (StatisticsMsg *) call AMSend.getPayload(&myMsg);
+    statsMsg = (StatisticsMsg *) call AMSend.getPayload(&myMsg, TOSH_DATA_LENGTH);
     statsMsg->value = value;
     statsMsg->unitLength = 0;
     statsMsg->statsId = id;

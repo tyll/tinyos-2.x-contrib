@@ -83,8 +83,8 @@ implementation {
     return call Packet.maxPayloadLength();
   }
 
-  command void* AMSend.getPayload[am_id_t id](message_t* m) {
-    return call Packet.getPayload(m, NULL);
+  command void* AMSend.getPayload[am_id_t id](message_t* m, uint8_t len) {
+    return call Packet.getPayload(m, len);
   }
   
   /***************** SubSend Events ****************/
@@ -111,11 +111,12 @@ implementation {
     return TOSH_DATA_LENGTH;
   }
   
-  command void* Packet.getPayload(message_t* msg, uint8_t* len) {
-    if (len != NULL) { 
-      *len = call Packet.payloadLength(msg);
+  command void* Packet.getPayload(message_t* msg, uint8_t len) {
+    if (len <= TOSH_DATA_LENGTH) { 
+      return msg->data;
+    } else {
+      return NULL;
     }
-    return msg->data;
   }
 
   /***************** AMPacket Commands ****************/

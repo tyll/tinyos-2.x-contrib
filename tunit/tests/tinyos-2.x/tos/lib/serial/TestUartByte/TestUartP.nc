@@ -46,7 +46,7 @@ implementation {
   message_t myMsg;
   
   event void TestSendBytes.run() {
-  	TUnitProcessingMsg *tunitMsg = (TUnitProcessingMsg *) call AMSend.getPayload(&myMsg);
+  	TUnitProcessingMsg *tunitMsg = (TUnitProcessingMsg *) call AMSend.getPayload(&myMsg, TOSH_DATA_LENGTH);
   	tunitMsg->cmd = TUNITPROCESSING_EVENT_TESTRESULT_SUCCESS;
   	tunitMsg->id = 0;
   	tunitMsg->lastMsg = TRUE;

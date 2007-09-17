@@ -92,7 +92,7 @@ implementation {
   event void Boot.booted() {
     int i;
     for(i = 0; i < MAX_TUNIT_QUEUE; i++) {
-      ((TUnitProcessingMsg *) call SerialEventSend.getPayload(&eventMsg[i]))->cmd = 0xFF;
+      ((TUnitProcessingMsg *) call SerialEventSend.getPayload(&eventMsg[i], TOSH_DATA_LENGTH))->cmd = 0xFF;
     }
     atomic writingEventMsg = 0;
     atomic sendingEventMsg = 0;

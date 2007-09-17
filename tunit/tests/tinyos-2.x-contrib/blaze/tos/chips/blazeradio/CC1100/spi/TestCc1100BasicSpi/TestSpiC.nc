@@ -13,6 +13,7 @@ implementation {
   
   components TestSpiP,
       BlazeSpiC,
+      new BlazeSpiResourceC,
       HplCC1100PinsC,
       LedsC;
       
@@ -20,7 +21,7 @@ implementation {
   TestSpiP.PARTNUM -> BlazeSpiC.PARTNUM;
   TestSpiP.SNOP -> BlazeSpiC.SNOP;
   TestSpiP.SpiTest -> SpiTestC;
-  TestSpiP.Resource -> BlazeSpiC;
+  TestSpiP.Resource -> BlazeSpiResourceC;
   TestSpiP.Leds -> LedsC;
   
 }

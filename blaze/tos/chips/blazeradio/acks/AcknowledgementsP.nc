@@ -107,8 +107,8 @@ implementation {
     return call SubSend.maxPayloadLength[id]();
   }
 
-  command void *Send.getPayload[radio_id_t id](message_t* msg) {
-    return call SubSend.getPayload[id](msg);
+  command void *Send.getPayload[radio_id_t id](message_t* msg, uint8_t len) {
+    return call SubSend.getPayload[id](msg, len);
   }
   
   

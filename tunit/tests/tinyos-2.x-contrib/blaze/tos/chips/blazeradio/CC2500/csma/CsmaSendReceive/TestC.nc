@@ -26,7 +26,6 @@ implementation {
   TestP.TearDownOneTime -> TestReceiveC.TearDownOneTime;
   TestP.TestReceive -> TestReceiveC;
   
-
   TestP.SplitControl -> CC2500ControlC;
   TestP.Leds -> LedsC;
   
@@ -36,8 +35,6 @@ implementation {
   TestP.Receive -> BlazeReceiveC.Receive[ CC2500_RADIO_ID ];
   TestP.ReceiveController -> BlazeReceiveC.ReceiveController[ CC2500_RADIO_ID ];
   TestP.BlazePacketBody -> BlazePacketC;
-   
-  BlazeReceiveC.Csn[ CC2500_RADIO_ID ] -> HplCC2500PinsC.Csn;
   
 }
 

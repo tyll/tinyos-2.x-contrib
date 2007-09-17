@@ -94,24 +94,6 @@ implementation {
     return SUCCESS;
   }
   
-  /***************** Receive Commands ****************/
-  /**
-   * TODO THIS IS GONE
-   */
-  command void* Receive.getPayload[radio_id_t id](message_t* msg, uint8_t* len) {
-    if (len != NULL) {
-      *len = ((uint8_t*) (call BlazePacketBody.getHeader( msg )))[0];
-    }
-    return msg->data;
-  }
-
-  /**
-   * TODO THIS IS GONE
-   */
-  command uint8_t Receive.payloadLength[radio_id_t id](message_t* m) {
-    uint8_t* buf = (uint8_t*)(call BlazePacketBody.getHeader( m ));
-    return buf[0];
-  }
   
   /*************** ReceiveController Commands ***********************/
   async command error_t ReceiveController.beginReceive[ radio_id_t id ](){

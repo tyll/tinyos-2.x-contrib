@@ -40,6 +40,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.rincon.tunit.properties.TUnitNodeProperties;
 import com.rincon.tunit.properties.TUnitSuiteProperties;
 import com.rincon.tunit.properties.TUnitTestRunProperties;
 import com.rincon.tunit.report.TestResult;
@@ -56,6 +57,12 @@ public class TestSuitePropertiesParser {
 
   private File suite3File;
   
+  private File suiteOnly0File;
+  
+  private File suiteOnly1File;
+  
+  private File suiteOnly2File;
+  
   public static junit.framework.Test suite() {
     return new JUnit4TestAdapter(TestSuitePropertiesParser.class);
   }
@@ -65,6 +72,9 @@ public class TestSuitePropertiesParser {
     suite1File = new File("suite1.properties");
     suite2File = new File("suite2.properties");
     suite3File = new File("suite3.properties");
+    suiteOnly0File = new File("suite_only0.properties");
+    suiteOnly1File = new File("suite_only1.properties");
+    suiteOnly2File = new File("suite_only2.properties");
   }
   
 
@@ -73,6 +83,10 @@ public class TestSuitePropertiesParser {
     assertTrue("suite1.properties does not exist", suite1File.exists());
     assertTrue("suite2.properties does not exist", suite2File.exists());
     assertTrue("suite3.properties does not exist", suite3File.exists());
+    assertTrue("suite_only0.properties does not exist", suiteOnly0File.exists());
+    assertTrue("suite_only1.properties does not exist", suiteOnly1File.exists());
+    assertTrue("suite_only2.properties does not exist", suiteOnly2File.exists());
+     
   }
   
   @Test public void suite0BasicParse() {
@@ -122,7 +136,7 @@ public class TestSuitePropertiesParser {
     assertEquals("suite1 getTestName() failed", "Suite1 Test", suite.getTestName());
     assertTrue("suite1 should be skipped", suite.getSkip());
   }
- 
+  
   @Test public void suite2ParseContents() {
     SuitePropertiesParser parser = new SuitePropertiesParser(suite2File);
     TestResult result = parser.parse();
@@ -220,4 +234,102 @@ public class TestSuitePropertiesParser {
     TUnitTestRunProperties run = new TUnitTestRunProperties();
     assertFalse("Should have skipped this test run", suite3.shouldRun(run));
   }
+  
+  @Test public void testOnly0() {
+	  SuitePropertiesParser parser = new SuitePropertiesParser(suiteOnly0File);
+	  TestResult result = parser.parse();
+	  assertTrue(result.getFailMsg(), result.isSuccess());
+	  TUnitSuiteProperties only0 = parser.getSuiteProperties();
+	  
+	  TUnitTestRunProperties runMicaz = new TUnitTestRunProperties();
+	  TUnitNodeProperties micazNodeProperties = new TUnitNodeProperties();
+	  micazNodeProperties.setTarget("micaz");
+	  runMicaz.addNodeToTestRun(micazNodeProperties);
+	  assertTrue("Should have run micaz", only0.shouldRun(runMicaz));
+	  
+	  TUnitTestRunProperties runTelosb = new TUnitTestRunProperties();
+	  TUnitNodeProperties telosbNodeProperties = new TUnitNodeProperties();
+	  telosbNodeProperties.setTarget("telosb");
+	  runTelosb.addNodeToTestRun(telosbNodeProperties);
+	  assertTrue("Should have run telosb", only0.shouldRun(runTelosb));
+	  
+	  TUnitTestRunProperties runMica2 = new TUnitTestRunProperties();
+	  TUnitNodeProperties mica2NodeProperties = new TUnitNodeProperties();
+	  mica2NodeProperties.setTarget("mica2");
+	  runMica2.addNodeToTestRun(mica2NodeProperties);
+	  assertFalse("Shouldn't have run mica2", only0.shouldRun(runMica2));
+  }
+  
+  @Test public void applyOnly1ToOnly0() {
+	  // Parse the suite_only0 file
+	  SuitePropertiesParser parser = new SuitePropertiesParser(suiteOnly0File);
+	  TestResult result = parser.parse();
+	  assertTrue(result.getFailMsg(), result.isSuccess());
+	  TUnitSuiteProperties only0 = parser.getSuiteProperties();
+	  
+	  // Parse the suite_only1 file
+	  parser = new SuitePropertiesParser(suiteOnly1File);
+	  result = parser.parse();
+	  assertTrue(result.getFailMsg(), result.isSuccess());
+	  TUnitSuiteProperties only1 = parser.getSuiteProperties();
+	  
+	  // Apply suite_only1 to suite_only0
+	  TUnitSuiteProperties only01 = only0.apply(only1);
+	  
+	  TUnitTestRunProperties runMicaz = new TUnitTestRunProperties();
+	  TUnitNodeProperties micazNodeProperties = new TUnitNodeProperties();
+	  micazNodeProperties.setTarget("micaz");
+	  runMicaz.addNodeToTestRun(micazNodeProperties);
+	  assertFalse("Shouldn't have run micaz", only01.shouldRun(runMicaz));
+	  
+	  TUnitTestRunProperties runTelosb = new TUnitTestRunProperties();
+	  TUnitNodeProperties telosbNodeProperties = new TUnitNodeProperties();
+	  telosbNodeProperties.setTarget("telosb");
+	  runTelosb.addNodeToTestRun(telosbNodeProperties);
+	  assertTrue("Should have run telosb", only01.shouldRun(runTelosb));
+	  
+	  TUnitTestRunProperties runMica2 = new TUnitTestRunProperties();
+	  TUnitNodeProperties mica2NodeProperties = new TUnitNodeProperties();
+	  mica2NodeProperties.setTarget("mica2");
+	  runMica2.addNodeToTestRun(mica2NodeProperties);
+	  assertFalse("Shouldn't have run mica2", only01.shouldRun(runMica2));
+  }
+  
+
+  @Test public void applyOnly2ToOnly0() {
+	  // Parse the suite_only0 file
+	  SuitePropertiesParser parser = new SuitePropertiesParser(suiteOnly0File);
+	  TestResult result = parser.parse();
+	  assertTrue(result.getFailMsg(), result.isSuccess());
+	  TUnitSuiteProperties only0 = parser.getSuiteProperties();
+	  
+	  // Parse the suite_only2 file
+	  parser = new SuitePropertiesParser(suiteOnly2File);
+	  result = parser.parse();
+	  assertTrue(result.getFailMsg(), result.isSuccess());
+	  TUnitSuiteProperties only2 = parser.getSuiteProperties();
+	  
+	  // Apply suite_only2 to suite_only0
+	  TUnitSuiteProperties only01 = only0.apply(only2);
+	  
+	  TUnitTestRunProperties runMicaz = new TUnitTestRunProperties();
+	  TUnitNodeProperties micazNodeProperties = new TUnitNodeProperties();
+	  micazNodeProperties.setTarget("micaz");
+	  runMicaz.addNodeToTestRun(micazNodeProperties);
+	  assertTrue("Should have run micaz", only01.shouldRun(runMicaz));
+	  
+	  TUnitTestRunProperties runTelosb = new TUnitTestRunProperties();
+	  TUnitNodeProperties telosbNodeProperties = new TUnitNodeProperties();
+	  telosbNodeProperties.setTarget("telosb");
+	  runTelosb.addNodeToTestRun(telosbNodeProperties);
+	  assertTrue("Should have run telosb", only01.shouldRun(runTelosb));
+	  
+	  TUnitTestRunProperties runMica2 = new TUnitTestRunProperties();
+	  TUnitNodeProperties mica2NodeProperties = new TUnitNodeProperties();
+	  mica2NodeProperties.setTarget("mica2");
+	  runMica2.addNodeToTestRun(mica2NodeProperties);
+	  assertFalse("Shouldn't have run mica2", only01.shouldRun(runMica2));
+  }
+  
+  
 }

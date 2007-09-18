@@ -377,7 +377,13 @@ public class TUnitSuiteProperties {
     }
     
     aggregate.ignore.addAll(subset.ignore);
-    aggregate.only.addAll(subset.only);
+    
+    // If the subset defines less @only's than the aggregate, only include
+    // the subset's @only's.
+    if(subset.only.size() > 0) {
+      aggregate.only = subset.only;
+    }
+    
     
     return aggregate;
   }

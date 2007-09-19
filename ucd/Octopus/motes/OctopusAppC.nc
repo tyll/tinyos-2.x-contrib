@@ -1,0 +1,106 @@
+// $Id$
+
+/*									tab:4
+ * Copyright (c) 2007 University College Dublin.
+ * All rights reserved.
+ *
+ * Permission to use, copy, modify, and distribute this software and its
+ * documentation for any purpose, without fee, and without written agreement is
+ * hereby granted, provided that the above copyright notice and the following
+ * two paragraphs appear in all copies of this software.
+ *
+ * IN NO EVENT SHALL UNIVERSITY COLLEGE DUBLIN BE LIABLE TO ANY
+ * PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES
+ * ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF 
+ * UNIVERSITY COLLEGE DUBLIN HAS BEEN ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ *
+ * UNIVERSITY COLLEGE DUBLIN SPECIFICALLY DISCLAIMS ANY WARRANTIES,
+ * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+ * AND FITNESS FOR A PARTICULAR PURPOSE.  THE SOFTWARE PROVIDED HEREUNDER IS
+ * ON AN "AS IS" BASIS, AND UNIVERSITY COLLEGE DUBLIN HAS NO
+ * OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
+ * MODIFICATIONS.
+ *
+ * Authors:	Raja Jurdak, Antonio Ruzzelli, and Samuel Boivineau
+ * Date created: 2007/09/07
+ *
+ */
+
+/**
+ * @author Raja Jurdak, Antonio Ruzzelli, and Samuel Boivineau
+ */
+
+
+#include <Octopus.h>
+
+configuration OctopusAppC { }
+implementation {
+	// Miscalleny:
+	components MainC, OctopusC, LedsC, new TimerMilliC(), 
+	new OctopusSensorC() as Sensor, RandomC;
+
+	//MainC.SoftwareInit -> Sensor;
+	OctopusC.Boot -> MainC;
+	OctopusC.Timer -> TimerMilliC;
+	OctopusC.Read -> Sensor;
+	OctopusC.Leds -> LedsC;
+	OctopusC.Random -> RandomC;
+
+	// Serial communication
+	components SerialActiveMessageC;
+	components new SerialAMReceiverC(AM_OCTOPUS_SENT_MSG) as SerialRequestReceiver;
+	components new SerialAMSenderC(AM_OCTOPUS_COLLECTED_MSG) as SerialCollectSender;
+
+	OctopusC.SerialControl -> SerialActiveMessageC;
+	OctopusC.SerialSend -> SerialCollectSender.AMSend;
+	OctopusC.SerialReceive -> SerialRequestReceiver;
+	
+	// General Radio Communication
+	components ActiveMessageC;
+	OctopusC.RadioControl -> ActiveMessageC;
+#if defined(PLATFORM_MICA2)
+	components CC1000CsmaRadioC as Radio;
+#elif defined(PLATFORM_MICAZ) || defined(PLATFORM_AQUISGRAIN) || defined(PLATFORM_TELOSA) || defined(PLATFORM_TELOSB)
+	components CC2420ActiveMessageC as Radio;
+#else
+#error "The OctopusGUI application is only supported for mica2, micaz, telos and aquisgrain nodes"
+#endif
+	OctopusC.LowPowerListening -> Radio;
+	
+	// Collected Radio Communication
+#if defined(COLLECTION_PROTOCOL)
+	components CtpP as CollectP;
+	components CollectionC as Collector,  				// Collection layer
+		new CollectionSenderC(AM_OCTOPUS_COLLECTED_MSG); 	// Sends multihop RF
+		
+	OctopusC.CollectSend -> CollectionSenderC;			// used by a node which wants to send data to the root
+	OctopusC.Snoop -> Collector.Snoop[AM_OCTOPUS_COLLECTED_MSG];
+	OctopusC.CollectReceive -> Collector.Receive[AM_OCTOPUS_COLLECTED_MSG];
+	OctopusC.RootControl -> Collector;
+//	OctopusC.RoutingControl -> Collector;
+	OctopusC.CollectControl -> Collector;
+#elif defined(DUMMY_COLLECT_PROTOCOL)
+	components DummyP as CollectP; // to complete
+#else
+#error "A protocol needs to be selected to collect data"
+#endif
+	OctopusC.CollectInfo -> CollectP;
+
+	// Broadcasted Radio Communication
+#if defined(DISSEMINATION_PROTOCOL)
+	components DisseminationC;
+	components new DisseminatorC(octopus_sent_msg_t, BROADCAST_DIS_KEY);
+	
+	OctopusC.BroadcastControl -> DisseminationC;
+	OctopusC.RequestUpdate -> DisseminatorC;
+	OctopusC.RequestValue -> DisseminatorC;
+#elif defined(DUMMY_BROADCAST_PROTOCOL)
+	components DummyC;
+	OctopusC.BroadcastControl -> DummyC;
+#else
+#error "A protocol needs to be selected to broadcast data"
+#endif
+
+//	OctopusC.LinkEstimator -> Ctp; // useless ??
+}

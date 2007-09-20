@@ -28,7 +28,6 @@ implementation {
   TestP.SetUpOneTime -> ResetRadioTestC.SetUpOneTime;
   
   TestP.CSN -> HplCC2500PinsC.Csn;
-  TestP.SRES -> BlazeSpiC.SRES;
   TestP.Resource -> BlazeSpiResourceC;
   TestP.Resource2 -> BlazeSpiResource2C;
   TestP.Leds -> LedsC;

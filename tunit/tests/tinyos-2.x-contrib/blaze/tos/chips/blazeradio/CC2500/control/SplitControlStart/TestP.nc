@@ -10,7 +10,6 @@ module TestP {
     interface TestCase as TestCC2500Control;
     interface SplitControl;
     interface Resource;
-    interface BlazePower;
     interface GeneralIO as Csn;
   }
 }
@@ -18,10 +17,6 @@ module TestP {
 implementation {
 
   event void TestCC2500Control.run() {
-    call BlazePower.reset();
-  }
-  
-  event void BlazePower.resetComplete() {
     error_t error;
     error = call SplitControl.start();
     

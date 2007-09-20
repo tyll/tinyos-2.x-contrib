@@ -11,7 +11,6 @@
 module TestP {
   uses {
     interface TestControl as SetUpOneTime;
-    interface BlazeStrobe as SRES;
     interface GeneralIO as CSN;
     interface Resource;
     interface Resource as Resource2;
@@ -46,9 +45,12 @@ implementation {
     call IOCFG2.read(&readBuffer);
     assertEquals("Wrong init value", 0x29, readBuffer);
     
+    call CSN.set();
+    call CSN.clr();
+    
     call IOCFG2.write(0x0);
     call IOCFG2.read(&readBuffer);
-    assertEquals("Couldn't write over init", 0x0, readBuffer);
+    assertEquals("Couldn't write IOCFG2 reg", 0x0, readBuffer);
     
     call CSN.set();
     call Resource.release();

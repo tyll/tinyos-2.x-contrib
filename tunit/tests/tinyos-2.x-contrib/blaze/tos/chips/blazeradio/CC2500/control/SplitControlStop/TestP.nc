@@ -8,7 +8,6 @@
 module TestP {
   uses {
     interface TestCase as TestCC2500Control;
-    interface BlazePower;
     interface SplitControl;
     interface Resource;
     interface GeneralIO as Csn;
@@ -26,12 +25,6 @@ implementation {
       call TestCC2500Control.done();
       return;
     }
-  }
-  
-  event void BlazePower.resetComplete() {
-  }
-  
-  event void BlazePower.deepSleepComplete() {
   }
   
   event void SplitControl.startDone(error_t error) {

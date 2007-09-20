@@ -19,7 +19,6 @@ implementation  {
   
   TestP.Resource -> BlazeSpiResourceC;
   TestP.TestCC2500Control -> TestCC2500ControlC;
-  TestP.BlazePower -> CC2500ControlC;
   TestP.SplitControl -> CC2500ControlC;
   TestP.Csn -> HplCC2500PinsC.Csn;
   

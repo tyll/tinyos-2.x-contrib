@@ -33,9 +33,7 @@ implementation {
  
   TestP.Resource -> BlazeSpiResourceC;
   TestP.SplitControl -> CC2500ControlC;
-  TestP.Leds -> LedsC;
-  
-  TestP.CC2500ReceiveInterrupt -> HplCC2500PinsC.Gdo2_int;
+  TestP.Leds -> LedsC;  
    
   TestP.Receive -> BlazeReceiveC.Receive[ CC2500_RADIO_ID ];
   TestP.AckReceive -> BlazeReceiveC.AckReceive;

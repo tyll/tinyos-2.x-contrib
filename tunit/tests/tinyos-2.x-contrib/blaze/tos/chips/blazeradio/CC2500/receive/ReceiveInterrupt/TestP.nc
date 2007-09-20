@@ -65,7 +65,6 @@ implementation {
   
   /***************** SplitControl Events ****************/
   event void SplitControl.startDone(error_t error) {
-    call CC2500ReceiveInterrupt.enableRisingEdge();
     call SetUpOneTime.done(); 
   }
   

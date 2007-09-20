@@ -18,6 +18,7 @@ configuration BlazeReceiveC {
   
   uses {
     interface GeneralIO as Csn[ radio_id_t id ];
+    interface GpioInterrupt as RxInterrupt[ radio_id_t id ];
     interface BlazeConfig[ radio_id_t id ];
   }
 }
@@ -30,6 +31,7 @@ implementation {
   AckReceive = BlazeReceiveP;
   Csn = BlazeReceiveP.Csn;
   BlazeConfig = BlazeReceiveP;
+  RxInterrupt = BlazeReceiveP;
   
   components MainC;
   MainC.SoftwareInit -> BlazeReceiveP;
@@ -39,7 +41,6 @@ implementation {
       new BlazeSpiResourceC();
       
   BlazeReceiveP.Resource -> BlazeSpiResourceC;
-  BlazeReceiveP.CheckRadio -> Spi.CheckRadio;
   BlazeReceiveP.SNOP -> Spi.SNOP;
   BlazeReceiveP.SRX -> Spi.SRX;
   BlazeReceiveP.SFRX -> Spi.SFRX;

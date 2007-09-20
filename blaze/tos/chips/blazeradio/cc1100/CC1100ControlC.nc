@@ -44,13 +44,14 @@ implementation {
   BlazeInitC.BlazeRegSettings[ CC1100_RADIO_ID ] -> CC1100ControlP;
   BlazeInitC.Gdo0_io[ CC1100_RADIO_ID ] -> Pins.Gdo0_io;
   BlazeInitC.Gdo2_io[ CC1100_RADIO_ID ] -> Pins.Gdo2_io;
-  CC1100ControlP.BlazeCommit -> BlazeInitC;
+  CC1100ControlP.BlazeCommit -> BlazeInitC.BlazeCommit[ CC1100_RADIO_ID ];
   
   components BlazeTransmitC;
   BlazeTransmitC.Csn[ CC1100_RADIO_ID ] -> Pins.Csn;
   
   components BlazeReceiveC;
   BlazeReceiveC.Csn[ CC1100_RADIO_ID ] -> Pins.Csn;
+  BlazeReceiveC.RxInterrupt [ CC1100_RADIO_ID ] -> Pins.Gdo2_int;
   BlazeReceiveC.BlazeConfig[ CC1100_RADIO_ID ] -> CC1100ControlP.BlazeConfig;
   
   components LedsC;

@@ -25,17 +25,20 @@ typedef nx_struct blaze_footer_t {
 typedef nx_struct blaze_metadata_t {
   nx_uint8_t txPower;
   nx_uint8_t rssi;
-  nx_uint8_t lqi;
-  nx_bool crc;
-  nx_bool ack;
+  nx_uint8_t lqi; 
+  nx_bool crc;  // TODO combine 
+  nx_bool ack;  // TODO combine
+  nx_uint8_t radio;  // TODO combine
   nx_uint32_t time;
   nx_uint16_t rxInterval;
   nx_uint16_t maxRetries;
   nx_uint16_t retryDelay;
-  nx_uint8_t radio;
 } blaze_metadata_t;
 
 
+/**
+ * Acknowledgement frame structure
+ */
 typedef nx_struct blaze_ack_t {
   nxle_uint8_t length;
   nxle_uint16_t dest;
@@ -55,12 +58,6 @@ enum {
   ACK_FRAME_LENGTH = sizeof( blaze_ack_t ) - 1,
 };
 
-enum blaze_radio_enums{
-  BLAZE_CC1100 = 0x00,
-  BLAZE_CC2500 = 0x01,
-  CC1100_GDO2 = 0x02,
-  CC1100_GDO0 = 0x03,
-};
 
 enum blaze_cmd_strobe_enums{
 

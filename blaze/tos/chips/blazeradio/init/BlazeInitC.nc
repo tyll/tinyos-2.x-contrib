@@ -8,7 +8,7 @@ configuration BlazeInitC {
   provides {
     interface SplitControl[ radio_id_t id ];
     interface BlazePower[ radio_id_t id ];
-    interface BlazeCommit;
+    interface BlazeCommit[ radio_id_t id ];
   }
   
   uses {
@@ -16,6 +16,8 @@ configuration BlazeInitC {
     interface GeneralIO as Csn[ radio_id_t id ];
     interface GeneralIO as Gdo0_io[ radio_id_t id ];
     interface GeneralIO as Gdo2_io[ radio_id_t id ];
+    interface GpioInterrupt as Gdo0_int[ radio_id_t id ];
+    interface GpioInterrupt as Gdo2_int[ radio_id_t id ];
     interface BlazeRegSettings[ radio_id_t id ];
   }
 }
@@ -39,7 +41,10 @@ implementation {
   BlazeCommit = BlazeInitP;
   
   Gdo0_io = BlazeInitP.Gdo0_io;
+  Gdo0_int = BlazeInitP.Gdo0_int;
+  
   Gdo2_io = BlazeInitP.Gdo2_io;
+  Gdo2_int = BlazeInitP.Gdo2_int;
   
   BlazeInitP.ResetResource -> ResetResourceC;
   BlazeInitP.DeepSleepResource -> DeepSleepResourceC;
@@ -53,7 +58,6 @@ implementation {
   BlazeInitP.RadioStatus -> BlazeSpiC.RadioStatus;
   
   BlazeInitP.RadioInit -> BlazeSpiC;
-  BlazeInitP.CheckRadio -> BlazeSpiC;
   
   components LedsC;
   BlazeInitP.Leds -> LedsC;

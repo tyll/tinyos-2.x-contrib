@@ -1,24 +1,29 @@
 
+/**
+ * @author David Moss
+ */
+ 
+#include "Blaze.h"
+
 interface RadioSelect{
 
-  /** Only controls which radio the current packet will be transmitted.
-    * Calls the split control functions on the radio, turning them on and off
-    */
-  command error_t requestCC1100();
-  
-  event void grantCC1100(error_t error);
-  
-  command error_t releaseCC1100();
-  
-  event void releaseCC1100Done(error_t error);
-  
-  command error_t requestCC2500();
-  
-  event void grantCC2500(error_t error);
-  
-  command error_t releaseCC2500();
-  
-  event void releaseCC2500Done(error_t error);
+  /**
+   * Select the radio to be used to send this message
+   * @param msg The message to configure that will be sent in the future
+   * @param radioId The radio ID to use when sending this message.
+   *    See CC1100.h or CC2500.h for definitions, the ID is either
+   *    CC1100_RADIO_ID or CC2500_RADIO_ID.
+   * @return SUCCESS if the radio ID was set. EINVAL if you have selected
+   *    an invalid radio
+   */
+  command error_t selectRadio(message_t *msg, radio_id_t radioId);
+
+  /**
+   * Get the radio ID this message will use to transmit when it is sent
+   * @param msg The message to extract the radio ID from
+   * @return The ID of the radio selected for this message
+   */
+  command radio_id_t getRadio(message_t *msg);
   
 }
 

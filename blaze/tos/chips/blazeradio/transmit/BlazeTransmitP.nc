@@ -35,8 +35,7 @@ module BlazeTransmitP {
     interface BlazeStrobe as SRX;
   
     interface BlazeRegister as TxReg;
-  
-    interface CheckRadio;
+    
     interface RadioStatus;
     
     interface State;

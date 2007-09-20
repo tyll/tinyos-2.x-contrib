@@ -8,10 +8,10 @@
 interface BlazeCommit {
 
   /**
-   * Only call commit() on the radio that is currently turned on.
-   * The event commitDone() will always be signaled, so no return is necessary
+   * Commit changes made to a radio's registers stored in RAM on the 
+   * microcontroller to the radio. 
    */
-  command void commit();
+  command error_t commit();
   
   event void commitDone();
   

@@ -23,15 +23,9 @@
  */
 
 /**
- * Interface representing one of the Read/Write registers on the
- * CC2420 radio. The return values (when appropriate) refer to the
- * status byte returned on the CC2420 SO pin. A full list of RW
- * registers can be found on page 61 of the CC2420 datasheet (rev
- * 1.2). Page 25 of the same document describes the protocol for
- * interacting with these registers over the CC2420 SPI bus.
- *
  * @author Philip Levis
- * @version $Revision$ $Date$
+ * @author Jared Hill
+ * @author David Moss
  */
 
 #include "Blaze.h"
@@ -54,8 +48,5 @@ interface BlazeRegister {
    */
   async command blaze_status_t write(uint8_t data);
   
-  //async event void readDone(uint8_t data, blaze_status_t status);
-  
-  //async event void writeDone(blaze_status_t status);
 
 }

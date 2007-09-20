@@ -7,6 +7,7 @@
  * the PacketAcknowledgement interface
  *
  * Above this layer, nothing should be asynchronous context
+ * Below this layer should be CSMA
  * 
  * @author David Moss
  */
@@ -15,6 +16,10 @@ configuration AcknowledgementsC {
     interface Send[radio_id_t id];
     interface PacketAcknowledgements;
   }
+  
+  uses {
+    interface Send as SubSend[radio_id_t id];
+  }
 }
 
 implementation {
@@ -22,9 +27,7 @@ implementation {
   components AcknowledgementsP;
   Send = AcknowledgementsP;
   PacketAcknowledgements = AcknowledgementsP;
- 
-  components CsmaC;
-  AcknowledgementsP.SubSend -> CsmaC;
+  SubSend = AcknowledgementsP;
   
   components BlazeSpiC;
   AcknowledgementsP.ChipSpiResource -> BlazeSpiC;

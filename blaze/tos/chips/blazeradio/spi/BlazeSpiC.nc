@@ -99,7 +99,6 @@ configuration BlazeSpiC {
   provides interface BlazeFifo as PATABLE;
   
   //radio control
-  provides interface CheckRadio;
   provides interface RadioStatus;
 
 }
@@ -197,7 +196,6 @@ implementation {
   PATABLE = BlazeSpiWireC.Fifo[ BLAZE_PATABLE ];
 
   //radio control
-  CheckRadio = BlazeSpiWireC.CheckRadio;
   RadioStatus = BlazeSpiWireC.RadioStatus;
 
 }

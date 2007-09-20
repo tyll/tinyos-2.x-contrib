@@ -137,8 +137,7 @@ implementation {
    * @return SUCCESS if the changes will be committed.
    */
   command error_t BlazeConfig.commit() {
-    call BlazeCommit.commit();
-    return SUCCESS;
+    return call BlazeCommit.commit();
   }
   
   /**

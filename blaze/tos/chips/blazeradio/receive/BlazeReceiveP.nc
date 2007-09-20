@@ -21,6 +21,7 @@ module BlazeReceiveP {
   uses {
     interface AsyncSend as AckSend[ radio_id_t id ];
     interface GeneralIO as Csn[ radio_id_t id ];
+    interface GpioInterrupt as RxInterrupt[ radio_id_t id ];
     interface BlazeConfig[ radio_id_t id ];
    
     interface BlazeFifo as RXFIFO;
@@ -39,7 +40,6 @@ module BlazeReceiveP {
     interface BlazePacket;
     interface BlazePacketBody;
     
-    interface CheckRadio;
     interface RadioStatus;
     
     interface ActiveMessageAddress;
@@ -63,6 +63,8 @@ implementation {
   /** Default message buffer */
   message_t myMsg;
 
+  /** Number of interrupts that occurred while we were busy receiving a pkt */
+  uint8_t missedPackets;
   
   enum receive_states{
     S_IDLE,
@@ -91,11 +93,20 @@ implementation {
     m_msg = &myMsg;
     acknowledgement.length = ACK_FRAME_LENGTH;
     acknowledgement.fcf = IEEE154_TYPE_ACK;
+    missedPackets = 0;
     return SUCCESS;
   }
   
+  /***************** RxInterrupt Events ****************/
+  async event void RxInterrupt.fired[ radio_id_t id ]() {
+    // TODO handle the case where the ReceiveController is already busy
+    // and we need to grab the next packet out when it's done.
+    if(call ReceiveController.beginReceive[id]() != SUCCESS) {
+      missedPackets++;
+    }
+  }
   
-  /*************** ReceiveController Commands ***********************/
+  /***************** ReceiveController Commands ***********************/
   async command error_t ReceiveController.beginReceive[ radio_id_t id ](){
     
     if(call State.requestState(S_RX_LENGTH) != SUCCESS) {
@@ -413,6 +424,19 @@ implementation {
   
   default async command bool BlazeConfig.isAutoAckEnabled[ radio_id_t id ]() {
     return TRUE;
+  }
+  
+  
+  default async command error_t RxInterrupt.enableRisingEdge[radio_id_t id]() {
+    return FAIL;
+  }
+  
+  default async command error_t RxInterrupt.enableFallingEdge[radio_id_t id]() {
+    return FAIL;
+  }
+  
+  default async command error_t RxInterrupt.disable[radio_id_t id]() {
+    return FAIL;
   }
   
 }

@@ -10,13 +10,13 @@ module BlazePacketP {
   provides {
     interface BlazePacket;
     interface BlazePacketBody;
-    interface PacketAcknowledgements as Acks;
   }
 
 }
 
 implementation {
 
+  /***************** Functions ****************/
   blaze_header_t *getHeader( message_t *msg ) {
     return (blaze_header_t *) ( msg->data - sizeof( blaze_header_t ));
   }
@@ -25,20 +25,7 @@ implementation {
     return (blaze_metadata_t *) msg->metadata;
   }
 
-  async command error_t Acks.requestAck( message_t* p_msg ) {
-    getHeader( p_msg )->fcf |= 1 << IEEE154_FCF_ACK_REQ;
-    return SUCCESS;
-  }
-
-  async command error_t Acks.noAck( message_t* p_msg ) {
-    getHeader( p_msg )->fcf &= ~(1 << IEEE154_FCF_ACK_REQ);
-    return SUCCESS;
-  }
-
-  async command bool Acks.wasAcked( message_t* p_msg ) {
-    return getMetadata( p_msg )->ack;
-  }
-
+  /***************** BlazePacket Commands ****************/
   async command void BlazePacket.setPower( message_t* p_msg, uint8_t power ) {
     if ( power > 31 )
       power = 31;
@@ -65,6 +52,7 @@ implementation {
     return getMetadata( p_msg )->radio;
   }
   
+  /***************** BlazePacketBody Commands ****************/
   async command blaze_header_t *BlazePacketBody.getHeader( message_t* msg ){
     return getHeader( msg );
   }

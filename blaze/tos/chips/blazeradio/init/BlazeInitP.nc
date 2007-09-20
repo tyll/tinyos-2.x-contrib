@@ -17,13 +17,18 @@
 #include "Blaze.h"
 #include "BlazeInit.h"
 
+/**
+ * TODO remove the single-radio requirement.  Add in Gdo0_int and Gdo2_int
+ * here and enable/disable them on SplitControl switching.
+ */
+ 
 module BlazeInitP {
 
   provides {
     interface Init;
     interface SplitControl[ radio_id_t id ];
     interface BlazePower[ radio_id_t id ];
-    interface BlazeCommit;
+    interface BlazeCommit[ radio_id_t id ];
   }
   
   uses {
@@ -34,6 +39,8 @@ module BlazeInitP {
     interface GeneralIO as Csn[ radio_id_t id ];
     interface GeneralIO as Gdo0_io[ radio_id_t id ];
     interface GeneralIO as Gdo2_io[ radio_id_t id ];
+    interface GpioInterrupt as Gdo0_int[ radio_id_t id ];
+    interface GpioInterrupt as Gdo2_int[ radio_id_t id ];
     
     interface BlazeRegSettings[ radio_id_t id ];
     interface RadioStatus;
@@ -46,7 +53,6 @@ module BlazeInitP {
     interface BlazeStrobe as SFTX;
     interface BlazeStrobe as SRX;
     
-    interface CheckRadio;
     interface Leds;
   }
 }
@@ -59,14 +65,14 @@ implementation {
 
   uint8_t m_id;
   
-  uint8_t blazePowerClient;
-  
-  uint8_t state;
+  uint8_t state[uniqueCount(UQ_BLAZE_RADIO)];
   
   enum {
-    S_IDLE,
+    S_OFF,
     S_STARTING,
+    S_ON,
     S_COMMITTING,
+    S_STOPPING,
   };
   
   /***************** Prototypes ****************/
@@ -76,9 +82,9 @@ implementation {
     uint8_t i;
     for(i = 0; i < uniqueCount(UQ_BLAZE_RADIO); i++) {
       call BlazePower.shutdown[i]();
+      state[i] = S_OFF;
     }
     m_id = NO_RADIO;
-    state = S_IDLE;
     return SUCCESS;
   }
     
@@ -93,34 +99,49 @@ implementation {
    * It may have something to do with the corrupted register writes on burst.
    */
   command error_t SplitControl.start[ radio_id_t id ]() {
-    if(m_id != NO_RADIO) {
-      return EBUSY;
-      
-    } else if (m_id == id) {
-      return EALREADY;
+    if(id >= uniqueCount(UQ_BLAZE_RADIO)) {
+      return EINVAL;
     }
     
-    atomic m_id = id;
-
-    call Power.set[ m_id ]();
-    call Csn.clr[ m_id ]();
-    call CheckRadio.waitForWakeup();
+    if(state[id] == S_ON) {
+      return EALREADY;
+      
+    } else if(state[id] == S_STARTING) {
+      return SUCCESS;
+      
+    } else if(state[id] != S_OFF) {
+      return EBUSY;
+    }
     
-    state = S_STARTING;
+    // We must be in state S_OFF for this radio. 
+    atomic m_id = id;
+    
+    call Power.set[ m_id ]();
+    
+    state[ m_id ] = S_STARTING;
     
     // Since we're in control of BlazeSpiP, we know this next command will only
     // return SUCCESS. Therefore, there is no need to create code to undo above.
-    return call BlazePower.reset[id]();
+    return call BlazePower.reset[ m_id ]();
   }
   
   command error_t SplitControl.stop[ radio_id_t id ](){
-    if(id != m_id) {
-      return FAIL;
+    if(state[id] == S_OFF) {
+      return EALREADY;
+    
+    } else if(state[id] == S_STOPPING) {
+      return SUCCESS;
+      
+    } else if(state[id] != S_ON) {
+      return EBUSY;
     }
+    
+    call Gdo0_int.disable[ id ]();
+    call Gdo2_int.disable[ id ]();
     
     call BlazePower.deepSleep[id]();
     call BlazePower.shutdown[id]();
-    m_id = NO_RADIO;
+    state[id] = S_OFF;
     signal SplitControl.stopDone[ id ](SUCCESS);
     
     return SUCCESS;
@@ -136,9 +157,17 @@ implementation {
    * It is up to higher layers to make sure we aren't trying to commit
    * registers to a different radio than the one currently turned on
    */
-  command void BlazeCommit.commit() {
-    state = S_COMMITTING;
-    call BlazePower.reset[m_id]();
+   
+  
+  command error_t BlazeCommit.commit[radio_id_t id]() {
+    atomic m_id = id;
+    
+    if(state[m_id] != S_ON) {
+      return FAIL;
+    }
+    
+    state[m_id] = S_COMMITTING;    
+    return call BlazePower.reset[m_id]();
   }
   
   
@@ -146,12 +175,16 @@ implementation {
 
   /**
    * Restart the chip.  All registers come up in their default settings.
-   * We don't confirm the radio ID, so be careful.  This is because
+   * We don't confirm the radio ID or state, so be careful.  This is because
    * we may want to call BlazePower.reset() on some radio, and then call
    * SplitControl.start() afterwards.
+   *
+   * Note that the client calling this may be internal or external, and could
+   * be different than the id we're servicing elsewhere.  So we keep the id
+   * in a separate location (m_id)
    */
   async command error_t BlazePower.reset[ radio_id_t id ]() {
-    atomic blazePowerClient = id;
+    atomic m_id = id;
     return call ResetResource.request();
   }
   
@@ -160,7 +193,7 @@ implementation {
    * We don't confirm the radio ID, so be careful
    */
   async command error_t BlazePower.deepSleep[ radio_id_t id ]() {
-    atomic blazePowerClient = id;
+    atomic m_id = id;
     return call DeepSleepResource.request();
   }
 
@@ -180,7 +213,7 @@ implementation {
   
   /***************** RadioInit Events ****************/
   event void RadioInit.initDone() { 
-  
+    
     call Gdo0_io.makeInput[ m_id ]();
     call Gdo2_io.makeInput[ m_id ]();
     
@@ -200,26 +233,43 @@ implementation {
     
     call ResetResource.release();
     
-    if(state == S_STARTING) {
+    call Gdo0_int.enableRisingEdge[ m_id ]();
+    call Gdo2_int.enableRisingEdge[ m_id ]();
+    
+    if(state[m_id] == S_STARTING) {
+      state[m_id] = S_ON;
       signal SplitControl.startDone[ m_id ](SUCCESS);
     
     } else {
-      signal BlazeCommit.commitDone();
+      state[m_id] = S_ON;
+      signal BlazeCommit.commitDone[ m_id ]();
     }
   }
   
   /***************** Resource Events ****************/
   event void ResetResource.granted() {
     uint8_t id;
-    atomic id = blazePowerClient;
+    
+    atomic id = m_id;
+    
     call Csn.set[id]();
     call Csn.clr[id]();
-    call Idle.strobe();
+    
+    /*
+     * This next line may be the first SPI command given to the radio 
+     * immediately after boot. Loop until CHIP_RDY is low in the 
+     * status byte.  This demonstrates the crystal oscillator is running 
+     * and the regulated digital supply voltage is stable.  Then we reset.
+     */
     call SRES.strobe();
     call Csn.set[id]();
+    
+    call Csn.clr[id]();
+    while((call Idle.strobe() & 0x80) != 0);
+    call Csn.set[id]();
+    
+    if(state[id] == S_STARTING || state[id] == S_COMMITTING) {
 
-    if(state == S_STARTING || state == S_COMMITTING) {
-      call Csn.set[id]();
       call Csn.clr[id]();
       call Idle.strobe();
     
@@ -238,7 +288,7 @@ implementation {
   
   event void DeepSleepResource.granted() {
     uint8_t id;
-    atomic id = blazePowerClient;
+    atomic id = m_id;
     call Csn.set[id]();
     call Csn.clr[id]();
     call Idle.strobe();
@@ -248,6 +298,13 @@ implementation {
     signal BlazePower.deepSleepComplete[id]();
   }
   
+
+  /***************** Interrupts ****************/
+  async event void Gdo0_int.fired[radio_id_t id]() {
+  }
+  
+  async event void Gdo2_int.fired[radio_id_t id]() {
+  }
   
   /***************** Functions ****************/
     
@@ -291,6 +348,14 @@ implementation {
   default async command void Gdo2_io.makeOutput[ radio_id_t id ](){}
   default async command bool Gdo2_io.isOutput[ radio_id_t id ](){return FALSE;}
   
+  default async command error_t Gdo0_int.enableRisingEdge[radio_id_t id]() { return FAIL; }
+  default async command error_t Gdo0_int.enableFallingEdge[radio_id_t id]() { return FAIL; }
+  default async command error_t Gdo0_int.disable[radio_id_t id]() { return FAIL; }
+  
+  default async command error_t Gdo2_int.enableRisingEdge[radio_id_t id]() { return FAIL; }
+  default async command error_t Gdo2_int.enableFallingEdge[radio_id_t id]() { return FAIL; }
+  default async command error_t Gdo2_int.disable[radio_id_t id]() { return FAIL; }
+  
   default event void BlazePower.resetComplete[ radio_id_t id ]() {}
   default event void BlazePower.deepSleepComplete[ radio_id_t id ]() {}
   
@@ -299,5 +364,5 @@ implementation {
   
   default command blaze_init_t *BlazeRegSettings.getDefaultRegisters[ radio_id_t id ]() { return NULL; }
   
-  default event void BlazeCommit.commitDone() {}
+  default event void BlazeCommit.commitDone[ radio_id_t id ]() {}
 }

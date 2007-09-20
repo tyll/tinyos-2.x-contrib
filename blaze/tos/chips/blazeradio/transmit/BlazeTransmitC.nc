@@ -36,7 +36,6 @@ implementation {
   Csn = BlazeTransmitP.Csn;
   
   components BlazeSpiC as Spi;
-  BlazeTransmitP.CheckRadio -> Spi.CheckRadio;
   BlazeTransmitP.RadioStatus -> Spi.RadioStatus;
   
   BlazeTransmitP.SNOP -> Spi.SNOP;

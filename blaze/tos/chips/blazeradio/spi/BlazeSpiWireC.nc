@@ -17,7 +17,6 @@ configuration BlazeSpiWireC {
   provides interface BlazeStrobe as Strobe[ uint8_t id ];
   provides interface RadioInit;
   provides interface ChipSpiResource;
-  provides interface CheckRadio;
   provides interface RadioStatus;
   
 }
@@ -31,10 +30,7 @@ implementation {
   Strobe = BlazeSpiP;
   RadioInit = BlazeSpiP;
   RadioStatus = BlazeSpiP;
-  
-  components CheckRadioC;
-  CheckRadio = CheckRadioC.CheckRadio;
-  
+    
   components HplRadioSpiC;
   BlazeSpiP.SpiResource -> HplRadioSpiC;
   BlazeSpiP.SpiByte -> HplRadioSpiC;

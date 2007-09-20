@@ -8,23 +8,24 @@ push( @includes, qw(
   ## tmote1100 Platform
   %T/platforms/tmote1100
   %T/platforms/tmote1100/chips/ccxx00
-  #%T/platforms/tmote1100/chips/msp430/usart
 
   ## Rincon CCxx00 Dual Radio Stack
   %T/../../blaze/tos/chips/blazeradio
   %T/../../blaze/tos/chips/blazeradio/acks
   %T/../../blaze/tos/chips/blazeradio/alarm
-  %T/../../blaze/tos/chips/blazeradio/arbiter
+  %T/../../blaze/tos/chips/blazeradio/am
   %T/../../blaze/tos/chips/blazeradio/cc1100
-  %T/../../blaze/tos/chips/blazeradio/cc1100
+  %T/../../blaze/tos/chips/blazeradio/cc2500
   %T/../../blaze/tos/chips/blazeradio/csma
   %T/../../blaze/tos/chips/blazeradio/init
   %T/../../blaze/tos/chips/blazeradio/interfaces
+  %T/../../blaze/tos/chips/blazeradio/link
   %T/../../blaze/tos/chips/blazeradio/packet
   %T/../../blaze/tos/chips/blazeradio/receive
+  %T/../../blaze/tos/chips/blazeradio/select
   %T/../../blaze/tos/chips/blazeradio/spi
-  %T/../../blaze/tos/chips/blazeradio/stub
   %T/../../blaze/tos/chips/blazeradio/transmit
+  %T/../../blaze/tos/chips/blazeradio/unique
 
   ## Rincon Additions to TinyOS chips
   %T/chips/rrc_stm25p
@@ -47,9 +48,6 @@ push( @includes, qw(
   %T/lib/serial
   %T/lib/adc
   %T/lib/power
-
-  ## TinyOS Interfaces
-  %T/../../tmote1100/tos/interfaces
 
 ) );
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2006 Stanford University.
+ * Copyright (c) 2006-2007 Stanford University.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -82,7 +82,8 @@ implementation
 
 	void DataReport(rssi_sample_msg* data)
 	{
-	  rssi_sample_msg *msg = (rssi_sample_msg *)(call AMSend.getPayload(&packet));
+	  rssi_sample_msg *msg = (rssi_sample_msg *)(call AMSend.getPayload(&packet, sizeof(rssi_sample_msg)));
+          if (msg == NULL) {return;}
 	  memcpy(msg, data, sizeof(rssi_sample_msg));
 	  
 	  if (sendBusy == TRUE)
@@ -102,8 +103,9 @@ implementation
 
 	void Report(error_t e)
 	{
-		uint8_t *msg = call AMSend.getPayload(&packet);
-
+		uint8_t *msg = call AMSend.getPayload(&packet, 1);
+                if (msg == NULL) {return;}
+ 
 		msg[0] = e;
 		if (sendBusy == TRUE)
 			return;

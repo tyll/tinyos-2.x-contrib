@@ -23,6 +23,7 @@ module CsmaP {
     interface BlazePacketBody;
     interface Random;
     interface State;
+    interface Leds;
   }
 }
 

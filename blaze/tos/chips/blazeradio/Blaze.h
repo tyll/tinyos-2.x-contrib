@@ -10,25 +10,24 @@ typedef uint8_t radio_id_t;
  * 8 bytes found in blaze_ack_t
  */
 typedef nx_struct blaze_header_t {
-  nxle_uint8_t length;
-  nxle_uint16_t dest;
-  nxle_uint16_t fcf;
-  nxle_uint8_t dsn;
-  nxle_uint16_t src;
-  nxle_uint16_t destpan;
-  nxle_uint8_t type;
+  nx_uint8_t length;
+  nx_uint16_t dest;
+  nx_uint16_t fcf;
+  nx_uint8_t dsn;
+  nx_uint16_t src;
+  nx_uint16_t destpan;
+  nx_uint8_t type;
 } blaze_header_t;
 
 typedef nx_struct blaze_footer_t {
 } blaze_footer_t;
 
 typedef nx_struct blaze_metadata_t {
-  nx_uint8_t txPower;
   nx_uint8_t rssi;
   nx_uint8_t lqi; 
-  nx_bool crc;  // TODO combine 
-  nx_bool ack;  // TODO combine
-  nx_uint8_t radio;  // TODO combine
+  nx_bool ack;  // TODO combine or take advantage of the FCF ack bit?
+  nx_uint8_t radio;  // TODO combine 
+  nx_uint8_t txPower;
   nx_uint32_t time;
   nx_uint16_t rxInterval;
   nx_uint16_t maxRetries;
@@ -40,11 +39,11 @@ typedef nx_struct blaze_metadata_t {
  * Acknowledgement frame structure
  */
 typedef nx_struct blaze_ack_t {
-  nxle_uint8_t length;
-  nxle_uint16_t dest;
-  nxle_uint16_t fcf;
-  nxle_uint8_t dsn;
-  nxle_uint16_t src;
+  nx_uint8_t length;
+  nx_uint16_t dest;
+  nx_uint16_t fcf;
+  nx_uint8_t dsn;
+  nx_uint16_t src;
 } blaze_ack_t;
 
 enum {

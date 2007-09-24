@@ -13,10 +13,5 @@ interface ReceiveController {
    */
   async command error_t beginReceive();
   
-  /**
-   * An error occurred that prevents this packet from being received.
-   * It is most likely an invalid or corrupted packet
-   */
-  async event void receiveFailed();
 }
 

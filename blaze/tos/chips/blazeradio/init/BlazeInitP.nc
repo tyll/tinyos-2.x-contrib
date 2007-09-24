@@ -63,7 +63,7 @@ implementation {
     NO_RADIO = 0xFF,
   };
 
-  uint8_t m_id;
+  norace uint8_t m_id;
   
   uint8_t state[uniqueCount(UQ_BLAZE_RADIO)];
   
@@ -221,11 +221,9 @@ implementation {
     call Csn.clr[ m_id ]();
     
     // Startup the radio in Rx mode by default
+    call Idle.strobe();
     call SFRX.strobe();
     call SFTX.strobe();
-    call Idle.strobe();
-    while (call RadioStatus.getRadioStatus() != BLAZE_S_IDLE);
-    
     call SRX.strobe();
     while (call RadioStatus.getRadioStatus() != BLAZE_S_RX);
     
@@ -233,8 +231,7 @@ implementation {
     
     call ResetResource.release();
     
-    call Gdo0_int.enableRisingEdge[ m_id ]();
-    call Gdo2_int.enableRisingEdge[ m_id ]();
+    call Gdo2_int.enableFallingEdge[ m_id ]();
     
     if(state[m_id] == S_STARTING) {
       state[m_id] = S_ON;

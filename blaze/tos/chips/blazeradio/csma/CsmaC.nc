@@ -57,4 +57,7 @@ implementation {
   components RandomC;
   CsmaP.Random -> RandomC;
   
+  components LedsC;
+  CsmaP.Leds -> LedsC;
+  
 }

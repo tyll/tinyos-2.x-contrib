@@ -8,14 +8,16 @@
 
 #include "Blaze.h"
 
+#warning "*** INCLUDING CC2500 RADIO ***"
+
 enum {
   CC2500_RADIO_ID = unique( UQ_BLAZE_RADIO ),
 };
 
 
 enum cc2500_config_reg_state_enums {
-  /** GDO2 goes high when we've received a packet until the buffer is empty */
-  CC2500_CONFIG_IOCFG2 = 0x01,
+  /** GDO2 asserts at Rx sync and deasserts at end of packet */
+  CC2500_CONFIG_IOCFG2 = 0x06,
   
   /** GDO1 is High Impedance */
   CC2500_CONFIG_IOCFG1 = 0x2E,
@@ -26,11 +28,18 @@ enum cc2500_config_reg_state_enums {
   CC2500_CONFIG_FIFOTHR = 0x07,
   CC2500_CONFIG_SYNC1 = 0xD3,
   CC2500_CONFIG_SYNC0 = 0x91,
-  CC2500_CONFIG_PKTLEN = 0xFF,
-  CC2500_CONFIG_PKTCTRL1 = 0x04,
-  CC2500_CONFIG_PKTCTRL0 = 0x45,
+  
+  /** Maximum variable packet length is 61 per Errata */
+  CC2500_CONFIG_PKTLEN = 0x3D,
+  
+  /** 0x0 and 0xFF are broadcast addresses, append 2 status bytes in Rx */
+  CC2500_CONFIG_PKTCTRL1 = 0x07,
+  
+  /** No hardware CRC check, per errata */
+  CC2500_CONFIG_PKTCTRL0 = 0x41,
+  
   CC2500_CONFIG_ADDR = 0x00,
-  CC2500_CONFIG_CHANNR = 0x37,
+  CC2500_CONFIG_CHANNR = 0x20, // 0x37,
   CC2500_CONFIG_FSCTRL1 = 0x10,
   CC2500_CONFIG_FSCTRL0 = 0x00,
   CC2500_CONFIG_FREQ2 = 0x5D,

@@ -100,7 +100,7 @@ implementation {
   
   /***************** Resource Commands *****************/
   async command error_t Resource.request[ uint8_t id ]() {
-        
+    
     atomic {
       if ( call SpiResourceState.requestState(S_BUSY) == SUCCESS ) {
         m_holder = id;
@@ -120,7 +120,7 @@ implementation {
   
   async command error_t Resource.immediateRequest[ uint8_t id ]() {
     error_t error;
-        
+    
     atomic {
       if ( call SpiResourceState.requestState(S_BUSY) != SUCCESS ) {
         return EBUSY;
@@ -137,11 +137,13 @@ implementation {
         call SpiResourceState.toIdle();
       }
     }
+    
     return error;
   }
 
   async command error_t Resource.release[ uint8_t id ]() {
     uint8_t i;
+    
     atomic {
       if ( m_holder != id ) {
         return FAIL;

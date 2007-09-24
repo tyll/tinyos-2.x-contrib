@@ -11,7 +11,6 @@
  
 #include "IEEE802154.h"
 #include "Blaze.h"
-#include "CC1100.h"
 #include "AM.h"
 
 module BlazeTransmitP {
@@ -23,6 +22,7 @@ module BlazeTransmitP {
   
   uses {
     interface GeneralIO as Csn[ radio_id_t id ];
+    interface GpioInterrupt as RxInterrupt[ radio_id_t id ];
     interface BlazePacketBody;
    
     interface BlazeFifo as TXFIFO;
@@ -86,7 +86,7 @@ implementation {
    *     EBUSY if the channel is busy (when hardware CCA is enabled)
    */
   async command error_t AsyncSend.send[ radio_id_t id ]() {
-  
+    
     if(call State.requestState(S_TX_PACKET) != SUCCESS) {
       return FAIL;
     }
@@ -152,6 +152,10 @@ implementation {
   }
   
   
+  /***************** RxInterrupt Events ****************/
+  async event void RxInterrupt.fired[ radio_id_t id ]() {
+  }
+  
   /***************** Local Functions ****************/
   /**
    * Load a message into the TX FIFO
@@ -195,6 +199,14 @@ implementation {
     uint8_t state;
     atomic m_id = id;
     
+    /*
+     * The Rx Interrupt line also toggles at the beginning and end of 
+     * the packet. This could be used for timestamp information on when
+     * the SFD was sent, but requires a bit more state / implementation
+     * than I'm willing to put in at the moment.
+     */
+    call RxInterrupt.disable[ id ]();
+    
     call Csn.clr[ id ]();
     
     /*
@@ -203,9 +215,9 @@ implementation {
      */
     
     while(call RadioStatus.getRadioStatus() != BLAZE_S_RX) {
+      call SFRX.strobe();
       call SRX.strobe();
     }
-    
     
     call STX.strobe();
     
@@ -216,11 +228,15 @@ implementation {
       }
     
     } else {
+    
       if(call RadioStatus.getRadioStatus() != BLAZE_S_TX) {
         // CCA failed
         call State.toIdle();
+        call Csn.set[ id ]();
+        call RxInterrupt.enableFallingEdge[ id ]();
         return EBUSY;
       }
+    
     }
     
     /*
@@ -229,11 +245,12 @@ implementation {
      * and save memory footprint
      */
     while(call RadioStatus.getRadioStatus() != BLAZE_S_RX);
-    
     call Csn.set[ id ]();
     
     state = call State.getState();
     call State.toIdle();
+    
+    call RxInterrupt.enableFallingEdge[ id ]();
     
     if(state == S_TX_PACKET) {
       signal AsyncSend.sendDone[ id ]();
@@ -257,6 +274,20 @@ implementation {
   
   default async event void AckSend.sendDone[ radio_id_t id ]() {}
   default async event void AckSend.loadDone[ radio_id_t id ](void *msg, error_t error) {}
+  
+  
+  default async command error_t RxInterrupt.enableRisingEdge[radio_id_t id]() {
+    return FAIL;
+  }
+  
+  default async command error_t RxInterrupt.enableFallingEdge[radio_id_t id]() {
+    return FAIL;
+  }
+  
+  default async command error_t RxInterrupt.disable[radio_id_t id]() {
+    return FAIL;
+  }
+  
   
 }
 

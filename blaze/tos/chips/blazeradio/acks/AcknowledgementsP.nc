@@ -65,7 +65,7 @@ implementation {
     
     if(state != S_IDLE) {
       // Still waiting for the last ack
-      return EBUSY;
+      return ECANCEL;
     }
     
     if(((call BlazePacketBody.getHeader(msg))->fcf >> IEEE154_FCF_ACK_REQ) & 0x1) {
@@ -159,8 +159,7 @@ implementation {
       if(source == header->dest &&
           destination == header->src &&
               dsn == header->dsn) {
-              
-        call Leds.led0On(); 
+        
         // This is our acknowledgement
         state = S_SEND_DONE;
         call AckWaitTimer.stop();
@@ -194,11 +193,11 @@ implementation {
   
   /***************** Defaults ****************/
   default command error_t SubSend.send[radio_id_t id](message_t* msg, uint8_t len) {
-    return FAIL;
+    return EINVAL;
   }
 
   default command error_t SubSend.cancel[radio_id_t id](message_t* msg) {
-    return FAIL;
+    return EINVAL;
   }
 
   default command uint8_t SubSend.maxPayloadLength[radio_id_t id]() { 

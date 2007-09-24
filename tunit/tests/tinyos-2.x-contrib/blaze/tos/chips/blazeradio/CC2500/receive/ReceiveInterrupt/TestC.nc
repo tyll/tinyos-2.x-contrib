@@ -28,7 +28,6 @@ implementation {
   TestP.CC2500ReceiveInterrupt -> HplCC2500PinsC.Gdo2_int;
    
   TestP.Receive -> BlazeReceiveC.Receive[ CC2500_RADIO_ID ];
-  TestP.ReceiveController -> BlazeReceiveC.ReceiveController[ CC2500_RADIO_ID ];
   
   TestP.AsyncSend -> BlazeTransmitC.AsyncSend[ CC2500_RADIO_ID ];
   

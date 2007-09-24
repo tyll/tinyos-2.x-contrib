@@ -24,7 +24,6 @@ module TestP {
     interface AsyncSend;
     interface Receive;
     interface AckReceive;
-    interface ReceiveController;
     interface Leds;
   }
 }
@@ -67,8 +66,7 @@ implementation {
     (call BlazePacketBody.getHeader(&myMsg))->length = MY_PACKET_LENGTH;
     (call BlazePacketBody.getHeader(&myMsg))->dest = 1;
     (call BlazePacketBody.getHeader(&myMsg))->fcf = 
-        (IEEE154_TYPE_DATA << IEEE154_FCF_FRAME_TYPE) |
-        (1 << IEEE154_FCF_ACK_REQ);
+        (IEEE154_TYPE_DATA << IEEE154_FCF_FRAME_TYPE) | (1 << IEEE154_FCF_ACK_REQ);
     
     (call BlazePacketBody.getHeader(&myMsg))->dsn = 0x55;
     (call BlazePacketBody.getHeader(&myMsg))->destpan = 0xCC;    
@@ -153,11 +151,6 @@ implementation {
     call TestReceive.done();
   }
   
-  /***************** Receive Events ****************/
-  async event void ReceiveController.receiveFailed() {
-    call Leds.led0On();
-    assertFail("receiveFailed()");
-  }
   
   /***************** Receive Events ****************/
   event message_t *Receive.receive(message_t *msg, void *payload, uint8_t len) {

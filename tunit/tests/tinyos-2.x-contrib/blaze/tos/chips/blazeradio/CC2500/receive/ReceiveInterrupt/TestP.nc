@@ -16,7 +16,6 @@ module TestP {
     interface GpioInterrupt as CC2500ReceiveInterrupt;
     interface AsyncSend;
     interface Receive;
-    interface ReceiveController;
     interface Leds;
   }
 }
@@ -101,11 +100,6 @@ implementation {
   async event void AsyncSend.sendDone() {
     timesSent++;
     call Leds.led2Toggle();
-    if(timesSent < 5) {
-      call AsyncSend.load(&myMsg);
-      return;
-    }
-    
     call Resource.release();
     // The receiver must stop the test by receiving one of those or we timeout
   }
@@ -118,11 +112,6 @@ implementation {
       assertSuccess();
       call TestReceive.done();
     }
-  }
-  
-  async event void ReceiveController.receiveFailed() {
-    call Leds.led0On();
-    assertFail("receiveFailed()");
   }
   
   /***************** Receive Events ****************/

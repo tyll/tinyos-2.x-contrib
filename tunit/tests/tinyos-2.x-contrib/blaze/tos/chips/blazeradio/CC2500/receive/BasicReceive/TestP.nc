@@ -21,7 +21,6 @@ module TestP {
     interface Resource;
     interface SplitControl;
     interface BlazePacketBody;
-    //interface GpioInterrupt as CC2500ReceiveInterrupt;
     interface AsyncSend;
     interface Receive;
     interface ReceiveController;
@@ -71,7 +70,7 @@ implementation {
     (call BlazePacketBody.getHeader(&myMsg))->destpan = 0xCC;    
     (call BlazePacketBody.getHeader(&myMsg))->src = 0;
     (call BlazePacketBody.getHeader(&myMsg))->type = 0x33;
-  
+    
     myPayload->a = 0xAA;
     myPayload->b = 0xBB;
     myPayload->c = 0xCC;
@@ -96,8 +95,7 @@ implementation {
   
   /***************** SplitControl Events ****************/
   event void SplitControl.startDone(error_t error) {
-    //call CC2500ReceiveInterrupt.enableRisingEdge();
-    call SetUpOneTime.done(); 
+    call SetUpOneTime.done();
   }
   
   event void SplitControl.stopDone(error_t error) {
@@ -118,38 +116,28 @@ implementation {
     
     error = call AsyncSend.load(&myMsg);
     
-    if(error) {
-      assertEquals("Error calling AsyncSend.send()", SUCCESS, error);
+    assertEquals("Error calling AsyncSend.send()", SUCCESS, error);
+    
+    if(error) {  
       call TestReceive.done();
     }
   }
  
   /***************** AsyncSend Events ****************/
   async event void AsyncSend.loadDone(void *msg, error_t error) {
-    call AsyncSend.send();
+    assertEquals("send(ERROR)", SUCCESS, call AsyncSend.send());
   }
   
   async event void AsyncSend.sendDone() {
-    timesSent++;
-    call Leds.led2Toggle();
-    if(timesSent < 5) {
-      call AsyncSend.load(&myMsg);
-    }
-    
+    call Leds.led2On();
+    call Resource.release();
     // The receiver must stop the test by receiving one of those or we timeout
   }
   
   
   /***************** Receive Events ****************
-  async event void CC2500ReceiveInterrupt.fired() {
-    call ReceiveController.beginReceive();
-  }
- 
+
   /***************** ReceiveController Events ****************/
-  async event void ReceiveController.receiveFailed() {
-    call Leds.led0On();
-    assertFail("receiveFailed()");
-  }
   
   /***************** Receive Events ****************/
   event message_t *Receive.receive(message_t *msg, void *payload, uint8_t len) {

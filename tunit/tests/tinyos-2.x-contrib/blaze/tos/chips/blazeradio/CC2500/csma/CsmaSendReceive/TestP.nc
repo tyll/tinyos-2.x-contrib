@@ -21,9 +21,7 @@ module TestP {
     interface Send;
     interface SplitControl;
     interface BlazePacketBody;
-    interface GpioInterrupt as CC2500ReceiveInterrupt;
     interface Receive;
-    interface ReceiveController;
     interface Leds;
   }
 }
@@ -91,7 +89,6 @@ implementation {
     
   /***************** SplitControl Events ****************/
   event void SplitControl.startDone(error_t error) {
-    call CC2500ReceiveInterrupt.enableRisingEdge();
     call SetUpOneTime.done(); 
   }
   
@@ -119,17 +116,6 @@ implementation {
   /***************** Send Events ****************/
   event void Send.sendDone(message_t* msg, error_t error) {
     call Leds.led2On();
-  }
-  
-  
-  /***************** Receive Events ****************/
-  async event void CC2500ReceiveInterrupt.fired() {
-    call ReceiveController.beginReceive();
-  }
- 
-  async event void ReceiveController.receiveFailed() {
-    call Leds.led0On();
-    assertFail("receiveFailed()");
   }
   
   /***************** Receive Events ****************/

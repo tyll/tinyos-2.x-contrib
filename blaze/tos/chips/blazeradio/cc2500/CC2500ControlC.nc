@@ -50,7 +50,7 @@ implementation {
   
   components BlazeTransmitC;
   BlazeTransmitC.Csn[ CC2500_RADIO_ID ] -> Pins.Csn;
-  BlazeTransmitC.RxInterrupt[ CC2500_RADIO_ID ] -> Pins.Gdo2_int;
+  BlazeTransmitC.TxInterrupt[ CC2500_RADIO_ID ] -> Pins.Gdo2_int;
   
   components BlazeReceiveC;
   BlazeReceiveC.Csn[ CC2500_RADIO_ID ] -> Pins.Csn;

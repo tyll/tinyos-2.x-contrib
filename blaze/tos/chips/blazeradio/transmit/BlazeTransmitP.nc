@@ -12,6 +12,7 @@
 #include "IEEE802154.h"
 #include "Blaze.h"
 #include "AM.h"
+#include "InterruptState.h"
 
 module BlazeTransmitP {
 
@@ -22,7 +23,7 @@ module BlazeTransmitP {
   
   uses {
     interface GeneralIO as Csn[ radio_id_t id ];
-    interface GpioInterrupt as RxInterrupt[ radio_id_t id ];
+    interface GpioInterrupt as TxInterrupt[ radio_id_t id ];
     interface BlazePacketBody;
    
     interface BlazeFifo as TXFIFO;
@@ -39,6 +40,7 @@ module BlazeTransmitP {
     interface RadioStatus;
     
     interface State;
+    interface State as InterruptState;
 
     interface Leds;
   }
@@ -152,8 +154,20 @@ implementation {
   }
   
   
-  /***************** RxInterrupt Events ****************/
-  async event void RxInterrupt.fired[ radio_id_t id ]() {
+  /***************** TxInterrupt Events ****************/
+  /**
+   * Because we had the falling edge enabled, if this is our event,
+   * the packet is finished transmitting. In the future, timestamping can
+   * occur on the rising edge.
+   */
+  async event void TxInterrupt.fired[ radio_id_t id ]() {
+    uint8_t state;
+    if(call InterruptState.isState(S_INTERRUPT_RX)) {
+      return;
+    }
+    
+    
+
   }
   
   /***************** Local Functions ****************/
@@ -198,27 +212,25 @@ implementation {
   error_t transmit(uint8_t id, bool force) {
     uint8_t state;
     atomic m_id = id;
-    
-    /*
-     * The Rx Interrupt line also toggles at the beginning and end of 
-     * the packet. This could be used for timestamp information on when
-     * the SFD was sent, but requires a bit more state / implementation
-     * than I'm willing to put in at the moment.
-     */
-    call RxInterrupt.disable[ id ]();
-    
+        
     call Csn.clr[ id ]();
     
     /*
      * Put the radio in RX mode if it's not already. This covers the
      * frequency / synthesizer startup and calibration
      */
-    
     while(call RadioStatus.getRadioStatus() != BLAZE_S_RX) {
       call SFRX.strobe();
       call SRX.strobe();
     }
     
+    /*
+     * Attempt to transmit.  If the radio goes into TX mode, then our transmit
+     * is occurring.  Otherwise, there was something on the channel that
+     * prevented CCA from passing
+     */
+    call TxInterrupt.disable[id]();
+    call InterruptState.forceState(S_INTERRUPT_TX);
     call STX.strobe();
     
     if(force) {
@@ -228,29 +240,34 @@ implementation {
       }
     
     } else {
-    
       if(call RadioStatus.getRadioStatus() != BLAZE_S_TX) {
         // CCA failed
+        call InterruptState.forceState(S_INTERRUPT_RX);
+        call TxInterrupt.enableRisingEdge[id]();
         call State.toIdle();
         call Csn.set[ id ]();
-        call RxInterrupt.enableFallingEdge[ id ]();
         return EBUSY;
       }
-    
     }
     
-    /*
-     * The radio will automatically enter RX mode when it is done transmitting
-     * Do this in a while loop instead of a task so we can transmit faster
-     * and save memory footprint
-     */
-    while(call RadioStatus.getRadioStatus() != BLAZE_S_RX);
+    while((state = call RadioStatus.getRadioStatus()) != BLAZE_S_RX) {
+      if (state == BLAZE_S_RXFIFO_OVERFLOW) {
+        call SFRX.strobe();
+        call SRX.strobe();
+      }
+      
+      if (state == BLAZE_S_TXFIFO_UNDERFLOW) {
+        call SFTX.strobe();
+        call SRX.strobe();
+      }
+    }
+    
+    call InterruptState.forceState(S_INTERRUPT_RX);
+    call TxInterrupt.enableRisingEdge[id]();
     call Csn.set[ id ]();
     
     state = call State.getState();
     call State.toIdle();
-    
-    call RxInterrupt.enableFallingEdge[ id ]();
     
     if(state == S_TX_PACKET) {
       signal AsyncSend.sendDone[ id ]();
@@ -259,6 +276,8 @@ implementation {
       signal AckSend.sendDone[ id ]();
     }
     
+    
+    // Execution continues at the TxInterrupt event.
     return SUCCESS;
   }
   
@@ -276,15 +295,15 @@ implementation {
   default async event void AckSend.loadDone[ radio_id_t id ](void *msg, error_t error) {}
   
   
-  default async command error_t RxInterrupt.enableRisingEdge[radio_id_t id]() {
+  default async command error_t TxInterrupt.enableRisingEdge[radio_id_t id]() {
     return FAIL;
   }
   
-  default async command error_t RxInterrupt.enableFallingEdge[radio_id_t id]() {
+  default async command error_t TxInterrupt.enableFallingEdge[radio_id_t id]() {
     return FAIL;
   }
   
-  default async command error_t RxInterrupt.disable[radio_id_t id]() {
+  default async command error_t TxInterrupt.disable[radio_id_t id]() {
     return FAIL;
   }
   

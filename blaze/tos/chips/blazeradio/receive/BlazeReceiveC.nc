@@ -38,6 +38,10 @@ implementation {
   components MainC;
   MainC.SoftwareInit -> BlazeReceiveP;
   
+  
+  components InterruptStateC;
+  BlazeReceiveP.InterruptState -> InterruptStateC;
+  
   components BlazePacketC,
       BlazeSpiC as Spi,
       new BlazeSpiResourceC();

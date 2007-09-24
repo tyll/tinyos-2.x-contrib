@@ -24,7 +24,7 @@ configuration BlazeTransmitC {
   
   uses {
     interface GeneralIO as Csn[ radio_id_t id ];
-    interface GpioInterrupt as RxInterrupt[ radio_id_t id ];
+    interface GpioInterrupt as TxInterrupt[ radio_id_t id ];
   }
 }
 
@@ -35,7 +35,7 @@ implementation {
   AckSend = BlazeTransmitP.AckSend;
   
   Csn = BlazeTransmitP.Csn;
-  RxInterrupt = BlazeTransmitP.RxInterrupt;
+  TxInterrupt = BlazeTransmitP.TxInterrupt;
     
   components BlazeSpiC as Spi;
   BlazeTransmitP.RadioStatus -> Spi.RadioStatus;
@@ -48,6 +48,9 @@ implementation {
   BlazeTransmitP.SIDLE -> Spi.SIDLE;
   BlazeTransmitP.SRX -> Spi.SRX;
   BlazeTransmitP.TxReg -> Spi.TXREG;
+  
+  components InterruptStateC;
+  BlazeTransmitP.InterruptState -> InterruptStateC;
   
   components new StateC();
   BlazeTransmitP.State -> StateC;

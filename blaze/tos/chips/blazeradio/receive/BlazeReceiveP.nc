@@ -7,6 +7,7 @@
  */
  
 #include "Blaze.h"
+#include "InterruptState.h"
 
 module BlazeReceiveP {
 
@@ -24,6 +25,7 @@ module BlazeReceiveP {
     interface GpioInterrupt as RxInterrupt[ radio_id_t id ];
     interface GeneralIO as RxAvailable[ radio_id_t id ];
     interface BlazeConfig[ radio_id_t id ];
+    interface State as InterruptState;
    
     interface BlazeFifo as RXFIFO;
   
@@ -86,7 +88,6 @@ implementation {
   task void receiveDone();
   
   void receive();
-  void initReceive();
   uint8_t getStatus();
   void failReceive();
   void cleanUp();
@@ -105,9 +106,11 @@ implementation {
 
   /***************** RxInterrupt Events ****************/
   async event void RxInterrupt.fired[ radio_id_t id ]() {
-    if(call ReceiveController.beginReceive[id]() != SUCCESS) {
-      // TODO make this an array for each radio, and check it at the end of rx
-      missedPackets++;
+    if(call InterruptState.isState(S_INTERRUPT_RX)) {
+      if(call ReceiveController.beginReceive[id]() != SUCCESS) {
+        // TODO make this an array for each radio, and check it at the end of rx
+        missedPackets++;
+      }
     }
   }
   
@@ -184,6 +187,7 @@ implementation {
       call State.forceState(S_RX_FCF);
     
       if(rxFrameLength + 1 > BLAZE_RXFIFO_LENGTH) {
+        //call Leds.set(1);
         // Flush everything if the length is bigger than our FIFO
         failReceive();
         return;
@@ -193,6 +197,7 @@ implementation {
           if(rxFrameLength > 0) {
             if(rxFrameLength > SACK_HEADER_LENGTH) {
               // This packet has an FCF byte plus at least one more byte to read
+              //call Leds.set(2);
               call RXFIFO.beginRead(buf + 1, SACK_HEADER_LENGTH);
             
             } else {
@@ -200,16 +205,19 @@ implementation {
               // bytes for a real header. Skip FCF and get it out of here.
               // Add two bytes to read out the status bytes 
               // (PKTCTRL1.APPEND_STATUS=1)
+              //call Leds.set(3);
               call State.forceState(S_RX_PAYLOAD);
               call RXFIFO.beginRead(buf + 1, rxFrameLength + 2);
             }
                           
           } else {
+            //call Leds.set(4);
             // Length == 0; start reading the next packet
             failReceive();
           }
         
         } else {
+          //call Leds.set(5);
           // Length is too large; we have to flush the entire Rx FIFO
           failReceive();
         }
@@ -217,6 +225,7 @@ implementation {
       break;
       
     case S_RX_FCF:
+      ////call Leds.set(5);
       call State.forceState(S_RX_PAYLOAD);
       
         // Our local address may have changed from the last packet received,
@@ -254,6 +263,7 @@ implementation {
       break;
       
     case S_RX_PAYLOAD:
+      //call Leds.set(6);
       // Put the radio back in receive mode and deselect it
       call Csn.set[ id ](); 
       
@@ -307,6 +317,8 @@ implementation {
     metadata->rssi = buf[ rxFrameLength ];
     metadata->lqi = buf[ rxFrameLength + 1 ] & 0x7f;
     
+    
+    //call Leds.set(7);
     atomicMsg = signal Receive.receive[atomicId]( m_msg, m_msg->data, rxFrameLength );
     
     if(atomicMsg != NULL) {
@@ -317,23 +329,6 @@ implementation {
     
     cleanUp();
   }
-  
-  
-  void initReceive() {
-    uint8_t state;
-    call SRX.strobe();
-    while ((state = call RadioStatus.getRadioStatus()) != BLAZE_S_RX) {
-      if(state == BLAZE_S_RXFIFO_OVERFLOW) {
-        call SFRX.strobe();
-      }
-      
-      if(state == BLAZE_S_TXFIFO_UNDERFLOW) {
-        call SFTX.strobe();
-      }
-      
-      call SRX.strobe();
-    }
-  } 
   
   /**
    * Receive the packet by first reading in the length byte.  The SPI
@@ -346,31 +341,24 @@ implementation {
     atomic id = m_id;
     
     call Csn.clr[ id ]();
-    
-    /*
-    status = call RadioStatus.getRadioStatus();
-    
-    if(status == BLAZE_S_TXFIFO_UNDERFLOW) {
-      // SFTX puts us back into IDLE.  Take us out of IDLE and back into Rx
-      call SFTX.strobe();
-      initReceive();
-    }
-    
-    if(status == BLAZE_S_RXFIFO_OVERFLOW) {
-      // RXFIFO is corrupted, don't try and read it in.
-      // need to service the interrupt or future ones won't fire
-      call State.toIdle();
-      failReceive();
-      return; 
-    }
-    */
-    
+        
     // Read in the length byte
     call RXFIFO.beginRead(msg, 1);
   }
   
   void failReceive() {
-    initReceive();
+    uint8_t state;
+    call SIDLE.strobe();
+    call SFRX.strobe();
+
+    state = call RadioStatus.getRadioStatus();
+    if(state == BLAZE_S_TXFIFO_UNDERFLOW) {
+      call SIDLE.strobe();
+      call SFTX.strobe();
+    }
+
+    call SRX.strobe();
+    
     cleanUp();
   }
   

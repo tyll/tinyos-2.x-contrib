@@ -225,7 +225,7 @@ implementation {
     call SFRX.strobe();
     call SFTX.strobe();
     call SRX.strobe();
-    while (call RadioStatus.getRadioStatus() != BLAZE_S_RX);
+    while(call RadioStatus.getRadioStatus() != BLAZE_S_RX);
     
     call Csn.set[ m_id ]();
     

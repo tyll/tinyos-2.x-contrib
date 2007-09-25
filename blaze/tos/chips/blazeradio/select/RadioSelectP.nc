@@ -183,10 +183,10 @@ implementation {
     return EINVAL;
   }
   
-  default event void SplitControl.startDone[ radio_id_t id ]() {
+  default event void SplitControl.startDone[ radio_id_t id ](error_t error) {
   }
   
-  default event void SplitControl.stopDone[ radio_id_t id ]() {
+  default event void SplitControl.stopDone[ radio_id_t id ](error_t error) {
   }
   
 }

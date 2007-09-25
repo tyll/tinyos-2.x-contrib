@@ -72,7 +72,7 @@ implementation {
    * @return SUCCESS if we're going to try to send the message.
    *     FAIL if you need to reevaluate your code
    */
-  command error_t Send.send[radio_id_t id](message_t* msg, uint8_t len) {    
+  command error_t Send.send[radio_id_t id](message_t* msg, uint8_t len) {
     if(call State.requestState(S_LOADING) != SUCCESS) {
       return FAIL;
     }
@@ -85,7 +85,7 @@ implementation {
     // Request the resource to load the TX FIFO.
     // Then, if we're going to backoff, release the resource and get it after
     // the backoff period.  Otherwise, keep the resource to force the tx.
-    call Resource.request();      
+    call Resource.request();
     
     return SUCCESS;
   }

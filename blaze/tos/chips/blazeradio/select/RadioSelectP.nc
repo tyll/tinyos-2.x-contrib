@@ -8,20 +8,47 @@
  
 module RadioSelectP {
   provides {
+    interface RadioSelect;
     interface Send;
     interface Receive;
-    interface RadioSelect;
+    interface SplitControl[ radio_id_t id ];
+    interface Init;
   }
   
   uses {
     interface Send as SubSend[ radio_id_t id ];
     interface Receive as SubReceive[ radio_id_t id ];
+    interface SplitControl as SubControl[ radio_id_t id ];
     interface BlazePacketBody;
   }
 }
 
 implementation {
 
+  /** State of all our radios - off, on, or sending */
+  uint8_t state[uniqueCount(UQ_BLAZE_RADIO)];
+  
+  /** Current radio ID being turned off */
+  uint8_t currentClient;
+  
+  enum {
+    S_OFF = 0,
+    S_ON,
+    S_SENDING,
+  };
+  
+  /***************** Prototypes ****************/
+  task void splitControlStop();
+  
+  /***************** Init Commands ****************/
+  command error_t Init.init() {
+    int i;
+    for(i = 0; i < uniqueCount(UQ_BLAZE_RADIO); i++) {
+      state[i] = S_OFF;
+    }
+  }
+  
+  
   /***************** RadioSelect Commands ****************/
   /**
    * Select the radio to be used to send this message
@@ -56,13 +83,26 @@ implementation {
   /***************** Send Commands ****************/
   /**
    * By this point, the length should already be set in the message itself.
+   *
+   * The RadioSelect.selectRadio() command sets the radio id in the message,
+   * and that command filters out invalid radio id's.
+   * 
    * @param msg the message to send
    * @param len IGNORED
    * @return SUCCESS if we're going to try to send the message.
    *     FAIL if you need to reevaluate your code
    */
   command error_t Send.send(message_t* msg, uint8_t len) {
-    return call SubSend.send[call RadioSelect.getRadio(msg)](msg, len);
+    error_t error;
+    if(state[call RadioSelect.getRadio(msg)] == S_OFF) {
+      return EOFF;
+    }
+    
+    if((error = call SubSend.send[call RadioSelect.getRadio(msg)](msg, len)) == SUCCESS) {
+      state[call RadioSelect.getRadio(msg)] = S_SENDING;
+    }
+    
+    return error;
   }
 
   command error_t Send.cancel(message_t* msg) {
@@ -76,6 +116,26 @@ implementation {
   command void *Send.getPayload(message_t* msg, uint8_t len) {
     return call SubSend.getPayload[call RadioSelect.getRadio(msg)](msg, len);
   }
+
+  /***************** SplitControl Commands ****************/
+  command error_t SplitControl.start[ radio_id_t id ]() {    
+    return call SubControl.start[ id ]();
+  }
+  
+  command error_t SplitControl.stop[ radio_id_t id ]() {
+    if(id >= uniqueCount(UQ_BLAZE_RADIO)) {
+      return EINVAL;
+    }
+    
+    if(state[id] == S_SENDING) {
+      // Queue this up for when this radio is done sending
+      currentClient = id;
+      post splitControlStop();
+      return SUCCESS;
+    }
+    
+    return call SubControl.stop[id]();
+  }
   
   /***************** SubSend Events ****************/
   event void SubSend.sendDone[ radio_id_t id ](message_t *msg, error_t error) {
@@ -88,5 +148,46 @@ implementation {
     return signal Receive.receive(msg, payload, len);
   }
 
+  /***************** SubControl Events ****************/
+  event void SubControl.startDone[ radio_id_t id ](error_t error) {
+    state[id] = S_ON;
+    signal SplitControl.startDone[id](error);
+  }
+  
+  event void SubControl.stopDone[ radio_id_t id ](error_t error) {
+    state[id] = S_OFF;
+    signal SplitControl.stopDone[id](error);
+  }
+  
+  /***************** Tasks ****************/
+  /**
+   * While we're sending, delay the SplitControl stop request
+   * Note that the only way we could be sending is if our radio is on,
+   * so SubControl.stop must go through.
+   */
+  task void splitControlStop() {
+    if(state[currentClient] == S_SENDING) {
+      post splitControlStop();
+    
+    } else {
+      call SubControl.stop[ currentClient ]();
+    }
+  }
+  
+  /***************** Defaults ****************/
+  default command error_t SubControl.start[ radio_id_t id ]() {
+    return EINVAL;
+  }
+  
+  default command error_t SubControl.stop[ radio_id_t id ]() {
+    return EINVAL;
+  }
+  
+  default event void SplitControl.startDone[ radio_id_t id ]() {
+  }
+  
+  default event void SplitControl.stopDone[ radio_id_t id ]() {
+  }
+  
 }
 

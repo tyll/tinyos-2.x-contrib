@@ -74,13 +74,10 @@ implementation {
   components CsmaC;
   Csma = CsmaC;
   
-  components BlazeInitC;
-  SplitControl = BlazeInitC.SplitControl[0];
-  BlazeSplitControl = BlazeInitC.SplitControl;
-  
   components UniqueSendC;
   components UniqueReceiveC;
   components BlazeReceiveC;
+  components BlazeInitC;
   
   /***************** Send Layers ****************/
   BlazeActiveMessageC.SubSend -> UniqueSendC.Send;
@@ -96,5 +93,9 @@ implementation {
   /* Layers below this are parameterized by radio id */
   RadioSelectC.SubReceive -> BlazeReceiveC.Receive;
     
+  /***************** SplitControl Layers ****************/
+  SplitControl = RadioSelectC.SplitControl[0];
+  BlazeSplitControl = RadioSelectC.SplitControl;
+  RadioSelectC.SubControl -> BlazeInitC;
 }
 

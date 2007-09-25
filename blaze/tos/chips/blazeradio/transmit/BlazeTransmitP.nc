@@ -161,13 +161,9 @@ implementation {
    * occur on the rising edge.
    */
   async event void TxInterrupt.fired[ radio_id_t id ]() {
-    uint8_t state;
     if(call InterruptState.isState(S_INTERRUPT_RX)) {
       return;
     }
-    
-    
-
   }
   
   /***************** Local Functions ****************/

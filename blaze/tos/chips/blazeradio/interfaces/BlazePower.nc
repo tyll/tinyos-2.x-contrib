@@ -30,6 +30,12 @@ interface BlazePower {
 
 
   /**
+   * @return TRUE if the parameterized radio id is currently turned on
+   */
+  async command bool isOn();
+  
+
+  /**
    * The radio has now been reset
    */
   event void resetComplete();

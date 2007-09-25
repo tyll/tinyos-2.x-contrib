@@ -136,11 +136,13 @@ implementation {
       return EBUSY;
     }
     
-    call Gdo0_int.disable[ id ]();
-    call Gdo2_int.disable[ id ]();
     
     call BlazePower.deepSleep[id]();
     call BlazePower.shutdown[id]();
+    
+    call Gdo0_int.disable[ id ]();
+    call Gdo2_int.disable[ id ]();
+    
     state[id] = S_OFF;
     signal SplitControl.stopDone[ id ](SUCCESS);
     
@@ -209,7 +211,10 @@ implementation {
     
     call Power.clr[ id ]();
   }
-
+  
+  async command bool BlazePower.isOn[ radio_id_t id ]() {
+    return state[id] == S_ON;
+  }
   
   /***************** RadioInit Events ****************/
   event void RadioInit.initDone() { 

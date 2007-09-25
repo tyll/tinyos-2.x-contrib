@@ -77,7 +77,7 @@ implementation {
     } else {
       detecting = FALSE;
       call Leds.led1Off();
-      assertResultIsAbove("Too few packet detects", 45, detects); // Used to be 500
+      assertResultIsAbove("Too few packet detects", 30, detects); // Used to be 500.
       assertResultIsAbove("Too few packet gaps", 10000, misses);
       call Statistics.log("[Packet Detects]", detects);
       call TestIndicator.done();

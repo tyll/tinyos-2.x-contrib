@@ -141,7 +141,9 @@ implementation {
         void* payload;
 
         memcpy(bufferPointer, msg, sizeof(message_t));
-        payload = call Packet.getPayload(bufferPointer, len);
+
+        payload = call Packet.getPayload(bufferPointer, call Packet.maxPayloadLength());
+        len = call Packet.payloadLength(bufferPointer);
 
         dbg("Serial", "Received serial message (%p) of type %hhu and length %hhu @ %s.\n",
             bufferPointer, call AMPacket.type(bufferPointer), len, sim_time_string());

@@ -1,0 +1,3 @@
+COMPONENT=TestRadioSelectC
+include $(MAKERULES)
+

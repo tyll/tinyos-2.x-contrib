@@ -29,6 +29,7 @@ implementation {
   
   bool on;
   
+  bool running;
   
   enum {
     S_IDLE,
@@ -41,6 +42,7 @@ implementation {
   
   /***************** Test Control Events ****************/
   event void SetUpOneTime.run() {
+    running = TRUE;
     call State.forceState(S_SETUPONETIME);
     if(call ActiveMessageAddress.amAddress() != 0) {
       call SplitControl.start();
@@ -51,6 +53,7 @@ implementation {
   }
   
   event void TearDownOneTime.run() {
+    running = FALSE;
     call State.forceState(S_TEARDOWNONETIME);
     call Timer.stop();
     call SplitControl.stop();
@@ -117,8 +120,10 @@ implementation {
   
   /***************** Tasks ****************/
   task void send() {
-    if(call AMSend.send(0, &myMsg, 0) != SUCCESS) {
-      post send();
+    if(running) {
+      if(call AMSend.send(0, &myMsg, 0) != SUCCESS) {
+        post send();
+      }
     }
   }
 }

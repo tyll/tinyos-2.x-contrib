@@ -269,6 +269,12 @@ implementation {
   
   event void SplitControl.stopDone[ radio_id_t id ](error_t error) {
     switch (call State.getState()) {
+      case S_TESTSTOPWHILESENDING:
+        assertEquals("Wrong stopDone radio [id]", CC2500_RADIO_ID, id);
+        assertEquals("Radio isn't off", S_SPLITCONTROL_OFF, state[CC2500_RADIO_ID]);
+        call TestStopWhileSending.done();
+        break;
+        
       case S_TESTSENDWHILEOFF:
         assertEquals("Wrong stopDone radio [id]", CC2500_RADIO_ID, id);
         assertEquals("Radio isn't off", S_SPLITCONTROL_OFF, state[CC2500_RADIO_ID]);
@@ -353,7 +359,9 @@ implementation {
   /***************** Tasks *****************/
   task void testStopWhileSending_checkSplitControl() {
     assertEquals("SubControl.stop() got issued", S_SPLITCONTROL_ON, state[CC2500_RADIO_ID]);
-    call TestStopWhileSending.done();
+    
+    signal SubSend.sendDone[CC2500_RADIO_ID](&myMsg, SUCCESS);
+    // Execution continues at SplitControl.stopDone()
   }
   
   /***************** Defaults ****************/

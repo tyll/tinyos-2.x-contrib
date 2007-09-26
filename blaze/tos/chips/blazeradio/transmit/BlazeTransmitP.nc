@@ -39,6 +39,7 @@ module BlazeTransmitP {
     
     interface RadioStatus;
     
+    interface PacketCrc;
     interface State;
     interface State as InterruptState;
 
@@ -61,12 +62,12 @@ implementation {
   
   /***************** Global Variables ****************/
   uint8_t m_id;
-  bool m_sending;
   
   /***************** Local Functions ****************/
   error_t load(uint8_t id, void *msg);
   error_t transmit(uint8_t id, bool force);
-
+  
+  
   /***************** AsyncSend Commands ****************/
   /**
    * Load a packet into the TX FIFO
@@ -143,8 +144,7 @@ implementation {
     
     if(state == S_LOAD_PACKET) {
       signal AsyncSend.loadDone[ id ](tx_buf, error);
-    
-    } else if(state == S_LOAD_ACK) {
+    } else {
       signal AckSend.loadDone[ id ](tx_buf, error);
     }
   }
@@ -171,15 +171,16 @@ implementation {
    * Load a message into the TX FIFO
    */
   error_t load(uint8_t id, void *msg) {
+    uint8_t status;
     atomic m_id = id;
     
-    call Csn.clr[ id ]();
+    call Csn.clr[ m_id ]();
     
-    if (call RadioStatus.getRadioStatus() == BLAZE_S_RXFIFO_OVERFLOW) {
+    // TODO is the status check & SRX necessary?  Remove it and run some tests.
+    status = call RadioStatus.getRadioStatus();
+    if (status == BLAZE_S_RXFIFO_OVERFLOW) {
       call SFRX.strobe();
-    }
-    
-    if (call RadioStatus.getRadioStatus() == BLAZE_S_TXFIFO_UNDERFLOW) {
+    } else if (status == BLAZE_S_TXFIFO_UNDERFLOW) {
       call SFTX.strobe();
     }
     
@@ -187,17 +188,21 @@ implementation {
     
     /* 
      * The length byte in the packet is already correct - it represents the
-     * number of bytes in the packet *AFTER* the length byte.
+     * number of bytes in the packet *AFTER* the length byte, not included CRC
      *
      * So in order to also get that length byte transmitted (or the LSB of the
      * CRC, whichever way you look at it) we gotta add one byte to the transmit
-     * length.
+     * length.  
+     * 
+     * The appendCrc() function will add 2 more for the CRC,
+     * to be automatically subtracted by the receive branch.
      */
+     
+    call PacketCrc.appendCrc(msg);
     
     call TXFIFO.write(msg, (call BlazePacketBody.getHeader(msg))->length + 1);
     return SUCCESS;
   }
-  
   
   /**
    * Transmit the given message through the given radio ID
@@ -276,6 +281,7 @@ implementation {
     // Execution continues at the TxInterrupt event.
     return SUCCESS;
   }
+  
   
   /***************** Defaults ****************/
   default async command void Csn.set[ radio_id_t id ](){}

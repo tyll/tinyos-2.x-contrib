@@ -68,6 +68,9 @@ implementation {
   components ActiveMessageAddressC;
   BlazeReceiveP.ActiveMessageAddress -> ActiveMessageAddressC;
   
+  components PacketCrcC;
+  BlazeReceiveP.PacketCrc -> PacketCrcC;
+  
   components new StateC();
   BlazeReceiveP.State -> StateC;
   

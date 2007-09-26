@@ -46,6 +46,7 @@ module BlazeReceiveP {
     interface RadioStatus;
     
     interface ActiveMessageAddress;
+    interface PacketCrc;
     interface State;
     interface Leds;
   }
@@ -79,7 +80,10 @@ implementation {
   
   enum {
     BLAZE_RXFIFO_LENGTH = 64,
-    MAC_PACKET_SIZE = MAC_HEADER_SIZE + TOSH_DATA_LENGTH + MAC_FOOTER_SIZE,
+    
+    // Add 2 because of the CRC hidden at the end
+    MAC_PACKET_SIZE = MAC_HEADER_SIZE + TOSH_DATA_LENGTH + MAC_FOOTER_SIZE + 2,
+    
     SACK_HEADER_LENGTH = 5,
   };
   
@@ -269,6 +273,11 @@ implementation {
       
       if((header->dest != call ActiveMessageAddress.amAddress()) 
           && (header->dest != AM_BROADCAST_ADDR)) {
+        cleanUp();
+        return;
+      }
+      
+      if(!call PacketCrc.verifyCrc(msg)) {
         cleanUp();
         return;
       }

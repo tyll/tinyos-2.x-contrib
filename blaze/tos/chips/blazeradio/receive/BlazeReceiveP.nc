@@ -70,12 +70,16 @@ implementation {
   /** Number of interrupts that occurred while we were busy receiving a pkt */
   uint8_t missedPackets;
   
+  /** TRUE if the CRC for the packet we're receiving passed */
+  bool crcValidated;
+  
   
   enum receive_states{
     S_IDLE,
     S_RX_LENGTH,
     S_RX_FCF,
     S_RX_PAYLOAD,
+    S_RX_STATUSBYTES,
   };
   
   enum {
@@ -158,9 +162,8 @@ implementation {
     
     call Csn.clr[ id ]();
     
-    // Add two bytes to read out the status bytes (PKTCTRL1.APPEND_STATUS=1)
     call RXFIFO.beginRead(buf + 1 + SACK_HEADER_LENGTH, 
-          rxFrameLength - SACK_HEADER_LENGTH + 2);
+          rxFrameLength - SACK_HEADER_LENGTH);
   }
   
   /***************** RXFIFO Events ****************/
@@ -191,7 +194,6 @@ implementation {
       call State.forceState(S_RX_FCF);
     
       if(rxFrameLength + 1 > BLAZE_RXFIFO_LENGTH) {
-        //call Leds.set(1);
         // Flush everything if the length is bigger than our FIFO
         failReceive();
         return;
@@ -201,27 +203,21 @@ implementation {
           if(rxFrameLength > 0) {
             if(rxFrameLength > SACK_HEADER_LENGTH) {
               // This packet has an FCF byte plus at least one more byte to read
-              //call Leds.set(2);
               call RXFIFO.beginRead(buf + 1, SACK_HEADER_LENGTH);
             
             } else {
               // This is a bad packet because it doesn't have enough
               // bytes for a real header. Skip FCF and get it out of here.
-              // Add two bytes to read out the status bytes 
-              // (PKTCTRL1.APPEND_STATUS=1)
-              //call Leds.set(3);
               call State.forceState(S_RX_PAYLOAD);
-              call RXFIFO.beginRead(buf + 1, rxFrameLength + 2);
+              call RXFIFO.beginRead(buf + 1, rxFrameLength);
             }
                           
           } else {
-            //call Leds.set(4);
             // Length == 0; start reading the next packet
             failReceive();
           }
         
         } else {
-          //call Leds.set(5);
           // Length is too large; we have to flush the entire Rx FIFO
           failReceive();
         }
@@ -229,55 +225,54 @@ implementation {
       break;
       
     case S_RX_FCF:
-      ////call Leds.set(5);
       call State.forceState(S_RX_PAYLOAD);
       
-        // Our local address may have changed from the last packet received,
-        // so set the outbound acknowledgement frame's source address each time
-        //
-        // Note that the destpan address is not checked before ack'ing.
-        // To add in the destpan check, increase SACK_HEADER_LENGTH by 2 to
-        // include reading in the destpan as part of the ack check, and
-        // add the necessary logic to the horrendous if-statement below to
-        // check the destpan.  Finally, add in a destpan address to the ack
-        // frame if you want and set/check it appropriately.
-      
-        if(call BlazeConfig.isAutoAckEnabled[ m_id ]()) {
+      // Our local address may have changed from the last packet received,
+      // so set the outbound acknowledgement frame's source address each time
+      //
+      // Note that the destpan address is not checked before ack'ing.
+      // To add in the destpan check, increase SACK_HEADER_LENGTH by 2 to
+      // include reading in the destpan as part of the ack check, and
+      // add the necessary logic to the horrendous if-statement below to
+      // check the destpan.  Finally, add in a destpan address to the ack
+      // frame if you want and set/check it appropriately.
+     
+      if(call BlazeConfig.isAutoAckEnabled[ m_id ]()) {
+        
+        if (((( header->fcf >> IEEE154_FCF_ACK_REQ ) & 0x01) == 1)
+            && ((header->dest == call ActiveMessageAddress.amAddress())
+                || (header->dest == AM_BROADCAST_ADDR))
+            && ((( header->fcf >> IEEE154_FCF_FRAME_TYPE ) & 7) == IEEE154_TYPE_DATA)) {
+          // CSn flippage cuts off our FIFO; SACK and begin reading again
           
-          if (((( header->fcf >> IEEE154_FCF_ACK_REQ ) & 0x01) == 1)
-              && ((header->dest == call ActiveMessageAddress.amAddress())
-                  || (header->dest == AM_BROADCAST_ADDR))
-              && ((( header->fcf >> IEEE154_FCF_FRAME_TYPE ) & 7) == IEEE154_TYPE_DATA)) {
-            // CSn flippage cuts off our FIFO; SACK and begin reading again
-            
-            acknowledgement.dest = header->src;
-            acknowledgement.dsn = header->dsn;
-            acknowledgement.src = call ActiveMessageAddress.amAddress();
+          acknowledgement.dest = header->src;
+          acknowledgement.dsn = header->dsn;
+          acknowledgement.src = call ActiveMessageAddress.amAddress();
   
-            call AckSend.load[ m_id ](&acknowledgement);
-            // Continues at AckSend.loadDone() and AckSend.sendDone()
-            return;
-          }
+          call AckSend.load[ m_id ](&acknowledgement);
+          // Continues at AckSend.loadDone() and AckSend.sendDone()
+          return;
         }
-        
-        
-      // Add two bytes to read out the status bytes (PKTCTRL1.APPEND_STATUS=1)
+      }
+      
       call RXFIFO.beginRead(buf + 1 + SACK_HEADER_LENGTH, 
-            rxFrameLength - SACK_HEADER_LENGTH + 2);
+            rxFrameLength - SACK_HEADER_LENGTH);
       break;
       
     case S_RX_PAYLOAD:
-      //call Leds.set(6);
-      // Put the radio back in receive mode and deselect it
-      call Csn.set[ id ](); 
+      call State.forceState(S_RX_STATUSBYTES);
+      crcValidated = call PacketCrc.verifyCrc(msg);
+      // Read in the two status bytes in place of where the CRC is currently
+      // stored in the packet
       
-      if((header->dest != call ActiveMessageAddress.amAddress()) 
-          && (header->dest != AM_BROADCAST_ADDR)) {
-        cleanUp();
-        return;
-      }
+      // Add 1 for the length byte, subtract 2 to replace the CRC => subtract 1
+      call RXFIFO.beginRead(buf + rxFrameLength - 1, 2);
+      break;
       
-      if(!call PacketCrc.verifyCrc(msg)) {
+    case S_RX_STATUSBYTES:
+      call Csn.set[ id ]();
+      
+      if(!crcValidated) {
         cleanUp();
         return;
       }
@@ -327,7 +322,6 @@ implementation {
     metadata->lqi = buf[ rxFrameLength + 1 ] & 0x7f;
     
     
-    //call Leds.set(7);
     atomicMsg = signal Receive.receive[atomicId]( m_msg, m_msg->data, rxFrameLength );
     
     if(atomicMsg != NULL) {

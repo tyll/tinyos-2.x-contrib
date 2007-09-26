@@ -35,6 +35,7 @@ implementation {
   
   /***************** Register Connections ****************/
   TestP.IOCFG2 -> BlazeSpiC.IOCFG2;
+  TestP.SIDLE -> BlazeSpiC.SIDLE;
   
   /***************** Test Connections ***************/
   TestP.ResetRadioTest -> ResetRadioTestC;

@@ -12,6 +12,7 @@ module TestP {
   uses {
     interface TestControl as SetUpOneTime;
     interface GeneralIO as CSN;
+
     interface Resource;
     interface Resource as Resource2;
     interface BlazePower;
@@ -19,7 +20,9 @@ module TestP {
     
     /***************** Register Interfaces ****************/
     interface BlazeRegister as IOCFG2;
-    
+
+    interface BlazeStrobe as SIDLE;
+        
     /***************** Test Interfaces ****************/
     interface TestCase as ResetRadioTest;
   }
@@ -30,6 +33,7 @@ implementation {
   uint8_t readBuffer;
   
   event void SetUpOneTime.run() {
+    call CSN.set();
     call SetUpOneTime.done();
   }
   
@@ -40,6 +44,10 @@ implementation {
   }
   
   event void Resource.granted() {
+    call CSN.clr();
+    while((call SIDLE.strobe() & 0x80) != 0);
+    call CSN.set();
+    
     call CSN.clr();
     call IOCFG2.write(0x29);
     call IOCFG2.read(&readBuffer);

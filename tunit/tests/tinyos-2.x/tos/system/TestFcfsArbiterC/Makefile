@@ -1,0 +1,4 @@
+COMPONENT=TestFcfsArbiterC
+
+include $(MAKERULES)
+

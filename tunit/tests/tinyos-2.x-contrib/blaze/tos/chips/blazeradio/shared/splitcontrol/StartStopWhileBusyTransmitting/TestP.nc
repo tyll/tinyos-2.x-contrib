@@ -2,10 +2,9 @@
 #include "TestCase.h"
 
 /**
- * Node 1 starts up its radio and begins transmitting messages as fast as 
- * possible.  Node 0 flips its radio on and off several times a second.
- *
- * If the test times out, then something's wrong underneath.
+ * Node 0 transmits its send() stuff in a continuous task loop while
+ * toggling its radio on and off.  If the test times out, something's wrong
+ * underneath in the radio stack. Obviously.
  * @author David Moss
  */
 module TestP {
@@ -43,16 +42,12 @@ implementation {
   /***************** Prototypes Events ****************/
   task void send();
   
+  
   /***************** Test Control Events ****************/
   event void SetUpOneTime.run() {
     running = TRUE;
-    call State.forceState(S_SETUPONETIME);
-    if(call ActiveMessageAddress.amAddress() != 0) {
-      call SplitControl.start();
-    
-    } else {
-      call SetUpOneTime.done();
-    }
+    times = 0;
+    call SetUpOneTime.done();
   }
   
   event void TearDownOneTime.run() {
@@ -64,21 +59,15 @@ implementation {
   
   /***************** SplitControl Events ****************/
   event void SplitControl.startDone(error_t error) {
+    call Leds.led0On();
     on = TRUE;
     times++;
-    call Leds.led0On();
-    if(call ActiveMessageAddress.amAddress() != 0 
-        && call State.getState() == S_SETUPONETIME) {
-      post send();
-      call SetUpOneTime.done();
-    }
   }
   
   event void SplitControl.stopDone(error_t error) {
     on = FALSE;
     times++;
     call Leds.set(0);
-    
     if(call State.getState() == S_TEARDOWNONETIME) {
       call TearDownOneTime.done();
     }
@@ -89,14 +78,17 @@ implementation {
   event void MultiStartStop.run() {
     times = 0;
     call Timer.startPeriodic(128);
+    post send();
   }
   
   /***************** Timer Events ****************/
   event void Timer.fired() {
     if(times < 800) {
       if(on) {
+        call Leds.led0Off();
         call SplitControl.stop();
       } else {
+        call Leds.led0On();
         call SplitControl.start();
       }
       
@@ -108,14 +100,15 @@ implementation {
   
   /***************** Receive Events ****************/
   event message_t *Receive.receive(message_t *msg, void *payload, uint8_t len) {
-    call Leds.led1Toggle();
     return msg;
   }
   
   /***************** AMSend Events ****************/
   event void AMSend.sendDone(message_t *msg, error_t error) {
     call Leds.led2Toggle();
-    post send();
+    if(running) {
+      post send();
+    }
   }
 
   async event void ActiveMessageAddress.changed() {
@@ -124,10 +117,8 @@ implementation {
   
   /***************** Tasks ****************/
   task void send() {
-    if(running) {
-      if(call AMSend.send(0, &myMsg, 0) != SUCCESS) {
-        post send();
-      }
+    if(call AMSend.send(0, &myMsg, 0) != SUCCESS) {
+      post send();
     }
   }
 }

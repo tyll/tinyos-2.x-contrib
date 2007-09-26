@@ -1,12 +1,13 @@
 
 /**
- * Test that we can toggle split control on and off while receiving packets
+ * Test that we can toggle split control on and off while transmitting 
+ * packets
  */
 configuration TestC {
 }
 
 implementation {
-  components new TestCaseC() as TestStartStopWhileReceivingC;
+  components new TestCaseC() as TestStartStopWhileTransmittingC;
   
   components BlazeC,
       new AMSenderC(0),
@@ -17,9 +18,9 @@ implementation {
       ActiveMessageAddressC,
       TestP;
    
-  TestP.MultiStartStop -> TestStartStopWhileReceivingC;
-  TestP.SetUpOneTime -> TestStartStopWhileReceivingC.SetUpOneTime;
-  TestP.TearDownOneTime -> TestStartStopWhileReceivingC.TearDownOneTime;
+  TestP.MultiStartStop -> TestStartStopWhileTransmittingC;
+  TestP.SetUpOneTime -> TestStartStopWhileTransmittingC.SetUpOneTime;
+  TestP.TearDownOneTime -> TestStartStopWhileTransmittingC.TearDownOneTime;
   
   TestP.Timer -> TimerMilliC;
   TestP.SplitControl -> BlazeC;

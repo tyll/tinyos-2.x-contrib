@@ -43,22 +43,12 @@ module TestFcfsArbiterP {
     interface Resource as Resource2;
 
     interface TestCase as TestFcfsOrder; 
-    interface TestControl as SetUpOneTime;
-    interface TestControl as TearDownOneTime;
   }
 }
 implementation {
 
   uint8_t resource;
 
-  event void SetUpOneTime.run() {
-    call SetUpOneTime.done();
-  }
-
-  event void TearDownOneTime.run() {
-    call TearDownOneTime.done();
-  }
-  
   //All resources try to gain access
   event void TestFcfsOrder.run() {
     resource = 0;
@@ -75,11 +65,12 @@ implementation {
   }  
   event void Resource1.granted() {
     assertEquals("Resource Granted Out of Order: 1", resource, 1);
+    call Resource1.release();
     call TestFcfsOrder.done();
   }  
   event void Resource2.granted() {
     assertEquals("Resource Granted Out of Order: 2", resource, 2);
     resource = 1;
-    call Resource0.release();
+    call Resource2.release();
   }  
 }

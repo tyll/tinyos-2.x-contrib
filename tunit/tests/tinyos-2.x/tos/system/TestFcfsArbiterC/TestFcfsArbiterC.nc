@@ -52,7 +52,5 @@ implementation {
 
   //Tunit Test cases 
   components new TestCaseC() as TestFcfsOrderC;
-  TestFcfsArbiterP.SetUpOneTime -> TestFcfsOrderC.SetUpOneTime;
-  TestFcfsArbiterP.TearDownOneTime -> TestFcfsOrderC.TearDownOneTime;
   TestFcfsArbiterP.TestFcfsOrder -> TestFcfsOrderC;
 }

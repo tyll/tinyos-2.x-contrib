@@ -16,6 +16,7 @@ push( @includes, qw(
   %T/../../blaze/tos/chips/blazeradio/am
   %T/../../blaze/tos/chips/blazeradio/cc1100
   %T/../../blaze/tos/chips/blazeradio/cc2500
+  %T/../../blaze/tos/chips/blazeradio/crc
   %T/../../blaze/tos/chips/blazeradio/csma
   %T/../../blaze/tos/chips/blazeradio/init
   %T/../../blaze/tos/chips/blazeradio/interfaces

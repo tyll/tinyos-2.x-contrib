@@ -139,6 +139,7 @@ implementation {
   
   /***************** SubSend Events ****************/
   event void SubSend.sendDone[ radio_id_t id ](message_t *msg, error_t error) {
+    state[id] = S_ON;
     signal Send.sendDone(msg, error);
   }
   

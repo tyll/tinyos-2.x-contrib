@@ -53,8 +53,6 @@ typedef nx_struct blaze_ack_t {
   nx_uint16_t fcf;
   nx_uint8_t dsn;
   nx_uint16_t src;
-  
-  nx_uint16_t crc;
 } blaze_ack_t;
 
 enum {

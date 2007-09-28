@@ -39,7 +39,6 @@ module BlazeTransmitP {
     
     interface RadioStatus;
     
-    interface PacketCrc;
     interface State;
     interface State as InterruptState;
 
@@ -190,15 +189,10 @@ implementation {
      * The length byte in the packet is already correct - it represents the
      * number of bytes in the packet *AFTER* the length byte, not included CRC
      *
-     * So in order to also get that length byte transmitted (or the LSB of the
-     * CRC, whichever way you look at it) we gotta add one byte to the transmit
-     * length.  
-     * 
-     * The appendCrc() function will add 2 more for the CRC,
-     * to be automatically subtracted by the receive branch.
+     * So in order to also get that length byte transmitted we gotta add one 
+     * byte to the transmit length. 
      */
      
-    call PacketCrc.appendCrc(msg);
     
     call TXFIFO.write(msg, (call BlazePacketBody.getHeader(msg))->length + 1);
     return SUCCESS;

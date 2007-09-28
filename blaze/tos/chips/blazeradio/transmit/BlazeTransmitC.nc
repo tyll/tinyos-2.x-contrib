@@ -52,9 +52,6 @@ implementation {
   components InterruptStateC;
   BlazeTransmitP.InterruptState -> InterruptStateC;
   
-  components PacketCrcC;
-  BlazeTransmitP.PacketCrc -> PacketCrcC;
-  
   components new StateC();
   BlazeTransmitP.State -> StateC;
   

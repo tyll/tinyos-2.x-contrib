@@ -19,7 +19,6 @@ configuration BlazeReceiveC {
   uses {
     interface GeneralIO as Csn[ radio_id_t id ];
     interface GpioInterrupt as RxInterrupt[ radio_id_t id ];
-    interface GeneralIO as RxAvailable[ radio_id_t id ];
     interface BlazeConfig[ radio_id_t id ];
   }
 }
@@ -33,7 +32,6 @@ implementation {
   Csn = BlazeReceiveP.Csn;
   BlazeConfig = BlazeReceiveP;
   RxInterrupt = BlazeReceiveP.RxInterrupt;
-  RxAvailable = BlazeReceiveP.RxAvailable;
   
   components MainC;
   MainC.SoftwareInit -> BlazeReceiveP;
@@ -47,15 +45,12 @@ implementation {
       new BlazeSpiResourceC();
       
   BlazeReceiveP.Resource -> BlazeSpiResourceC;
-  BlazeReceiveP.SNOP -> Spi.SNOP;
   BlazeReceiveP.SRX -> Spi.SRX;
   BlazeReceiveP.SFRX -> Spi.SFRX;
   BlazeReceiveP.SFTX -> Spi.SFTX;
-  BlazeReceiveP.STX -> Spi.STX;
   BlazeReceiveP.RXFIFO -> Spi.RXFIFO;
   BlazeReceiveP.SIDLE -> Spi.SIDLE;
-  BlazeReceiveP.RxReg -> Spi.RXREG;
-  BlazeReceiveP.PktStatus -> Spi.PKTSTATUS;
+  BlazeReceiveP.RXREG -> Spi.RXREG;
   
   BlazeReceiveP.RadioStatus -> Spi.RadioStatus;
 
@@ -67,9 +62,6 @@ implementation {
   
   components ActiveMessageAddressC;
   BlazeReceiveP.ActiveMessageAddress -> ActiveMessageAddressC;
-  
-  components PacketCrcC;
-  BlazeReceiveP.PacketCrc -> PacketCrcC;
   
   components new StateC();
   BlazeReceiveP.State -> StateC;

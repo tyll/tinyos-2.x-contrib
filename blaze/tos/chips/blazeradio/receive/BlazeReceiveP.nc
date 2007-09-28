@@ -23,7 +23,6 @@ module BlazeReceiveP {
     interface AsyncSend as AckSend[ radio_id_t id ];
     interface GeneralIO as Csn[ radio_id_t id ];
     interface GpioInterrupt as RxInterrupt[ radio_id_t id ];
-    interface GeneralIO as RxAvailable[ radio_id_t id ];
     interface BlazeConfig[ radio_id_t id ];
     interface State as InterruptState;
    
@@ -32,13 +31,10 @@ module BlazeReceiveP {
     interface Resource;
     interface BlazeStrobe as SFRX;
     interface BlazeStrobe as SFTX;
-    interface BlazeStrobe as STX;
-    interface BlazeStrobe as SNOP;
     interface BlazeStrobe as SRX;
     interface BlazeStrobe as SIDLE;
-  
-    interface BlazeRegister as RxReg;
-    interface BlazeRegister as PktStatus;
+    
+    interface BlazeRegister as RXREG;
   
     interface BlazePacket;
     interface BlazePacketBody;
@@ -46,7 +42,6 @@ module BlazeReceiveP {
     interface RadioStatus;
     
     interface ActiveMessageAddress;
-    interface PacketCrc;
     interface State;
     interface Leds;
   }
@@ -79,7 +74,6 @@ implementation {
     S_RX_LENGTH,
     S_RX_FCF,
     S_RX_PAYLOAD,
-    S_RX_STATUSBYTES,
   };
   
   enum {
@@ -117,6 +111,7 @@ implementation {
     if(call InterruptState.isState(S_INTERRUPT_RX)) {
       if(call ReceiveController.beginReceive[id]() != SUCCESS) {
         // TODO make this an array for each radio, and check it at the end of rx
+        call Leds.led0On();
         missedPackets++;
       }
     }
@@ -162,8 +157,9 @@ implementation {
     
     call Csn.clr[ id ]();
     
+    // Add 2 for status bytes
     call RXFIFO.beginRead(buf + 1 + SACK_HEADER_LENGTH, 
-          rxFrameLength - SACK_HEADER_LENGTH);
+          rxFrameLength - SACK_HEADER_LENGTH + 2);
   }
   
   /***************** RXFIFO Events ****************/
@@ -192,7 +188,7 @@ implementation {
     switch (call State.getState()) {
     case S_RX_LENGTH:
       call State.forceState(S_RX_FCF);
-    
+      
       if(rxFrameLength + 1 > BLAZE_RXFIFO_LENGTH) {
         // Flush everything if the length is bigger than our FIFO
         failReceive();
@@ -207,7 +203,7 @@ implementation {
             
             } else {
               // This is a bad packet because it doesn't have enough
-              // bytes for a real header. Skip FCF and get it out of here.
+              // bytes for a real header. Skip ack check and get it out of here.
               call State.forceState(S_RX_PAYLOAD);
               call RXFIFO.beginRead(buf + 1, rxFrameLength);
             }
@@ -236,13 +232,17 @@ implementation {
       // add the necessary logic to the horrendous if-statement below to
       // check the destpan.  Finally, add in a destpan address to the ack
       // frame if you want and set/check it appropriately.
+      //
+      // Finally, the length of the packet must be at least the size of
+      // a TinyOS header for us to acknowledge it.
      
       if(call BlazeConfig.isAutoAckEnabled[ m_id ]()) {
         
         if (((( header->fcf >> IEEE154_FCF_ACK_REQ ) & 0x01) == 1)
             && ((header->dest == call ActiveMessageAddress.amAddress())
                 || (header->dest == AM_BROADCAST_ADDR))
-            && ((( header->fcf >> IEEE154_FCF_FRAME_TYPE ) & 7) == IEEE154_TYPE_DATA)) {
+            && ((( header->fcf >> IEEE154_FCF_FRAME_TYPE ) & 7) == IEEE154_TYPE_DATA)
+            && (header->length >= sizeof(blaze_header_t) - 1)) {
           // CSn flippage cuts off our FIFO; SACK and begin reading again
           
           acknowledgement.dest = header->src;
@@ -255,37 +255,31 @@ implementation {
         }
       }
       
+      // Add 2 for the status bytes
       call RXFIFO.beginRead(buf + 1 + SACK_HEADER_LENGTH, 
-            rxFrameLength - SACK_HEADER_LENGTH);
+            rxFrameLength - SACK_HEADER_LENGTH + 2);
       break;
       
     case S_RX_PAYLOAD:
-      call State.forceState(S_RX_STATUSBYTES);
-      crcValidated = call PacketCrc.verifyCrc(msg);
-      // Read in the two status bytes in place of where the CRC is currently
-      // stored in the packet
-      
-      // Add 1 for the length byte, subtract 2 to replace the CRC => subtract 1
-      call RXFIFO.beginRead(buf + rxFrameLength - 1, 2);
-      break;
-      
-    case S_RX_STATUSBYTES:
       call Csn.set[ id ]();
       
-      if(!crcValidated) {
-        cleanUp();
-        return;
-      }
+      // TODO check the CRC one more time just to be safe.
+      // The CRC AUTOFLUSH could flush a second packet, which would stop
+      // you from getting the current one correctly.
       
-      // The FCF_FRAME_TYPE bit in the FCF byte tells us 
-      // if this is an ack or data
+      // The FCF_FRAME_TYPE bit in the FCF byte tells us if this is an ack or 
+      // data.  If it's data, make sure it meets the minimum size requirement.
       if ((( header->fcf >> IEEE154_FCF_FRAME_TYPE ) & 7) == IEEE154_TYPE_ACK) {
         signal AckReceive.receive( header->src, header->dest, header->dsn );
         cleanUp();
         
-      } else {
+      } else if(rxFrameLength >= sizeof(blaze_header_t) - 1) {
         // IEEE_TYPE_DATA frame
         post receiveDone();
+        
+      } else {
+        // Didn't meet the minimum size requirement
+        cleanUp();
       }
       break;
       
@@ -317,10 +311,9 @@ implementation {
     
     atomic atomicId = m_id;
     
-    //metadata->crc = buf[ rxFrameLength ] >> 7;
-    metadata->rssi = buf[ rxFrameLength ];
-    metadata->lqi = buf[ rxFrameLength + 1 ] & 0x7f;
-    
+    // Note the correct CRC result is stored in the MSB of the LQI
+    metadata->rssi = buf[ rxFrameLength + 1 ];
+    metadata->lqi = buf[ rxFrameLength + 2 ];
     
     atomicMsg = signal Receive.receive[atomicId]( m_msg, m_msg->data, rxFrameLength );
     
@@ -340,13 +333,22 @@ implementation {
   void receive() {
     uint8_t *msg;
     uint8_t id;
+    uint8_t rxBytesAvailable;
     atomic msg = (uint8_t *) m_msg;
     atomic id = m_id;
     
     call Csn.clr[ id ]();
-        
-    // Read in the length byte
-    call RXFIFO.beginRead(msg, 1);
+    
+    call RXREG.read(&rxBytesAvailable);
+    
+    if(rxBytesAvailable == 0) {
+      // The RX FIFO was CRC Auto flushed
+      cleanUp();
+
+    } else {    
+      // Read in the length byte
+      call RXFIFO.beginRead(msg, 1);
+    }
   }
   
   void failReceive() {
@@ -375,13 +377,15 @@ implementation {
     atomic missed = missedPackets;
     
     call Csn.set[ id ]();
-    call State.toIdle();
-    
+
     if(missed > 0) {
+      call Leds.led2On();
       atomic missedPackets--;
+      call State.forceState(S_RX_LENGTH);
       receive();
     
     } else {
+      call State.toIdle();
       call Resource.release();
     }
   }
@@ -411,18 +415,7 @@ implementation {
   default async command bool Csn.isInput[ radio_id_t id ](){ return 0; }
   default async command void Csn.makeOutput[ radio_id_t id ](){}
   default async command bool Csn.isOutput[ radio_id_t id ](){ return 0; }
-  
     
-  default async command void RxAvailable.set[ radio_id_t id ](){}
-  default async command void RxAvailable.clr[ radio_id_t id ](){}
-  default async command void RxAvailable.toggle[ radio_id_t id ](){}
-  default async command bool RxAvailable.get[ radio_id_t id ](){ return 0; }
-  default async command void RxAvailable.makeInput[ radio_id_t id ](){}
-  default async command bool RxAvailable.isInput[ radio_id_t id ](){ return 0; }
-  default async command void RxAvailable.makeOutput[ radio_id_t id ](){}
-  default async command bool RxAvailable.isOutput[ radio_id_t id ](){ return 0; }
-  
-  
   
   default command error_t BlazeConfig.commit[ radio_id_t id ]() {
     return FAIL;

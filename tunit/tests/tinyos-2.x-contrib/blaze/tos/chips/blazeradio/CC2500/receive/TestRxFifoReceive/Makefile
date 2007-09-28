@@ -1,0 +1,3 @@
+COMPONENT=TestRxFifoC
+include $(MAKERULES)
+

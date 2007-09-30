@@ -32,7 +32,7 @@ Just designate a specific number you want.
 
 3) Running the java program to collect the sampled data in 'Noise.txt' file
 
-java TestSerial -comm serial@COMx:telosb
+java RssiSample -comm serial@COMx:telosb
 (x is the port number you are using.)
 
 

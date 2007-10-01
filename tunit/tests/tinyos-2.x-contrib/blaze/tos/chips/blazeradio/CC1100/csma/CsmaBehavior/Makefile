@@ -1,0 +1,3 @@
+COMPONENT=TestCsmaC
+include $(MAKERULES)
+

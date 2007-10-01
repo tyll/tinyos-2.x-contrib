@@ -214,8 +214,9 @@ void sim_sf_forward_packet(const void *packet, int len)
 {
     char* forwardPacket = (char*)packet + 1;
 
-    uint16_t addr = sim_serial_packet_destination((struct sim_serial_packet*)packet);
+    uint16_t addr = sim_serial_packet_destination((struct sim_serial_packet*)forwardPacket);
 
+    printf("Dest: %d\n", addr);
     sim_serial_packet_deliver(addr, 
                              (struct sim_serial_packet*)forwardPacket,
                              sim_time());

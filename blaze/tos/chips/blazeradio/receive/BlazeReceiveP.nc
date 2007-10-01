@@ -421,13 +421,6 @@ implementation {
     return FAIL;
   }
   
-  default command void BlazeConfig.setChannel[ radio_id_t id ]( uint16_t channel ) {
-  }
-  
-  default command uint16_t BlazeConfig.getChannel[ radio_id_t id ]() {
-    return 0;
-  }
-  
   default async command uint16_t BlazeConfig.getPanAddr[ radio_id_t id ]() {
     return 0;
   }
@@ -456,6 +449,21 @@ implementation {
     return TRUE;
   }
   
+  default command error_t BlazeConfig.setFrequencyKhz[ radio_id_t id ]( uint32_t freqKhz ) {
+    return FAIL;
+  }
+  
+  default command uint32_t BlazeConfig.getFrequencyKhz[ radio_id_t id ]() {
+    return 0;
+  }
+  
+  default command void BlazeConfig.setChannel[ radio_id_t id ]( uint8_t chan ) {
+  }
+  
+  default command uint8_t BlazeConfig.getChannel[ radio_id_t id ]() {
+    return 0;
+  }
+   
   
   default async command error_t RxInterrupt.enableRisingEdge[radio_id_t id]() {
     return FAIL;
@@ -468,6 +476,6 @@ implementation {
   default async command error_t RxInterrupt.disable[radio_id_t id]() {
     return FAIL;
   }
-  
+ 
 }
 

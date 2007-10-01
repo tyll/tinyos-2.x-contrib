@@ -8,7 +8,8 @@ interface BlazeConfig {
   /**
    * If changes have been made to the chip's configuration, those changes are
    * currently stored in the microcontroller.  This command will commit those 
-   * changes to hardware.  It must be called for the changes to take effect.
+   * changes to hardware.  It must be called before any changes made by calling
+   * "set" functions within the BlazeConfig interface will take effect.
    * @return SUCCESS if the changes will be committed.
    */
   command error_t commit();
@@ -18,16 +19,6 @@ interface BlazeConfig {
    */
   event void commitDone();
   
-  
-  /**
-   * @param channel The channel ID to set the radio to
-   */
-  command void setChannel( uint16_t channel );
-
-  /**
-   * @return the radio's channel
-   */
-  command uint16_t getChannel();
   
 
   /**
@@ -73,5 +64,35 @@ interface BlazeConfig {
    * @return TRUE if auto acks are enabled
    */
   async command bool isAutoAckEnabled();
+  
+  
+  /** 
+   * This command is used to set the (approximate) frequency the radio.
+   * It uses the assumed base frequency, the assumed channel width and the changes the 
+   * value in the channel register.  
+   * @param freqKhz - the desired frequency in Khz to set the radio to
+   * @reutrn - FAIL if desired frequency is not in range, else SUCCESS
+   */
+  command error_t setFrequencyKhz( uint32_t freqKhz );
+  
+  /** 
+   * This command is used to get the current (approximate) frequency the radio is set to in KHz.
+   * It uses the assumed base frequency, the assumed channel width and the current value in the 
+   * channel register to calculate this.  
+   * @return approx. frequency in KHz
+   */
+  command uint32_t getFrequencyKhz();
+  
+  /** 
+   * This command sets the value of the channel register on the radio
+   * @param chan - the value of the channel
+   */
+  command void setChannel( uint8_t chan );
+  
+  /** 
+   * This command returns the value of the channel register on the radio
+   * @return the value of the channel register
+   */
+  command uint8_t getChannel();
   
 }

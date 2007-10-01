@@ -85,6 +85,10 @@ implementation {
       CC1100_CONFIG_FSCAL0,
   };
   
+  /***************** Prototypes ****************/
+  uint8_t freqToChannel( uint32_t freq );
+  uint32_t channelToFreq( uint8_t chan );
+  
   /***************** SoftwareInit Commands ****************/
   command error_t SoftwareInit.init() {
     // TODO the struct is an nxle. Do we put the MSB's in the ADDR reg?
@@ -138,21 +142,6 @@ implementation {
    */
   command error_t BlazeConfig.commit() {
     return call BlazeCommit.commit();
-  }
-  
-  /**
-   * @param channel The channel ID to set the radio to
-   */
-  command void BlazeConfig.setChannel( uint16_t channel ) {
-    // TODO
-  }
-
-  /**
-   * @return the radio's channel
-   */
-  command uint16_t BlazeConfig.getChannel() {
-    // TODO
-    return regValues[BLAZE_CHANNR];
   }
   
   /**
@@ -221,6 +210,51 @@ implementation {
     return atomicAckEnabled;
   }
   
+  
+  /** 
+   * This command is used to set the (approximate) frequency the radio.
+   * It uses the assumed base frequency, the assumed channel width and the changes the 
+   * value in the channel register.  
+   * @param freqKhz - the desired frequency in Khz to set the radio to
+   * @reutrn - FAIL if desired frequency is not in range, else SUCCESS
+   */
+  command error_t BlazeConfig.setFrequencyKhz( uint32_t freqKhz ) {
+    if((freq > FREQ_MAX) || (freq < FREQ_MIN)){
+      return FAIL;
+    } 
+    
+    regValues[BLAZE_CHANNR] = freqToChannel(freq);
+    
+    return SUCCESS;
+  }
+  
+  /** 
+   * This command is used to get the current (approximate) frequency the radio is set to in KHz.
+   * It uses the assumed base frequency, the assumed channel width and the current value in the 
+   * channel register to calculate this.  
+   * @return approx. frequency in KHz
+   */
+  command uint32_t BlazeConfig.getFrequencyKhz() {
+    return channelToFreq(regValues[BLAZE_CHANNR]);
+  }
+  
+  /** 
+   * This command sets the value of the channel register on the radio
+   * @param chan - the value of the channel
+   */
+  command void BlazeConfig.setChannel( uint8_t chan ) {
+    regValues[BLAZE_CHANNR] = chan;  
+  }
+  
+  /** 
+   * This command returns the value of the channel register on the radio
+   * @return the value of the channel register
+   */
+  command uint8_t BlazeConfig.getChannel() {
+    return regValues[BLAZE_CHANNR];
+  }
+  
+  
   /***************** ActiveMessageAddress Events ****************/
   async event void ActiveMessageAddress.changed() {   
     regValues[BLAZE_ADDR] = (call ActiveMessageAddress.amAddress()) >> 8;
@@ -229,6 +263,26 @@ implementation {
   /***************** BlazeCommit Events ****************/
   event void BlazeCommit.commitDone() {
     signal BlazeConfig.commitDone();
+  }
+  
+  /***************** Functions ****************/
+  uint8_t freqToChannel( uint32_t freq ) {
+    uint32_t offset;
+    uint32_t rem;
+    uint8_t chann;
+    offset = freq - BASE_FREQ;
+    rem = offset % CHAN_WIDTH;
+    chann = (uint8_t)(offset / CHAN_WIDTH); 
+    if(rem > (CHAN_WIDTH >> 1)){
+      chann++;    
+    }
+    return chann;
+  }
+  
+  uint32_t channelToFreq( uint8_t chan ){
+    uint32_t offset;
+    offset = (uint32_t)(((uint32_t)chan) * CHAN_WIDTH);
+    return offset + BASE_FREQ;
   }
   
   /***************** Defaults ****************/

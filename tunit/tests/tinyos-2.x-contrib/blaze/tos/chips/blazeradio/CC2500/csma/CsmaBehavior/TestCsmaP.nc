@@ -457,7 +457,6 @@ implementation {
       return SUCCESS;
     
     } else {
-      assertFail("Resource.release called without owning");
       return SUCCESS;
     }
   }

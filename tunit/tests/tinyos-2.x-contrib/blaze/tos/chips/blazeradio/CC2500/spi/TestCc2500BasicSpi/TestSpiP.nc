@@ -25,6 +25,10 @@ implementation {
   
   event void Resource.granted() {
     call CSN.clr();
+    while((call Idle.strobe() & 0x80) != 0);
+    call CSN.set();
+    
+    call CSN.clr();
     call Idle.strobe();
     assertEquals("CC2500 is not IDLE [6:4]!=0", 0, ((call PARTNUM.read(&readBuffer)) & 0x70));
     assertEquals("CC2500 didn't ID itself", 0x80, readBuffer);

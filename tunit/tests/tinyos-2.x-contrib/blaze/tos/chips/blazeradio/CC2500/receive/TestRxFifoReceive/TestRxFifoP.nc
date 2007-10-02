@@ -193,6 +193,9 @@ implementation {
     
     append(&myMsg, myHeader->length + 1);
     append(&statusBytes, 2);
+    
+    rxFifo[0] = 0;  // Flushed the RX FIFO - the variable packet length = 0
+    
     signal RxInterrupt.fired[0]();
     call Timer.startOneShot(256);
     // Since we won't receive this packet, continue at Timer.fired and make

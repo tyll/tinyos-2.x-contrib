@@ -207,7 +207,7 @@ implementation {
     
     call State.forceState(S_WRITE_FIFO);    
     atomic m_addr = addr;
-    status = call SpiByte.write( m_addr | BLAZE_BURST | BLAZE_WRITE );
+    status = call SpiByte.write( addr | BLAZE_BURST | BLAZE_WRITE );
     call SpiPacket.send( data, NULL, len );
 
     return status;
@@ -280,6 +280,7 @@ implementation {
 
   /***************** Functions ****************/
   uint8_t getRadioStatus(){
+    //return BLAZE_S_RX;
     return ((call SpiByte.write(BLAZE_SNOP) >> 4) & 0x07);
   }
 

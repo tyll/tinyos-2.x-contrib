@@ -62,38 +62,34 @@ implementation {
    */
   command error_t Send.send[radio_id_t id](message_t* msg, uint8_t len) {
     error_t error;
+    uint8_t myState;
+    atomic myState = state;
     
-    if(state != S_IDLE) {
+    if(myState != S_IDLE) {
       // Still waiting for the last ack
       return ECANCEL;
     }
     
     if(((call BlazePacketBody.getHeader(msg))->fcf >> IEEE154_FCF_ACK_REQ) & 0x1) {
-      state = S_SENDING_ACK;
+      atomic state = S_SENDING_ACK;
       
     } else {
-      state = S_SENDING_NOACK;
+      atomic state = S_SENDING_NOACK;
     }
     
     radioId = id;
-    myMsg = msg;
+    atomic myMsg = msg;
     
     (call BlazePacketBody.getHeader(msg))->fcf |=
         ( IEEE154_TYPE_DATA << IEEE154_FCF_FRAME_TYPE );
-        
-        /* |
-	    ( 1 << IEEE154_FCF_INTRAPAN ) |
-	    ( IEEE154_ADDR_SHORT << IEEE154_FCF_DEST_ADDR_MODE ) |
-	    ( IEEE154_ADDR_SHORT << IEEE154_FCF_SRC_ADDR_MODE ) );
-        */
-        
+    
     (call BlazePacketBody.getMetadata(msg))->ack = FALSE;
     
     error = call SubSend.send[id](msg, len);
     
     if(error != SUCCESS) {
-      state = S_IDLE;
-      myMsg = NULL;
+      atomic state = S_IDLE;
+      atomic myMsg = NULL;
     }
     
     return error;
@@ -130,9 +126,11 @@ implementation {
   
   /***************** BackoffTimer Events ****************/
   async event void AckWaitTimer.fired() {
-    if(state == S_ACK_WAIT) {
+    uint8_t myState;
+    atomic myState = state;
+    if(myState == S_ACK_WAIT) {
       // Our ack wait period expired with no luck...
-      state = S_SEND_DONE;
+      atomic state = S_SEND_DONE;
       call ChipSpiResource.attemptRelease();
       post sendDone();
     }
@@ -141,12 +139,13 @@ implementation {
   
   /***************** SubSend Events ****************/
   event void SubSend.sendDone[radio_id_t id](message_t *msg, error_t error) {
-    
-    if(state == S_SENDING_NOACK) {
+    uint8_t myState;
+    atomic myState = state;
+    if(myState == S_SENDING_NOACK) {
       post sendDone();
       
-    } else if(state == S_SENDING_ACK) {
-      state = S_ACK_WAIT;
+    } else if(myState == S_SENDING_ACK) {
+      atomic state = S_ACK_WAIT;
       call AckWaitTimer.start(BLAZE_ACK_WAIT);
       
     }
@@ -154,16 +153,23 @@ implementation {
   
   /***************** AckReceive Events ****************/
   async event void AckReceive.receive( am_addr_t source, am_addr_t destination, uint8_t dsn ) {
-    blaze_header_t *header = call BlazePacketBody.getHeader(myMsg);
-    if(state == S_ACK_WAIT) {
+    message_t *atomicMsg;
+    blaze_header_t *header;
+    uint8_t myState;
+    
+    atomic atomicMsg = myMsg;
+    header = call BlazePacketBody.getHeader(atomicMsg);
+    atomic myState = state;
+    
+    if(myState == S_ACK_WAIT) {
       if(source == header->dest &&
           destination == header->src &&
               dsn == header->dsn) {
         
         // This is our acknowledgement
-        state = S_SEND_DONE;
+        atomic state = S_SEND_DONE;
         call AckWaitTimer.stop();
-        (call BlazePacketBody.getMetadata(myMsg))->ack = TRUE;
+        (call BlazePacketBody.getMetadata(atomicMsg))->ack = TRUE;
         call ChipSpiResource.attemptRelease();
         post sendDone();
       }
@@ -177,7 +183,10 @@ implementation {
    * abortRelease() within the event.
    */
   async event void ChipSpiResource.releasing() {
-    if(state == S_SENDING_ACK || state == S_ACK_WAIT) {
+    uint8_t myState;
+    atomic myState = state;
+    
+    if(myState == S_SENDING_ACK || myState == S_ACK_WAIT) {
       // Csma is trying to release the SPI bus. Let the chip own the SPI bus
       // so it's immediately available when Receive needs it.
       call ChipSpiResource.abortRelease();
@@ -186,7 +195,7 @@ implementation {
   
   /***************** Tasks ****************/
   task void sendDone() {
-    state = S_IDLE;
+    atomic state = S_IDLE;
     signal Send.sendDone[radioId](myMsg, SUCCESS);
   }
   

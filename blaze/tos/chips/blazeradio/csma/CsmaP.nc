@@ -45,12 +45,15 @@ implementation {
   /** TRUE if the current packet should use clear channel assessments */
   bool useCca;
   
+  /** Error to pass back in sendDone */
+  error_t myError;
   
   enum {
     S_IDLE,
     S_LOADING,
     S_BACKOFF,
     S_FORCING,
+    S_CANCEL,
   };
   
   /**************** Tasks ****************/
@@ -91,6 +94,14 @@ implementation {
   }
 
   command error_t Send.cancel[radio_id_t id](message_t* msg) {
+    message_t *atomicMsg;
+    atomic atomicMsg = myMsg;
+    
+    if(!call State.isIdle() && (msg == atomicMsg)) {
+      call State.forceState(S_CANCEL);
+      return SUCCESS;
+    }
+   
     return FAIL;
   }
 
@@ -116,11 +127,21 @@ implementation {
         call Resource.release();
         congestionBackoff();
       }
+    
+    } else if(call State.isState(S_CANCEL)) {
+      atomic myError = ECANCEL;
+      post sendDone();
     }
   }
   
   /***************** AsyncSend Events ****************/
   async event void AsyncSend.loadDone[radio_id_t id](void *msg, error_t error) {
+    if(call State.isState(S_CANCEL)) {
+      atomic myError = ECANCEL;
+      post sendDone();
+      return;
+    }
+    
     requestCca();
     
     if(!useCca) {
@@ -135,6 +156,7 @@ implementation {
   }
   
   async event void AsyncSend.sendDone[radio_id_t id]() {
+    atomic myError = SUCCESS;
     post sendDone();
   }
   
@@ -144,7 +166,7 @@ implementation {
    * @param backoffTime the amount of time in some unspecified units to backoff
    */
   async command void Csma.setInitialBackoff[am_id_t amId](uint16_t backoffTime) {
-    myInitialBackoff = backoffTime + 1;
+    atomic myInitialBackoff = backoffTime + 1;
   }
   
   /**
@@ -152,7 +174,7 @@ implementation {
    * @param backoffTime the amount of time in some unspecified units to backoff
    */
   async command void Csma.setCongestionBackoff[am_id_t amId](uint16_t backoffTime) {
-    myCongestionBackoff = backoffTime + 1;
+    atomic myCongestionBackoff = backoffTime + 1;
   }
   
   /**
@@ -160,13 +182,19 @@ implementation {
    * @param cca TRUE to use cca for the outbound packet, FALSE to not use CCA
    */
   async command void Csma.setCca[am_id_t amId](bool cca) {
-    useCca = cca;
+    atomic useCca = cca;
   }
   
 
   /***************** BackoffTimer Events ****************/
   async event void BackoffTimer.fired() {
     radio_id_t atomicId;
+    
+    if(call State.isState(S_CANCEL)) {
+      atomic myError = ECANCEL;
+      post sendDone();
+      return;
+    }
     
     if(!call State.isState(S_BACKOFF)) {
       // not my event to handle
@@ -191,14 +219,21 @@ implementation {
    */
   task void forceSend() {
     if(call AsyncSend.send[myRadio]() != SUCCESS) {
-      post forceSend();
+      if(call State.isState(S_CANCEL)) {
+        atomic myError = ECANCEL;
+        
+      } else {
+        post forceSend();
+      }
     }
   }
   
   task void sendDone() {
+    error_t atomicError;
+    atomic atomicError = myError;
     call Resource.release();
     call State.toIdle();
-    signal Send.sendDone[myRadio](myMsg, SUCCESS);
+    signal Send.sendDone[myRadio](myMsg, atomicError);
   }
   
   
@@ -208,7 +243,7 @@ implementation {
    * to not use software CCA. 
    */
   void requestCca() {
-    useCca = TRUE;
+    atomic useCca = TRUE;
     signal Csma.requestCca[(call BlazePacketBody.getHeader(myMsg))->type](myMsg);
   }
   
@@ -218,7 +253,7 @@ implementation {
    * correct amount of initial backoff time to use
    */
   void requestInitialBackoff() {
-    myInitialBackoff = ( call Random.rand16() % 
+    atomic myInitialBackoff = ( call Random.rand16() % 
         (0x1F * BLAZE_BACKOFF_PERIOD) + BLAZE_MIN_BACKOFF);
         
     signal Csma.requestInitialBackoff[(call BlazePacketBody.getHeader(myMsg))->type](myMsg);
@@ -230,7 +265,7 @@ implementation {
    * correct amount of congestion backoff time to use.
    */
   void requestCongestionBackoff() {
-    myCongestionBackoff = ( call Random.rand16() % 
+    atomic myCongestionBackoff = ( call Random.rand16() % 
         (0x7 * BLAZE_BACKOFF_PERIOD) + BLAZE_MIN_BACKOFF);
     
     signal Csma.requestCongestionBackoff[(call BlazePacketBody.getHeader(myMsg))->type](myMsg);
@@ -241,16 +276,20 @@ implementation {
    * Backoff for the initial backoff period of time
    */
   void initialBackoff() {
+    uint16_t atomicBackoff;
     requestInitialBackoff();
-    call BackoffTimer.start( myInitialBackoff );
+    atomic atomicBackoff = myInitialBackoff;
+    call BackoffTimer.start( atomicBackoff );
   }
   
   /**
    * Backoff because of a congested channel
    */
   void congestionBackoff() {
+    uint16_t atomicBackoff;
     requestCongestionBackoff();
-    call BackoffTimer.start( myCongestionBackoff );
+    atomic atomicBackoff = myCongestionBackoff;
+    call BackoffTimer.start( atomicBackoff );
   }
   
   

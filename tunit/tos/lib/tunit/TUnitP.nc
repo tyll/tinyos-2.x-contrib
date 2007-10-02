@@ -137,9 +137,11 @@ implementation {
   void tearDownDone();
   void tearDownOneTimeDone();
   void attemptTest();
+  void dummyCalls();
   
   /***************** Init Commands ****************/
   command error_t Init.init() {  
+    dummyCalls();
     driver = (call ActiveMessageAddress.amAddress() == 0);
     return SUCCESS;
   }
@@ -303,6 +305,24 @@ implementation {
       signal TUnitProcessing.allDone();
       // Next, the computer gives the signal to all motes to tearDownOneTime()
     }
+  }
+  
+  /**
+   * We add this function in only so we don't see warnings at compile time
+   * that we didn't use any of the defined TUnit macros
+   */
+  void dummyCalls() {
+    assertSuccess();
+    assertFail("");
+    assertEquals("", 0, 0);
+    assertNotEquals("", 0, 0);
+    assertResultIsBelow("", 0, 0);
+    assertResultIsAbove("", 0, 0);
+    assertCompares("", NULL, NULL, 0);
+    assertTrue("", TRUE);
+    assertFalse("", FALSE);
+    assertNull(NULL);
+    assertNotNull(NULL);
   }
   
   /***************** ActiveMessageAddress Events ****************/

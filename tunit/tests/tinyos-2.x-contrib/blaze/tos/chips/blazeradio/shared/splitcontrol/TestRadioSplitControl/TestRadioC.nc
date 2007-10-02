@@ -2,6 +2,9 @@
 #include "TestCase.h"
 
 /**
+ * Make sure SplitControl works and we're compliant with the virtualized
+ * power devices TEP
+ * 
  * @author David Moss
  */
 configuration TestRadioC {

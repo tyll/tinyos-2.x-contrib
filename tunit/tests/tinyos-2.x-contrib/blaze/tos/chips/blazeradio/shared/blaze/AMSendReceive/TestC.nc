@@ -12,6 +12,7 @@ implementation {
       TestP;
    
   TestP.SetUpOneTime -> TestAmC.SetUpOneTime;
+  TestP.TearDownOneTime -> TestAmC.TearDownOneTime;
   TestP.TestAm -> TestAmC;
   
   TestP.SplitControl -> BlazeC;

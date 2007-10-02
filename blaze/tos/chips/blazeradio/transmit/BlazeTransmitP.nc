@@ -173,7 +173,7 @@ implementation {
     uint8_t status;
     atomic m_id = id;
     
-    call Csn.clr[ m_id ]();
+    call Csn.clr[ id ]();
     
     // TODO is the status check & SRX necessary?  Remove it and run some tests.
     status = call RadioStatus.getRadioStatus();

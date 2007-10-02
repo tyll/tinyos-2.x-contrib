@@ -333,22 +333,13 @@ implementation {
   void receive() {
     uint8_t *msg;
     uint8_t id;
-    uint8_t rxBytesAvailable;
     atomic msg = (uint8_t *) m_msg;
     atomic id = m_id;
     
     call Csn.clr[ id ]();
-    
-    call RXREG.read(&rxBytesAvailable);
-    
-    if(rxBytesAvailable == 0) {
-      // The RX FIFO was CRC Auto flushed
-      cleanUp();
-
-    } else {    
-      // Read in the length byte
-      call RXFIFO.beginRead(msg, 1);
-    }
+ 
+    // Read in the length byte
+    call RXFIFO.beginRead(msg, 1);
   }
   
   void failReceive() {

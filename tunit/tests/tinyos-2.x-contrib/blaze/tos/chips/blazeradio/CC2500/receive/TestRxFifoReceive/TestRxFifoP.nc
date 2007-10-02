@@ -153,13 +153,14 @@ implementation {
   
   /**
    * The largest packet should be received with no problems and also
-   * send an ack
+   * send an ack.  We're transmitting to the broadcast address, make
+   * sure the ack works for broadcasts.
    */
   event void TestReceiveLargePacket.run() {
     call State.forceState(S_TESTRECEIVELARGEPACKET);
     // Subtract 1 because the length byte isn't counted
     myHeader->length = sizeof(blaze_header_t) + TOSH_DATA_LENGTH - 1;
-    myHeader->dest = 0;
+    myHeader->dest = AM_BROADCAST_ADDR;
     myHeader->fcf = (IEEE154_TYPE_DATA << IEEE154_FCF_FRAME_TYPE) | (1 << IEEE154_FCF_ACK_REQ);
     myHeader->dsn = 1;
     myHeader->destpan = 2;
@@ -328,7 +329,7 @@ implementation {
     
     case S_TESTRECEIVELARGEPACKET:
       assertEquals("Wrong length", sizeof(blaze_header_t) + TOSH_DATA_LENGTH - 1, len);
-      assertEquals("Wrong dest", 0, (call BlazePacketBody.getHeader(msg))->dest);
+      assertEquals("Wrong dest", AM_BROADCAST_ADDR, (call BlazePacketBody.getHeader(msg))->dest);
       assertEquals("Wrong fcf", (IEEE154_TYPE_DATA << IEEE154_FCF_FRAME_TYPE) | (1 << IEEE154_FCF_ACK_REQ), (call BlazePacketBody.getHeader(msg))->fcf);
       assertEquals("Wrong dsn", 1, (call BlazePacketBody.getHeader(msg))->dsn);
       assertEquals("Wrong destpan", 2, (call BlazePacketBody.getHeader(msg))->destpan);

@@ -15,7 +15,8 @@ implementation {
       new TestCaseC() as TestNoCcaWithCongestionC,
       new TestCaseC() as TestInitialRequestC,
       new TestCaseC() as TestSingleCongestionC,
-      new TestCaseC() as TestMultipleCongestionC;
+      new TestCaseC() as TestMultipleCongestionC,
+      new TestCaseC() as TestCancelC;
       
   components TestCsmaP,
       CsmaP,
@@ -35,6 +36,7 @@ implementation {
   TestCsmaP.TestInitialRequest -> TestInitialRequestC;
   TestCsmaP.TestSingleCongestion -> TestSingleCongestionC;
   TestCsmaP.TestMultipleCongestion -> TestMultipleCongestionC;
+  TestCsmaP.TestCancel -> TestCancelC;
   
   
   /***************** CsmaP Wrapper Configuration *****************/

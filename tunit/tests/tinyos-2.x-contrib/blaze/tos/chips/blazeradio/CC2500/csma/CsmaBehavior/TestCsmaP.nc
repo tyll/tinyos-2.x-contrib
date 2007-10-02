@@ -26,6 +26,7 @@ module TestCsmaP {
     interface TestCase as TestInitialRequest;
     interface TestCase as TestSingleCongestion;
     interface TestCase as TestMultipleCongestion;
+    interface TestCase as TestCancel;
   }
     
 }
@@ -43,6 +44,7 @@ implementation {
     S_TESTINITIALREQUEST,
     S_TESTSINGLECONGESTION,
     S_TESTMULTIPLECONGESTION,
+    S_TESTCANCEL,
   };
 
   enum {
@@ -145,6 +147,16 @@ implementation {
     assertEquals("Send.send() failed", SUCCESS, call Send.send[MY_RADIO_ID](&myMsg, 20));
   }
   
+  /**
+   * Load and attempt to send the packet. The packet will never be sent,
+   * always returning EBUSY. On the congestion backoff request, cancel
+   * the send.  Assert that we get a sendDone(ECANCEL) event.
+   */
+  event void TestCancel.run() {
+    call State.forceState(S_TESTCANCEL);
+    assertEquals("Send.send() failed", SUCCESS, call Send.send[MY_RADIO_ID](&myMsg, 20));
+  }
+  
   /***************** Send Events ****************/
   event void Send.sendDone[radio_id_t id](message_t *msg, error_t error) {
     atomic asyncSendLoaded = FALSE;
@@ -156,16 +168,14 @@ implementation {
     if(msg != &myMsg) {
       assertFail("sendDone msg!=&myMsg");
     }
-        
-    if(error != SUCCESS) {
-      assertEquals("sendDone(ERROR)", SUCCESS, error);
-    }
+    
         
     switch(call State.getState()) {
       case S_TESTCCAREQUEST:
         assertEquals("Incorrect CCA requests", 1, csmaCcaRequests);
         assertEquals("Incorrect initial backoffs", 1, csmaInitialBackoffRequests);
         assertEquals("Incorrect congestion backoffs", 0, csmaCongestionBackoffRequests);
+        assertEquals("sendDone(ERROR)", SUCCESS, error);
         call TestCcaRequest.done();
         break;
         
@@ -173,6 +183,7 @@ implementation {
         assertEquals("Incorrect CCA requests", 1, csmaCcaRequests);
         assertEquals("Incorrect initial backoffs", 0, csmaInitialBackoffRequests);
         assertEquals("Incorrect congestion backoffs", 0, csmaCongestionBackoffRequests);
+        assertEquals("sendDone(ERROR)", SUCCESS, error);
         call TestNoCcaNoCongestion.done();
         break;
         
@@ -180,6 +191,7 @@ implementation {
         assertEquals("Incorrect CCA requests", 1, csmaCcaRequests);
         assertEquals("Incorrect initial backoffs", 0, csmaInitialBackoffRequests);
         assertEquals("Incorrect congestion backoffs", 0, csmaCongestionBackoffRequests);
+        assertEquals("sendDone(ERROR)", SUCCESS, error);        
         call TestNoCcaWithCongestion.done();
         break;
         
@@ -190,6 +202,7 @@ implementation {
         assertEquals("Incorrect CCA requests", 1, csmaCcaRequests);
         assertEquals("Incorrect initial backoffs", 1, csmaInitialBackoffRequests);
         assertEquals("Incorrect congestion backoffs", 0, csmaCongestionBackoffRequests);
+        assertEquals("sendDone(ERROR)", SUCCESS, error);        
         call TestInitialRequest.done();
         break;
         
@@ -197,6 +210,7 @@ implementation {
         assertEquals("Incorrect CCA requests", 1, csmaCcaRequests);
         assertEquals("Incorrect initial backoffs", 1, csmaInitialBackoffRequests);
         assertEquals("Incorrect congestion backoffs", 1, csmaCongestionBackoffRequests);
+        assertEquals("sendDone(ERROR)", SUCCESS, error);
         call TestSingleCongestion.done();
         break;
         
@@ -204,7 +218,16 @@ implementation {
         assertEquals("Incorrect CCA requests", 1, csmaCcaRequests);
         assertEquals("Incorrect initial backoffs", 1, csmaInitialBackoffRequests);
         assertEquals("Incorrect congestion backoffs", 99, csmaCongestionBackoffRequests);
+        assertEquals("sendDone(ERROR)", SUCCESS, error);        
         call TestMultipleCongestion.done();
+        break;
+        
+      case S_TESTCANCEL:
+        assertEquals("Incorrect CCA requests", 1, csmaCcaRequests);
+        assertEquals("Incorrect initial backoffs", 1, csmaInitialBackoffRequests);
+        assertEquals("Incorrect congestion backoffs", 1, csmaCongestionBackoffRequests);
+        assertEquals("sendDone(NOT ECANCEL)", ECANCEL, error);
+        call TestCancel.done();
         break;
         
         
@@ -273,6 +296,11 @@ implementation {
         
       case S_TESTSINGLECONGESTION:
         call Csma.setCongestionBackoff[amId](0);
+        break;
+        
+      case S_TESTCANCEL:
+        assertEquals("cancel(ERROR)", SUCCESS, call Send.cancel[amId](msg));
+        // Should continue at sendDone()
         break;
         
       default:
@@ -374,6 +402,10 @@ implementation {
           signal AsyncSend.sendDone[id]();
           return SUCCESS;
         }
+        break;
+        
+      case S_TESTCANCEL:
+        return EBUSY;
         break;
         
       default:

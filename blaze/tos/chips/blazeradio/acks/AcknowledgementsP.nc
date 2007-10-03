@@ -162,7 +162,7 @@ implementation {
     atomic myState = state;
     
     if(myState == S_ACK_WAIT) {
-      if(source == header->dest &&
+      if((source == header->dest || header->dest == AM_BROADCAST_ADDR) &&
           destination == header->src &&
               dsn == header->dsn) {
         

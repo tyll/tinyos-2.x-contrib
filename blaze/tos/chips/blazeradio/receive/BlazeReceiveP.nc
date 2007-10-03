@@ -111,7 +111,6 @@ implementation {
     if(call InterruptState.isState(S_INTERRUPT_RX)) {
       if(call ReceiveController.beginReceive[id]() != SUCCESS) {
         // TODO make this an array for each radio, and check it at the end of rx
-        call Leds.led0On();
         missedPackets++;
       }
     }
@@ -370,7 +369,6 @@ implementation {
     call Csn.set[ id ]();
 
     if(missed > 0) {
-      call Leds.led2On();
       atomic missedPackets--;
       call State.forceState(S_RX_LENGTH);
       receive();

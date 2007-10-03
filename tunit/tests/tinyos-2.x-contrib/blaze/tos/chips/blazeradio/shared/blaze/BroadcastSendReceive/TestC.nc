@@ -6,8 +6,8 @@ implementation {
   components new TestCaseC() as TestAmC;
   
   components BlazeC,
-      new AMSenderC(0),
-      new AMReceiverC(0),
+      new AMSenderC(4),
+      new AMReceiverC(4),
       LedsC,
       TestP;
    

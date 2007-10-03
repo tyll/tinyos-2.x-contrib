@@ -38,20 +38,25 @@ implementation {
   
   
   /***************** Tests ****************/
-  event void TestAm.run() {
+  task void send() {
     error_t error;
-    call PacketAcknowledgements.requestAck(&myMsg);
     if((error = call AMSend.send(AM_BROADCAST_ADDR, &myMsg, 0)) != SUCCESS) {
       assertEquals("send(ERROR)", SUCCESS, error);
       call TestAm.done();
     }
   }
   
+  /**
+   * Make sure we get an ack, then the test is done
+   */
+  event void TestAm.run() {
+    call PacketAcknowledgements.requestAck(&myMsg);
+    post send();
+  }
+  
   
   event message_t *Receive.receive(message_t *msg, void *payload, uint8_t len) {
     call Leds.led1On();
-    assertSuccess();
-    call TestAm.done();
     return msg;
   }
   
@@ -68,10 +73,8 @@ implementation {
     }
     
     assertEquals("sendDone(ERROR)", SUCCESS, error);
-    
-    if(error) {
-      call TestAm.done();
-    }
+   
+    call TestAm.done();
     
   }
 

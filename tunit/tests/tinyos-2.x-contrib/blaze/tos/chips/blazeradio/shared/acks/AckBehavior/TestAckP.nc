@@ -31,6 +31,7 @@ module TestAckP {
     interface TestCase as TestAckWrongDsn;
     interface TestCase as TestAckWrongSource;
     interface TestCase as TestAckWrongDest;
+    interface TestCase as TestAckBroadcastDest;
     interface Leds;
   }
     
@@ -50,6 +51,7 @@ implementation {
     S_TESTACKWRONGDSN,
     S_TESTACKWRONGSOURCE,
     S_TESTACKWRONGDEST,
+    S_TESTACKBROADCASTDEST,
   };
 
   enum {
@@ -188,6 +190,13 @@ implementation {
     assertEquals("Send.send() failed", SUCCESS, call Send.send[MY_RADIO_ID](&myMsg, 20));
   }
   
+  event void TestAckBroadcastDest.run() {
+    call State.forceState(S_TESTACKBROADCASTDEST);
+    call PacketAcknowledgements.requestAck(&myMsg);
+    (call BlazePacketBody.getHeader(&myMsg))->dest = AM_BROADCAST_ADDR;
+    assertEquals("Send.send() failed", SUCCESS, call Send.send[MY_RADIO_ID](&myMsg, 20));
+  }
+  
  
   /***************** Send Events ****************/
   event void Send.sendDone[radio_id_t id](message_t *msg, error_t error) {
@@ -251,6 +260,13 @@ implementation {
         call TestAckWrongDest.done();
         break;
         
+      case S_TESTACKBROADCASTDEST:
+        assertEquals("Incorrect SPI aborts", 1, chipSpiResourceAborts);
+        assertEquals("Incorrect SPI releases", 1, chipSpiResourceReleases);
+        assertTrue("Should have gotten ack'd", call PacketAcknowledgements.wasAcked(&myMsg));
+        call TestAckBroadcastDest.done();
+        break;      
+      
       default:
         assertFail("Test Error: sendDone.default called");
         break;
@@ -338,24 +354,32 @@ implementation {
     
       case S_TESTACKWRONGDSN:
         signal SubSend.sendDone[sendRadioId](sendMsg, SUCCESS);
-        ackSrc = MY_SOURCE;
-        ackDest = MY_DEST;
+        ackSrc = MY_DEST;
+        ackDest = MY_SOURCE;
         ackDsn = MY_DSN - 1;
         post receiveAck();
         break;
         
      case S_TESTACKWRONGSOURCE:
         signal SubSend.sendDone[sendRadioId](sendMsg, SUCCESS);
-        ackSrc = MY_SOURCE - 1;
-        ackDest = MY_DEST;
+        ackSrc = MY_DEST - 1;
+        ackDest = MY_SOURCE;
         ackDsn = MY_DSN;
         post receiveAck();
         break;
         
      case S_TESTACKWRONGDEST:
         signal SubSend.sendDone[sendRadioId](sendMsg, SUCCESS);
-        ackSrc = MY_SOURCE;
-        ackDest = MY_DEST - 1;
+        ackSrc = MY_DEST;
+        ackDest = MY_SOURCE - 1;
+        ackDsn = MY_DSN;
+        post receiveAck();
+        break;
+        
+      case S_TESTACKBROADCASTDEST:
+        signal SubSend.sendDone[sendRadioId](sendMsg, SUCCESS);
+        ackSrc = MY_DEST;
+        ackDest = MY_SOURCE;
         ackDsn = MY_DSN;
         post receiveAck();
         break;

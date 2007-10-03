@@ -16,7 +16,8 @@ implementation {
       new TestCaseC() as TestAckNoResponseC,
       new TestCaseC() as TestAckWrongDsnC,
       new TestCaseC() as TestAckWrongSourceC,
-      new TestCaseC() as TestAckWrongDestC;
+      new TestCaseC() as TestAckWrongDestC,
+      new TestCaseC() as TestAckBroadcastDestC;
       
   components TestAckP,
       AcknowledgementsP,
@@ -39,6 +40,7 @@ implementation {
   TestAckP.TestAckWrongDsn -> TestAckWrongDsnC;
   TestAckP.TestAckWrongSource -> TestAckWrongSourceC;
   TestAckP.TestAckWrongDest -> TestAckWrongDestC;
+  TestAckP.TestAckBroadcastDest -> TestAckBroadcastDestC;
   
   /***************** AckP Wrapper Configuration *****************/
   AcknowledgementsP.SubSend -> TestAckP;

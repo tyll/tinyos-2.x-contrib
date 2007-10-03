@@ -153,22 +153,6 @@ implementation {
   }
   
   /**
-   * Get the PAN (network) address for this node
-   */
-  async command uint16_t BlazeConfig.getPanAddr() {
-    uint16_t atomicPan;
-    atomic atomicPan = panAddress;
-    return atomicPan;
-  }
-  
-  /**
-   * @param address the PAN (network) address for this node
-   */
-  command void BlazeConfig.setPanAddr( uint16_t address ) {
-    atomic panAddress = address;
-  }
-  
-  /**
    * @param on TRUE to turn address recognition on, FALSE to turn it off
    */
   command void BlazeConfig.setAddressRecognition(bool on) {
@@ -266,6 +250,8 @@ implementation {
   /***************** ActiveMessageAddress Events ****************/
   async event void ActiveMessageAddress.changed() {   
     regValues[BLAZE_ADDR] = (call ActiveMessageAddress.amAddress()) >> 8;
+    atomic panAddress = call ActiveMessageAddress.amGroup();
+    call BlazeCommit.commit();
   }
   
   /***************** BlazeCommit Events ****************/

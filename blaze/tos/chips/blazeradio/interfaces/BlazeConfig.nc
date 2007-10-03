@@ -20,18 +20,6 @@ interface BlazeConfig {
   event void commitDone();
   
   
-
-  /**
-   * Get the PAN (network) address for this node
-   */
-  async command uint16_t getPanAddr();
-  
-  /**
-   * @param address the PAN (network) address for this node
-   */
-  command void setPanAddr( uint16_t address );
-
-  
   /**
    * @param on TRUE to turn address recognition on, FALSE to turn it off
    */

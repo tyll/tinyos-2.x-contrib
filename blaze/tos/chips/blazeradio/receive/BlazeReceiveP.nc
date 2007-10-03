@@ -409,14 +409,7 @@ implementation {
   default command error_t BlazeConfig.commit[ radio_id_t id ]() {
     return FAIL;
   }
-  
-  default async command uint16_t BlazeConfig.getPanAddr[ radio_id_t id ]() {
-    return 0;
-  }
-  
-  default command void BlazeConfig.setPanAddr[ radio_id_t id ]( uint16_t address ) {
-  }
-  
+    
   default command void BlazeConfig.setAddressRecognition[ radio_id_t id ](bool on) {
   }
   

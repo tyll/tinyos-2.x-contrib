@@ -165,7 +165,9 @@ implementation {
     atomic m_id = id;
     
     if(state[m_id] != S_ON) {
-      return FAIL;
+      // Will be committed automatically next time the radio turns on..
+      signal BlazeCommit.commitDone[id]();
+      return SUCCESS;
     }
     
     state[m_id] = S_COMMITTING;    

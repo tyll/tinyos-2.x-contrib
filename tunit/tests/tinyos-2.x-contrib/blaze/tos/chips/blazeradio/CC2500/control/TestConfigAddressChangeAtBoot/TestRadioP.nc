@@ -59,10 +59,12 @@ implementation {
     attempts = 0;
     call PacketAcknowledgements.requestAck(&myMsg);
     
-    if(call SplitControl.start() != SUCCESS) {
-      call State.toIdle();
-      call SetUpOneTime.done();
+    if(transmitter) {
+      call ActiveMessageAddress.setAddress(GROUP, TRANSMIT_ID);
+    } else {
+      call ActiveMessageAddress.setAddress(GROUP, RECEIVE_ID);
     }
+    
   }
   
   event void TearDownOneTime.run() {
@@ -75,11 +77,8 @@ implementation {
   /***************** SplitControl Events ****************/
   event void SplitControl.startDone(error_t error) {
     call Leds.led2On();
-    if(transmitter) {
-      call ActiveMessageAddress.setAddress(GROUP, TRANSMIT_ID);
-    } else {
-      call ActiveMessageAddress.setAddress(GROUP, RECEIVE_ID);
-    }
+    call State.toIdle();
+    call SetUpOneTime.done();
     
   }
   
@@ -129,8 +128,13 @@ implementation {
   event void BlazeConfig.commitDone( ) {
     call Leds.led1On();
     synced++;
-    call State.toIdle();
-    call SetUpOneTime.done();
+    
+    
+    if(call SplitControl.start() != SUCCESS) {
+      call State.toIdle();
+      call SetUpOneTime.done();
+    }
+    
   }
   
   async event void ActiveMessageAddress.changed() {

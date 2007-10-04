@@ -94,7 +94,7 @@ public class TUnit {
    */
   public static void main(String[] args) {
     org.apache.log4j.BasicConfigurator.configure();
-    Logger.getRootLogger().setLevel((Level) Level.INFO);
+    Logger.getRootLogger().setLevel((Level) Level.TRACE);
     new TUnit(args).runTunit(args);
   }
 

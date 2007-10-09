@@ -85,6 +85,13 @@ implementation {
       CC1100_CONFIG_FSCAL0,
   };
   
+  enum{
+    BASE_FREQ = 301000,
+    CHAN_WIDTH = 200,
+    FREQ_MIN = 30100,
+    FREQ_MAX = 351987,
+  };  
+  
   /***************** Prototypes ****************/
   uint8_t freqToChannel( uint32_t freq );
   uint32_t channelToFreq( uint8_t chan );
@@ -203,11 +210,11 @@ implementation {
    * @reutrn - FAIL if desired frequency is not in range, else SUCCESS
    */
   command error_t BlazeConfig.setFrequencyKhz( uint32_t freqKhz ) {
-    if((freq > FREQ_MAX) || (freq < FREQ_MIN)){
+    if((freqKhz > FREQ_MAX) || (freqKhz < FREQ_MIN)){
       return FAIL;
     } 
     
-    regValues[BLAZE_CHANNR] = freqToChannel(freq);
+    regValues[BLAZE_CHANNR] = freqToChannel(freqKhz);
     
     return SUCCESS;
   }

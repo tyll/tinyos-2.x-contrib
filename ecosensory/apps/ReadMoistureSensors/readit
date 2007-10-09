@@ -1,0 +1,4 @@
+#!/bin/bash
+#msgreader-from-sf
+
+java net.tinyos.tools.MsgReader -comm sf@localhost:9002 MoistureSensorsMsg

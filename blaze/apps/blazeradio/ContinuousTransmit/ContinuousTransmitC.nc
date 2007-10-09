@@ -18,7 +18,6 @@ implementation {
   ContinuousTransmitP.Boot -> MainC;
   ContinuousTransmitP.AMSend -> AMSenderC;
   ContinuousTransmitP.SplitControl -> ActiveMessageC;
-  ContinuousTransmitP.Resource -> BlazeSpiC;
   ContinuousTransmitP.Leds -> LedsC;
   
 }

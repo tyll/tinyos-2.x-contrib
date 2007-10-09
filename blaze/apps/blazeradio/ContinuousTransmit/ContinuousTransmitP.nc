@@ -3,7 +3,6 @@ module ContinuousTransmitP {
   uses {
     interface Boot;
     interface SplitControl;
-    interface Resource;
     interface AMSend;
     interface Leds;
   }
@@ -18,13 +17,9 @@ implementation {
   
   /***************** Boot Events ****************/
   event void Boot.booted() {
-    call Resource.request();
-  }
-  
-  event void Resource.granted() {
     call SplitControl.start();
   }
-
+  
   /***************** SplitControl Events ****************/
   event void SplitControl.startDone(error_t error) {
     post send();

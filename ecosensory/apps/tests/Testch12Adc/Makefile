@@ -1,0 +1,4 @@
+COMPONENT=Testch12AdcC
+SENSORBOARD=ch12Adc
+
+include $(MAKERULES)

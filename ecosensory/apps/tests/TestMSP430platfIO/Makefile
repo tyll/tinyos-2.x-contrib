@@ -1,0 +1,3 @@
+COMPONENT=TestMSP430platfIOC
+
+include $(MAKERULES)

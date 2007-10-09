@@ -1,0 +1,9 @@
+SwitchC() uses a get() to read in a 1 or 0, then defines
+ interrupt to trigger on rising or falling; whatever is next.
+  Each trigger, it does a send event
+ that includes signal Notify.notify( pinHigh )
+the value of type <bool>0 or 1 pin state.
+
+Every down of the switch display one LED, and change to the
+ next IO test that outputs 1Hz square 0 and 1 values on 
+a port pin.

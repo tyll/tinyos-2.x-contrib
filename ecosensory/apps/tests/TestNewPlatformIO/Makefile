@@ -1,0 +1,3 @@
+COMPONENT=TestNewPlatformIOC
+
+include $(MAKERULES)

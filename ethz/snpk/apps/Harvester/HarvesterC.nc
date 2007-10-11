@@ -41,11 +41,12 @@ implementation {
   	MainC,
   	HarvesterP,
   	LedsC,
-  	new TimerMilliC(), 
-  	new TimerMilliC() as TreeInfoTimer,
+  	new TimerMilliC() as SensorTimer, 
+  	new TimerMilliC() as TopologyTimer,
+  	new TimerMilliC() as StatusTimer,
     //new DemoSensorC() as Sensor,
-    //new SensirionSht11C() as Sensor,
-    new SensirionSht71C() as Sensor,
+    new SensirionSht11C() as InternalSensirion,
+    new SensirionSht71C() as ExternalSensirion,
   	DSNC,
   	new DsnCommandC("set lpl", uint16_t , 1) as LplCommand;
   	
@@ -54,9 +55,11 @@ implementation {
 
   
   HarvesterP.Boot -> MainC;
-  HarvesterP.Timer -> TimerMilliC;
-  HarvesterP.TreeInfoTimer -> TreeInfoTimer;
-  HarvesterP.Read -> Sensor.Temperature;
+  HarvesterP.SensorTimer -> SensorTimer;
+  HarvesterP.TopologyTimer -> TopologyTimer;
+  HarvesterP.StatusTimer -> StatusTimer;
+  HarvesterP.TempExternalRead -> ExternalSensirion.Temperature;
+  HarvesterP.TempInternalRead -> InternalSensirion.Temperature;
   HarvesterP.Leds -> LedsC;
 
   //
@@ -65,13 +68,13 @@ implementation {
   //
   components CollectionC as Collector,   // Collection layer
     ActiveMessageC,                      // AM layer
-    new CollectionSenderC(AM_HARVESTER), // Sends multihop RF
     SerialActiveMessageC;                // Serial messaging
     
  // lpl
-   components CC2420ActiveMessageC as Lpl;
-   HarvesterP.LowPowerListening->Lpl;
-   //HarvesterP.CollectionLowPowerListening->Collector;
+  components CC2420ActiveMessageC as Lpl;
+  
+  HarvesterP.LowPowerListening->Lpl;
+  // HarvesterP.CollectionLowPowerListening->Collector;
 
   HarvesterP.RadioControl -> ActiveMessageC;
   HarvesterP.AMPacket -> ActiveMessageC;
@@ -80,19 +83,25 @@ implementation {
   HarvesterP.SerialControl -> SerialActiveMessageC;
   HarvesterP.RoutingControl -> Collector;
 
-  HarvesterP.Send -> CollectionSenderC;
   HarvesterP.SerialSend -> SerialActiveMessageC.AMSend;
   HarvesterP.SerialAMPacket -> SerialActiveMessageC;
   HarvesterP.SerialPacket -> SerialActiveMessageC;
-  HarvesterP.Snoop -> Collector.Snoop[AM_HARVESTER];
-  HarvesterP.Receive -> Collector.Receive[AM_HARVESTER];
   HarvesterP.RootControl -> Collector;
   
-  // communication TreeInfo
-  components	
-  	new CollectionSenderC(AM_TREEINFO) as TreeCollectionSender;
-  HarvesterP.TreeInfoReceive -> Collector.Receive[AM_TREEINFO];
-  HarvesterP.TreeInfoSend -> TreeCollectionSender;
+  // Sensor radio communication
+  components new CollectionSenderC(AM_HARVESTERSENSOR) as SensorCollectionSender;
+  HarvesterP.SensorReceive -> Collector.Receive[AM_HARVESTERSENSOR];
+  HarvesterP.SensorSend -> SensorCollectionSender;
+  
+  // radio communication topology
+  components new CollectionSenderC(AM_HARVESTERTOPOLOGY) as TopologyCollectionSender;
+  HarvesterP.TopologyReceive -> Collector.Receive[AM_HARVESTERTOPOLOGY];
+  HarvesterP.TopologySend -> TopologyCollectionSender;
+  
+  // radio communication status
+  components new CollectionSenderC(AM_HARVESTERSTATUS) as StatusCollectionSender;
+  HarvesterP.StatusReceive -> Collector.Receive[AM_HARVESTERSTATUS];
+  HarvesterP.StatusSend -> StatusCollectionSender;
   
   HarvesterP.CtpInfo-> Collector;
 
@@ -106,7 +115,6 @@ implementation {
   components
   	CC2420TransmitP,
   	Counter32khz32C;
-  //HarvesterP.AsyncNotify->CC2420TransmitP;
   HarvesterP.Counter->Counter32khz32C;
 
   components
@@ -114,5 +122,9 @@ implementation {
   	new TimerMilliC() as LoadTimer;
   HarvesterP.ReadCpuLoad->TraceSchedulerC;
   HarvesterP.LoadTimer->LoadTimer;
+  
+  // neighboursync request
+  // components NeighbourSyncC;
+  // HarvesterP.NeighbourSyncRequest->NeighbourSyncC;
   
 }

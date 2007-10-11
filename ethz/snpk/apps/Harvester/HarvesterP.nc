@@ -28,7 +28,7 @@
 *  For additional information see http://www.btnode.ethz.ch/
 *
 *  $Id$
-* 
+*  
 */
 
 /**
@@ -48,9 +48,6 @@ module HarvesterP {
     interface StdControl as RoutingControl;
     
     // Interfaces for communication, multihop and serial:
-    interface Send;
-    interface Receive as Snoop;
-    interface Receive;
     interface AMSend as SerialSend[am_id_t id];
     interface CollectionPacket;
     interface RootControl;
@@ -59,26 +56,37 @@ module HarvesterP {
     interface AMPacket as SerialAMPacket;
     interface Packet as SerialPacket;
     
+    // interface CollectionLowPowerListening;
     interface LowPowerListening;
 
     interface Queue<message_t *> as UARTQueue;
     interface Pool<message_t> as UARTMessagePool;
 
     // Miscalleny:
-    interface Timer<TMilli>;
-    interface Timer<TMilli> as TreeInfoTimer;
-    interface Read<uint16_t>;
+    interface Timer<TMilli> as SensorTimer;
+    interface Timer<TMilli> as TopologyTimer;
+    interface Timer<TMilli> as StatusTimer;
     interface Leds;
     
     // DSN
     interface DSN;
     interface DsnCommand<uint16_t> as LplCommand;
+
+    // Sensor
+    interface Read<uint16_t> as TempExternalRead;
+    interface Read<uint16_t> as TempInternalRead;
+    interface Receive as SensorReceive;
+    interface Send as SensorSend;
     
-    // TreeInfo
+    // Topology
     interface CtpInfo;
-    interface Receive as TreeInfoReceive;
-    interface Send as TreeInfoSend;
+    interface Receive as TopologyReceive;
+    interface Send as TopologySend;
     
+    // Status
+    interface Receive as StatusReceive;
+    interface Send as StatusSend;
+
     // for statistics
     //interface AsyncNotify;
     interface Counter<T32khz,uint32_t>;
@@ -86,7 +94,8 @@ module HarvesterP {
     
     interface Read<uint16_t> as ReadCpuLoad;
     interface Timer<TMilli> as LoadTimer;
-    interface PowerCycle;
+    
+    // interface NeighbourSyncRequest;
   }
 }
 
@@ -102,13 +111,14 @@ implementation {
   message_t sendbuf;
   message_t uartbuf;
   uint8_t * m_state;
-  treeinfo_t *tinfo;
-  uint8_t sn=0;
+  harvester_topology_t * tinfo;
+  uint8_t sensor_sn=0, topology_sn=0, status_sn=0;
   bool sendbusy=FALSE, uartbusy=FALSE;
   error_t e=SUCCESS;
+  uint16_t lplSleepInterval=LPL_INT;
 
   /* Current local state - interval, version and accumulated readings */
-  harvester_t local;
+  harvester_sensor_t local;
 
   uint8_t reading; /* 0 to NREADINGS */
 
@@ -158,6 +168,9 @@ implementation {
     	call DSN.logError("RoutingControl.start() failed");
     	fatal_problem();
     }
+    else {
+    	// call CollectionLowPowerListening.setDefaultRxSleepInterval(lplSleepInterval);
+    }
   }
 
   event void RadioControl.startDone(error_t error) {
@@ -167,7 +180,11 @@ implementation {
       		fatal_problem();
     	}
 
-    	if (sizeof(local) > call Send.maxPayloadLength()) {
+    	if (
+    		sizeof(harvester_sensor_t) > call SensorSend.maxPayloadLength() ||
+    		sizeof(harvester_topology_t) > call TopologySend.maxPayloadLength() ||
+    		sizeof(harvester_status_t) > call StatusSend.maxPayloadLength() 
+    	) {
     		call DSN.logError("Radio payload length out of range");
       		fatal_problem();
     	}
@@ -176,7 +193,6 @@ implementation {
     		call DSN.logError("SerialControl.start() failed");
     		fatal_problem();
     	}
-    	call LowPowerListening.setLocalSleepInterval(LPL_INT);
   	} else {
   		call RoutingControl.start();
   		call DSN.logInfo("Routing restarted.");
@@ -194,25 +210,21 @@ implementation {
       call RootControl.setRoot();
       call LowPowerListening.setLocalSleepInterval(0);
     }
-    else
+    else {
     	call SerialControl.stop();
+    	call LowPowerListening.setLocalSleepInterval(lplSleepInterval);
+    }
 	state=S_RUNNING;
 	// start periodic actions
-	//startTimer();
-    call TreeInfoTimer.startPeriodic(TREEINFO_INT);
-    //call LoadTimer.startPeriodic(2048);
+	if (INT_SENSOR != 0)
+    	call SensorTimer.startPeriodic(INT_SENSOR);
+    if (INT_TOPOLOGY != 0)
+    	call TopologyTimer.startPeriodic(INT_TOPOLOGY);
+    if (INT_STATUS != 0)
+    	call StatusTimer.startPeriodic(INT_STATUS);
   }
 
-  static void startTimer() {
-  	m_state=__FUNCTION__;
-    if (call Timer.isRunning()) call Timer.stop();
-    call Timer.startPeriodic(SAMPLING_INTERVAL);
-    reading = 0;
-  }
-
-  event void RadioControl.stopDone(error_t error) {
-  	post startradio();
-  }
+  event void RadioControl.stopDone(error_t error) { }
   
   event void SerialControl.stopDone(error_t error) { }
   
@@ -226,7 +238,7 @@ implementation {
   // connected to the sensor network.
   //
   event message_t*
-  Receive.receive(message_t* msg, void *payload, uint8_t len) {
+  SensorReceive.receive(message_t* msg, void *payload, uint8_t len) {
 	void * out;
     message_t *newmsg = call UARTMessagePool.get();
     m_state=__FUNCTION__;
@@ -236,9 +248,9 @@ implementation {
    	    call DSN.logError("UART pool full");
         return msg;
     }
-    out = (message_t*)call SerialPacket.getPayload(newmsg, NULL);
+    out = (message_t*)call SerialPacket.getPayload(newmsg, len);
 	memcpy(out, payload, len);
-    call SerialAMPacket.setType(newmsg, AM_HARVESTER);
+    call SerialAMPacket.setType(newmsg, AM_HARVESTERSENSOR);
 	call SerialPacket.setPayloadLength(newmsg, len);
     
     //Prepare message to be sent over the uart
@@ -288,19 +300,6 @@ implementation {
   	}
   }
 
-  //
-  // Overhearing other traffic in the network.
-  //
-  event message_t* 
-  Snoop.receive(message_t* msg, void* payload, uint8_t len) {
-  	// this function is never called with CTP underneath because 
-  	// all harvester traffic is unicast and therefore rejected by the CC2420
-  	// early packet rejection mechanism	
-  	m_state=__FUNCTION__;
-  	
-    return msg;
-  }
-
 // #######################################
 //	Sensor data
 // #######################################
@@ -308,12 +307,13 @@ implementation {
      - if local sample buffer is full, send accumulated samples
      - read next sample
   */
-  event void Timer.fired() {
+  event void SensorTimer.fired() {
    	if (!sendbusy) {
-		harvester_t *o = (harvester_t *)call Send.getPayload(&sendbuf);
-		local.dsn++;
+		harvester_sensor_t *o = (harvester_sensor_t *)call SensorSend.getPayload(&sendbuf, sizeof(harvester_sensor_t));
+		local.dsn=sensor_sn++;
+		local.id=TOS_NODE_ID;
 		memcpy(o, &local, sizeof(local));
-		if (call Send.send(&sendbuf, sizeof(local)) == SUCCESS)
+		if (call SensorSend.send(&sendbuf, sizeof(local)) == SUCCESS)
 	  		sendbusy = TRUE;
         else {
         	report_problem();
@@ -323,11 +323,11 @@ implementation {
     else {
   		call DSN.logError("Radio busy while sending SensorData");
     }  	
-    if (call Read.read() != SUCCESS)
+    if (call TempExternalRead.read() != SUCCESS)
     	fatal_problem();
   }
 
-  event void Send.sendDone(message_t* msg, error_t error) {
+  event void SensorSend.sendDone(message_t* msg, error_t error) {
   	m_state=__FUNCTION__;
     if (error == SUCCESS)
       report_sent(msg);
@@ -338,52 +338,65 @@ implementation {
     sendbusy = FALSE;
   }
 
-  event void Read.readDone(error_t result, uint16_t data) {
+  event void TempExternalRead.readDone(error_t result, uint16_t data) {
   	m_state=__FUNCTION__;
     if (result != SUCCESS) {
       data = 0xffff;
       report_problem();
-  	  call DSN.logError("reading Sensordata failed");
     }
-    local.value = data;
-    call DSN.logInt(data - 3960); // temp is now give times 100
-    call DSN.logDebug("Sensor value %i");
+    local.temp_external = data;
+    if (call TempInternalRead.read() != SUCCESS)
+    	fatal_problem();
+  }
+
+  event void TempInternalRead.readDone(error_t result, uint16_t data) {
+  	m_state=__FUNCTION__;
+    if (result != SUCCESS) {
+      data = 0xffff;
+      report_problem();
+    }
+    local.temp_internal = data;
   }
   
+  
+  
 // #######################################
-//		Tree Info
+// Harvester Topology
 // #######################################
   
-  event void TreeInfoTimer.fired() {
+  event void TopologyTimer.fired() {
   	am_addr_t parent;
   	uint8_t i;
   	error_t err;
+  	uint8_t numNeighbours;
   	m_state=__FUNCTION__;
+  	
   	if (!sendbusy) {
-  		treeinfo_t *info = (treeinfo_t *)call Send.getPayload(&sendbuf);
+  		harvester_topology_t *info = (harvester_topology_t *)call TopologySend.getPayload(&sendbuf, sizeof(harvester_topology_t));
+  		for (i=0;i<5;i++)
+  			info->neighbour_id[i]=0xffff;
   		if (call CtpInfo.getParent(&parent)==SUCCESS) {
 			info->parent=parent;
-			info->numNeighbours=call CtpInfo.numNeighbors();
-			for (i=0;i<info->numNeighbours;i++) {
-				info->neighbours[i].nodeId=call CtpInfo.getNeighborAddr(i);
-				info->neighbours[i].etx=call CtpInfo.getNeighborRouteQuality(i);
+			numNeighbours = call CtpInfo.numNeighbors();
+			for (i=0;i<numNeighbours;i++) {
+				if (i<5)
+					info->neighbour_id[i]=call CtpInfo.getNeighborAddr(i);
+				if (call CtpInfo.getNeighborAddr(i)==parent)	
+					info->parent_etx=call CtpInfo.getNeighborRouteQuality(i);
 			}
 		}
 		else {
 			info->parent=0xffff;
-			info->numNeighbours=0;
 		}
 		info->id=TOS_NODE_ID;
-		info->sn=sn++;
-		call LowPowerListening.setRxSleepInterval(&sendbuf, LPL_INT);
+		info->dsn=topology_sn++;
 		packet_send=call Counter.get();
 		atomic {
 			backoff_signaled=FALSE;
 		}
-		err=call TreeInfoSend.send(&sendbuf, sizeof(treeinfo_t));
+		err=call TopologySend.send(&sendbuf, sizeof(harvester_topology_t));
 		if (err == SUCCESS) {
 			sendbusy = TRUE;
-			//call SendWatchdogTimer.startOneShot(((uint32_t)(SENDDONE_NOACK_OFFSET+2*LPL_INT))*((uint32_t)(MAX_RETRIES*2)));
 		}
 		else {
 	    	report_problem();  	
@@ -398,7 +411,7 @@ implementation {
   }
   
  event message_t*
- TreeInfoReceive.receive(message_t* msg, void *payload, uint8_t len) {
+ TopologyReceive.receive(message_t* msg, void *payload, uint8_t len) {
 	void * out;
     message_t *newmsg = call UARTMessagePool.get();
     // tinfo = call Packet.getPayload(msg, NULL); 
@@ -409,9 +422,9 @@ implementation {
    	  	call DSN.logError("UART msg pool full");
         return msg;
     }
-    out = call SerialPacket.getPayload(newmsg, NULL);
+    out = call SerialPacket.getPayload(newmsg, len);
 	memcpy(out, payload, len);
-    call SerialAMPacket.setType(newmsg, AM_TREEINFO);
+    call SerialAMPacket.setType(newmsg, AM_HARVESTERTOPOLOGY);
 	call SerialPacket.setPayloadLength(newmsg, len);
     
     //Prepare message to be sent over the uart
@@ -430,7 +443,7 @@ implementation {
     return msg;
   }
   
-  event void TreeInfoSend.sendDone(message_t* msg, error_t error) {
+  event void TopologySend.sendDone(message_t* msg, error_t error) {
   	m_state=__FUNCTION__;
   	if (error == SUCCESS) {
   	  packet_senddone=call Counter.get();
@@ -443,6 +456,75 @@ implementation {
     sendbusy = FALSE;
   }
   
+// #######################################
+// Harvester Status
+// #######################################
+  
+  event void StatusTimer.fired() {
+  	error_t err;
+  	if (!sendbusy) {
+  		harvester_status_t * status = (harvester_status_t *)call StatusSend.getPayload(&sendbuf, sizeof(harvester_status_t));
+		status->id=TOS_NODE_ID;
+		status->dsn=status_sn++;
+		status->prog_version=IDENT_UNIX_TIME;
+
+		err=call StatusSend.send(&sendbuf, sizeof(harvester_status_t));
+		if (err == SUCCESS) {
+			sendbusy = TRUE;
+		}
+		else {
+	    	report_problem();  	
+	    	call DSN.logInt(err);
+   			call DSN.logError("Status stack (%i)");
+    	}
+  	}
+  	else {
+  		report_problem();
+  	}
+  }
+  
+ event message_t*
+ StatusReceive.receive(message_t* msg, void *payload, uint8_t len) {
+	void * out;
+    message_t *newmsg = call UARTMessagePool.get();
+    if (newmsg == NULL) {
+    	// drop the message on the floor if we run out of queue space.
+        report_problem();
+   	  	call DSN.logError("UART msg pool full");
+        return msg;
+    }
+    out = call SerialPacket.getPayload(newmsg, len);
+	memcpy(out, payload, len);
+    call SerialAMPacket.setType(newmsg, AM_HARVESTERSTATUS);
+	call SerialPacket.setPayloadLength(newmsg, len);
+    
+    //Prepare message to be sent over the uart
+    if (call UARTQueue.enqueue(newmsg) != SUCCESS) {
+        // drop the message on the floor and hang if we run out of
+        // queue space without running out of queue space first (this
+        // should not occur).
+        call UARTMessagePool.put(newmsg);
+        fatal_problem();
+        return msg;
+    }
+    report_received(msg);
+    if (uartbusy == FALSE) {
+      post uartSendTask();
+    }
+    return msg;
+  }
+  
+  event void StatusSend.sendDone(message_t* msg, error_t error) {
+  	m_state=__FUNCTION__;
+  	if (error == SUCCESS) {
+      report_sent(msg);
+  	}
+    else {
+      report_problem();
+  	  call DSN.logError("Send Status failed");
+    }
+    sendbusy = FALSE;
+  }
 
 // #######################################
 //		Reporting
@@ -454,7 +536,6 @@ implementation {
     call Leds.led0On(); 
     call Leds.led1On();
     call Leds.led2On();
-    call Timer.stop();
   }
 
   static void report_problem() { 
@@ -494,15 +575,14 @@ implementation {
   }
   
   event void LplCommand.detected(uint16_t * values, uint8_t n) {
-  	//call Leds.led2Toggle(); 
-  	call DSN.logInt(n);
-  	call DSN.log("detected command with %i parameters");
+  	if (n==1) {
+  		lplSleepInterval=values[0];
+  		call LowPowerListening.setLocalSleepInterval(lplSleepInterval);
+  		// call CollectionLowPowerListening.setDefaultRxSleepInterval(lplSleepInterval);
+  		call DSN.logInt(lplSleepInterval);
+  		call DSN.logInfo("changed lpl interval to %ims");
+  	}
   }
-  
-  event void PowerCycle.detected() {
-  	// call DSN.log("wakeup");
-  }
-  
   
   //*************************
   // statistics
@@ -552,6 +632,14 @@ implementation {
     	post startradio();
     }
   }
+  
+  /****************** NeighbourSyncRequest events *******/
+  /*
+  event void NeighbourSyncRequest.updateRequest(){
+  	 call DSN.logDebug("Update synced neihbours with routing info");
+  	 call CtpInfo.triggerRouteUpdate();
+  }
+  */
   
 }
 

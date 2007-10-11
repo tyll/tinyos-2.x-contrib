@@ -44,33 +44,41 @@ enum {
      increase the message_t size. */
   // NREADINGS = 1,
   /* Default sampling period. */
-  SAMPLING_INTERVAL = 10240,
-  AM_HARVESTER = 0x93,
-  AM_TREEINFO = 0x94,
-  TREEINFO_INT = 30000,
-  LPL_INT = 150UL,
-  NEIGHBOR_TABLE_SIZE = 1,
-//  TX_POWER=3, /* 0 - 31, use lower values to generate multihop network in a smaller place */
+  AM_HARVESTERSENSOR = 0x93,
+  INT_SENSOR = 32000,
+  
+  AM_HARVESTERTOPOLOGY = 0x94,
+  INT_TOPOLOGY = 20000, // milliseconds
+  
+  AM_HARVESTERSTATUS = 0x95,
+  INT_STATUS = 0,
+
+  LPL_INT = 400UL, // default lpl interval in milliseconds
 };
 
-typedef nx_struct harvester {
+typedef nx_struct harvesterSensor {
   nx_uint8_t dsn; /* serial number */
   nx_uint16_t id; /* Mote id of sending mote. */
-  nx_uint16_t value; /* the value of the sample */
-} harvester_t;
+  nx_uint16_t temp_internal; /*	raw value of the on-board Sensirion temperature sensor */	 
+  nx_uint16_t temp_external; /*	raw value of the external Sensirion temperature sensor */ 
+  nx_uint16_t hum_internal; /*	raw value of the on-board Sensirion humidity sensor	 */
+  nx_uint16_t hum_external; /*	raw value of the external Sensirion humidity sensor	 */
+  nx_uint16_t voltage; /*	voltage level	 */
+  nx_uint16_t light1; /*	value from Hamatsu S1087 light sensor */ 	 
+  nx_uint16_t light2; /*	value from Hamatsu S1087-01 light sensor */	
+} harvester_sensor_t;
 
-typedef nx_struct treeinfoNeighour {
-	nx_am_addr_t nodeId; /* This is the current parent of the node. */
-	nx_uint16_t etx;		/* linkquality to parent */ 
-} nx_treeinfoNeighour_t;
+typedef nx_struct harvesterTopology {
+  nx_uint8_t dsn; /* serial number */
+  nx_uint16_t id; /* Mote id of sending mote. */
+  nx_am_addr_t parent; /*	id of parent node (treerouting) */	 
+  nx_uint16_t parent_etx; /*	estimated transmissions to parent */	 
+  nx_am_addr_t neighbour_id[5]; /*	ids of 5 best neighbours */
+} harvester_topology_t;
 
-
-typedef nx_struct treeinfo {
-	nx_am_addr_t id; /* Mote id of sending mote. */
-	nx_am_addr_t parent; /* This is the current parent of the node. */
-	nx_uint8_t numNeighbours;
-	nx_treeinfoNeighour_t neighbours[NEIGHBOR_TABLE_SIZE]; /* NEIGHBOR_TABLE_SIZE is defined in LE */
-	nx_uint8_t sn;
-} treeinfo_t;
-
+typedef nx_struct harvesterNodeStatus {
+  nx_uint8_t dsn; /* serial number */
+  nx_uint16_t id; /* Mote id of sending mote. */	 	 
+  nx_uint32_t prog_version; /*	program version e.g. IDENT_UNIX_TIME */
+}  harvester_status_t;
 #endif

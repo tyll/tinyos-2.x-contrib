@@ -171,6 +171,11 @@ norace uint8_t volatile RFIF  __attribute((sfrAT0xE9)); /*  RF Interrupt Flags  
         /* Set transmitter power */
         CC2430PALevelSet(CC2420_DEFAULT_POWER);
 
+        /******************************************
+        ** Turn off receiver as default          **
+        ******************************************/
+        CC2430RFDisable();
+
         call InterruptTXDone.enableRisingEdge();
         call InterruptRFErr.enableRisingEdge();
     }

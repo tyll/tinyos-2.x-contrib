@@ -39,16 +39,33 @@ ifndef BUILD_DEPS
   endif
 endif
 
+ifndef MCS51_COMPILER
+	MCS51_COMPILER=keil
+endif
 
-# old:
-#	$(NCC) -o $(MAIN_EXE) $(OPTFLAGS) $(PFLAGS) $(CFLAGS) $(WIRING_CHECK_FLAGS) $(COMPONENT).nc $(LIBS) $(LDFLAGS)
-#$(NCC) -S $(OPTFLAGS) $(PFLAGS) $(CFLAGS) $(WIRING_CHECK_FLAGS) $(COMPONENT).nc $(LIBS)
+ifndef MCS51_IAR_PATH
+	MCS51_IAR_PATH=Program\ Files/IAR\ Systems/Embedded\ Workbench\ 4.0\ Evaluation\ version/common/bin/
+endif
+
+OSNAME = $(shell uname)
+ifeq ($(findstring CYGWIN,$(OSNAME)),CYGWIN)
+	MCS51_IAR_PATH=/cygdrive/c/$(MCS51_IAR_PATH)
+else
+	MCS51_IAR_PATH:=C:$(MCS51_IAR_PATH)
+	ifndef MCS51_WINE_IAR_PATH
+	       MCS51_WINE_IAR_PATH := $(HOME)/.wine.iar
+	endif
+	ifndef MCS51_WINE_KEIL_PATH
+	       MCS51_WINE_KEIL_PATH := $(HOME)/.wine.keil
+	endif
+        MCS51_WINE_IAR=env WINEPREFIX=$(MCS51_WINE_IAR_PATH) LC_ALL=en_US wine
+        MCS51_WINE_KEIL=env WINEPREFIX=$(MCS51_WINE_KEIL_PATH) LC_ALL=en_US wine wcmd /c
+endif
 
 
 #####
 # $(APP_C) moves to app.preMangle.c
 # mangles to app.c
-# Build to .hex using CC2430-F128.bat
 
 tosimage: ihex FORCE
 	@:
@@ -56,33 +73,78 @@ tosimage: ihex FORCE
 ihex: exe FORCE
 	@:
 
-exe: ncc $(POST_NCC_DEPS) $(BUILDDIR)/startup.OBJ FORCE
-	@echo "    compiling $(COMPONENT) to a $(PLATFORM) binary"
-	mv $(APP_C) $(BUILDDIR)/app.preMangle.c
-	perl -w $(MCS51_MAKE_PATH)/mcs51/mangleAppC.pl --KEIL --file=$(BUILDDIR)/app.preMangle.c > $(APP_C)
-	cp $(MCS51_MAKE_PATH)/mcs51/CC2430-F128.bat $(BUILDDIR)
-	cd $(BUILDDIR) && env WINEPREFIX=$(HOME)/.wine.keil LC_ALL=en_US wine wcmd /c ./CC2430-F128.bat
-	@bash -c "if [ -f $(COMPONENT).s ]; then mv $(COMPONENT).s build/cc2430em/; fi"
-	@echo "    compiled $(COMPONENT) to a $(PLATFORM) binary"
-	@echo "Code size of app.o"
-	@grep -A 7 "MODULE INFORMATION:   STATIC OVERLAYABLE" $(BUILDDIR)/app.lst
-	@echo "Total sizes"
-	@grep "Program Size:" $(BUILDDIR)/app.map
 
-$(BUILDDIR)/startup.OBJ: $(MCS51_MAKE_PATH)/mcs51/startup.a51
-	cp $(MCS51_MAKE_PATH)/mcs51/startup.a51 $(BUILDDIR)
-	cp $(MCS51_MAKE_PATH)/mcs51/startup.bat $(BUILDDIR)
-	cd $(BUILDDIR) && env WINEPREFIX=$(HOME)/.wine.keil LC_ALL=en_US wine wcmd /c ./startup.bat
+#######
+# Common ncc rules
 
-# app.c:  FORCE
+exe: ncc $(POST_NCC_DEPS) mangle $(MCS51_COMPILER) FORCE
+
 .PHONY: ncc
 ncc: builddir $(BUILD_EXTRA_DEPS)
+	@echo "    compiling $(COMPONENT) to a $(PLATFORM) binary"
 	$(NCC) -S $(OPTFLAGS) $(CFLAGS) $(PFLAGS) $(WIRING_CHECK_FLAGS) $(COMPONENT).nc 2>&1 | \
 		grep -v "attribute directive ignored"
 ifdef WIRING_CHECK_FILE
 	@nescc-wiring $(WIRING_CHECK_FILE)
 endif
 	@echo "    compiled $(COMPONENT) to $(APP_C)"
+
+.PHONY: mangle
+mangle: ncc
+	mv $(APP_C) $(BUILDDIR)/app.preMangle.c
+	perl -w $(MCS51_MAKE_PATH)/mcs51/mangleAppC.pl --$(MCS51_COMPILER) --file=$(BUILDDIR)/app.preMangle.c > $(APP_C)
+
+#######
+# IAR rules
+
+iar: mangle builddir
+	cp $(MCS51_MAKE_PATH)/mcs51/iar* $(BUILDDIR)
+	cd $(BUILDDIR) && $(MCS51_WINE_IAR) $(MCS51_IAR_PATH)/iarbuild.exe iar-app-project.ewp -build Debug
+	@grep "SEGMENTS IN ADDRESS ORDER" -B 3 -A 20 $(BUILDDIR)/Debug/List/iar-app-project.map
+	@grep "END OF CROSS REFERENCE" -A 8 $(BUILDDIR)/Debug/List/iar-app-project.map | grep memory 
+
+#######
+# SDCC rules
+
+.PHONY: sdcc
+sdcc: mangle
+	sdcc -mmcs51 $(APP_C) -o$(BUILDDIR)/app
+	@echo "Segment sizes"
+	@grep -A 1 "OSEG" $(BUILDDIR)/app.sym
+	@grep -A 1 "SSEG" $(BUILDDIR)/app.sym
+	@grep -A 1 "DSEG" $(BUILDDIR)/app.sym
+	@grep -A 1 "CSEG" $(BUILDDIR)/app.sym
+	@grep -A 1 "XSEG" $(BUILDDIR)/app.sym
+	@grep -A 1 "CONST" $(BUILDDIR)/app.sym
+	@grep -A 1 "HOME" $(BUILDDIR)/app.sym
+	@grep -A 1 "GSFINAL" $(BUILDDIR)/app.sym
+	@echo "Memory usage"
+	@grep "Stack starts at" $(BUILDDIR)/app.mem
+	@grep "Other memory" -A 5 $(BUILDDIR)/app.mem
+
+#######
+# Keil rules
+# Build to .hex using $(MCS51_KEIL_SCRIPT) from
+
+# env WINEPREFIX=$(HOME)/.wine.keil LC_ALL=en_US wine wcmd /c
+keil: mangle $(BUILDDIR)/startup.OBJ $(BUILDDIR)/$(KEIL_BAT_SCRIPT)
+	cd $(BUILDDIR) $(OSTYPE) &&   $(MCS51_WINE_KEIL) ./$(MCS51_KEIL_SCRIPT)
+	@bash -c "if [ -f $(COMPONENT).s ]; then mv $(COMPONENT).s build/$(PLATFORM)/; fi"
+	@echo "    compiled $(COMPONENT) to a $(PLATFORM) binary"
+	@echo "Code size of app.o"
+	@grep -A 7 "MODULE INFORMATION:   STATIC OVERLAYABLE" $(BUILDDIR)/app.lst
+	@echo "Total sizes"
+	@grep "Program Size:" $(BUILDDIR)/app.map
+
+.PHONY: $(BUILDDIR)/$(KEIL_BAT_SCRIPT)
+$(BUILDDIR)/$(KEIL_BAT_SCRIPT):
+	cp $(MCS51_MAKE_PATH)/mcs51/$(MCS51_KEIL_SCRIPT) $(BUILDDIR)
+
+$(BUILDDIR)/startup.OBJ: $(MCS51_MAKE_PATH)/mcs51/startup.a51
+	cp $(MCS51_MAKE_PATH)/mcs51/startup.a51 $(BUILDDIR)
+	cp $(MCS51_MAKE_PATH)/mcs51/startup.bat $(BUILDDIR)
+	cd $(BUILDDIR) && $(MCS51_WINE_KEIL) ./startup.bat
+
 
 builddir: FORCE
 	mkdir -p $(BUILDDIR)

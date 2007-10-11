@@ -31,18 +31,12 @@
 #
 
 #
-# FILE: cc2430em/.platform
-# 
 # Includes that should take precedence come first.  Platforms come before
 # chips because they may override files.  These must be specified as
 # @includes instead of -I's to @opts, otherwise the %T won't be processed
 # by ncc. 
 #
 #
-
-# A starting point.. The compiler and posibly mangler should probably
-# end up here at some point
-#  - Martin Leopold (Sep 4, 2006)
 
 $CR = $ENV{"CONTRIBROOT"} if defined($ENV{"CONTRIBROOT"});
 
@@ -66,19 +60,6 @@ push(@includes, @dirs);
 );
 
 push( @includes, @LIST);
-
-
-# None of these seems to end up as commandline options!? In particular
-# target is povided by the Makefile
-
-#@opts = qw(
-#  -gcc=avr-gcc
-#  -mmcu=atmega128
-#  -fnesc-target=avr
-#  -fnesc-no-debug
-#  -fnesc-scheduler=TinySchedulerC,TinySchedulerC.TaskBasic,TaskBasic,TaskBasic,runTask,postTask
-#
-#);
 
 push (@opts, qw(
 		-fnesc-no-debug

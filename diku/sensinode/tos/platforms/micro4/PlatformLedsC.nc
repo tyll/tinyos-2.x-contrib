@@ -46,13 +46,13 @@ implementation
   Init = PlatformP.LedsInit;
 
   Led0 = Led0Impl;
-  Led0Impl -> GeneralIOC.Port66;
+  Led0Impl -> GeneralIOC.Port64;
 
   Led1 = Led1Impl;
   Led1Impl -> GeneralIOC.Port65;
 
   Led2 = Led2Impl;
-  Led2Impl -> GeneralIOC.Port64;
+  Led2Impl -> GeneralIOC.Port66;
 
   Led3 = Led3Impl;
   Led3Impl -> GeneralIOC.Port67;

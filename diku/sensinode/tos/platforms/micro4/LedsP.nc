@@ -1,4 +1,4 @@
-/*									tab:4
+/*                                  tab:4
  * "Copyright (c) 2000-2005 The Regents of the University  of California.  
  * All rights reserved.
  *
@@ -48,10 +48,10 @@ implementation {
       call Led1.makeOutput();
       call Led2.makeOutput();
       call Led3.makeOutput();
-      call Led0.set();
-      call Led1.set();
-      call Led2.set();
-      call Led3.set();
+      call Led0.clr();
+      call Led1.clr();
+      call Led2.clr();
+      call Led3.clr();
     }
     return SUCCESS;
   }
@@ -62,12 +62,12 @@ implementation {
   dbg("LedsC", "LEDS: Led" #n " %s.\n", call Led ## n .get() ? "off" : "on");
 
   async command void Leds.led0On() {
-    call Led0.clr();
+    call Led0.set();
     DBGLED(0);
   }
 
   async command void Leds.led0Off() {
-    call Led0.set();
+    call Led0.clr();
     DBGLED(0);
   }
 
@@ -77,12 +77,12 @@ implementation {
   }
 
   async command void Leds.led1On() {
-    call Led1.clr();
+    call Led1.set();
     DBGLED(1);
   }
 
   async command void Leds.led1Off() {
-    call Led1.set();
+    call Led1.clr();
     DBGLED(1);
   }
 
@@ -126,13 +126,13 @@ implementation {
     atomic {
       rval = 0;
       if (!call Led0.get()) {
-	rval |= LEDS_LED0;
+    rval |= LEDS_LED0;
       }
       if (!call Led1.get()) {
-	rval |= LEDS_LED1;
+    rval |= LEDS_LED1;
       }
       if (!call Led2.get()) {
-	rval |= LEDS_LED2;
+    rval |= LEDS_LED2;
       }
       if (!call Led3.get()) {
     rval |= (1 << 3);
@@ -144,22 +144,22 @@ implementation {
   async command void Leds.set(uint8_t val) {
     atomic {
       if (val & LEDS_LED0) {
-	call Leds.led0On();
+    call Leds.led0On();
       }
       else {
-	call Leds.led0Off();
+    call Leds.led0Off();
       }
       if (val & LEDS_LED1) {
-	call Leds.led1On();
+    call Leds.led1On();
       }
       else {
-	call Leds.led1Off();
+    call Leds.led1Off();
       }
       if (val & LEDS_LED2) {
-	call Leds.led2On();
+    call Leds.led2On();
       }
       else {
-	call Leds.led2Off();
+    call Leds.led2Off();
       }
       if (val & (1 << 3)) {
     call Leds.led3On();

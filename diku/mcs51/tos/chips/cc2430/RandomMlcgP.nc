@@ -33,6 +33,7 @@
 /*
  * Modified for 32-bit math by Martin Leopold 27/2 2006
  * Algorithm from: http://www.firstpr.com.au/dsp/rand31/
+ * NOTE: This RNG produces 31-bit pseudo random numbers!
  */
 module RandomMlcgP {
   provides interface Init;
@@ -41,7 +42,7 @@ module RandomMlcgP {
 }
 implementation
 {
-    uint32_t seed ;
+    uint32_t seed;
 
   /* Initialize the seed from the ID of the node */
   command error_t Init.init() {
@@ -57,21 +58,21 @@ implementation
     return SUCCESS;
   }
 
-  /* Return the next 32 bit random number */
-  async command uint32_t Random.rand32() {
-    uint32_t mlcg,hi,lo;
-    atomic
-      {
-	lo = 16807 * (seed & 0xFFFF);
-	hi = 16807 * (mlcg >> 16);
+  /* Return the next 31 bit random number */
+  async command uint32_t Random.rand32()
+  {
+	uint32_t hi,lo;
+    atomic {
+    	lo = 16807 * (seed & 0xFFFFu);
+		hi = 16807 * (seed >> 16);
 
-	lo += (hi & 0x7FFF) << 16;
-	lo += hi >> 15;
+		lo += (hi & 0x7FFFu) << 16;
+		lo += hi >> 15;
 
-	if (lo > 0x7FFFFFFF) lo -= 0x7FFFFFFF;
-	mlcg = (uint32_t) lo;
-      }
-    return mlcg; 
+		if (lo > 0x7FFFFFFFul) lo -= 0x7FFFFFFFul;
+		seed = (uint32_t) lo;
+	}
+    return seed; 
   }
 
   /* Return low 16 bits of next 32 bit random number */

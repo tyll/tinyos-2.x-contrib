@@ -1,0 +1,24 @@
+0.1 pre2
+ * Cygwin support
+ * SDCC support
+ * IAR support
+ * Nano definitions (left out from 0.1pre1 by mistake)
+
+0.1 pre1
+ * First public release
+
+RoadMap
+=======
+0.1
+ Cleanup clock control + PlatformC
+ Sleep modes
+ SimpleMac idle-power-consumption problem
+ PlatformSerial? UartC - UartStream
+
+Later
+ Cygwin support
+ nRF24E1
+ Serial Stack
+ AM Stack
+ Acurate timers (pending final silicon rev.)
+ 

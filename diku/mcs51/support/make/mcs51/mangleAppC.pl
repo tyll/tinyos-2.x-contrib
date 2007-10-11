@@ -51,6 +51,7 @@ use Getopt::Long;
 
 my $KEIL = '';
 my $SDCC = '';
+my $IAR = '';
 my $file = '';
 
 my $comment_level = 0;
@@ -70,13 +71,14 @@ my %typedef_struct_empty_ident = ();
 my $line_no = 0;
 
 GetOptions(
-	'KEIL' => \$KEIL,
-	'SDCC' => \$SDCC,
+	'keil' => \$KEIL,
+	'sdcc' => \$SDCC,
+	'iar' => \$IAR,
 	'file=s' => \$file,
 );
 
-if ( ! $KEIL && ! $SDCC || ! $file) {
-	die "Usage sdccMangleAppC.pl <compiler> -file \"<filename>\"\nwhere compiler is either -KEIL or -SDCC\n";
+if ( !( $KEIL || $SDCC || $IAR ) || ! $file) {
+	die "Usage sdccMangleAppC.pl <compiler> -file \"<filename>\"\nwhere compiler is either --keil, --sdcc, --iar\n";
 }
 
 open(FILE,"<$file") or die "no such file $file\n";
@@ -135,7 +137,24 @@ if(m{uint(\d+)_t\s+volatile\s+(.*)\s+__attribute(?:__)?\(\((?:__)?(sfr|sbit|sfr1
      }
      if ( $KEIL ) {$_ = "$type $ident = $addr;\n"; }
      if ( $SDCC ) {$_ = "__$type __at ($addr) $ident;\n"; }
+
+     # IAR uses a slightly different way to define the
+     # sbit:  __bit __no_init volatile bool name @ (addr+bit)
+     # sfr:   __sfr __no_init volatile unsigned char name @ addr
+     # sfr16: __sfr __no_init volatile unsigned int  name @ addr
+     # sfr32: __sfr __no_init volatile unsigned long name @ addr
+     if ( $IAR )  {
+	 if ($type eq "sfr")   { $_ = "__sfr __no_init volatile unsigned char $ident @ $addr;\n"; }
+	 if ($type eq "sfr16") { $_ = "__sfr __no_init volatile unsigned int $ident @ $addr;\n"; }
+	 if ($type eq "sbit")  { $_ = "__bit  __no_init bool $ident @ $addr;\n"; }
+     }
+
  }
+
+  if ($IAR && m(typedef uint8_t bool.*;) ) {
+      $_ = "//" . $_;
+      $_ = $_ . "#include \"stdbool.h\"\n";
+  }
 
 
   # Replace dummy xdata types with type and storrage class specifier
@@ -150,7 +169,7 @@ if(m{uint(\d+)_t\s+volatile\s+(.*)\s+__attribute(?:__)?\(\((?:__)?(sfr|sbit|sfr1
 #  Remove string.h definitions (memset, memcpy, strnlen, ..). Get Keil versions from string.h
 # 
 
- # Replaced by costum string.h
+ # Replaced by custom string.h
  #
  #  if( $string_h_match==1  ||
  #      /^.*extern size_t strlen\(/  ||
@@ -243,10 +262,10 @@ if(m{uint(\d+)_t\s+volatile\s+(.*)\s+__attribute(?:__)?\(\((?:__)?(sfr|sbit|sfr1
   # Turns out nescc produces a lot of these based on enums. So we need
   # to look them up and replace the ones that are 0 (sigh)
 
-  if ($KEIL && m{(\w+) = (\d+)U}){
+  if (($KEIL || $IAR) && m{(\w+) = (\d+)U}){
       $enums{$1} = $2;
   }
-  if ($KEIL && m{^\s*(typedef|volatile)\s+(\w+)\s+(\w+)\[(\w+)\];}) {
+  if (($KEIL || $IAR) && m{^\s*(typedef|volatile)\s+(\w+)\s+(\w+)\[(\w+)\];}) {
       my $type=$1; my $target_type = $2; my $identifier = $3; my $enum = $4;
       if ( defined($enums{$enum}) && ($enums{$enum} == 0) ) {
 	  $_ = "$type $target_type $identifier\[\];\n";
@@ -261,7 +280,7 @@ if(m{uint(\d+)_t\s+volatile\s+(.*)\s+__attribute(?:__)?\(\((?:__)?(sfr|sbit|sfr1
   #
   # Replace varname[] with * varname;
   #
-  if( $KEIL && $typedef_struct_lines ) {
+  if( ($KEIL || $IAR) && $typedef_struct_lines ) {
 
      # [] and * are _NOT_ the same inside a struct definition!!
      # [] means an array with a length that is up to the compiler to calculate

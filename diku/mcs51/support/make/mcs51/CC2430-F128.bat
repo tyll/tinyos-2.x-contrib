@@ -10,7 +10,7 @@ rem C:\Keil\C51\BIN\C51.EXE "app.c" LARGE BROWSE DEBUG OBJECTEXTEND PRINT(.\app.
 rem C:\Keil\C51\BIN\C51.EXE "app.c" LARGE PRINT(.\app.lst) OPTIMIZE(0,SIZE) OBJECT(.\app.obj)
 
 rem Compile app.c to app.obj
-C:\Keil\C51\BIN\C51.EXE "app.c" LARGE PRINT(.\app.lst) OBJECT(.\app.obj)
+C:\Keil\C51\BIN\C51.EXE "app.c" LARGE PRINT(.\app.lst) OBJECT(.\app.obj) SYMBOLS
 
 rem Link startup.obj/app.obj and convert to hex
 rem C:\Keil\C51\BIN\BL51.EXE "startup.obj", "app.obj" TO "app" PRINT (app.map) XDATA( 0XE000-0XFF00 ) RAMSIZE(256) REGFILE(app.reg)

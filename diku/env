@@ -2,3 +2,14 @@ export TOSDIR=/opt/tinyos-2.x/tos/
 export MAKERULES=$TOSDIR/../support/make/Makerules
 export CONTRIBROOT=/opt/tinyos-2.x-contrib
 export TOSMAKE_PATH="$TOSMAKEPATH $CONTRIBROOT/diku/sensinode/support/make $CONTRIBROOT/diku/mcs51/support/make"
+
+# Supported Compilers: iar, sdcc
+export MC51_COMPILER=keil
+
+# If using wine set the path to the wine directory containing the
+# compiler
+MCS51_WINE_IAR_PATH=$HOME/.wine.iar
+MCS51_WINE_KEIL_PATH=$HOME/.wine.keil
+
+# If using IAR set the path to the executable
+export MCS51_IAR_PATH=Program\ Files/IAR\ Systems/Embedded\ Workbench\ 4.0\ Evaluation\ version/common/bin/

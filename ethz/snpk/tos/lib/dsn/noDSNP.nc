@@ -81,7 +81,7 @@ implementation
   command error_t NodeIdInit.init() {
   		#ifndef NODSN
 			// setup node id
-			am_id_t flashId = call DsnPlatform.getSavedId(); 
+			am_addr_t flashId = call DsnPlatform.getSavedId(); 
 			if (flashId!=NO_ID) {
 				call DsnPlatform.setNodeId(flashId); 
 			}

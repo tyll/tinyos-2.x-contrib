@@ -3,7 +3,7 @@
 
 PLATFORM = pmote
 PROGRAMMER_PART ?= -dpart=ATmega128
-PFLAGS += -finline-limit=100000 -I$(TOSROOT)/../tinyos-2.x-contrib/tinybotics/tos/platforms/$(PLATFORM)
+PFLAGS += --param max-inline-insns-single=100000 -I$(TOSROOT)/../tinyos-2.x-contrib/tinybotics/tos/platforms/$(PLATFORM)
 
 AVR_FUSE_H ?= 0xc4
 

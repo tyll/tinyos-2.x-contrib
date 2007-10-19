@@ -1,0 +1,20 @@
+############################################################################
+# This file is an example of how to setup classpaths for running TUnit.
+# Make sure the TUNIT_BASE is defined as an absolute path to your
+# tunit directory, then source this file in your shell
+#
+#   $ source .tunitclasspath
+#
+############################################################################
+
+export TUNIT_BASE=c:/tinyos/cygwin/opt_svn/tinyos-2.x-contrib/tunit
+
+export LOG4J="`cygpath -w $TUNIT_BASE/support/sdk/tunit/depends/log4j.jar`"
+export TUNIT="`cygpath -w $TUNIT_BASE/support/sdk/tunit/tunit.jar`"
+export XERCES="`cygpath -w $TUNIT_BASE/support/sdk/tunit/depends/xerces.jar`"
+export JFREECHART="`cygpath -w $TUNIT_BASE/support/sdk/tunit/depends/jfreechart-1.0.5.jar`"
+export JCOMMON="`cygpath -w $TUNIT_BASE/support/sdk/tunit/depends/jcommon-1.0.9.jar`"
+
+
+export CLASSPATH="${CLASSPATH};${LOG4J};${TUNIT};${XERCES};${JFREECHART};${JCOMMON};."
+

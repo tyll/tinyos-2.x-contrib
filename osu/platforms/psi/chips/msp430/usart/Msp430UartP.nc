@@ -266,8 +266,6 @@ implementation {
       uint8_t* buf = m_tx_buf;
       m_tx_buf = NULL;
       
-      
-      
       atomic IE2 &= ~UTXIE1;
       uart_wiggle(0);
       

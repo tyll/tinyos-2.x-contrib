@@ -129,10 +129,7 @@ implementation
   MSP430REG_NORACE(U1RCTL);
   MSP430REG_NORACE(U1TXBUF);
 
-
 	uint8_t state=0;
-
-  
   
   TOSH_SIGNAL(UART1RX_VECTOR) {
     uint8_t temp = U1RXBUF;
@@ -329,23 +326,22 @@ implementation
   }
 
   async command void Usart.enableSpi() {
-    /*
+    
     atomic {
       call SIMO.selectModuleFunc();
       call SOMI.selectModuleFunc();
       call UCLK.selectModuleFunc();
-    }*/
+    }
     ME2 |= USPIE1;   // USART1 SPI module enable
   }
 
   async command void Usart.disableSpi() {
-    ME2 &= ~USPIE1;   // USART1 SPI module disable
-    /*
+    ME2 &= ~USPIE1;   // USART1 SPI module disable    
     atomic {
       call SIMO.selectIOFunc();
       call SOMI.selectIOFunc();
       call UCLK.selectIOFunc();
-    }*/
+    }
   }
 
 
@@ -434,14 +430,14 @@ implementation
     
     configSpi(config);
     call Usart.enableSpi();
+    
+    call Usart.clrIntr();
+    call Usart.disableIntr();
         
     return;
   }
-
-
-
-	/*
-  void configUart_back(msp430_uart_config_t* config) {
+	
+  void configUart_prev(msp430_uart_config_t* config) {
     msp430_uctl_t uctl = call Usart.getUctl();
     msp430_utctl_t utctl = call Usart.getUtctl();
     msp430_urctl_t urctl = call Usart.getUrctl();
@@ -466,13 +462,13 @@ implementation
     call Usart.setUrctl(urctl);
     call Usart.setUbr(config->ubr);
     call Usart.setUmctl(config->umctl);
-  }*/
+  }
   
   void configUart(msp430_uart_config_t* config) {
 		//all SPI
 		/**by Lifeng Sang, for PSI mote only**/
     //hard coded
-    //configUart_back(config);
+    configUart_prev(config);
     uart_init_spi1();  
 	}
 
@@ -496,9 +492,15 @@ implementation
       call Usart.disableIntr();
     }*/
     
-    configUart(config);
-    call Usart.enableTxIntr();
     
+     atomic
+    {
+    	configUart(config);
+	    call Usart.enableTxIntr();
+	    call Usart.resetUsart(FALSE);
+	    call Usart.clrIntr();
+	    call Usart.disableIntr();
+    } 
     return;
   }
 
@@ -519,9 +521,15 @@ implementation
       call Usart.disableIntr();
     }*/
     
-    configUart(config);
-    call Usart.enableRxIntr();
-    
+   
+    atomic
+    {
+    	configUart(config);
+	    call Usart.enableRxIntr();
+	    call Usart.resetUsart(FALSE);
+	    call Usart.clrIntr();
+	    call Usart.disableIntr();
+     } 
     return;
   }
 
@@ -543,8 +551,16 @@ implementation
       call Usart.disableIntr();
     }*/
     
-    configUart(config);
-    call Usart.enableSpi();
+    
+    
+    atomic
+    {
+    	configUart(config);
+	    call Usart.enableSpi();
+		  call Usart.resetUsart(FALSE);
+		  call Usart.clrIntr();
+		  call Usart.disableIntr();
+    }
     
     return;
   }

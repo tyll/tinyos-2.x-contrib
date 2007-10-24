@@ -101,6 +101,7 @@ generic module CtpRoutingEngineP(uint8_t routingTableSize, uint16_t minInterval,
         interface StdControl;
         interface CtpRoutingPacket;
         interface Init;
+        interface CollectionLowPowerListening;
     } 
     uses {
         interface AMSend as BeaconSend;
@@ -115,7 +116,12 @@ generic module CtpRoutingEngineP(uint8_t routingTableSize, uint16_t minInterval,
         interface CtpCongestion;
 
         interface DSN;
+	interface DsnCommand<uint8_t> as GetTopologyCommand;
+	interface DsnCommand<am_addr_t> as SetParentCommand;
         interface LowPowerListening;
+        interface Leds;
+	interface Queue<fe_queue_entry_t*> as SendQueue;
+	interface CC2420Packet;
     }
 }
 
@@ -168,6 +174,9 @@ implementation {
     uint32_t t; 
     bool tHasPassed;
 
+    bool parent_is_root;
+    am_addr_t forcedParent = AM_BROADCAST_ADDR;
+
     void chooseAdvertiseTime() {
        t = currentInterval;
        t *= 512; // * 1024 / 2
@@ -212,7 +221,6 @@ implementation {
         my_ll_addr = call AMPacket.address();
         beaconMsg = call BeaconSend.getPayload(&beaconMsgBuffer);
         maxLength = call BeaconSend.maxPayloadLength();
-	call LowPowerListening.setRxSleepInterval(&beaconMsgBuffer, LPL_INT);
         dbg("TreeRoutingCtl","TreeRouting initialized. (used payload:%d max payload:%d!\n", 
               sizeof(beaconMsg), maxLength);
         return SUCCESS;
@@ -262,7 +270,7 @@ implementation {
      * units, that can be *added* to form path metric measures */
     uint16_t evaluateEtx(uint8_t quality) {
         //dbg("TreeRouting","%s %d -> %d\n",__FUNCTION__,quality, quality+10);
-        return (quality + 10);
+	return ((uint16_t)quality + 10);
     }
 
     /* updates the routing information, using the info that has been received
@@ -327,6 +335,10 @@ implementation {
                     routeInfo.etx = entry->info.etx;
                     routeInfo.congested = entry->info.congested;
                 }
+		if (entry->info.etx==0)
+			parent_is_root=TRUE;
+		else
+			parent_is_root=FALSE;
                 continue;
             }
             /* Ignore links that are congested */
@@ -364,7 +376,7 @@ implementation {
                 etx. Any descendent will be at least that + 10 (1 hop), so we restrict the 
                 selection to be less than that.
         */
-        if (minEtx != MAX_METRIC) {
+        if (minEtx != MAX_METRIC /* && !parent_is_root */ && forcedParent == AM_BROADCAST_ADDR) {
             if (currentEtx == MAX_METRIC ||
                 (routeInfo.congested && (minEtx < (routeInfo.etx + 10))) ||
                 minEtx + PARENT_SWITCH_THRESHOLD < currentEtx) {
@@ -435,8 +447,8 @@ implementation {
             beaconMsg->etx = routeInfo.etx +
                                 evaluateEtx(call LinkEstimator.getLinkQuality(routeInfo.parent));
 	    // make beacon meaningfull if sent without good parent
-            if (evaluateEtx(call LinkEstimator.getLinkQuality(routeInfo.parent))>ETX_THRESHOLD)
-		beaconMsg->options |= CTP_OPT_PULL;
+            //if (evaluateEtx(call LinkEstimator.getLinkQuality(routeInfo.parent))>ETX_THRESHOLD)
+		// beaconMsg->options |= CTP_OPT_PULL;
         }
 
         dbg("TreeRouting", "%s parent: %d etx: %d\n",
@@ -449,6 +461,7 @@ implementation {
                                     &beaconMsgBuffer, 
                                     sizeof(ctp_routing_header_t));
         if (eval == SUCCESS) {
+		//call Leds.led1Toggle();
             sending = TRUE;
         } else if (eval == EOFF) {
             radioOn = FALSE;
@@ -469,6 +482,16 @@ implementation {
             return;
         }
         sending = FALSE;
+/*
+        if (error==SUCCESS) {
+		call DSN.logDebug("SendDone=SUCCESS");
+	}
+	else {
+		call DSN.logInt(error);
+		call DSN.logDebug("SendDone=%i");
+	}
+*/
+	//call Leds.led2Off();
     }
 
     event void RouteTimer.fired() {
@@ -504,18 +527,33 @@ implementation {
         ctp_routing_header_t* rcvBeacon;
         bool congested;
 
+	from = call AMPacket.source(msg);
+/*
+	if (from == 0) {
+	call DSN.logInt(from);
+	call DSN.logInt(len);
+	call DSN.logDebug("Beacon from %i len:%i");
+	}
+*/
+
         // Received a beacon, but it's not from us.
         if (len != sizeof(ctp_routing_header_t)) {
           dbg("LITest", "%s, received beacon of size %hhu, expected %i\n",
                      __FUNCTION__, 
                      len,
                      (int)sizeof(ctp_routing_header_t));
-              
           return msg;
         }
+
+	//need to get the am_addr_t of the source
+        //from = call AMPacket.source(msg);
         
-        //need to get the am_addr_t of the source
-        from = call AMPacket.source(msg);
+/*
+	// received a message from this node
+	if (from == my_ll_addr) {
+	  return msg;
+	}
+  */      
         rcvBeacon = (ctp_routing_header_t*)payload;
 
         congested = call CtpRoutingPacket.getOption(msg, CTP_OPT_ECN);
@@ -524,6 +562,8 @@ implementation {
             __FUNCTION__, from, 
             rcvBeacon->parent, rcvBeacon->etx);
         //call CollectionDebug.logEventRoute(NET_C_TREE_RCV_BEACON, rcvBeacon->parent, 0, rcvBeacon->etx);
+
+	
 
         //update neighbor table
         if (rcvBeacon->parent != INVALID_ADDR) {
@@ -540,12 +580,12 @@ implementation {
             routingTableUpdateEntry(from, rcvBeacon->parent, rcvBeacon->etx);
             call CtpInfo.setNeighborCongested(from, congested);
 	    
-		/*
+	    /*
             call DSN.logInt(from);
 	    call DSN.logInt(congested);
 	    call DSN.logInt(call CtpRoutingPacket.getOption(msg, CTP_OPT_PULL));
 	    call DSN.logDebug("Beacon from %i,congested:%i,pull:%i");
-		*/
+            */
 	    
         }
 
@@ -602,23 +642,23 @@ implementation {
 
     command void CtpInfo.triggerRouteUpdate() {
       // Random time in interval 64-127ms
-      uint16_t time = call Random.rand16();
-      time &= 0x3f; 
-      time += 64;
+      uint16_t beaconDelay = call Random.rand16();
+      beaconDelay &= 0x3f; 
+      beaconDelay += 64;
       if (call BeaconTimer.gett0() + call BeaconTimer.getdt() -
-                                     call BeaconTimer.getNow() >= time) {
+                                     call BeaconTimer.getNow() >= beaconDelay) {
          call BeaconTimer.stop();
-         call BeaconTimer.startOneShot(time);
+         call BeaconTimer.startOneShot(beaconDelay);
         }
      }
 
     command void CtpInfo.triggerImmediateRouteUpdate() {
       // Random time in interval 4-11ms
-      uint16_t time = call Random.rand16();
-      time &= 0x7; 
-      time += 4;
+      uint16_t beaconDelay = call Random.rand16();
+      beaconDelay &= 0x7; 
+      beaconDelay += 4;
       call BeaconTimer.stop();
-      call BeaconTimer.startOneShot(time);
+      call BeaconTimer.startOneShot(beaconDelay);
     }
 
     command void CtpInfo.setNeighborCongested(am_addr_t n, bool congested) {
@@ -837,5 +877,57 @@ implementation {
     }
     
   // DSN specific
-  event void DSN.receive(void *msg, uint8_t len) {  }
+  event void DSN.receive(void *msg, uint8_t len) { 
+  }
+
+  event void GetTopologyCommand.detected(uint8_t * values, uint8_t n) {
+    // log neighbour table
+    uint8_t i;
+    uint16_t linkEtx;
+    routing_table_entry* entry;
+    for (i = 0; i < routingTableActive; i++) {
+      entry = &routingTable[i];
+      linkEtx = evaluateEtx(call LinkEstimator.getLinkQuality(entry->neighbor));
+      call DSN.logInt(entry->neighbor);
+      call DSN.logInt(entry->info.parent);
+      call DSN.logInt(linkEtx);
+      call DSN.appendLog("[%i %i %i]");
+     }
+     call DSN.logInt(routeInfo.parent);
+     call DSN.logInt(call SendQueue.size());
+     call DSN.log("(%i %i)");
+  }
+
+  event void SetParentCommand.detected(am_addr_t * newForcedParent, uint8_t n) {
+    if (n==0) {
+      forcedParent = AM_BROADCAST_ADDR;
+    }
+    else if (n==1){
+      forcedParent = newForcedParent[0];
+      parentChanges++;
+      resetInterval();
+      call LinkEstimator.unpinNeighbor(routeInfo.parent);
+      call LinkEstimator.pinNeighbor(forcedParent);
+      call LinkEstimator.clearDLQ(forcedParent);
+      atomic {
+        if (routeInfo.etx==0)
+          routeInfo.etx++;
+        routeInfo.parent = forcedParent;
+      }
+    }
+    else
+      return;
+    call DSN.logInt(forcedParent);
+    call DSN.log("forced parent node %i");
+  }
+
+  /****************** CollectionLowPowerListening commands *******/
+  command void CollectionLowPowerListening.setDefaultRxSleepInterval(uint16_t sleepIntervalMs) {
+    call LowPowerListening.setRxSleepInterval(&beaconMsgBuffer, sleepIntervalMs);
+  }
+
+  command void CollectionLowPowerListening.setDefaultRxDutyCycle(uint16_t dutyCycle) {
+    call LowPowerListening.setRxSleepInterval(&beaconMsgBuffer, call LowPowerListening.dutyCycleToSleepInterval(dutyCycle));
+  }
+
 } 

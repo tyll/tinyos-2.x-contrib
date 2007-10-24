@@ -125,6 +125,7 @@
 
 #include <CtpForwardingEngine.h>
 #include <CtpDebugMsg.h>
+#include "CC2420.h"
    
 generic module CtpForwardingEngineP() {
   provides {
@@ -138,6 +139,7 @@ generic module CtpForwardingEngineP() {
     interface CollectionPacket;
     interface CtpPacket;
     interface CtpCongestion;
+    interface CollectionLowPowerListening;
   }
   uses {
     interface AMSend as SubSend;
@@ -167,6 +169,9 @@ generic module CtpForwardingEngineP() {
     interface CollectionDebug;
     interface Leds;
     interface DSN;
+    interface LowPowerListening;
+    interface CC2420Packet;
+    interface Receive as DuplicateReceive;
   }
 }
 implementation {
@@ -231,6 +236,12 @@ implementation {
      
   message_t loopbackMsg;
   message_t* loopbackMsgPtr;
+
+  uint8_t lastQueueSize=0; 
+
+  uint8_t fastPacketCount=0;
+
+  uint16_t lplSleepInterval=0;
 
   command error_t Init.init() {
     int i;
@@ -343,6 +354,8 @@ implementation {
     dbg("Forwarder", "%s: queue entry for %hhu is %hhu deep\n", __FUNCTION__, client, call SendQueue.size());
     if (call SendQueue.enqueue(qe) == SUCCESS) {
       if (radioOn && !call RetxmitTimer.isRunning()) {
+	// perhaps a delayed start would be better?
+	//startRetxmitTimer(SENDDONE_FAIL_WINDOW, SENDDONE_FAIL_OFFSET);
         post sendTask();
       }
       clientPtrs[client] = NULL;
@@ -395,9 +408,13 @@ implementation {
   task void sendTask() {
     dbg("Forwarder", "%s: Trying to send a packet. Queue size is %hhu.\n", __FUNCTION__, call SendQueue.size());
     
-    call DSN.logInt(call SendQueue.size());
-    call DSN.logDebug("q %i");
-    
+/*
+    if (call SendQueue.size() != lastQueueSize) {
+      call DSN.logInt(call SendQueue.size());
+      call DSN.logDebug("q %i");
+      lastQueueSize=call SendQueue.size();
+    }
+  */  
     if (sending) {
       dbg("Forwarder", "%s: busy, don't send\n", __FUNCTION__);
       call CollectionDebug.logEvent(NET_C_FE_SEND_BUSY);
@@ -408,6 +425,7 @@ implementation {
       dbg("Forwarder", "%s: queue empty, don't send\n", __FUNCTION__);
       call CollectionDebug.logEvent(NET_C_FE_SENDQUEUE_EMPTY);
       //call DSN.logDebug("forwarding queue empty");
+      fastPacketCount=0;
       return;
     }
     else if (!call RootControl.isRoot() && 
@@ -494,6 +512,19 @@ implementation {
         // If we have no metric, set our gradient conservatively so
         // that other nodes don't automatically drop our packets.
         gradient = 0;
+        call LowPowerListening.setRxSleepInterval(qe->msg, lplSleepInterval);
+      } else {
+        // if receiver is a root or this is a subsequent packet, don't use lpl
+        if (gradient == 0 || fastPacketCount>0) {
+/*
+	  call DSN.logInt(gradient);
+	  call DSN.logInt(fastPacketCount);
+          call DSN.logDebug("no lpl (%i, %i)");
+*/
+          call LowPowerListening.setRxSleepInterval(qe->msg, 0);
+        }
+        else
+          call LowPowerListening.setRxSleepInterval(qe->msg, lplSleepInterval);
       }
       call CtpPacket.setEtx(qe->msg, gradient);
       
@@ -504,13 +535,15 @@ implementation {
         call CtpPacket.setOption(qe->msg, CTP_OPT_ECN);
       else
         call CtpPacket.clearOption(qe->msg, CTP_OPT_ECN);
-      
+
       subsendResult = call SubSend.send(dest, qe->msg, payloadLen);
       
+/*
       if (subsendResult != SUCCESS) {
-		//call DSN.logInt(subsendResult);
-      		//call DSN.logDebug("forwarding subsend result:%i");
+		call DSN.logInt(subsendResult);
+      		call DSN.logDebug("forwarding subsend result:%i");
 	}
+*/
       if (subsendResult == SUCCESS) {
         // Successfully submitted to the data-link layer.
         sending = TRUE;
@@ -568,13 +601,25 @@ implementation {
    */
 
   event void SubSend.sendDone(message_t* msg, error_t error) {
+    // cc2420_metadata_t * msg_metadata; 
     fe_queue_entry_t *qe = call SendQueue.head();
     dbg("Forwarder", "%s to %hu and %hhu\n", __FUNCTION__, call AMPacket.destination(msg), error);
+/*
+	// packet metadata
+	msg_metadata = call CC2420Packet.getMetadata( msg );
+        call DSN.logInt(call AMPacket.destination(msg));
+	call DSN.logInt( msg_metadata->rxInterval);
+	call DSN.logInt( msg_metadata->lplTransmissions);
+	call DSN.logInt( msg_metadata->backoffSamples);
+	call DSN.logInt( msg_metadata->ack);
+	call DSN.logWarning("dst: %i, meta: %ims, lpl# %i, samples %i, ack %i");
+*/
+
     if (qe == NULL || qe->msg != msg) {
       dbg("Forwarder", "%s: BUG: not our packet (%p != %p)!\n", __FUNCTION__, msg, qe->msg);
       sendDoneBug();      // Not our packet, something is very wrong...
-      //call DSN.logError("Not our packet, something is very wrong...");
-      //call DSN.logPacket(msg);
+      call DSN.logError("Not our packet, something is very wrong...");
+      call DSN.logPacket(msg);
       return;
     }
     else if (error != SUCCESS) {
@@ -589,7 +634,13 @@ implementation {
     else if (ackPending && !call PacketAcknowledgements.wasAcked(msg)) {
       // AckPending is for case when DL cannot support acks.
       call LinkEstimator.txNoAck(call AMPacket.destination(msg));
+      //call Leds.led2Toggle();
       call CtpInfo.recomputeRoutes();
+/*
+      call DSN.logInt(call AMPacket.destination(msg));
+      call DSN.logWarning("noAck > %i");
+*/
+      fastPacketCount=0;
       if (--qe->retries) { 
         dbg("Forwarder", "%s: not acked\n", __FUNCTION__);
         call CollectionDebug.logEventMsg(NET_C_FE_SENDDONE_WAITACK, 
@@ -601,8 +652,8 @@ implementation {
 		call CtpInfo.triggerRouteUpdate();
 		call DSN.logInt(qe->retries);
 		call DSN.logDebug("Trigger route update after %i retries");
-	
-	} */
+	} 
+	*/
         startRetxmitTimer(SENDDONE_NOACK_WINDOW, SENDDONE_NOACK_OFFSET);
       } else {
         //max retries, dropping packet
@@ -642,12 +693,20 @@ implementation {
 					 call CollectionPacket.getOrigin(msg), 
                                          call AMPacket.destination(msg));
       call LinkEstimator.txAck(call AMPacket.destination(msg));
+      //call Leds.led0Toggle();
       clientPtrs[client] = qe;
       hdr = getHeader(qe->msg);
       call SendQueue.dequeue();
       signal Send.sendDone[client](msg, SUCCESS);
       sending = FALSE;
-      startRetxmitTimer(SENDDONE_OK_WINDOW, SENDDONE_OK_OFFSET);
+      if (fastPacketCount<MAX_FAST_PACKETS) {
+      	startRetxmitTimer(SENDDONE_OK_WINDOW, SENDDONE_OK_OFFSET+fastPacketCount*FASTPACKET_DELAY);
+      	fastPacketCount++;
+      }
+      else {
+        startRetxmitTimer(SENDDONE_NOACK_WINDOW, SENDDONE_NOACK_OFFSET);
+        fastPacketCount=0;
+      }
     }
     else if (call MessagePool.size() < call MessagePool.maxSize()) {
       // A successfully forwarded packet.
@@ -670,15 +729,26 @@ implementation {
       if (call QEntryPool.put(qe) != SUCCESS)
         call CollectionDebug.logEvent(NET_C_FE_PUT_QEPOOL_ERR);
       sending = FALSE;
-      startRetxmitTimer(SENDDONE_OK_WINDOW, SENDDONE_OK_OFFSET);
+      if (fastPacketCount<MAX_FAST_PACKETS) {	
+        startRetxmitTimer(SENDDONE_OK_WINDOW, SENDDONE_OK_OFFSET);
+        fastPacketCount++;
+      }
+      else {
+        startRetxmitTimer(SENDDONE_NOACK_WINDOW, SENDDONE_NOACK_OFFSET);
+        fastPacketCount=0;
+      }
     }
     else {
       dbg("Forwarder", "%s: BUG: we have a pool entry, but the pool is full, client is %hhu.\n", __FUNCTION__, qe->client);
       sendDoneBug();    // It's a forwarded packet, but there's no room the pool;
-      call DSN.logError("BUG:pool is full");
+      // call DSN.logError("BUG:pool is full");
       // someone has double-stored a pointer somewhere and we have nowhere
       // to put this, so we have to leak it...
     }
+    /*
+    call DSN.logInt(fastPacketCount);
+    call DSN.logDebug("%i fast packets");
+    */
   }
 
   /*
@@ -744,7 +814,9 @@ implementation {
         if (!call RetxmitTimer.isRunning()) {
           // sendTask is only immediately posted if we don't detect a
           // loop.
-          post sendTask();
+	// prevent congesting the medium
+	//startRetxmitTimer(SENDDONE_NOACK_WINDOW, SENDDONE_NOACK_OFFSET);
+	post sendTask();
         }
         
         // Successful function exit point:
@@ -844,10 +916,11 @@ implementation {
       return msg;
     else {
       dbg("Route", "Forwarding packet from %hu.\n", getHeader(msg)->origin);
+
 /*
       call DSN.logInt(call AMPacket.source(msg));
       call DSN.logDebug("Forwarding packet from %i");
-*/      
+*/
       return forward(msg);
     }
   }
@@ -875,6 +948,12 @@ implementation {
   SubSnoop.receive(message_t* msg, void *payload, uint8_t len) {
     //am_addr_t parent = call UnicastNameFreeRouting.nextHop();
     am_addr_t proximalSrc = call AMPacket.source(msg);
+
+/*
+    call DSN.logInt(proximalSrc);
+    call DSN.logInt(call CtpPacket.option(msg, CTP_OPT_PULL));
+    call DSN.logDebug("Snooped packet from %i, pull:%i");
+*/
 
     // Check for the pull bit (P) [TEP123] and act accordingly.  This
     // check is made for all packets, not just ones addressed to us.
@@ -1020,8 +1099,17 @@ implementation {
 
   static void startRetxmitTimer(uint16_t mask, uint16_t offset) {
     uint16_t r = call Random.rand16();
+    /*
+    call DSN.logInt(mask);
+    call DSN.logInt(offset);
+    call DSN.logInt(r);
+    */
     r &= mask;
     r += offset;
+    /*
+    call DSN.logInt(r);
+    call DSN.log("mask %i, offset %i, rand16=%i, timer in %ims");
+    */
     call RetxmitTimer.startOneShot(r);
     dbg("Forwarder", "Rexmit timer will fire in %hu ms\n", r);
   }
@@ -1060,6 +1148,24 @@ implementation {
     }
 
     void event DSN.receive(void * msg, uint8_t len){}
+
+    event message_t * DuplicateReceive.receive(message_t* msg, void* payload, uint8_t len) {
+	if (call AMPacket.destination(msg)!=AM_BROADCAST_ADDR) {
+		call DSN.logInt(call AMPacket.source(msg));
+		call DSN.logDebug("duplicate from %i");
+	}
+	return msg;
+    }
+
+  /****************** CollectionLowPowerListening commands *******/
+  command void CollectionLowPowerListening.setDefaultRxSleepInterval(uint16_t sleepIntervalMs) {
+    lplSleepInterval=sleepIntervalMs;
+  }
+
+  command void CollectionLowPowerListening.setDefaultRxDutyCycle(uint16_t dutyCycle) {
+    lplSleepInterval=call LowPowerListening.dutyCycleToSleepInterval(dutyCycle);
+  }
+
 }
 
 /* Rodrigo. This is an alternative

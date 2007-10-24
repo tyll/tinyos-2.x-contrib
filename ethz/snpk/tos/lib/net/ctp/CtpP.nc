@@ -78,7 +78,9 @@ configuration CtpP {
     interface CtpInfo;
     interface LinkEstimator;
     interface CtpCongestion;
-    interface RootControl;    
+    interface RootControl;
+
+    interface CollectionLowPowerListening;
   }
 
   uses {
@@ -131,7 +133,7 @@ implementation {
   components new AMReceiverC(AM_CTP_DATA);
   components new AMSnooperC(AM_CTP_DATA);
   
-  components new CtpRoutingEngineP(TREE_ROUTING_TABLE_SIZE, 1, 1024) as Router;
+  components new CtpRoutingEngineP(TREE_ROUTING_TABLE_SIZE, 10, 1024) as Router;
   StdControl = Router;
   StdControl = Estimator;
   RootControl = Router;
@@ -144,10 +146,14 @@ implementation {
   Router.BeaconTimer -> RoutingBeaconTimer;
   Router.RouteTimer -> RouteUpdateTimer;
   Router.CollectionDebug = CollectionDebug;
+  Router.Leds -> LedsC;
+  Router.SendQueue -> SendQueueP;
   Forwarder.CollectionDebug = CollectionDebug;
   Forwarder.CtpInfo -> Router;
   Router.CtpCongestion -> Forwarder;
   CtpInfo = Router;
+  CollectionLowPowerListening = Forwarder;
+  CollectionLowPowerListening = Router;
 
   components new TimerMilliC() as RetxmitTimer;
   Forwarder.RetxmitTimer -> RetxmitTimer;
@@ -174,17 +180,33 @@ implementation {
   components new AMSenderC(AM_CTP_ROUTING) as SendControl;
   components new AMReceiverC(AM_CTP_ROUTING) as ReceiveControl;
 
+  components DSNC;
+
   LinkEstimator = Estimator;
-  
+
   Estimator.AMSend -> SendControl;
   Estimator.SubReceive -> ReceiveControl;
   Estimator.SubPacket -> SendControl;
   Estimator.SubAMPacket -> SendControl;
+  Estimator.DSN -> DSNC;
   MainC.SoftwareInit -> Estimator;
 
-  components DSNC;
   Router.DSN->DSNC;
   Forwarder.DSN->DSNC;
   components CC2420ActiveMessageC as Lpl;
   Router.LowPowerListening->Lpl;
+  Forwarder.LowPowerListening->Lpl;
+
+  components CC2420PacketC,
+  new DsnCommandC("getTopology", uint8_t, 0) as GetTopologyCommand,
+  new DsnCommandC("set parent", am_addr_t, 1) as SetParentCommand,
+  UniqueReceiveC;
+  //GetTopologyCommand.DSN->DSNC;
+  Router.GetTopologyCommand->GetTopologyCommand;
+  //SetParentCommand.DSN->DSNC;
+  Router.SetParentCommand->SetParentCommand;
+  Router.CC2420Packet->CC2420PacketC;
+  Forwarder.CC2420Packet->CC2420PacketC;
+  Forwarder.DuplicateReceive->UniqueReceiveC.DuplicateReceive;
+
 }

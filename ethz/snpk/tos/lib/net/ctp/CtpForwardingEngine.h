@@ -59,7 +59,7 @@
 
 enum {
 #if PLATFORM_MICAZ || PLATFORM_TELOSA || PLATFORM_TELOSB || PLATFORM_TMOTE
-  FORWARD_PACKET_TIME = 100, // wait longer for lpl (100 instead of 4)
+  FORWARD_PACKET_TIME = 128, // wait longer for lpl (100 instead of 4)
   FORWARD_PACKET_TIME_SHORT = 4,
 #else
   FORWARD_PACKET_TIME = 32,
@@ -67,17 +67,20 @@ enum {
 #endif
 };
 
+// window must be set as a bitmask (e.g. 11111b )
 enum {
-  SENDDONE_FAIL_OFFSET      =                       512,
-  SENDDONE_NOACK_OFFSET     = FORWARD_PACKET_TIME  << 2,
-  SENDDONE_OK_OFFSET        = FORWARD_PACKET_TIME_SHORT  << 2,
+  SENDDONE_FAIL_OFFSET      =                       1024,
+  SENDDONE_NOACK_OFFSET     = FORWARD_PACKET_TIME << 2,
+  SENDDONE_OK_OFFSET        = FORWARD_PACKET_TIME_SHORT,
   LOOPY_OFFSET              = FORWARD_PACKET_TIME  << 4,
   SENDDONE_FAIL_WINDOW      = SENDDONE_FAIL_OFFSET  - 1,
   LOOPY_WINDOW              = LOOPY_OFFSET          - 1,
-  SENDDONE_NOACK_WINDOW     = SENDDONE_NOACK_OFFSET - 1,
-  SENDDONE_OK_WINDOW        = SENDDONE_OK_OFFSET    - 1,
+  SENDDONE_NOACK_WINDOW     = (SENDDONE_NOACK_OFFSET << 3) - 1,
+  SENDDONE_OK_WINDOW        = (SENDDONE_OK_OFFSET << 2) -1,
   CONGESTED_WAIT_OFFSET     = FORWARD_PACKET_TIME  << 2,
   CONGESTED_WAIT_WINDOW     = CONGESTED_WAIT_OFFSET - 1,
+  MAX_FAST_PACKETS          = 4,
+  FASTPACKET_DELAY          = 10,
 };
 
 
@@ -88,7 +91,7 @@ enum {
  * not support acknowledgments it sends the packet once.
  */
 enum {
-  MAX_RETRIES = 30
+  MAX_RETRIES = 30 // maybe allow very lossy network ??
 };
 
 /*

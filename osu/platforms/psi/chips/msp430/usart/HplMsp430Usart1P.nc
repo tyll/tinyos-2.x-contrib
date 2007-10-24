@@ -113,9 +113,11 @@ module HplMsp430Usart1P {
   uses interface HplMsp430GeneralIO as SOMI;
   uses interface HplMsp430GeneralIO as UCLK;
   uses interface HplMsp430GeneralIO as URXD;
-  uses interface HplMsp430GeneralIO as UTXD;
+  uses interface HplMsp430GeneralIO as UTXD;  
   
   uses interface Leds;
+  
+  uses interface HplMsp430Interrupt as SPI_CS1_INTERRUPT;
 }
 
 implementation
@@ -141,37 +143,28 @@ implementation
   TOSH_SIGNAL(UART1TX_VECTOR) {  	
     signal Interrupts.txDone();
   }
-  
-  
-  TOSH_SIGNAL(PORT1_VECTOR) {  	  	  	
-  	
-  	 if (P1IFG & SPI_CS1_INT)
-  	 {  	  	 	
-  	 	 P1IFG &= ~SPI_CS1_INT;  		
-  	 	 
+		
+	/*	
+  TOSH_SIGNAL(PORT1_VECTOR)
+  {
+		if (P1IFG & SPI_CS1_INT)
+  	{  	  	 	
+  	 	 P1IFG &= ~SPI_CS1_INT;  		  	 	 
   	 	 //SPI_CS1_INT is the chip select from the host (EZX) module.
   	 	 //routed to a pin on the MSP that is interruptible
-  	 	 //can be used to facilitate communication between the EZX and PSI
-  	 	   	 	 
-  	 	 /* 
-    	 if (state == STATE_SEND)
-    	 {    
-    	 			
-    	 			atomic state=STATE_RECV;	 			
-      			signal Interrupts.txDone();
-      			atomic {
-				    	 	U1CTL |= SWRST;
-				    	 	U1CTL &= ~SWRST;				    	 
-				     		IFG2 &= ~(UTXIFG1 | URXIFG1);
-				      	IE2 |= (UTXIE1 | URXIE1);
-    				}
-       }		
-    	 else
-    	 {
-    			//uint8_t temp = U1RXBUF;
-    			//signal Interrupts.rxDone(temp);
-    	 }*/    	 
-  	 }
+  	 	 //can be used to facilitate communication between the EZX and PSI  	 	    	 
+  	}
+  }*/  
+  
+  async event void SPI_CS1_INTERRUPT.fired() 
+  { 
+  	if (P1IFG & SPI_CS1_INT)
+  	{  	  	 	
+  	 	 P1IFG &= ~SPI_CS1_INT;  		  	 	 
+  	 	 //SPI_CS1_INT is the chip select from the host (EZX) module.
+  	 	 //routed to a pin on the MSP that is interruptible
+  	 	 //can be used to facilitate communication between the EZX and PSI  	 	    	 
+  	}
   }
   
   

@@ -86,9 +86,13 @@ implementation {
   HplUsartP.SOMI -> GIO.SOMI1;
   HplUsartP.UCLK -> GIO.UCLK1;
   HplUsartP.URXD -> GIO.URXD1;
-  HplUsartP.UTXD -> GIO.UTXD1;
-  
+  HplUsartP.UTXD -> GIO.UTXD1;    
   HplUsartP.Leds -> LedsC;
+  
+  
+  
+  components HplMsp430InterruptC;
+  HplUsartP.SPI_CS1_INTERRUPT ->HplMsp430InterruptC.Port13;  
   
 
 }

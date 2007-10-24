@@ -22,6 +22,40 @@
 /**
  * @author Joe Polastre
  */
+
+/**
+ * Copyright (c) 2007 - The Ohio State University.
+ * All rights reserved.
+ *
+ * Permission to use, copy, modify, and distribute this software and its
+ * documentation for any purpose, without fee, and without written agreement is
+ * hereby granted, provided that the above copyright notice, the following
+ * two paragraphs, and the author attribution appear in all copies of this
+ * software.
+ *
+ * IN NO EVENT SHALL THE OHIO STATE UNIVERSITY BE LIABLE TO ANY PARTY FOR
+ * DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING OUT
+ * OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF THE OHIO STATE
+ * UNIVERSITY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * THE OHIO STATE UNIVERSITY SPECIFICALLY DISCLAIMS ANY WARRANTIES,
+ * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+ * AND FITNESS FOR A PARTICULAR PURPOSE.  THE SOFTWARE PROVIDED HEREUNDER IS
+ * ON AN "AS IS" BASIS, AND THE OHIO STATE UNIVERSITY HAS NO OBLIGATION TO
+ * PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+
+	@author 
+	Lifeng Sang  <sangl@cse.ohio-state.edu>
+	Anish Arora  <anish@cse.ohio-state.edu>	
+	$Date$
+	
+	Porting TinyOS to Intel PSI motes
+ */
+ 
+
+#include "Msp430PSI.h"
+ 
+ 
 module HplMsp430InterruptP
 {
 #ifdef __msp430_have_port1
@@ -48,12 +82,20 @@ module HplMsp430InterruptP
 }
 implementation
 {
-
+	
 #ifdef __msp430_have_port1
   TOSH_SIGNAL(PORT1_VECTOR)
   {
     volatile int n = P1IFG & P1IE;
-
+    
+		if (P1IFG & SPI_CS1_INT)
+  	{  	  	 	
+  	 	 P1IFG &= ~SPI_CS1_INT;  		  	 	 
+  	 	 //SPI_CS1_INT is the chip select from the host (EZX) module.
+  	 	 //routed to a pin on the MSP that is interruptible
+  	 	 //can be used to facilitate communication between the EZX and PSI  	 	    	 
+  	}
+  	    
     if (n & (1 << 0)) { signal Port10.fired(); return; }
     if (n & (1 << 1)) { signal Port11.fired(); return; }
     if (n & (1 << 2)) { signal Port12.fired(); return; }

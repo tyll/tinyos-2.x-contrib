@@ -60,7 +60,7 @@ public class Statistics extends Thread implements MessageListener {
   /** MoteIF's that we're registered with */
   private List listeningComms;
 
-  /** List of FileTransferEvents listeners */
+  /** List of StatisticsEvents listeners */
   @SuppressWarnings("unchecked")
   private List listeners = Collections.synchronizedList(new ArrayList());
 
@@ -105,15 +105,19 @@ public class Statistics extends Thread implements MessageListener {
    * @param inMsg
    */
   private String extractUnits(StatisticsMsg inMsg) {
+    return inMsg.getString_units();
+    
+    /*
     if (inMsg.get_unitLength() > 0) {
       short[] message = new short[inMsg.get_unitLength()];
-      for (int i = 0; i < message.length; i++) {
+      for (int i = 0; i < message.length && i < inMsg.get_units().length; i++) {
         message[i] = inMsg.get_units()[i];
       }
       return Util.dataToString(message);
     }
 
     return "";
+    */
   }
 
   /**
@@ -179,6 +183,8 @@ public class Statistics extends Thread implements MessageListener {
     inMsg = (StatisticsMsg) m;
 
     log.info("RECEIVED A STATISTICS MESSAGE");
+    log.debug("StatsMsg: id=" + inMsg.get_statsId() + "; units=" + extractUnits(inMsg) + "; value=" + inMsg.get_value());
+    
     synchronized (receivedMessages) {
       receivedMessages.add(m);
       receivedMessages.notify();

@@ -40,6 +40,7 @@ import org.apache.log4j.Logger;
 
 import com.rincon.tunit.properties.TUnitSuiteProperties;
 import com.rincon.tunit.report.TestResult;
+import com.rincon.util.Util;
 
 /**
  * Parse test suite configuration files. These files can be located
@@ -103,6 +104,18 @@ public class SuitePropertiesParser {
           
         } else if(line.toLowerCase().startsWith("@extras")) {
           suiteProperties.addExtras(line.replace("@extras","").trim());
+          
+        } else if(line.toLowerCase().startsWith("@assertions")) {
+          int numAssertions;
+          try {
+            numAssertions = Integer.decode(line.replace("@assertions","").trim()).intValue();
+            
+          } catch (NumberFormatException e) {
+            log.error("Unable to extract assertions, use a valid number: " + line);
+            numAssertions = 5;  // The default
+          }
+          
+          suiteProperties.addExtras("CFLAGS+=-DMAX_TUNIT_QUEUE=" + numAssertions);
           
         } else if(line.toLowerCase().startsWith("@extra")) {
           suiteProperties.addExtras(line.replace("@extra","").trim());

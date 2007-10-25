@@ -399,6 +399,9 @@ public class ResultCollector extends Thread implements Messenger,
    * Signal from the mote to log some statistics
    */
   public void statistics_log(short id, String units, long value) {
+    log.trace("statistics_log");
+    log.debug("Stats Logging: id=" + id + "; units=" + units + "; value=" + value);
+    
     try {
       StatisticsChart.write(StatisticsReport.log(report.getPackage(),
           (String) statsMap.get(new Integer(id)), units, value), 500, 325);

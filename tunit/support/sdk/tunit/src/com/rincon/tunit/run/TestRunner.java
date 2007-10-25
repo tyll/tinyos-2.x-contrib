@@ -249,6 +249,7 @@ public class TestRunner {
             + "CFLAGS+=-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/system "
             + "CFLAGS+=-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/interfaces "
             + "CFLAGS+=-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/lib/directserial "
+            + "CFLAGS+=-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/lib/fifoqueue "
             + "CFLAGS+=-DTUNIT_TOTAL_NODES=" + runProperties.totalNodes() + " "
             + "";
           
@@ -270,6 +271,7 @@ public class TestRunner {
           + "CFLAGS+=-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/system "
           + "CFLAGS+=-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/interfaces "
           + "CFLAGS+=-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/lib/directserial "
+          + "CFLAGS+=-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/lib/fifoqueue "
           + "CFLAGS+=-DTUNIT_TOTAL_NODES=" + runProperties.totalNodes() + " "
           + "";
 

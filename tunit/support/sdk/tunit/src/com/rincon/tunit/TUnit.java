@@ -94,7 +94,7 @@ public class TUnit {
    */
   public static void main(String[] args) {
     org.apache.log4j.BasicConfigurator.configure();
-    Logger.getRootLogger().setLevel((Level) Level.TRACE);
+    Logger.getRootLogger().setLevel((Level) Level.DEBUG);
     new TUnit(args).runTunit(args);
   }
 
@@ -107,19 +107,46 @@ public class TUnit {
       if(args[i].equalsIgnoreCase("-tunitbase") && args.length > i + 1) {
         i++;
         tunitBase = args[i];
+        
+        File tunitBaseAttempt = new File(tunitBase);
+        if(!tunitBaseAttempt.exists()) {
+          System.out.println("Invalid TUnit Base Directory: " + tunitBaseAttempt.getAbsolutePath() );
+          syntax();
+          System.exit(1);
+        }
+        
         log.debug("Using TUnit at: " + tunitBase);
         
       } else if(args[i].equalsIgnoreCase("-testdir") && args.length > i + 1) {
         i++;
         rootDirectory = new File(args[i]);
+        
+        if(!rootDirectory.exists()) {
+          System.out.println("Invalid Test Directory: " + rootDirectory.getAbsolutePath() );
+          syntax();
+          System.exit(1);
+        }
+        
         log.debug("Testing at directory: " + rootDirectory.getAbsolutePath());
+        
+      } else if(args[i].equalsIgnoreCase("-reportdir") && args.length > i + 1) {
+        i++;
+        baseReportDirectory = new File(args[i]);
+        
+        // We'll create the report directory if it doesn't exist.
+        
+        log.debug("Saving TUnit reports in: " + baseReportDirectory.getAbsolutePath());
+      
+      } else if(args[i].equalsIgnoreCase("-debug")) {
+        // Set the logger all the way down to the lowest level
+        log.info("Running TUnit in debug mode");
+        Logger.getRootLogger().setLevel((Level) Level.TRACE);
         
       } else if(args[i].contains("?")) {
         syntax();
         System.exit(1);
       }
     }
-    
     
     log = Logger.getLogger(getClass());
     startTime = System.currentTimeMillis();
@@ -136,7 +163,16 @@ public class TUnit {
     System.out.println("TUnit Syntax: java com.rincon.tunit.TUnit (options)");
     System.out.println("\nOptions are:");
     System.out.println("\t-tunitbase [absolute tunit_base directory]");
+    System.out.println("\t\tThe TUNIT_BASE directory contains TUnit's embedded libraries");
+    System.out.println();
     System.out.println("\t-testdir [absolute test directory]");
+    System.out.println("\t\tThis lets you start testing in a specific directory");
+    System.out.println();
+    System.out.println("\t-reportdir [absolute report directory]");
+    System.out.println("\t\tThis directory is where your reports will be stored.");
+    System.out.println();
+    System.out.println("\t-debug");
+    System.out.println("\t\tDisplay all TUnit Java framework debug statements");
     System.out.println("\n\t-? for help");
   }
   
@@ -296,7 +332,10 @@ public class TUnit {
    * 
    */
   private void establishReportDir() {
-    baseReportDirectory = new File(tunitBase, "/reports");
+    if(baseReportDirectory == null) {
+      baseReportDirectory = new File(tunitBase, "/reports");
+    }
+    
     new File(baseReportDirectory, "/xml").mkdirs();
   }
 

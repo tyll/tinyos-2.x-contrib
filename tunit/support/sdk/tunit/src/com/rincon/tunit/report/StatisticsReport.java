@@ -115,6 +115,8 @@ public class StatisticsReport {
     reportDir.mkdirs();
     
     File reportFile = new File(reportDir, name + ".csv");
+    log.info("Statistics log file: " + reportFile.getAbsolutePath());
+    
     if (!reportFile.exists()) {
       newFile = true;
       try {

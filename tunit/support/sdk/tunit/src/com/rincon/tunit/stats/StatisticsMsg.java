@@ -177,14 +177,14 @@ public class StatisticsMsg extends net.tinyos.message.Message {
      * Return the value (as a long) of the field 'value'
      */
     public long get_value() {
-        return (long)getUIntBEElement(offsetBits_value(), 32);
+        return (long)getSIntBEElement(offsetBits_value(), 32);
     }
 
     /**
      * Set the value of the field 'value'
      */
     public void set_value(long value) {
-        setUIntBEElement(offsetBits_value(), 32, value);
+        setSIntBEElement(offsetBits_value(), 32, value);
     }
 
     /**

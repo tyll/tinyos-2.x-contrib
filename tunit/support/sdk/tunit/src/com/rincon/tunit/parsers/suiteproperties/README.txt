@@ -40,6 +40,12 @@ Each keyword must be located at the beginning of the line in the file.
  - Multiple @extra keywords are allowed.  They are separated with " "'s in the
    make line
  
+@assertions <#>
+ - If you have a single test that will make more than 5 assertions in a row, 
+   use this option to bump up the default number of message_t's used by
+   the embedded TUnit library so it can buffer up all those assertions.
+   Don't set it too high or you might run out of RAM on some platforms.
+   
 @ignore <target>
  - Do not run this test suite on a test run that includes the given target
  - Only list one target per @ignore

@@ -1,0 +1,4 @@
+COMPONENT=TestStatsC
+
+include $(MAKERULES)
+

@@ -13,7 +13,8 @@ implementation {
       new TestCaseC() as TestReceiveLargePacketC,
       new TestCaseC() as TestBadPacketC,
       new TestCaseC() as TestReceiveTwoPacketsC,
-      new TestCaseC() as TestReceiveTooSmallC;
+      new TestCaseC() as TestReceiveTooSmallC,
+      new TestCaseC() as TestReceiveAckC;
       
   components TestRxFifoP,
       CC2500ControlC,
@@ -30,8 +31,10 @@ implementation {
   TestRxFifoP.TestBadPacket -> TestBadPacketC;
   TestRxFifoP.TestReceiveTwoPackets -> TestReceiveTwoPacketsC;
   TestRxFifoP.TestReceiveTooSmall -> TestReceiveTooSmallC;
+  TestRxFifoP.TestReceiveAck -> TestReceiveAckC;
   
   TestRxFifoP.Receive -> BlazeReceiveC.Receive;
+  TestRxFifoP.AckReceive -> BlazeReceiveC;
   TestRxFifoP.BlazePacketBody -> BlazePacketC;
   TestRxFifoP.State -> StateC;
   TestRxFifoP.Leds -> LedsC;

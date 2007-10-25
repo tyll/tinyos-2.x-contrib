@@ -122,10 +122,6 @@ implementation {
   }
   
   
-  /***************** Statistics Events *****************/
-  event void Statistics.logDone() {
-  }
-  
   /***************** Tasks *****************/
   task void sendMsg() {
     call Leds.led0Toggle();

@@ -252,7 +252,7 @@ implementation {
   /***************** Funtions ****************/
   /**
    * Node 0, which drives the test, is allowed to attempt the test.
-   * All other nodes run setUpOneTime() to initiate the entire test suite,
+   * All other nodes run SetUpOneTime() to initiate the entire test suite,
    * and then don't do anything else.  Those other nodes can certainly make
    * assertions and call TUnit.done() to end the test on the computer, but
    * they are not allowed to drive.  That's why the code below shows any node

@@ -29,15 +29,26 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE
  */
 
+#include "Statistics.h"
+
 /**
- * TUnit Statistics Interface
+ * Single wiring point for StatisticsP outside of a generic configuration
  * @author David Moss
  */
-interface Statistics {
+configuration WireStatisticsC {
+}
 
-  command error_t log(char *units, uint32_t value);
-  
-  event void logDone();
+implementation {
+  components StatisticsP,
+      new SerialAMSenderC(AM_STATISTICSMSG),
+      new StateC(),
+      new FifoQueueC(StatisticsMsg*, uniqueCount(UQ_STATISTICS)),
+      TUnitP;
+      
+  StatisticsP.AMSend -> SerialAMSenderC;
+  StatisticsP.State -> StateC;
+  StatisticsP.StatsQuery -> TUnitP;
+  StatisticsP.FifoQueue -> FifoQueueC;
   
 }
 

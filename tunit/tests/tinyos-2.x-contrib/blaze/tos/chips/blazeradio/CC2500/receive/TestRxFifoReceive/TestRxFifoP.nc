@@ -25,6 +25,7 @@ module TestRxFifoP {
   
   uses {
     interface Receive[radio_id_t id];
+    interface AckReceive;
     interface BlazePacketBody;
     interface State;
     interface GpioInterrupt as TheRealRxInterruptThatWeIgnore[radio_id_t id];
@@ -38,6 +39,7 @@ module TestRxFifoP {
     interface TestCase as TestBadPacket;
     interface TestCase as TestReceiveTwoPackets;
     interface TestCase as TestReceiveTooSmall;
+    interface TestCase as TestReceiveAck;
   }
   
 }
@@ -51,13 +53,18 @@ implementation {
     S_TESTBADPACKET,
     S_TESTRECEIVETWOPACKETS,
     S_TESTRECEIVETOOSMALL,
+    S_TESTRECEIVEACK,
   };
   
   /** Message to load into the RX FIFO */
   norace message_t myMsg;
 
+  /** Ack to load into the RX FIFO */
+  norace blaze_ack_t myAck;
+  
   /** Header of our message */
   norace blaze_header_t *myHeader;
+  
   
     
   /** Our radio RX FIFO */
@@ -247,6 +254,22 @@ implementation {
     // should continue at Timer.fired() because we don't receive a packet
   }
   
+  event void TestReceiveAck.run() {
+    call State.forceState(S_TESTRECEIVEACK);
+    
+    myAck.length = ACK_FRAME_LENGTH;
+    myAck.dest = 0;
+    myAck.fcf = (IEEE154_TYPE_ACK << IEEE154_FCF_FRAME_TYPE);
+    myAck.dsn = 50;
+    myAck.src = 100;
+    
+    append(&myAck, sizeof(blaze_ack_t));
+    append(&statusBytes, 2);
+    
+    signal RxInterrupt.fired[0]();
+    // Continues at AckReceive...
+  }
+  
 
   
   /***************** RXFIFO commands ****************/
@@ -364,6 +387,15 @@ implementation {
     
     return msg;
   } 
+  
+  async event void AckReceive.receive( am_addr_t source, am_addr_t destination, uint8_t dsn ) {
+    if(call State.isState(S_TESTRECEIVEACK)) {
+      assertEquals("Wrong ack src", 100, source);
+      assertEquals("Wrong ack dest", 0, destination);
+      assertEquals("Wrong ack dsn", 50, dsn);
+      call TestReceiveAck.done();
+    }
+  }
   
   /***************** RXREG Commands ***************/
   async command blaze_status_t RXREG.read(uint8_t* data) {

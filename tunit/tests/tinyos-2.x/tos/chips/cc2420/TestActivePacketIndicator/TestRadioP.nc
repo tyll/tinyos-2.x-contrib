@@ -84,10 +84,6 @@ implementation {
     }
   }
   
-  /***************** Statistics Events ****************/
-  event void Statistics.logDone() {
-  }
-  
   /***************** Send/Receive ****************/
   event void AMSend.sendDone(message_t *msg, error_t error) {
     call Leds.led0Off();

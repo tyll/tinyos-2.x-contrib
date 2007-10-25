@@ -29,40 +29,23 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE
  */
 
-
 /**
- * T-Unit TinyOS Unit Testing
+ * A generic FIFO queue
  * @author David Moss
  */
 
-#include "TestCase.h"
-
-/**
- * Entry point configuration that creates new TUnit test cases
- * @author David Moss
- */
-generic configuration TestCaseC() {
+generic configuration FifoQueueC(typedef q_element_t, uint8_t size) {
   provides {
-    interface TestCase;
-    interface TestControl as SetUpOneTime @atmostonce();
-    interface TestControl as SetUp @atmostonce();
-    interface TestControl as TearDown @atmostonce();
-    interface TestControl as TearDownOneTime @atmostonce();
+    interface FifoQueue<q_element_t>;
   }
 }
 
 implementation {
-  components TUnitP,
-      WireTUnitC;
-      
-  enum {
-    TUNIT_TEST_ID = unique(UQ_TESTCASE),
-  };
+  components MainC,
+      new FifoQueueP(q_element_t, size);
   
-  TestCase = TUnitP.TestCase[TUNIT_TEST_ID];
-  SetUpOneTime = TUnitP.SetUpOneTime;
-  SetUp = TUnitP.SetUp;
-  TearDown = TUnitP.TearDown;
-  TearDownOneTime = TUnitP.TearDownOneTime;
+  FifoQueue = FifoQueueP;
+
+  MainC.SoftwareInit -> FifoQueueP;
   
 }

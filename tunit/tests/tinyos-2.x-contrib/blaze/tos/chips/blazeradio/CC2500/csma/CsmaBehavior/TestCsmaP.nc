@@ -457,7 +457,7 @@ implementation {
       return SUCCESS;
     
     } else {
-      return SUCCESS;
+      return FAIL;
     }
   }
 

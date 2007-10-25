@@ -42,7 +42,7 @@
 
 #define STATISTICS_LENGTH (TOSH_DATA_LENGTH - 6)
 typedef nx_struct StatisticsMsg {
-  nx_uint32_t value;
+  nx_int32_t value;
   nx_uint8_t statsId;
   nx_uint8_t unitLength;
   nx_uint8_t units[STATISTICS_LENGTH];

@@ -43,19 +43,13 @@ generic configuration StatisticsC() {
 
 implementation {
   components StatisticsP,
-      new SerialAMSenderC(AM_STATISTICSMSG),
-      new StateC(),
-      TUnitP;
+      WireStatisticsC;
   
   enum {
     STATISTICS_ID = unique(UQ_STATISTICS),
   };
   
   Statistics = StatisticsP.Statistics[STATISTICS_ID];
-  
-  StatisticsP.AMSend -> SerialAMSenderC;
-  StatisticsP.State -> StateC;
-  StatisticsP.StatsQuery -> TUnitP;
   
 }
 

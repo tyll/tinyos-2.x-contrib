@@ -32,7 +32,8 @@
 #include "Statistics.h"
 
 /**
- * Log day to day statistics on the computer to graph progress
+ * Log day to day statistics on the computer, characterizing performance and 
+ * progress over time
  * @author David Moss
  */
 module StatisticsP {
@@ -44,6 +45,7 @@ module StatisticsP {
     interface AMSend;
     interface State;
     interface StatsQuery;
+    interface FifoQueue<StatisticsMsg*>;
   }
 }
 
@@ -52,8 +54,8 @@ implementation {
   /** Message to send */
   message_t myMsg;
   
-  /** Current client we're handling */
-  uint8_t currentClient;
+  /** Statistics payloads to queue */
+  StatisticsMsg statsPayload[uniqueCount(UQ_STATISTICS)];
   
   enum {
     S_IDLE,
@@ -64,43 +66,70 @@ implementation {
   
   /***************** Statistics Commands ****************/
   command error_t Statistics.log[uint8_t id](char *units, uint32_t value) {
-    StatisticsMsg *statsMsg;
+    StatisticsMsg *stats;
     
-    if(call State.requestState(S_BUSY) != SUCCESS) {
-      return FAIL;
+    if(id > uniqueCount(UQ_STATISTICS)) {
+      return EINVAL;
     }
     
-    currentClient = id;
-    
-    statsMsg = (StatisticsMsg *) call AMSend.getPayload(&myMsg, TOSH_DATA_LENGTH);
-    statsMsg->value = value;
-    statsMsg->unitLength = 0;
-    statsMsg->statsId = id;
+    stats = &(statsPayload[id]);
+
+    stats->value = value;
+    stats->unitLength = 0;
+    stats->statsId = id;
     
     if(units != NULL) {
-      while(*units && statsMsg->unitLength < STATISTICS_LENGTH) {
-        statsMsg->units[statsMsg->unitLength] = *units++;
-        statsMsg->unitLength++;
+      while(*units && stats->unitLength < STATISTICS_LENGTH) {
+        stats->units[stats->unitLength] = *units++;
+        stats->unitLength++;
       }
     }
     
-    return call AMSend.send(0, &myMsg, sizeof(StatisticsMsg));
+    return call FifoQueue.enqueue(stats);
+  }
+  
+  /***************** FifoQueue Events ****************/
+  event void FifoQueue.available() {
+    StatisticsMsg *focusedMsg;
+
+    if(call State.requestState(S_BUSY) != SUCCESS) {
+      return;
+    }
+    
+    if(call FifoQueue.dequeue(&focusedMsg, TOSH_DATA_LENGTH) == SUCCESS) {
+      memcpy((&myMsg)->data, focusedMsg, sizeof(StatisticsMsg));
+      call AMSend.send(0, &myMsg, sizeof(StatisticsMsg));
+    
+    } else {
+      call State.toIdle();
+    }
   }
   
   /***************** AMSend Events ****************/
   event void AMSend.sendDone(message_t *msg, error_t error) {
-    call State.toIdle();
-    signal Statistics.logDone[currentClient]();
+    StatisticsMsg *focusedMsg;
+    
+    if(call FifoQueue.dequeue(&focusedMsg, TOSH_DATA_LENGTH) == SUCCESS) {
+      memcpy((&myMsg)->data, focusedMsg, sizeof(StatisticsMsg));
+      call AMSend.send(0, &myMsg, sizeof(StatisticsMsg));
+    
+    } else {
+      call State.toIdle();
+    }
   }
   
   /***************** StatsQuery Events ****************/
+  /**
+   * TUnit will not stop until all statistics have been exfil'd.
+   * This event decouples the main TUnit library from the statistics library,
+   * allowing TUnit to compile without using this statistics module to save
+   * memory footprint
+   */
   event bool StatsQuery.isIdle() {
-    return call State.isIdle();
+    return call FifoQueue.isEmpty();
   }
   
   /***************** Defaults ****************/
-  default event void Statistics.logDone[uint8_t id]() {
-  }
   
 }
 

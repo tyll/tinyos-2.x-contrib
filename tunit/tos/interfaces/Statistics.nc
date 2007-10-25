@@ -35,9 +35,13 @@
  */
 interface Statistics {
 
+  /**
+   * Log some statistics. TUnit takes care of the split-phase stuff so
+   * your application doesn't have to. If you call log() properly, you can
+   * safely assume your statistics will get sent to the computer before
+   * the test is allowed to stop.
+   */
   command error_t log(char *units, uint32_t value);
-  
-  event void logDone();
   
 }
 

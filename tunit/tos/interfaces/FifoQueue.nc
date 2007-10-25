@@ -29,40 +29,58 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE
  */
 
-
 /**
- * T-Unit TinyOS Unit Testing
  * @author David Moss
  */
+interface FifoQueue<t> {
 
-#include "TestCase.h"
-
-/**
- * Entry point configuration that creates new TUnit test cases
- * @author David Moss
- */
-generic configuration TestCaseC() {
-  provides {
-    interface TestCase;
-    interface TestControl as SetUpOneTime @atmostonce();
-    interface TestControl as SetUp @atmostonce();
-    interface TestControl as TearDown @atmostonce();
-    interface TestControl as TearDownOneTime @atmostonce();
-  }
+  /**
+   * Enqueue a single element into our queue.  The available(...) event will
+   * signaled every time.
+   */
+  command error_t enqueue(t element);
+  
+  /**
+   * Dequeue the next element if it exists
+   * @param *location the location to put this element
+   * @param maxSize the maximum size of our location so we don't overflow
+   * @return SUCCESS if we dequeued something to the given location.
+   *     FAIL if there was nothing to dequeue.
+   *     ESIZE if the dequeue destination buffer is too small
+   */
+  command error_t dequeue(void *location, uint8_t maxSize);
+  
+  /**
+   * @return the maximum size of our queue
+   */
+  command uint8_t maxSize();
+  
+  /**
+   * @return the total number of elements enqueued
+   */
+  command uint8_t size();
+  
+  /**
+   * @return TRUE if the queue is empty
+   */
+  command bool isEmpty();
+  
+  /**
+   * @return TRUE if the queue is full
+   */
+  command bool isFull();
+  
+  /**
+   * Dump all contents of this queue and reset everything
+   */
+  command void reset();
+  
+  
+  /**
+   * Notification that there are more elements available in the queue.
+   * It is up to the consumer to know when to dequeue those elements.
+   */
+  event void available();
+  
 }
 
-implementation {
-  components TUnitP,
-      WireTUnitC;
-      
-  enum {
-    TUNIT_TEST_ID = unique(UQ_TESTCASE),
-  };
-  
-  TestCase = TUnitP.TestCase[TUNIT_TEST_ID];
-  SetUpOneTime = TUnitP.SetUpOneTime;
-  SetUp = TUnitP.SetUp;
-  TearDown = TUnitP.TearDown;
-  TearDownOneTime = TUnitP.TearDownOneTime;
-  
-}

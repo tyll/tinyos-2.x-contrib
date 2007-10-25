@@ -146,9 +146,6 @@ implementation {
   }
   
   
-  /***************** Statistics Events *****************/
-  event void Statistics.logDone() {
-  }
   
   /***************** Tasks *****************/
   task void sendMsg() {

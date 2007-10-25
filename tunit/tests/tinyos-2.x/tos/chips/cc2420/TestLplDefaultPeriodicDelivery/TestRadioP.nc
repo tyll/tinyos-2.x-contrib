@@ -187,6 +187,8 @@ implementation {
     }
     
     call AveragePktStats.log("[Avg # Pkt Rx]", average);
+    call DetectRateStats.log("[Detects/Attempts %]", (float) (((float) (detects * 100)) / (float) attempts));
+    call TestPeriodicDelivery.done();
   }
   
   event void WaitTimer.fired() {
@@ -195,15 +197,6 @@ implementation {
   
   
   /***************** Other Events ****************/
-  event void AveragePktStats.logDone() {
-    call DetectRateStats.log("[Detects/Attempts %]", (float) (((float) (detects * 100)) / (float) attempts));
-  }
-  
-  event void DetectRateStats.logDone() {
-    // Now that our stats are logged, we're done!
-    call TestPeriodicDelivery.done();
-  }
-  
   async event void ActiveMessageAddress.changed() {
   }
   

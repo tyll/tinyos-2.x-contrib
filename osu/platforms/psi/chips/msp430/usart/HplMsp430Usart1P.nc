@@ -283,12 +283,11 @@ implementation
       return USART_NONE;
   }
 
-  async command void Usart.enableUart() {
-  	/*
+  async command void Usart.enableUart() {  	
     atomic{
       call UTXD.selectModuleFunc();
       call URXD.selectModuleFunc();
-    }*/  //Lifeng Sang
+    }
         
     ME2 |= (UTXE1 | URXE1);   // USART1 UART module enable
   }
@@ -296,32 +295,31 @@ implementation
   async command void Usart.disableUart() {
     ME2 &= ~(UTXE1 | URXE1);   // USART1 UART module enable
     
-    /*
+   
     atomic {
       call UTXD.selectIOFunc();
       call URXD.selectIOFunc();
-    }*/ //Lifeng Sang
+    }
   }
 
   async command void Usart.enableUartTx() {
-    //call UTXD.selectModuleFunc(); Lifeng Sang
+    call UTXD.selectModuleFunc(); //Lifeng Sang
     ME2 |= UTXE1;   // USART1 UART Tx module enable
   }
 
   async command void Usart.disableUartTx() {
-    ME2 &= ~UTXE1;   // USART1 UART Tx module enable
-    
-    //call UTXD.selectIOFunc(); //Lifeng Sang
+    ME2 &= ~UTXE1;   // USART1 UART Tx module enable    
+    call UTXD.selectIOFunc(); //Lifeng Sang
   }
 
   async command void Usart.enableUartRx() {
-    //call URXD.selectModuleFunc(); //Lifeng Sang
+    call URXD.selectModuleFunc(); //Lifeng Sang
     ME2 |= URXE1;   // USART1 UART Rx module enable
   }
 
   async command void Usart.disableUartRx() {
     ME2 &= ~URXE1;  // USART1 UART Rx module disable
-    //call URXD.selectIOFunc(); //Lifeng Sang
+    call URXD.selectIOFunc(); //Lifeng Sang
 
   }
 
@@ -351,30 +349,28 @@ implementation
 				
 				atomic
 				{
-				  U1CTL |= SWRST;
-				  U1CTL  = CHAR+SWRST+(spi ? SYNC:0);//+MM;
+				  U1CTL |= SWRST;				  
+				 
+				  U1CTL  = CHAR+SWRST+(spi ? SYNC:0);//+MM;				  				  				  
 				  U1TCTL = CKPL;
-				  U1RCTL = 0;
 				  
+				  
+				  U1RCTL = 0;				  
 				  U1BR1 = 0x00;
 				  U1BR0 = 0x02;				   
-				  U1MCTL = 0x6E;
-				  
+				  U1MCTL = 0x6E;				  
 				  //enable USART module
 				  if (spi)
 				    ME2 |= USPIE1;
 				  else
-				    ME2 |= UTXE1 | URXE1;
-				
-					U1CTL &= ~SWRST;
-					
+				    ME2 |= UTXE1 | URXE1;				
+					U1CTL &= ~SWRST;					
 					//enable interrupts
 				  IE2 &= ~(URXIE1 | UTXIE1);
 					
-				  // enable the SPI_CS1_INT so that we can detect
-				  // the end-of-frame signal to reset the SPI channel
-				  
-				  
+				  //enable the SPI_CS1_INT so that we can detect
+				  //the end-of-frame signal to reset the SPI channel
+				  				  
 				  P1IES &= ~SPI_CS1_INT;
 				  P1IE |= SPI_CS1_INT;
 				  P1IFG &= ~SPI_CS1_INT;
@@ -382,7 +378,7 @@ implementation
 	}
 
 	/*
-	void configSpi_back(msp430_spi_config_t* config) {
+	void configSpi(msp430_spi_config_t* config) {
     msp430_uctl_t uctl = call Usart.getUctl();
     msp430_utctl_t utctl = call Usart.getUtctl();
 
@@ -402,19 +398,14 @@ implementation
     call Usart.setUmctl(0x00);    
   }*/
 
-  void configSpi(msp430_spi_config_t* config) {
-    
+  void configSpi(msp430_spi_config_t* config) {    
     /**by Lifeng Sang, for PSI mote only**/
-    //hard coded
+    //hard coded    
     uart_init_spi1();    
   }
 
-
-
-
-  async command void Usart.setModeSpi(msp430_spi_config_t* config) {
+  async command void Usart.setModeSpi(msp430_spi_config_t* config) {    
     
-    /*
     call Usart.disableUart();
     atomic {
       call Usart.resetUsart(TRUE);
@@ -423,21 +414,12 @@ implementation
       call Usart.resetUsart(FALSE);
       call Usart.clrIntr();
       call Usart.disableIntr();
-    }*/
-    
-    call Usart.disableSpi();
-    call Usart.disableUart();
-    
-    configSpi(config);
-    call Usart.enableSpi();
-    
-    call Usart.clrIntr();
-    call Usart.disableIntr();
-        
+    }     
     return;
   }
 	
-  void configUart_prev(msp430_uart_config_t* config) {
+	/*
+  void configUart(msp430_uart_config_t* config) {
     msp430_uctl_t uctl = call Usart.getUctl();
     msp430_utctl_t utctl = call Usart.getUtctl();
     msp430_urctl_t urctl = call Usart.getUrctl();
@@ -462,45 +444,36 @@ implementation
     call Usart.setUrctl(urctl);
     call Usart.setUbr(config->ubr);
     call Usart.setUmctl(config->umctl);
-  }
+  }*/
   
   void configUart(msp430_uart_config_t* config) {
-		//all SPI
-		/**by Lifeng Sang, for PSI mote only**/
-    //hard coded
-    configUart_prev(config);
+		//all SPI		
+    //hard coded    
     uart_init_spi1();  
 	}
 
   async command void Usart.setModeUartTx(msp430_uart_config_t* config) {
-
-			
+				
     call Usart.disableSpi();
     call Usart.disableUart();
-		
-		/*
-    atomic {
-    	
+        
+    //Lifeng
+		//------------------				
+		call Usart.setModeSpi(NULL);
+        
+    /*					
+    atomic {    	      
       call UTXD.selectModuleFunc();
-      call URXD.selectIOFunc(); 
-      
+      call URXD.selectIOFunc();             
       call Usart.resetUsart(TRUE);
       configUart(config);
       call Usart.enableUartTx();
       call Usart.resetUsart(FALSE);
       call Usart.clrIntr();
       call Usart.disableIntr();
-    }*/
+    }*/    
     
     
-     atomic
-    {
-    	configUart(config);
-	    call Usart.enableTxIntr();
-	    call Usart.resetUsart(FALSE);
-	    call Usart.clrIntr();
-	    call Usart.disableIntr();
-    } 
     return;
   }
 
@@ -509,27 +482,22 @@ implementation
 		
     call Usart.disableSpi();
     call Usart.disableUart();
-    /*
-    atomic {
+   
+   	 //Lifeng
+		//------------------				
+		call Usart.setModeSpi(NULL);
+   
+   	/*
+    atomic {      
       call UTXD.selectIOFunc();
-      call URXD.selectModuleFunc();
+      call URXD.selectModuleFunc();          
       call Usart.resetUsart(TRUE);
       configUart(config);
       call Usart.enableUartRx();
       call Usart.resetUsart(FALSE);
       call Usart.clrIntr();
       call Usart.disableIntr();
-    }*/
-    
-   
-    atomic
-    {
-    	configUart(config);
-	    call Usart.enableRxIntr();
-	    call Usart.resetUsart(FALSE);
-	    call Usart.clrIntr();
-	    call Usart.disableIntr();
-     } 
+    }*/   
     return;
   }
 
@@ -539,7 +507,12 @@ implementation
     call Usart.disableSpi();
     call Usart.disableUart();
     
-		/*
+    
+    //Lifeng
+		//------------------			
+		call Usart.setModeSpi(NULL);		
+			
+    /*		
     atomic {
       call UTXD.selectModuleFunc();
       call URXD.selectModuleFunc();
@@ -551,16 +524,6 @@ implementation
       call Usart.disableIntr();
     }*/
     
-    
-    
-    atomic
-    {
-    	configUart(config);
-	    call Usart.enableSpi();
-		  call Usart.resetUsart(FALSE);
-		  call Usart.clrIntr();
-		  call Usart.disableIntr();
-    }
     
     return;
   }
@@ -638,8 +601,7 @@ implementation
   async command void Usart.tx(uint8_t data) {
     atomic 
     {
-    		U1TXBUF = data;    		
-    		//state=STATE_SEND;
+    		U1TXBUF = data; 
     }
   }
 
@@ -648,7 +610,6 @@ implementation
     atomic 
     {
     	value = U1RXBUF;
-    	//state=STATE_RECV;
     }
     return value;
   }

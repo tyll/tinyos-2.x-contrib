@@ -17,17 +17,17 @@ push( @includes, qw(
   %T/platforms/psi/chips/stm25p  
   %T/platforms/psi/chips/cc2420
   %T/platforms/psi/chips/msp430/pins
-  %T/platforms/psi/chips/msp430/usart
+  %T/platforms/psi/chips/msp430/usart  
+  %T/platforms/psi/chips/msp430/adc12
   %T/chips/cc2420
-  %T/chips/msp430
-  %T/chips/msp430/adc12
+  %T/chips/msp430  
+  %T/platforms/psi/chips/msp430/sensors
   %T/chips/msp430/dma  
-  %T/chips/msp430/timer  
-  %T/chips/msp430/sensors
+  %T/chips/msp430/timer    
   %T/chips/stm25p
   %T/chips/sht11
   %T/lib/timer
-  %T/lib/serial
+  %T/platforms/psi/lib/serial
   %T/lib/adc
   %T/lib/power
 ) );

@@ -40,5 +40,8 @@ implementation
         TimeSyncC.LocalTime -> CounterToLocalTimeC;
         TimeSyncC.RadioTimeStamping -> CC2420TransmitC;
         TimeSyncC.CC2420Transmit -> CC2420TransmitC;
-        TimeSyncC.CC2420Packet -> CC2420PacketC;
+        TimeSyncC.CC2420PacketBody -> CC2420PacketC;
+
+	components DSNC;
+        TimeSyncC.DsnSend->DSNC;
 }

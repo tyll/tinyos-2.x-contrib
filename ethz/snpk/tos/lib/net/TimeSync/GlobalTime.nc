@@ -4,32 +4,32 @@
 
 interface GlobalTime
 {
-	/**
-	 * Returns the current local time of this mote. 
-	 */
+    /**
+     * Returns the current local time of this mote. 
+     */
 
-	async command uint32_t getLocalTime();
+    async command uint32_t getLocalTime();
 
-	/**
-	 * Reads the current global time. 
-	 * @return SUCCESS if this mote is synchronized, FAIL otherwise.
-	 */
+    /**
+     * Reads the current global time. 
+     * @return SUCCESS if this mote is synchronized, FAIL otherwise.
+     */
 
-	async command error_t getGlobalTime(uint32_t *time);
+    async command error_t getGlobalTime(uint32_t *time);
 
-	/**
-	 * Converts the global time to the correspoding local time 
-	 *
-	 * @return SUCCESS if this mote is synchronized, FAIL otherwise.
-	 */
+    /**
+     * Converts the global time to the correspoding local time 
+     *
+     * @return SUCCESS if this mote is synchronized, FAIL otherwise.
+     */
 
-	async command error_t global2Local(uint32_t *time);
+    async command error_t global2Local(uint32_t *time);
 
-        /**
-         * This event is triggered when the mote is synchronized
-	 *
-	 */
+    /**
+     * This event is triggered when the mote is synchronized
+     *
+     */
 
-        event void synced();
+    event void synced();
 
 }

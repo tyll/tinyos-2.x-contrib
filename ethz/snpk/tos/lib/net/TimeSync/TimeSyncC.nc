@@ -8,9 +8,6 @@
  * 
 */
 
-// Variable skewFloat needs update when clearing the table
-// Function Global2Local needs modification. Although the effect on time difference is no more than 3 ticks (less than 1 normally).
-
 #include "Timer.h"
 #include "TimeSyncMsg.h"
 
@@ -192,7 +189,7 @@ implementation
             table[addPlace].localTime = arrivalTime;
             table[addPlace].timeOffset = psend - arrivalTime;
 
-            numEntries = occNum;
+            atomic numEntries = occNum;
 
             call DsnSend.logInt(arrivalTime); 
             call DsnSend.logInt(psend);

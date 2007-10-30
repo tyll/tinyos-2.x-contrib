@@ -4,7 +4,7 @@
  * Author: Min Guo
  */
 
-//?? I cant use two T32khz timers?
+/* in this application, every mote should periodically (around 10 seconds) blink and generate a trigger at the same time */
 
 #include "Timer.h"
 

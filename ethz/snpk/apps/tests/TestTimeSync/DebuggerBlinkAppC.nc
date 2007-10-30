@@ -4,8 +4,6 @@
  * Author: Min Guo
  */
 
-//?? What is  the @param max_timers Number of virtual timers to create. How could one create and manage more than two virtual timers?
-
 configuration DebuggerBlinkAppC
 {
 }

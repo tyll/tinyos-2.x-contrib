@@ -24,11 +24,12 @@ interface GlobalTime
 	 */
 
 	async command error_t global2Local(uint32_t *time);
-      
+
         /**
-	 * This event is triggered when the mote is synchronized
+         * This event is triggered when the mote is synchronized
 	 *
 	 */
+
         event void synced();
-  
+
 }

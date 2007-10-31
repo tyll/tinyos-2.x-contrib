@@ -139,8 +139,9 @@ implementation
         int8_t oldestPlace = 0;
         uint32_t lt = 0; 
         uint32_t timePass;
-
-        uint32_t diffTime;
+        
+        uint32_t preceive;
+        int32_t diffTime;
 
         float newSkew = skew;
         uint32_t newLocalAverage;
@@ -150,18 +151,16 @@ implementation
         int64_t offsetSum;
         float foffsetSum;
 
-        diffTime = arrivalTime;
-        diffTime += offsetAverage + (int32_t)(skew * (int32_t)(arrivalTime - localAverage));
-        call DsnSend.logInt(diffTime);
+        preceive = arrivalTime;
+        preceive += offsetAverage + (int32_t)(skew * (int32_t)(arrivalTime - localAverage));
+        call DsnSend.logInt(preceive);
         call DsnSend.log("global time at receiving %i \r");
-
-        if (diffTime > psend) {diffTime -= psend;}
-            else {diffTime = psend - diffTime;}
+        diffTime = preceive - psend;
 
         call DsnSend.logInt(diffTime);
         call DsnSend.log("time difference %i \r");
 
-        if((is_synced() == SUCCESS) && (diffTime > INVALID_MSG_LIMIT)) {
+        if((is_synced() == SUCCESS) && (diffTime > INVALID_MSG_LIMIT || diffTime < -INVALID_MSG_LIMIT)) {
             call DsnSend.logInt(arrivalTime); 
             call DsnSend.logInt(psend);
             call DsnSend.logInt(numEntries);

@@ -56,6 +56,7 @@ implementation
   message_t* curSend;
   message_t* cancel_msg;
   uint8_t cancel_id;
+  priority_t gPriority;
   
   enum 
   {
@@ -74,7 +75,11 @@ implementation
   {
     priority_t p;
     queue_t* q;
-    p = signal AmRegistry.configure[ amId ](msg);
+    signal AmRegistry.configure[ amId ](msg);
+    atomic{
+      p = gPriority;
+    }
+    
     //if the queue is full, return fail
     if(index == QUEUE_SIZE)
     {
@@ -144,6 +149,12 @@ implementation
     return call SubSend.getPayload[ amId ](msg, len);
   }
   
+  /**************** AmRegistry Commands *****************/
+  command void AmRegistry.configureDone[ am_id_t amId ](message_t* msg, priority_t p){
+    atomic{
+      gPriority = p;
+    }
+  }
   /**************** SubSend Events **********************/
   event void SubSend.sendDone[ am_id_t amId ](message_t* msg, error_t error)
   {
@@ -209,7 +220,7 @@ implementation
     uint8_t i, high_priority;
     queue_t* q;
     high_priority = P_LOWEST;
-    q = &queue; //if nothing is higher than p lowest, return the first message;
+    q = queue; //if nothing is higher than p lowest, return the first message;
     atomic
     {
       for(i = 0; i < index; i++)
@@ -231,7 +242,7 @@ implementation
   task void sendCancel(){
   
     uint8_t amId;
-    uint8_t msg;
+    message_t* msg;
     atomic
     {
       amId = cancel_id;
@@ -241,11 +252,25 @@ implementation
   }
   
   /*************** Default AmRegistry ******************/
-  default event priority_t AmRegistry.configure[ am_id_t id ]( message_t* msg )
+  default event void AmRegistry.configure[ am_id_t id ]( message_t* msg )
   {
-    return P_LOWEST;
+    call AmRegistry.configureDone[ id ](msg, P_LOWEST);
   }
+  
+  default event void AMSend.sendDone[ am_id_t amId ](message_t* msg, error_t error){};
 
+  default command error_t SubSend.send[ am_id_t amId ](am_addr_t addr, message_t* msg, uint8_t len){
+    return FAIL;
+  }
+  default command error_t SubSend.cancel[ am_id_t amId ](message_t* msg){
+    return FAIL;
+  }
+  default command uint8_t SubSend.maxPayloadLength[ am_id_t amId ](){
+    return 0;
+  }
+  default command void* SubSend.getPayload[ am_id_t amId ](message_t* msg, uint8_t len){
+    return NULL;
+  }
 }
 
 

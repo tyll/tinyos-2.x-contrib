@@ -78,6 +78,7 @@ implementation {
   
   components BlazeTransmitC;
   BlazeTransmitC.Csn[ CC1100_RADIO_ID ] -> Pins.Csn;
+  BlazeTransmitC.TxInterrupt[ CC1100_RADIO_ID ] -> Pins.Gdo2_int;
   
   components BlazeReceiveC;
   BlazeReceiveC.Csn[ CC1100_RADIO_ID ] -> Pins.Csn;

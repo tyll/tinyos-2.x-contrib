@@ -94,10 +94,7 @@ implementation {
 
   /** Number of interrupts that occurred while we were busy receiving a pkt */
   uint8_t missedPackets;
-  
-  /** TRUE if the CRC for the packet we're receiving passed */
-  bool crcValidated;
-  
+
   
   enum receive_states{
     S_IDLE,
@@ -109,7 +106,7 @@ implementation {
   enum {
     BLAZE_RXFIFO_LENGTH = 64,
     
-    // Add 2 because of the CRC hidden at the end
+    // Add 2 because of RSSI and LQI hidden at the end
     MAC_PACKET_SIZE = MAC_HEADER_SIZE + TOSH_DATA_LENGTH + MAC_FOOTER_SIZE + 2,
     
     SACK_HEADER_LENGTH = 5,

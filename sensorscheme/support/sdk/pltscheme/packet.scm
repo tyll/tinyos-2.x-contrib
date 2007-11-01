@@ -1,0 +1,18 @@
+(let-values ([(in-port out-port) (tcp-connect "localhost" 9002)])
+  (define (read-packet)
+    (let ([n (read-byte in-port)])
+      (printf "~a:~a " n (read-bytes n in-port))
+      )
+    (newline))
+  
+(file-stream-buffer-mode in-port 'none)
+(file-stream-buffer-mode out-port 'none)
+  (write-char #\U out-port)
+  (write-char #\  out-port)
+  (flush-output out-port)
+  (printf "~a" (read-char in-port))
+  (printf "~a" (read-char in-port))
+  
+  (let loop ()
+    (read-packet)
+    (loop)))

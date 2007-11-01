@@ -1,0 +1,31 @@
+0: 1 node farm/supermarket BS
+1: 1 node harbor BS
+2: 1 node truck
+3: 1 node container
+4,5: 2 coffee
+6-10: 4 bananas
+
+1. banana nodes blink green when others are nearby or red when more than 1 coffee mote is near.
+2. when truck moves in (after 10 s) bcast announce, banana nodes advance to loaded state. 
+3. truck receives all banana replies and advances to loaded state.
+4. when arrive at dock, banana nodes advance state
+5. bananas hear container and advance state
+6. bananas arrive at harbor and finish
+
+Banana states:
+1. empty (matching number of bananas vs coffee)
+2. in truck
+3. at dock
+4. in container
+5. finish
+state number determines duration of blue led on
+ 
+once per second : 
+  announce type
+  check received types
+  set leds
+  set timer to turn leds off
+  
+received types: 
+- advancing state: when state == x: if received contains (x+1) device: update to x+1
+- if state == 'empty': 

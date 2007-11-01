@@ -121,12 +121,12 @@ implementation
 
     void skewInMsg() 
     {
-        if (skew>=0) {
-            skewInt = skew;
+        if (skew>=0.0) {
+            skewInt = (int8_t)skew;
             skewFloat = (uint32_t)((float)(skew - skewInt)*2147483648.0);
         }
         else {
-            skewInt = skew-1;
+            skewInt = (int8_t)(skew-1.0);
             skewFloat = (uint32_t)((float)(skew - skewInt)*2147483648.0);
         }
     }

@@ -73,6 +73,8 @@ module BlazeTransmitP {
     interface State as InterruptState;
 
     interface Leds;
+    
+    //interface DebugPins as Pins;
   }
 }
 
@@ -122,7 +124,7 @@ implementation {
     if(call State.requestState(S_TX_PACKET) != SUCCESS) {
       return FAIL;
     }
-    
+
     return transmit(id, FALSE);
   }
   
@@ -254,8 +256,8 @@ implementation {
      * is occurring.  Otherwise, there was something on the channel that
      * prevented CCA from passing
      */
-    call TxInterrupt.disable[id]();
-    call InterruptState.forceState(S_INTERRUPT_TX);
+    //call TxInterrupt.disable[id]();//JCH CHANGE
+    //call InterruptState.forceState(S_INTERRUPT_TX);//JCH CHANGE
     call STX.strobe();
     
     if(force) {
@@ -265,10 +267,13 @@ implementation {
       }
     
     } else {
-      if(call RadioStatus.getRadioStatus() != BLAZE_S_TX) {
+      if((state = call RadioStatus.getRadioStatus()) != BLAZE_S_TX) {
         // CCA failed
-        call InterruptState.forceState(S_INTERRUPT_RX);
-        call TxInterrupt.enableRisingEdge[id]();
+        if(state == BLAZE_S_RX){
+          //call Pins.toggle65();
+        }
+        //call InterruptState.forceState(S_INTERRUPT_RX);//JCH CHANGE
+        //call TxInterrupt.enableRisingEdge[id]();//JCH CHANGE
         call State.toIdle();
         call Csn.set[ id ]();
         return EBUSY;
@@ -287,8 +292,8 @@ implementation {
       }
     }
     
-    call InterruptState.forceState(S_INTERRUPT_RX);
-    call TxInterrupt.enableRisingEdge[id]();
+    //call InterruptState.forceState(S_INTERRUPT_RX);//JCH CHANGE
+    //call TxInterrupt.enableRisingEdge[id]();//JCH CHANGE
     call Csn.set[ id ]();
     
     state = call State.getState();

@@ -83,7 +83,11 @@ module BlazeInitP {
     interface BlazeStrobe as SFTX;
     interface BlazeStrobe as SRX;
     
+    interface State as InterruptState;
+    
     interface Leds;
+    
+    //interface DebugPins as Pins;
   }
 }
 
@@ -261,6 +265,12 @@ implementation {
     call Idle.strobe();
     call SFRX.strobe();
     call SFTX.strobe();
+    
+    call InterruptState.forceState(S_INTERRUPT_RX); 
+    //call Pins.toggle66();
+    call Gdo2_int.disable[ m_id ]();
+    call Gdo2_int.enableRisingEdge[ m_id ](); //JCH CHANGE
+    
     call SRX.strobe();
     while(call RadioStatus.getRadioStatus() != BLAZE_S_RX);
     
@@ -268,7 +278,9 @@ implementation {
     
     call ResetResource.release();
     
-    call Gdo2_int.enableFallingEdge[ m_id ]();
+    //should this be enablerisingedge in orig???
+    //call Gdo2_int.enableFallingEdge[ m_id ]();
+    //call Gdo2_int.enableRisingEdge[ m_id ]();
     
     if(state[m_id] == S_STARTING) {
       state[m_id] = S_ON;

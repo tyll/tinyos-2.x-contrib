@@ -74,6 +74,8 @@ implementation {
   BlazeInitC.BlazeRegSettings[ CC1100_RADIO_ID ] -> CC1100ControlP;
   BlazeInitC.Gdo0_io[ CC1100_RADIO_ID ] -> Pins.Gdo0_io;
   BlazeInitC.Gdo2_io[ CC1100_RADIO_ID ] -> Pins.Gdo2_io;
+  BlazeInitC.Gdo2_int[ CC1100_RADIO_ID ] -> Pins.Gdo2_int;
+  BlazeInitC.Gdo0_int[ CC1100_RADIO_ID ] -> Pins.Gdo0_int;
   CC1100ControlP.BlazeCommit -> BlazeInitC.BlazeCommit[ CC1100_RADIO_ID ];
   
   components BlazeTransmitC;

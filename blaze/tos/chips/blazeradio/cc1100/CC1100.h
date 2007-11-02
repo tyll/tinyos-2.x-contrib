@@ -47,7 +47,8 @@ enum {
 
 enum CC1100_config_reg_state_enums {
   /** GDO2 asserts at Rx sync and deasserts at end of packet */
-  CC1100_CONFIG_IOCFG2 = 0x06,
+  CC1100_CONFIG_IOCFG2 = 0x01, // asserts when avove fifothr, deasserts when empty
+  //CC1100_CONFIG_IOCFG2 = 0x06,//JCH CHANGE
   
   /** GDO1 is High Impedance */
   CC1100_CONFIG_IOCFG1 = 0x2E,
@@ -55,7 +56,8 @@ enum CC1100_config_reg_state_enums {
   /** GDO0 goes high when the channel is clear */
   CC1100_CONFIG_IOCFG0 = 0x09, 
   
-  CC1100_CONFIG_FIFOTHR = 0x07,
+  CC1100_CONFIG_FIFOTHR = 0x0F,//JCH CHANGE
+  //CC1100_CONFIG_FIFOTHR = 0x07,
   CC1100_CONFIG_SYNC1 = 0xD3,
   CC1100_CONFIG_SYNC0 = 0x91,
   
@@ -69,7 +71,8 @@ enum CC1100_config_reg_state_enums {
   CC1100_CONFIG_PKTCTRL0 = 0x41,
   
   CC1100_CONFIG_ADDR = 0x00,
-  CC1100_CONFIG_CHANNR = 0x46, // 315 MHz default
+  CC1100_CONFIG_CHANNR = 0x78, // 315 MHz default
+  //CC1100_CONFIG_CHANNR = 0x46, // 315 MHz default
   CC1100_CONFIG_FSCTRL1 = 0x10,
   CC1100_CONFIG_FSCTRL0 = 0x00,
   CC1100_CONFIG_FREQ2 = 0x0B,  //base freq is 301 MHz

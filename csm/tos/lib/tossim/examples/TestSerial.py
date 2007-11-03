@@ -1,4 +1,4 @@
-#
+    #
 # Copyright (c) 2007 Toilers Research Group - Colorado School of Mines
 # All rights reserved.
 #
@@ -32,17 +32,54 @@
 # Author: Chad Metcalf
 # Date: July 9, 2007
 #
+# A simple TOSSIM driver for the TestSerial application that utilizes 
+# TOSSIM Live extensions.
+#
+import sys
+import time
 
-DRIVER_OBJS=build/micaz/c-sf.o build/micaz/sf.o build/micaz/tossim.o build/micaz/c-support.o build/micaz/sim.o build/micaz/throttle.o 
+from TOSSIM import *
+from TestSerialMsg import *
 
-SFDIR=$(TOSDIR)/lib/tossim/sf
+t = Tossim([])
+m = t.mac()
+r = t.radio()
+sf = SerialForwarder(9001)
+throttle = Throttle(t, 10)
 
-all:
-	make micaz sim-sf
-	g++ -g -c -o TestSerial.o TestSerial.c -I$(TOSDIR)/lib/tossim -I$(SFDIR) 
-	g++ -o TestSerial $(DRIVER_OBJS)  TestSerial.o -lpython2.5 
-	mig python -target=null -python-classname=TestSerialMsg TestSerial.h test_serial_msg -o TestSerialMsg.py
+t.addChannel("Serial", sys.stdout);
+t.addChannel("TestSerialC", sys.stdout);
 
-clean:
-	make clean
-	rm -f TestSerial TestSerial.o TestSerialMsg.py *.pyc app.xml
+for i in range(0, 2):
+  m = t.getNode(i);
+  m.bootAtTime((31 + t.ticksPerSecond() / 10) * i + 1);
+
+sf.process();
+throttle.initialize();
+
+for i in range(0, 60):
+  throttle.checkThrottle();
+  t.runNextEvent();
+  sf.process();
+
+msg = TestSerialMsg()
+msg.set_counter(7);
+
+serialpkt = t.newSerialPacket();
+serialpkt.setData(msg.data)
+serialpkt.setType(msg.get_amType())
+serialpkt.setDestination(0)
+serialpkt.deliver(0, t.time() + 3)
+
+pkt = t.newPacket();
+pkt.setData(msg.data)
+pkt.setType(msg.get_amType())
+pkt.setDestination(0)
+pkt.deliver(0, t.time() + 10)
+
+for i in range(0, 20):
+  throttle.checkThrottle();
+  t.runNextEvent();
+  sf.process();
+
+throttle.printStatistics()

@@ -1,0 +1,1 @@
+./sf 9001 /dev/ttyS0 19200 mica &

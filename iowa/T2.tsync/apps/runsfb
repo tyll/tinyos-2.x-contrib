@@ -1,0 +1,1 @@
+./sf 9001 /dev/tts/USB0 telosb &

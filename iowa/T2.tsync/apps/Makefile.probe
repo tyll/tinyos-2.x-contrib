@@ -1,0 +1,5 @@
+COMPONENT=probeTsyncC
+
+PFLAGS= -I../IAtsync
+
+include $(MAKERULES)

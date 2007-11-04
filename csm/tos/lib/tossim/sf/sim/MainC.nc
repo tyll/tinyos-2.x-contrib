@@ -29,7 +29,8 @@
  * TOSSIM simulation is triggered from Python.
  *
  * @author Philip Levis
- * @date   August 6 2005
+ * @author Chad Metcalf
+ * @date   Sep 14 2007
  */
 
 // $Id$

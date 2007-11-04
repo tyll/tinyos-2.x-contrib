@@ -26,7 +26,8 @@
  * Used to generate Python objects.
  *
  * @author Philip Levis
- * @date   Nov 22 2005
+ * @author Chad Metcalf
+ * @date   July 15 2007
  */
 
 // $Id$

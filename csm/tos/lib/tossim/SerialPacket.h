@@ -26,7 +26,8 @@
  * Injecting packets into TOSSIM.
  *
  * @author Philip Levis
- * @date   Dec 10 2005
+ * @author Chad Metcalf
+ * @date   July 15 2007
  */
 
 #ifndef SERIAL_PACKET_H_INCLUDED

@@ -31,7 +31,8 @@
  * sim_mac.c.
  *
  * @author Philip Levis
- * @date   Jan 2 2006
+ * @author Chad Metcalf
+ * @date   July 17 2007
  */
 
 

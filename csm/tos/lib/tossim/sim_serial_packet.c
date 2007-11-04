@@ -27,7 +27,8 @@
  * code that does the native-to-network type translation.
  *
  * @author Philip Levis
- * @date   Jan 2 2006
+ * @author Chad Metcalf
+ * @date   July 15 2007
  */
 
 // $Id$

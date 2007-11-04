@@ -1,0 +1,12 @@
+#!/bin/sh
+while true ; do 
+    if [ -z $1 ] ; then exit 0 ; fi
+    s=`grep "\-\-EOCpr712" $1 | wc -l` 
+    if [ $s = '0' ] ; then 
+       cat copyright.txt > hold
+       cat $1 >> hold
+       mv hold $1
+       echo "Copyright addeded to" $1
+       fi
+    shift
+    done

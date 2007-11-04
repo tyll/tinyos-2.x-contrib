@@ -1,16 +1,93 @@
 <html>
 <head>
-   <title>Index Placeholder</title>
+   <title>Iowa Projects</title>
 </head>
 <body TEXT="#000000" BGCOLOR="#FFFFFF" LINK="#0000EF" VLINK="#55188A" ALINK="#FF0000">
 
 <img src="http://www.tinyos.net/scoop/images/tos-jwall.jpg"></img>
 
-<h1>Index Placeholder</h1>
+<h1>Iowa Projects</h1>
+
+So far, we only have one:  Timesync.
+
+<h2>Rootless Timesync</h2>
 
 <p>
-This file is a placeholder for your personal index file.  It is linked to from your entry in the main index file found in <i>tinyos-2.x-contrib/index.html</i>.  It should be used to document any projects contained in this directory.  Please update it as appropriate. 
+This project is an implementation of <i>rootless</i> timesync.
+Most clock synchronization algorithms are rooted to an 
+authoritative clock (though perhaps by leader election, 
+as Vanderbilt's FTSP does).  The advantage of a rootless
+protocol is that it may be better suited to mobile 
+nodes.  This project has several interfaces of interest,
+please see the doc directory for a README and some 
+PDF documents explaining interfaces and operation.
 </p>
+<p>
+<b>Project Status:  EXPERIMENTAL</b>
+</p>
+<p>
+<b>Acknowledgement:</b>
+<i>
+This material is based upon work supported by the National Science
+Foundation under Grant No. 0519907.
+Any opinions, findings, and conclusions or recommendations expressed 
+in this material are those of the author(s) and do not necessarily 
+reflect the views of the National Science Foundation.
+</i>
+</p>
+
+<h3>Directory Structure for T2.tsync</h3>
+<pre>
+T2.tsync
++--apps
+|  README.txt
+|  Makefile       (makefile for testTsync)
+|  Makefile.probe (makefile for probe generator)
+|  probeTsyncC.nc (probe generator for testing only)
+|  probeTsyncP.nc
+|  testTsyncC.nc  (trivial test of timesync)
+|  testTsyncP.nc
+|  runsfb  (script to run sf in background)
+|  spy (compiled from ../IAtsync/T2spy.c)
+|  sf  (compiled from /opt/tinyos-2.x/support/sdk/c/sf.c)
++--doc
+|  README.txt  (duplicate of apps/README.txt)
+|  ZigBeeNotes.txt
+|  inaybur.pdf
+|  itamsenk.pdf
++--IAtsync
+|  CounterMicro32C.nc  (please remove when T2 has this checked in)
+|  RadioTimeStamping.nc (please remove when T2 fixes missing include)
+|  Beacon.h
+|  MarginC.nc
+|  MarginP.nc
+|  Neighbor.nc
+|  OTime.h
+|  OTime.nc
+|  OTimeC.nc
+|  OTimeP.nc
+|  PowAMSendP.nc
+|  PowCommC.nc
+|  PowCon.h
+|  PowCon.nc
+|  PowConC.nc
+|  PowConP.nc
+|  PowConQS.nc
+|  T2spy.c
+|  Tnbrhood.h
+|  Tnbrhood.nc
+|  TnbrhoodC.nc
+|  TnbrhoodP.nc
+|  TskewC.nc
+|  TskewP.nc
+|  Tsync.nc
+|  TsyncC.nc
+|  TsyncP.nc
+|  Wakker.h
+|  Wakker.nc
+|  WakkerC.nc
+|  WakkerP.nc
+</pre>
 
 </body>
 </html>

@@ -256,8 +256,6 @@ implementation {
      * is occurring.  Otherwise, there was something on the channel that
      * prevented CCA from passing
      */
-    //call TxInterrupt.disable[id]();//JCH CHANGE
-    //call InterruptState.forceState(S_INTERRUPT_TX);//JCH CHANGE
     call STX.strobe();
     
     if(force) {
@@ -269,17 +267,18 @@ implementation {
     } else {
       if((state = call RadioStatus.getRadioStatus()) != BLAZE_S_TX) {
         // CCA failed
-        if(state == BLAZE_S_RX){
-          //call Pins.toggle65();
-        }
-        //call InterruptState.forceState(S_INTERRUPT_RX);//JCH CHANGE
-        //call TxInterrupt.enableRisingEdge[id]();//JCH CHANGE
         call State.toIdle();
         call Csn.set[ id ]();
         return EBUSY;
       }
     }
     
+    /*
+     * Our radio must go back into RX mode after a transmit. Wait until
+     * the status byte tells us we're in the RX mode, or if there
+     * was an overflow/underflow, fix it and make sure we're 
+     * back in RX mode by the time this is done.
+     */
     while((state = call RadioStatus.getRadioStatus()) != BLAZE_S_RX) {
       if (state == BLAZE_S_RXFIFO_OVERFLOW) {
         call SFRX.strobe();
@@ -292,8 +291,9 @@ implementation {
       }
     }
     
-    //call InterruptState.forceState(S_INTERRUPT_RX);//JCH CHANGE
-    //call TxInterrupt.enableRisingEdge[id]();//JCH CHANGE
+    /*
+     * Deselect the radio hardware, set our state back to idle, signal done
+     */
     call Csn.set[ id ]();
     
     state = call State.getState();
@@ -306,8 +306,6 @@ implementation {
       signal AckSend.sendDone[ id ]();
     }
     
-    
-    // Execution continues at the TxInterrupt event.
     return SUCCESS;
   }
   

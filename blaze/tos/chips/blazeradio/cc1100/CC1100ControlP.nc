@@ -129,7 +129,7 @@ implementation {
   /***************** SoftwareInit Commands ****************/
   command error_t SoftwareInit.init() {
     // Our header dest is an nxle. Match up our 8-bit address with it.
-    regValues[BLAZE_ADDR] = (call ActiveMessageAddress.amAddress()) >> 8;
+    regValues[BLAZE_ADDR] = (call ActiveMessageAddress.amAddress());
     panAddress = TOS_AM_GROUP;
     
 #if defined(NO_ACKNOWLEDGEMENTS)

@@ -13,7 +13,7 @@ implementation {
   
   components TestSpiP,
       BlazeSpiC,
-      new BlazeSpiResourceC,
+      new BlazeSpiResourceC(),
       HplCC1100PinsC,
       LedsC;
       

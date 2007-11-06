@@ -1,3 +1,3 @@
-COMPONENT=TestC
+COMPONENT=TestRadioC
 include $(MAKERULES)
 

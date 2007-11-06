@@ -46,6 +46,7 @@
  
 #include "Blaze.h"
 #include "BlazeInit.h"
+#include "InterruptState.h"
 
 /**
  * TODO remove the single-radio requirement.  Add in Gdo0_int and Gdo2_int

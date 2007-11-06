@@ -5,7 +5,11 @@
 
 /**
  * Fill up and transmit a single packet, then verify every byte got
- * transferred correctly
+ * transferred correctly.  The receiver should transmit back an acknowledgement
+ * that has the correct bytes filled in.
+ *
+ * If the test times out, that's because the transmitter (node 0) never got
+ * an acknowledgement.
  */
 configuration TestC {
 }
@@ -15,8 +19,9 @@ implementation {
   components new TestCaseC() as TestReceiveC;
   
   components TestP,
+      new BlazeSpiResourceC(),
       CC1100ControlC,
-      CsmaC,
+      BlazeTransmitC,
       BlazeReceiveC,
       HplCC1100PinsC,
       BlazePacketC,
@@ -25,13 +30,16 @@ implementation {
   TestP.SetUpOneTime -> TestReceiveC.SetUpOneTime;
   TestP.TearDownOneTime -> TestReceiveC.TearDownOneTime;
   TestP.TestReceive -> TestReceiveC;
-  
+ 
+  TestP.Resource -> BlazeSpiResourceC;
   TestP.SplitControl -> CC1100ControlC;
   TestP.Leds -> LedsC;
-   
-  TestP.Send -> CsmaC.Send[CC1100_RADIO_ID];
+  
   TestP.Receive -> BlazeReceiveC.Receive[ CC1100_RADIO_ID ];
+  TestP.AckReceive -> BlazeReceiveC.AckReceive;
   TestP.BlazePacketBody -> BlazePacketC;
+  
+  TestP.AsyncSend -> BlazeTransmitC.AsyncSend[ CC1100_RADIO_ID ];
   
 }
 

@@ -4,8 +4,8 @@
 
 
 /**
- * Fill up and transmit a single packet, then verify every byte got
- * transferred correctly
+ * Fill up and transmit a single packet to the broadcast address, 
+ * then verify every byte got transferred correctly
  */
 configuration TestC {
 }
@@ -15,8 +15,9 @@ implementation {
   components new TestCaseC() as TestReceiveC;
   
   components TestP,
+      new BlazeSpiResourceC(),
       CC1100ControlC,
-      CsmaC,
+      BlazeTransmitC,
       BlazeReceiveC,
       HplCC1100PinsC,
       BlazePacketC,
@@ -25,13 +26,16 @@ implementation {
   TestP.SetUpOneTime -> TestReceiveC.SetUpOneTime;
   TestP.TearDownOneTime -> TestReceiveC.TearDownOneTime;
   TestP.TestReceive -> TestReceiveC;
-  
+ 
+  TestP.Resource -> BlazeSpiResourceC;
   TestP.SplitControl -> CC1100ControlC;
   TestP.Leds -> LedsC;
    
-  TestP.Send -> CsmaC.Send[CC1100_RADIO_ID];
   TestP.Receive -> BlazeReceiveC.Receive[ CC1100_RADIO_ID ];
+  TestP.ReceiveController -> BlazeReceiveC.ReceiveController[ CC1100_RADIO_ID ];
   TestP.BlazePacketBody -> BlazePacketC;
+  
+  TestP.AsyncSend -> BlazeTransmitC.AsyncSend[ CC1100_RADIO_ID ];
   
 }
 

@@ -4,8 +4,7 @@
 
 
 /**
- * Fill up and transmit a single packet, then verify every byte got
- * transferred correctly
+ * Transmit a packet back and forth a bunch of times.
  */
 configuration TestC {
 }
@@ -16,21 +15,25 @@ implementation {
   
   components TestP,
       CC1100ControlC,
+      AcknowledgementsC,
       CsmaC,
       BlazeReceiveC,
-      HplCC1100PinsC,
       BlazePacketC,
       LedsC;
       
+  AcknowledgementsC.SubSend -> CsmaC.Send;
+  
   TestP.SetUpOneTime -> TestReceiveC.SetUpOneTime;
   TestP.TearDownOneTime -> TestReceiveC.TearDownOneTime;
   TestP.TestReceive -> TestReceiveC;
   
+
   TestP.SplitControl -> CC1100ControlC;
-  TestP.Leds -> LedsC;
+  TestP.Leds -> LedsC; 
    
-  TestP.Send -> CsmaC.Send[CC1100_RADIO_ID];
+  TestP.Send -> AcknowledgementsC.Send[CC1100_RADIO_ID];
   TestP.Receive -> BlazeReceiveC.Receive[ CC1100_RADIO_ID ];
+  TestP.PacketAcknowledgements -> AcknowledgementsC;
   TestP.BlazePacketBody -> BlazePacketC;
   
 }

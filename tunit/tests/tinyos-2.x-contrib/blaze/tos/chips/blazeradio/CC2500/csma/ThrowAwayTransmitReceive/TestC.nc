@@ -15,18 +15,24 @@ implementation {
   components new TestCaseC() as TestReceiveC;
   
   components TestP,
+      MainC,
       CC1100ControlC,
       CsmaC,
       BlazeReceiveC,
       HplCC1100PinsC,
       BlazePacketC,
+      ActiveMessageAddressC,
+      new TimerMilliC(),
       LedsC;
       
+  TestP.Boot -> MainC;
+  
   TestP.SetUpOneTime -> TestReceiveC.SetUpOneTime;
   TestP.TearDownOneTime -> TestReceiveC.TearDownOneTime;
   TestP.TestReceive -> TestReceiveC;
-  
+  TestP.ActiveMessageAddress -> ActiveMessageAddressC;
   TestP.SplitControl -> CC1100ControlC;
+  TestP.Timer -> TimerMilliC;
   TestP.Leds -> LedsC;
    
   TestP.Send -> CsmaC.Send[CC1100_RADIO_ID];

@@ -20,6 +20,7 @@ implementation {
       BlazeReceiveC,
       HplCC1100PinsC,
       BlazePacketC,
+      new TimerMilliC(),
       LedsC;
       
   TestP.SetUpOneTime -> TestReceiveC.SetUpOneTime;
@@ -27,6 +28,7 @@ implementation {
   TestP.TestReceive -> TestReceiveC;
   
   TestP.SplitControl -> CC1100ControlC;
+  TestP.Timer -> TimerMilliC;
   TestP.Leds -> LedsC;
    
   TestP.Send -> CsmaC.Send[CC1100_RADIO_ID];

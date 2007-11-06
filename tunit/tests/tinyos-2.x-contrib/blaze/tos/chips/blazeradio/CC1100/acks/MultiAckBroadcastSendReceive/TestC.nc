@@ -16,22 +16,24 @@ implementation {
   
   components TestP,
       CC1100ControlC,
-      CsmaC,
       BlazeReceiveC,
       HplCC1100PinsC,
       BlazePacketC,
+      AcknowledgementsC,
       LedsC;
       
   TestP.SetUpOneTime -> TestReceiveC.SetUpOneTime;
   TestP.TearDownOneTime -> TestReceiveC.TearDownOneTime;
   TestP.TestReceive -> TestReceiveC;
-  
+  TestP.PacketAcknowledgements -> AcknowledgementsC;
   TestP.SplitControl -> CC1100ControlC;
   TestP.Leds -> LedsC;
    
-  TestP.Send -> CsmaC.Send[CC1100_RADIO_ID];
+  TestP.Send -> AcknowledgementsC.Send[CC1100_RADIO_ID];
   TestP.Receive -> BlazeReceiveC.Receive[ CC1100_RADIO_ID ];
   TestP.BlazePacketBody -> BlazePacketC;
   
+  components CsmaC;
+  AcknowledgementsC.SubSend -> CsmaC;
 }
 

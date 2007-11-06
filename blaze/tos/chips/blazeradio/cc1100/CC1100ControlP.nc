@@ -128,7 +128,7 @@ implementation {
   
   /***************** SoftwareInit Commands ****************/
   command error_t SoftwareInit.init() {
-    // TODO the struct is an nxle. Do we put the MSB's in the ADDR reg?
+    // Our header dest is an nxle. Match up our 8-bit address with it.
     regValues[BLAZE_ADDR] = (call ActiveMessageAddress.amAddress()) >> 8;
     panAddress = TOS_AM_GROUP;
     

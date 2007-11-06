@@ -41,13 +41,13 @@ typedef uint8_t radio_id_t;
  * 8 bytes found in blaze_ack_t
  */
 typedef nx_struct blaze_header_t {
-  nx_uint8_t length;
-  nx_uint16_t dest;
-  nx_uint16_t fcf;
-  nx_uint8_t dsn;
-  nx_uint16_t src;
-  nx_uint16_t destpan;
-  nx_uint8_t type;
+  nxle_uint8_t length;
+  nxle_uint16_t dest;
+  nxle_uint16_t fcf;
+  nxle_uint8_t dsn;
+  nxle_uint16_t src;
+  nxle_uint16_t destpan;
+  nxle_uint8_t type;
 } blaze_header_t;
 
 /**
@@ -79,11 +79,11 @@ typedef nx_struct blaze_metadata_t {
  * does not get transferred.
  */
 typedef nx_struct blaze_ack_t {
-  nx_uint8_t length;
-  nx_uint16_t dest;
-  nx_uint16_t fcf;
-  nx_uint8_t dsn;
-  nx_uint16_t src;
+  nxle_uint8_t length;
+  nxle_uint16_t dest;
+  nxle_uint16_t fcf;
+  nxle_uint8_t dsn;
+  nxle_uint16_t src;
 } blaze_ack_t;
 
 enum {

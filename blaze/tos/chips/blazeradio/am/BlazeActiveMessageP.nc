@@ -74,6 +74,7 @@ implementation {
     header->type = id;
     header->dest = addr;
     header->destpan = call ActiveMessageAddress.amGroup();
+    header->src = call ActiveMessageAddress.amAddress();
     
     return call SubSend.send( msg, header->length + 1);
   }

@@ -1,0 +1,10 @@
+CFLAGS += -DFOOTER_SIZE=0
+MAX_LPL_CCA_CHECKS=80
+
+ifeq ($(UPMA),1)
+        CFLAGS += -I$(UPMA_DIR)/lib/macs/bmac
+else
+	CFLAGS += -DNOACK_LOW_POWER_LISTENING
+endif
+
+include ../../Makefile.common

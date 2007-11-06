@@ -1,0 +1,12 @@
+This document provides instructions on how to set up and use UPMA (including MLA).
+
+1) Open the file 'upma.sh' and point the UPMA_DIR variable to the location of your 'tinyos-2.x-contrib/wustl/upma' directory
+
+2) Source the 'upma.sh' file by calling 'source upma.sh'.  If you plan to use the upma stack on a regular basis, it may be worthwile to add this line to your .profile or .bashrc files.
+
+3) Test to make sure the test applications under 'tinyos-2.x-contrib/wustl/upma/apps/tests' compile and run correctly.  Unfortunately, at this time, we only provide support for the telosb platform.
+
+4) Take a look at the Makefiles in each of the test app directories to get a feel for how you include the upma stack in your own applications.
+
+If you have any questions or comments, feel free to email me (Kevin Klues) at klueska@cs.stanford.edu or Greg Hackmann at gwh2@cse.wustl.edu 
+

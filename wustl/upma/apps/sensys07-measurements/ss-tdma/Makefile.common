@@ -1,0 +1,7 @@
+CFLAGS += -I$(UPMA_DIR)/lib/macs/ss-tdma \
+	  -I$(UPMA_DIR)/lib/macs/pure-tdma \
+	  -DFOOTER_SIZE=0 \
+	  -DTDMA
+UPMA = 1
+
+include ../../Makefile.common

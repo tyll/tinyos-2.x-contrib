@@ -1,0 +1,40 @@
+CFLAGS += -I../.. \
+	-I$(TOSDIR)/lib/printf \
+	-DPREAMBLE_LENGTH=100
+PFLAGS = -DCC2420_DEF_CHANNEL=11
+
+ifeq ($(UPMA),1)
+	CFLAGS += -I$(UPMA_DIR)/chips/cc2420 \
+		-I$(UPMA_DIR)/chips/cc2420/alarm \
+		-I$(UPMA_DIR)/chips/cc2420/control \
+		-I$(UPMA_DIR)/chips/cc2420/csma \
+		-I$(UPMA_DIR)/chips/cc2420/interfaces \
+		-I$(UPMA_DIR)/chips/cc2420/link \
+		-I$(UPMA_DIR)/chips/cc2420/lowpan \
+		-I$(UPMA_DIR)/chips/cc2420/lpl \
+		-I$(UPMA_DIR)/chips/cc2420/packet \
+		-I$(UPMA_DIR)/chips/cc2420/receive \
+		-I$(UPMA_DIR)/chips/cc2420/spi \
+		-I$(UPMA_DIR)/chips/cc2420/transmit \
+		-I$(UPMA_DIR)/chips/cc2420/unique \
+		-I$(UPMA_DIR)/lib/alarm \
+		-I$(UPMA_DIR)/lib/serial \
+		-I$(UPMA_DIR)/platforms/$(PLATFORM) \
+		-I$(UPMA_DIR)/system \
+		-I$(UPMA_DIR)/interfaces \
+		-I$(UPMA_DIR)/types \
+		-DUPMA
+	ifeq ($(NEWCCA),0)
+		CFLAGS += -DOLDCCA \
+			-DMAX_LPL_CCA_CHECKS=$(MAX_LPL_CCA_CHECKS)
+	endif
+else
+	CFLAGS += -I$(UPMA_DIR)/chips/cc2420_lpl 
+	ifeq ($(NEWCCA),1)
+		CFLAGS += -DNEWCCA \
+			-I$(UPMA_DIR)/system \
+			-I$(UPMA_DIR)/types
+	endif
+endif
+
+include $(MAKERULES)

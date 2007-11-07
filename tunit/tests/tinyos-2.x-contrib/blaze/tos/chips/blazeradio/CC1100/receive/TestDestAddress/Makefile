@@ -1,0 +1,3 @@
+COMPONENT=TestDestAddressC
+include $(MAKERULES)
+

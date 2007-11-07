@@ -6,6 +6,9 @@ push( @includes, qw(
   %T/../../tinyos-2.x-contrib/tinybotics/tos/platforms/robostix
   %T/../../tinyos-2.x-contrib/tinybotics/tos/platforms/robostix/system
   %T/../../tinyos-2.x-contrib/tinybotics/tos/platforms/robostix/chips/atm128
+  %T/../../tinyos-2.x-contrib/tinybotics/tos/interfaces
+  %T/../../tinyos-2.x-contrib/tinybotics/tos/chips/atm128
+  %T/../../tinyos-2.x-contrib/tinybotics/tos/chips/atm128/timer
   %T/chips/atm128
   %T/chips/atm128/adc
   %T/chips/atm128/i2c

@@ -21,6 +21,9 @@ CFLAGS+=-I../../tos/platforms/tmote2500
 CFLAGS+=-I../../tos/platforms/tmote2500/chips
 CFLAGS+=-I../../tos/platforms/tmote2500/chips/ccxx00
 
+CFLAGS+=-I../../tos/platforms/tmote1100/
+CFLAGS+=-I../../tos/platforms/tmote1100/chips
+CFLAGS+=-I../../tos/platforms/tmote1100/chips/ccxx00
 
 BUILD_EXTRA_DEPS = RadioCountMsg.py RadioCountMsg.class
 

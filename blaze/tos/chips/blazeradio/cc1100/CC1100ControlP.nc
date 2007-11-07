@@ -144,17 +144,6 @@ implementation {
 #else
     panRecognition = TRUE;
 #endif
-
-
-    call Csn.makeOutput();
-    call Power.makeOutput();
-    
-    // TODO Keep GDO's output low to avoid floaters when the chip is off
-    // But when I made these outputs they locked up my code
-    call Gdo0_io.makeInput();  // TODO platform init this to output
-    call Gdo2_io.makeInput();  // TODO should be output perhaps
-    call Gdo0_io.clr();
-    call Gdo2_io.clr();
     
     return SUCCESS;
   }
@@ -178,10 +167,15 @@ implementation {
   
   /**
    * @param on TRUE to turn address recognition on, FALSE to turn it off
+   * You must call sync() after this to propagate changes to hardware
    */
   command void BlazeConfig.setAddressRecognition(bool on) {
     atomic addressRecognition = on;
-    // TODO set the address recognition in hardware
+    if(on) {
+      regValues[CC1100_CONFIG_PKTCTRL1] |= 0x3;
+    } else {
+      regValues[CC1100_CONFIG_PKTCTRL1] &= 0xFC;
+    }
   }
   
   /**

@@ -71,5 +71,13 @@ implementation {
   components HplCC1100PinsP;
   HplCC1100PinsP.Gdo2_int -> CC1100GDO2;
   HplCC1100PinsP.Gdo0_int -> CC1100GDO0;
+  HplCC1100PinsP.Gdo2_io -> CC1100GDO2_IO;
+  HplCC1100PinsP.Gdo0_io -> CC1100GDO0_IO;
+  HplCC1100PinsP.Csn -> CSNM;
+  HplCC1100PinsP.Power -> DummyIoP;
+  
+  components RealMainP;
+  RealMainP.PlatformInit -> HplCC1100PinsP;
+  
 }
 

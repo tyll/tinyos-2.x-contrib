@@ -52,6 +52,7 @@ interface BlazeConfig {
   
   /**
    * @param on TRUE to turn address recognition on, FALSE to turn it off
+   * You must call sync() after this to propagate changes to hardware
    */
   command void setAddressRecognition(bool on);
   

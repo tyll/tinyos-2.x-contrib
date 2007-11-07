@@ -71,5 +71,13 @@ implementation {
   components HplCC2500PinsP;
   HplCC2500PinsP.Gdo2_int -> CC2500GDO2;
   HplCC2500PinsP.Gdo0_int -> CC2500GDO0;
+  HplCC2500PinsP.Gdo2_io -> CC2500GDO2_IO;
+  HplCC2500PinsP.Gdo0_io -> CC2500GDO0_IO;
+  HplCC2500PinsP.Csn -> CSNM;
+  HplCC2500PinsP.Power -> DummyIoP;
+  
+  components RealMainP;
+  RealMainP.PlatformInit -> HplCC2500PinsP;
+  
 }
 

@@ -31,6 +31,7 @@
 
 /**
  * @author Jared Hill
+ * @author David Moss
  */
  
 #ifndef CC1100_H
@@ -45,10 +46,173 @@ enum {
 };
 
 
+enum {
+  CC1100_315_MHZ,
+  CC1100_433_MHZ,
+  CC1100_868_MHZ,
+  CC1100_915_MHZ,
+};
+
+/**
+ * You can change the matching network at compile time
+ */
+#ifndef CC1100_MATCHING_NETWORK
+#define CC1100_MATCHING_NETWORK CC1100_315_MHZ
+#endif
+
+
+/**
+ * All default channels and FREQx registers obtained from SmartRF studio. We
+ * are not trying to define channel frequencies to match up with any sort of
+ * specification; instead, we want flexibility.  If you want to align with 
+ * specs, then go for it.
+ *
+ * Note you can setup the CC1100 to match your antenna characteristics.
+ * Maybe your antenna is tuned to +/- 5 MHz with a center frequency of 315 MHz.
+ * You want your center frequency to be 314.996 MHz, and your lower edge to be 
+ * 310 MHz and your upper edge to be 320 MHz. 
+ *
+ *   Lower Channel Calculation:
+ *      CC1100_CHANNEL_MIN = [(310000 desired kHz) - (CC1100_LOWEST_FREQ)]
+ *                           ---------------------------------------------
+ *                                     199 kHz channel spacing
+ *
+ *         Where CC1100_LOWEST_FREQ is defined for each band and 199 kHz is 
+ *         approximately the channel spacing, CC1100_CHANNEL_WIDTH
+ *
+ *      CC1100_CHANNEL_MIN ~= 45
+ *
+ *  
+ *   Upper Channel Calculation:
+ *      CC1100_CHANNEL_MAX = [(320000 desired kHz) - (CC1100_LOWEST_FREQ)]
+ *                           ---------------------------------------------
+ *                                     199 kHz channel spacing
+ * 
+ *      CC1100_CHANNEL_MAX ~= 95
+ * 
+ * Incidentally, (95+45)/2 = 70, which is our default center channel.
+ * 
+ * When you apply the MAX and MIN values, the radio stack will automatically 
+ * make sure you're within bounds when you set the frequency or channel during
+ * runtime.
+ *
+ * We defined the minimum and maximum channels for the various bands below
+ * so they generally stay within the limits of the CC1100 radio defined in the
+ * datasheet.
+ */
+ 
+ 
+#if (CC1100_MATCHING_NETWORK == CC1100_315_MHZ)
+/***************** 315 Matching Network ****************/
+
+// Default channel is at 314.996490 MHz
+#ifndef CC1100_DEFAULT_CHANNEL
+#define CC1100_DEFAULT_CHANNEL 70
+#endif
+
+#ifndef CC1100_CHANNEL_MIN
+#define CC1100_CHANNEL_MIN 0
+#endif
+
+#ifndef CC1100_CHANNEL_MAX
+#define CC1100_CHANNEL_MAX 240
+#endif
+
+enum {  
+  CC1100_LOWEST_FREQ = 300998,  // kHz
+  CC1100_DEFAULT_FREQ2 = 0x0B,
+  CC1100_DEFAULT_FREQ1 = 0x93,
+  CC1100_DEFAULT_FREQ0 = 0xB1,
+}; 
+
+
+#elif (CC1100_MATCHING_NETWORK == CC1100_433_MHZ)
+/***************** 433 MHz Matching Network ****************/
+
+// Default channel is at 433.191833 MHz
+#ifndef CC1100_DEFAULT_CHANNEL
+#define CC1100_DEFAULT_CHANNEL 161
+#endif
+
+#ifndef CC1100_CHANNEL_MIN
+#define CC1100_CHANNEL_MIN 0
+#endif
+
+#ifndef CC1100_CHANNEL_MAX
+#define CC1100_CHANNEL_MAX 255
+#endif
+
+enum {  
+  CC1100_LOWEST_FREQ = 400998, 
+  CC1100_DEFAULT_FREQ2 = 0x0F,
+  CC1100_DEFAULT_FREQ1 = 0x6C,
+  CC1100_DEFAULT_FREQ0 = 0x4E,
+};  
+
+
+#elif (CC1100_MATCHING_NETWORK == CC1100_868_MHZ)
+/***************** 868 MHz Matching Network ****************/
+
+// Default channel is at 868.192749 MHz
+#ifndef CC1100_DEFAULT_CHANNEL
+#define CC1100_DEFAULT_CHANNEL 141
+#endif
+
+#ifndef CC1100_CHANNEL_MIN
+#define CC1100_CHANNEL_MIN 0
+#endif
+
+#ifndef CC1100_CHANNEL_MAX
+#define CC1100_CHANNEL_MAX 255
+#endif
+
+enum {
+  CC1100_LOWEST_FREQ = 839998, 
+  CC1100_DEFAULT_FREQ2 = 0x20,
+  CC1100_DEFAULT_FREQ1 = 0x4E,
+  CC1100_DEFAULT_FREQ0 = 0xC4,
+};  
+
+
+#else
+/***************** 915 MHz Matching Network ****************/
+
+// Default channel is at 914.996796 MHz
+#ifndef CC1100_DEFAULT_CHANNEL
+#define CC1100_DEFAULT_CHANNEL 65
+#endif
+
+#ifndef CC1100_CHANNEL_MIN
+#define CC1100_CHANNEL_MIN 0
+#endif
+
+#ifndef CC1100_CHANNEL_MAX
+#define CC1100_CHANNEL_MAX 135
+#endif
+
+enum {
+  CC1100_LOWEST_FREQ = 901998, 
+  CC1100_DEFAULT_FREQ2 = 0x22,
+  CC1100_DEFAULT_FREQ1 = 0xB1,
+  CC1100_DEFAULT_FREQ0 = 0x3B,
+};  
+
+#endif
+
+/**
+ * These are used for calculating channels at runtime
+ */
+#define CC1100_CHANNEL_WIDTH 199 // kHz : Do not edit
+#define CC1100_FREQ_MIN (CC1100_LOWEST_FREQ + (CC1100_CHANNEL_MIN * CC1100_CHANNEL_WIDTH))
+#define CC1100_FREQ_MAX (CC1100_LOWEST_FREQ + (CC1100_CHANNEL_MAX * CC1100_CHANNEL_WIDTH))
+
+
 enum CC1100_config_reg_state_enums {
-  /** GDO2 asserts at Rx sync and deasserts at end of packet */
-  CC1100_CONFIG_IOCFG2 = 0x01, // asserts when avove fifothr, deasserts when empty
-  //CC1100_CONFIG_IOCFG2 = 0x06,//JCH CHANGE
+  /**
+   * GDO2 asserts when RX FIFO is filled at or above RXFIFO_THR or the end of 
+   * packet is reached. Deasserts when RX FIFO empty
+   */
+  CC1100_CONFIG_IOCFG2 = 0x01,
   
   /** GDO1 is High Impedance */
   CC1100_CONFIG_IOCFG1 = 0x2E,
@@ -56,8 +220,7 @@ enum CC1100_config_reg_state_enums {
   /** GDO0 goes high when the channel is clear */
   CC1100_CONFIG_IOCFG0 = 0x09, 
   
-  CC1100_CONFIG_FIFOTHR = 0x0F,//JCH CHANGE
-  //CC1100_CONFIG_FIFOTHR = 0x07,
+  CC1100_CONFIG_FIFOTHR = 0x0F,
   CC1100_CONFIG_SYNC1 = 0xD3,
   CC1100_CONFIG_SYNC0 = 0x91,
   
@@ -71,13 +234,16 @@ enum CC1100_config_reg_state_enums {
   CC1100_CONFIG_PKTCTRL0 = 0x41,
   
   CC1100_CONFIG_ADDR = 0x00,
-  CC1100_CONFIG_CHANNR = 0x78, // 315 MHz default
-  //CC1100_CONFIG_CHANNR = 0x46, // 315 MHz default
+  
+  CC1100_CONFIG_CHANNR = CC1100_DEFAULT_CHANNEL,
+  
   CC1100_CONFIG_FSCTRL1 = 0x10,
   CC1100_CONFIG_FSCTRL0 = 0x00,
-  CC1100_CONFIG_FREQ2 = 0x0B,  //base freq is 301 MHz
-  CC1100_CONFIG_FREQ1 = 0x93,
-  CC1100_CONFIG_FREQ0 = 0xB1,
+  
+  CC1100_CONFIG_FREQ2 = CC1100_DEFAULT_FREQ2,
+  CC1100_CONFIG_FREQ1 = CC1100_DEFAULT_FREQ1,
+  CC1100_CONFIG_FREQ0 = CC1100_DEFAULT_FREQ0,
+  
   CC1100_CONFIG_MDMCFG4 = 0x2D,
   CC1100_CONFIG_MDMCFG3 = 0x3B,
   CC1100_CONFIG_MDMCFG2 = 0xF3,

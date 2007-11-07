@@ -135,6 +135,7 @@ implementation {
 
   /***************** RxInterrupt Events ****************/
   async event void RxInterrupt.fired[ radio_id_t id ]() {
+    call Leds.led0Toggle();
     if(call InterruptState.isState(S_INTERRUPT_RX)) {
       if(call ReceiveController.beginReceive[id]() != SUCCESS) {
         // TODO make this an array for each radio, and check it at the end of rx
@@ -466,7 +467,7 @@ implementation {
     return 0;
   }
   
-  default command void BlazeConfig.setChannel[ radio_id_t id ]( uint8_t chan ) {
+  default command error_t BlazeConfig.setChannel[ radio_id_t id ]( uint8_t chan ) {
   }
   
   default command uint8_t BlazeConfig.getChannel[ radio_id_t id ]() {

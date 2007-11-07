@@ -89,7 +89,7 @@ interface BlazeConfig {
    * It uses the assumed base frequency, the assumed channel width and the changes the 
    * value in the channel register.  
    * @param freqKhz - the desired frequency in Khz to set the radio to
-   * @reutrn - FAIL if desired frequency is not in range, else SUCCESS
+   * @reutrn - EINVAL if desired frequency is not in range, else SUCCESS
    */
   command error_t setFrequencyKhz( uint32_t freqKhz );
   
@@ -104,8 +104,9 @@ interface BlazeConfig {
   /** 
    * This command sets the value of the channel register on the radio
    * @param chan - the value of the channel
+   * @return EINVAL if the desired channel is not in range, else SUCCESS
    */
-  command void setChannel( uint8_t chan );
+  command error_t setChannel( uint8_t chan );
   
   /** 
    * This command returns the value of the channel register on the radio

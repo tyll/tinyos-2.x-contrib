@@ -116,13 +116,6 @@ implementation {
   };
   
   
-  enum{
-    BASE_FREQ = 2401000,
-    CHAN_WIDTH = 324,
-    FREQ_MIN = BASE_FREQ,
-    FREQ_MAX = 2483753,
-  }; 
-  
   /***************** Prototypes ****************/
   uint8_t freqToChannel( uint32_t freq );
   uint32_t channelToFreq( uint8_t chan );
@@ -241,7 +234,7 @@ implementation {
    * @reutrn - FAIL if desired frequency is not in range, else SUCCESS
    */
   command error_t BlazeConfig.setFrequencyKhz( uint32_t freqKhz ) {
-    if((freqKhz > FREQ_MAX) || (freqKhz < FREQ_MIN)){
+    if((freqKhz > CC2500_FREQ_MAX) || (freqKhz < CC2500_FREQ_MIN)){
       return FAIL;
     } 
     
@@ -263,9 +256,15 @@ implementation {
   /** 
    * This command sets the value of the channel register on the radio
    * @param chan - the value of the channel
+   * @return EINVAL if the channel is out of bounds
    */
-  command void BlazeConfig.setChannel( uint8_t chan ) {
-    regValues[BLAZE_CHANNR] = chan;  
+  command error_t BlazeConfig.setChannel( uint8_t chan ) {
+    if(chan < CC2500_CHANNEL_MIN || chan > CC2500_CHANNEL_MAX) {
+      return EINVAL;
+    }
+    
+    regValues[BLAZE_CHANNR] = chan;
+    return SUCCESS;
   }
   
   /** 
@@ -279,7 +278,7 @@ implementation {
   
   /***************** ActiveMessageAddress Events ****************/
   async event void ActiveMessageAddress.changed() {   
-    regValues[BLAZE_ADDR] = (call ActiveMessageAddress.amAddress()) >> 8;
+    regValues[BLAZE_ADDR] = call ActiveMessageAddress.amAddress();
     atomic panAddress = call ActiveMessageAddress.amGroup();
     call BlazeCommit.commit();
   }
@@ -295,10 +294,10 @@ implementation {
     uint32_t offset;
     uint32_t rem;
     uint8_t chann;
-    offset = freq - BASE_FREQ;
-    rem = offset % CHAN_WIDTH;
-    chann = (uint8_t)(offset / CHAN_WIDTH); 
-    if(rem > (CHAN_WIDTH >> 1)){
+    offset = freq - CC2500_FREQ_MIN;
+    rem = offset % CC2500_CHANNEL_WIDTH;
+    chann = (uint8_t)(offset / CC2500_CHANNEL_WIDTH); 
+    if(rem > (CC2500_CHANNEL_WIDTH >> 1)){
       chann++;    
     }
     return chann;     
@@ -308,8 +307,8 @@ implementation {
   uint32_t channelToFreq( uint8_t chan ){
   
     uint32_t offset;
-    offset = (uint32_t)(((uint32_t)chan) * CHAN_WIDTH);
-    return offset + BASE_FREQ;
+    offset = (uint32_t)(((uint32_t)chan) * CC2500_CHANNEL_WIDTH);
+    return offset + CC2500_FREQ_MIN;
   
   }
   

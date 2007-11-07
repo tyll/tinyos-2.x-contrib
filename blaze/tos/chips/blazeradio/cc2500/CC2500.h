@@ -45,6 +45,76 @@ enum {
 };
 
 
+/**
+ * All default channels and FREQx registers obtained from SmartRF studio. We
+ * are not trying to define channel frequencies to match up with any sort of
+ * specification; instead, we want flexibility.  If you want to align with 
+ * specs, then go for it.
+ *
+ * Note you can setup the CC2500 to match your antenna characteristics.
+ * Maybe your antenna is tuned to +/- 20 MHz around 2442.4 MHz
+ * You want your center frequency to be 2442.4 MHz, and your lower edge to be 
+ * 2422.4 MHz and your upper edge to be 2462.4 MHz. 
+ *
+ *   Lower Channel Calculation:
+ *      CC2500_CHANNEL_MIN = [(2422400 desired kHz) - (CC2500_LOWEST_FREQ)]
+ *                           ---------------------------------------------
+ *                                     324 kHz channel spacing
+ *
+ *         Where CC2500_LOWEST_FREQ is 2400998 kHz and 324 kHz is 
+ *         approximately the channel spacing, CC2500_CHANNEL_WIDTH
+ *
+ *      CC2500_CHANNEL_MIN ~= 66
+ *
+ *  
+ *   Upper Channel Calculation:
+ *      CC2500_CHANNEL_MAX = [(320000 desired kHz) - (CC2500_LOWEST_FREQ)]
+ *                           ---------------------------------------------
+ *                                     324 kHz channel spacing
+ * 
+ *      CC2500_CHANNEL_MAX ~= 189
+ * 
+ * Incidentally, (189+66)/2 ~= 128, which is our default center channel.
+ * 
+ * When you apply the MAX and MIN values, the radio stack will automatically 
+ * make sure you're within bounds when you set the frequency or channel during
+ * runtime.
+ *
+ * We defined the channel spacing below so all channels from 0 to 255 fit 
+ * within the 2.400 - 2.483 GHz band.
+ */
+ 
+ 
+/***************** 2.4 GHz Matching Network ****************/
+// Default channel is at 2442.437286 MHz
+#ifndef CC2500_DEFAULT_CHANNEL
+#define CC2500_DEFAULT_CHANNEL 128
+#endif
+
+#ifndef CC2500_CHANNEL_MIN
+#define CC2500_CHANNEL_MIN 0
+#endif
+
+#ifndef CC2500_CHANNEL_MAX
+#define CC2500_CHANNEL_MAX 255
+#endif
+
+enum {
+  CC2500_LOWEST_FREQ = 2400998,  // kHz
+  CC2500_DEFAULT_FREQ2 = 0x5C,
+  CC2500_DEFAULT_FREQ1 = 0x58,
+  CC2500_DEFAULT_FREQ0 = 0x9D,
+};  
+
+/**
+ * These are used for calculating channels at runtime
+ */
+#define CC2500_CHANNEL_WIDTH 324 // kHz : Do not edit
+#define CC2500_FREQ_MIN (CC2500_LOWEST_FREQ + (CC2500_CHANNEL_MIN * CC2500_CHANNEL_WIDTH))
+#define CC2500_FREQ_MAX (CC2500_LOWEST_FREQ + (CC2500_CHANNEL_MAX * CC2500_CHANNEL_WIDTH))
+ 
+  
+
 enum cc2500_config_reg_state_enums {
   /** GDO2 asserts at Rx sync and deasserts at end of packet */
   CC2500_CONFIG_IOCFG2 = 0x01,
@@ -71,12 +141,16 @@ enum cc2500_config_reg_state_enums {
   CC2500_CONFIG_PKTCTRL0 = 0x41,
   
   CC2500_CONFIG_ADDR = 0x00,
-  CC2500_CONFIG_CHANNR = 0x80, // default to 2442.5 MHz
+  
+  CC2500_CONFIG_CHANNR = CC2500_DEFAULT_CHANNEL,
+  
   CC2500_CONFIG_FSCTRL1 = 0x10,
   CC2500_CONFIG_FSCTRL0 = 0x00,
-  CC2500_CONFIG_FREQ2 = 0x5C,
-  CC2500_CONFIG_FREQ1 = 0x58,
-  CC2500_CONFIG_FREQ0 = 0x9D,
+  
+  CC2500_CONFIG_FREQ2 = CC2500_DEFAULT_FREQ2,
+  CC2500_CONFIG_FREQ1 = CC2500_DEFAULT_FREQ1,
+  CC2500_CONFIG_FREQ0 = CC2500_DEFAULT_FREQ0,
+  
   CC2500_CONFIG_MDMCFG4 = 0x2D,
   CC2500_CONFIG_MDMCFG3 = 0x3B,
   CC2500_CONFIG_MDMCFG2 = 0xF3,

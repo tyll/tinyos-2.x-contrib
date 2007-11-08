@@ -34,6 +34,7 @@
  * This module assumes it already has full access to the Spi Bus
  * @author Jared Hill
  * @author David Moss
+ * @author Roland Hendel
  */
  
 #include "Blaze.h"

@@ -39,6 +39,7 @@
  * 
  * @author Jared Hill
  * @author David Moss
+ * @author Roland Hendel
  */
 
 configuration CC2500ControlC {

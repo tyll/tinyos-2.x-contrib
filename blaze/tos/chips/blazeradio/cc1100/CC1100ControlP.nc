@@ -33,6 +33,7 @@
  * Manage the CC1100 SPI connection
  * @author Jared Hill
  * @author David Moss
+ * @author Roland Hendel
  */
  
 #include "Blaze.h"

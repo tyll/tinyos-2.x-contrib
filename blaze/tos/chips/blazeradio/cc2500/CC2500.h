@@ -31,6 +31,8 @@
 
 /**
  * @author Jared Hill
+ * @author David Moss
+ * @author Roland Hendel
  */
  
 #ifndef CC2500_H

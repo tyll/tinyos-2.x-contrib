@@ -33,6 +33,7 @@
  * Manage the CC2500 SPI connection
  * @author Jared Hill
  * @author David Moss
+ * @author Roland Hendel
  */
  
 #include "Blaze.h"

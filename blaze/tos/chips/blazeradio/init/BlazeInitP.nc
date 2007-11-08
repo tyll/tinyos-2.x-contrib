@@ -47,11 +47,7 @@
 #include "Blaze.h"
 #include "BlazeInit.h"
 
-/**
- * TODO remove the single-radio requirement.  Add in Gdo0_int and Gdo2_int
- * here and enable/disable them on SplitControl switching.
- */
- 
+
 module BlazeInitP {
 
   provides {
@@ -168,12 +164,11 @@ implementation {
       return EBUSY;
     }
     
+    call Gdo0_int.disable[ id ]();
+    call Gdo2_int.disable[ id ]();
     
     call BlazePower.deepSleep[id]();
     call BlazePower.shutdown[id]();
-    
-    call Gdo0_int.disable[ id ]();
-    call Gdo2_int.disable[ id ]();
     
     state[id] = S_OFF;
     signal SplitControl.stopDone[ id ](SUCCESS);
@@ -273,10 +268,6 @@ implementation {
     
     call ResetResource.release();
     
-    //should this be enablerisingedge in orig???
-    //call Gdo2_int.enableFallingEdge[ m_id ]();
-    //call Gdo2_int.enableRisingEdge[ m_id ]();
-    
     if(state[m_id] == S_STARTING) {
       state[m_id] = S_ON;
       signal SplitControl.startDone[ m_id ](SUCCESS);
@@ -314,7 +305,6 @@ implementation {
       call Csn.clr[id]();
       call Idle.strobe();
     
-      // TODO Is it safe to assume this will always succeed?
       call RadioInit.init(BLAZE_IOCFG2, 
           call BlazeRegSettings.getDefaultRegisters[ id ](), 
               BLAZE_TOTAL_INIT_REGISTERS);

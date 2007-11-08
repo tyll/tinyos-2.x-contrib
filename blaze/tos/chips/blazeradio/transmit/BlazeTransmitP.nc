@@ -204,15 +204,16 @@ implementation {
     
     call Csn.clr[ id ]();
     
-    // TODO is the status check & SRX necessary?  Remove it and run some tests.
     status = call RadioStatus.getRadioStatus();
-    if (status == BLAZE_S_RXFIFO_OVERFLOW) {
-      call SFRX.strobe();
-    } else if (status == BLAZE_S_TXFIFO_UNDERFLOW) {
-      call SFTX.strobe();
+    if(status != BLAZE_S_RX) {
+      if (status == BLAZE_S_RXFIFO_OVERFLOW) {
+        call SFRX.strobe();
+      } else if (status == BLAZE_S_TXFIFO_UNDERFLOW) {
+        call SFTX.strobe();
+      }
+      
+      call SRX.strobe();
     }
-    
-    call SRX.strobe();
     
     /* 
      * The length byte in the packet is already correct - it represents the
@@ -221,7 +222,6 @@ implementation {
      * So in order to also get that length byte transmitted we gotta add one 
      * byte to the transmit length. 
      */
-     
     
     call TXFIFO.write(msg, (call BlazePacketBody.getHeader(msg))->length + 1);
     return SUCCESS;

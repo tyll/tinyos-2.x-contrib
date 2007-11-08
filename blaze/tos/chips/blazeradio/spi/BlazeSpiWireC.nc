@@ -33,7 +33,6 @@
 #include "Blaze.h"
 
 /**
- * TODO
  * Originally, BlazeSpiC was generic because of Resource so we had to have this
  * Consider folding this back into the BlazeSpiC configuration.
  * 

@@ -284,11 +284,7 @@ implementation {
       
     case S_RX_PAYLOAD:
       call Csn.set[ id ]();
-      
-      // TODO check the CRC one more time just to be safe.
-      // The CRC AUTOFLUSH could flush a second packet, which would stop
-      // you from getting the current one correctly.
-      
+            
       // The FCF_FRAME_TYPE bit in the FCF byte tells us if this is an ack or 
       // data.  If it's data, make sure it meets the minimum size requirement.
       if ((( header->fcf >> IEEE154_FCF_FRAME_TYPE ) & 7) == IEEE154_TYPE_ACK) {

@@ -85,6 +85,7 @@ implementation {
   
   components BlazeReceiveC;
   BlazeReceiveC.Csn[ CC2500_RADIO_ID ] -> Pins.Csn;
+  BlazeReceiveC.RxIo[ CC2500_RADIO_ID ] -> Pins.Gdo2_io;
   BlazeReceiveC.RxInterrupt [ CC2500_RADIO_ID ] -> Pins.Gdo2_int;
   BlazeReceiveC.BlazeConfig[ CC2500_RADIO_ID ] -> CC2500ControlP.BlazeConfig;
   

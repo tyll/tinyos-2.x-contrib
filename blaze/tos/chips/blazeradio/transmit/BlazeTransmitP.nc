@@ -44,7 +44,6 @@
 #include "IEEE802154.h"
 #include "Blaze.h"
 #include "AM.h"
-#include "InterruptState.h"
 
 module BlazeTransmitP {
 
@@ -72,7 +71,6 @@ module BlazeTransmitP {
     interface RadioStatus;
     
     interface State;
-    interface State as InterruptState;
 
     interface Leds;
     
@@ -194,9 +192,6 @@ implementation {
    * occur on the rising edge.
    */
   async event void TxInterrupt.fired[ radio_id_t id ]() {
-    if(call InterruptState.isState(S_INTERRUPT_RX)) {
-      return;
-    }
   }
   
   /***************** Local Functions ****************/

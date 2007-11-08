@@ -79,9 +79,6 @@ implementation {
   BlazeTransmitP.SRX -> Spi.SRX;
   BlazeTransmitP.TxReg -> Spi.TXREG;
   
-  components InterruptStateC;
-  BlazeTransmitP.InterruptState -> InterruptStateC;
-  
   components new StateC();
   BlazeTransmitP.State -> StateC;
   

@@ -89,9 +89,6 @@ implementation {
   
   BlazeInitP.RadioInit -> BlazeSpiC;
   
-  components InterruptStateC;
-  BlazeInitP.InterruptState -> InterruptStateC;
-  
   components LedsC;
   BlazeInitP.Leds -> LedsC;
   

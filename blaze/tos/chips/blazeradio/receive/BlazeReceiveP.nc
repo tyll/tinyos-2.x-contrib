@@ -38,7 +38,6 @@
  */
  
 #include "Blaze.h"
-#include "InterruptState.h"
 
 module BlazeReceiveP {
 
@@ -53,9 +52,9 @@ module BlazeReceiveP {
   uses {
     interface AsyncSend as AckSend[ radio_id_t id ];
     interface GeneralIO as Csn[ radio_id_t id ];
+    interface GeneralIO as RxIo[ radio_id_t id ];
     interface GpioInterrupt as RxInterrupt[ radio_id_t id ];
     interface BlazeConfig[ radio_id_t id ];
-    interface State as InterruptState;
    
     interface BlazeFifo as RXFIFO;
   
@@ -93,9 +92,8 @@ implementation {
   /** Default message buffer */
   message_t myMsg;
 
-  /** Number of interrupts that occurred while we were busy receiving a pkt */
-  uint8_t missedPackets;
-
+  /** The ID of the other radio waiting for its packet to be received */
+  uint8_t pendingRadioRx;
   
   enum receive_states{
     S_IDLE,
@@ -128,7 +126,7 @@ implementation {
       m_msg = &myMsg;
       acknowledgement.length = ACK_FRAME_LENGTH;
       acknowledgement.fcf = IEEE154_TYPE_ACK;
-      missedPackets = 0;
+      pendingRadioRx = 0xFF;
     }
     return SUCCESS;
   }
@@ -136,12 +134,8 @@ implementation {
 
   /***************** RxInterrupt Events ****************/
   async event void RxInterrupt.fired[ radio_id_t id ]() {
-    call Leds.led0Toggle();
-    if(call InterruptState.isState(S_INTERRUPT_RX)) {
-      if(call ReceiveController.beginReceive[id]() != SUCCESS) {
-        // TODO make this an array for each radio, and check it at the end of rx
-        missedPackets++;
-      }
+    if(call ReceiveController.beginReceive[id]() != SUCCESS) {
+      pendingRadioRx = id;
     }
   }
   
@@ -391,17 +385,21 @@ implementation {
    */
   void cleanUp() {
     uint8_t id;
-    uint8_t missed;
     atomic id = m_id;
-    atomic missed = missedPackets;
     
     call Csn.set[ id ]();
 
-    if(missed > 0) {
-      atomic missedPackets--;
+    if(call RxIo.get[id]()) {
+      // The GPO Rx line hasn't gone low, so there is more to receive.
       call State.forceState(S_RX_LENGTH);
       receive();
     
+    } else if(call RxIo.get[pendingRadioRx]()) {
+      atomic m_id = pendingRadioRx;
+      pendingRadioRx = 0xFF;
+      call State.forceState(S_RX_LENGTH);
+      receive();
+      
     } else {
       call State.toIdle();
       call Resource.release();
@@ -434,6 +432,16 @@ implementation {
   default async command void Csn.makeOutput[ radio_id_t id ](){}
   default async command bool Csn.isOutput[ radio_id_t id ](){ return 0; }
     
+  default async command void RxIo.set[ radio_id_t id ](){}
+  default async command void RxIo.clr[ radio_id_t id ](){}
+  default async command void RxIo.toggle[ radio_id_t id ](){}
+  default async command bool RxIo.get[ radio_id_t id ](){ return 0; }
+  default async command void RxIo.makeInput[ radio_id_t id ](){}
+  default async command bool RxIo.isInput[ radio_id_t id ](){ return 0; }
+  default async command void RxIo.makeOutput[ radio_id_t id ](){}
+  default async command bool RxIo.isOutput[ radio_id_t id ](){ return 0; }
+    
+  
   
   default command error_t BlazeConfig.commit[ radio_id_t id ]() {
     return FAIL;

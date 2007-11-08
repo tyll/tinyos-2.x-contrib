@@ -46,7 +46,6 @@
  
 #include "Blaze.h"
 #include "BlazeInit.h"
-#include "InterruptState.h"
 
 /**
  * TODO remove the single-radio requirement.  Add in Gdo0_int and Gdo2_int
@@ -83,8 +82,6 @@ module BlazeInitP {
     interface BlazeStrobe as SFRX;
     interface BlazeStrobe as SFTX;
     interface BlazeStrobe as SRX;
-    
-    interface State as InterruptState;
     
     interface Leds;
     
@@ -267,10 +264,7 @@ implementation {
     call SFRX.strobe();
     call SFTX.strobe();
     
-    call InterruptState.forceState(S_INTERRUPT_RX); 
-    //call Pins.toggle66();
-    call Gdo2_int.disable[ m_id ]();
-    call Gdo2_int.enableRisingEdge[ m_id ](); //JCH CHANGE
+    call Gdo2_int.enableRisingEdge[ m_id ]();
     
     call SRX.strobe();
     while(call RadioStatus.getRadioStatus() != BLAZE_S_RX);

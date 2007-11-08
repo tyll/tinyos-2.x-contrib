@@ -18,6 +18,7 @@
 module TestRxFifoP {
   provides {
     interface GpioInterrupt as RxInterrupt[radio_id_t id];
+    interface GeneralIO as RxIo[ radio_id_t id ];    
     interface BlazeFifo as RXFIFO;
     interface AsyncSend as AckSend[radio_id_t id];
     interface BlazeRegister as RXREG;
@@ -29,6 +30,7 @@ module TestRxFifoP {
     interface BlazePacketBody;
     interface State;
     interface GpioInterrupt as TheRealRxInterruptThatWeIgnore[radio_id_t id];
+    interface GeneralIO as TheRealRxIoThatWeIgnore[ radio_id_t id ];    
     interface Leds;
     interface Timer<TMilli>;
         
@@ -88,6 +90,10 @@ implementation {
   /** Used for the RXFIFO.readDone task only */
   norace uint8_t rxFifoLength;
   
+  /** Used when we receive two packets */
+  norace bool rxIo;
+  
+  
   struct statusBytes {
     uint8_t rssi;
     uint8_t lqi;
@@ -111,6 +117,7 @@ implementation {
     myHeader = call BlazePacketBody.getHeader(&myMsg);
     call State.toIdle();
     
+    rxIo = FALSE;
     packetReceived = FALSE;
     ackSent = FALSE;
     totalPacketsReceived = 0;
@@ -229,8 +236,9 @@ implementation {
     append(&myMsg, myHeader->length + 1);
     append(&statusBytes, 2);
 
+    rxIo = TRUE;
+    
     // We magically received two packets instantaneously
-    signal RxInterrupt.fired[0]();
     signal RxInterrupt.fired[0]();
   }
   
@@ -325,6 +333,31 @@ implementation {
     assertEquals("Bad rx fired connection []", 0, id);
   }
  
+  /***************** RxIo Commands ****************/
+  async command void RxIo.set[ radio_id_t id ]() {}
+  async command void RxIo.clr[ radio_id_t id ]() {}
+  async command void RxIo.toggle[ radio_id_t id ]() {}
+  async command bool RxIo.get[ radio_id_t id ]() {
+    // Only trigger this once if rxIo is TRUE - which would only be the case
+    // for the TESTRECEIVETWOPACKETS test.
+    if(rxIo) {
+      rxIo = FALSE;
+      return TRUE;
+    }
+    
+    return rxIo;
+  }
+  
+  async command void RxIo.makeInput[ radio_id_t id ]() {}
+  async command bool RxIo.isInput[ radio_id_t id ]() {
+    return TRUE;
+  }
+  
+  async command void RxIo.makeOutput[ radio_id_t id ]() {}
+  async command bool RxIo.isOutput[ radio_id_t id ]() {
+    return FALSE;
+  }
+   
   /***************** TheRealRxInterruptThatWeIgnore Events ****************/
   async event void TheRealRxInterruptThatWeIgnore.fired[radio_id_t id]() {
     // Ignored!

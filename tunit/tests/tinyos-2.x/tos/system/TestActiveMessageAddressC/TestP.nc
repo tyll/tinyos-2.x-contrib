@@ -21,6 +21,8 @@ implementation {
    * event gets fired (otherwise timeout) and verify each setting.
    */
   event void TestSet.run() {
+    assertEquals("Wrong init address", 0, call ActiveMessageAddress.amAddress());
+    assertEquals("Wrong init group", 0x22, call ActiveMessageAddress.amGroup());
     call ActiveMessageAddress.setAddress(GROUP, ADDRESS);
   }
   

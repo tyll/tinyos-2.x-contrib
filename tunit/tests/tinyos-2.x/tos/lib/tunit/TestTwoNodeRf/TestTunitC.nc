@@ -39,6 +39,7 @@ implementation {
   components TestTunitP,
       new TestCaseC() as TestRfC,
       ActiveMessageC,
+      CC2420ActiveMessageC,
       new AMSenderC(4),
       new AMReceiverC(4),
       LedsC;
@@ -50,6 +51,7 @@ implementation {
   TestTunitP.AMSend -> AMSenderC;
   TestTunitP.Receive -> AMReceiverC;
   TestTunitP.Leds -> LedsC;
+  TestTunitP.LowPowerListening -> CC2420ActiveMessageC;
   
   TestTunitP.TearDownOneTime -> TestRfC.TearDownOneTime;
   

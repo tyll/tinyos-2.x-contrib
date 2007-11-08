@@ -44,6 +44,7 @@ module TestTunitP {
     interface AMSend;
     interface Receive;
     interface Leds;
+    interface LowPowerListening;
   }
 }
 
@@ -58,6 +59,7 @@ implementation {
   
   /***************** SetUpOneTime Events ****************/
   event void SetUpOneTime.run() {
+   // call LowPowerListening.setRxSleepInterval(&myMsg, 1000);
     call SplitControl.start();
   }
   
@@ -73,21 +75,21 @@ implementation {
   }
   
   event void SplitControl.stopDone(error_t error) {
-    call Leds.led2On();
     call TearDownOneTime.done();
   }
   
   /***************** TestRf Events ****************/
   event void TestRf.run() {
-    call Leds.led0On();
     post sendMsg();
   }
   
   /***************** AMSend Events ****************/
   event void AMSend.sendDone(message_t *msg, error_t error) {
+    call Leds.led2On();
   }
   
   event message_t *Receive.receive(message_t *msg, void *payload, error_t error) {
+    call Leds.led2On();
     assertSuccess();
     call TestRf.done();
     return msg;
@@ -95,7 +97,7 @@ implementation {
   
   /***************** Tasks *****************/
   task void sendMsg() {
-    if(call AMSend.send(1, &myMsg, 0) != SUCCESS) {
+    if(call AMSend.send(1, &myMsg, 2) != SUCCESS) {
       post sendMsg();
     }
   }

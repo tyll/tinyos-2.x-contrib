@@ -32,6 +32,7 @@
 /**
  * @author Jared Hill
  * @author David Moss
+ * @author Roland Hendel
  */
  
 #ifndef CC1100_H
@@ -46,12 +47,10 @@ enum {
 };
 
 
-enum {
-  CC1100_315_MHZ,
-  CC1100_433_MHZ,
-  CC1100_868_MHZ,
-  CC1100_915_MHZ,
-};
+#define CC1100_315_MHZ 0
+#define CC1100_433_MHZ 1
+#define CC1100_868_MHZ 2
+#define CC1100_915_MHZ 3
 
 /**
  * You can change the matching network at compile time

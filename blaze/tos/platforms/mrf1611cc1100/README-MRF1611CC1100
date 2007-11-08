@@ -1,0 +1,33 @@
+if you want to use this patch to build apps
+on the SoftBaugh MRF1611CC1100, you'll need
+to do a few things:
+  - remove ***ALL*** of the jumpers from the
+    HMRF1611 host board (if you're using one)
+
+  - check out tinyos-2.x-contrib from CVS
+
+  - do something like what's in ./rc to set
+    $BLAZE to point to the blaze radio stack
+    in your contrib directory
+
+  - get your SoftBaugh USBP programmer and
+    installation app set up (you'll install
+    build/mrf1611cc1100/main.ihex)
+
+at this point, you should be able to build
+and install at least Blink and RadioCountToLeds,
+the two most important apps in existence :-)
+
+if you want to use the jumpers on the host board,
+get the MRF1611CC1100 and HMRF1611 schematics,
+the 'F1611 data sheet, and hammer on MotePlatformC.
+you need to make sure the MCU isn't going to melt.
+by default, this patch configures them all as
+output-low (per TI's recommendations about what to
+do with unconnected pins).
+
+note that this patch doesn't support any of the
+hardware on the host board (buttons, pot, etc).
+
+--mark
+

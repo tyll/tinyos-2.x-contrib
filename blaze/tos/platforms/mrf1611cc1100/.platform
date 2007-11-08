@@ -1,0 +1,69 @@
+# Includes that should take precedence come first.  Platforms come before
+# chips because they may override files.  These must be specified as
+# @includes instead of -I's to @opts, otherwise the %T won't be processed
+# by ncc.
+
+push( @includes, qw(
+  ## tmote1100 Platform
+  %T/platforms/mrf1611cc1100
+  %T/platforms/mrf1611cc1100/chips/ccxx00
+) );
+
+## Rincon CCxx00 Dual Radio Stack
+my @I = qw(
+  %B
+  %B/acks
+  %B/alarm
+  %B/am
+  %B/cc1100
+  %B/cc2500
+  %B/crc
+  %B/csma
+  %B/init
+  %B/interfaces
+  %B/link
+  %B/packet
+  %B/receive
+  %B/select
+  %B/spi
+  %B/transmit
+  %B/unique
+);
+foreach $ent (@I) {
+    $ent =~ s/%B/$ENV{BLAZE}/g;
+}
+push( @includes, @I );
+
+push( @includes, qw(
+  ## TinyOS Default Chips
+  %T/platforms/telosb
+  %T/platforms/telosa
+  %T/platforms/telosb/chips/stm25p
+  %T/chips/msp430
+  %T/chips/msp430/adc12
+  %T/chips/msp430/dma
+  %T/chips/msp430/pins
+  %T/chips/msp430/timer
+  %T/chips/msp430/usart
+  %T/chips/msp430/sensors
+  %T/chips/stm25p
+  %T/lib/timer
+  %T/lib/serial
+  %T/lib/adc
+  %T/lib/power
+
+) );
+
+@opts = qw(
+  -gcc=msp430-gcc
+  -mmcu=msp430x1611
+  -fnesc-target=msp430
+  -fnesc-no-debug
+  -fnesc-scheduler=TinySchedulerC,TinySchedulerC.TaskBasic,TaskBasic,TaskBasic,runTask,postTask
+
+);
+
+#print join("\n", @includes); exit 1;
+
+push @opts, "-mingw-gcc" if $cygwin;
+

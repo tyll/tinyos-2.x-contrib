@@ -78,10 +78,11 @@ module BlazeInitP {
     interface BlazeStrobe as SFRX;
     interface BlazeStrobe as SFTX;
     interface BlazeStrobe as SRX;
+    interface BlazeStrobe as SNOP;
     
     interface Leds;
     
-    //interface DebugPins as Pins;
+    interface DebugPins as Pins;
   }
 }
 
@@ -248,6 +249,7 @@ implementation {
   /***************** RadioInit Events ****************/
   event void RadioInit.initDone() { 
     
+    uint8_t cnt = 0;
     call Gdo0_io.makeInput[ m_id ]();
     call Gdo2_io.makeInput[ m_id ]();
     
@@ -261,9 +263,22 @@ implementation {
     
     call Gdo2_int.enableRisingEdge[ m_id ]();
     
+    //call Pins.set65();
     call SRX.strobe();
-    while(call RadioStatus.getRadioStatus() != BLAZE_S_RX);
-    
+    while(call RadioStatus.getRadioStatus() != BLAZE_S_RX){
+      if(cnt == 0xFF){
+        cnt = 0;
+        call Csn.set[m_id]();
+        //call Pins.toggle65();
+        call SFRX.strobe();
+        call SFTX.strobe();
+        call Csn.clr[m_id]();
+        call SRX.strobe();
+      }else{
+        cnt++;
+      }
+    }
+    //call Pins.clr65();
     call Csn.set[ m_id ]();
     
     call ResetResource.release();
@@ -281,7 +296,7 @@ implementation {
   /***************** Resource Events ****************/
   event void ResetResource.granted() {
     uint8_t id;
-    
+    uint8_t cnt = 0;
     atomic id = m_id;
     
     call Csn.set[id]();
@@ -293,11 +308,19 @@ implementation {
      * status byte.  This demonstrates the crystal oscillator is running 
      * and the regulated digital supply voltage is stable.  Then we reset.
      */
-    call SRES.strobe();
-    call Csn.set[id]();
+    //call Pins.set64();
     
-    call Csn.clr[id]();
-    while((call Idle.strobe() & 0x80) != 0);
+    while((call SNOP.strobe() & 0x80) != 0){
+      if(cnt == 0xFF){
+        call Csn.set[id]();
+        call Csn.clr[id](); 
+        cnt = 0;
+      }else{
+        cnt++;
+      } 
+      
+    }
+    //call Pins.clr64();
     call Csn.set[id]();
     
     if(state[id] == S_STARTING || state[id] == S_COMMITTING) {

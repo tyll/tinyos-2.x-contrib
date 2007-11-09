@@ -2,7 +2,9 @@
 <project name="TUnit" basedir="." default="tunit">
 
 	<!-- Reports, archives, statistics, etc. locations -->
-	<property name="tunit_base.dir" value="." />
+	<property environment="env" />
+	<property name="tunit_base.dir" value="${env.TUNIT_BASE}" />
+	<property name="user.dir" value="/home/mmaroti/tinyos-2.x/tests" />
 	<property name="report.dir" value="${tunit_base.dir}/reports" />
 	<property name="xml.dir" value="${report.dir}/xml" />
 	<property name="htmlreport.dir" value="${report.dir}/html" />
@@ -11,7 +13,7 @@
 	
 	<!-- Java locations -->
 	<property name="java.dir" value="${tunit_base.dir}/support/sdk/tunit" />
-	<property name="tinyos.dir" value="/opt/tinyos-2.x" />
+      <property name="tinyos.dir" value="/home/mmaroti/tinyos-2.x" />
 
 	<!-- Jar definitions -->
 	<property name="tinyos.jar" value="${tinyos.dir}/support/sdk/java/tinyos.jar" />
@@ -28,19 +30,21 @@
 		<delete dir="${xml.dir}" />
 		<mkdir dir="${xml.dir}" />
 		<java classname="com.rincon.tunit.TUnit">
+			<arg value="-testdir" />
+			<arg value="${user.dir}" />
 			<classpath>
 				<pathelement path="${classpath}" />
 			</classpath>
 		</java>
 
 		<antcall target="tunitreport" />
-		<antcall target="feedback" />
+		<!-- <antcall target="feedback" /> -->
 	</target>
 
 
 	<target name="tunitrerun">
 		<java classname="com.rincon.tunit.TUnit">
-			<arg value="-rerun" />			
+			<arg value="-rerun" />
 			<classpath>
 				<pathelement path="${classpath}" />
 			</classpath>
@@ -105,5 +109,3 @@
 	</target>
 
 </project>
-
-

@@ -86,6 +86,7 @@ implementation {
   BlazeInitP.SFTX -> BlazeSpiC.SFTX;
   BlazeInitP.SRX -> BlazeSpiC.SRX;
   BlazeInitP.RadioStatus -> BlazeSpiC.RadioStatus;
+  BlazeInitP.SNOP -> BlazeSpiC.SNOP;
   
   BlazeInitP.RadioInit -> BlazeSpiC;
   

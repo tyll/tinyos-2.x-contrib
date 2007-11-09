@@ -82,7 +82,7 @@ module BlazeInitP {
     
     interface Leds;
     
-    interface DebugPins as Pins;
+    //interface DebugPins as Pins;
   }
 }
 

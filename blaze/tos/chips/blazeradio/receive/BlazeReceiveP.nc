@@ -128,11 +128,7 @@ implementation {
       m_msg = &myMsg;
       acknowledgement.length = ACK_FRAME_LENGTH;
       acknowledgement.fcf = IEEE154_TYPE_ACK;
-<<<<<<< BlazeReceiveP.nc
       pendingRadioRx = NO_RADIO_PENDING;
-=======
-      pendingRadioRx = 0xFF;
->>>>>>> 1.24
     }
     return SUCCESS;
   }
@@ -140,14 +136,9 @@ implementation {
 
   /***************** RxInterrupt Events ****************/
   async event void RxInterrupt.fired[ radio_id_t id ]() {
-<<<<<<< BlazeReceiveP.nc
     //call Pins.set67();
     if(call ReceiveController.beginReceive[id]() != SUCCESS) {
       pendingRadioRx = id;
-=======
-    if(call ReceiveController.beginReceive[id]() != SUCCESS) {
-      pendingRadioRx = id;
->>>>>>> 1.24
     }
   }
   
@@ -398,7 +389,6 @@ implementation {
     atomic id = m_id;
     
     call Csn.set[ id ]();
-<<<<<<< BlazeReceiveP.nc
     call RxInterrupt.disable[id]();
     //call RxIo.makeInput[id]();
     if(call RxIo.get[id]()) {
@@ -409,24 +399,6 @@ implementation {
     } else if(pendingRadioRx != NO_RADIO_PENDING) {
       atomic m_id = pendingRadioRx;
       pendingRadioRx = NO_RADIO_PENDING;
-=======
-
-    if(call RxIo.get[id]()) {
-      // The GPO Rx line hasn't gone low, so there is more to receive.
->>>>>>> 1.24
-      call State.forceState(S_RX_LENGTH);
-      receive();
-<<<<<<< BlazeReceiveP.nc
-      
-=======
-    
-    } else if(call RxIo.get[pendingRadioRx]()) {
-      atomic m_id = pendingRadioRx;
-      pendingRadioRx = 0xFF;
-      call State.forceState(S_RX_LENGTH);
-      receive();
-      
->>>>>>> 1.24
     } else {
       //call Pins.clr67();
       call State.toIdle();

@@ -38,30 +38,22 @@ implementation {
   
   my_payload_t *myPayload;
   
-  uint8_t totalErrors;
-  
-  bool sending;
   
   enum {
     // Not including the length byte:
     MY_PACKET_LENGTH = MAC_HEADER_SIZE + sizeof(my_payload_t),
     
     MY_PAYLOAD_LENGTH = sizeof(my_payload_t),
-    
-    TOO_MANY_ERRORS = 1000,
   };
   
-  /***************** Prototypes ****************/
-  task void send();
-  
+  /***************** Functions ****************/
+
   /***************** TestControl ****************/
   event void SetUpOneTime.run() {
     myPayload = (my_payload_t *) (&myMsg.data);
-    
-    sending = FALSE;
+  
     receivedPacket = FALSE;
     timesSent = 0;
-    totalErrors = 0;
     memset(&myMsg, 0, MY_PACKET_LENGTH);
     // Subtract 1 because the length byte isn't counted as part of the packet
     // at Tx or Rx time.  This would be handled in BlazeActiveMessageP
@@ -71,13 +63,13 @@ implementation {
     // below see things differently.
     
     (call BlazePacketBody.getHeader(&myMsg))->length = MY_PACKET_LENGTH;
-    (call BlazePacketBody.getHeader(&myMsg))->dest = AM_BROADCAST_ADDR;
+    (call BlazePacketBody.getHeader(&myMsg))->dest = 1;
     (call BlazePacketBody.getHeader(&myMsg))->dsn = 0x55;
     (call BlazePacketBody.getHeader(&myMsg))->destpan = 0xCC;
     (call BlazePacketBody.getHeader(&myMsg))->src = 0;
     (call BlazePacketBody.getHeader(&myMsg))->type = 0x33;
   
-    call PacketAcknowledgements.requestAck(&myMsg);
+    call PacketAcknowledgements.noAck(&myMsg);
     
     myPayload->a = 0xAA;
     myPayload->b = 0xBB;
@@ -113,60 +105,59 @@ implementation {
    * anything for this test.
    */
   event void TestReceive.run() {
-    post send();
+    error_t error;
+
+    error = call Send.send(&myMsg, MY_PACKET_LENGTH);
+    
+    if(error) {
+      assertEquals("Error calling Send.send()", SUCCESS, error);
+      call TestReceive.done();
+    }
   }
  
   /***************** Send Events ****************/
   event void Send.sendDone(message_t* msg, error_t error) {
-    sending = FALSE;
-    if(!call PacketAcknowledgements.wasAcked(msg)) {
-      totalErrors++;
-      if(totalErrors > TOO_MANY_ERRORS) {
-        assertFail("No ack: too many errors");
-        call TestReceive.done();
-      
-      } else {
-        post send(); 
-      }
-      
-    } else {
-      timesSent++;
-    }
-    call Leds.led2Toggle();
+    assertFalse("Ack rx'd", call PacketAcknowledgements.wasAcked(msg));
+    call Leds.led2On();
   }
   
   
   /***************** Receive Events ****************/
+  
+  /***************** Receive Events ****************/
   event message_t *Receive.receive(message_t *msg, void *payload, uint8_t len) {
-    call Leds.led1Toggle();
-    if(timesSent < 2) {
-      post send();
-    
-    } else {
-      assertSuccess();
+    call Leds.led1On();
+    if(!receivedPacket) {
+      // This is the first packet we received
+      receivedPacket = TRUE;
+      myPayload = (my_payload_t *) msg->data;
+
+      if(msg->data != payload) {
+        assertFail("Wrong payload pointer");
+      }
+      
+      assertEquals("Wrong length", MY_PACKET_LENGTH, len);
+      assertEquals("Wrong dest", 1, (call BlazePacketBody.getHeader(msg))->dest);
+      assertEquals("Wrong dsn", 0x55, (call BlazePacketBody.getHeader(msg))->dsn);
+      assertEquals("Wrong destpan", 0xCC, (call BlazePacketBody.getHeader(msg))->destpan);
+      assertEquals("Wrong src", 0, (call BlazePacketBody.getHeader(msg))->src);
+      assertEquals("Wrong type", 0x33, (call BlazePacketBody.getHeader(msg))->type);
+      
+      assertEquals("Payload byte A", 0xAA, myPayload->a);
+      assertEquals("Payload byte B", 0xBB, myPayload->b);
+      assertEquals("Payload byte C", 0xCC, myPayload->c);
+      assertEquals("Payload byte D", 0xDD, myPayload->d);
+      assertEquals("Payload byte E", 0xEE, myPayload->e);
+      assertEquals("Payload byte F", 0xFF, myPayload->f);
+      assertEquals("Payload byte G", 0xAA, myPayload->g);
+      assertEquals("Payload byte H", 0xBB, myPayload->h);
+      assertEquals("Payload byte I", 0xCC, myPayload->i);
+      
       call TestReceive.done();
     }
     
     return msg;
   }
-  
-  /***************** Tasks ****************/
-  task void send() {
-    error_t error;
-    if((!sending) && (error = call Send.send(&myMsg, MY_PACKET_LENGTH)) != SUCCESS) {
-      totalErrors++;
-      if(totalErrors > TOO_MANY_ERRORS) {
-        assertFail("Send: Too many errors");
-        call TestReceive.done();
-      
-      } else {
-        assertEquals("send(ERROR)", SUCCESS, error);
-        post send();
-      }
-      
-    } else {
-      sending = TRUE;
-    }
-  }
+ 
 }
 

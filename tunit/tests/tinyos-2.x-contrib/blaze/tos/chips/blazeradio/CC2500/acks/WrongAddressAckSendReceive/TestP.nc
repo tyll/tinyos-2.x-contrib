@@ -38,30 +38,22 @@ implementation {
   
   my_payload_t *myPayload;
   
-  uint8_t totalErrors;
-  
-  bool sending;
   
   enum {
     // Not including the length byte:
     MY_PACKET_LENGTH = MAC_HEADER_SIZE + sizeof(my_payload_t),
     
     MY_PAYLOAD_LENGTH = sizeof(my_payload_t),
-    
-    TOO_MANY_ERRORS = 1000,
   };
   
-  /***************** Prototypes ****************/
-  task void send();
-  
+  /***************** Functions ****************/
+
   /***************** TestControl ****************/
   event void SetUpOneTime.run() {
     myPayload = (my_payload_t *) (&myMsg.data);
-    
-    sending = FALSE;
+  
     receivedPacket = FALSE;
     timesSent = 0;
-    totalErrors = 0;
     memset(&myMsg, 0, MY_PACKET_LENGTH);
     // Subtract 1 because the length byte isn't counted as part of the packet
     // at Tx or Rx time.  This would be handled in BlazeActiveMessageP
@@ -71,7 +63,7 @@ implementation {
     // below see things differently.
     
     (call BlazePacketBody.getHeader(&myMsg))->length = MY_PACKET_LENGTH;
-    (call BlazePacketBody.getHeader(&myMsg))->dest = AM_BROADCAST_ADDR;
+    (call BlazePacketBody.getHeader(&myMsg))->dest = 100;
     (call BlazePacketBody.getHeader(&myMsg))->dsn = 0x55;
     (call BlazePacketBody.getHeader(&myMsg))->destpan = 0xCC;
     (call BlazePacketBody.getHeader(&myMsg))->src = 0;
@@ -113,60 +105,32 @@ implementation {
    * anything for this test.
    */
   event void TestReceive.run() {
-    post send();
+    error_t error;
+
+    error = call Send.send(&myMsg, MY_PACKET_LENGTH);
+    
+    if(error) {
+      assertEquals("Error calling Send.send()", SUCCESS, error);
+      call TestReceive.done();
+    }
   }
  
   /***************** Send Events ****************/
   event void Send.sendDone(message_t* msg, error_t error) {
-    sending = FALSE;
-    if(!call PacketAcknowledgements.wasAcked(msg)) {
-      totalErrors++;
-      if(totalErrors > TOO_MANY_ERRORS) {
-        assertFail("No ack: too many errors");
-        call TestReceive.done();
-      
-      } else {
-        post send(); 
-      }
-      
-    } else {
-      timesSent++;
-    }
-    call Leds.led2Toggle();
+    assertFalse("Ack rx'd", call PacketAcknowledgements.wasAcked(msg));
+    call TestReceive.done();
+    call Leds.led2On();
   }
   
   
   /***************** Receive Events ****************/
+  
+  /***************** Receive Events ****************/
   event message_t *Receive.receive(message_t *msg, void *payload, uint8_t len) {
-    call Leds.led1Toggle();
-    if(timesSent < 2) {
-      post send();
-    
-    } else {
-      assertSuccess();
-      call TestReceive.done();
-    }
-    
+    call Leds.led1On();
+    assertFail("Received to the wrong address!");    
     return msg;
   }
-  
-  /***************** Tasks ****************/
-  task void send() {
-    error_t error;
-    if((!sending) && (error = call Send.send(&myMsg, MY_PACKET_LENGTH)) != SUCCESS) {
-      totalErrors++;
-      if(totalErrors > TOO_MANY_ERRORS) {
-        assertFail("Send: Too many errors");
-        call TestReceive.done();
-      
-      } else {
-        assertEquals("send(ERROR)", SUCCESS, error);
-        post send();
-      }
-      
-    } else {
-      sending = TRUE;
-    }
-  }
+ 
 }
 

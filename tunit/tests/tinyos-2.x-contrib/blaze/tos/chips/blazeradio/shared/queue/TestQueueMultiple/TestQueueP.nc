@@ -128,35 +128,35 @@ implementation {
   }
 
   /***************** AmRegistry events ******************/
-  event priority_t AM55.configure(message_t* msg){
+  event void AM55.configure(message_t* msg){
     
     memcpy(msg, &values, 15);
     
-    return PRIORITY55;
+    call AM55.configureDone(msg, PRIORITY55);
   
   }
   
-  event priority_t AM56.configure(message_t* msg){
+  event void AM56.configure(message_t* msg){
     
     memcpy(msg, &values, 15);
     
-    return PRIORITY56;
+    call AM56.configureDone(msg, PRIORITY56);
   
   }
   
-  event priority_t AM57.configure(message_t* msg){
+  event void AM57.configure(message_t* msg){
     
     memcpy(msg, &values, 15);
     
-    return PRIORITY57;
+    call AM57.configureDone(msg, PRIORITY57);
   
   }
   
-  event priority_t AM58.configure(message_t* msg){
+  event void AM58.configure(message_t* msg){
     
     memcpy(msg, &values, 15);
     
-    return PRIORITY58;
+    call AM58.configureDone(msg, PRIORITY58);
   
   }
   

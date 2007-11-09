@@ -318,7 +318,7 @@ implementation {
     assertNotEquals("", 0, 0);
     assertResultIsBelow("", 0, 0);
     assertResultIsAbove("", 0, 0);
-    assertCompares("", NULL, NULL, 0);
+    //assertCompares("", NULL, NULL, 0);
     assertTrue("", TRUE);
     assertFalse("", FALSE);
     assertNull(NULL);

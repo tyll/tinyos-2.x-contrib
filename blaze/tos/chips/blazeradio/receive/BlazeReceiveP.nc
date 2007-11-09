@@ -74,6 +74,7 @@ module BlazeReceiveP {
     interface ActiveMessageAddress;
     interface State;
     interface Leds;
+    //interface DebugPins as Pins;
   }
 
 }
@@ -109,6 +110,7 @@ implementation {
     MAC_PACKET_SIZE = MAC_HEADER_SIZE + TOSH_DATA_LENGTH + MAC_FOOTER_SIZE + 2,
     
     SACK_HEADER_LENGTH = 5,
+    NO_RADIO_PENDING = 0xFF,
   };
   
   
@@ -126,7 +128,11 @@ implementation {
       m_msg = &myMsg;
       acknowledgement.length = ACK_FRAME_LENGTH;
       acknowledgement.fcf = IEEE154_TYPE_ACK;
+<<<<<<< BlazeReceiveP.nc
+      pendingRadioRx = NO_RADIO_PENDING;
+=======
       pendingRadioRx = 0xFF;
+>>>>>>> 1.24
     }
     return SUCCESS;
   }
@@ -134,8 +140,14 @@ implementation {
 
   /***************** RxInterrupt Events ****************/
   async event void RxInterrupt.fired[ radio_id_t id ]() {
+<<<<<<< BlazeReceiveP.nc
+    //call Pins.set67();
     if(call ReceiveController.beginReceive[id]() != SUCCESS) {
       pendingRadioRx = id;
+=======
+    if(call ReceiveController.beginReceive[id]() != SUCCESS) {
+      pendingRadioRx = id;
+>>>>>>> 1.24
     }
   }
   
@@ -213,6 +225,7 @@ implementation {
       
       if(rxFrameLength + 1 > BLAZE_RXFIFO_LENGTH) {
         // Flush everything if the length is bigger than our FIFO
+        //call Pins.clr65();
         failReceive();
         return;
       
@@ -357,14 +370,15 @@ implementation {
     call Csn.clr[ id ]();
  
     // Read in the length byte
+    //call Pins.set65();
     call RXFIFO.beginRead(msg, 1);
   }
   
   void failReceive() {
     uint8_t state;
+    //call Pins.set66();
     call SIDLE.strobe();
     call SFRX.strobe();
-
     state = call RadioStatus.getRadioStatus();
     if(state == BLAZE_S_TXFIFO_UNDERFLOW) {
       call SIDLE.strobe();
@@ -372,7 +386,7 @@ implementation {
     }
 
     call SRX.strobe();
-    
+    //call Pins.clr66();
     cleanUp();
   }
   
@@ -384,11 +398,27 @@ implementation {
     atomic id = m_id;
     
     call Csn.set[ id ]();
-
+<<<<<<< BlazeReceiveP.nc
+    call RxInterrupt.disable[id]();
+    //call RxIo.makeInput[id]();
     if(call RxIo.get[id]()) {
       // The GPO Rx line hasn't gone low, so there is more to receive.
       call State.forceState(S_RX_LENGTH);
       receive();
+      
+    } else if(pendingRadioRx != NO_RADIO_PENDING) {
+      atomic m_id = pendingRadioRx;
+      pendingRadioRx = NO_RADIO_PENDING;
+=======
+
+    if(call RxIo.get[id]()) {
+      // The GPO Rx line hasn't gone low, so there is more to receive.
+>>>>>>> 1.24
+      call State.forceState(S_RX_LENGTH);
+      receive();
+<<<<<<< BlazeReceiveP.nc
+      
+=======
     
     } else if(call RxIo.get[pendingRadioRx]()) {
       atomic m_id = pendingRadioRx;
@@ -396,10 +426,13 @@ implementation {
       call State.forceState(S_RX_LENGTH);
       receive();
       
+>>>>>>> 1.24
     } else {
+      //call Pins.clr67();
       call State.toIdle();
       call Resource.release();
     }
+    call RxInterrupt.enableRisingEdge[id]();
   }
   
   /***************** Defaults ****************/

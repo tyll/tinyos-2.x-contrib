@@ -1,6 +1,6 @@
 /*
-* Copyright (c) 2007 New University Of Lisbon - Faculty of Sciences and
-* Tecnology.
+* Copyright (c) 2007 New University of Lisbon - Faculty of Sciences and
+* Technology.
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
@@ -12,7 +12,8 @@
 *   notice, this list of conditions and the following disclaimer in the
 *   documentation and/or other materials provided with the
 *   distribution.
-* - Neither the name of #### NAME_OF_YUOR_INSTITUTION ####  nor the names of
+* - Neither the name of New University of Lisbon - Faculty of Sciences and
+* Technology nor the names of
 *   its contributors may be used to endorse or promote products derived
 *   from this software without specific prior written permission.
 *

@@ -1,0 +1,955 @@
+['__class__', '__del__', '__delattr__', '__dict__', '__doc__', '__getattr__', '__getattribute__', '__hash__', '__init__', '__module__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__str__', '__swig_destroy__', '__swig_getmethods__', '__swig_setmethods__', '__weakref__', 'addChannel', 'currentNode', 'getNode', 'init', 'mac', 'newFireEstimator', 'newPacket', 'radio', 'randomSeed', 'removeChannel', 'runNextEvent', 'setCurrentNode', 'setTime', 'ticksPerSecond', 'time', 'timeStr']
+DEBUG (1): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (99): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (3): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (7): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (15): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (31): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (63): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (62): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (30): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (61): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (60): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (14): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (29): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (59): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (58): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (28): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (57): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (56): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (6): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (13): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (27): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (55): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (54): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (26): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (53): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (52): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (12): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (25): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (51): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (50): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (24): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (49): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (98): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (48): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (97): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (96): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (2): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (5): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (11): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (23): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (47): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (95): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (94): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (46): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (93): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (92): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (22): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (45): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (91): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (90): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (44): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (89): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (88): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (10): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (21): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (43): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (87): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (86): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (42): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (85): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (84): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (20): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (41): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (83): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (82): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (40): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (81): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (80): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (4): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (9): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (19): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (39): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (79): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (78): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (38): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (77): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (76): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (18): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (37): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (75): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (74): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (36): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (73): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (72): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (8): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (17): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (35): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (71): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (70): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (34): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (69): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (68): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (16): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (33): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (67): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (66): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (32): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (65): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (64): TestFireSimP$Boot$booted: booted @ 0:0:0.000000000
+DEBUG (50): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (50): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (17): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (17): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (7): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (7): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (19): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (19): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (44): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (44): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (6): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (6): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (85): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (85): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (63): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (63): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (72): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (72): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (16): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (16): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (95): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (95): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (12): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (12): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (18): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (18): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (53): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (53): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (2): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (2): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (13): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (13): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (80): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (80): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (54): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (54): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (37): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (37): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (41): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (41): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (34): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (34): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (20): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (20): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (97): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (97): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (5): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (5): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (75): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (75): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (69): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (69): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (83): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (83): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (96): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (96): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (30): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (30): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (47): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (47): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (21): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (21): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (39): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (39): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (82): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (82): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (87): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (87): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (33): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (33): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (88): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (88): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (36): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (36): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (42): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (42): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (8): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (8): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (93): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (93): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (49): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (49): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (61): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (61): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (71): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (71): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (60): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (60): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (57): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (57): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (65): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (65): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (74): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (74): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (4): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (4): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (48): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (48): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (64): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (64): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (3): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (3): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (32): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (32): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (22): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (22): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (67): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (67): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (89): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (89): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (11): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (11): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (26): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (26): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (45): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (45): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (1): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (1): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (77): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (77): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (73): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (73): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (76): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (76): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (10): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (10): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (31): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (31): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (38): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (38): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (66): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (66): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (68): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (68): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (24): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (24): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (43): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (43): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (98): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (98): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (81): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (81): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (90): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (90): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (15): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (15): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (46): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (46): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (25): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (25): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (14): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (14): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (29): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (29): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (70): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (70): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (9): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (9): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (40): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (40): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (27): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (27): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (52): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (52): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (91): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (91): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (92): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (92): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (51): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (51): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (79): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (79): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (28): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (28): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (35): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (35): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (58): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (58): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (84): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (84): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (59): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (59): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (56): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (56): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (99): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (99): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (23): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (23): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (86): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (86): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (94): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (94): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (62): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (62): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (55): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (55): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (78): TestFireSimP$FireTimer$fired: fire started @ 0:0:10.000976572
+DEBUG (78): SimFireP$SimFire$start: fire started @ 0:0:10.000976572
+DEBUG (63): TestFireSimP$SimFire$red: sensors in red @ 0:1:10.000976572
+DEBUG (80): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:1:10.000976572
+DEBUG (62): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:1:10.000976572
+DEBUG (81): TestFireSimP$SimFire$red: sensors in red @ 0:1:10.000976572
+DEBUG (72): TestFireSimP$SimFire$red: sensors in red @ 0:1:10.000976572
+DEBUG (53): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:1:10.000976572
+DEBUG (90): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:1:10.000976572
+DEBUG (71): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:1:10.000976572
+DEBUG (54): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:1:10.000976572
+DEBUG (89): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:1:10.000976572
+DEBUG (88): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:2:10.000976572
+DEBUG (45): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:2:10.000976572
+DEBUG (43): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:2:10.000976572
+DEBUG (62): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:2:10.000976572
+DEBUG (70): TestFireSimP$SimFire$red: sensors in red @ 0:2:10.000976572
+DEBUG (79): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:2:10.000976572
+DEBUG (72): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:2:10.000976572
+DEBUG (63): TestFireSimP$SimFire$red: sensors in red @ 0:2:10.000976572
+DEBUG (81): TestFireSimP$SimFire$red: sensors in red @ 0:2:10.000976572
+DEBUG (53): TestFireSimP$SimFire$red: sensors in red @ 0:2:10.000976572
+DEBUG (42): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:2:10.000976572
+DEBUG (71): TestFireSimP$SimFire$red: sensors in red @ 0:2:10.000976572
+DEBUG (44): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:2:10.000976572
+DEBUG (51): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:2:10.000976572
+DEBUG (52): TestFireSimP$SimFire$red: sensors in red @ 0:2:10.000976572
+DEBUG (78): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:2:10.000976572
+DEBUG (80): TestFireSimP$SimFire$red: sensors in red @ 0:2:10.000976572
+DEBUG (90): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:2:10.000976572
+DEBUG (69): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:2:10.000976572
+DEBUG (60): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:2:10.000976572
+DEBUG (61): TestFireSimP$SimFire$red: sensors in red @ 0:2:10.000976572
+DEBUG (89): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:2:10.000976572
+DEBUG (54): TestFireSimP$SimFire$red: sensors in red @ 0:2:10.000976572
+DEBUG (40): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:3:10.000976572
+DEBUG (41): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:3:10.000976572
+DEBUG (43): TestFireSimP$SimFire$red: sensors in red @ 0:3:10.000976572
+DEBUG (67): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:3:10.000976572
+DEBUG (52): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:3:10.000976572
+DEBUG (34): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:3:10.000976572
+DEBUG (81): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:3:10.000976572
+DEBUG (32): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:3:10.000976572
+DEBUG (35): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:3:10.000976572
+DEBUG (45): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:3:10.000976572
+DEBUG (44): TestFireSimP$SimFire$red: sensors in red @ 0:3:10.000976572
+DEBUG (69): TestFireSimP$SimFire$red: sensors in red @ 0:3:10.000976572
+DEBUG (76): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:3:10.000976572
+DEBUG (50): TestFireSimP$SimFire$red: sensors in red @ 0:3:10.000976572
+DEBUG (54): TestFireSimP$SimFire$red: sensors in red @ 0:3:10.000976572
+DEBUG (49): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:3:10.000976572
+DEBUG (70): TestFireSimP$SimFire$red: sensors in red @ 0:3:10.000976572
+DEBUG (80): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:3:10.000976572
+DEBUG (36): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:3:10.000976572
+DEBUG (68): TestFireSimP$SimFire$red: sensors in red @ 0:3:10.000976572
+DEBUG (77): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:3:10.000976572
+DEBUG (63): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:3:10.000976572
+DEBUG (78): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:3:10.000976572
+DEBUG (59): TestFireSimP$SimFire$red: sensors in red @ 0:3:10.000976572
+DEBUG (33): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:3:10.000976572
+DEBUG (60): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:3:10.000976572
+DEBUG (53): TestFireSimP$SimFire$red: sensors in red @ 0:3:10.000976572
+DEBUG (42): TestFireSimP$SimFire$red: sensors in red @ 0:3:10.000976572
+DEBUG (51): TestFireSimP$SimFire$red: sensors in red @ 0:3:10.000976572
+DEBUG (79): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:3:10.000976572
+DEBUG (61): TestFireSimP$SimFire$red: sensors in red @ 0:3:10.000976572
+DEBUG (58): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:3:10.000976572
+DEBUG (71): TestFireSimP$SimFire$red: sensors in red @ 0:3:10.000976572
+DEBUG (51): TestFireSimP$SimFire$red: sensors in red @ 0:4:10.000976572
+DEBUG (50): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:4:10.000976572
+DEBUG (41): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:4:10.000976572
+DEBUG (81): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:4:10.000976572
+DEBUG (71): TestFireSimP$SimFire$red: sensors in red @ 0:4:10.000976572
+DEBUG (79): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:4:10.000976572
+DEBUG (70): TestFireSimP$SimFire$red: sensors in red @ 0:4:10.000976572
+DEBUG (45): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:4:10.000976572
+DEBUG (54): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:4:10.000976572
+DEBUG (69): TestFireSimP$SimFire$red: sensors in red @ 0:4:10.000976572
+DEBUG (68): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:4:10.000976572
+DEBUG (61): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:4:10.000976572
+DEBUG (43): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:4:10.000976572
+DEBUG (42): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:4:10.000976572
+DEBUG (78): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:4:10.000976572
+DEBUG (53): TestFireSimP$SimFire$red: sensors in red @ 0:4:10.000976572
+DEBUG (44): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:4:10.000976572
+DEBUG (59): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:4:10.000976572
+DEBUG (80): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:4:10.000976572
+DEBUG (77): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:4:10.000976572
+DEBUG (54): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:5:10.000976572
+DEBUG (50): TestFireSimP$SimFire$red: sensors in red @ 0:5:10.000976572
+DEBUG (43): TestFireSimP$SimFire$red: sensors in red @ 0:5:10.000976572
+DEBUG (49): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:5:10.000976572
+DEBUG (58): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:5:10.000976572
+DEBUG (81): TestFireSimP$SimFire$red: sensors in red @ 0:5:10.000976572
+DEBUG (98): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:5:10.000976572
+DEBUG (99): TestFireSimP$SimFire$red: sensors in red @ 0:5:10.000976572
+DEBUG (68): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:5:10.000976572
+DEBUG (51): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:5:10.000976572
+DEBUG (33): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:5:10.000976572
+DEBUG (80): TestFireSimP$SimFire$red: sensors in red @ 0:5:10.000976572
+DEBUG (31): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:5:10.000976572
+DEBUG (40): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:5:10.000976572
+DEBUG (79): TestFireSimP$SimFire$red: sensors in red @ 0:5:10.000976572
+DEBUG (34): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:5:10.000976572
+DEBUG (42): TestFireSimP$SimFire$red: sensors in red @ 0:5:10.000976572
+DEBUG (67): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:5:10.000976572
+DEBUG (70): TestFireSimP$SimFire$red: sensors in red @ 0:5:10.000976572
+DEBUG (89): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:5:10.000976572
+DEBUG (90): TestFireSimP$SimFire$red: sensors in red @ 0:5:10.000976572
+DEBUG (41): TestFireSimP$SimFire$red: sensors in red @ 0:5:10.000976572
+DEBUG (88): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:5:10.000976572
+DEBUG (59): TestFireSimP$SimFire$red: sensors in red @ 0:5:10.000976572
+DEBUG (78): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:5:10.000976572
+DEBUG (71): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:5:10.000976572
+DEBUG (35): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:5:10.000976572
+DEBUG (44): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:5:10.000976572
+DEBUG (53): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:5:10.000976572
+DEBUG (32): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:5:10.000976572
+DEBUG (69): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:5:10.000976572
+DEBUG (87): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:5:10.000976572
+DEBUG (79): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:6:10.000976572
+DEBUG (89): TestFireSimP$SimFire$red: sensors in red @ 0:6:10.000976572
+DEBUG (98): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:6:10.000976572
+DEBUG (81): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:6:10.000976572
+DEBUG (99): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:6:10.000976572
+DEBUG (70): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:6:10.000976572
+DEBUG (97): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:6:10.000976572
+DEBUG (80): TestFireSimP$SimFire$red: sensors in red @ 0:6:10.000976572
+DEBUG (88): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:6:10.000976572
+DEBUG (90): TestFireSimP$SimFire$red: sensors in red @ 0:6:10.000976572
+DEBUG (26): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:7:10.000976572
+DEBUG (35): TestFireSimP$SimFire$red: sensors in red @ 0:7:10.000976572
+DEBUG (97): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:7:10.000976572
+DEBUG (89): TestFireSimP$SimFire$red: sensors in red @ 0:7:10.000976572
+DEBUG (25): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:7:10.000976572
+DEBUG (43): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:7:10.000976572
+DEBUG (70): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:7:10.000976572
+DEBUG (88): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:7:10.000976572
+DEBUG (80): TestFireSimP$SimFire$red: sensors in red @ 0:7:10.000976572
+DEBUG (32): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:7:10.000976572
+DEBUG (24): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:7:10.000976572
+DEBUG (54): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:7:10.000976572
+DEBUG (50): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:7:10.000976572
+DEBUG (34): TestFireSimP$SimFire$red: sensors in red @ 0:7:10.000976572
+DEBUG (41): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:7:10.000976572
+DEBUG (59): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:7:10.000976572
+DEBUG (53): TestFireSimP$SimFire$red: sensors in red @ 0:7:10.000976572
+DEBUG (79): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:7:10.000976572
+DEBUG (36): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:7:10.000976572
+DEBUG (27): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:7:10.000976572
+DEBUG (23): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:7:10.000976572
+DEBUG (42): TestFireSimP$SimFire$red: sensors in red @ 0:7:10.000976572
+DEBUG (44): TestFireSimP$SimFire$red: sensors in red @ 0:7:10.000976572
+DEBUG (33): TestFireSimP$SimFire$red: sensors in red @ 0:7:10.000976572
+DEBUG (98): TestFireSimP$SimFire$red: sensors in red @ 0:7:10.000976572
+DEBUG (45): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:7:10.000976572
+DEBUG (99): TestFireSimP$SimFire$red: sensors in red @ 0:7:10.000976572
+DEBUG (90): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:7:10.000976572
+DEBUG (50): TestFireSimP$SimFire$red: sensors in red @ 0:8:10.000976572
+DEBUG (53): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:8:10.000976572
+DEBUG (32): TestFireSimP$SimFire$red: sensors in red @ 0:8:10.000976572
+DEBUG (24): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:8:10.000976572
+DEBUG (31): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:8:10.000976572
+DEBUG (69): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:8:10.000976572
+DEBUG (33): TestFireSimP$SimFire$red: sensors in red @ 0:8:10.000976572
+DEBUG (25): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:8:10.000976572
+DEBUG (44): TestFireSimP$SimFire$red: sensors in red @ 0:8:10.000976572
+DEBUG (45): TestFireSimP$SimFire$red: sensors in red @ 0:8:10.000976572
+DEBUG (26): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:8:10.000976572
+DEBUG (22): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:8:10.000976572
+DEBUG (35): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:8:10.000976572
+DEBUG (41): TestFireSimP$SimFire$red: sensors in red @ 0:8:10.000976572
+DEBUG (59): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:8:10.000976572
+DEBUG (23): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:8:10.000976572
+DEBUG (34): TestFireSimP$SimFire$red: sensors in red @ 0:8:10.000976572
+DEBUG (36): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:8:10.000976572
+DEBUG (40): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:8:10.000976572
+DEBUG (70): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:8:10.000976572
+DEBUG (42): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:8:10.000976572
+DEBUG (58): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:8:10.000976572
+DEBUG (54): TestFireSimP$SimFire$red: sensors in red @ 0:8:10.000976572
+DEBUG (49): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:8:10.000976572
+DEBUG (80): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:8:10.000976572
+DEBUG (3): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:9:10.000976572
+DEBUG (4): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:9:10.000976572
+DEBUG (49): TestFireSimP$SimFire$red: sensors in red @ 0:9:10.000976572
+DEBUG (29): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:9:10.000976572
+DEBUG (58): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:9:10.000976572
+DEBUG (22): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:9:10.000976572
+DEBUG (11): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:9:10.000976572
+DEBUG (31): TestFireSimP$SimFire$red: sensors in red @ 0:9:10.000976572
+DEBUG (34): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:9:10.000976572
+DEBUG (13): TestFireSimP$SimFire$red: sensors in red @ 0:9:10.000976572
+DEBUG (39): TestFireSimP$SimFire$red: sensors in red @ 0:9:10.000976572
+DEBUG (56): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:9:10.000976572
+DEBUG (14): TestFireSimP$SimFire$red: sensors in red @ 0:9:10.000976572
+DEBUG (16): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:9:10.000976572
+DEBUG (5): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:9:10.000976572
+DEBUG (41): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:9:10.000976572
+DEBUG (24): TestFireSimP$SimFire$red: sensors in red @ 0:9:10.000976572
+DEBUG (38): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:9:10.000976572
+DEBUG (21): TestFireSimP$SimFire$red: sensors in red @ 0:9:10.000976572
+DEBUG (25): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:9:10.000976572
+DEBUG (47): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:9:10.000976572
+DEBUG (12): TestFireSimP$SimFire$red: sensors in red @ 0:9:10.000976572
+DEBUG (40): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:9:10.000976572
+DEBUG (33): TestFireSimP$SimFire$red: sensors in red @ 0:9:10.000976572
+DEBUG (59): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:9:10.000976572
+DEBUG (50): TestFireSimP$SimFire$red: sensors in red @ 0:9:10.000976572
+DEBUG (48): TestFireSimP$SimFire$red: sensors in red @ 0:9:10.000976572
+DEBUG (57): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:9:10.000976572
+DEBUG (23): TestFireSimP$SimFire$red: sensors in red @ 0:9:10.000976572
+DEBUG (2): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:9:10.000976572
+DEBUG (30): TestFireSimP$SimFire$red: sensors in red @ 0:9:10.000976572
+DEBUG (6): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:9:10.000976572
+DEBUG (32): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:9:10.000976572
+DEBUG (15): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:9:10.000976572
+DEBUG (20): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:9:10.000976572
+DEBUG (5): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:10:10.000976572
+DEBUG (48): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:10:10.000976572
+DEBUG (11): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:10:10.000976572
+DEBUG (20): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:10:10.000976572
+DEBUG (26): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:10:10.000976572
+DEBUG (44): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:10:10.000976572
+DEBUG (34): TestFireSimP$SimFire$red: sensors in red @ 0:10:10.000976572
+DEBUG (39): TestFireSimP$SimFire$red: sensors in red @ 0:10:10.000976572
+DEBUG (21): TestFireSimP$SimFire$red: sensors in red @ 0:10:10.000976572
+DEBUG (13): TestFireSimP$SimFire$red: sensors in red @ 0:10:10.000976572
+DEBUG (30): TestFireSimP$SimFire$red: sensors in red @ 0:10:10.000976572
+DEBUG (49): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:10:10.000976572
+DEBUG (6): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:10:10.000976572
+DEBUG (14): TestFireSimP$SimFire$red: sensors in red @ 0:10:10.000976572
+DEBUG (3): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:10:10.000976572
+DEBUG (35): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:10:10.000976572
+DEBUG (16): TestFireSimP$SimFire$red: sensors in red @ 0:10:10.000976572
+DEBUG (24): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:10:10.000976572
+DEBUG (23): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:10:10.000976572
+DEBUG (25): TestFireSimP$SimFire$red: sensors in red @ 0:10:10.000976572
+DEBUG (17): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:10:10.000976572
+DEBUG (33): TestFireSimP$SimFire$red: sensors in red @ 0:10:10.000976572
+DEBUG (50): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:10:10.000976572
+DEBUG (31): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:10:10.000976572
+DEBUG (8): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:10:10.000976572
+DEBUG (38): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:10:10.000976572
+DEBUG (15): TestFireSimP$SimFire$red: sensors in red @ 0:10:10.000976572
+DEBUG (47): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:10:10.000976572
+DEBUG (7): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:10:10.000976572
+DEBUG (4): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:10:10.000976572
+DEBUG (29): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:10:10.000976572
+DEBUG (12): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:10:10.000976572
+DEBUG (99): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:11:10.000976572
+DEBUG (13): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:11:10.000976572
+DEBUG (26): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:11:10.000976572
+DEBUG (49): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:11:10.000976572
+DEBUG (20): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:11:10.000976572
+DEBUG (34): TestFireSimP$SimFire$red: sensors in red @ 0:11:10.000976572
+DEBUG (12): TestFireSimP$SimFire$red: sensors in red @ 0:11:10.000976572
+DEBUG (7): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:11:10.000976572
+DEBUG (15): TestFireSimP$SimFire$red: sensors in red @ 0:11:10.000976572
+DEBUG (44): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:11:10.000976572
+DEBUG (33): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:11:10.000976572
+DEBUG (6): TestFireSimP$SimFire$red: sensors in red @ 0:11:10.000976572
+DEBUG (5): TestFireSimP$SimFire$red: sensors in red @ 0:11:10.000976572
+DEBUG (29): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:11:10.000976572
+DEBUG (25): TestFireSimP$SimFire$red: sensors in red @ 0:11:10.000976572
+DEBUG (30): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:11:10.000976572
+DEBUG (3): TestFireSimP$SimFire$red: sensors in red @ 0:11:10.000976572
+DEBUG (16): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:11:10.000976572
+DEBUG (21): TestFireSimP$SimFire$red: sensors in red @ 0:11:10.000976572
+DEBUG (11): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:11:10.000976572
+DEBUG (4): TestFireSimP$SimFire$red: sensors in red @ 0:11:10.000976572
+DEBUG (2): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:11:10.000976572
+DEBUG (14): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:11:10.000976572
+DEBUG (50): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:11:10.000976572
+DEBUG (35): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:11:10.000976572
+DEBUG (17): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:11:10.000976572
+DEBUG (97): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:12:10.000976572
+DEBUG (80): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:12:10.000976572
+DEBUG (87): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:12:10.000976572
+DEBUG (70): TestFireSimP$SimFire$red: sensors in red @ 0:12:10.000976572
+DEBUG (89): TestFireSimP$SimFire$red: sensors in red @ 0:12:10.000976572
+DEBUG (99): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:12:10.000976572
+DEBUG (78): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:12:10.000976572
+DEBUG (88): TestFireSimP$SimFire$red: sensors in red @ 0:12:10.000976572
+DEBUG (98): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:12:10.000976572
+DEBUG (96): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:12:10.000976572
+DEBUG (79): TestFireSimP$SimFire$red: sensors in red @ 0:12:10.000976572
+DEBUG (69): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:12:10.000976572
+DEBUG (97): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:14:10.000976572
+DEBUG (89): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:14:10.000976572
+DEBUG (50): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:14:10.000976572
+DEBUG (35): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:14:10.000976572
+DEBUG (45): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:14:10.000976572
+DEBUG (67): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:14:10.000976572
+DEBUG (26): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:14:10.000976572
+DEBUG (95): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:14:10.000976572
+DEBUG (98): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:14:10.000976572
+DEBUG (78): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:14:10.000976572
+DEBUG (4): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:14:10.000976572
+DEBUG (8): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:14:10.000976572
+DEBUG (94): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:14:10.000976572
+DEBUG (85): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:14:10.000976572
+DEBUG (58): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:14:10.000976572
+DEBUG (54): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:14:10.000976572
+DEBUG (88): TestFireSimP$SimFire$red: sensors in red @ 0:14:10.000976572
+DEBUG (70): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:14:10.000976572
+DEBUG (6): TestFireSimP$SimFire$red: sensors in red @ 0:14:10.000976572
+DEBUG (5): TestFireSimP$SimFire$red: sensors in red @ 0:14:10.000976572
+DEBUG (99): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:14:10.000976572
+DEBUG (77): TestFireSimP$SimFire$red: sensors in red @ 0:14:10.000976572
+DEBUG (79): TestFireSimP$SimFire$red: sensors in red @ 0:14:10.000976572
+DEBUG (86): TestFireSimP$SimFire$red: sensors in red @ 0:14:10.000976572
+DEBUG (7): TestFireSimP$SimFire$red: sensors in red @ 0:14:10.000976572
+DEBUG (76): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:14:10.000976572
+DEBUG (16): TestFireSimP$SimFire$red: sensors in red @ 0:14:10.000976572
+DEBUG (25): TestFireSimP$SimFire$red: sensors in red @ 0:14:10.000976572
+DEBUG (96): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:14:10.000976572
+DEBUG (69): TestFireSimP$SimFire$red: sensors in red @ 0:14:10.000976572
+DEBUG (15): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:14:10.000976572
+DEBUG (34): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:14:10.000976572
+DEBUG (17): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:14:10.000976572
+DEBUG (59): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:14:10.000976572
+DEBUG (68): TestFireSimP$SimFire$red: sensors in red @ 0:14:10.000976572
+DEBUG (87): TestFireSimP$SimFire$red: sensors in red @ 0:14:10.000976572
+DEBUG (93): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:15:10.000976572
+DEBUG (94): TestFireSimP$SimFire$red: sensors in red @ 0:15:10.000976572
+DEBUG (58): TestFireSimP$SimFire$red: sensors in red @ 0:15:10.000976572
+DEBUG (30): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:15:10.000976572
+DEBUG (29): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:15:10.000976572
+DEBUG (56): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:15:10.000976572
+DEBUG (85): TestFireSimP$SimFire$red: sensors in red @ 0:15:10.000976572
+DEBUG (69): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:15:10.000976572
+DEBUG (38): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:15:10.000976572
+DEBUG (68): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:15:10.000976572
+DEBUG (79): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:15:10.000976572
+DEBUG (96): TestFireSimP$SimFire$red: sensors in red @ 0:15:10.000976572
+DEBUG (36): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:15:10.000976572
+DEBUG (97): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:15:10.000976572
+DEBUG (59): TestFireSimP$SimFire$red: sensors in red @ 0:15:10.000976572
+DEBUG (47): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:15:10.000976572
+DEBUG (45): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:15:10.000976572
+DEBUG (67): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:15:10.000976572
+DEBUG (95): TestFireSimP$SimFire$red: sensors in red @ 0:15:10.000976572
+DEBUG (86): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:15:10.000976572
+DEBUG (87): TestFireSimP$SimFire$red: sensors in red @ 0:15:10.000976572
+DEBUG (66): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:15:10.000976572
+DEBUG (65): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:15:10.000976572
+DEBUG (84): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:15:10.000976572
+DEBUG (54): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:15:10.000976572
+DEBUG (49): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:15:10.000976572
+DEBUG (76): TestFireSimP$SimFire$red: sensors in red @ 0:15:10.000976572
+DEBUG (88): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:15:10.000976572
+DEBUG (50): TestFireSimP$SimFire$red: sensors in red @ 0:15:10.000976572
+DEBUG (39): TestFireSimP$SimFire$red: sensors in red @ 0:15:10.000976572
+DEBUG (77): TestFireSimP$SimFire$red: sensors in red @ 0:15:10.000976572
+DEBUG (57): TestFireSimP$SimFire$red: sensors in red @ 0:15:10.000976572
+DEBUG (48): TestFireSimP$SimFire$red: sensors in red @ 0:15:10.000976572
+DEBUG (75): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:15:10.000976572
+DEBUG (39): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:16:10.000976572
+DEBUG (50): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:16:10.000976572
+DEBUG (79): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:16:10.000976572
+DEBUG (95): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:16:10.000976572
+DEBUG (94): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:16:10.000976572
+DEBUG (75): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:16:10.000976572
+DEBUG (87): TestFireSimP$SimFire$red: sensors in red @ 0:16:10.000976572
+DEBUG (88): TestFireSimP$SimFire$red: sensors in red @ 0:16:10.000976572
+DEBUG (57): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:16:10.000976572
+DEBUG (84): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:16:10.000976572
+DEBUG (89): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:16:10.000976572
+DEBUG (96): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:16:10.000976572
+DEBUG (66): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:16:10.000976572
+DEBUG (85): TestFireSimP$SimFire$red: sensors in red @ 0:16:10.000976572
+DEBUG (76): TestFireSimP$SimFire$red: sensors in red @ 0:16:10.000976572
+DEBUG (77): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:16:10.000976572
+DEBUG (36): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:16:10.000976572
+DEBUG (59): TestFireSimP$SimFire$red: sensors in red @ 0:16:10.000976572
+DEBUG (45): TestFireSimP$SimFire$red: sensors in red @ 0:16:10.000976572
+DEBUG (48): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:16:10.000976572
+DEBUG (68): TestFireSimP$SimFire$red: sensors in red @ 0:16:10.000976572
+DEBUG (99): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:16:10.000976572
+DEBUG (93): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:16:10.000976572
+DEBUG (44): TestFireSimP$SimFire$red: sensors in red @ 0:16:10.000976572
+DEBUG (97): TestFireSimP$SimFire$red: sensors in red @ 0:16:10.000976572
+DEBUG (67): TestFireSimP$SimFire$red: sensors in red @ 0:16:10.000976572
+DEBUG (69): TestFireSimP$SimFire$red: sensors in red @ 0:16:10.000976572
+DEBUG (58): TestFireSimP$SimFire$red: sensors in red @ 0:16:10.000976572
+DEBUG (34): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:16:10.000976572
+DEBUG (35): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:16:10.000976572
+DEBUG (98): TestFireSimP$SimFire$red: sensors in red @ 0:16:10.000976572
+DEBUG (54): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:16:10.000976572
+DEBUG (30): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:16:10.000976572
+DEBUG (69): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:17:10.000976572
+DEBUG (88): TestFireSimP$SimFire$red: sensors in red @ 0:17:10.000976572
+DEBUG (37): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:17:10.000976572
+DEBUG (68): TestFireSimP$SimFire$red: sensors in red @ 0:17:10.000976572
+DEBUG (28): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:17:10.000976572
+DEBUG (85): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:17:10.000976572
+DEBUG (67): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:17:10.000976572
+DEBUG (21): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:17:10.000976572
+DEBUG (58): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:17:10.000976572
+DEBUG (29): TestFireSimP$SimFire$red: sensors in red @ 0:17:10.000976572
+DEBUG (39): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:17:10.000976572
+DEBUG (47): TestFireSimP$SimFire$red: sensors in red @ 0:17:10.000976572
+DEBUG (20): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:17:10.000976572
+DEBUG (55): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:17:10.000976572
+DEBUG (97): TestFireSimP$SimFire$red: sensors in red @ 0:17:10.000976572
+DEBUG (76): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:17:10.000976572
+DEBUG (46): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:17:10.000976572
+DEBUG (98): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:17:10.000976572
+DEBUG (48): TestFireSimP$SimFire$red: sensors in red @ 0:17:10.000976572
+DEBUG (19): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:17:10.000976572
+DEBUG (56): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:17:10.000976572
+DEBUG (30): TestFireSimP$SimFire$red: sensors in red @ 0:17:10.000976572
+DEBUG (87): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:17:10.000976572
+DEBUG (57): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:17:10.000976572
+DEBUG (38): TestFireSimP$SimFire$red: sensors in red @ 0:17:10.000976572
+DEBUG (96): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:17:10.000976572
+DEBUG (59): TestFireSimP$SimFire$red: sensors in red @ 0:17:10.000976572
+DEBUG (85): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:18:10.000976572
+DEBUG (20): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:18:10.000976572
+DEBUG (57): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:18:10.000976572
+DEBUG (88): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:18:10.000976572
+DEBUG (84): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:18:10.000976572
+DEBUG (48): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:18:10.000976572
+DEBUG (45): TestFireSimP$SimFire$red: sensors in red @ 0:18:10.000976572
+DEBUG (58): TestFireSimP$SimFire$red: sensors in red @ 0:18:10.000976572
+DEBUG (27): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:18:10.000976572
+DEBUG (17): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:18:10.000976572
+DEBUG (66): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:18:10.000976572
+DEBUG (75): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:18:10.000976572
+DEBUG (12): TestFireSimP$SimFire$red: sensors in red @ 0:18:10.000976572
+DEBUG (4): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:18:10.000976572
+DEBUG (2): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:18:10.000976572
+DEBUG (76): TestFireSimP$SimFire$red: sensors in red @ 0:18:10.000976572
+DEBUG (25): TestFireSimP$SimFire$red: sensors in red @ 0:18:10.000976572
+DEBUG (5): TestFireSimP$SimFire$red: sensors in red @ 0:18:10.000976572
+DEBUG (34): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:18:10.000976572
+DEBUG (67): TestFireSimP$SimFire$red: sensors in red @ 0:18:10.000976572
+DEBUG (44): TestFireSimP$SimFire$red: sensors in red @ 0:18:10.000976572
+DEBUG (11): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:18:10.000976572
+DEBUG (59): TestFireSimP$SimFire$red: sensors in red @ 0:18:10.000976572
+DEBUG (35): TestFireSimP$SimFire$red: sensors in red @ 0:18:10.000976572
+DEBUG (87): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:18:10.000976572
+DEBUG (16): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:18:10.000976572
+DEBUG (26): TestFireSimP$SimFire$red: sensors in red @ 0:18:10.000976572
+DEBUG (3): TestFireSimP$SimFire$red: sensors in red @ 0:18:10.000976572
+DEBUG (21): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:18:10.000976572
+DEBUG (18): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:18:10.000976572
+DEBUG (6): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:18:10.000976572
+DEBUG (68): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:18:10.000976572
+DEBUG (36): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:18:10.000976572
+DEBUG (20): TestFireSimP$SimFire$red: sensors in red @ 0:19:10.000976572
+DEBUG (3): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:19:10.000976572
+DEBUG (21): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:19:10.000976572
+DEBUG (12): TestFireSimP$SimFire$red: sensors in red @ 0:19:10.000976572
+DEBUG (5): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:19:10.000976572
+DEBUG (10): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:19:10.000976572
+DEBUG (95): TestFireSimP$SimFire$red: sensors in red @ 0:19:10.000976572
+DEBUG (97): TestFireSimP$SimFire$red: sensors in red @ 0:19:10.000976572
+DEBUG (19): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:19:10.000976572
+DEBUG (28): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:19:10.000976572
+DEBUG (2): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:19:10.000976572
+DEBUG (87): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:19:10.000976572
+DEBUG (38): TestFireSimP$SimFire$red: sensors in red @ 0:19:10.000976572
+DEBUG (76): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:19:10.000976572
+DEBUG (11): TestFireSimP$SimFire$red: sensors in red @ 0:19:10.000976572
+DEBUG (96): TestFireSimP$SimFire$red: sensors in red @ 0:19:10.000976572
+DEBUG (30): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:19:10.000976572
+DEBUG (94): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:19:10.000976572
+DEBUG (37): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:19:10.000976572
+DEBUG (29): TestFireSimP$SimFire$red: sensors in red @ 0:19:10.000976572
+DEBUG (88): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:19:10.000976572
+DEBUG (67): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:19:10.000976572
+DEBUG (1): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:19:10.000976572
+DEBUG (48): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:19:10.000976572
+DEBUG (85): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:19:10.000976572
+DEBUG (47): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:19:10.000976572
+DEBUG (46): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:19:10.000976572
+DEBUG (27): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:21:10.000976572
+DEBUG (25): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:21:10.000976572
+DEBUG (67): TestFireSimP$SimFire$red: sensors in red @ 0:21:10.000976572
+DEBUG (18): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:21:10.000976572
+DEBUG (9): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:21:10.000976572
+DEBUG (58): TestFireSimP$SimFire$red: sensors in red @ 0:21:10.000976572
+DEBUG (6): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:21:10.000976572
+DEBUG (26): TestFireSimP$SimFire$red: sensors in red @ 0:21:10.000976572
+DEBUG (57): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:21:10.000976572
+DEBUG (45): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:21:10.000976572
+DEBUG (44): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:21:10.000976572
+DEBUG (36): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:21:10.000976572
+DEBUG (7): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:21:10.000976572
+DEBUG (8): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:21:10.000976572
+DEBUG (48): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:21:10.000976572
+DEBUG (59): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:21:10.000976572
+DEBUG (76): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:21:10.000976572
+DEBUG (5): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:21:10.000976572
+DEBUG (35): TestFireSimP$SimFire$red: sensors in red @ 0:21:10.000976572
+DEBUG (75): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:21:10.000976572
+DEBUG (17): TestFireSimP$SimFire$red: sensors in red @ 0:21:10.000976572
+DEBUG (16): TestFireSimP$SimFire$red: sensors in red @ 0:21:10.000976572
+DEBUG (66): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:21:10.000976572
+DEBUG (37): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:23:10.000976572
+DEBUG (65): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:23:10.000976572
+DEBUG (58): TestFireSimP$SimFire$red: sensors in red @ 0:23:10.000976572
+DEBUG (64): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:23:10.000976572
+DEBUG (47): TestFireSimP$SimFire$red: sensors in red @ 0:23:10.000976572
+DEBUG (38): TestFireSimP$SimFire$red: sensors in red @ 0:23:10.000976572
+DEBUG (57): TestFireSimP$SimFire$red: sensors in red @ 0:23:10.000976572
+DEBUG (55): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:23:10.000976572
+DEBUG (48): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:23:10.000976572
+DEBUG (56): TestFireSimP$SimFire$red: sensors in red @ 0:23:10.000976572
+DEBUG (46): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:23:10.000976572
+DEBUG (28): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:23:10.000976572
+DEBUG (67): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:23:10.000976572
+DEBUG (66): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:23:10.000976572
+DEBUG (29): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:23:10.000976572
+DEBUG (16): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:24:10.000976572
+DEBUG (5): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:24:10.000976572
+DEBUG (12): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:24:10.000976572
+DEBUG (7): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:24:10.000976572
+DEBUG (3): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:24:10.000976572
+DEBUG (6): TestFireSimP$SimFire$red: sensors in red @ 0:24:10.000976572
+DEBUG (28): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:26:10.000976572
+DEBUG (3): TestFireSimP$SimFire$red: sensors in red @ 0:26:10.000976572
+DEBUG (20): TestFireSimP$SimFire$red: sensors in red @ 0:26:10.000976572
+DEBUG (1): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:26:10.000976572
+DEBUG (2): TestFireSimP$SimFire$red: sensors in red @ 0:26:10.000976572
+DEBUG (10): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:26:10.000976572
+DEBUG (12): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:26:10.000976572
+DEBUG (29): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:26:10.000976572
+DEBUG (11): TestFireSimP$SimFire$red: sensors in red @ 0:26:10.000976572
+DEBUG (19): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:26:10.000976572
+DEBUG (75): TestFireSimP$SimFire$red: sensors in red @ 0:27:10.000976572
+DEBUG (8): TestFireSimP$SimFire$red: sensors in red @ 0:27:10.000976572
+DEBUG (65): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:27:10.000976572
+DEBUG (66): TestFireSimP$SimFire$red: sensors in red @ 0:27:10.000976572
+DEBUG (94): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:27:10.000976572
+DEBUG (76): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:27:10.000976572
+DEBUG (85): TestFireSimP$SimFire$red: sensors in red @ 0:27:10.000976572
+DEBUG (27): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:27:10.000976572
+DEBUG (56): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:27:10.000976572
+DEBUG (35): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:27:10.000976572
+DEBUG (26): TestFireSimP$SimFire$red: sensors in red @ 0:27:10.000976572
+DEBUG (96): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:27:10.000976572
+DEBUG (16): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:27:10.000976572
+DEBUG (18): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:27:10.000976572
+DEBUG (83): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:27:10.000976572
+DEBUG (67): TestFireSimP$SimFire$red: sensors in red @ 0:27:10.000976572
+DEBUG (93): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:27:10.000976572
+DEBUG (36): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:27:10.000976572
+DEBUG (6): TestFireSimP$SimFire$red: sensors in red @ 0:27:10.000976572
+DEBUG (7): TestFireSimP$SimFire$red: sensors in red @ 0:27:10.000976572
+DEBUG (84): TestFireSimP$SimFire$red: sensors in red @ 0:27:10.000976572
+DEBUG (58): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:27:10.000976572
+DEBUG (17): TestFireSimP$SimFire$red: sensors in red @ 0:27:10.000976572
+DEBUG (57): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:27:10.000976572
+DEBUG (74): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:27:10.000976572
+DEBUG (92): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:27:10.000976572
+DEBUG (9): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:27:10.000976572
+DEBUG (95): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:27:10.000976572
+DEBUG (67): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:28:10.000976572
+DEBUG (65): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:28:10.000976572
+DEBUG (56): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:28:10.000976572
+DEBUG (66): TestFireSimP$SimFire$red: sensors in red @ 0:28:10.000976572
+DEBUG (84): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:28:10.000976572
+DEBUG (57): TestFireSimP$SimFire$red: sensors in red @ 0:28:10.000976572
+DEBUG (83): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:28:10.000976572
+DEBUG (85): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:28:10.000976572
+DEBUG (47): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:28:10.000976572
+DEBUG (75): TestFireSimP$SimFire$red: sensors in red @ 0:28:10.000976572
+DEBUG (74): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:28:10.000976572
+DEBUG (58): TestFireSimP$SimFire$red: sensors in red @ 0:28:10.000976572
+DEBUG (36): TestFireSimP$SimFire$red: sensors in red @ 0:31:10.000976572
+DEBUG (27): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:31:10.000976572
+DEBUG (45): TestFireSimP$SimFire$red: sensors in red @ 0:31:10.000976572
+DEBUG (26): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:31:10.000976572
+DEBUG (35): TestFireSimP$SimFire$red: sensors in red @ 0:31:10.000976572
+DEBUG (44): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:31:10.000976572
+DEBUG (45): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:32:10.000976572
+DEBUG (35): TestFireSimP$SimFire$red: sensors in red @ 0:32:10.000976572
+DEBUG (36): TestFireSimP$SimFire$red: sensors in red @ 0:32:10.000976572
+DEBUG (65): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:32:10.000976572
+DEBUG (27): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:32:10.000976572
+DEBUG (93): TestFireSimP$SimFire$red: sensors in red @ 0:32:10.000976572
+DEBUG (83): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:32:10.000976572
+DEBUG (74): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:32:10.000976572
+DEBUG (92): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:32:10.000976572
+DEBUG (75): TestFireSimP$SimFire$red: sensors in red @ 0:32:10.000976572
+DEBUG (84): TestFireSimP$SimFire$red: sensors in red @ 0:32:10.000976572
+DEBUG (96): TestFireSimP$SimFire$red: sensors in red @ 0:32:10.000976572
+DEBUG (85): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:32:10.000976572
+DEBUG (97): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:32:10.000976572
+DEBUG (95): TestFireSimP$SimFire$red: sensors in red @ 0:32:10.000976572
+DEBUG (26): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:32:10.000976572
+DEBUG (66): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:32:10.000976572
+DEBUG (94): TestFireSimP$SimFire$red: sensors in red @ 0:32:10.000976572
+DEBUG (35): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:34:10.000976572
+DEBUG (36): TestFireSimP$SimFire$red: sensors in red @ 0:34:10.000976572
+DEBUG (18): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:34:10.000976572
+DEBUG (17): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:34:10.000976572
+DEBUG (26): TestFireSimP$SimFire$red: sensors in red @ 0:34:10.000976572
+DEBUG (27): TestFireSimP$SimFire$red: sensors in red @ 0:34:10.000976572
+DEBUG (36): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:35:10.000976572
+DEBUG (27): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:35:10.000976572
+DEBUG (93): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:37:10.000976572
+DEBUG (84): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:37:10.000976572
+DEBUG (75): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:37:10.000976572
+DEBUG (95): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:37:10.000976572
+DEBUG (96): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:37:10.000976572
+DEBUG (94): TestFireSimP$SimFire$red: sensors in red @ 0:37:10.000976572
+DEBUG (38): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:38:10.000976572
+DEBUG (58): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:38:10.000976572
+DEBUG (57): TestFireSimP$SimFire$red: sensors in red @ 0:38:10.000976572
+DEBUG (47): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:38:10.000976572
+DEBUG (17): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:38:10.000976572
+DEBUG (6): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:38:10.000976572
+DEBUG (56): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:38:10.000976572
+DEBUG (74): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:38:10.000976572
+DEBUG (26): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:38:10.000976572
+DEBUG (66): TestFireSimP$SimFire$red: sensors in red @ 0:38:10.000976572
+DEBUG (7): TestFireSimP$SimFire$red: sensors in red @ 0:38:10.000976572
+DEBUG (8): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:38:10.000976572
+DEBUG (65): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:38:10.000976572
+DEBUG (75): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:38:10.000976572
+DEBUG (37): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:39:10.000976572
+DEBUG (73): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:39:10.000976572
+DEBUG (75): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:39:10.000976572
+DEBUG (47): TestFireSimP$SimFire$red: sensors in red @ 0:39:10.000976572
+DEBUG (38): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:39:10.000976572
+DEBUG (46): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:39:10.000976572
+DEBUG (57): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:39:10.000976572
+DEBUG (65): TestFireSimP$SimFire$red: sensors in red @ 0:39:10.000976572
+DEBUG (64): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:39:10.000976572
+DEBUG (66): TestFireSimP$SimFire$red: sensors in red @ 0:39:10.000976572
+DEBUG (55): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:39:10.000976572
+DEBUG (56): TestFireSimP$SimFire$red: sensors in red @ 0:39:10.000976572
+DEBUG (74): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:39:10.000976572
+DEBUG (10): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:42:10.000976572
+DEBUG (20): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:42:10.000976572
+DEBUG (3): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:42:10.000976572
+DEBUG (2): TestFireSimP$SimFire$red: sensors in red @ 0:42:10.000976572
+DEBUG (11): TestFireSimP$SimFire$red: sensors in red @ 0:42:10.000976572
+DEBUG (19): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:42:10.000976572
+DEBUG (1): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:42:10.000976572
+DEBUG (18): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:44:10.000976572
+DEBUG (9): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:44:10.000976572
+DEBUG (27): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:44:10.000976572
+DEBUG (17): TestFireSimP$SimFire$red: sensors in red @ 0:44:10.000976572
+DEBUG (7): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:44:10.000976572
+DEBUG (8): TestFireSimP$SimFire$red: sensors in red @ 0:44:10.000976572
+DEBUG (26): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:44:10.000976572
+DEBUG (75): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:47:10.000976572
+DEBUG (92): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:47:10.000976572
+DEBUG (83): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:47:10.000976572
+DEBUG (74): TestFireSimP$SimFire$yellow: sensors in yellow @ 0:47:10.000976572
+DEBUG (84): TestFireSimP$SimFire$red: sensors in red @ 0:47:10.000976572
+DEBUG (94): TestFireSimP$SimFire$died: node destroyed by fire - turning off @ 0:47:10.000976572
+DEBUG (93): TestFireSimP$SimFire$red: sensors in red @ 0:47:10.000976572
+Completed simulation for 3600 sec.

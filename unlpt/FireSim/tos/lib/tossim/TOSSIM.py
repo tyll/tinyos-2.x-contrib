@@ -135,22 +135,6 @@ class Packet(_object):
 Packet_swigregister = _TOSSIM.Packet_swigregister
 Packet_swigregister(Packet)
 
-class EnergyEstimator(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, EnergyEstimator, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, EnergyEstimator, name)
-    __repr__ = _swig_repr
-    def __init__(self, *args): 
-        this = _TOSSIM.new_EnergyEstimator(*args)
-        try: self.this.append(this)
-        except: self.this = this
-    __swig_destroy__ = _TOSSIM.delete_EnergyEstimator
-    __del__ = lambda self : None;
-    def getNodeEnergy(*args): return _TOSSIM.EnergyEstimator_getNodeEnergy(*args)
-EnergyEstimator_swigregister = _TOSSIM.EnergyEstimator_swigregister
-EnergyEstimator_swigregister(EnergyEstimator)
-
 class FireEstimator(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, FireEstimator, name, value)
@@ -289,7 +273,6 @@ class Tossim(_object):
     def mac(*args): return _TOSSIM.Tossim_mac(*args)
     def radio(*args): return _TOSSIM.Tossim_radio(*args)
     def newPacket(*args): return _TOSSIM.Tossim_newPacket(*args)
-    def newEnergyEstimator(*args): return _TOSSIM.Tossim_newEnergyEstimator(*args)
     def newFireEstimator(*args): return _TOSSIM.Tossim_newFireEstimator(*args)
 Tossim_swigregister = _TOSSIM.Tossim_swigregister
 Tossim_swigregister(Tossim)

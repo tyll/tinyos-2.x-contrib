@@ -2465,22 +2465,21 @@ SWIG_Python_MustGetPtr(PyObject *obj, swig_type_info *ty, int argnum, int flags)
 
 /* -------- TYPES TABLE (BEGIN) -------- */
 
-#define SWIGTYPE_p_EnergyEstimator swig_types[0]
-#define SWIGTYPE_p_FILE swig_types[1]
-#define SWIGTYPE_p_FireEstimator swig_types[2]
-#define SWIGTYPE_p_MAC swig_types[3]
-#define SWIGTYPE_p_Mote swig_types[4]
-#define SWIGTYPE_p_Packet swig_types[5]
-#define SWIGTYPE_p_Radio swig_types[6]
-#define SWIGTYPE_p_Tossim swig_types[7]
-#define SWIGTYPE_p_Variable swig_types[8]
-#define SWIGTYPE_p_char swig_types[9]
-#define SWIGTYPE_p_int swig_types[10]
-#define SWIGTYPE_p_nesc_app swig_types[11]
-#define SWIGTYPE_p_p_char swig_types[12]
-#define SWIGTYPE_p_var_string swig_types[13]
-static swig_type_info *swig_types[15];
-static swig_module_info swig_module = {swig_types, 14, 0, 0, 0, 0};
+#define SWIGTYPE_p_FILE swig_types[0]
+#define SWIGTYPE_p_FireEstimator swig_types[1]
+#define SWIGTYPE_p_MAC swig_types[2]
+#define SWIGTYPE_p_Mote swig_types[3]
+#define SWIGTYPE_p_Packet swig_types[4]
+#define SWIGTYPE_p_Radio swig_types[5]
+#define SWIGTYPE_p_Tossim swig_types[6]
+#define SWIGTYPE_p_Variable swig_types[7]
+#define SWIGTYPE_p_char swig_types[8]
+#define SWIGTYPE_p_int swig_types[9]
+#define SWIGTYPE_p_nesc_app swig_types[10]
+#define SWIGTYPE_p_p_char swig_types[11]
+#define SWIGTYPE_p_var_string swig_types[12]
+static swig_type_info *swig_types[14];
+static swig_module_info swig_module = {swig_types, 13, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -3066,9 +3065,6 @@ SWIG_AsVal_long_SS_long (PyObject *obj, long long *val)
 #endif
   return res;
 }
-
-
-#include <EnergyEstimate.h>
 
 
 #include <FireEstimate.h>
@@ -4463,78 +4459,6 @@ SWIGINTERN PyObject *Packet_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObjec
   PyObject *obj;
   if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_Packet, SWIG_NewClientData(obj));
-  return SWIG_Py_Void();
-}
-
-SWIGINTERN PyObject *_wrap_new_EnergyEstimator(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  EnergyEstimator *result = 0 ;
-  
-  if (!PyArg_ParseTuple(args,(char *)":new_EnergyEstimator")) SWIG_fail;
-  result = (EnergyEstimator *)new EnergyEstimator();
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_EnergyEstimator, SWIG_POINTER_NEW |  0 );
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_delete_EnergyEstimator(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  EnergyEstimator *arg1 = (EnergyEstimator *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject * obj0 = 0 ;
-  
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_EnergyEstimator",&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_EnergyEstimator, SWIG_POINTER_DISOWN |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_EnergyEstimator" "', argument " "1"" of type '" "EnergyEstimator *""'"); 
-  }
-  arg1 = reinterpret_cast< EnergyEstimator * >(argp1);
-  delete arg1;
-  
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_EnergyEstimator_getNodeEnergy(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  EnergyEstimator *arg1 = (EnergyEstimator *) 0 ;
-  int arg2 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  int val2 ;
-  int ecode2 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  
-  if (!PyArg_ParseTuple(args,(char *)"OO:EnergyEstimator_getNodeEnergy",&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_EnergyEstimator, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "EnergyEstimator_getNodeEnergy" "', argument " "1"" of type '" "EnergyEstimator *""'"); 
-  }
-  arg1 = reinterpret_cast< EnergyEstimator * >(argp1);
-  ecode2 = SWIG_AsVal_int(obj1, &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "EnergyEstimator_getNodeEnergy" "', argument " "2"" of type '" "int""'");
-  } 
-  arg2 = static_cast< int >(val2);
-  (arg1)->getNodeEnergy(arg2);
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *EnergyEstimator_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
-  SWIG_TypeNewClientData(SWIGTYPE_p_EnergyEstimator, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
 
@@ -6488,28 +6412,6 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_Tossim_newEnergyEstimator(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  Tossim *arg1 = (Tossim *) 0 ;
-  EnergyEstimator *result = 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject * obj0 = 0 ;
-  
-  if (!PyArg_ParseTuple(args,(char *)"O:Tossim_newEnergyEstimator",&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_Tossim, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Tossim_newEnergyEstimator" "', argument " "1"" of type '" "Tossim *""'"); 
-  }
-  arg1 = reinterpret_cast< Tossim * >(argp1);
-  result = (EnergyEstimator *)(arg1)->newEnergyEstimator();
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_EnergyEstimator, 0 |  0 );
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
 SWIGINTERN PyObject *_wrap_Tossim_newFireEstimator(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   Tossim *arg1 = (Tossim *) 0 ;
@@ -6591,10 +6493,6 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"Packet_deliver", _wrap_Packet_deliver, METH_VARARGS, NULL},
 	 { (char *)"Packet_deliverNow", _wrap_Packet_deliverNow, METH_VARARGS, NULL},
 	 { (char *)"Packet_swigregister", Packet_swigregister, METH_VARARGS, NULL},
-	 { (char *)"new_EnergyEstimator", _wrap_new_EnergyEstimator, METH_VARARGS, NULL},
-	 { (char *)"delete_EnergyEstimator", _wrap_delete_EnergyEstimator, METH_VARARGS, NULL},
-	 { (char *)"EnergyEstimator_getNodeEnergy", _wrap_EnergyEstimator_getNodeEnergy, METH_VARARGS, NULL},
-	 { (char *)"EnergyEstimator_swigregister", EnergyEstimator_swigregister, METH_VARARGS, NULL},
 	 { (char *)"new_FireEstimator", _wrap_new_FireEstimator, METH_VARARGS, NULL},
 	 { (char *)"delete_FireEstimator", _wrap_delete_FireEstimator, METH_VARARGS, NULL},
 	 { (char *)"FireEstimator_setIgnition", _wrap_FireEstimator_setIgnition, METH_VARARGS, NULL},
@@ -6655,7 +6553,6 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"Tossim_mac", _wrap_Tossim_mac, METH_VARARGS, NULL},
 	 { (char *)"Tossim_radio", _wrap_Tossim_radio, METH_VARARGS, NULL},
 	 { (char *)"Tossim_newPacket", _wrap_Tossim_newPacket, METH_VARARGS, NULL},
-	 { (char *)"Tossim_newEnergyEstimator", _wrap_Tossim_newEnergyEstimator, METH_VARARGS, NULL},
 	 { (char *)"Tossim_newFireEstimator", _wrap_Tossim_newFireEstimator, METH_VARARGS, NULL},
 	 { (char *)"Tossim_swigregister", Tossim_swigregister, METH_VARARGS, NULL},
 	 { NULL, NULL, 0, NULL }
@@ -6664,7 +6561,6 @@ static PyMethodDef SwigMethods[] = {
 
 /* -------- TYPE CONVERSION AND EQUIVALENCE RULES (BEGIN) -------- */
 
-static swig_type_info _swigt__p_EnergyEstimator = {"_p_EnergyEstimator", "EnergyEstimator *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_FILE = {"_p_FILE", "FILE *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_FireEstimator = {"_p_FireEstimator", "FireEstimator *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_MAC = {"_p_MAC", "MAC *", 0, 0, (void*)0, 0};
@@ -6680,7 +6576,6 @@ static swig_type_info _swigt__p_p_char = {"_p_p_char", "char **", 0, 0, (void*)0
 static swig_type_info _swigt__p_var_string = {"_p_var_string", "var_string *|variable_string_t *", 0, 0, (void*)0, 0};
 
 static swig_type_info *swig_type_initial[] = {
-  &_swigt__p_EnergyEstimator,
   &_swigt__p_FILE,
   &_swigt__p_FireEstimator,
   &_swigt__p_MAC,
@@ -6696,7 +6591,6 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_var_string,
 };
 
-static swig_cast_info _swigc__p_EnergyEstimator[] = {  {&_swigt__p_EnergyEstimator, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_FILE[] = {  {&_swigt__p_FILE, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_FireEstimator[] = {  {&_swigt__p_FireEstimator, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_MAC[] = {  {&_swigt__p_MAC, 0, 0, 0},{0, 0, 0, 0}};
@@ -6712,7 +6606,6 @@ static swig_cast_info _swigc__p_p_char[] = {  {&_swigt__p_p_char, 0, 0, 0},{0, 0
 static swig_cast_info _swigc__p_var_string[] = {  {&_swigt__p_var_string, 0, 0, 0},{0, 0, 0, 0}};
 
 static swig_cast_info *swig_cast_initial[] = {
-  _swigc__p_EnergyEstimator,
   _swigc__p_FILE,
   _swigc__p_FireEstimator,
   _swigc__p_MAC,

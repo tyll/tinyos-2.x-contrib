@@ -36,6 +36,7 @@
  */
 
 #include "FireEstimate.h"
+#include "sim_fire.h"
 
 FireEstimator::FireEstimator() {
 }

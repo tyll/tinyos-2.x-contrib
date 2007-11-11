@@ -187,9 +187,9 @@ void setFireIgnition(int val) {
 		}
 		//printf("ignition matrix loaded\n");
 	}
-	for (i = 0; i < 12; i++) {
+	/*for (i = 0; i < 12; i++) {
 		for (j= 0; j < 12; j++) {
 			//printf("ignition[%d][%d]=%d\n",i,j,ignition[i][j]);
 		}
-	}
+	}*/
 }

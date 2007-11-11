@@ -13,5 +13,7 @@ fire behavior growth simulators.)
 
 http://www.fire.org/index.php?option=content&task=category&sectionid=2&id=11&Itemid=29
 
+Limitations: Tested in Tossim 2.0.0 & 2.0.1
+
 
 

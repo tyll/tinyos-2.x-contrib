@@ -137,8 +137,9 @@ implementation {
   /***************** RxInterrupt Events ****************/
   async event void RxInterrupt.fired[ radio_id_t id ]() {
     //call Pins.set67();
+    call RxInterrupt.disable[id]();
     if(call ReceiveController.beginReceive[id]() != SUCCESS) {
-      pendingRadioRx = id;
+      atomic pendingRadioRx = id;
     }
   }
   
@@ -389,22 +390,32 @@ implementation {
     atomic id = m_id;
     
     call Csn.set[ id ]();
-    call RxInterrupt.disable[id]();
     //call RxIo.makeInput[id]();
+   
     if(call RxIo.get[id]()) {
       // The GPO Rx line hasn't gone low, so there is more to receive.
       call State.forceState(S_RX_LENGTH);
       receive();
+      return;
       
-    } else if(pendingRadioRx != NO_RADIO_PENDING) {
-      atomic m_id = pendingRadioRx;
-      pendingRadioRx = NO_RADIO_PENDING;
     } else {
-      //call Pins.clr67();
+      if(pendingRadioRx != NO_RADIO_PENDING) {
+        // Switch over to the other radio
+        atomic m_id = pendingRadioRx;
+        pendingRadioRx = NO_RADIO_PENDING;
+        
+        // Now re-enable interrupts on the radio we were previously servicing
+        call RxInterrupt.enableRisingEdge[id]();
+        call State.forceState(S_RX_LENGTH);
+        receive();
+        return;
+      }
+      
+      // Re-enable the RX interrupt on this radio
       call State.toIdle();
       call Resource.release();
+      call RxInterrupt.enableRisingEdge[id]();
     }
-    call RxInterrupt.enableRisingEdge[id]();
   }
   
   /***************** Defaults ****************/

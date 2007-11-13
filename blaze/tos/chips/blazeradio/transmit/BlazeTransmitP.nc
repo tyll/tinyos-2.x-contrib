@@ -244,6 +244,7 @@ implementation {
      * frequency / synthesizer startup and calibration
      */
     while(call RadioStatus.getRadioStatus() != BLAZE_S_RX) {
+      //call Leds.set(1);
       call SFRX.strobe();
       call SRX.strobe();
     }
@@ -256,10 +257,24 @@ implementation {
     call STX.strobe();
     
     if(force) {
-      while(call RadioStatus.getRadioStatus() != BLAZE_S_TX) {
-        // Keep trying until the channel is clear enough for this to go through
+      while((state = call RadioStatus.getRadioStatus()) != BLAZE_S_TX) {
+        //call Leds.set(2);
+         // Keep trying until the channel is clear enough for this to go through
+         if (state == BLAZE_S_RXFIFO_OVERFLOW) {
+          call SFRX.strobe();
+          call SRX.strobe();
+        }
+      
+        if (state == BLAZE_S_TXFIFO_UNDERFLOW) {
+          call SFTX.strobe();
+          call SRX.strobe();
+        }
+        
         call STX.strobe();
+            
       }
+      
+      
     
     } else {
       if((state = call RadioStatus.getRadioStatus()) != BLAZE_S_TX) {
@@ -277,6 +292,7 @@ implementation {
      * back in RX mode by the time this is done.
      */
     while((state = call RadioStatus.getRadioStatus()) != BLAZE_S_RX) {
+      //call Leds.set(3);
       if (state == BLAZE_S_RXFIFO_OVERFLOW) {
         call SFRX.strobe();
         call SRX.strobe();
@@ -284,6 +300,10 @@ implementation {
       
       if (state == BLAZE_S_TXFIFO_UNDERFLOW) {
         call SFTX.strobe();
+        call SRX.strobe();
+      }
+      
+      if (state == BLAZE_S_IDLE) {
         call SRX.strobe();
       }
     }

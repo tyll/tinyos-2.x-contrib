@@ -387,7 +387,9 @@ implementation {
    */
   void cleanUp() {
     uint8_t id;
+    uint8_t localPendingRx;
     atomic id = m_id;
+    
     
     call Csn.set[ id ]();
     //call RxIo.makeInput[id]();
@@ -399,10 +401,11 @@ implementation {
       return;
       
     } else {
-      if(pendingRadioRx != NO_RADIO_PENDING) {
+      atomic localPendingRx = pendingRadioRx;
+      if(localPendingRx != NO_RADIO_PENDING) {
         // Switch over to the other radio
         atomic m_id = pendingRadioRx;
-        pendingRadioRx = NO_RADIO_PENDING;
+        atomic pendingRadioRx = NO_RADIO_PENDING;
         
         // Now re-enable interrupts on the radio we were previously servicing
         call RxInterrupt.enableRisingEdge[id]();

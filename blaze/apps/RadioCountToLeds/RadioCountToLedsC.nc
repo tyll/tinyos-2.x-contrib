@@ -61,39 +61,39 @@ implementation {
   bool locked;
   uint16_t counter = 0;
   
+  task void send();
+  
   event void Boot.booted() {
     call SplitControl.start();
   }
 
   event void SplitControl.startDone(error_t err) {
     call AMSend.send(AM_BROADCAST_ADDR, &packet, sizeof(radio_count_msg_t));
-    call MilliTimer.startPeriodic(256);
+    //call MilliTimer.startPeriodic(5120);
   }
 
   event void SplitControl.stopDone(error_t err) {
   }
   
   event void MilliTimer.fired() {
-    //call Leds.led0Toggle();
+    post send(); 
   }
 
   event message_t* Receive.receive(message_t* bufPtr, 
                                    void* payload, uint8_t len) {
     
-    //call Leds.led1Toggle();
     if (len != sizeof(radio_count_msg_t)) {
       return bufPtr;
       
     } else {
       radio_count_msg_t* rcm = (radio_count_msg_t*)payload;
-      call Leds.set(rcm->counter);
+      //call Leds.set(rcm->counter);
       return bufPtr;
     }
   }
   
   task void send() {
     if (call AMSend.send(AM_BROADCAST_ADDR, &packet, sizeof(radio_count_msg_t)) != SUCCESS) {
-      //call Leds.led0Toggle();
       post send();
     }
   }
@@ -102,8 +102,8 @@ implementation {
     radio_count_msg_t* rcm = (radio_count_msg_t*) call Packet.getPayload(&packet, sizeof(radio_count_msg_t)); 
     counter++;
     rcm->counter = counter;
+    call Leds.set(0);
     post send();
-    //call Leds.led2Toggle();
   }
 
 }

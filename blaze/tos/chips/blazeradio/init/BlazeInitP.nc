@@ -148,8 +148,14 @@ implementation {
     
     call Power.set[ m_id ]();
     
-    for(pause =  0; pause < 2700; pause++); // 2 ms pause after power is initialized on radio
-      
+    /* 3 ms pause after power is initialized on radio
+     * Datasheet says a max of 3 ms from inital power on time 
+     * until the radio is calibrated and ready to receive commands
+     * Issues arose if we tried to burst the setup registers to quickly 
+     * after applying power to the module. 
+     */
+    for(pause =  0; pause < 2700; pause++);   
+
     state[ m_id ] = S_STARTING;
     
     // Since we're in control of BlazeSpiP, we know this next command will only

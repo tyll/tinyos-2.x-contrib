@@ -128,6 +128,7 @@ implementation {
    * It may have something to do with the corrupted register writes on burst.
    */
   command error_t SplitControl.start[ radio_id_t id ]() {
+    uint16_t pause = 0;
     if(id >= uniqueCount(UQ_BLAZE_RADIO)) {
       return EINVAL;
     }
@@ -147,6 +148,8 @@ implementation {
     
     call Power.set[ m_id ]();
     
+    for(pause =  0; pause < 2700; pause++); // 2 ms pause after power is initialized on radio
+      
     state[ m_id ] = S_STARTING;
     
     // Since we're in control of BlazeSpiP, we know this next command will only
@@ -248,7 +251,6 @@ implementation {
   
   /***************** RadioInit Events ****************/
   event void RadioInit.initDone() { 
-    
     uint8_t cnt = 0;
     call Gdo0_io.makeInput[ m_id ]();
     call Gdo2_io.makeInput[ m_id ]();

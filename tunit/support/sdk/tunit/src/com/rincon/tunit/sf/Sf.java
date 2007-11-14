@@ -149,23 +149,33 @@ public class Sf implements SerialForwarder, Messenger, PhoenixError {
   public void disconnect() {
     log.trace("disconnect()");
     
-    if (provider != null) {
-      log.trace("Calling provider.shutdown()");
-      provider.shutdown();
+    // TODO This is hack-ish. Not sure why we constantly freeze up when
+    // connecting and disconnecting quickly, so we pause for ridiculous reasons.
+    synchronized (this) {
+      log.trace("In a synchronized block, pausing for disconnect prep");
+      try {
+        wait(2000);
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
     }
-
+    
     synchronized (this) {
       log.trace("In a synchronized block, waiting for the server to stop");
       // Experiments show we should wait for everything to clear up
-      while (serverRunning) {
+      while (serverRunning) {    
+        if (provider != null) {
+          log.trace("Calling provider.shutdown()");
+          provider.shutdown();
+        }
+        
         try {
-          wait();
+          wait(1000);
         } catch (InterruptedException e) {
           e.printStackTrace();
         }
       }
     }
-    
     
     // TODO This is hack-ish.  If we disconnect and decide to reconnect
     // too quickly, the serial driver craps.  I've spent several days
@@ -185,8 +195,8 @@ public class Sf implements SerialForwarder, Messenger, PhoenixError {
   public void serverStopped() {
     log.trace("serverStopped()");
     log.debug(motecom + "." + port + ": server stopped");
-    provider = null;
     synchronized (this) {
+      provider = null;
       serverRunning = false;
       this.notify();
     }

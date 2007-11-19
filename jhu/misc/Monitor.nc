@@ -18,3 +18,16 @@
 *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 *  THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+/**
+ * This interface exposes the receive event from the Receive interface
+ * and sendDone from AMSend. This is useful for passive detection of
+ * the neighbors.
+ *
+ * @author Razvan Musaloiu-E. <razvanm@cs.jhu.edu>
+ */
+
+interface Monitor {
+  event void receive(message_t* msg, void* payload, uint8_t len);
+  event void sendDone(message_t* msg, error_t error);
+}

@@ -1,0 +1,132 @@
+Lower Power Probing (LPP)
+=========================
+
+LPP is lower power technique which can be used to efficiently wake up
+a multi-hop network of motes. There are two types of nodes in the
+network: sensing nodes and base stations. A sensing node keeps the
+radio off all the time and probes periodically to see if it needs to
+wake up and take part in some communication activity. A basestation is
+a node which can trigger the wake up of the whole network.
+
+The probing done by the sensing nodes is performed as follows:
+- turn the radio on with auto ack disable
+- send a bcast empty packet with ack request set
+- if the packet is acked then turn on the auto ack and signal the
+  startDone to the upper layers. Otherwise turn the radio off.
+
+To trigger a network wake-up a basestation only needs to turn on the
+radio with auto ack enabled.
+
+In the current implementation LPP is not a complete LPL replacement.
+
+Testing
+=======
+
+TestLppNode and TestLppBasestation are implementing the sensing node
+and the base station. DRIP, the default dissemination mechanism from
+T2 is used to keep the network alive until the base station is turned
+off.
+
+Semantics
+=========
+
+LPP implements a simpler semantic than LPL. The interaction with LPP
+is done through two interfaces: SplitControl (start/startDone and
+stop/stopDone) and LowPowerProbing (setLocalSleepInterval and
+getLocalSleepInterval).
+
+In the initial state the local sleep interval is zero so the
+duty-cycling is disabled. A call to setLocalSleepInterval will start
+the periodic probing. If the radio is off then the timer is started
+right away and if the radio is on then it will first be stopped. When
+the probing detects activity the startDone is signaled and a stop is
+expected.
+
+The setLocalSleepInterval(0) will disable the duty-cycling and will
+leave the radio in it's current state (on if the called is issued
+after a startDone or off if it's before the startDone).
+
+
+Example 1:
+
+	     Application             LPP
+	     ===========             ===
+	setLocalSleepInterval(x) -->  +
+	                              |    (probing)
+	                              |    (probing)
+	                              |    (probing)
+	startDone() <---------------  +
+	  |                                (radio on)
+	  |                                (radio on)
+	  |                                (radio on)
+	stop() -------------------->  +
+	                              |    (probing)
+	                              |    (probing)
+	startDone() <---------------  +
+	  |                                (radio on)
+	  .
+
+Example 2:
+
+	     Application            LPP
+	     ===========            ===
+	setLocalSleepInterval(x) -->  +
+	                              |    (probing)
+	                              |    (probing)
+	                              |    (probing)
+	startDone() <---------------  +
+	  |                                (radio on)
+	  |                                (radio on)
+	  |                                (radio on)
+	setLocalSleepInterval(y) -->  +
+	                              |    (probing)
+	                              |    (probing)
+	startDone() <---------------  +
+	  |
+	  .
+
+Example 3:
+
+	     Application            LPP
+	     ===========            ===
+	setLocalSleepInterval(x) -->  +
+	                              |    (probing)
+	                              |    (probing)
+	                              |    (probing)
+	setLocalSleepInterval(0) -->  +
+	  |                                (radio off)
+          |                                (radio off)
+	start() ------------------->
+	startDone() <---------------- 
+	  |                                (radio on)
+	  |                                (radio on)
+	  |                                (radio on)
+	stop() -------------------->
+	stopDone() <---------------- 
+          |                                (radio off)
+	  .
+
+
+Example 4:
+
+	     Application            LPP
+	     ===========            ===
+	setLocalSleepInterval(x) -->  +
+	                              |    (probing)
+	                              |    (probing)
+	                              |    (probing)
+	startDone() <---------------  +
+	  |                                (radio on)
+	  |                                (radio on)
+	  |                                (radio on)
+	setLocalSleepInterval(0) --> 
+	  |                                (radio on)
+	  |                                (radio on)
+	stop() -------------------->
+	stopDone() <---------------- 
+	  |                                (radio off)
+          |                                (radio off)
+	setLocalSleepInterval(x) -->  +
+	                              |    (probing)
+	                              .
+

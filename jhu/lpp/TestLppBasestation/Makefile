@@ -1,0 +1,6 @@
+COMPONENT=TestLppBasestationApp
+CFLAGS=-I%T/lib/net -I%T/lib/net/drip
+CFLAGS+=-I../ -I../../misc
+CFLAGS+=-DCC2420_DEF_CHANNEL=20
+CFLAGS+=-DCC2420_HW_ACKNOWLEDGEMENTS
+include $(MAKERULES)

@@ -1,0 +1,198 @@
+==================================
+Serial Communication in TinyOS 2.x
+==================================
+
+Intro
+====================================================================
+
+The official documentation of the serial communication in TinyOS 2.x
+is [TEP113]_. Briefly, the higher level interface to the serial stack
+is provided by an AMSend interface provided by SerialAMSenderC and a
+Receive interface provided by SerialAMReceiverC.
+
+Below the ActiveMessage interface there is a Dispatch Layer
+(SerialDispatcherC), a Protocol Layer (SerialP) and a Encoder/Framer
+Layer (HdlcTranslateC).
+
+The Dispatch Layer adds one byte that indicates which type of packet
+is contained in the payload. The types defined in Serial.h are:
+ActiveMessage (0), CC1000 (1), CC2420 (2) and Unknown (255).
+
+The Protocol Layer adds one protocol byte and one sequence number byte
+in the header and a 2-bytes CRC in the footer. The protocol byte in the
+header is used to indicate the following types of the packets:
+acknowledge packet (67), data packet which needs to be acknowledged
+(68) and data packet which doesn't need to be acknowledged (69). The
+sequence byte is missing from the data packets which doesn't need to
+be acknowledged.
+
+The Encoder/Framer Layer is implementing the HDLC framing which uses
+0x7e as a frame delimiter and 0x7d as escape character. The encoding
+consists of replacing all occurrences of 0x7e with 0x7d 0x2e and all
+occurrences of 0x7d with 0x7d 0x2d. The frame delimiter is added both
+in header and footer.
+
+All the platform independent code is in located in
+``$TOSDIR/lib/serial``.
+
+Types of packets
+====================================================================
+
+All multi-byte fields are big-endian. The only exception is the CRC
+which is little-endian ([RFC1662]_ defines it this way).
+
+
+Acknowledge Frame
+--------------------------------------------------------------------
+
+::
+
+   ________
+  | | |  | |
+  | | |  | |
+  |_|_|__|_|
+   F P CR F
+
+  F       = Framing byte, denoting start of packet (0x7e): HdlcTranslateC
+  P       = Protocol byte (67): SerialP
+  S       = Sequence number byte: SerialP
+  CR      = Two-byte CRC over S to end of Payload: SerialP
+  F       = Framing byte denoting end of packet (0x7e): HdlcTranslateC
+
+
+Data Frame
+--------------------------------------------------------------------
+
+::
+
+   ____________________________________________
+  | | | | |                               |  | |
+  | | | | |                               |  | |
+  |_|_|_|_|_______________________________|__|_|
+   F P S D         Payload                 CR F
+
+  F       = Framing byte, denoting start of packet (0x7e): HdlcTranslateC
+  P       = Protocol byte (68): SerialP
+  S       = Sequence number byte: SerialP
+  D       = Packet format dispatch byte: SerialDispatcherC
+  Payload = Data payload (stored in SerialDispatcherC): SerialDispatcherC
+  CR      = Two-byte CRC over S to end of Payload: SerialP
+  F       = Framing byte denoting end of packet (0x7e): HdlcTranslateC
+
+
+NoAck Data Frame
+--------------------------------------------------------------------
+
+::
+
+   ____________________________________________
+  | | | | |                               |  | |
+  | | | | |                               |  | |
+  |_|_|_|_|_______________________________|__|_|
+   F P S D         Payload                 CR F
+
+  F       = Framing byte, denoting start of packet (0x7e): HdlcTranslateC
+  P       = Protocol byte (69): SerialP
+  S       = Sequence number byte: SerialP
+  D       = Packet format dispatch byte: SerialDispatcherC
+  Payload = Data payload (stored in SerialDispatcherC): SerialDispatcherC
+  CR      = Two-byte CRC over S to end of Payload: SerialP
+  F       = Framing byte denoting end of packet (0x7e): HdlcTranslateC
+
+Python tools
+====================================================================
+
+The ``tinyos.py`` Python library provides two main things: a simple
+way to send and receive Active Messages on the serial port and a
+versatile way to encode/decode arbitrary packets. For byte-level serial
+communication the PySerial Python library is used.
+
+The classes provided by ``tinyos.py`` are:
+
+- Serial
+- GenericPacket
+- RawPacket
+- AckFrame
+- DataFrame
+- NoAckDataFrame
+- ActiveMessage
+
+Serial
+--------------------------------------------------------------------
+
+The constructor requires two parameters: the port and the baudrate.
+
+The most important methods provided are:
+
+- sniff(skip_queue = False): it returns None if no packet was received
+  for the timeout period (right now it's set to 0.5 seconds) or a
+  RawPacket. The Active Messages send by TinyOS 2.x are always
+  NoAckDataFrame. The skip_queue parameter is used to ignore the
+  content of the queue of packets received between a send of a packet
+  and the arrival of the ack.
+
+- sniff_am(skip_queue = False, timeout=0): this is similar with sniff
+  but returns an ActiveMessage.
+
+- write(payload, num_tries=3): it sends a packet (usually an Active
+  Message) on the serial port. If payload parameter is a list then it's
+  assume to be exactly the payload. Otherwise the payload is assume to
+  be a GenericPacket and the real payload is obtain by calling the
+  payload() method. The TinyOS 2.x only accepts packets that required
+  acknowledge. If the ack is not received during the timeout period
+  the packet is resent up to num_tried times. If some new packets
+  arrived during this period they will be queued and delivered to the
+  next sniff/sniff_am calls.
+
+GenericPacket
+--------------------------------------------------------------------
+
+This class is responsible for making easy the work with arbitrary
+packets. The constructor of the class has two parameters: a
+description of the packet (we'll call this schema) and optionally, a
+packet.
+
+The schema is a list of 3-tuples formed by (*name*, *format*,
+*size*). *name* is the name of the field, *format* can be 'int' for
+integers, 'bint' for integers with lengths shorter than a byte, or
+'blob' which indicate an opaque field. The size represents the number
+of bytes for 'int' and 'blob' fields and number of bits for
+'bint'. Size can also set to None in which case the size will be
+dynamically adjusted.
+
+The packet parameter is used to initialize the content of the fields
+described by the schema. It can be a tuple with the desired values of
+the fields (so it needs to have the same size as the schema) or it can
+be a list of bytes in which case it will be interpreted based on the
+schema.
+
+After init, the fields appear as variables inside the GenericPacket
+object (*e.g.* gp.source). Beside this a GenericPacket also implements
+the behavior of a map (*e.g.* gp['source'], gp.keys()).
+
+Other methods are:
+
+- names(): it returns a list with all the names of the fields
+- sizes(): it returns a list with all the sizes of the fields
+- payload(): it returns a list of bytes with a serialization of all
+  the fields. Multi-byte integers are in big-ending.
+
+ActiveMessage
+--------------------------------------------------------------------
+
+This is a GenericPacket offering the following fields:
+- destination
+- source
+- length
+- group
+- type
+- data
+
+The constructor has three optional parameters: packet = None, am_id =
+0x00, dest = 0xFFFF.
+
+Citations
+====================================================================
+
+.. [TEP113] Serial Communication. ``tinyos-2.x/doc/tep113.txt``
+.. [RFC1662] PPP in HDLC-like Framing.

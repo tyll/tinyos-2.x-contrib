@@ -31,6 +31,9 @@
 
 /**
  * Initialize a CC1100 or CC2500 radio
+ * Note we combine both radios' I/O and interrupt lines here, providing
+ * them for other modules to access freely.
+ * 
  * @author David Moss
  */
 
@@ -39,6 +42,13 @@ configuration BlazeInitC {
     interface SplitControl[ radio_id_t id ];
     interface BlazePower[ radio_id_t id ];
     interface BlazeCommit[ radio_id_t id ];
+    
+    interface GeneralIO as BlazeCsn[ radio_id_t id ];
+    interface GeneralIO as BlazeGdo0_io[ radio_id_t id ];
+    interface GeneralIO as BlazeGdo2_io[ radio_id_t id ];
+    interface GpioInterrupt as BlazeGdo0_int[ radio_id_t id ];
+    interface GpioInterrupt as BlazeGdo2_int[ radio_id_t id ];
+    interface BlazeConfig[ radio_id_t id ];
   }
   
   uses {
@@ -48,6 +58,7 @@ configuration BlazeInitC {
     interface GeneralIO as Gdo2_io[ radio_id_t id ];
     interface GpioInterrupt as Gdo0_int[ radio_id_t id ];
     interface GpioInterrupt as Gdo2_int[ radio_id_t id ];
+    interface BlazeConfig as Config[ radio_id_t id ];
     interface BlazeRegSettings[ radio_id_t id ];
   }
 }
@@ -69,6 +80,13 @@ implementation {
   BlazePower = BlazeInitP;
   BlazeRegSettings = BlazeInitP;
   BlazeCommit = BlazeInitP;
+  
+  BlazeCsn = Csn;
+  BlazeGdo0_io = Gdo0_io;
+  BlazeGdo2_io = Gdo2_io;
+  BlazeGdo0_int = Gdo0_int;
+  BlazeGdo2_int = Gdo2_int;
+  BlazeConfig = Config;
   
   Gdo0_io = BlazeInitP.Gdo0_io;
   Gdo0_int = BlazeInitP.Gdo0_int;

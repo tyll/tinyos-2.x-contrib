@@ -156,8 +156,6 @@ implementation {
     return transmit(id, TRUE);
   }
   
-
-  
   
   /***************** TXFIFO Events ****************/
   async event void TXFIFO.writeDone( uint8_t* tx_buf, uint8_t tx_len,
@@ -166,17 +164,19 @@ implementation {
     uint8_t id;
     uint8_t state;
     
-    atomic id = m_id;
+    if(!call State.isIdle()) {
+      atomic id = m_id;
     
-    call Csn.set[ id ]();
+      call Csn.set[ id ]();
+      
+      state = call State.getState();
+      call State.toIdle();
     
-    state = call State.getState();
-    call State.toIdle();
-    
-    if(state == S_LOAD_PACKET) {
-      signal AsyncSend.loadDone[ id ](tx_buf, error);
-    } else {
-      signal AckSend.loadDone[ id ](tx_buf, error);
+      if(state == S_LOAD_PACKET) {
+        signal AsyncSend.loadDone[ id ](tx_buf, error);
+      } else {
+        signal AckSend.loadDone[ id ](tx_buf, error);
+      }
     }
   }
 

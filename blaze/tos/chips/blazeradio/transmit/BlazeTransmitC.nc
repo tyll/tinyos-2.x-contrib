@@ -51,11 +51,6 @@ configuration BlazeTransmitC {
     interface AsyncSend[ radio_id_t id ];
     interface AsyncSend as AckSend[ radio_id_t id ];
   }
-  
-  uses {
-    interface GeneralIO as Csn[ radio_id_t id ];
-    interface GpioInterrupt as TxInterrupt[ radio_id_t id ];
-  }
 }
 
 implementation {
@@ -64,8 +59,9 @@ implementation {
   AsyncSend = BlazeTransmitP.AsyncSend;
   AckSend = BlazeTransmitP.AckSend;
   
-  Csn = BlazeTransmitP.Csn;
-  TxInterrupt = BlazeTransmitP.TxInterrupt;
+  components BlazeInitC;  
+  BlazeTransmitP.Csn -> BlazeInitC.BlazeCsn;
+  BlazeTransmitP.TxInterrupt -> BlazeInitC.BlazeGdo2_int;
     
   components BlazeSpiC as Spi;
   BlazeTransmitP.RadioStatus -> Spi.RadioStatus;

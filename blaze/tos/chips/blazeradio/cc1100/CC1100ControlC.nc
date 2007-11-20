@@ -77,17 +77,8 @@ implementation {
   BlazeInitC.Gdo2_io[ CC1100_RADIO_ID ] -> Pins.Gdo2_io;
   BlazeInitC.Gdo2_int[ CC1100_RADIO_ID ] -> Pins.Gdo2_int;
   BlazeInitC.Gdo0_int[ CC1100_RADIO_ID ] -> Pins.Gdo0_int;
+  BlazeInitC.Config[ CC1100_RADIO_ID ] -> CC1100ControlP.BlazeConfig;
   CC1100ControlP.BlazeCommit -> BlazeInitC.BlazeCommit[ CC1100_RADIO_ID ];
-  
-  components BlazeTransmitC;
-  BlazeTransmitC.Csn[ CC1100_RADIO_ID ] -> Pins.Csn;
-  BlazeTransmitC.TxInterrupt[ CC1100_RADIO_ID ] -> Pins.Gdo2_int;
-  
-  components BlazeReceiveC;
-  BlazeReceiveC.Csn[ CC1100_RADIO_ID ] -> Pins.Csn;
-  BlazeReceiveC.RxIo[ CC1100_RADIO_ID ] -> Pins.Gdo2_io;
-  BlazeReceiveC.RxInterrupt [ CC1100_RADIO_ID ] -> Pins.Gdo2_int;
-  BlazeReceiveC.BlazeConfig[ CC1100_RADIO_ID ] -> CC1100ControlP.BlazeConfig;
   
   components LedsC;
   CC1100ControlP.Leds -> LedsC;

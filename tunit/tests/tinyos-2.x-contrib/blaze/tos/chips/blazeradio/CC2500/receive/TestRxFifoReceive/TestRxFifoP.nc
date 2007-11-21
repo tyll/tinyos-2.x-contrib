@@ -28,6 +28,7 @@ module TestRxFifoP {
     interface Receive[radio_id_t id];
     interface AckReceive;
     interface BlazePacketBody;
+    interface ActiveMessageAddress;
     interface State;
     interface GpioInterrupt as TheRealRxInterruptThatWeIgnore[radio_id_t id];
     interface GeneralIO as TheRealRxIoThatWeIgnore[ radio_id_t id ];    
@@ -146,7 +147,7 @@ implementation {
     myHeader->dest = 0;
     myHeader->fcf = (IEEE154_TYPE_DATA << IEEE154_FCF_FRAME_TYPE) | (1 << IEEE154_FCF_ACK_REQ);
     myHeader->dsn = 1;
-    myHeader->destpan = 2;
+    myHeader->destpan = call ActiveMessageAddress.amGroup();
     myHeader->src = 3;
     myHeader->type = 4;
     
@@ -177,7 +178,7 @@ implementation {
     myHeader->dest = AM_BROADCAST_ADDR;
     myHeader->fcf = (IEEE154_TYPE_DATA << IEEE154_FCF_FRAME_TYPE) | (1 << IEEE154_FCF_ACK_REQ);
     myHeader->dsn = 1;
-    myHeader->destpan = 2;
+    myHeader->destpan = call ActiveMessageAddress.amGroup();
     myHeader->src = 3;
     myHeader->type = 4;
     
@@ -198,7 +199,7 @@ implementation {
     myHeader->dest = 0;
     myHeader->fcf = (IEEE154_TYPE_DATA << IEEE154_FCF_FRAME_TYPE) | (1 << IEEE154_FCF_ACK_REQ);
     myHeader->dsn = 1;
-    myHeader->destpan = 2;
+    myHeader->destpan = call ActiveMessageAddress.amGroup();
     myHeader->src = 3;
     myHeader->type = 4;
     
@@ -224,7 +225,7 @@ implementation {
     myHeader->dest = 0;
     myHeader->fcf = (IEEE154_TYPE_DATA << IEEE154_FCF_FRAME_TYPE) | (1 << IEEE154_FCF_ACK_REQ);
     myHeader->dsn = 1;
-    myHeader->destpan = 2;
+    myHeader->destpan = call ActiveMessageAddress.amGroup();
     myHeader->src = 3;
     myHeader->type = 4;
     
@@ -249,7 +250,7 @@ implementation {
     myHeader->dest = 0;
     myHeader->fcf = (IEEE154_TYPE_DATA << IEEE154_FCF_FRAME_TYPE) | (1 << IEEE154_FCF_ACK_REQ);
     myHeader->dsn = 1;
-    myHeader->destpan = 2;
+    myHeader->destpan = call ActiveMessageAddress.amGroup();
     myHeader->src = 3;
     myHeader->type = 4;
     
@@ -279,6 +280,8 @@ implementation {
   }
   
 
+  async event void ActiveMessageAddress.changed() {
+  }
   
   /***************** RXFIFO commands ****************/
   async command blaze_status_t RXFIFO.beginRead( uint8_t* data, uint8_t length ) {
@@ -374,7 +377,7 @@ implementation {
       assertEquals("Wrong dest", 0, (call BlazePacketBody.getHeader(msg))->dest);
       assertEquals("Wrong fcf", (IEEE154_TYPE_DATA << IEEE154_FCF_FRAME_TYPE) | (1 << IEEE154_FCF_ACK_REQ), (call BlazePacketBody.getHeader(msg))->fcf);
       assertEquals("Wrong dsn", 1, (call BlazePacketBody.getHeader(msg))->dsn);
-      assertEquals("Wrong destpan", 2, (call BlazePacketBody.getHeader(msg))->destpan);
+      assertEquals("Wrong destpan", call ActiveMessageAddress.amGroup(), (call BlazePacketBody.getHeader(msg))->destpan);
       assertEquals("Wrong src", 3, (call BlazePacketBody.getHeader(msg))->src);
       assertEquals("Wrong type", 4, (call BlazePacketBody.getHeader(msg))->type);
       assertEquals("Wrong RSSI", 0xAA, (call BlazePacketBody.getMetadata(msg))->rssi);
@@ -388,7 +391,7 @@ implementation {
       assertEquals("Wrong dest", AM_BROADCAST_ADDR, (call BlazePacketBody.getHeader(msg))->dest);
       assertEquals("Wrong fcf", (IEEE154_TYPE_DATA << IEEE154_FCF_FRAME_TYPE) | (1 << IEEE154_FCF_ACK_REQ), (call BlazePacketBody.getHeader(msg))->fcf);
       assertEquals("Wrong dsn", 1, (call BlazePacketBody.getHeader(msg))->dsn);
-      assertEquals("Wrong destpan", 2, (call BlazePacketBody.getHeader(msg))->destpan);
+      assertEquals("Wrong destpan", call ActiveMessageAddress.amGroup(), (call BlazePacketBody.getHeader(msg))->destpan);
       assertEquals("Wrong src", 3, (call BlazePacketBody.getHeader(msg))->src);
       assertEquals("Wrong type", 4, (call BlazePacketBody.getHeader(msg))->type);
       assertEquals("Wrong RSSI", 0xAA, (call BlazePacketBody.getMetadata(msg))->rssi);
@@ -402,7 +405,7 @@ implementation {
       assertEquals("Wrong dest", 0, (call BlazePacketBody.getHeader(msg))->dest);
       assertEquals("Wrong fcf", (IEEE154_TYPE_DATA << IEEE154_FCF_FRAME_TYPE) | (1 << IEEE154_FCF_ACK_REQ), (call BlazePacketBody.getHeader(msg))->fcf);
       assertEquals("Wrong dsn", 1, (call BlazePacketBody.getHeader(msg))->dsn);
-      assertEquals("Wrong destpan", 2, (call BlazePacketBody.getHeader(msg))->destpan);
+      assertEquals("Wrong destpan", call ActiveMessageAddress.amGroup(), (call BlazePacketBody.getHeader(msg))->destpan);
       assertEquals("Wrong src", 3, (call BlazePacketBody.getHeader(msg))->src);
       assertEquals("Wrong type", 4, (call BlazePacketBody.getHeader(msg))->type);
       assertEquals("Wrong RSSI", 0xAA, (call BlazePacketBody.getMetadata(msg))->rssi);

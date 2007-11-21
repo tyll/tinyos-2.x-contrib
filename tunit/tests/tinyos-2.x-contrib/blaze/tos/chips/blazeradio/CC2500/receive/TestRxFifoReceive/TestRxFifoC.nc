@@ -22,6 +22,7 @@ implementation {
       new StateC(),
       LedsC,
       new TimerMilliC(),
+      ActiveMessageAddressC,
       BlazeReceiveC;
       
   TestRxFifoP.SetUp -> TestReceiveHeaderPacketC.SetUp;
@@ -32,6 +33,7 @@ implementation {
   TestRxFifoP.TestReceiveTwoPackets -> TestReceiveTwoPacketsC;
   TestRxFifoP.TestReceiveTooSmall -> TestReceiveTooSmallC;
   TestRxFifoP.TestReceiveAck -> TestReceiveAckC;
+  TestRxFifoP.ActiveMessageAddress -> ActiveMessageAddressC;
   
   TestRxFifoP.Receive -> BlazeReceiveC.Receive;
   TestRxFifoP.AckReceive -> BlazeReceiveC;

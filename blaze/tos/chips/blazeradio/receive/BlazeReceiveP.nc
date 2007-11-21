@@ -99,7 +99,6 @@ implementation {
   enum receive_states{
     S_IDLE,
     S_RX_LENGTH,
-    S_RX_FCF,
     S_RX_PAYLOAD,
   };
   
@@ -109,7 +108,6 @@ implementation {
     // Add 2 because of RSSI and LQI hidden at the end
     MAC_PACKET_SIZE = MAC_HEADER_SIZE + TOSH_DATA_LENGTH + MAC_FOOTER_SIZE + 2,
     
-    SACK_HEADER_LENGTH = 5,
     NO_RADIO_PENDING = 0xFF,
   };
   
@@ -136,7 +134,6 @@ implementation {
 
   /***************** RxInterrupt Events ****************/
   async event void RxInterrupt.fired[ radio_id_t id ]() {
-    //call Pins.set67();
     call RxInterrupt.disable[id]();
     if(call ReceiveController.beginReceive[id]() != SUCCESS) {
       atomic pendingRadioRx = id;
@@ -177,15 +174,8 @@ implementation {
   }
   
   async event void AckSend.sendDone[ radio_id_t id ]() {
-    blaze_header_t *header = call BlazePacketBody.getHeader( m_msg );
-    uint8_t rxFrameLength = header->length;
-    uint8_t *buf = (uint8_t*) header;
-    
-    call Csn.clr[ id ]();
-    
-    // Add 2 for status bytes
-    call RXFIFO.beginRead(buf + 1 + SACK_HEADER_LENGTH, 
-          rxFrameLength - SACK_HEADER_LENGTH + 2);
+    call Csn.set[ id ]();
+    post receiveDone();
   }
   
   /***************** RXFIFO Events ****************/
@@ -213,28 +203,20 @@ implementation {
     
     switch (call State.getState()) {
     case S_RX_LENGTH:
-      call State.forceState(S_RX_FCF);
+      call State.forceState(S_RX_PAYLOAD);
       
       if(rxFrameLength + 1 > BLAZE_RXFIFO_LENGTH) {
         // Flush everything if the length is bigger than our FIFO
-        //call Pins.clr65();
+
         failReceive();
         return;
       
       } else {
         if(rxFrameLength <= MAC_PACKET_SIZE) {
           if(rxFrameLength > 0) {
-            if(rxFrameLength > SACK_HEADER_LENGTH) {
-              // This packet has an FCF byte plus at least one more byte to read
-              call RXFIFO.beginRead(buf + 1, SACK_HEADER_LENGTH);
+            // Add 2 for the status bytes
+            call RXFIFO.beginRead(buf + 1, rxFrameLength + 2);
             
-            } else {
-              // This is a bad packet because it doesn't have enough
-              // bytes for a real header. Skip ack check and get it out of here.
-              call State.forceState(S_RX_PAYLOAD);
-              call RXFIFO.beginRead(buf + 1, rxFrameLength);
-            }
-                          
           } else {
             // Length == 0; start reading the next packet
             failReceive();
@@ -246,58 +228,49 @@ implementation {
         }
       }
       break;
-      
-    case S_RX_FCF:
-      call State.forceState(S_RX_PAYLOAD);
-      
-      // Our local address may have changed from the last packet received,
-      // so set the outbound acknowledgement frame's source address each time
-      //
-      // Note that the destpan address is not checked before ack'ing.
-      // To add in the destpan check, increase SACK_HEADER_LENGTH by 2 to
-      // include reading in the destpan as part of the ack check, and
-      // add the necessary logic to the horrendous if-statement below to
-      // check the destpan.  Finally, add in a destpan address to the ack
-      // frame if you want and set/check it appropriately.
-      //
-      // Finally, the length of the packet must be at least the size of
-      // a TinyOS header for us to acknowledge it.
-     
-      if(call BlazeConfig.isAutoAckEnabled[ m_id ]()) {
-        
-        if (((( header->fcf >> IEEE154_FCF_ACK_REQ ) & 0x01) == 1)
-            && ((header->dest == call ActiveMessageAddress.amAddress())
-                || (header->dest == AM_BROADCAST_ADDR))
-            && ((( header->fcf >> IEEE154_FCF_FRAME_TYPE ) & 7) == IEEE154_TYPE_DATA)
-            && (header->length >= sizeof(blaze_header_t) - 1)) {
-          // CSn flippage cuts off our FIFO; SACK and begin reading again
-          
-          acknowledgement.dest = header->src;
-          acknowledgement.dsn = header->dsn;
-          acknowledgement.src = call ActiveMessageAddress.amAddress();
-  
-          call AckSend.load[ m_id ](&acknowledgement);
-          // Continues at AckSend.loadDone() and AckSend.sendDone()
-          return;
-        }
-      }
-      
-      // Add 2 for the status bytes
-      call RXFIFO.beginRead(buf + 1 + SACK_HEADER_LENGTH, 
-            rxFrameLength - SACK_HEADER_LENGTH + 2);
-      break;
-      
+    
     case S_RX_PAYLOAD:
       call Csn.set[ id ]();
-            
+      
+      if((buf[ rxFrameLength + 2 ] & 0x80) == 0) {
+        // CRC check failed
+        cleanUp();
+        return;
+      }
+
+
       // The FCF_FRAME_TYPE bit in the FCF byte tells us if this is an ack or 
       // data.  If it's data, make sure it meets the minimum size requirement.
-      if ((( header->fcf >> IEEE154_FCF_FRAME_TYPE ) & 7) == IEEE154_TYPE_ACK) {
+      if ((( header->fcf >> IEEE154_FCF_FRAME_TYPE ) & 7) == IEEE154_TYPE_ACK) {    
         signal AckReceive.receive( header->src, header->dest, header->dsn );
         cleanUp();
         
       } else if(rxFrameLength >= sizeof(blaze_header_t) - 1) {
-        // IEEE_TYPE_DATA frame
+        // IEEE_TYPE_DATA frame; check if we need to ack
+      
+        if(call BlazeConfig.isAutoAckEnabled[ id ]()) {
+          if (((( header->fcf >> IEEE154_FCF_ACK_REQ ) & 0x01) == 1)
+              && ((header->dest == call ActiveMessageAddress.amAddress())
+                  || (header->dest == AM_BROADCAST_ADDR))
+              && (header->destpan == call ActiveMessageAddress.amGroup())
+              && ((( header->fcf >> IEEE154_FCF_FRAME_TYPE ) & 7) == IEEE154_TYPE_DATA)
+              && (header->length >= sizeof(blaze_header_t) - 1)) {
+            
+            // Send an ack and then receive the packet in AckSend.sendDone()
+            atomic {
+              acknowledgement.dest = header->src;
+              acknowledgement.dsn = header->dsn;
+              acknowledgement.src = call ActiveMessageAddress.amAddress();
+            }
+            
+            call Csn.clr[ id ]();
+            call AckSend.load[ id ](&acknowledgement);
+            // Continues at AckSend.loadDone() and AckSend.sendDone()
+            return;
+          }
+        }
+        
+        // Do not send an acknowledgement, just receive this packet
         post receiveDone();
         
       } else {
@@ -362,13 +335,11 @@ implementation {
     call Csn.clr[ id ]();
  
     // Read in the length byte
-    //call Pins.set65();
     call RXFIFO.beginRead(msg, 1);
   }
   
   void failReceive() {
     uint8_t state;
-    //call Pins.set66();
     call SIDLE.strobe();
     call SFRX.strobe();
     state = call RadioStatus.getRadioStatus();
@@ -378,7 +349,6 @@ implementation {
     }
 
     call SRX.strobe();
-    //call Pins.clr66();
     cleanUp();
   }
   

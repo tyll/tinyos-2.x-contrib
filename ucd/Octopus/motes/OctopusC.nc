@@ -284,6 +284,9 @@ implementation {
 		if (!sendBusy && !root) {
 			octopus_collected_msg_t *o = (octopus_collected_msg_t *)call CollectSend.getPayload(&sndMsg);
 			memcpy(o, &localCollectedMsg, sizeof(octopus_collected_msg_t));
+			
+			call LowPowerListening.setRxSleepInterval(&sndMsg, call LowPowerListening.dutyCycleToSleepInterval(awakeDutyCycle));	
+			
 			if (call CollectSend.send(&sndMsg, sizeof(octopus_collected_msg_t)) == SUCCESS)
 				sendBusy = TRUE;
 			else
@@ -295,6 +298,7 @@ implementation {
 		if (!uartBusy && root) {
 			octopus_collected_msg_t * o = (octopus_collected_msg_t *)call SerialSend.getPayload(&sndMsg);
 			memcpy(o, &localCollectedMsg, sizeof(octopus_collected_msg_t));
+			call LowPowerListening.setRxSleepInterval(&sndMsg, call LowPowerListening.dutyCycleToSleepInterval(awakeDutyCycle));
 			if (call SerialSend.send(0xffff, &sndMsg, sizeof(octopus_collected_msg_t)) == SUCCESS)
 				uartBusy = TRUE;
 			else

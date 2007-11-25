@@ -65,7 +65,7 @@ implementation {
     (call BlazePacketBody.getHeader(&myMsg))->length = MY_PACKET_LENGTH;
     (call BlazePacketBody.getHeader(&myMsg))->dest = 100;
     (call BlazePacketBody.getHeader(&myMsg))->dsn = 0x55;
-    (call BlazePacketBody.getHeader(&myMsg))->destpan = 0xCC;
+    (call BlazePacketBody.getHeader(&myMsg))->destpan = TOS_AM_GROUP;
     (call BlazePacketBody.getHeader(&myMsg))->src = 0;
     (call BlazePacketBody.getHeader(&myMsg))->type = 0x33;
   

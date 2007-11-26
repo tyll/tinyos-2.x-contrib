@@ -69,7 +69,7 @@ implementation {
         (IEEE154_TYPE_DATA << IEEE154_FCF_FRAME_TYPE) | (1 << IEEE154_FCF_ACK_REQ);
     
     (call BlazePacketBody.getHeader(&myMsg))->dsn = 0x55;
-    (call BlazePacketBody.getHeader(&myMsg))->destpan = 0xCC;    
+    (call BlazePacketBody.getHeader(&myMsg))->destpan = TOS_AM_GROUP;    
     (call BlazePacketBody.getHeader(&myMsg))->src = 0;
     (call BlazePacketBody.getHeader(&myMsg))->type = 0x33;
   
@@ -169,7 +169,7 @@ implementation {
       // 33 = 100001 = ack request + type data:
       assertEquals("Wrong fcf", 33, (call BlazePacketBody.getHeader(msg))->fcf);
       assertEquals("Wrong dsn", 0x55, (call BlazePacketBody.getHeader(msg))->dsn);
-      assertEquals("Wrong destpan", 0xCC, (call BlazePacketBody.getHeader(msg))->destpan);
+      assertEquals("Wrong destpan", TOS_AM_GROUP, (call BlazePacketBody.getHeader(msg))->destpan);
       assertEquals("Wrong src", 0, (call BlazePacketBody.getHeader(msg))->src);
       assertEquals("Wrong type", 0x33, (call BlazePacketBody.getHeader(msg))->type);
       

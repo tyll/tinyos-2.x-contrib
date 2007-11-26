@@ -60,8 +60,7 @@ module BlazeInitP {
   uses {
     interface Resource as ResetResource;
     interface Resource as DeepSleepResource;
-   
-    interface GeneralIO as Power[ radio_id_t id ];
+     
     interface GeneralIO as Csn[ radio_id_t id ];
     interface GeneralIO as Gdo0_io[ radio_id_t id ];
     interface GeneralIO as Gdo2_io[ radio_id_t id ];
@@ -146,15 +145,12 @@ implementation {
     // We must be in state S_OFF for this radio. 
     atomic m_id = id;
     
-    call Power.set[ m_id ]();
-    
-    /* 3 ms pause after power is initialized on radio
-     * Datasheet says a max of 3 ms from inital power on time 
-     * until the radio is calibrated and ready to receive commands
-     * Issues arose if we tried to burst the setup registers to quickly 
-     * after applying power to the module. 
+    /* 
+     * We no longer enable / disable the power line - it's too inefficient
+     * call Power.set[ m_id ]();
+     *  
+     * for(pause =  0; pause < 2700; pause++);   
      */
-    for(pause =  0; pause < 2700; pause++);   
 
     state[ m_id ] = S_STARTING;
     
@@ -248,7 +244,7 @@ implementation {
     call Gdo0_io.clr[ id ]();
     call Gdo2_io.clr[ id ]();
     
-    call Power.clr[ id ]();
+    /* call Power.clr[ id ](); */
   }
   
   async command bool BlazePower.isOn[ radio_id_t id ]() {
@@ -383,6 +379,7 @@ implementation {
   default async command void Csn.makeOutput[ radio_id_t id ](){}
   default async command bool Csn.isOutput[ radio_id_t id ](){return FALSE;}
   
+  /*
   default async command void Power.set[ radio_id_t id ](){}
   default async command void Power.clr[ radio_id_t id ](){}
   default async command void Power.toggle[ radio_id_t id ](){}
@@ -391,6 +388,7 @@ implementation {
   default async command bool Power.isInput[ radio_id_t id ](){return FALSE;}
   default async command void Power.makeOutput[ radio_id_t id ](){}
   default async command bool Power.isOutput[ radio_id_t id ](){return FALSE;}
+  */
   
   default async command void Gdo0_io.set[ radio_id_t id ](){}
   default async command void Gdo0_io.clr[ radio_id_t id ](){}

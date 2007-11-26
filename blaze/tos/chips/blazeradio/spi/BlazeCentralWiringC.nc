@@ -29,60 +29,51 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE
  */
 
-#include "Blaze.h"
-#include "BlazeInit.h"
-#include "CC2500.h"
-
 /**
- * This configuration is responsible for wiring in the CC2500 pins to the 
- * BlazeCentralWiringC component, and provides register values for the CC2500.
+ * Collect all GPIO and interrupts from any compiled-in radios and provide
+ * them here.
+ *  
+ *          [ CC2500 ]      [ CC1100 ]
+ *            ||||||          ||||||
+ *            vvvvvv          vvvvvv
+ *         [ CENTRAL WIRING COMPONENT ]
+ *                   ||||||
+ *                   vvvvvv
+ *            [ Blaze SubSystems ]
  * 
- * @author Jared Hill
  * @author David Moss
- * @author Roland Hendel
  */
 
-configuration CC2500ControlC {
+configuration BlazeCentralWiringC {
   provides {
-    interface SplitControl;
-    interface BlazePower;
-    interface BlazeConfig;
+    interface GeneralIO as Csn[ radio_id_t id ];
+    interface GeneralIO as Gdo0_io[ radio_id_t id ];
+    interface GeneralIO as Gdo2_io[ radio_id_t id ];
+    interface GpioInterrupt as Gdo0_int[ radio_id_t id ];
+    interface GpioInterrupt as Gdo2_int[ radio_id_t id ];
+    interface BlazeConfig[ radio_id_t id ];
+    interface BlazeRegSettings[ radio_id_t id ];
+  }
+  
+  uses {
+    interface GeneralIO as ChipCsn[ radio_id_t id ];
+    interface GeneralIO as ChipGdo0_io[ radio_id_t id ];
+    interface GeneralIO as ChipGdo2_io[ radio_id_t id ];
+    interface GpioInterrupt as ChipGdo0_int[ radio_id_t id ];
+    interface GpioInterrupt as ChipGdo2_int[ radio_id_t id ];
+    interface BlazeConfig as ChipConfig[ radio_id_t id ];
+    interface BlazeRegSettings as ChipRegSettings[ radio_id_t id ];
   }
 }
 
 implementation {
-  
-  components MainC,
-      CC2500ControlP,
-      ActiveMessageAddressC,
-      HplCC2500PinsC as Pins;
-      
-  MainC.SoftwareInit -> CC2500ControlP;
-  
-  BlazeConfig = CC2500ControlP;
-  
-  CC2500ControlP.Csn -> Pins.Csn;
-  CC2500ControlP.Power -> Pins.Power;
-  CC2500ControlP.Gdo0_io -> Pins.Gdo0_io;
-  CC2500ControlP.Gdo2_io -> Pins.Gdo2_io;
-  CC2500ControlP.ActiveMessageAddress -> ActiveMessageAddressC;
-  
-  components BlazeInitC;
-  SplitControl = BlazeInitC.SplitControl[ CC2500_RADIO_ID ];
-  BlazePower = BlazeInitC.BlazePower[ CC2500_RADIO_ID ];
-  CC2500ControlP.BlazeCommit -> BlazeInitC.BlazeCommit[ CC2500_RADIO_ID ];
-  
-  components BlazeCentralWiringC;
-  BlazeCentralWiringC.ChipCsn[ CC2500_RADIO_ID ] -> Pins.Csn;
-  BlazeCentralWiringC.ChipRegSettings[ CC2500_RADIO_ID ] -> CC2500ControlP;
-  BlazeCentralWiringC.ChipGdo0_io[ CC2500_RADIO_ID ] -> Pins.Gdo0_io;
-  BlazeCentralWiringC.ChipGdo2_io[ CC2500_RADIO_ID ] -> Pins.Gdo2_io;
-  BlazeCentralWiringC.ChipGdo0_int[ CC2500_RADIO_ID ] -> Pins.Gdo0_int;
-  BlazeCentralWiringC.ChipGdo2_int[ CC2500_RADIO_ID ] -> Pins.Gdo2_int;
-  BlazeCentralWiringC.ChipConfig[ CC2500_RADIO_ID ] -> CC2500ControlP.BlazeConfig;
-  
-  components LedsC;
-  CC2500ControlP.Leds -> LedsC;
-  
+
+  Csn = ChipCsn;
+  Gdo0_io = ChipGdo0_io;
+  Gdo2_io = ChipGdo2_io;
+  Gdo0_int = ChipGdo0_int;
+  Gdo2_int = ChipGdo2_int;
+  BlazeConfig = ChipConfig;
+  BlazeRegSettings = ChipRegSettings;
 }
 

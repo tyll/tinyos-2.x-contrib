@@ -59,9 +59,9 @@ implementation {
   AsyncSend = BlazeTransmitP.AsyncSend;
   AckSend = BlazeTransmitP.AckSend;
   
-  components BlazeInitC;  
-  BlazeTransmitP.Csn -> BlazeInitC.BlazeCsn;
-  BlazeTransmitP.TxInterrupt -> BlazeInitC.BlazeGdo2_int;
+  components BlazeCentralWiringC;  
+  BlazeTransmitP.Csn -> BlazeCentralWiringC.Csn;
+  BlazeTransmitP.TxInterrupt -> BlazeCentralWiringC.Gdo2_int;
     
   components BlazeSpiC as Spi;
   BlazeTransmitP.RadioStatus -> Spi.RadioStatus;

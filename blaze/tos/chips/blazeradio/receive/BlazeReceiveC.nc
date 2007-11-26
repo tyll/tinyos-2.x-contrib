@@ -53,11 +53,11 @@ implementation {
   ReceiveController = BlazeReceiveP;
   AckReceive = BlazeReceiveP;
   
-  components BlazeInitC;
-  BlazeReceiveP.Csn -> BlazeInitC.BlazeCsn;
-  BlazeReceiveP.RxIo -> BlazeInitC.BlazeGdo2_io;
-  BlazeReceiveP.BlazeConfig -> BlazeInitC.BlazeConfig;
-  BlazeReceiveP.RxInterrupt -> BlazeInitC.BlazeGdo2_int;
+  components BlazeCentralWiringC;
+  BlazeReceiveP.Csn -> BlazeCentralWiringC.Csn;
+  BlazeReceiveP.RxIo -> BlazeCentralWiringC.Gdo2_io;
+  BlazeReceiveP.BlazeConfig -> BlazeCentralWiringC.BlazeConfig;
+  BlazeReceiveP.RxInterrupt -> BlazeCentralWiringC.Gdo2_int;
   
   components MainC;
   MainC.SoftwareInit -> BlazeReceiveP;

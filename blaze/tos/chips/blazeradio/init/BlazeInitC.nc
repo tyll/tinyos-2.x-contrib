@@ -40,26 +40,8 @@
 configuration BlazeInitC {
   provides {
     interface SplitControl[ radio_id_t id ];
-    interface BlazePower[ radio_id_t id ];
     interface BlazeCommit[ radio_id_t id ];
-    
-    interface GeneralIO as BlazeCsn[ radio_id_t id ];
-    interface GeneralIO as BlazeGdo0_io[ radio_id_t id ];
-    interface GeneralIO as BlazeGdo2_io[ radio_id_t id ];
-    interface GpioInterrupt as BlazeGdo0_int[ radio_id_t id ];
-    interface GpioInterrupt as BlazeGdo2_int[ radio_id_t id ];
-    interface BlazeConfig[ radio_id_t id ];
-  }
-  
-  uses {
-    interface GeneralIO as Power[ radio_id_t id ];
-    interface GeneralIO as Csn[ radio_id_t id ];
-    interface GeneralIO as Gdo0_io[ radio_id_t id ];
-    interface GeneralIO as Gdo2_io[ radio_id_t id ];
-    interface GpioInterrupt as Gdo0_int[ radio_id_t id ];
-    interface GpioInterrupt as Gdo2_int[ radio_id_t id ];
-    interface BlazeConfig as Config[ radio_id_t id ];
-    interface BlazeRegSettings[ radio_id_t id ];
+    interface BlazePower[ radio_id_t id ];
   }
 }
 
@@ -68,31 +50,23 @@ implementation {
   components MainC,
       BlazeInitP,
       BlazeSpiC,
+      BlazeCentralWiringC,
       new BlazeSpiResourceC() as ResetResourceC,
       new BlazeSpiResourceC() as DeepSleepResourceC;
       
   
   MainC.SoftwareInit -> BlazeInitP;
-  
-  Power = BlazeInitP.Power;
-  Csn = BlazeInitP.Csn;
+
   SplitControl = BlazeInitP;
   BlazePower = BlazeInitP;
-  BlazeRegSettings = BlazeInitP;
   BlazeCommit = BlazeInitP;
-  
-  BlazeCsn = Csn;
-  BlazeGdo0_io = Gdo0_io;
-  BlazeGdo2_io = Gdo2_io;
-  BlazeGdo0_int = Gdo0_int;
-  BlazeGdo2_int = Gdo2_int;
-  BlazeConfig = Config;
-  
-  Gdo0_io = BlazeInitP.Gdo0_io;
-  Gdo0_int = BlazeInitP.Gdo0_int;
-  
-  Gdo2_io = BlazeInitP.Gdo2_io;
-  Gdo2_int = BlazeInitP.Gdo2_int;
+
+  BlazeInitP.Csn -> BlazeCentralWiringC.Csn;
+  BlazeInitP.Gdo0_io -> BlazeCentralWiringC.Gdo0_io;
+  BlazeInitP.Gdo2_io -> BlazeCentralWiringC.Gdo2_io;
+  BlazeInitP.Gdo0_int -> BlazeCentralWiringC.Gdo0_int;
+  BlazeInitP.Gdo2_int -> BlazeCentralWiringC.Gdo2_int;
+  BlazeInitP.BlazeRegSettings -> BlazeCentralWiringC.BlazeRegSettings;
   
   BlazeInitP.ResetResource -> ResetResourceC;
   BlazeInitP.DeepSleepResource -> DeepSleepResourceC;

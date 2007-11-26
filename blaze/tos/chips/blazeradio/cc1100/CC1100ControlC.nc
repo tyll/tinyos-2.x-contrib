@@ -35,7 +35,7 @@
 
 /**
  * This configuration is responsible for wiring in the CC1100 pins to the 
- * main BlazeInitC component, and provides register values for the CC1100.
+ * BlazeCentralWiringC component, and provides register values for the CC1100.
  * 
  * @author Jared Hill
  * @author David Moss
@@ -70,15 +70,16 @@ implementation {
   components BlazeInitC;
   SplitControl = BlazeInitC.SplitControl[ CC1100_RADIO_ID ];
   BlazePower = BlazeInitC.BlazePower[ CC1100_RADIO_ID ];
-  BlazeInitC.Csn[ CC1100_RADIO_ID ] -> Pins.Csn;
-  BlazeInitC.Power[ CC1100_RADIO_ID ] -> Pins.Power;
-  BlazeInitC.BlazeRegSettings[ CC1100_RADIO_ID ] -> CC1100ControlP;
-  BlazeInitC.Gdo0_io[ CC1100_RADIO_ID ] -> Pins.Gdo0_io;
-  BlazeInitC.Gdo2_io[ CC1100_RADIO_ID ] -> Pins.Gdo2_io;
-  BlazeInitC.Gdo2_int[ CC1100_RADIO_ID ] -> Pins.Gdo2_int;
-  BlazeInitC.Gdo0_int[ CC1100_RADIO_ID ] -> Pins.Gdo0_int;
-  BlazeInitC.Config[ CC1100_RADIO_ID ] -> CC1100ControlP.BlazeConfig;
   CC1100ControlP.BlazeCommit -> BlazeInitC.BlazeCommit[ CC1100_RADIO_ID ];
+  
+  components BlazeCentralWiringC;
+  BlazeCentralWiringC.ChipCsn[ CC1100_RADIO_ID ] -> Pins.Csn;
+  BlazeCentralWiringC.ChipRegSettings[ CC1100_RADIO_ID ] -> CC1100ControlP;
+  BlazeCentralWiringC.ChipGdo0_io[ CC1100_RADIO_ID ] -> Pins.Gdo0_io;
+  BlazeCentralWiringC.ChipGdo2_io[ CC1100_RADIO_ID ] -> Pins.Gdo2_io;
+  BlazeCentralWiringC.ChipGdo0_int[ CC1100_RADIO_ID ] -> Pins.Gdo0_int;
+  BlazeCentralWiringC.ChipGdo2_int[ CC1100_RADIO_ID ] -> Pins.Gdo2_int;
+  BlazeCentralWiringC.ChipConfig[ CC1100_RADIO_ID ] -> CC1100ControlP.BlazeConfig;
   
   components LedsC;
   CC1100ControlP.Leds -> LedsC;

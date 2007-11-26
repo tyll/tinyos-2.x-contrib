@@ -1,6 +1,6 @@
 
 #include "TestCase.h"
-#include "CC1100.h"
+#include "CC2500.h"
 
 
 /**
@@ -15,10 +15,10 @@ implementation {
   components new TestCaseC() as TestReceiveC;
   
   components TestP,
-      CC1100ControlC,
+      CC2500ControlC,
       CsmaC,
       BlazeReceiveC,
-      HplCC1100PinsC,
+      HplCC2500PinsC,
       BlazePacketC,
       new TimerMilliC(),
       LedsC;
@@ -27,12 +27,12 @@ implementation {
   TestP.TearDownOneTime -> TestReceiveC.TearDownOneTime;
   TestP.TestReceive -> TestReceiveC;
   
-  TestP.SplitControl -> CC1100ControlC;
+  TestP.SplitControl -> CC2500ControlC;
   TestP.Timer -> TimerMilliC;
   TestP.Leds -> LedsC;
    
-  TestP.Send -> CsmaC.Send[CC1100_RADIO_ID];
-  TestP.Receive -> BlazeReceiveC.Receive[ CC1100_RADIO_ID ];
+  TestP.Send -> CsmaC.Send[CC2500_RADIO_ID];
+  TestP.Receive -> BlazeReceiveC.Receive[ CC2500_RADIO_ID ];
   TestP.BlazePacketBody -> BlazePacketC;
   
 }

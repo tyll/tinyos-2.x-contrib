@@ -69,7 +69,7 @@ implementation {
       return;
     }
     
-    while((error = call AsyncSend.send()) != SUCCESS) {
+    while((error = call AsyncSend.send(0)) != SUCCESS) {
       if(error == EBUSY) {
         // Then we couldn't send because of CCA
         // Try again.
@@ -81,7 +81,7 @@ implementation {
     }
   }
   
-  async event void AsyncSend.sendDone() {
+  async event void AsyncSend.sendDone(error_t error) {
     error_t sendError;
     times++;
     

@@ -67,7 +67,7 @@ implementation {
     (call BlazePacketBody.getHeader(&myMsg))->dest = 1;
     (call BlazePacketBody.getHeader(&myMsg))->fcf = IEEE154_TYPE_DATA;
     (call BlazePacketBody.getHeader(&myMsg))->dsn = 0x55;
-    (call BlazePacketBody.getHeader(&myMsg))->destpan = 0xCC;    
+    (call BlazePacketBody.getHeader(&myMsg))->destpan = TOS_AM_GROUP;    
     (call BlazePacketBody.getHeader(&myMsg))->src = 0;
     (call BlazePacketBody.getHeader(&myMsg))->type = 0x33;
     
@@ -116,7 +116,7 @@ implementation {
     
     error = call AsyncSend.load(&myMsg);
     
-    assertEquals("Error calling AsyncSend.send()", SUCCESS, error);
+    assertEquals("AsyncSend.load() error", SUCCESS, error);
     
     if(error) {  
       call TestReceive.done();
@@ -125,10 +125,11 @@ implementation {
  
   /***************** AsyncSend Events ****************/
   async event void AsyncSend.loadDone(void *msg, error_t error) {
-    assertEquals("send(ERROR)", SUCCESS, call AsyncSend.send());
+    assertEquals("send(ERROR)", SUCCESS, call AsyncSend.send(0));
   }
   
-  async event void AsyncSend.sendDone() {
+  async event void AsyncSend.sendDone(error_t error) {
+    assertEquals("sendDone(ERROR)", SUCCESS, error);
     call Leds.led2On();
     call Resource.release();
     // The receiver must stop the test by receiving one of those or we timeout
@@ -155,7 +156,7 @@ implementation {
       assertEquals("Wrong dest", 1, (call BlazePacketBody.getHeader(msg))->dest);
       assertEquals("Wrong fcf", IEEE154_TYPE_DATA, (call BlazePacketBody.getHeader(msg))->fcf);
       assertEquals("Wrong dsn", 0x55, (call BlazePacketBody.getHeader(msg))->dsn);
-      assertEquals("Wrong destpan", 0xCC, (call BlazePacketBody.getHeader(msg))->destpan);
+      assertEquals("Wrong destpan", TOS_AM_GROUP, (call BlazePacketBody.getHeader(msg))->destpan);
       assertEquals("Wrong src", 0, (call BlazePacketBody.getHeader(msg))->src);
       assertEquals("Wrong type", 0x33, (call BlazePacketBody.getHeader(msg))->type);
       

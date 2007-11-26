@@ -358,7 +358,7 @@ implementation {
     return SUCCESS;
   }
   
-  async command error_t AsyncSend.send[ radio_id_t id ]() {
+  async command error_t AsyncSend.send[ radio_id_t id ](uint16_t rxInterval) {
     asyncSendAttempts++;
     
     if(!asyncSendLoaded) {
@@ -379,7 +379,7 @@ implementation {
           return EBUSY;
        
         } else {
-          signal AsyncSend.sendDone[id]();
+          signal AsyncSend.sendDone[id](SUCCESS);
           return SUCCESS;
         }
         break;
@@ -389,7 +389,7 @@ implementation {
           return EBUSY;
           
         } else {
-          signal AsyncSend.sendDone[id]();
+          signal AsyncSend.sendDone[id](SUCCESS);
           return SUCCESS;
         }
         break;
@@ -399,7 +399,7 @@ implementation {
           return EBUSY;
           
         } else {
-          signal AsyncSend.sendDone[id]();
+          signal AsyncSend.sendDone[id](SUCCESS);
           return SUCCESS;
         }
         break;
@@ -409,7 +409,7 @@ implementation {
         break;
         
       default:
-        signal AsyncSend.sendDone[id]();
+        signal AsyncSend.sendDone[id](SUCCESS);
         return SUCCESS;
     }
     
@@ -420,7 +420,7 @@ implementation {
     assertFail("Default AsyncSend.loadDone event executed");
   }
   
-  default async event void AsyncSend.sendDone[radio_id_t id]() {
+  default async event void AsyncSend.sendDone[radio_id_t id](error_t error) {
     assertFail("Default AsyncSend.sendDone event executed");
   }
   

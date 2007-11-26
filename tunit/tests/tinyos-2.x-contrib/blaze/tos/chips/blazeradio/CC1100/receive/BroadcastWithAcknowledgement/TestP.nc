@@ -69,7 +69,7 @@ implementation {
         (IEEE154_TYPE_DATA << IEEE154_FCF_FRAME_TYPE) | (1 << IEEE154_FCF_ACK_REQ);
     
     (call BlazePacketBody.getHeader(&myMsg))->dsn = 0x55;
-    (call BlazePacketBody.getHeader(&myMsg))->destpan = 0xCC;    
+    (call BlazePacketBody.getHeader(&myMsg))->destpan = TOS_AM_GROUP;    
     (call BlazePacketBody.getHeader(&myMsg))->src = 0;
     (call BlazePacketBody.getHeader(&myMsg))->type = 0x33;
   
@@ -120,7 +120,7 @@ implementation {
     error = call AsyncSend.load(&myMsg);
     
     if(error) {
-      assertEquals("Error calling AsyncSend.send()", SUCCESS, error);
+      assertEquals("AsyncSend.load() error", SUCCESS, error);
       call TestReceive.done();
     }
   }
@@ -129,14 +129,14 @@ implementation {
   async event void AsyncSend.loadDone(void *msg, error_t error) {
     assertEquals("loadDone(ERROR)", SUCCESS, error);
     
-    error = call AsyncSend.send();
+    error = call AsyncSend.send(0);
     
     if(error) {
       assertEquals("send(ERROR)", SUCCESS, error);
     }
   }
   
-  async event void AsyncSend.sendDone() {
+  async event void AsyncSend.sendDone(error_t error) {
     call Leds.led2Toggle();
     call Resource.release();
     // The receiver must stop the test by receiving one of those or we timeout
@@ -165,11 +165,11 @@ implementation {
       }
         
       assertEquals("Wrong length", MY_PACKET_LENGTH, len);
-      assertEquals("Wrong dest", 1, (call BlazePacketBody.getHeader(msg))->dest);
+      assertEquals("Wrong dest", AM_BROADCAST_ADDR, (call BlazePacketBody.getHeader(msg))->dest);
       // 33 = 100001 = ack request + type data:
       assertEquals("Wrong fcf", 33, (call BlazePacketBody.getHeader(msg))->fcf);
       assertEquals("Wrong dsn", 0x55, (call BlazePacketBody.getHeader(msg))->dsn);
-      assertEquals("Wrong destpan", 0xCC, (call BlazePacketBody.getHeader(msg))->destpan);
+      assertEquals("Wrong destpan", TOS_AM_GROUP, (call BlazePacketBody.getHeader(msg))->destpan);
       assertEquals("Wrong src", 0, (call BlazePacketBody.getHeader(msg))->src);
       assertEquals("Wrong type", 0x33, (call BlazePacketBody.getHeader(msg))->type);
       

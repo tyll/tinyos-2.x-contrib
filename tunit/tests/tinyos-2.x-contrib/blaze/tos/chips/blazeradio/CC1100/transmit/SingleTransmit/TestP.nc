@@ -57,14 +57,15 @@ implementation {
   async event void AsyncSend.loadDone(void *msg, error_t error) {
     assertEquals("loadDone(ERROR)", SUCCESS, error);
     assertNotNull(msg);
-    if((error = call AsyncSend.send()) != SUCCESS) {
+    if((error = call AsyncSend.send(0)) != SUCCESS) {
       assertEquals("Couldn't send()", SUCCESS, error);
       call TestTransmit.done();
     }
     
   }
    
-  async event void AsyncSend.sendDone() {
+  async event void AsyncSend.sendDone(error_t error) {
+    assertEquals("sendDone(ERROR)", SUCCESS, error);
     call Resource.release();
     call TestTransmit.done();
   }

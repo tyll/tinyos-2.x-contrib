@@ -13,7 +13,7 @@ module TestP {
     
     interface Resource;
     interface SplitControl;
-    interface GpioInterrupt as CC1100ReceiveInterrupt;
+    interface GpioInterrupt as CC2500ReceiveInterrupt;
     interface AsyncSend;
     interface Receive;
     interface Leds;
@@ -87,17 +87,17 @@ implementation {
     error = call AsyncSend.load(&myMsg);
     
     if(error) {
-      assertEquals("Error calling AsyncSend.send()", SUCCESS, error);
+      assertEquals("AsyncSend.load() error", SUCCESS, error);
       call TestReceive.done();
     }
   }
  
   /***************** AsyncSend Events ****************/
   async event void AsyncSend.loadDone(void *msg, error_t error) {
-    call AsyncSend.send();
+    call AsyncSend.send(0);
   }
   
-  async event void AsyncSend.sendDone() {
+  async event void AsyncSend.sendDone(error_t error) {
     timesSent++;
     call Leds.led2Toggle();
     call Resource.release();
@@ -106,7 +106,7 @@ implementation {
   
   
   /***************** Receive Events ****************/
-  async event void CC1100ReceiveInterrupt.fired() {
+  async event void CC2500ReceiveInterrupt.fired() {
     if(!runningTest) {
       call Leds.led1On();
       assertSuccess();

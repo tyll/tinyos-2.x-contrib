@@ -304,9 +304,9 @@ implementation {
     return SUCCESS;
   }
   
-  async command error_t AckSend.send[radio_id_t id]() {
+  async command error_t AckSend.send[radio_id_t id](uint16_t rxInterval) {
     ackSent = TRUE;
-    signal AckSend.sendDone[id]();
+    signal AckSend.sendDone[id](SUCCESS);
     return SUCCESS;
   }
   
@@ -314,7 +314,7 @@ implementation {
     assertEquals("Bad loadDone connection []", 0, id);
   }
   
-  default async event void AckSend.sendDone[radio_id_t id]() {
+  default async event void AckSend.sendDone[radio_id_t id](error_t error) {
     assertEquals("Bad sendDone connection []", 0, id);
   }
   

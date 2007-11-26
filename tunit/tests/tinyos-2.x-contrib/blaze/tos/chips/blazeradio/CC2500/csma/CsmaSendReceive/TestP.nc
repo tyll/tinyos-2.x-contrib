@@ -65,7 +65,7 @@ implementation {
     (call BlazePacketBody.getHeader(&myMsg))->dest = 1;
     (call BlazePacketBody.getHeader(&myMsg))->fcf = IEEE154_TYPE_DATA;
     (call BlazePacketBody.getHeader(&myMsg))->dsn = 0x55;
-    (call BlazePacketBody.getHeader(&myMsg))->destpan = 0xCC;    
+    (call BlazePacketBody.getHeader(&myMsg))->destpan = TOS_AM_GROUP;    
     (call BlazePacketBody.getHeader(&myMsg))->src = 0;
     (call BlazePacketBody.getHeader(&myMsg))->type = 0x33;
   
@@ -134,7 +134,7 @@ implementation {
       assertEquals("Wrong dest", 1, (call BlazePacketBody.getHeader(msg))->dest);
       assertEquals("Wrong fcf", IEEE154_TYPE_DATA, (call BlazePacketBody.getHeader(msg))->fcf);
       assertEquals("Wrong dsn", 0x55, (call BlazePacketBody.getHeader(msg))->dsn);
-      assertEquals("Wrong destpan", 0xCC, (call BlazePacketBody.getHeader(msg))->destpan);
+      assertEquals("Wrong destpan", TOS_AM_GROUP, (call BlazePacketBody.getHeader(msg))->destpan);
       assertEquals("Wrong src", 0, (call BlazePacketBody.getHeader(msg))->src);
       assertEquals("Wrong type", 0x33, (call BlazePacketBody.getHeader(msg))->type);
       

@@ -49,7 +49,7 @@ configuration BlazeReceiveC {
 implementation {
 
   components BlazeReceiveP;  
-  Receive = BlazeReceiveP;
+  Receive = BlazeReceiveP.Receive;
   ReceiveController = BlazeReceiveP;
   AckReceive = BlazeReceiveP;
   

@@ -43,6 +43,7 @@ module BlazeReceiveP {
 
   provides {
     interface Receive[ radio_id_t id ];
+    interface Receive as BadCrcReceive[ radio_id_t id ];
     interface ReceiveController[ radio_id_t id ];
     interface AckReceive;
         
@@ -114,7 +115,8 @@ implementation {
   
   /***************** Prototypes ****************/
   task void receiveDone();
-  
+  task void badCrcReceive();
+   
   void receive();
   uint8_t getStatus();
   void failReceive();
@@ -234,7 +236,7 @@ implementation {
       
       if((buf[ rxFrameLength + 2 ] & 0x80) == 0) {
         // CRC check failed
-        cleanUp();
+        post badCrcReceive();
         return;
       }
 
@@ -247,7 +249,7 @@ implementation {
         
       } else if(rxFrameLength >= sizeof(blaze_header_t) - 1) {
         // IEEE_TYPE_DATA frame; check if we need to ack
-      
+        
         if(call BlazeConfig.isAutoAckEnabled[ id ]()) {
           if (((( header->fcf >> IEEE154_FCF_ACK_REQ ) & 0x01) == 1)
               && ((header->dest == call ActiveMessageAddress.amAddress())
@@ -297,7 +299,7 @@ implementation {
   event void BlazeConfig.commitDone[radio_id_t id]() {
   }
   
-  /***************** Tasks and Functions ****************/
+  /***************** Tasks s****************/
   task void receiveDone() {
     blaze_metadata_t *metadata = call BlazePacketBody.getMetadata( m_msg );
     uint8_t *buf = (uint8_t*) call BlazePacketBody.getHeader( m_msg );
@@ -322,6 +324,32 @@ implementation {
     cleanUp();
   }
   
+  task void badCrcReceive() {
+    blaze_metadata_t *metadata = call BlazePacketBody.getMetadata( m_msg );
+    uint8_t *buf = (uint8_t*) call BlazePacketBody.getHeader( m_msg );
+    uint8_t rxFrameLength = buf[0];
+    message_t *atomicMsg;
+    uint8_t atomicId;
+    
+    atomic atomicId = m_id;
+    
+    // Note the correct CRC result is stored in the MSB of the LQI
+    metadata->rssi = buf[ rxFrameLength + 1 ];
+    metadata->lqi = buf[ rxFrameLength + 2 ];
+    
+        
+    atomicMsg = signal BadCrcReceive.receive[atomicId]( m_msg, m_msg->data, rxFrameLength );
+    
+    if(atomicMsg != NULL) {
+      atomic m_msg = atomicMsg;
+    } else {
+      atomic m_msg = &myMsg;
+    }
+    
+    cleanUp();
+  }
+  
+  /***************** Functions ****************/
   /**
    * Receive the packet by first reading in the length byte.  The SPI
    * bus should already be allocated.
@@ -393,6 +421,10 @@ implementation {
   
   /***************** Defaults ****************/
   default event message_t *Receive.receive[ radio_id_t id ](message_t* msg, void* payload, uint8_t len){
+    return msg;
+  }
+  
+  default event message_t *BadCrcReceive.receive[ radio_id_t id ](message_t* msg, void* payload, uint8_t len){
     return msg;
   }
   

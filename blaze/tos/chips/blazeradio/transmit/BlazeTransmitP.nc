@@ -119,7 +119,7 @@ implementation {
    *     FAIL if we're doing something else
    *     EBUSY if the channel is busy (when hardware CCA is enabled)
    */
-  async command error_t AsyncSend.send[ radio_id_t id ]() {
+  async command error_t AsyncSend.send[ radio_id_t id ](uint16_t rxInterval) {
     
     if(call State.requestState(S_TX_PACKET) != SUCCESS) {
       return FAIL;
@@ -148,7 +148,7 @@ implementation {
    * Transmit the acknowledgement already in the TX FIFO.  
    * Should only be accessed by BlazeReceiveP
    */
-  async command error_t AckSend.send[ radio_id_t id ]() {
+  async command error_t AckSend.send[ radio_id_t id ](uint16_t rxInterval) {
     if(call State.requestState(S_TX_ACK) != SUCCESS) {
       return FAIL;
     }
@@ -317,10 +317,10 @@ implementation {
     call State.toIdle();
     
     if(state == S_TX_PACKET) {
-      signal AsyncSend.sendDone[ id ]();
+      signal AsyncSend.sendDone[ id ](SUCCESS);
     
     } else if(state == S_TX_ACK) {
-      signal AckSend.sendDone[ id ]();
+      signal AckSend.sendDone[ id ](SUCCESS);
     }
     
     return SUCCESS;
@@ -334,12 +334,11 @@ implementation {
   default async command void Csn.makeInput[ radio_id_t id ](){}
   default async command void Csn.makeOutput[ radio_id_t id ](){}
   
-  default async event void AsyncSend.sendDone[ radio_id_t id ]() {}
+  default async event void AsyncSend.sendDone[ radio_id_t id ](error_t error) {}
   default async event void AsyncSend.loadDone[ radio_id_t id ](void *msg, error_t error) {}
   
-  default async event void AckSend.sendDone[ radio_id_t id ]() {}
+  default async event void AckSend.sendDone[ radio_id_t id ](error_t error) {}
   default async event void AckSend.loadDone[ radio_id_t id ](void *msg, error_t error) {}
-  
   
   default async command error_t TxInterrupt.enableRisingEdge[radio_id_t id]() {
     return FAIL;

@@ -172,10 +172,10 @@ implementation {
   
   /***************** AckSend Events ****************/
   async event void AckSend.loadDone[ radio_id_t id ](void *msg, error_t error) {
-    call AckSend.send[id]();
+    call AckSend.send[id](0);
   }
   
-  async event void AckSend.sendDone[ radio_id_t id ]() {
+  async event void AckSend.sendDone[ radio_id_t id ](error_t error) {
     call Csn.set[ id ]();
     post receiveDone();
   }
@@ -436,7 +436,7 @@ implementation {
     return FAIL;
   }
   
-  default async command error_t AckSend.send[ radio_id_t id ]() {
+  default async command error_t AckSend.send[ radio_id_t id ](uint16_t rxInterval) {
     return FAIL;
   }
   

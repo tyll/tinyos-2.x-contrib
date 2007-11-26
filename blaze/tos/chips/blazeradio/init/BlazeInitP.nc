@@ -127,7 +127,6 @@ implementation {
    * It may have something to do with the corrupted register writes on burst.
    */
   command error_t SplitControl.start[ radio_id_t id ]() {
-    uint16_t pause = 0;
     if(id >= uniqueCount(UQ_BLAZE_RADIO)) {
       return EINVAL;
     }

@@ -153,7 +153,7 @@ implementation {
       call AsyncSend.load[myRadio](myMsg);
     
     } else if(call State.isState(S_BACKOFF)) {
-      if(call AsyncSend.send[myRadio]() != SUCCESS) {
+      if(call AsyncSend.send[myRadio](0) != SUCCESS) {
         call Resource.release();
         congestionBackoff();
       }
@@ -185,8 +185,8 @@ implementation {
     }
   }
   
-  async event void AsyncSend.sendDone[radio_id_t id]() {
-    atomic myError = SUCCESS;
+  async event void AsyncSend.sendDone[radio_id_t id](error_t error) {
+    atomic myError = error;
     post sendDone();
   }
   
@@ -248,7 +248,7 @@ implementation {
    * hardware CCA.
    */
   task void forceSend() {
-    if(call AsyncSend.send[myRadio]() != SUCCESS) {
+    if(call AsyncSend.send[myRadio](0) != SUCCESS) {
       if(call State.isState(S_CANCEL)) {
         atomic myError = ECANCEL;
         
@@ -327,7 +327,7 @@ implementation {
   default event void Send.sendDone[radio_id_t id](message_t* msg, error_t error) { }
   
   default async command error_t AsyncSend.load[radio_id_t id](void *msg) { }
-  default async command error_t AsyncSend.send[radio_id_t id]() { }
+  default async command error_t AsyncSend.send[radio_id_t id](uint16_t rxInterval) { }
   
   default async event void Csma.requestInitialBackoff[am_id_t amId](message_t *msg) { }
   default async event void Csma.requestCongestionBackoff[am_id_t amId](message_t *msg) { }

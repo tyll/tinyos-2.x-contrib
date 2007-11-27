@@ -55,16 +55,15 @@ body {
             <td bgcolor="#EEEEEE"><p align="center" class="style7">1. Software and Pin Compatibility</p>
               <p align="center" class="style12">The CC1100 and CC2500 radios are completely software driver and pin compatible. We can reach 315 MHz, 433 MHz, 900 MHz, and 2.4 GHz by only replacing the chip and its matching network. Everything else, including software, stays the same. </p>
               <p align="center" class="style12">We can run two radios using one software stack.</p>
+              <p align="center" class="style12">At 315 MHz, we have reached ranges of 750+ feet on grass at +10 dBm and wire antennas.</p>
               <p align="center" class="style7">&nbsp;</p>
               <p align="center" class="style7">2. Power Consumption</p>
               <p align="center" class="style12">The CC1100 and CC2500 support a hardware-driven low power listening implementation, or Wake-on-Radio (WoR). Your microcontroller can remain in the deepest sleep possible while the radio takes care of its own duty cycling.</p>
-              <p align="center" class="style12">Our Blaze Radio stack will also support platforms that feature a power pin to the radios. Instead of putting the radio into a deep sleep mode, we can  completely shut it off to the tune of 5 nanoamps.</p>
               <p align="center" class="style12">&nbsp;</p>
               <p align="center" class="style12"><span class="style13">3. Throughput</span></p>
               <p align="center" class="style12">The CC1100 and CC2500 are capable of communicating at 500 kbps maximum.</p>
               <p align="center" class="style12">Compare that to the CC2420 which reaches a maximum of 250 kbps, or the CC1000 which exhibits a lazy 76.8 kbps.</p>
               <p align="center" class="style12">The faster you communicate, the less time your radio has to be consuming power to get messages through your network.</p>
-              <p align="center" class="style12">Finally, these radios also support Forward Error Correction (FEC) and data whitening.</p>
               <p>&nbsp;</p>
               <p align="center" class="style12"><span class="style13">4. Modulation Techniques</span></p>
               <p align="center" class="style12">The CC2420 only supports DSSS. The CC1000 only supports FSK and OOK.</p>
@@ -80,7 +79,7 @@ body {
         <div align="center"></div>
         <p align="center" class="style12">&nbsp;</p>
         <p align="center" class="style2">Development</p>
-        <p align="center" class="style12"><span class="style15">Development so far has taken place on hacked up <a href="http://www.moteiv.com">TMotes</a>. We have obtained some CC1100EM and CC2500EM evaluation modules and wired them by hand to our nodes, calling it a &quot;tmote blaze&quot;. This gives us a stable platform on which to build and test our software radio drivers.</span></p>
+        <p align="center" class="style12"><span class="style15">Development so far has taken place on hacked up <a href="http://www.moteiv.com">TMotes</a>. We have obtained some CC1100EM and CC2500EM evaluation modules and wired them by hand to our nodes, calling it a &quot;tmote1100&quot; and &quot;tmote2500&quot;. This gives us a stable platform on which to build and test our software radio drivers.</span></p>
         <p align="center" class="style15">Development has proceeded through a continuous integration process, where unit tests are written using <a href="http://tinyos.cvs.sourceforge.net/*checkout*/tinyos/tinyos-2.x-contrib/tunit/index.html">TUnit</a> to verify code integrity running on actual hardware. This has proven to be an invaluable tool to the development process, and the quality and robustness of our code reflects it.</p>
         <p align="center" class="style15">All code is available under the BSD license found <a href="license.txt">here</a>.</p>
       </td>

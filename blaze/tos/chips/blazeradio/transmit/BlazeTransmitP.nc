@@ -54,7 +54,6 @@ module BlazeTransmitP {
   
   uses {
     interface GeneralIO as Csn[ radio_id_t id ];
-    interface GpioInterrupt as TxInterrupt[ radio_id_t id ];
     interface BlazePacketBody;
    
     interface BlazeFifo as TXFIFO;
@@ -183,17 +182,7 @@ implementation {
   async event void TXFIFO.readDone( uint8_t* tx_buf, uint8_t tx_len, 
       error_t error ) {
   }
-  
-  
-  /***************** TxInterrupt Events ****************/
-  /**
-   * Because we had the falling edge enabled, if this is our event,
-   * the packet is finished transmitting. In the future, timestamping can
-   * occur on the rising edge.
-   */
-  async event void TxInterrupt.fired[ radio_id_t id ]() {
-  }
-  
+    
   /***************** Local Functions ****************/
   /**
    * Load a message into the TX FIFO
@@ -339,19 +328,6 @@ implementation {
   
   default async event void AckSend.sendDone[ radio_id_t id ](error_t error) {}
   default async event void AckSend.loadDone[ radio_id_t id ](void *msg, error_t error) {}
-  
-  default async command error_t TxInterrupt.enableRisingEdge[radio_id_t id]() {
-    return FAIL;
-  }
-  
-  default async command error_t TxInterrupt.enableFallingEdge[radio_id_t id]() {
-    return FAIL;
-  }
-  
-  default async command error_t TxInterrupt.disable[radio_id_t id]() {
-    return FAIL;
-  }
-  
   
 }
 

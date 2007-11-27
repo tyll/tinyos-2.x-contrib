@@ -61,7 +61,6 @@ implementation {
   
   components BlazeCentralWiringC;  
   BlazeTransmitP.Csn -> BlazeCentralWiringC.Csn;
-  BlazeTransmitP.TxInterrupt -> BlazeCentralWiringC.Gdo2_int;
     
   components BlazeSpiC as Spi;
   BlazeTransmitP.RadioStatus -> Spi.RadioStatus;

@@ -75,7 +75,6 @@ module BlazeReceiveP {
     interface ActiveMessageAddress;
     interface State;
     interface Leds;
-    //interface DebugPins as Pins;
   }
 
 }
@@ -171,8 +170,8 @@ implementation {
   
   
   /***************** AckSend Events ****************/
-  async event void AckSend.loadDone[ radio_id_t id ](void *msg, error_t error) {
-    call AckSend.send[id](0);
+  async event void AckSend.loadDone[ radio_id_t id ](error_t error) {
+    call AckSend.send[id]();
   }
   
   async event void AckSend.sendDone[ radio_id_t id ](error_t error) {
@@ -266,7 +265,7 @@ implementation {
             }
             
             call Csn.clr[ id ]();
-            call AckSend.load[ id ](&acknowledgement);
+            call AckSend.load[ id ](&acknowledgement, 0);
             // Continues at AckSend.loadDone() and AckSend.sendDone()
             return;
           }
@@ -432,11 +431,11 @@ implementation {
   }
   
     
-  default async command error_t AckSend.load[ radio_id_t id ](void *msg) {
+  default async command error_t AckSend.load[ radio_id_t id ](void *msg, uint16_t rxInterval) {
     return FAIL;
   }
   
-  default async command error_t AckSend.send[ radio_id_t id ](uint16_t rxInterval) {
+  default async command error_t AckSend.send[ radio_id_t id ]() {
     return FAIL;
   }
   

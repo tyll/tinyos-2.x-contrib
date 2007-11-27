@@ -29,43 +29,64 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE
  */
 
-#include "message.h"
+/**
+ * BMAC transmission implementation
+ * This transmits a long preamble followed by the packet.  To use this on
+ * the MSP430, DMA MUST be enabled. Also, it is highly recommended the SMCLK
+ * used for SPI is increased above its default minimum.  The microcontroller
+ * must access the SPI bus at a minimum of 500 kbps or the node will lock up.
+ * 
+ * Directly send a message over the radio.  No clear channel assessments are
+ * performed.  This is the lowest level.
+ *
+ * The parameterized ID is, of course, a unique value of UQ_BLAZE_RADIO
+ * which you'll find in each individual radio's header file (CC1100.h or 
+ * CC2500.h).  
+ *
+ * @author Jared Hill
+ * @author David Moss
+ */
 
-interface AsyncSend {
+#include "IEEE802154.h"
+#include "Blaze.h"
 
-  /**
-   * Load a message into the radio stack drivers or the actual radio itself
-   * @param msg The message to load, with the first byte being the length
-   *    of the rest of the packet (not including the length byte itself)
-   * @param rxInterval For low power transmissions, this is the amount of
-   *     time to spend transmitting to allow a duty cycling receiver to wake up
-   * @return error_t
-   */
-  async command error_t load(void *msg, uint16_t rxInterval);
-  
-  /**
-   * Attempt to transmit the message previously loaded.
+configuration BmacTransmitC {
 
-   * @return SUCCESS if the transmission will occur
-   *         EBUSY if the channel is already in use
-   *         FAIL if something else is already using the transmit module
-   */
-  async command error_t send();
-  
-  
-  /**
-   * The message has been loaded
-   * @param msg The loaded message
-   * @param error Any error that occurred
-   */
-  async event void loadDone(error_t error);
-  
-  /**
-   * The message has been sent
-   * @param error SUCCESS if the message was sent
-   *              ESIZE if there was a TX or RX FIFO underflow
-   */
-  async event void sendDone(error_t error);
-  
+  provides {
+    interface AsyncSend[ radio_id_t id ];
+  }
 }
 
+implementation {
+
+  components BmacTransmitP;
+  AsyncSend = BmacTransmitP;
+  
+  components BlazeCentralWiringC;  
+  BmacTransmitP.Csn -> BlazeCentralWiringC.Csn;
+  
+  components BlazeSpiC as Spi;
+  BmacTransmitP.RadioStatus -> Spi.RadioStatus;
+  
+  BmacTransmitP.SNOP -> Spi.SNOP;
+  BmacTransmitP.STX -> Spi.STX;
+  BmacTransmitP.SFTX -> Spi.SFTX;
+  BmacTransmitP.SFRX -> Spi.SFRX;
+  BmacTransmitP.TXFIFO -> Spi.TXFIFO;
+  BmacTransmitP.SIDLE -> Spi.SIDLE;
+  BmacTransmitP.SRX -> Spi.SRX;
+  BmacTransmitP.TxReg -> Spi.TXREG;
+  
+  components new TimerMilliC();
+  BmacTransmitP.Timer -> TimerMilliC;
+  
+  components new StateC();
+  BmacTransmitP.State -> StateC;
+  
+  components BlazePacketC;
+  BmacTransmitP.BlazePacketBody -> BlazePacketC;
+  
+  components LedsC;
+  BmacTransmitP.Leds -> LedsC;
+  
+}

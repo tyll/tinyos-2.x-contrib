@@ -29,43 +29,27 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE
  */
 
-#include "message.h"
+/**
+ * This component determines whether to send a message using the standard
+ * BlazeTransmit component or some other low power listening component.
+ * 
+ * It must be implemented for each type of low power listening to direct
+ * messages
+ * 
+ * @author David Moss
+ */
 
-interface AsyncSend {
+#include "Blaze.h"
+#include "AlwaysOn.h"
 
-  /**
-   * Load a message into the radio stack drivers or the actual radio itself
-   * @param msg The message to load, with the first byte being the length
-   *    of the rest of the packet (not including the length byte itself)
-   * @param rxInterval For low power transmissions, this is the amount of
-   *     time to spend transmitting to allow a duty cycling receiver to wake up
-   * @return error_t
-   */
-  async command error_t load(void *msg, uint16_t rxInterval);
-  
-  /**
-   * Attempt to transmit the message previously loaded.
-
-   * @return SUCCESS if the transmission will occur
-   *         EBUSY if the channel is already in use
-   *         FAIL if something else is already using the transmit module
-   */
-  async command error_t send();
-  
-  
-  /**
-   * The message has been loaded
-   * @param msg The loaded message
-   * @param error Any error that occurred
-   */
-  async event void loadDone(error_t error);
-  
-  /**
-   * The message has been sent
-   * @param error SUCCESS if the message was sent
-   *              ESIZE if there was a TX or RX FIFO underflow
-   */
-  async event void sendDone(error_t error);
-  
+configuration TransmitArbiterC {
+  provides {
+    interface AsyncSend[ radio_id_t id ];
+  }
 }
 
+implementation {
+  components BlazeTransmitC;
+  
+  AsyncSend = BlazeTransmitC.AsyncSend;
+}

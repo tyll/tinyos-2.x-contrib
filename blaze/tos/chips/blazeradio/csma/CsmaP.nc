@@ -150,10 +150,10 @@ implementation {
   /***************** Resource Events ****************/
   event void Resource.granted() {
     if(call State.isState(S_LOADING)) {
-      call AsyncSend.load[myRadio](myMsg);
+      call AsyncSend.load[myRadio](myMsg, (call BlazePacketBody.getMetadata(myMsg))->rxInterval);
     
     } else if(call State.isState(S_BACKOFF)) {
-      if(call AsyncSend.send[myRadio](0) != SUCCESS) {
+      if(call AsyncSend.send[myRadio]() != SUCCESS) {
         call Resource.release();
         congestionBackoff();
       }
@@ -165,7 +165,7 @@ implementation {
   }
   
   /***************** AsyncSend Events ****************/
-  async event void AsyncSend.loadDone[radio_id_t id](void *msg, error_t error) {
+  async event void AsyncSend.loadDone[radio_id_t id](error_t error) {
     if(call State.isState(S_CANCEL)) {
       atomic myError = ECANCEL;
       post sendDone();
@@ -248,7 +248,7 @@ implementation {
    * hardware CCA.
    */
   task void forceSend() {
-    if(call AsyncSend.send[myRadio](0) != SUCCESS) {
+    if(call AsyncSend.send[myRadio]() != SUCCESS) {
       if(call State.isState(S_CANCEL)) {
         atomic myError = ECANCEL;
         
@@ -326,8 +326,8 @@ implementation {
   /***************** Defaults ****************/
   default event void Send.sendDone[radio_id_t id](message_t* msg, error_t error) { }
   
-  default async command error_t AsyncSend.load[radio_id_t id](void *msg) { }
-  default async command error_t AsyncSend.send[radio_id_t id](uint16_t rxInterval) { }
+  default async command error_t AsyncSend.load[radio_id_t id](void *msg, uint16_t rxInterval) { }
+  default async command error_t AsyncSend.send[radio_id_t id]() { }
   
   default async event void Csma.requestInitialBackoff[am_id_t amId](message_t *msg) { }
   default async event void Csma.requestCongestionBackoff[am_id_t amId](message_t *msg) { }

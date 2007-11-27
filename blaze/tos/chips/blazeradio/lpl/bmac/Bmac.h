@@ -29,43 +29,23 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE
  */
 
-#include "message.h"
+/**
+ * Make sure we aren't trying to compile multiple LPL directories into the
+ * radio stack
+ */
+ 
+#ifndef BMAC_H
+#define BMAC_H
 
-interface AsyncSend {
+#warning "*** Using BMAC Low Power Listening ***"
 
-  /**
-   * Load a message into the radio stack drivers or the actual radio itself
-   * @param msg The message to load, with the first byte being the length
-   *    of the rest of the packet (not including the length byte itself)
-   * @param rxInterval For low power transmissions, this is the amount of
-   *     time to spend transmitting to allow a duty cycling receiver to wake up
-   * @return error_t
-   */
-  async command error_t load(void *msg, uint16_t rxInterval);
-  
-  /**
-   * Attempt to transmit the message previously loaded.
+#ifndef BLAZE_TRANSMIT_ARBITER_DEFINED
+#define BLAZE_TRANSMIT_ARBITER_DEFINED
+#else
+#warning "You are attempting to include multiple LPL paths at compile time." 
+#error "Choose a single LPL directory in your compiler path and recompile."
+#endif
 
-   * @return SUCCESS if the transmission will occur
-   *         EBUSY if the channel is already in use
-   *         FAIL if something else is already using the transmit module
-   */
-  async command error_t send();
-  
-  
-  /**
-   * The message has been loaded
-   * @param msg The loaded message
-   * @param error Any error that occurred
-   */
-  async event void loadDone(error_t error);
-  
-  /**
-   * The message has been sent
-   * @param error SUCCESS if the message was sent
-   *              ESIZE if there was a TX or RX FIFO underflow
-   */
-  async event void sendDone(error_t error);
-  
-}
+
+#endif
 

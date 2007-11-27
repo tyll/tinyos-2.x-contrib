@@ -72,8 +72,8 @@ implementation {
   components new BlazeSpiResourceC();
   CsmaP.Resource -> BlazeSpiResourceC;
   
-  components BlazeTransmitC;
-  CsmaP.AsyncSend -> BlazeTransmitC.AsyncSend;
+  components TransmitArbiterC;
+  CsmaP.AsyncSend -> TransmitArbiterC.AsyncSend;
 
   components BlazePacketC;
   CsmaP.BlazePacketBody -> BlazePacketC;

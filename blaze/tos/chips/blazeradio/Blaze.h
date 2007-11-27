@@ -67,7 +67,7 @@ typedef nx_struct blaze_metadata_t {
   nx_bool ack;  // TODO combine or take advantage of the FCF ack bit?
   nx_uint8_t radio;  // TODO combine 
   nx_uint8_t txPower;
-  nx_uint32_t time;
+  nx_uint32_t timestamp;
   nx_uint16_t rxInterval;
   nx_uint16_t maxRetries;
   nx_uint16_t retryDelay;

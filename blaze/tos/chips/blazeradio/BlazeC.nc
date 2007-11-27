@@ -77,6 +77,11 @@ configuration BlazeC {
     /** Configure CSMA properties, like backoff and clear channel assessments */
     interface Csma[am_id_t amId];
     
+    /** Configure low power listening for the default radio */
+    interface LowPowerListening;
+    
+    /** Configure low power listening for any blaze radio */
+    interface LowPowerListening as BlazeLowPowerListening[ radio_id_t radioId ];
   }
 }
 
@@ -98,6 +103,10 @@ implementation {
   components PacketLinkC;
   PacketLink = PacketLinkC;
   
+  components LplC;
+  LowPowerListening = LplC.LowPowerListening[0];
+  BlazeLowPowerListening = LplC;
+  
   components AcknowledgementsC;
   PacketAcknowledgements = AcknowledgementsC;
   
@@ -112,20 +121,25 @@ implementation {
   /***************** Send Layers ****************/
   BlazeActiveMessageC.SubSend -> UniqueSendC.Send;
   UniqueSendC.SubSend -> PacketLinkC.Send;
-  PacketLinkC.SubSend -> RadioSelectC;
+  PacketLinkC.SubSend -> LplC.Send;
+  LplC.SubSend -> RadioSelectC;
+  
   /* Layers below this are parameterized by radio id */
   RadioSelectC.SubSend -> AcknowledgementsC.Send;
   AcknowledgementsC.SubSend -> CsmaC;
   
   /***************** Receive Layers ****************/
   BlazeActiveMessageC.SubReceive -> UniqueReceiveC.Receive;
-  UniqueReceiveC.SubReceive -> RadioSelectC.Receive;
+  UniqueReceiveC.SubReceive -> LplC.Receive;
+  LplC.SubReceive -> RadioSelectC.Receive;
+  
   /* Layers below this are parameterized by radio id */
   RadioSelectC.SubReceive -> BlazeReceiveC.Receive;
     
   /***************** SplitControl Layers ****************/
   SplitControl = RadioSelectC.SplitControl[0];
-  BlazeSplitControl = RadioSelectC.SplitControl;
+  BlazeSplitControl = LplC.SplitControl;
+  LplC.SubControl -> RadioSelectC.SplitControl;
   RadioSelectC.SubControl -> BlazeInitC;
 }
 

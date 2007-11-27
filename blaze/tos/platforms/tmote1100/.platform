@@ -21,6 +21,8 @@ push( @includes, qw(
   %T/../../blaze/tos/chips/blazeradio/init
   %T/../../blaze/tos/chips/blazeradio/interfaces
   %T/../../blaze/tos/chips/blazeradio/link
+  %T/../../blaze/tos/chips/blazeradio/lpl
+  %T/../../blaze/tos/chips/blazeradio/lpl/alwayson
   %T/../../blaze/tos/chips/blazeradio/packet
   %T/../../blaze/tos/chips/blazeradio/receive
   %T/../../blaze/tos/chips/blazeradio/select

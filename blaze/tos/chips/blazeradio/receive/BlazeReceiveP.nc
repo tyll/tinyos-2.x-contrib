@@ -308,9 +308,9 @@ implementation {
     
     atomic atomicId = m_id;
     
-    // Note the correct CRC result is stored in the MSB of the LQI
+    // Remove the CRC bit from the LQI byte (0x80)
     metadata->rssi = buf[ rxFrameLength + 1 ];
-    metadata->lqi = buf[ rxFrameLength + 2 ];
+    metadata->lqi = buf[ rxFrameLength + 2 ] & 0x7F;
     
     atomicMsg = signal Receive.receive[atomicId]( m_msg, m_msg->data, rxFrameLength );
     

@@ -381,7 +381,7 @@ implementation {
       assertEquals("Wrong src", 3, (call BlazePacketBody.getHeader(msg))->src);
       assertEquals("Wrong type", 4, (call BlazePacketBody.getHeader(msg))->type);
       assertEquals("Wrong RSSI", 0xAA, (call BlazePacketBody.getMetadata(msg))->rssi);
-      assertEquals("Wrong LQI", 0xBB, (call BlazePacketBody.getMetadata(msg))->lqi);
+      assertEquals("Wrong LQI", 0x3B, (call BlazePacketBody.getMetadata(msg))->lqi);
       assertTrue("No ack issued", ackSent);
       call TestReceiveHeaderPacket.done();
       break;
@@ -395,7 +395,7 @@ implementation {
       assertEquals("Wrong src", 3, (call BlazePacketBody.getHeader(msg))->src);
       assertEquals("Wrong type", 4, (call BlazePacketBody.getHeader(msg))->type);
       assertEquals("Wrong RSSI", 0xAA, (call BlazePacketBody.getMetadata(msg))->rssi);
-      assertEquals("Wrong LQI", 0xBB, (call BlazePacketBody.getMetadata(msg))->lqi);
+      assertEquals("Wrong LQI", 0x3B, (call BlazePacketBody.getMetadata(msg))->lqi);
       assertTrue("No ack issued", ackSent);
       call TestReceiveLargePacket.done();
       break;
@@ -409,7 +409,7 @@ implementation {
       assertEquals("Wrong src", 3, (call BlazePacketBody.getHeader(msg))->src);
       assertEquals("Wrong type", 4, (call BlazePacketBody.getHeader(msg))->type);
       assertEquals("Wrong RSSI", 0xAA, (call BlazePacketBody.getMetadata(msg))->rssi);
-      assertEquals("Wrong LQI", 0xBB, (call BlazePacketBody.getMetadata(msg))->lqi);
+      assertEquals("Wrong LQI", 0x3B, (call BlazePacketBody.getMetadata(msg))->lqi);
       assertTrue("No ack issued", ackSent);
       if(totalPacketsReceived == 2) {
         call TestReceiveTwoPackets.done();

@@ -46,7 +46,7 @@ implementation {
     call Resource.immediateRequest();
     
     call Leds.led2On();
-    error = call AsyncSend.load(&myMsg);
+    error = call AsyncSend.load(&myMsg, 0);
     
     if(error) {
       assertEquals("Error on load()", SUCCESS, error);
@@ -54,13 +54,9 @@ implementation {
     }
   }
   
-  async event void AsyncSend.loadDone(void *msg, error_t error) {
+  async event void AsyncSend.loadDone(error_t error) {
     call Leds.led2Off();
     call Leds.led1On();
-    
-    if(msg != &myMsg) {
-      assertFail("msg!=&myMsg");
-    }
     
     if(error != SUCCESS) {
       assertEquals("loadDone() error", SUCCESS, error);
@@ -69,7 +65,7 @@ implementation {
       return;
     }
     
-    while((error = call AsyncSend.send(0)) != SUCCESS) {
+    while((error = call AsyncSend.send()) != SUCCESS) {
       if(error == EBUSY) {
         // Then we couldn't send because of CCA
         // Try again.
@@ -91,7 +87,7 @@ implementation {
     // Arbitrary amount of times to resend.
     if(times < 1000) {
       call  Leds.led2On();
-      sendError = call AsyncSend.load(&myMsg);
+      sendError = call AsyncSend.load(&myMsg, 0);
       
       if(sendError == SUCCESS) {
         return;

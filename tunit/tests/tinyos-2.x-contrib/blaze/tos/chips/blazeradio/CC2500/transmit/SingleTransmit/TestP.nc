@@ -46,7 +46,7 @@ implementation {
     call Leds.led2On();
     call Resource.immediateRequest();
     
-    error = call AsyncSend.load(&myMsg);
+    error = call AsyncSend.load(&myMsg, 0);
     
     if(error) {
       assertEquals("Error calling AsyncSend.send()", SUCCESS, error);
@@ -54,10 +54,9 @@ implementation {
     }
   }
   
-  async event void AsyncSend.loadDone(void *msg, error_t error) {
+  async event void AsyncSend.loadDone(error_t error) {
     assertEquals("loadDone(ERROR)", SUCCESS, error);
-    assertNotNull(msg);
-    if((error = call AsyncSend.send(0)) != SUCCESS) {
+    if((error = call AsyncSend.send()) != SUCCESS) {
       assertEquals("Couldn't send()", SUCCESS, error);
       call TestTransmit.done();
     }

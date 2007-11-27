@@ -299,18 +299,18 @@ implementation {
   }
   
   /***************** AckSend Commands ****************/
-  async command error_t AckSend.load[radio_id_t id](void *msg) {
-    signal AckSend.loadDone[id](msg, SUCCESS);
+  async command error_t AckSend.load[radio_id_t id](void *msg, uint16_t rxInterval) {
+    signal AckSend.loadDone[id](SUCCESS);
     return SUCCESS;
   }
   
-  async command error_t AckSend.send[radio_id_t id](uint16_t rxInterval) {
+  async command error_t AckSend.send[radio_id_t id]() {
     ackSent = TRUE;
     signal AckSend.sendDone[id](SUCCESS);
     return SUCCESS;
   }
   
-  default async event void AckSend.loadDone[radio_id_t id](void *msg, error_t error) {
+  default async event void AckSend.loadDone[radio_id_t id](error_t error) {
     assertEquals("Bad loadDone connection []", 0, id);
   }
   

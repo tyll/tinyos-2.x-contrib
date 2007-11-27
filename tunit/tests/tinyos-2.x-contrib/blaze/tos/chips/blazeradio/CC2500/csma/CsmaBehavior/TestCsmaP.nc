@@ -341,7 +341,7 @@ implementation {
   
   /***************** Dummy AsyncSend Implementation ****************/
 
-  async command error_t AsyncSend.load[ radio_id_t id ](void *msg) {
+  async command error_t AsyncSend.load[ radio_id_t id ](void *msg, uint16_t rxInterval) {
     if(asyncSendLoaded) {
       assertFail("TX FIFO previously loaded");
     }
@@ -354,11 +354,11 @@ implementation {
       assertFail("load failed: resource not owned");
     }
     
-    signal AsyncSend.loadDone[id](msg, SUCCESS);
+    signal AsyncSend.loadDone[id](SUCCESS);
     return SUCCESS;
   }
   
-  async command error_t AsyncSend.send[ radio_id_t id ](uint16_t rxInterval) {
+  async command error_t AsyncSend.send[ radio_id_t id ]() {
     asyncSendAttempts++;
     
     if(!asyncSendLoaded) {
@@ -416,7 +416,7 @@ implementation {
     
   }
   
-  default async event void AsyncSend.loadDone[radio_id_t id](void *msg, error_t error) {
+  default async event void AsyncSend.loadDone[radio_id_t id](error_t error) {
     assertFail("Default AsyncSend.loadDone event executed");
   }
   

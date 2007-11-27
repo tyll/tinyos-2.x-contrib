@@ -114,7 +114,7 @@ implementation {
 
     call Resource.immediateRequest();
     
-    error = call AsyncSend.load(&myMsg);
+    error = call AsyncSend.load(&myMsg, 0);
     
     assertEquals("AsyncSend.load() error", SUCCESS, error);
     
@@ -124,8 +124,8 @@ implementation {
   }
  
   /***************** AsyncSend Events ****************/
-  async event void AsyncSend.loadDone(void *msg, error_t error) {
-    assertEquals("send(ERROR)", SUCCESS, call AsyncSend.send(0));
+  async event void AsyncSend.loadDone(error_t error) {
+    assertEquals("send(ERROR)", SUCCESS, call AsyncSend.send());
   }
   
   async event void AsyncSend.sendDone(error_t error) {

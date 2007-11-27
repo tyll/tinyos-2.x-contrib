@@ -107,7 +107,7 @@ enum {
 
 // Default channel is at 314.996490 MHz
 #ifndef CC1100_DEFAULT_CHANNEL
-#define CC1100_DEFAULT_CHANNEL 70
+#define CC1100_DEFAULT_CHANNEL 128
 #endif
 
 #ifndef CC1100_CHANNEL_MIN
@@ -124,6 +124,23 @@ enum {
   CC1100_DEFAULT_FREQ1 = 0x93,
   CC1100_DEFAULT_FREQ0 = 0xB1,
 }; 
+
+/** 
+ * These values calculated using TI smart RF studio
+ */
+enum{
+  CC1100_PA_PLUS_10 = 0xC2,
+  CC1100_PA_PLUS_5 = 0x85,
+  CC1100_PA_PLUS_0 = 0x60,
+  CC1100_PA_MINUS_5 = 0x57,
+  CC1100_PA_MINUS_10 = 0x26,	
+};
+
+#ifndef CC1100_PA
+#define CC1100_PA CC1100_PA_PLUS_10
+#endif
+
+
 
 
 #elif (CC1100_MATCHING_NETWORK == CC1100_433_MHZ)
@@ -149,6 +166,21 @@ enum {
   CC1100_DEFAULT_FREQ0 = 0x4E,
 };  
 
+/** 
+ * These values calculated using TI smart RF studio
+ */
+enum{
+  CC1100_PA_PLUS_10 = 0xC0,
+  CC1100_PA_PLUS_5 = 0x85,
+  CC1100_PA_PLUS_0 = 0x60,
+  CC1100_PA_MINUS_5 = 0x57,
+  CC1100_PA_MINUS_10 = 0x26,	
+};
+
+#ifndef CC1100_PA
+#define CC1100_PA CC1100_PA_PLUS_10
+#endif
+
 
 #elif (CC1100_MATCHING_NETWORK == CC1100_868_MHZ)
 /***************** 868 MHz Matching Network ****************/
@@ -172,6 +204,21 @@ enum {
   CC1100_DEFAULT_FREQ1 = 0x4E,
   CC1100_DEFAULT_FREQ0 = 0xC4,
 };  
+
+/** 
+ * These values calculated using TI smart RF studio
+ */
+enum{
+  CC1100_PA_PLUS_10 = 0xC3,
+  CC1100_PA_PLUS_5 = 0x85,
+  CC1100_PA_PLUS_0 = 0x8E,
+  CC1100_PA_MINUS_5 = 0x57,
+  CC1100_PA_MINUS_10 = 0x34,	
+};
+
+#ifndef CC1100_PA
+#define CC1100_PA CC1100_PA_PLUS_10
+#endif
 
 
 #else
@@ -197,6 +244,22 @@ enum {
   CC1100_DEFAULT_FREQ0 = 0x3B,
 };  
 
+/** 
+ * These values calculated using TI smart RF studio
+ */
+enum{
+  CC1100_PA_PLUS_10 = 0xC0,
+  CC1100_PA_PLUS_5 = 0x85,
+  CC1100_PA_PLUS_0 = 0x8E,
+  CC1100_PA_MINUS_5 = 0x57,
+  CC1100_PA_MINUS_10 = 0x26,	
+};
+
+#ifndef CC1100_PA
+#define CC1100_PA CC1100_PA_PLUS_10
+#endif
+
+
 #endif
 
 /**
@@ -205,7 +268,6 @@ enum {
 #define CC1100_CHANNEL_WIDTH 199 // kHz : Do not edit
 #define CC1100_FREQ_MIN (CC1100_LOWEST_FREQ + (CC1100_CHANNEL_MIN * CC1100_CHANNEL_WIDTH))
 #define CC1100_FREQ_MAX (CC1100_LOWEST_FREQ + (CC1100_CHANNEL_MAX * CC1100_CHANNEL_WIDTH))
-
 
 enum CC1100_config_reg_state_enums {
   /**

@@ -90,7 +90,7 @@ enum {
 /***************** 2.4 GHz Matching Network ****************/
 // Default channel is at 2442.437286 MHz
 #ifndef CC2500_DEFAULT_CHANNEL
-#define CC2500_DEFAULT_CHANNEL 128
+#define CC2500_DEFAULT_CHANNEL 80
 #endif
 
 #ifndef CC2500_CHANNEL_MIN
@@ -107,6 +107,20 @@ enum {
   CC2500_DEFAULT_FREQ1 = 0x58,
   CC2500_DEFAULT_FREQ0 = 0x9D,
 };  
+
+/** 
+ * These values calculated using TI smart RF studio
+ */
+enum{
+  CC2500_PA_PLUS_0 = 0xFE,
+  CC2500_PA_MINUS_4 = 0xA9,
+  CC2500_PA_MINUS_10 = 0x97,	
+};
+
+#ifndef CC2500_PA
+#define CC2500_PA CC2500_PA_PLUS_0
+#endif
+
 
 /**
  * These are used for calculating channels at runtime

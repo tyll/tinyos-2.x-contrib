@@ -81,6 +81,9 @@ implementation {
   BlazeInitP.SNOP -> BlazeSpiC.SNOP;
   
   BlazeInitP.RadioInit -> BlazeSpiC;
+
+  //components BlazeSpiC;
+  BlazeInitP.PaReg -> BlazeSpiC.PA;
   
   components LedsC;
   BlazeInitP.Leds -> LedsC;

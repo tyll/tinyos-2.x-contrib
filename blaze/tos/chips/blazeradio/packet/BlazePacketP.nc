@@ -40,6 +40,7 @@ module BlazePacketP {
   provides {
     interface BlazePacket;
     interface BlazePacketBody;
+    interface LinkPacketMetadata;
   }
 
 }
@@ -89,6 +90,11 @@ implementation {
   
   async command blaze_metadata_t *BlazePacketBody.getMetadata( message_t* msg ){
     return getMetadata( msg );
+  }
+  
+  /**************** LinkPacketMetadata Commands **************/
+  async command bool LinkPacketMetadata.highChannelQuality(message_t* msg) {
+    return call BlazePacket.getLqi(msg) > 105; //TODO: IS THIS ARBITRARY???
   }
 
 }

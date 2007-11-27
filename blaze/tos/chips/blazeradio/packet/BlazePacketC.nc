@@ -38,6 +38,7 @@ configuration BlazePacketC {
   provides {
     interface BlazePacket;
     interface BlazePacketBody;
+    interface LinkPacketMetadata;
   }
 }
 
@@ -46,6 +47,7 @@ implementation {
   components BlazePacketP;
   BlazePacket = BlazePacketP;
   BlazePacketBody = BlazePacketP;
+  LinkPacketMetadata = BlazePacketP;
   
 }
 

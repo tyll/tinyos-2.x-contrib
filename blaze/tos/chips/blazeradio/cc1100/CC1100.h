@@ -56,6 +56,7 @@ enum {
  * You can change the matching network at compile time
  */
 #ifndef CC1100_MATCHING_NETWORK
+#warning "Using CC1100 default matching network at 315 MHz"
 #define CC1100_MATCHING_NETWORK CC1100_315_MHZ
 #endif
 
@@ -227,7 +228,7 @@ enum CC1100_config_reg_state_enums {
   CC1100_CONFIG_PKTLEN = 0x3D,
   
   /** 0x0 and 0xFF are broadcasts, append 2 status bytes */
-  CC1100_CONFIG_PKTCTRL1 = 0x01,
+  CC1100_CONFIG_PKTCTRL1 = 0x07,
   
   /** No hardware CRC check, per errata */
   CC1100_CONFIG_PKTCTRL0 = 0x41,

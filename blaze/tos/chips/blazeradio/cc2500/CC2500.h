@@ -151,8 +151,8 @@ enum cc2500_config_reg_state_enums {
   /** 0x0 and 0xFF are broadcasts, append 2 status bytes */
   CC2500_CONFIG_PKTCTRL1 = 0x07,
   
-  /** No hardware CRC check, per errata */
-  CC2500_CONFIG_PKTCTRL0 = 0x41,
+  /** CRC appending, variable length packets */
+  CC2500_CONFIG_PKTCTRL0 = 0x45,
   
   CC2500_CONFIG_ADDR = 0x00,
   

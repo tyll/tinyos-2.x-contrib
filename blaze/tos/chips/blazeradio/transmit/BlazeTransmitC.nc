@@ -80,6 +80,9 @@ implementation {
   components BlazePacketC;
   BlazeTransmitP.BlazePacketBody -> BlazePacketC;
   
+  components PacketCrcC;
+  BlazeTransmitP.PacketCrc -> PacketCrcC;
+  
   components LedsC;
   BlazeTransmitP.Leds -> LedsC;
   

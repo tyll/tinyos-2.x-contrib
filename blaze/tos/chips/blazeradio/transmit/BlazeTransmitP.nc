@@ -64,13 +64,11 @@ module BlazeTransmitP {
     interface BlazeStrobe as SFRX;
     interface BlazeStrobe as SIDLE;
     interface BlazeStrobe as SRX;
-  
+    
     interface BlazeRegister as TxReg;
     
     interface RadioStatus;
-    
     interface State;
-
     interface Leds;
   }
 }
@@ -90,6 +88,7 @@ implementation {
   
   /***************** Global Variables ****************/
   uint8_t m_id;
+  uint8_t *myMsg;
   
   /***************** Local Functions ****************/
   error_t load(uint8_t id, void *msg);
@@ -188,6 +187,7 @@ implementation {
   error_t load(uint8_t id, void *msg) {
     uint8_t status;
     atomic m_id = id;
+    atomic myMsg = msg;
     
     call Csn.clr[ id ]();
     
@@ -206,9 +206,15 @@ implementation {
      * The length byte in the packet is already correct - it represents the
      * number of bytes in the packet *AFTER* the length byte, not included CRC
      *
-     * So in order to also get that length byte transmitted we gotta add one 
-     * byte to the transmit length. 
+     * So in order to also get that length byte transmitted (or the LSB of the
+     * CRC, whichever way you look at it) we gotta add one byte to the transmit
+     * length.  
+     * 
+     * The appendCrc() function will add 2 more for the CRC,
+     * to be automatically subtracted by the receive branch.
      */
+     
+    //call PacketCrc.appendCrc(msg);
     
     call TXFIFO.write(msg, (call BlazePacketBody.getHeader(msg))->length + 1);
     return SUCCESS;
@@ -222,7 +228,12 @@ implementation {
    */
   error_t transmit(uint8_t id, bool force) {
     uint8_t state;
-    atomic m_id = id;
+    uint8_t *msg;
+    
+    atomic {
+      m_id = id;
+      msg = myMsg;
+    }
         
     call Csn.clr[ id ]();
     
@@ -296,6 +307,8 @@ implementation {
     
     state = call State.getState();
     call State.toIdle();
+    
+    //call PacketCrc.removeCrc(msg);
     
     if(state == S_TX_PACKET) {
       signal AsyncSend.sendDone[ id ](SUCCESS);

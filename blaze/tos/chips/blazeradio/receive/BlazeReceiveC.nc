@@ -82,6 +82,9 @@ implementation {
   components BlazeTransmitC;
   BlazeReceiveP.AckSend -> BlazeTransmitC.AckSend;
   
+  components PacketCrcC;
+  BlazeReceiveP.PacketCrc -> PacketCrcC;
+  
   components ActiveMessageAddressC;
   BlazeReceiveP.ActiveMessageAddress -> ActiveMessageAddressC;
   

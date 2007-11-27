@@ -57,6 +57,15 @@ interface PacketCrc {
   async command void appendCrc(uint8_t *msg);
   
   /**
+   * This command MUST be called after the message has been sent, so the
+   * original message is not corrupted by a larger length. Without doing
+   * this, it is possible to call appendCrc() many times on the same message
+   * causing an overflow.
+   * @param msg the message that was recently sent
+   */
+  async command void removeCrc(uint8_t *msg);
+  
+  /**
    * Verify a CRC at the end of a message.  The first byte of the
    * message MUST be exactly as received - the full packet, including the 
    * 16-bit CRC at the end, minus the length byte itself.  After CRC

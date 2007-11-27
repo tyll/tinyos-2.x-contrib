@@ -72,9 +72,7 @@ module BmacTransmitP {
     
     interface RadioStatus;
     interface Timer<TMilli>;
-    
     interface State;
-
     interface Leds;
   }
 }
@@ -100,6 +98,7 @@ implementation {
   
   /***************** AsyncSend Commands ****************/
   async command error_t AsyncSend.load[ radio_id_t id ](void *msg, uint16_t rxInterval) {
+
     atomic {
       myMsg = msg;
       interval = rxInterval;

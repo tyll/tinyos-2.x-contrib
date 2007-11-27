@@ -43,7 +43,6 @@ module BlazeReceiveP {
 
   provides {
     interface Receive[ radio_id_t id ];
-    interface Receive as BadCrcReceive[ radio_id_t id ];
     interface ReceiveController[ radio_id_t id ];
     interface AckReceive;
         
@@ -69,9 +68,7 @@ module BlazeReceiveP {
   
     interface BlazePacket;
     interface BlazePacketBody;
-    
     interface RadioStatus;
-    
     interface ActiveMessageAddress;
     interface State;
     interface Leds;
@@ -114,7 +111,6 @@ implementation {
   
   /***************** Prototypes ****************/
   task void receiveDone();
-  task void badCrcReceive();
    
   void receive();
   uint8_t getStatus();
@@ -235,10 +231,9 @@ implementation {
       
       if((buf[ rxFrameLength + 2 ] & 0x80) == 0) {
         // CRC check failed
-        post badCrcReceive();
+        cleanUp();
         return;
       }
-
 
       // The FCF_FRAME_TYPE bit in the FCF byte tells us if this is an ack or 
       // data.  If it's data, make sure it meets the minimum size requirement.
@@ -303,41 +298,22 @@ implementation {
     blaze_metadata_t *metadata = call BlazePacketBody.getMetadata( m_msg );
     uint8_t *buf = (uint8_t*) call BlazePacketBody.getHeader( m_msg );
     uint8_t rxFrameLength = buf[0];
+    uint8_t myRssi;
+    uint8_t myLqi;
     message_t *atomicMsg;
     uint8_t atomicId;
     
     atomic atomicId = m_id;
+    
     
     // Remove the CRC bit from the LQI byte (0x80)
-    metadata->rssi = buf[ rxFrameLength + 1 ];
-    metadata->lqi = buf[ rxFrameLength + 2 ] & 0x7F;
+    myRssi = buf[ rxFrameLength + 1 ];
+    myLqi = buf[ rxFrameLength + 2 ] & 0x7F;
+    
+    metadata->rssi = myRssi;
+    metadata->lqi = myLqi;
     
     atomicMsg = signal Receive.receive[atomicId]( m_msg, m_msg->data, rxFrameLength );
-    
-    if(atomicMsg != NULL) {
-      atomic m_msg = atomicMsg;
-    } else {
-      atomic m_msg = &myMsg;
-    }
-    
-    cleanUp();
-  }
-  
-  task void badCrcReceive() {
-    blaze_metadata_t *metadata = call BlazePacketBody.getMetadata( m_msg );
-    uint8_t *buf = (uint8_t*) call BlazePacketBody.getHeader( m_msg );
-    uint8_t rxFrameLength = buf[0];
-    message_t *atomicMsg;
-    uint8_t atomicId;
-    
-    atomic atomicId = m_id;
-    
-    // Note the correct CRC result is stored in the MSB of the LQI
-    metadata->rssi = buf[ rxFrameLength + 1 ];
-    metadata->lqi = buf[ rxFrameLength + 2 ];
-    
-        
-    atomicMsg = signal BadCrcReceive.receive[atomicId]( m_msg, m_msg->data, rxFrameLength );
     
     if(atomicMsg != NULL) {
       atomic m_msg = atomicMsg;
@@ -422,11 +398,7 @@ implementation {
   default event message_t *Receive.receive[ radio_id_t id ](message_t* msg, void* payload, uint8_t len){
     return msg;
   }
-  
-  default event message_t *BadCrcReceive.receive[ radio_id_t id ](message_t* msg, void* payload, uint8_t len){
-    return msg;
-  }
-  
+    
   default async event void AckReceive.receive( am_addr_t source, am_addr_t destination, uint8_t dsn ) {
   }
   

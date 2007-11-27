@@ -42,6 +42,7 @@
  * @author Roland Hendel
  */
 
+
 configuration CC1100ControlC {
   provides {
     interface SplitControl;
@@ -51,7 +52,7 @@ configuration CC1100ControlC {
 }
 
 implementation {
-  
+
   components MainC,
       CC1100ControlP,
       ActiveMessageAddressC,

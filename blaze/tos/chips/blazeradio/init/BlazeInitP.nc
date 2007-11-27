@@ -46,8 +46,6 @@
  
 #include "Blaze.h"
 #include "BlazeInit.h"
-#include "cc1100.h"
-#include "cc2500.h"
 
 module BlazeInitP {
 
@@ -273,11 +271,10 @@ implementation {
     while(call RadioStatus.getRadioStatus() != BLAZE_S_IDLE){
       call Idle.strobe();
     } 
-    if(m_id == CC1100_RADIO_ID){
-      call PaReg.write(CC1100_PA);
-    }else if(m_id == CC2500_RADIO_ID){
-      call PaReg.write(CC2500_PA);
-    }
+    
+    call PaReg.write(call BlazeRegSettings.getPa[ m_id ]());
+    
+    
     /********** END POWER HACK **************/ 
     //call Pins.set65();
     call SRX.strobe();
@@ -435,6 +432,7 @@ implementation {
   default event void SplitControl.stopDone[ radio_id_t id ](error_t error){}
   
   default command blaze_init_t *BlazeRegSettings.getDefaultRegisters[ radio_id_t id ]() { return NULL; }
+  default command uint8_t BlazeRegSettings.getPa[ radio_id_t id ]() { return 0xC0; }
   
   default event void BlazeCommit.commitDone[ radio_id_t id ]() {}
 }

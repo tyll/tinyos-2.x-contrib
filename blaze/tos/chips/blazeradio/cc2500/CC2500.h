@@ -45,8 +45,7 @@
 enum {
   CC2500_RADIO_ID = unique( UQ_BLAZE_RADIO ),
 };
-
-
+  
 /**
  * All default channels and FREQx registers obtained from SmartRF studio. We
  * are not trying to define channel frequencies to match up with any sort of

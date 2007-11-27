@@ -40,5 +40,10 @@ interface BlazeRegSettings {
 
   command uint8_t *getDefaultRegisters();
   
+  /**
+   * @return the power amplifier register setting
+   */
+  command uint8_t getPa();
+  
 }
 

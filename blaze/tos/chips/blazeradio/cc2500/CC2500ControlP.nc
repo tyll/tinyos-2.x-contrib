@@ -153,6 +153,10 @@ implementation {
     return regValues;
   }
 
+  command uint8_t BlazeRegSettings.getPa() {
+    return CC2500_PA;
+  }
+  
   /***************** BlazeConfig Commands ****************/
   
   /**

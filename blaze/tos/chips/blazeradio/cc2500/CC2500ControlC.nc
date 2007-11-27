@@ -51,7 +51,7 @@ configuration CC2500ControlC {
 }
 
 implementation {
-  
+
   components MainC,
       CC2500ControlP,
       ActiveMessageAddressC,

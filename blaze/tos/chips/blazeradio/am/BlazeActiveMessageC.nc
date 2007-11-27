@@ -44,6 +44,7 @@ configuration BlazeActiveMessageC {
     interface Receive as Snoop[am_id_t id];
     interface AMPacket;
     interface Packet;
+    interface LinkPacketMetadata;
   }
   
   uses {
@@ -67,6 +68,7 @@ implementation {
   components BlazePacketC;
   BlazeActiveMessageP.BlazePacket -> BlazePacketC;
   BlazeActiveMessageP.BlazePacketBody -> BlazePacketC;
+  LinkPacketMetadata = BlazePacketC;
   
   components RadioSelectC;
   BlazeActiveMessageP.RadioSelect -> RadioSelectC;

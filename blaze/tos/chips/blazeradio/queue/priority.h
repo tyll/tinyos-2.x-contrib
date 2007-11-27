@@ -63,7 +63,7 @@ enum {
 typedef struct queue_t{
 
   message_t* msg;
-  uint8_t addr;
+  am_addr_t addr;
   uint8_t amId;
   uint8_t priority;
   uint8_t len;

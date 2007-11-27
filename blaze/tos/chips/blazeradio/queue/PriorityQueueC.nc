@@ -50,6 +50,9 @@ implementation {
   
   components new StateC();
   PriorityQueueP.State -> StateC;
+  
+  //components DebugPinsC;
+  //PriorityQueueP.Pins -> DebugPinsC;
 
 }
 

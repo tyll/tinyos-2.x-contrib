@@ -40,6 +40,7 @@ module PriorityQueueP
   uses interface AMSend as SubSend[ am_id_t amId ];
   uses interface State;
   uses interface Leds;
+ // uses interface DebugPins as Pins;
 }
 
 implementation 
@@ -81,7 +82,7 @@ implementation
     }
     
     //if the queue is full, return fail
-    if(index == QUEUE_SIZE)
+    if(index == QUEUE_SIZE - 1)
     {
       return FAIL;
     }
@@ -107,7 +108,8 @@ implementation
     }
     if(index == 1)  //it is the only message in the queue, send immediately
     {
-      return call SubSend.send[ amId ](addr, msg, len);
+      post sendNextMsg();
+      //return call SubSend.send[ amId ](addr, msg, len);
     }
     return SUCCESS;
   }
@@ -235,7 +237,7 @@ implementation
     if(call SubSend.send[ q -> amId ](q -> addr, q -> msg, q -> len) != SUCCESS)
     {
       post sendNextMsg();
-    }   
+    }  
   
   }
   

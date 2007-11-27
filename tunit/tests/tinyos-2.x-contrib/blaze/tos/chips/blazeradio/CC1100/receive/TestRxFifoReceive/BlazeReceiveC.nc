@@ -5,7 +5,7 @@
  * AckSend, and RXREG into our test so we can control those.
  */
  
-#warning "USING BLAZERECEIVEP DEFINED IN THE TEST SUITE"
+#warning "USING BLAZERECEIVEC DEFINED IN THE TEST SUITE"
 configuration BlazeReceiveC {
 
   provides {
@@ -43,9 +43,6 @@ implementation {
   
   components MainC;
   MainC.SoftwareInit -> BlazeReceiveP;
-  
-  components PacketCrcC;
-  BlazeReceiveP.PacketCrc -> PacketCrcC;
   
   components BlazePacketC,
       BlazeSpiC as Spi,

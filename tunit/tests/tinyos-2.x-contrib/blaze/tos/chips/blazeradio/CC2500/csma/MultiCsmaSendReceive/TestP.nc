@@ -142,6 +142,7 @@ implementation {
   /***************** Receive Events ****************/
   event message_t *Receive.receive(message_t *msg, void *payload, uint8_t len) {
     timesSent++;
+    call Leds.set(timesSent);
     if(timesSent > 15) {
       assertSuccess();
       call TestReceive.done();

@@ -44,9 +44,6 @@ implementation {
   components MainC;
   MainC.SoftwareInit -> BlazeReceiveP;
   
-  components PacketCrcC;
-  BlazeReceiveP.PacketCrc -> PacketCrcC;
-  
   components BlazePacketC,
       BlazeSpiC as Spi,
       new BlazeSpiResourceC();

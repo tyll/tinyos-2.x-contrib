@@ -135,8 +135,10 @@ implementation {
 #endif
 
 #if defined(NO_ADDRESS_RECOGNITION)
+    regValues[CC1100_CONFIG_PKTCTRL1] &= 0xFC;
     addressRecognition = FALSE;
 #else
+    regValues[CC1100_CONFIG_PKTCTRL1] |= 0x3;
     addressRecognition = TRUE;
 #endif
 

@@ -1,4 +1,0 @@
-COMPONENT=TestQueueC
-CFLAGS += -DMAX_TUNIT_QUEUE=40
-include $(MAKERULES)
-

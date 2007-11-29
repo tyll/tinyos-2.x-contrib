@@ -267,21 +267,27 @@ implementation {
     
     call Gdo2_int.enableRisingEdge[ m_id ]();
     
-    while(call RadioStatus.getRadioStatus() != BLAZE_S_IDLE) {
+    while(call RadioStatus.getRadioStatus() != BLAZE_S_IDLE){
       call Idle.strobe();
     } 
     
     call PaReg.write(call BlazeRegSettings.getPa[ m_id ]());
     
     call SRX.strobe();
-    while(call RadioStatus.getRadioStatus() != BLAZE_S_RX) {
-      call Csn.set[m_id]();
-      call Csn.clr[m_id]();
-      call SFRX.strobe();
-      call SFTX.strobe();
-      call SRX.strobe();
+    while(call RadioStatus.getRadioStatus() != BLAZE_S_RX){
+      if(cnt == 0xFF){
+        cnt = 0;
+        call Csn.set[m_id]();
+        call Csn.clr[m_id]();
+        //call Pins.toggle65();
+        call SFRX.strobe();
+        call SFTX.strobe();
+        call SRX.strobe();
+      } else {
+        cnt++;
+      }
     }
-    
+    //call Pins.clr65();
     call Csn.set[ m_id ]();
     
     call ResetResource.release();
@@ -299,6 +305,7 @@ implementation {
   /***************** Resource Events ****************/
   event void ResetResource.granted() {
     uint8_t id;
+    uint8_t cnt = 0;
     atomic id = m_id;
     
     call Csn.set[id]();
@@ -310,13 +317,22 @@ implementation {
      * status byte.  This demonstrates the crystal oscillator is running 
      * and the regulated digital supply voltage is stable.  Then we reset.
      */
-    while((call SNOP.strobe() & 0x80) != 0){
-      call Csn.set[id]();
-      call Csn.clr[id](); 
-    }
+    //call Pins.set64();
     
     call SRES.strobe();
-    
+    call Csn.set[id]();
+    call Csn.clr[id]();
+
+    while((call SNOP.strobe() & 0x80) != 0){
+      if(cnt == 0xFF){
+        call Csn.set[id]();
+        call Csn.clr[id](); 
+        cnt = 0;
+      }else{
+        cnt++;
+      } 
+    }
+    //call Pins.clr64();
     call Csn.set[id]();
     
     if(state[id] == S_STARTING || state[id] == S_COMMITTING) {

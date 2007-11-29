@@ -113,6 +113,7 @@ public class StatsReport {
       log.info(units2 + " = " + value2.longValue());
     }
 
+    // TODO This replaces tinyos-2.x with tinyos-2/x!
     File reportDir = new File(TUnit.getStatsReportDirectory(), packageId
         .replace('.', File.separatorChar));
     reportDir.mkdirs();

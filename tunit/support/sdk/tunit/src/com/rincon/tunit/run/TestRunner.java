@@ -127,7 +127,7 @@ public class TestRunner {
     packageId = testRunProperties.getName()
         + "."
         + myBuildDirectory.getAbsolutePath().substring(
-            TUnit.getTunitDirectory().getAbsolutePath().length()).replace(
+            TUnit.getBasePackageDirectory().getAbsolutePath().length()).replace(
             File.separatorChar, '.').replaceFirst(".", "");
 
     log.info("PACKAGE " + packageId);
@@ -197,7 +197,6 @@ public class TestRunner {
     } catch (ParseException e) {
       log.error(e.getMessage());
     }
-
   }
 
   /**

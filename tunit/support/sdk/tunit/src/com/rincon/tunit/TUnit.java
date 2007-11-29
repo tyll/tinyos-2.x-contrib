@@ -32,6 +32,7 @@ package com.rincon.tunit;
  */
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.Calendar;
@@ -55,8 +56,7 @@ import com.rincon.tunit.run.TestRunManager;
 /**
  * Main entry point to TUnit TinyOS Embedded testing.
  * 
- * TODO:
- *   > Add command line input to choose a tunit.xml file
+ * TODO: > Add command line input to choose a tunit.xml file
  * 
  * @author David Moss
  * 
@@ -81,6 +81,12 @@ public class TUnit {
   /** The directory we're running our tests from */
   private static File rootDirectory;
 
+  /**
+   * The directory from which all other packages are relative Also the directory
+   * where build.xml is located, or the root of the file system
+   */
+  private static File basePackageDirectory;
+
   /** The start time, in milliseconds */
   private static long startTime;
 
@@ -103,58 +109,111 @@ public class TUnit {
    * 
    */
   public TUnit(String[] args) {
-    for(int i = 0; i < args.length; i++) {
-      if(args[i].equalsIgnoreCase("-tunitbase") && args.length > i + 1) {
+    rootDirectory = new File(System.getProperty("user.dir"));
+    File packageDirectoryAttempt = null;
+
+    for (int i = 0; i < args.length; i++) {
+      if (args[i].equalsIgnoreCase("-tunitbase") && args.length > i + 1) {
         i++;
         tunitBase = args[i];
-        
+
         File tunitBaseAttempt = new File(tunitBase);
-        if(!tunitBaseAttempt.exists()) {
-          System.out.println("Invalid TUnit Base Directory: " + tunitBaseAttempt.getAbsolutePath() );
+        if (!tunitBaseAttempt.exists()) {
+          System.out.println("Invalid TUnit Base Directory: "
+              + tunitBaseAttempt.getAbsolutePath());
           syntax();
           System.exit(1);
         }
-        
+
         log.debug("Using TUnit at: " + tunitBase);
-        
-      } else if(args[i].equalsIgnoreCase("-testdir") && args.length > i + 1) {
+
+      } else if (args[i].equalsIgnoreCase("-testdir") && args.length > i + 1) {
         i++;
-        rootDirectory = new File(args[i]);
-        
-        if(!rootDirectory.exists()) {
-          System.out.println("Invalid Test Directory: " + rootDirectory.getAbsolutePath() );
+        File rootDirectoryAttempt = new File(args[i]);
+
+        if (!rootDirectoryAttempt.exists()) {
+          System.err.println("Invalid Test Directory: "
+              + rootDirectoryAttempt.getAbsolutePath());
           syntax();
           System.exit(1);
+
+        } else {
+          rootDirectory = rootDirectoryAttempt;
+          log.debug("Testing at directory: " + rootDirectory.getAbsolutePath());
         }
-        
-        log.debug("Testing at directory: " + rootDirectory.getAbsolutePath());
-        
-      } else if(args[i].equalsIgnoreCase("-reportdir") && args.length > i + 1) {
+
+      } else if (args[i].equalsIgnoreCase("-packagedir") && args.length > i + 1) {
+        i++;
+        packageDirectoryAttempt = new File(args[i]);
+
+      } else if (args[i].equalsIgnoreCase("-reportdir") && args.length > i + 1) {
         i++;
         baseReportDirectory = new File(args[i]);
-        
+
         // We'll create the report directory if it doesn't exist.
-        
-        log.debug("Saving TUnit reports in: " + baseReportDirectory.getAbsolutePath());
-      
-      } else if(args[i].equalsIgnoreCase("-debug")) {
+
+        log.debug("Saving TUnit reports in: "
+            + baseReportDirectory.getAbsolutePath());
+
+      } else if (args[i].equalsIgnoreCase("-debug")) {
         // Set the logger all the way down to the lowest level
         log.info("Running TUnit in debug mode");
         Logger.getRootLogger().setLevel((Level) Level.TRACE);
-        
-      } else if(args[i].contains("?")) {
+
+      } else if (args[i].contains("?")) {
         syntax();
         System.exit(1);
       }
     }
-    
+
+    // Process this after we've absolutely set our root directory
+    if (packageDirectoryAttempt != null) {
+      if (!packageDirectoryAttempt.exists()) {
+        System.err.println("Invalid Package Directory: "
+            + packageDirectoryAttempt.getAbsolutePath());
+        syntax();
+        System.exit(1);
+
+      } else if (!rootDirectory.getAbsolutePath().startsWith(
+          packageDirectoryAttempt.getAbsolutePath())) {
+        /*
+         * The package identifier is outside of our root directory. This causes
+         * problems because when we move into our root directory's tree, we
+         * cannot remove the base package directory identifier from the current
+         * test directory's absolute path
+         */
+        System.err
+            .println("Package directory mismatch! The base package directory MUST be");
+        System.err
+            .println("below the directory structure you're testing within.");
+        System.err
+            .println("For example, if you're testing within /opt/tunit/tests,");
+        System.err
+            .println("your base package directory may be /opt, /opt/tunit, or /opt/tunit/tests,");
+        System.err
+            .println("but cannot be something outside of that like /yap/mypackage.");
+        System.err
+            .println("By default, the base package directory is the current or parent");
+        System.err
+            .println("directory containing the build.xml file. If no directory above contains");
+        System.err
+            .println("a build.xml file, the base package directory is your root directory");
+        syntax();
+        System.exit(1);
+
+      } else {
+        basePackageDirectory = packageDirectoryAttempt;
+        log.debug("Base package directory set to: "
+            + basePackageDirectory.getAbsolutePath());
+      }
+    }
+
     log = Logger.getLogger(getClass());
     startTime = System.currentTimeMillis();
-    
-    if(rootDirectory == null) {
-      rootDirectory = new File(System.getProperty("user.dir"));
-    }
-    
+
+    // Run this in case the base package wasn't defined above
+    getBasePackageDirectory();
+
     establishTunitDir();
     establishReportDir();
   }
@@ -163,20 +222,28 @@ public class TUnit {
     System.out.println("TUnit Syntax: java com.rincon.tunit.TUnit (options)");
     System.out.println("\nOptions are:");
     System.out.println("\t-tunitbase [absolute tunit_base directory]");
-    System.out.println("\t\tThe TUNIT_BASE directory contains TUnit's embedded libraries");
+    System.out
+        .println("\t\tThe TUNIT_BASE directory contains TUnit's embedded libraries");
     System.out.println();
     System.out.println("\t-testdir [absolute test directory]");
-    System.out.println("\t\tThis lets you start testing in a specific directory");
+    System.out
+        .println("\t\tThis lets you start testing in a specific directory");
     System.out.println();
     System.out.println("\t-reportdir [absolute report directory]");
-    System.out.println("\t\tThis directory is where your reports will be stored.");
+    System.out
+        .println("\t\tThis directory is where your reports will be stored.");
+    System.out.println();
+    System.out.println("\t-packagedir [absolute package directory]");
+    System.out
+        .println("\t\tThis directory is where your tests will be reference from in reports");
+    System.out
+        .println("\t\tBy default, this is the parent directory containing build.xml");
     System.out.println();
     System.out.println("\t-debug");
     System.out.println("\t\tDisplay all TUnit Java framework debug statements");
     System.out.println("\n\t-? for help");
   }
-  
-  
+
   /**
    * Run TUnit tests
    * 
@@ -184,7 +251,7 @@ public class TUnit {
    */
   public void runTunit(String[] args) {
     System.out.println("Running TUnit from " + rootDirectory.getAbsolutePath());
-    
+
     // 1. Locate the tunit.xml file from the TUNIT_BASE directory
     processTunitXml();
 
@@ -254,24 +321,23 @@ public class TUnit {
     return baseReportDirectory;
   }
 
-
   /**
-   * Get a friendly string version of the TUNIT_BASE directory, with the 
-   * correct slashies.
+   * Get a friendly string version of the TUNIT_BASE directory, with the correct
+   * slashies.
+   * 
    * @return
    */
   public static String getTunitBase() {
     return tunitBase;
   }
-  
-  
+
   /**
    * Establish the TUNIT Base directory
    * 
    * @return the tunit directory, so external apps can figure it out.
    */
   private void establishTunitDir() {
-    if(tunitBase == null) {
+    if (tunitBase == null) {
       tunitBase = ((String) System.getenv().get("TUNIT_BASE")).replace('\\',
           File.separatorChar).replace('/', File.separatorChar);
     }
@@ -313,6 +379,50 @@ public class TUnit {
   }
 
   /**
+   * If the private basePackageDirectory variable is null, this locates the base
+   * package directory by looking at all parent directories until a directory is
+   * found containing the build.xml file. The location functionality is a
+   * one-time thing, and every other time this function is called it will simply
+   * return that package directory.
+   * 
+   * The package directory is mainly used for test reporting. Say you're running
+   * tests from C:/opt/tinyos-2.x-contrib/tests/blah, and your base package
+   * directory is found to be C:/opt/tinyos-2.x-contrib/tests. All tests run
+   * below .../blah will be in the package "tests.blah.whatever" which is
+   * helpful when we want to track down where the test is from the html reports.
+   * 
+   * @return the base package directory from which all other tests are run and
+   *         referenced.
+   */
+  public static File getBasePackageDirectory() {
+    if (basePackageDirectory != null) {
+      return basePackageDirectory;
+    }
+
+    File currentDirectory;
+    
+    for(currentDirectory = rootDirectory; currentDirectory.list(
+        new FilenameFilter() {
+          public boolean accept(File dir, String name) {
+            return name.compareToIgnoreCase("build.xml") == 0;
+          }
+        }).length == 0 ; ) {
+          
+      if(currentDirectory.getParentFile() != null) {
+        currentDirectory = currentDirectory.getParentFile();
+        
+      } else {
+        break;
+      }
+    }
+    
+    basePackageDirectory = currentDirectory;
+    
+    log.info("Base package directory located: " + basePackageDirectory.getAbsolutePath());
+    return basePackageDirectory;
+  }
+
+  /**
    * Parse arguments
    * 
    * @param args
@@ -332,10 +442,10 @@ public class TUnit {
    * 
    */
   private void establishReportDir() {
-    if(baseReportDirectory == null) {
+    if (baseReportDirectory == null) {
       baseReportDirectory = new File(tunitBase, "/reports");
     }
-    
+
     new File(baseReportDirectory, "/xml").mkdirs();
   }
 
@@ -409,7 +519,7 @@ public class TUnit {
             + problemResult.getFailMsg() + "\n");
       }
     }
-    
+
     System.out.println("\n");
   }
 
@@ -424,29 +534,32 @@ public class TUnit {
       // Write out all our results for our test reports.
       StatisticsLogData dataSet = StatisticsReport.log("", "TotalProgress",
           "[Total Problems]", TestReport.getTotalTunitErrors()
-          + TestReport.getTotalTunitFailures(), "[Total Tests]", TestReport
-          .getTotalTunitTests());
+              + TestReport.getTotalTunitFailures(), "[Total Tests]", TestReport
+              .getTotalTunitTests());
       StatisticsChart.write(dataSet, 500, 325);
-      
+
       // Write out our results for just the past 5 days.
       Calendar cal = Calendar.getInstance();
       cal.add(Calendar.DATE, -5);
       Date severalDaysAgo = cal.getTime();
-      StatisticsLogData truncatedSet = new StatisticsLogData("RecentProgress", getStatsReportDirectory(), "[# Problems]", "[# Tests]");
-      for(int i = 0; i < dataSet.size(); i++) {
-        if(dataSet.get(i).getDate().after(severalDaysAgo)) {
+      StatisticsLogData truncatedSet = new StatisticsLogData("RecentProgress",
+          getStatsReportDirectory(), "[# Problems]", "[# Tests]");
+      for (int i = 0; i < dataSet.size(); i++) {
+        if (dataSet.get(i).getDate().after(severalDaysAgo)) {
           truncatedSet.addEntry(dataSet.get(i));
         }
       }
       StatisticsChart.write(truncatedSet, 500, 325);
-      
+
       // And.. write out results for the past 5 days with a different name
       cal = Calendar.getInstance();
       cal.add(Calendar.DATE, -5);
       severalDaysAgo = cal.getTime();
-      truncatedSet = new StatisticsLogData("Progress", getStatsReportDirectory().getParentFile(), "[# Problems]", "[# Tests]");
-      for(int i = 0; i < dataSet.size(); i++) {
-        if(dataSet.get(i).getDate().after(severalDaysAgo)) {
+      truncatedSet = new StatisticsLogData("Progress",
+          getStatsReportDirectory().getParentFile(), "[# Problems]",
+          "[# Tests]");
+      for (int i = 0; i < dataSet.size(); i++) {
+        if (dataSet.get(i).getDate().after(severalDaysAgo)) {
           truncatedSet.addEntry(dataSet.get(i));
         }
       }

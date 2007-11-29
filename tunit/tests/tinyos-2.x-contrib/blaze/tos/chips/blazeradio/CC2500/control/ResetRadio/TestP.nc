@@ -78,7 +78,7 @@ implementation {
   event void Resource2.granted() {
     call CSN.clr();
     call IOCFG2.read(&readBuffer);
-    assertEquals("Wrong reset value", 0x29, readBuffer);
+    assertEquals("Reset failed (shouldn't be 0x0)", 0x29, readBuffer);
     
     call CSN.set();
     call Resource2.release();

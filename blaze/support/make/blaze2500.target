@@ -1,7 +1,7 @@
 #-*-Makefile-*- vim:syntax=make
 #$Id$
 
-PLATFORM ?= tma
+PLATFORM ?= blaze2500
 
 #MSP_MCU = msp430x1611
 CFLAGS += -DPLATFORM_BLAZE
@@ -18,5 +18,5 @@ VOLUME_ALLOCATOR = tos-storage-stm25p
 
 $(call TOSMake_include_platform,msp)
 
-tma: $(BUILD_DEPS)
+blaze2500: $(BUILD_DEPS)
 	@:

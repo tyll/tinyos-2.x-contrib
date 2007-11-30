@@ -254,8 +254,9 @@ public class TestRunner {
           
           focusedResult = make.build(buildDirectory, focusedTarget
               .getTargetName(), extras);
-          report.addResult(focusedResult);
+          
           if (!focusedResult.isSuccess()) {
+            report.addResult(focusedResult);
             return false;
           }
         }
@@ -291,8 +292,8 @@ public class TestRunner {
           focusedResult = make.build(buildDirectory, focusedTarget
               .getTargetName(), reinstallExtras);
 
-          report.addResult(focusedResult);
           if (!focusedResult.isSuccess()) {
+            report.addResult(focusedResult);
             return false;
           }
         }

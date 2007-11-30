@@ -1,0 +1,22 @@
+#-*-Makefile-*- vim:syntax=make
+#$Id$
+
+PLATFORM ?= tma
+
+#MSP_MCU = msp430x1611
+CFLAGS += -DPLATFORM_BLAZE
+
+# Disable MSP430 hardware multiply because it makes MSPGCC die
+PFLAGS += -mdisable-hwmul
+OPTFLAGS += -O
+
+MSP_BSL ?= tos-bsl
+MSP_BSL_FLAGS = --telosb
+
+VOLUME_FILE = volumes-stm25p.xml
+VOLUME_ALLOCATOR = tos-storage-stm25p
+
+$(call TOSMake_include_platform,msp)
+
+tma: $(BUILD_DEPS)
+	@:

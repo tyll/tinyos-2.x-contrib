@@ -1,0 +1,86 @@
+# Includes that should take precedence come first.  Platforms come before
+# chips because they may override files.  These must be specified as
+# @includes instead of -I's to @opts, otherwise the %T won't be processed
+# by ncc.
+
+push( @includes, qw(
+
+
+  ## Hardware implementation layers
+  %T/platforms/blazehw
+  %T/platforms/blazehw/chips/
+  %T/platforms/blazehw/chips/ccxx00
+  %T/platforms/blazehw/chips/msp430
+  %T/platforms/blazehw/chips/msp430/usart
+
+  ## Blaze default radio stack
+  %T/../../tinyos-2.x-contrib/blaze/tos/chips/blazeradio
+  %T/../../tinyos-2.x-contrib/blaze/tos/chips/blazeradio/acks
+  %T/../../tinyos-2.x-contrib/blaze/tos/chips/blazeradio/alarm
+  %T/../../tinyos-2.x-contrib/blaze/tos/chips/blazeradio/am
+  %T/../../tinyos-2.x-contrib/blaze/tos/chips/blazeradio/cc1100
+  %T/../../tinyos-2.x-contrib/blaze/tos/chips/blazeradio/cc2500
+  %T/../../tinyos-2.x-contrib/blaze/tos/chips/blazeradio/crc
+  %T/../../tinyos-2.x-contrib/blaze/tos/chips/blazeradio/csma
+  %T/../../tinyos-2.x-contrib/blaze/tos/chips/blazeradio/init
+  %T/../../tinyos-2.x-contrib/blaze/tos/chips/blazeradio/interfaces
+  %T/../../tinyos-2.x-contrib/blaze/tos/chips/blazeradio/link
+  %T/../../tinyos-2.x-contrib/blaze/tos/chips/blazeradio/lpl
+  %T/../../tinyos-2.x-contrib/blaze/tos/chips/blazeradio/lpl/alwayson
+  %T/../../tinyos-2.x-contrib/blaze/tos/chips/blazeradio/packet
+  %T/../../tinyos-2.x-contrib/blaze/tos/chips/blazeradio/receive
+  %T/../../tinyos-2.x-contrib/blaze/tos/chips/blazeradio/select
+  %T/../../tinyos-2.x-contrib/blaze/tos/chips/blazeradio/spi
+  %T/../../tinyos-2.x-contrib/blaze/tos/chips/blazeradio/transmit
+  %T/../../tinyos-2.x-contrib/blaze/tos/chips/blazeradio/unique
+
+  ## Ghostrider supporting libraries
+  %T/interfaces
+  %T/system
+  %T/lib/net/ctp
+  %T/lib/queue
+  %T/lib/rfresource
+  %T/lib/tmdcontrol
+  %T/chips/rrc_msp430
+  %T/chips/rrc_msp430/flash
+  %T/chips/rrc_msp430/dma
+  %T/chips/rrc_stm25p
+
+  ## trunk/tinyos-2.x Directories
+  %T/../../tinyos-2.x/tos/interfaces
+  %T/../../tinyos-2.x/tos/system
+  %T/../../tinyos-2.x/tos/types
+
+  %T/../../tinyos-2.x/tos/lib/net/
+  %T/../../tinyos-2.x/tos/lib/net/4bitle
+  %T/../../tinyos-2.x/tos/lib/net/ctp
+  %T/../../tinyos-2.x/tos/lib/net/drip
+  %T/../../tinyos-2.x/tos/lib/net/le
+  %T/../../tinyos-2.x/tos/lib/net/lqi
+  %T/../../tinyos-2.x/tos/lib/timer
+  %T/../../tinyos-2.x/tos/lib/serial
+  %T/../../tinyos-2.x/tos/lib/adc
+  %T/../../tinyos-2.x/tos/lib/power
+
+  %T/../../tinyos-2.x/tos/chips/msp430
+  %T/../../tinyos-2.x/tos/chips/msp430/adc12
+  %T/../../tinyos-2.x/tos/chips/msp430/dma
+  %T/../../tinyos-2.x/tos/chips/msp430/pins
+  %T/../../tinyos-2.x/tos/chips/msp430/timer
+  %T/../../tinyos-2.x/tos/chips/msp430/usart
+  %T/../../tinyos-2.x/tos/chips/msp430/sensors
+  %T/../../tinyos-2.x/tos/chips/stm25p
+
+) );
+
+@opts = qw(
+  -gcc=msp430-gcc
+  -mmcu=msp430x1611
+  -fnesc-target=msp430
+  -fnesc-no-debug
+  -fnesc-scheduler=TinySchedulerC,TinySchedulerC.TaskBasic,TaskBasic,TaskBasic,runTask,postTask
+
+);
+
+push @opts, "-mingw-gcc" if $cygwin;
+

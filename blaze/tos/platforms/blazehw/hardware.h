@@ -1,0 +1,51 @@
+#ifndef _H_hardware_h
+#define _H_hardware_h
+
+#include "msp430hardware.h"
+//#include "MSP430ADC12.h"
+//#include "CC2420Const.h"
+//#include "AM.h"
+
+// LEDs
+TOSH_ASSIGN_PIN(RED_LED, 1, 0);
+TOSH_ASSIGN_PIN(GREEN_LED, 1, 1);
+TOSH_ASSIGN_PIN(YELLOW_LED, 2, 2);
+TOSH_ASSIGN_PIN(BLUE_LED, 2, 3);
+
+// UART pins
+TOSH_ASSIGN_PIN(SOMI0, 3, 2);
+TOSH_ASSIGN_PIN(SIMO0, 3, 1);
+TOSH_ASSIGN_PIN(UCLK0, 3, 3);
+TOSH_ASSIGN_PIN(UTXD0, 3, 4);
+TOSH_ASSIGN_PIN(URXD0, 3, 5);
+TOSH_ASSIGN_PIN(UTXD1, 3, 6);
+TOSH_ASSIGN_PIN(URXD1, 3, 7);
+TOSH_ASSIGN_PIN(UCLK1, 5, 3);
+TOSH_ASSIGN_PIN(SOMI1, 5, 2);
+TOSH_ASSIGN_PIN(SIMO1, 5, 1);
+
+// ADC
+TOSH_ASSIGN_PIN(ADC0, 6, 0);
+TOSH_ASSIGN_PIN(ADC1, 6, 1);
+TOSH_ASSIGN_PIN(ADC2, 6, 2);
+TOSH_ASSIGN_PIN(ADC3, 6, 3);
+
+// GIO pins
+TOSH_ASSIGN_PIN(GIO0, 2, 0);
+TOSH_ASSIGN_PIN(GIO1, 2, 1);
+TOSH_ASSIGN_PIN(GIO2, 2, 3);
+TOSH_ASSIGN_PIN(GIO3, 2, 6);
+
+// FLASH
+TOSH_ASSIGN_PIN(FLASH_CS, 4, 4);
+TOSH_ASSIGN_PIN(FLASH_HOLD, 4, 7);
+// XXX mhh TOSH_ASSIGN_PIN(FLASH_HOLD, 4, 6);
+
+// PROGRAMMING PINS (tri-state)
+TOSH_ASSIGN_PIN(PROG_RX, 1, 1);
+TOSH_ASSIGN_PIN(PROG_TX, 2, 2);
+
+// need to undef atomic inside header files or nesC ignores the directive
+#undef atomic
+
+#endif // _H_hardware_h

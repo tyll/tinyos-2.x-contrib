@@ -204,7 +204,6 @@ implementation {
       
       if(rxFrameLength + 1 > BLAZE_RXFIFO_LENGTH) {
         // Flush everything if the length is bigger than our FIFO
-
         failReceive();
         return;
       
@@ -234,7 +233,7 @@ implementation {
         cleanUp();
         return;
       }
-
+      
       // The FCF_FRAME_TYPE bit in the FCF byte tells us if this is an ack or 
       // data.  If it's data, make sure it meets the minimum size requirement.
       if ((( header->fcf >> IEEE154_FCF_FRAME_TYPE ) & 7) == IEEE154_TYPE_ACK) {    

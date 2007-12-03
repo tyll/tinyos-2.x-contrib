@@ -50,19 +50,6 @@ typedef nx_struct blaze_header_t {
   nxle_uint8_t type;
 } blaze_header_t;
 
-/**
- * Note that we do calculate a software CRC per errata which would be in the 
- * footer; however, we do not need to add an extra 2 bytes per message to 
- * store it on send. The RSSI and LQI values in the metadata provide enough 
- * buffer to store the 16-bit CRC, and those values will not be used in a send 
- * message. They will be overwritten after the CRC has been verified with the 
- * correct RSSI and LQI after reception.
- *
- * On receiving a full packet, the CRC writes over the RSSI and LQI
- * bytes, and the status bytes from the radio overwrite the ack and radio bytes.
- * The ack byte is a don't-care for receive, and the RadioSelect layer puts 
- * the radio byte back in place. 
- */
 typedef nx_struct blaze_footer_t {
 } blaze_footer_t;
 
@@ -80,8 +67,7 @@ typedef nx_struct blaze_metadata_t {
 
 
 /**
- * Acknowledgement frame structure.  Note the explicit CRC holder at the end
- * does not get transferred.
+ * Acknowledgement frame structure.
  */
 typedef nx_struct blaze_ack_t {
   nxle_uint8_t length;
@@ -89,8 +75,6 @@ typedef nx_struct blaze_ack_t {
   nxle_uint16_t fcf;
   nxle_uint8_t dsn;
   nxle_uint16_t src;
-  
-  nx_uint16_t crc;
 } blaze_ack_t;
 
 enum {
@@ -100,8 +84,8 @@ enum {
   // size of the footer (FCS field)
   MAC_FOOTER_SIZE = sizeof( uint16_t ),
   
-  // size of the acknowledgement frame, not including the length byte or CRC's
-  ACK_FRAME_LENGTH = sizeof( blaze_ack_t ) - 3,
+  // size of the acknowledgement frame, not including the length byte
+  ACK_FRAME_LENGTH = sizeof( blaze_ack_t ) - 1,
 };
 
 

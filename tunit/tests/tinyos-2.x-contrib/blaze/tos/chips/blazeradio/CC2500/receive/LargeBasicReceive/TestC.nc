@@ -1,6 +1,6 @@
 
 #include "TestCase.h"
-#include "CC1100.h"
+#include "CC2500.h"
 
 
 /**
@@ -16,10 +16,10 @@ implementation {
   
   components TestP,
       new BlazeSpiResourceC(),
-      CC1100ControlC,
+      CC2500ControlC,
       BlazeTransmitC,
       BlazeReceiveC,
-      HplCC1100PinsC,
+      HplCC2500PinsC,
       BlazePacketC,
       LedsC;
       
@@ -28,14 +28,14 @@ implementation {
   TestP.TestReceive -> TestReceiveC;
  
   TestP.Resource -> BlazeSpiResourceC;
-  TestP.SplitControl -> CC1100ControlC;
+  TestP.SplitControl -> CC2500ControlC;
   TestP.Leds -> LedsC;
    
-  TestP.Receive -> BlazeReceiveC.Receive[ CC1100_RADIO_ID ];
-  TestP.ReceiveController -> BlazeReceiveC.ReceiveController[ CC1100_RADIO_ID ];
+  TestP.Receive -> BlazeReceiveC.Receive[ CC2500_RADIO_ID ];
+  TestP.ReceiveController -> BlazeReceiveC.ReceiveController[ CC2500_RADIO_ID ];
   TestP.BlazePacketBody -> BlazePacketC;
   
-  TestP.AsyncSend -> BlazeTransmitC.AsyncSend[ CC1100_RADIO_ID ];
+  TestP.AsyncSend -> BlazeTransmitC.AsyncSend[ CC2500_RADIO_ID ];
   
 }
 

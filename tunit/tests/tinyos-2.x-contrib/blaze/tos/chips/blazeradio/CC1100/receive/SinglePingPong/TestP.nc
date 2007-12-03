@@ -151,7 +151,7 @@ implementation {
     
       call Resource.immediateRequest();
     
-      error = call AsyncSend.load(&myMsg);
+      error = call AsyncSend.load(&myMsg, 0);
       assertEquals("node 1 load error", SUCCESS, error);
       
     } else {

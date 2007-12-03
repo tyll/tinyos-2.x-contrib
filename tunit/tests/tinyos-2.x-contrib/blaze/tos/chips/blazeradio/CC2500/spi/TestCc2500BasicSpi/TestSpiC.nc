@@ -20,6 +20,7 @@ implementation {
   TestSpiP.CSN -> HplCC2500PinsC.Csn;
   TestSpiP.Idle -> BlazeSpiC.SIDLE;
   TestSpiP.PARTNUM -> BlazeSpiC.PARTNUM;
+  TestSpiP.SRES -> BlazeSpiC.SRES;
   TestSpiP.SNOP -> BlazeSpiC.SNOP;
   TestSpiP.SpiTest -> SpiTestC;
   TestSpiP.Resource -> BlazeSpiResourceC;

@@ -8,6 +8,7 @@ module TestSpiP {
     interface BlazeStrobe as Idle;
     interface BlazeStrobe as SNOP;
     interface GeneralIO as CSN;
+    interface BlazeStrobe as SRES;
     interface Resource;
     interface Leds;
   }
@@ -24,6 +25,10 @@ implementation {
   }
   
   event void Resource.granted() {
+    call CSN.clr();
+    call SRES.strobe();
+    call CSN.set();
+    
     call CSN.clr();
     while((call Idle.strobe() & 0x80) != 0);
     call CSN.set();

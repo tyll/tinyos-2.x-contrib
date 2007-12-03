@@ -5,8 +5,10 @@ module TestSpiP {
   uses {
     interface TestCase as SpiTest;
     interface BlazeRegister as PARTNUM;
+    interface BlazeStrobe as Idle;
     interface BlazeStrobe as SNOP;
     interface GeneralIO as CSN;
+    interface BlazeStrobe as SRES;
     interface Resource;
     interface Leds;
   }
@@ -24,10 +26,17 @@ implementation {
   
   event void Resource.granted() {
     call CSN.clr();
+    call SRES.strobe();
     call CSN.set();
+    
     call CSN.clr();
+    while((call Idle.strobe() & 0x80) != 0);
+    call CSN.set();
+    
+    call CSN.clr();
+    call Idle.strobe();
     assertEquals("CC1100 is not IDLE [6:4]!=0", 0, ((call PARTNUM.read(&readBuffer)) & 0x70));
-    assertEquals("CC1100 didn't ID itself", 0x0, readBuffer);
+    assertEquals("CC1100 didn't ID itself", 0x80, readBuffer);
     call CSN.set();
     call Resource.release();
     call Leds.led1On();

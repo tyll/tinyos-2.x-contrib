@@ -269,7 +269,7 @@ implementation {
     myAck.length = ACK_FRAME_LENGTH;
     myAck.dest = 0;
     myAck.fcf = (IEEE154_TYPE_ACK << IEEE154_FCF_FRAME_TYPE);
-    myAck.dsn = 50;
+    myAck.dsn = TOS_AM_GROUP;
     myAck.src = 100;
     
     append(&myAck, sizeof(blaze_ack_t));
@@ -428,7 +428,7 @@ implementation {
     if(call State.isState(S_TESTRECEIVEACK)) {
       assertEquals("Wrong ack src", 100, source);
       assertEquals("Wrong ack dest", 0, destination);
-      assertEquals("Wrong ack dsn", 50, dsn);
+      assertEquals("Wrong ack dsn", TOS_AM_GROUP, dsn);
       call TestReceiveAck.done();
     }
   }

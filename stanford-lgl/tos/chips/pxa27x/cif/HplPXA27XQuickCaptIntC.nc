@@ -42,7 +42,7 @@
  /**                                         
  * Modified and ported to tinyos-2.x.
  * 
- * @author Brano Kusy
+ * @author Brano Kusy (branislav.kusy@gmail.com)
  * @version October 25, 2007
  */
  

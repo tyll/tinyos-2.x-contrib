@@ -37,6 +37,10 @@
  * @author Konrad Lorincz
  * @version 1.0, August 15, 2005
  */
+/**
+ * @brief Ported to TOS2
+ * @author Brano Kusy (branislav.kusy@gmail.com)
+ */ 
 #ifndef PXA27XQuickCaptInt_H
 #define PXA27XQuickCaptInt_H
 

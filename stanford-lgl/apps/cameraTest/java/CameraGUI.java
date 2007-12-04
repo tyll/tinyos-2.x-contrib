@@ -29,8 +29,7 @@
 
 
 /**
- * @author Bret Hull
- * @author David Gay
+ * @author Brano Kusy
  */
 
 import javax.swing.*;

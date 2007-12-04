@@ -30,11 +30,9 @@
  */
 
 /**
- * HPL implementation of interrupts and captures for the ChipCon
- * CC2420 radio connected to a TI MSP430 processor.
- *
- * @author Jonathan Hui <jhui@archrock.com>
- * @version $Revision$ $Date$
+ * CC1100 interrupts as connected to my tmote.
+ * See the wiring diagrams in HplCC1100PinsC
+ * for more information
  */
 
 configuration HplCC1100InterruptsC {

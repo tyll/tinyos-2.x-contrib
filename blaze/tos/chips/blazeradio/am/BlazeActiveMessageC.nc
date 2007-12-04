@@ -76,4 +76,7 @@ implementation {
   components ActiveMessageAddressC;
   BlazeActiveMessageP.ActiveMessageAddress -> ActiveMessageAddressC;
   
+  components LedsC;
+  BlazeActiveMessageP.Leds -> LedsC;
+  
 }

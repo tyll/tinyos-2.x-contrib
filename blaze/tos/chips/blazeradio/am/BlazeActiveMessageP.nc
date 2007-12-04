@@ -57,8 +57,10 @@ module BlazeActiveMessageP {
     interface BlazePacket;
     interface BlazePacketBody;
     interface ActiveMessageAddress;
+    interface Leds;
   }
 }
+
 implementation {
 
   enum {

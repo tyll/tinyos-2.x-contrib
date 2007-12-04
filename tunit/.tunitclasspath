@@ -4,11 +4,18 @@
 # tunit directory, then source this file in your shell
 #
 #   $ source .tunitclasspath
-#
 ############################################################################
 
-export TUNIT_BASE=c:/tinyos/cygwin/opt_svn/tinyos-2.x-contrib/tunit
 
+############################################################################
+# TUNIT_BASE is the absolute path to the tunit directory
+############################################################################
+export TUNIT_BASE="`cygpath -w /opt/tinyos-2.x-contrib/tunit`"
+
+
+############################################################################
+# These define .jar files dependencies to run tunit.jar
+############################################################################
 export LOG4J="`cygpath -w $TUNIT_BASE/support/sdk/tunit/depends/log4j.jar`"
 export TUNIT="`cygpath -w $TUNIT_BASE/support/sdk/tunit/tunit.jar`"
 export XERCES="`cygpath -w $TUNIT_BASE/support/sdk/tunit/depends/xerces.jar`"
@@ -16,5 +23,14 @@ export JFREECHART="`cygpath -w $TUNIT_BASE/support/sdk/tunit/depends/jfreechart-
 export JCOMMON="`cygpath -w $TUNIT_BASE/support/sdk/tunit/depends/jcommon-1.0.9.jar`"
 
 
+############################################################################
+# This is the classpath definition combining all the .jar dependencies
+############################################################################
 export CLASSPATH="${CLASSPATH};${LOG4J};${TUNIT};${XERCES};${JFREECHART};${JCOMMON};."
+
+
+############################################################################
+# This is the optional report directory for build.xml, when the -reportdir option is used
+############################################################################
+export REPORTDIR="`cygpath -w $TUNIT_BASE/reports`"
 

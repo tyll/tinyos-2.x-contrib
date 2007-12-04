@@ -1,52 +1,49 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <project name="TUnit" basedir="." default="tunit">
 
+
+      <!---------------------------------------------------------
+           This build.xml assumes you have sourced .tunitclasspath. 
+           Specifically, you need your $CLASSPATH pointing to all .jar 
+           files, and your TUNIT_BASE (or TUNIT_HOME, or TOSCONTRIB)
+           environment variables pointing to the tunit directory,
+           and your REPORTDIR defined so it knows where to store
+           test reports.
+        --------------------------------------------------------->
+
+      <property environment="env"/>
+
 	<!-- Reports, archives, statistics, etc. locations -->
-	<property environment="env" />
-	<property name="tunit_base.dir" value="${env.TUNIT_BASE}" />
-	<property name="user.dir" value="/home/mmaroti/tinyos-2.x/tests" />
+	<property name="tunit_base.dir" value="." />
 	<property name="report.dir" value="${tunit_base.dir}/reports" />
 	<property name="xml.dir" value="${report.dir}/xml" />
 	<property name="htmlreport.dir" value="${report.dir}/html" />
 	<property name="archive.dir" value="${report.dir}/archive" />
 	<property name="stats.dir" value="${report.dir}/stats" />
 	
-	<!-- Java locations -->
-	<property name="java.dir" value="${tunit_base.dir}/support/sdk/tunit" />
-      <property name="tinyos.dir" value="/home/mmaroti/tinyos-2.x" />
-
-	<!-- Jar definitions -->
-	<property name="tinyos.jar" value="${tinyos.dir}/support/sdk/java/tinyos.jar" />
-	<property name="tunit.jar" value="${java.dir}/tunit.jar" />
-	<property name="jcommon.jar" value="${java.dir}/depends/jcommon-1.0.9.jar" />
-	<property name="jfreechart.jar" value="${java.dir}/depends/jfreechart-1.0.5.jar" />
-	<property name="log4j.jar" value="${java.dir}/depends/log4j.jar" />
-	<property name="xerces.jar" value="${java.dir}/depends/xerces.jar" />
-	
-	<!-- Classpath Definition -->
-	<property name="classpath" value="${tinyos.jar}:${tunit.jar}:${jcommon.jar}:${jfreechart.jar}:${log4j.jar}:${xerces.jar}" />
 
 	<target name="tunit">
 		<delete dir="${xml.dir}" />
 		<mkdir dir="${xml.dir}" />
 		<java classname="com.rincon.tunit.TUnit">
-			<arg value="-testdir" />
-			<arg value="${user.dir}" />
+			<arg value="-reportdir" />		
+			<arg value="${env.REPORTDIR}" />
 			<classpath>
-				<pathelement path="${classpath}" />
+				<pathelement path="${env.CLASSPATH}" />
 			</classpath>
 		</java>
 
 		<antcall target="tunitreport" />
-		<!-- <antcall target="feedback" /> -->
 	</target>
 
 
 	<target name="tunitrerun">
 		<java classname="com.rincon.tunit.TUnit">
-			<arg value="-rerun" />
+			<arg value="-rerun" />			
+			<arg value="-reportdir" />
+			<arg value="${env.REPORTDIR}" />
 			<classpath>
-				<pathelement path="${classpath}" />
+				<pathelement path="${env.CLASSPATH}" />
 			</classpath>
 		</java>
 		
@@ -66,7 +63,7 @@
 		
 		<java classname="com.rincon.tunitposthtml.PostHtmlEdit">
 			<classpath>
-				<pathelement path="${classpath}" />
+				<pathelement path="${env.CLASSPATH}" />
 			</classpath>
 		</java>
 
@@ -94,7 +91,7 @@
 	<target name="feedback">
 		<java classname="com.rincon.tunitfeedback.TUnitFeedback">
 			<classpath>
-				<pathelement path="${classpath}" />
+				<pathelement path="${env.CLASSPATH}" />
 			</classpath>
 		</java>
 	</target>
@@ -109,3 +106,4 @@
 	</target>
 
 </project>
+

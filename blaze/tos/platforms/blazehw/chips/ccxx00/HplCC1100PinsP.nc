@@ -21,6 +21,7 @@ implementation {
 
   command error_t Init.init() {
     call PowerIn.set();
+    return SUCCESS;
   }
 
   async event void Gdo2_int.fired() {

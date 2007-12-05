@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<!DOCTYPE Part SYSTEM "part.dtd">
+<Part NAME="AT89C51ID2">
+   <Memory NAME="FLASH" SIZE="65536" RESET_VALUE="FF" SECURITY="true" />
+
+   <Memory NAME="EEPROM" SIZE="2048" RESET_VALUE="FF" SECURITY="true" />
+
+   <Gui FILE="at89c51id2_gui.xml" />
+
+   <Protocol FILE="RS232_S01.xml" />
+</Part>
+

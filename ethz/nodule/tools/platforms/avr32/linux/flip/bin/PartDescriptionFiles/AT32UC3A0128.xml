@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!DOCTYPE Part SYSTEM "part.dtd">
+<Part NAME="AT32UC3A0128">
+	<USB_PID VALUE="2FF8" />
+
+	<Memory NAME="FLASH" SIZE="131072" ADDR="80000000" />
+
+	<Memory NAME="BOOTLOADER" SIZE="3" INDEX="3"/>
+
+	<Memory NAME="SIGNATURE" SIZE="4" INDEX="6"/>
+
+	<Memory NAME="SECURITY" SIZE="1" />
+
+	<Memory NAME="CONFIGURATION" SIZE="32" />
+
+	<Memory NAME="USER" SIZE="512" ADDR="80800000" INDEX="11" />
+
+	<Memory NAME="INT_RAM" SIZE="32768" ADDR="0" />
+
+	<!-- EXT_RAM memories are too large (>= 16Mbyte) to create a buffer; we declare a 0-byte size for them.
+		We program them during the ELF parsing process. -->
+	<Memory NAME="EXT_MEM_CS0" SIZE="0" ADDR="C0000000" />
+
+	<Memory NAME="EXT_MEM_CS1" SIZE="0" ADDR="D0000000" />
+
+	<Memory NAME="EXT_MEM_CS2" SIZE="0" ADDR="C8000000" />
+
+	<Memory NAME="EXT_MEM_CS3" SIZE="0" ADDR="CC000000" />
+
+	<Protocol FILE="USB_DFU_02.xml" />
+	
+	
+</Part>

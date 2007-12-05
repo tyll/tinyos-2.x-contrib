@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!DOCTYPE Part SYSTEM "part.dtd">
+<Part NAME="AT89C5130">
+   <USB_PID VALUE="2FFD" />
+
+   <Memory NAME="FLASH" SIZE="16384" RESET_VALUE="FF" SECURITY="true" />
+
+   <Memory NAME="EEPROM" SIZE="1024" RESET_VALUE="FF" SECURITY="false" />
+
+   <Gui FILE="at89c5131_gui.xml" />
+
+   <Protocol FILE="USB_DFU_00.xml" />
+
+   <Protocol FILE="RS232_S02.xml" />
+
+</Part>
+

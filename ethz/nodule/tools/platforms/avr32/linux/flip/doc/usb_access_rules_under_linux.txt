@@ -1,0 +1,4 @@
+Add group 'flip' and add necessary users.
+
+Then add the following entry to /etc/fstab:
+none   /proc/bus/usb   usbfs   devgid=<flip_group_id>,devmode=0660   0   0

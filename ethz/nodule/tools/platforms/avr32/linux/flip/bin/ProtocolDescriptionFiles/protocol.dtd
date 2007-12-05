@@ -1,0 +1,21 @@
+<!--
+
+      ===========================================
+      DTD for Flip XML Protocol Description Files
+      ===========================================
+
+-->
+
+<!ELEMENT Protocol (Ptcl, Cmd+)>
+
+<!ELEMENT Ptcl EMPTY>
+<!ATTLIST Ptcl
+	NAME	CDATA #REQUIRED>
+
+<!ELEMENT Cmd EMPTY>
+<!ATTLIST Cmd
+	NAME				CDATA	#REQUIRED
+	VALUE				CDATA	#REQUIRED
+	EXPECTED_NUM_CHARS	CDATA	#IMPLIED
+	MEM_TYPE			CDATA	#IMPLIED>
+

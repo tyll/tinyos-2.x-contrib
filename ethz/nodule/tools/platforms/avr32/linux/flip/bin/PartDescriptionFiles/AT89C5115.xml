@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<!DOCTYPE Part SYSTEM "part.dtd">
+<Part NAME="AT89C5115">
+   <Memory NAME="FLASH" SIZE="16384" RESET_VALUE="FF" SECURITY="true" VISIBLE="true" />
+
+   <Memory NAME="EEPROM" SIZE="2048" RESET_VALUE="FF" SECURITY="false" VISIBLE="true" />
+
+   <Gui FILE="at89c5115_gui.xml" />
+
+   <Protocol FILE="RS232_S04.xml" />
+</Part>
+

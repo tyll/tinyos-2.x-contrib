@@ -1,0 +1,6 @@
+# $Id$ #
+
+# author: Mustafa Yuecel <mustafa.yuecel@alumni.ethz.ch> #
+
+NODEID = $(INSTALL)
+BUILD_DEPS = tosimage $(POST_BUILD_EXTRA_DEPS) setid program delsetid

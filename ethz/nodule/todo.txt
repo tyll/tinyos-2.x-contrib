@@ -1,0 +1,9 @@
+implement interrupt handling
+
+implement timer
+
+implement MCU sleep
+
+enable external clocks
+
+secondary: implement PWM LED component

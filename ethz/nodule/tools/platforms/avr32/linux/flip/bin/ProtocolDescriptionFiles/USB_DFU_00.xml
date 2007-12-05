@@ -1,0 +1,96 @@
+<?xml version="1.0"?>
+<!DOCTYPE Protocol SYSTEM "protocol.dtd">
+<Protocol>
+   <Ptcl NAME="USB_DFU_00" />
+
+   <Cmd NAME="wfl" VALUE="2048" />
+
+   <Cmd NAME="rfl" VALUE="2048" />
+
+   <Cmd NAME="read_manuf_id" VALUE="050130" />
+
+   <Cmd NAME="read_family_code_id" VALUE="050131" />
+
+   <Cmd NAME="read_device_name_id" VALUE="050160" />
+
+   <Cmd NAME="read_device_rev_id" VALUE="050161" />
+
+   <Cmd NAME="read_device_boot_id_1" VALUE="050001" />
+
+   <Cmd NAME="read_device_boot_id_2" VALUE="050002" />
+
+   <Cmd NAME="read_hardware_byte" VALUE="050200" />
+
+   <Cmd NAME="prog_hardware_byte" VALUE="040200" />
+
+   <Cmd NAME="read_boot_loader_version" VALUE="050000" />
+
+   <Cmd NAME="read_ssb" VALUE="050105" />
+
+   <Cmd NAME="read_bsb" VALUE="050100" />
+
+   <Cmd NAME="prog_bsb" VALUE="040100" />
+
+   <Cmd NAME="read_eb" VALUE="050106" />
+
+   <Cmd NAME="prog_eb" VALUE="040106" />
+
+   <Cmd NAME="read_sbv" VALUE="050101" />
+
+   <Cmd NAME="prog_sbv" VALUE="040101" />
+
+   <Cmd NAME="set_security_level_1" VALUE="040105FE" />
+
+   <Cmd NAME="set_security_level_2" VALUE="040105FC" />
+
+   <Cmd NAME="startAppliWithReset" VALUE="040300" />
+
+   <Cmd NAME="startAppliWithoutReset" VALUE="040301" />
+
+   <Cmd NAME="erase_flash" VALUE="0400FF" />
+
+   <Cmd NAME="erase_block_0" VALUE="040000" />
+
+   <Cmd NAME="erase_block_1" VALUE="040020" />
+
+   <Cmd NAME="erase_block_2" VALUE="040040" />
+
+   <Cmd NAME="erase_block_3" VALUE="040080" />
+
+   <Cmd NAME="erase_block_4" VALUE="0400C0" />
+
+   <Cmd NAME="prog_p1cf" VALUE="040102" />
+
+   <Cmd NAME="prog_p3cf" VALUE="040103" />
+
+   <Cmd NAME="prog_p4cf" VALUE="040104" />
+
+   <Cmd NAME="read_p1cf" VALUE="050102" />
+
+   <Cmd NAME="read_p3cf" VALUE="050103" />
+
+   <Cmd NAME="read_p4cf" VALUE="050104" />
+
+   <Cmd NAME="blank_check_flash" VALUE="0301" />
+
+   <Cmd NAME="read_memory" VALUE="03MM" />
+
+   <Cmd NAME="read_flash_byte" VALUE="00" />
+
+   <Cmd NAME="read_eeprom_byte" VALUE="02" />
+
+   <Cmd NAME="read_custom_byte" VALUE="03" />
+
+   <Cmd NAME="program_start_byte" VALUE="01" />
+
+   <Cmd NAME="progFlashByte" VALUE="00" />
+
+   <Cmd NAME="progEepromByte" VALUE="01" />
+
+   <Cmd NAME="progCustomByte" VALUE="08" />
+
+   <Cmd NAME="writeProtection" VALUE="P" />
+
+   <Cmd NAME="readWriteProtection" VALUE="L" />
+</Protocol>
+

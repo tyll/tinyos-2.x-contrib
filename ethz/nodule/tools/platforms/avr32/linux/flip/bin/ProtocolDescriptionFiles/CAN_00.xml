@@ -1,0 +1,116 @@
+<?xml version="1.0"?>
+<!DOCTYPE Protocol SYSTEM "protocol.dtd">
+<Protocol>
+   <Ptcl NAME="CAN_00" />
+
+   <Cmd NAME="wfl" VALUE="8" />
+
+   <Cmd NAME="rfl" VALUE="8" />
+
+   <Cmd NAME="select_can_node" VALUE="00001FF" />
+
+   <Cmd NAME="read_manuf_id" VALUE="005020130" />
+
+   <Cmd NAME="read_family_code_id" VALUE="005020131" />
+
+   <Cmd NAME="read_device_name_id" VALUE="005020160" />
+
+   <Cmd NAME="read_device_rev_id" VALUE="005020161" />
+
+   <Cmd NAME="read_btc1" VALUE="00502011C" />
+
+   <Cmd NAME="prog_btc1" VALUE="00403011C" />
+
+   <Cmd NAME="read_btc2" VALUE="00502011D" />
+
+   <Cmd NAME="prog_btc2" VALUE="00403011D" />
+
+   <Cmd NAME="read_btc3" VALUE="00502011E" />
+
+   <Cmd NAME="prog_btc3" VALUE="00403011E" />
+
+   <Cmd NAME="read_nnb" VALUE="00502011F" />
+
+   <Cmd NAME="prog_nnb" VALUE="00403011F" />
+
+   <Cmd NAME="read_cris" VALUE="005020120" />
+
+   <Cmd NAME="prog_cris" VALUE="004030120" />
+
+   <Cmd NAME="read_device_boot_id_1" VALUE="005020001" />
+
+   <Cmd NAME="read_device_boot_id_2" VALUE="005020002" />
+
+   <Cmd NAME="read_hardware_byte" VALUE="005020200" />
+
+   <Cmd NAME="prog_hardware_byte" VALUE="004030200" />
+
+   <Cmd NAME="read_boot_loader_version" VALUE="005020000" />
+
+   <Cmd NAME="read_ssb" VALUE="005020105" />
+
+   <Cmd NAME="read_bsb" VALUE="005020100" />
+
+   <Cmd NAME="prog_bsb" VALUE="004030100" />
+
+   <Cmd NAME="read_eb" VALUE="005020106" />
+
+   <Cmd NAME="prog_eb" VALUE="004030106" />
+
+   <Cmd NAME="read_sbv" VALUE="005020101" />
+
+   <Cmd NAME="prog_sbv" VALUE="004030101" />
+
+   <Cmd NAME="set_security_level_1" VALUE="004030105FE" />
+
+   <Cmd NAME="set_security_level_2" VALUE="004030105FC" />
+
+   <Cmd NAME="startAppliWithReset" VALUE="004020300" />
+
+   <Cmd NAME="startAppliWithoutReset" VALUE="004040301XXXX" />
+
+   <Cmd NAME="erase_flash" VALUE="0040200FF" />
+
+   <Cmd NAME="erase_block_0" VALUE="004020000" />
+
+   <Cmd NAME="erase_block_1" VALUE="004020020" />
+
+   <Cmd NAME="erase_block_2" VALUE="004020040" />
+
+   <Cmd NAME="erase_block_3" VALUE="004020080" />
+
+   <Cmd NAME="erase_block_4" VALUE="0040200C0" />
+
+   <Cmd NAME="prog_p1cf" VALUE="004030102VV" />
+
+   <Cmd NAME="prog_p3cf" VALUE="004030103VV" />
+
+   <Cmd NAME="prog_p4cf" VALUE="004030104VV" />
+
+   <Cmd NAME="read_p1cf" VALUE="005020102" />
+
+   <Cmd NAME="read_p3cf" VALUE="005020103" />
+
+   <Cmd NAME="read_p4cf" VALUE="005020104" />
+
+   <Cmd NAME="blank_check_flash" VALUE="0030501XXXXYYYY" />
+
+   <Cmd NAME="read_memory" VALUE="00305MMXXXXYYYY" />
+
+   <Cmd NAME="read_flash_byte" VALUE="00" />
+
+   <Cmd NAME="read_eeprom_byte" VALUE="02" />
+
+   <Cmd NAME="read_custom_byte" VALUE="03" />
+
+   <Cmd NAME="program_start" VALUE="00105" />
+
+   <Cmd NAME="program_data" VALUE="002" />
+
+   <Cmd NAME="progFlashByte" VALUE="00" />
+
+   <Cmd NAME="progEepromByte" VALUE="01" />
+
+   <Cmd NAME="progCustomByte" VALUE="08" />
+</Protocol>
+

@@ -1,0 +1,6 @@
+# $Id$ #
+
+# author: Mustafa Yuecel <mustafa.yuecel@alumni.ethz.ch> #
+
+OPTFLAGS += -g
+

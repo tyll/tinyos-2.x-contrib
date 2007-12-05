@@ -1,0 +1,12 @@
+TestLedAppC:
+
+MCU:
+VDDIN: 5 mv -> 250 uA (labeled as VCC3R on board)
+
+VDDCORE: 5 mV -> 250 uA (slow clock @ 115kHz)
+VDDPLL: 0 mV -> 0 uA
+
+Peripheral:
+AVCC3: -0.025 mV -> -1.25 mA
+VCCIO: -0.01 mV -> -0.5 mA
+VCC3: 0.220 mV -> 11 mA

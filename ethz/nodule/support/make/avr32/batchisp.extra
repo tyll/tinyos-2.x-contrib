@@ -1,0 +1,35 @@
+# $Id$ #
+
+# author: Mustafa Yuecel <mustafa.yuecel@alumni.ethz.ch> #
+
+PROGRAM = batchisp
+
+BATCHISP_BIN = batchisp3
+
+ifeq ($(JAVA_HOME)_x,_x)
+
+Makefile: show_error
+
+show_error:
+	@echo "JAVA_HOME is not defined (e.g. '/usr/lib/jvm/java-6-sun/jre')"
+	@exit 1
+
+else ifeq ($(FLIP_BINDIR)_x,_x)
+
+Makefile: show_error
+
+show_error:
+	@echo "FLIP_BINDIR is not defined (e.g. '../../tools/platforms/avr32/linux/flip/bin')"
+	@exit 1
+
+endif
+
+program: FORCE
+	@echo "    installing $(PLATFORM) binary using $(BATCHISP_BIN)"
+        # ugly hack because batchisp expects certain files in current/working directory (MY: ask Atmel about moving these files into flip.jar)
+	@ln -fs $(FLIP_BINDIR)/PartDescriptionFiles
+	@ln -fs $(FLIP_BINDIR)/ProtocolDescriptionFiles
+#	@PATH=$(FLIP_BINDIR) LD_LIBRARY_PATH=$(FLIP_BINDIR):$(JAVA_HOME)/lib/i386/client $(BATCHISP_BIN) -help
+	@cp -f $(INSTALL_IHEX) $(BUILDDIR)/flash.hex
+	@PATH=$(FLIP_BINDIR) LD_LIBRARY_PATH=$(FLIP_BINDIR):$(JAVA_HOME)/lib/i386/client $(BATCHISP_BIN) -device $(AVR32_MCU) -hardware usb -operation erase f memory flash blankcheck loadbuffer $(BUILDDIR)/flash.hex program verify start reset 0 || exit 0
+	@rm $(BUILDDIR)/flash.hex PartDescriptionFiles ProtocolDescriptionFiles

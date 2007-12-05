@@ -1,0 +1,545 @@
+CHANGES - FLIP
+
+               
+Atmel
+
+
+CHANGES
+-------
+
+Version 3.2.1; Oct-12-2007
+==========================
+
+- Linux Support for RS232 AND usb product, CAN product are not 
+  supported as is needes third-party support.
+- Support of the RS232 protocol added to the T89C51CC01 device.
+- AT89C51CC03 device supported.
+
+
+Version 3.2.0; Jun-14-2007
+==========================
+
+- AT32UC3A0128, AT32UC3A0256, AT32UC3A0512, AT32UC3A1128, AT32UC3A1256,
+  AT32UC3A1512, AT32UC3B0128, AT32UC3B0256, AT32UC3B064, AT32UC3B1128,
+  AT32UC3B1256 and AT32UC3B164 devices supported (batchisp only).
+
+
+
+Version 3.1.1; Mar-06-2007
+==========================
+
+- AT90USB647, AT90USB646, AT90USB162, AT90USB82, AT89C51SND2, AT89C51IC2,
+  T89C51IC2, AT89C51ID2, and AT89C5132 devices supported.
+
+- Bug fixed on AT89C51SND1 X2 and BLJB bits settings through the USB.
+
+- Auto-connect feature added: Flip remembers the last session settings
+  an tries to perform a connection on start.
+
+
+Version 3.1.0; Dec-20-2006
+==========================
+
+- For USB devices, the Jungo's windrvr.sys driver has been replaced
+  by the libusb0.sys one. Read driver un-installation instructions
+  carefully if you already have run Flip USB on your machine.
+
+- Tested on a Java 6.0 VM.
+
+- Fixes a regression: can parse .dat files used by the OCD system.
+  .dat files are used to upgrade the Atmel USB OCD dongle firmware.
+
+
+Version 3.0.5; Nov-02-2006
+==========================
+
+- ATOCDTARGET virtual device added.
+
+- AT90CAN128, AT90CAN64 and AT90CAN32 and AT89C51ED2 devices added.
+
+- Demo program added; shows how to work with Atmel's ISP DLLs
+  if you want to write your own ISP program.
+
+- RS232 settings are now stored as user preferences.
+
+
+Version 3.0.4; Jul-26-2006
+==========================
+
+- The following devices have been added: AT89C5130, AT89C51IE2,
+  AT89C51RE2 and AT90USB1286.
+  
+
+Version 3.0.3; Apr-27-2006
+==========================
+
+- Programming and reading operations have been threaded to fix some CAN
+  interfaces time out issue.
+
+- Debug mode capability added.
+
+
+Version 3.0.2; Apr-14-2006
+==========================
+
+- Buffer editing operations could not end up correctly when an
+  edit operation was still running; this happened on large memory
+  buffers. A consequence of this anomaly was a corrupted buffer
+  dialog display.
+
+- DTD files added to control XML part, GUI and protocol description files.
+
+- AVR-CAN devices support added.
+
+
+Version 3.0.1; Mar-21-2006
+===========================
+
+- Help command bug fixed (looked for flip 2.4.4 help path).
+
+- New About dialog.
+
+- In the buffer options dialog, user defined values were not
+  exported to the buffer info view on OK button click. 
+
+Version 3.0.0; Feb-19-2006
+==========================
+
+- Major release: Devices, protocols and GUIs are built from 
+  XML files by Java handlers.
+  This program requires Java Run-Time Environment (JRE 1.5)
+  to be installed. The JRE may be donwloaded from
+  http://java.sun.com/
+
+- Adds support for the AT90USB1287 device.
+
+- This release of Flip does not support all our devices yet as
+  Flip 2.4.4 and above did. Missing devices will be added soon.
+  
+Version 2.4.6; Dec-14-2005
+==========================
+
+- AtRs232 library updated to work with almost all USB/RS232
+  adapters. For Targus adapters, use the new AtRs232Targus DLL.
+
+- CAN Peak AtCanPeak library upgraded to fit with the new
+  Peak driver release.
+
+- AtCanVector library bug fixed.
+
+Version 2.4.4; Mar-31-2005
+==========================
+
+- Adds support for AT89C5130 device.
+
+- usb_dfu.inf file updated for Windows standard USB driver
+  installation through Wizard.
+
+
+Version 2.4.2; Dec-02-2004
+==========================
+
+- RS232 library updated to support more USB/RS232 interfaces.
+
+- JANZ CAN interfaces supported.
+
+- USB driver installation procedure simplified.
+
+- USB devices scan method improved; it was sometimes necessary to
+  swap an USB device like the mouse with the target ISP hardware.
+
+- The serial number was not incremented if the serialize
+  directive was written in lowercase.
+
+- AT89C5115 replaced by T89C5115.
+
+- Microcontrollers names are listed in alphabetical order.
+
+- Fixed an error which occured when the user clicked the Device
+  selection dialog OK button without selecting any device.
+
+- Remove AT8XC5122-DPW; update the verify command of AT8XC5122
+  for the RS232 protocol; set the RS232 to single 115200.
+
+- If no RS232 port is available, warn the user and exit Flip.
+
+
+Version 2.4.0; Jul-19-2004
+==========================
+
+- AtIsp.dll version 0.0.1.11 fixes a CAN Verify problem; when the
+  operation failed, Flip did not wait for the block reading completion.
+
+- Adds timeout configuration through Preferences.
+
+- Adds F4 accelerator to load HEX file.
+
+- The RS232 setup dialog only shows available COM ports.
+
+- Keeps the last selected device name in the preferences file.
+
+- Adds support for AT89C51SND2.
+
+- Changes theCAN dialog buttons state after START APPLICATION so that
+  the user can re-init the CAN dongle to start a new ISP session.
+
+- Closes port on Start Application (RS232/USB/CAN).
+
+- The Preferences dialog displays HEX386/HEX86 radiobuttons for HEX file generation.
+
+- Batchisp supports a timeout operation directive.
+
+- Batchisp logf and debug switches work together in a more coherent way:
+  -logf is used to select a logfile and -debug is used to display
+  information about ISP traffic.
+  When both switches are used, ISP traffic is logged to the file.
+
+- The Batchisp CANOPEN directive has now two arguments: Node Number
+  and CRIS (default value of CRIS is 0). The CRIS argument is necessary
+  to update the CAN dongle acceptance filter.
+
+- The HEX file parser supports both Extended Segment (HEX86) and
+  Extended Linear (HEX386) address records.
+
+- SYSTEC USBCAN dongle acceptance filter bug fixed.
+
+- The Time out message on CAN dongle connection failure was not displayed.
+
+- When loading a recent HEX file which did not exist any more
+  no warning message was displayed.
+
+
+
+Version 2.2.5; Apr-08-2004
+==========================
+
+- USB driver installation checker bug fixed.
+
+- Batchisp supports reading and writing commands for the
+  Px_conf bytes.
+
+- Flip and Batchisp support the SA4LU2000 device.
+
+Version 2.2.4; Mar-09-2004
+==========================
+
+- No more Software Security Error message when connecting to
+  a RW-protected AT89C5122 device.
+
+- Error on exit application on W98 fixed.
+
+- Batchisp supports hexadecimal serial numbers.
+
+- Batchisp supports the read and write operations on CRIS, NNB and BTCx bytes.
+
+- Batchisp can open and close CAN nodes, allowing subsequent ISP operations
+  on different CAN nodes in a network with a single command file.
+
+- USB driver proper installation is checked when the user opens the USB port.
+
+
+Version 2.2.2; Jan-12-2004
+==========================
+
+- AT89C51AC3 device supported.
+
+- Close any open port when the communication dialog is invoked by the user.
+
+- If no COM port is available, display a "Cannot open port" message
+  instead of exiting.
+
+- All IXXAT CAN dongles are now supported.
+
+- The debug console now appears only when requested.
+
+- The main window dynamically sets its dimensions so that
+  all device information can be displayed.
+
+- LPC USB dongle added to AT89C5131.
+
+- Device frame updated after programming so that we can see
+  that the BSB has been cleared.
+
+Version 2.2.0; Nov-13-2003
+==========================
+
+- Introduces batchisp, the DOS-executable version of Flip.
+
+- Allows easy design of your own ISP program without having to know
+  the details of Atmel's ISP protocols.
+
+- USB driver installation problem fixed.
+
+- Enhanced User's Manuals.
+
+- All CAN dongles from IXXAT, PEAK and VECTOR are supported.
+
+- The RM CANview dongle is not supported by this release.
+
+
+Version 1.8.8; May-16-2003
+==========================
+
+- New supported devices: AT89C51RD2, AT89C51ED2 and AT89C51ID2.
+
+- USB 2.0 supported through Jungo's WinDriver 5.2.2 version.
+
+- RM CANview interface connection problem fixed; the error message was:
+  "can't read deviceArray(bootloaderId)".
+
+- Vector CANpari interface node connect problem fixed.
+
+- Possible CUSTOM memory selection with the T89C51AC2 device if the bootloader
+  version >= 1.5
+
+- 1200 bps added to the RS232 baudrate selection list.
+
+
+Version 1.8.2; October-04-2002
+==============================
+
+- New supported devices: AT89C5131, AT89C5132
+  AT89C51RB2, AT89C51RC2 and AT89C51IC2.
+
+- New USB drivers from Jungo supporting Windows 2000 SP3.
+
+- Start Application command bug fixed on the T8XC5121 device.
+
+- Inhanced troubleshooting and CAN interfaces information in the User's Manual.
+
+- New Buffer commands: Search, Copy and Move data.
+
+- Possible serialization of parts through the configuration file.
+
+
+Version 1.7.1; July-03-2002
+===========================
+
+- Supports the AT89C5131, T89C5115 and T89C51IC2 devices.
+
+- Update the buffer checksum on device reading completion.
+
+- P1/P3/P4 config bytes settings are made possible for the
+  CC02 device if the bootloader version > 1.1.
+
+- Add Start Application capability to the config file.
+
+- After a device read, the buffer is considered to be modified. Therefore
+  if we launch a device program, we don't prompt the user any more for
+  continuing to program. A buffer reset cancels this.
+
+- If the connection times out, the GUI must remain disabled. Fixed.
+
+- FLIP exited when there was no available serial port, even though the user
+  intended to perform ISP through USB. Fixed.
+
+
+Version 1.6.0; February-22-2002
+===============================
+
+- Supports the T89C51CC02 device.
+
+
+Version 1.5.4; January-28-2002
+===============================
+
+- Add Buttons toolbars to the main and the buffer edit windows.
+
+- Fix widget update error in the CAN setup dialog.
+
+- Add buffer randomization.
+
+
+
+Version 1.5.3; January-18-2002
+===============================
+
+- This version supports the following devices :
+
+  T89C51SND1 through RS232 and USB
+
+  T8XC5121 / RS232
+
+  T89C51AC2 / RS232
+
+  T89C51CC01 / RS232 and CAN via :
+
+    * ATMEL              RS232/CAN interface
+    * RM     CANview     RS232/CAN interface
+    * VECTOR CANpari     Parallel/CAN interface
+    * VECTOR CANcardX    PCMCIA/CAN interface
+    * IXXAT  CANdy       Parallel/CAN interface
+    * PEAK   Pcan-Dongle Parallel/CAN interface
+    * SYSTEC USB-CAN     USB/CAN interface
+
+  T89C51RB2 / T89C51RC2 / T89C51RD2 through RS232
+
+Version 1.5.2; November-07-2001
+===============================
+
+- This version supports the following devices :
+
+  T89C51SND1 through RS232 and USB
+
+  T8XC5121 / RS232
+
+  T89C51AC2 / RS232
+
+  T89C51CC01 / RS232 and CAN via :
+    * IXXAT  CANdy interface
+    * VECTOR CANpari interface
+    * PEAK   Pcan-Dongle
+    * ATMEL  RS232/CAN interface
+    * SYSTEC USB-CAN interface
+
+  T89C51RB2 / T89C51RC2 / T89C51RD2 through RS232
+
+Version 1.5.0; October-19-2001
+==============================
+
+- This version supports the following devices :
+
+  T8XC5121 / RS232
+
+  T89C51AC2 / RS232
+
+  T89C51CC01 / RS232 and CAN via :
+    * IXXAT  CANdy interface
+    * VECTOR CANpari interface
+    * PEAK   Pcan-Dongle
+    * ATMEL  RS232/CAN interface
+    * SYSTEC USB-CAN interface
+
+  T89C51RB2 / T89C51RC2 / T89C51RD2 through RS232
+
+
+Version 1.4.9; October-12-2001
+==============================
+
+- This version supports the following devices :
+
+  T89C51AC2
+
+  T89C51CC01 / RS232 and CAN via :
+    * IXXAT  CANdy interface
+    * VECTOR CANpari interface
+    * PEAK   Pcan-Dongle
+    * ATMEL  RS232/CAN interface
+    * SYSTEC USB-CAN interface
+
+  T89C51RB2 / T89C51RC2 / T89C51RD2
+
+- The configuration file usage has changed.
+  Read the User's Manual for details.
+
+- When spurious data flew from the target hardware to the
+  PC COM port, FLIP displayed many error messages.
+  
+- The menu list of Windows COM ports was corrupted.
+
+- BLJB and X2 fuses checkbuttons state was not updated
+  when reading the HSB, although the HSB value was correct.
+
+- Known bugs and anomalies :
+  ------------------------
+
+  For the On-Line Help to work properly, FLIP must be
+  launched from the directory which houses the flip.exe
+  file.
+
+
+
+Version 1.4.2; September-07-2001
+================================
+
+- This version supports the following devices :
+  T89C51CC01 / RS232 and CAN via :
+    * IXXAT  CANdy interface
+    * VECTOR CANpari interface
+    * PEAK   Pcan-Dongle
+    * ATMEL  RS232/CAN interface
+    * SYSTEC USB-CAN interface
+  T89C51RB2 & T89C51RC2
+  T89C51RD2
+
+Version 1.4.0; August-30-2001
+=============================
+
+- This version supports the following devices :
+  T89C51CC01 / RS232 and CAN via :
+    * IXXAT CANdy interface
+    * VECTOR CANpari interface
+    * PEAK Pcan-Dongle
+  T89C51RB2 & T89C51RC2
+  T89C51RD2
+
+- For devices with multiple memories like the T89C51CC01
+  a button allows the selection of the ISP target memory.
+
+- The serial port selection mechanism has been modified
+   to allow users to connect USB to RS232 converters. 
+
+- Several minor GUI improvements have been done.
+
+- The FLIP User's Guide now contains information about
+  the CAN setup and capabilities. All possible FLIP error
+  and warning messages are explained.
+
+Version 1.2.0; Apr-20-2001
+==========================
+
+- This version supports the following devices :
+  T89C51CC01 / RS232
+  T89C51RB2 & T89C51RC2
+  T89C51RD2
+
+- The buffer checksum is calculated, displayed in the main window
+  and updated when necessary.
+
+- "Cannot find channel name filexxxxxxxxx" problem fixed.
+  This occured when exiting FLIP after a communication failure.
+
+- Access to the Atmel-wm WEB site from the About window is 
+  now possible.
+
+- Timeout problem at low baudrates fixed.
+
+- The name of the last loaded HEX file is displayed.
+
+- If the last loaded HEX file has been changed on disk, the user
+  is warned each time he launches a device program command.
+
+- A configuration file may be saved on disk to make the
+  following sessions of FLIP faster. All operations are
+  recorded for replay purpose.
+
+
+Version 1.1.0; Jan-25-2001
+==========================
+
+- This version supports the following devices :
+  T89C51CC01
+  T89C51IB2 & T89C51IC2
+  T89C51RB2 & T89C51RC2
+  T89C51RD2
+
+- Known bugs and anomalies :
+  ------------------------
+* the bootloader version 0.1.1 loaded into the following devices :
+  T89C51IB2 & T89C51IC2
+  T89C51RB2 & T89C51RC2
+  allows writing the BSB byte after the device has been set to 
+  security level 1.
+
+* the bootloader version 0.2.4 loaded into the T89C51RD2 device
+  forbids the blank check operation after the device has been set
+  to level 2. The blank check operation should be allowed, whatever
+  the security level is.
+
+Version 1.0.0; Jan-10-2001
+==========================
+
+- This version supports the T89C51RD2 and T89C51CC01 devices only.
+  The RS232 is the only supported communication link, even for the
+  T89C51CC01 device.
+

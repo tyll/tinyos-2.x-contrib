@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<!DOCTYPE Part SYSTEM "part.dtd">
+<Part NAME="ATOCDTARGET">
+   <USB_PID VALUE="2FFF" />
+
+   <Memory NAME="FLASH" SIZE="131072" />
+
+   <Memory NAME="EEPROM" SIZE="8192" />
+
+   <Memory NAME="CUSTOM" SIZE="128" />
+
+   <Memory NAME="BOOT" SIZE="128" />
+
+   <Memory NAME="XAF" SIZE="128" />
+
+   <Memory NAME="HWB" SIZE="1" />
+
+   <Memory NAME="SIGNATURES" SIZE="3" />
+
+   <Memory NAME="FWUPDATE" SIZE="1" />
+
+   <Memory NAME="IDATA" SIZE="256" />
+
+   <Memory NAME="ERAM" SIZE="8192" />
+
+   <Memory NAME="XDATA" SIZE="65536" />
+
+   <Memory NAME="SFR" SIZE="512" />
+
+   <Memory NAME="OCDSFR" SIZE="128" />
+
+   <Memory NAME="CODER51" SIZE="65536" />
+
+   <Memory NAME="CODEC51" SIZE="131072" />
+
+   <Memory NAME="LINK" SIZE="2048" />
+
+   <Memory NAME="LP" SIZE="8192" />
+
+   <Protocol FILE="RS232_I01.xml" />
+</Part>
+

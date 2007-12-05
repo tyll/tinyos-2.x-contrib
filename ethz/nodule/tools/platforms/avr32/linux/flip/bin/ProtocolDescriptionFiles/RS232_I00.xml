@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<!DOCTYPE Protocol SYSTEM "protocol.dtd">
+<Protocol>
+   <Ptcl NAME="RS232_I00" />
+
+   <Cmd NAME="wfl" VALUE="128" />
+
+   <Cmd NAME="rfl" VALUE="128" />
+
+   <Cmd NAME="stop_bit" VALUE="1" />
+
+   <Cmd NAME="sync" VALUE="U" />
+
+   <Cmd NAME="read_manuf_id" MEM_TYPE="signature" VALUE=":05000004003000300097" EXPECTED_NUM_CHARS="11" />
+
+   <Cmd NAME="read_family_code_id" MEM_TYPE="signature" VALUE=":05000004003100310095" EXPECTED_NUM_CHARS="11" />
+
+   <Cmd NAME="read_device_name_id" MEM_TYPE="signature" VALUE=":05000004006000600037" EXPECTED_NUM_CHARS="11" />
+
+   <Cmd NAME="read_device_rev_id" MEM_TYPE="signature" VALUE=":05000004006100610035" EXPECTED_NUM_CHARS="11" />
+
+   <Cmd NAME="read_device_boot_id_1" MEM_TYPE="bootloader" VALUE=":050000040001000100F5" EXPECTED_NUM_CHARS="11" />
+
+   <Cmd NAME="read_device_boot_id_2" MEM_TYPE="bootloader" VALUE=":050000040002000200F3" EXPECTED_NUM_CHARS="11" />
+
+   <Cmd NAME="read_boot_loader_version" MEM_TYPE="bootloader" VALUE=":050000040000000000F7" EXPECTED_NUM_CHARS="11" />
+
+   <Cmd NAME="read_fcb" MEM_TYPE="configuration" VALUE=":050000040000000000F7" EXPECTED_NUM_CHARS="11" />
+
+   <Cmd NAME="read_flash_security" MEM_TYPE="security" VALUE=":050000040000000000F7" EXPECTED_NUM_CHARS="11" />
+
+   <Cmd NAME="read_eeprom_security" MEM_TYPE="security" VALUE=":050000040001000100F5" EXPECTED_NUM_CHARS="11" />
+
+   <Cmd NAME="startAppliWithReset" VALUE=":00000001FF" />
+
+   <Cmd NAME="startAppliWithoutReset" VALUE=":00000001FF" />
+
+   <Cmd NAME="select_memory_flash" VALUE=":020000040000FA" />
+
+   <Cmd NAME="select_memory_eeprom" VALUE=":020000040100F9" />
+
+   <Cmd NAME="select_memory_security" VALUE=":020000040700F3" />
+
+   <Cmd NAME="select_memory_configuration" VALUE=":020000040800F2" />
+
+   <Cmd NAME="select_memory_bootloader" VALUE=":020000040300F7" />
+
+   <Cmd NAME="select_memory_signature" VALUE=":020000040600F4" />
+
+   <Cmd NAME="select_memory_n" VALUE=":02000004" />
+
+   <Cmd NAME="select_memory_page" VALUE=":02000002p000" />
+
+   <Cmd NAME="program_memory" VALUE=":LLaaaa00" />
+
+   <Cmd NAME="erase" VALUE=":0500000400FF000002F6" />
+
+   <Cmd NAME="blank_check" VALUE=":05000004aaaabbbb01" />
+
+   <Cmd NAME="read_memory" VALUE=":05000004aaaabbbb00" />
+
+   <Cmd NAME="writeProtection" VALUE="P" />
+
+   <Cmd NAME="readWriteProtection" VALUE="L" />
+</Protocol>
+

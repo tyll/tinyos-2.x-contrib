@@ -1,0 +1,39 @@
+# $Id$ #
+
+# author: Mustafa Yuecel <mustafa.yuecel@alumni.ethz.ch> #
+
+# TOSCONTRIBROOT, can be overridden
+$TCR = "%T/../../tinyos-2.x-contrib";
+$TCR = $ENV{"TOS_CONTRIB"} if defined($ENV{"TOS_CONTRIB"});
+
+# TOSCONTRIBDIR
+$TCD = "$TCR/ethz/nodule/tos";
+
+#qw doesn't replace variable so build list manually
+@INCLUDES_LIST = (
+
+  "$TCD/platforms/atevk1101",
+  "$TCD/chips/at32uc3b",
+  "$TCD/chips/at32uc3b/pins",
+  "$TCD/chips/cc2500",
+  "%T/lib/timer",
+  "%T/lib/serial",
+  "%T/interfaces",
+  "%T/system"
+
+);
+
+push( @includes, @INCLUDES_LIST );
+
+@opts = qw(
+
+  -gcc=avr32-gcc
+  -march=uc
+  -mpart=uc3b0256
+  -fnesc-target=env
+  -fnesc-no-debug
+  -fnesc-scheduler=TinySchedulerC,TinySchedulerC.TaskBasic,TaskBasic,TaskBasic,runTask,postTask
+
+);
+
+$ENV{NESC_MACHINE} = "pointer=4,4 float=4,4 double=8,4 long_double=8,4 short=2,2 int=4,4 long=4,4 long_long=8,4 int1248_align=1,2,4,4 wchar_size_size=4,4 char_wchar_signed=false,true";

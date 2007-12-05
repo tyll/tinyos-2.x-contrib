@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<!DOCTYPE Protocol SYSTEM "protocol.dtd">
+<Protocol>
+	<Ptcl NAME="USB_DFU_02" />
+
+	<Cmd NAME="wfl" VALUE="2048" />
+
+	<Cmd NAME="rfl" VALUE="2048" />
+
+	<Cmd NAME="select_memory_flash" VALUE="06030000" />
+
+	<Cmd NAME="select_memory_eeprom" VALUE="06030001" />
+
+	<Cmd NAME="select_memory_security" VALUE="06030002" />
+
+	<Cmd NAME="select_memory_configuration" VALUE="06030003" />
+
+	<Cmd NAME="select_memory_bootloader" VALUE="06030004" />
+
+	<Cmd NAME="select_memory_signature" VALUE="06030005" />
+
+	<Cmd NAME="select_memory_user" VALUE="06030006" />
+	
+	<Cmd NAME="select_memory_int_ram" VALUE="06030007" />
+	
+	<Cmd NAME="select_memory_ext_mem_cs0" VALUE="06030008" />
+	
+	<Cmd NAME="select_memory_ext_mem_cs1" VALUE="06030009" />
+	
+	<Cmd NAME="select_memory_ext_mem_cs2" VALUE="0603000A" />
+	
+	<Cmd NAME="select_memory_ext_mem_cs3" VALUE="0603000B" />
+	
+	<Cmd NAME="select_memory_page" VALUE="060301PPPP" />
+
+	<Cmd NAME="read_boot_loader_version" MEM_TYPE="bootloader"
+		VALUE="030000000000" />
+
+	<!-- The value of this command is not used. The sole purpose of this cmd
+		is to force a reading of the bootlaoder size.-->
+	<Cmd NAME="read_boot_loader_size" MEM_TYPE="configuration"
+		VALUE="0300" />
+
+	<Cmd NAME="erase" VALUE="0400FF" />
+
+	<Cmd NAME="blank_check" VALUE="0301" />
+
+	<Cmd NAME="read_memory" VALUE="0300" />
+
+	<Cmd NAME="program_start" VALUE="0100" />
+
+	<Cmd NAME="writeProtection" VALUE="P" />
+
+	<Cmd NAME="readWriteProtection" VALUE="L" />
+
+	<Cmd NAME="startAppliWithReset" VALUE="040300" />
+
+	<Cmd NAME="startAppliWithoutReset" VALUE="040301" />
+</Protocol>
+

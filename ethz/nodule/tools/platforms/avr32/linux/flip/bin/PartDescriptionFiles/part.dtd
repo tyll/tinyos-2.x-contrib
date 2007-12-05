@@ -1,0 +1,43 @@
+
+
+<!--
+
+      =======================================
+      DTD for Flip XML Part Description Files
+      =======================================
+
+-->
+
+<!ELEMENT Part (USB_PID?, Memory+, Gui?, Protocol+)>
+<!ATTLIST Part NAME CDATA #REQUIRED>
+
+<!ELEMENT USB_PID EMPTY>
+<!ATTLIST USB_PID
+    VALUE CDATA #REQUIRED>
+
+<!--  Memory SIZE is decimal while ADDR is hexadecimal -->
+
+<!ELEMENT Memory EMPTY>
+<!ATTLIST Memory
+    NAME        		CDATA #REQUIRED
+    SIZE        		CDATA #REQUIRED
+    ADDR				CDATA #IMPLIED
+    INDEX				CDATA #IMPLIED
+    RESET_VALUE			CDATA "FF"
+    ERASE_SELECTED		(true | false) "true"
+    BLANKCHECK_SELECTED	(true | false) "true"
+    PROGRAM_SELECTED	(true | false) "true"
+    VERIFY_SELECTED		(true | false) "true"
+    SECURITY			CDATA "false"
+    VISIBLE				(true | false) "true">
+
+<!ELEMENT Gui EMPTY>
+<!ATTLIST Gui
+    FILE CDATA #REQUIRED>
+
+<!-- ISP protocol description file -->
+<!ELEMENT Protocol EMPTY>
+<!ATTLIST Protocol
+    FILE CDATA #REQUIRED>
+
+

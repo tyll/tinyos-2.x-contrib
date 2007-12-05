@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!DOCTYPE Part SYSTEM "part.dtd">
+<Part NAME="AT32UC3B064">
+	<USB_PID VALUE="2FF6" />
+
+	<Memory NAME="FLASH" SIZE="65536" ADDR="80000000" />
+
+	<Memory NAME="BOOTLOADER" SIZE="3" INDEX="3"/>
+
+	<Memory NAME="SIGNATURE" SIZE="4" INDEX="6"/>
+
+	<Memory NAME="SECURITY" SIZE="1" />
+
+	<Memory NAME="CONFIGURATION" SIZE="32" />
+
+	<Memory NAME="USER" SIZE="512" ADDR="80800000" INDEX="11" />
+
+	<Memory NAME="INT_RAM" SIZE="16384" ADDR="0" />
+
+	<Protocol FILE="USB_DFU_02.xml" />
+</Part>

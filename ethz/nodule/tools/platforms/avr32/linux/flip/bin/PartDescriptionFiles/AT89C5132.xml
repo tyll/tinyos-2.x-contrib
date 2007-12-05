@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!DOCTYPE Part SYSTEM "part.dtd">
+<Part NAME="AT89C5132">
+   <USB_PID VALUE="2FFF" />
+
+   <Memory NAME="FLASH" SIZE="65536" RESET_VALUE="FF" SECURITY="true" />
+
+   <Gui FILE="at89c51snd1_gui.xml" />
+
+   <Protocol FILE="USB_DFU_00.xml" />
+
+   <Protocol FILE="RS232_S02.xml" />
+</Part>
+

@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!DOCTYPE Part SYSTEM "part.dtd">
+<Part NAME="AT90USB162">
+   <USB_PID VALUE="2FFA" />
+
+   <Memory NAME="FLASH" SIZE="12288" RESET_VALUE="FF" SECURITY="true" BLANKCHECK_SELECTED="false" />
+
+   <Memory NAME="EEPROM" SIZE="512" RESET_VALUE="FF" SECURITY="false" ERASE_SELECTED="false" BLANKCHECK_SELECTED="false" />
+
+   <Gui FILE="at90usb1287_gui.xml" />
+
+   <Protocol FILE="USB_DFU_01.xml" />
+</Part>
+

@@ -1,0 +1,23 @@
+<ERRORS>
+   <STATUS_PASS TEXT="Pass" />
+   <STATUS_MEMORY_ALLOC_ERROR TEXT="Memory allocation error" />
+   <STATUS_ADDRESS_OUT_OF_RANGE_ERROR  TEXT="Address out of range" />
+   <STATUS_FUNCTION_NOT_IMPLEMENTED_ERROR TEXT="Function not implemented" />
+   <STATUS_TIMEOUT_ERROR TEXT="Timeout error" />
+   <STATUS_READING_ERROR TEXT="Reading error" />
+   <STATUS_CHECKSUM_ERROR TEXT="Checksum error" />
+   <STATUS_DEVICE_DOES_NOT_EXIST TEXT="Device does not exist" />
+   <STATUS_PROTOCOL_DOES_NOT_EXIST TEXT="Protocol does not exist" />
+   <STATUS_CANNOT_EXECUTE_COMMAND TEXT="Cannot execute command" />
+   <STATUS_INVALID_DEVICE_HARDWARE_ASSOCIATION TEXT="Invalid device / hardware association" />
+   <STATUS_CANNOT_CREATE_DEVICE_OBJECT TEXT="Cannot create device object" />
+   <STATUS_CANNOT_CREATE_PROTOCOL_OBJECT TEXT="Cannot create protocol object" />
+   <STATUS_HARDWARE_DOES_NOT_EXIST TEXT="Hardware does not exist" />
+   <STATUS_COMMAND_DOES_NOT_EXIST TEXT="Command does not exist" />
+   <STATUS_OPEN_PORT_ERROR TEXT="Cannot open port" />
+   <STATUS_CLOSE_PORT_ERROR TEXT="Error on closing port" />
+   <STATUS_CANNOT_WRITE_TO_PORT TEXT="Cannot write to port" />
+   <STATUS_POSSIBLE_FRAMING_ERROR TEXT="Possible framing error" />
+   <STATUS_WRITE_PROTECTION_ERROR TEXT="Write protection error" />
+   <STATUS_READ_WRITE_PROTECTION_ERROR TEXT="Read-Write protection error" />
+</ERRORS>

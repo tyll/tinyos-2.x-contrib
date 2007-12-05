@@ -1,0 +1,82 @@
+<?xml version="1.0"?>
+<!DOCTYPE Protocol SYSTEM "protocol.dtd">
+<Protocol>
+   <Ptcl NAME="RS232_S03" />
+
+   <Cmd NAME="wfl" VALUE="16" />
+
+   <Cmd NAME="rfl" VALUE="16" />
+
+   <Cmd NAME="stop_bit" VALUE="1" />
+
+   <Cmd NAME="sync" VALUE="U" />
+
+   <Cmd NAME="read_manuf_id" VALUE=":020000050000F9" />
+
+   <Cmd NAME="read_family_code_id" VALUE=":020000050001F8" />
+
+   <Cmd NAME="read_device_name_id" VALUE=":020000050002F7" />
+
+   <Cmd NAME="read_device_rev_id" VALUE=":020000050003F6" />
+
+   <Cmd NAME="read_device_boot_id_1" VALUE=":020000050E00EB" />
+
+   <Cmd NAME="read_device_boot_id_2" VALUE=":020000050E01EA" />
+
+   <Cmd NAME="read_hardware_byte" VALUE=":020000050703EF" />
+
+   <Cmd NAME="read_boot_loader_version" VALUE=":020000050800F1" />
+
+   <Cmd NAME="read_ssb" VALUE=":020000050700F2" />
+
+   <Cmd NAME="read_bsb" VALUE=":020000050701F1" />
+
+   <Cmd NAME="prog_bsb" VALUE=":030000030600" />
+
+   <Cmd NAME="read_eb" VALUE=":020000050706EC" />
+
+   <Cmd NAME="prog_eb" VALUE=":030000030606" />
+
+   <Cmd NAME="read_sbv" VALUE=":020000050702F0" />
+
+   <Cmd NAME="prog_sbv" VALUE=":030000030601" />
+
+   <Cmd NAME="enable_bljb_fuse" VALUE=":030000030A0400EC" />
+
+   <Cmd NAME="disable_bljb_fuse" VALUE=":030000030A0401EB" />
+
+   <Cmd NAME="enable_x2_fuse" VALUE=":030000030A0800E8" />
+
+   <Cmd NAME="disable_x2_fuse" VALUE=":030000030A0801E7" />
+
+   <Cmd NAME="set_security_level_1" VALUE=":020000030500F6" />
+
+   <Cmd NAME="set_security_level_2" VALUE=":020000030501F5" />
+
+   <Cmd NAME="startAppliWithReset" VALUE=":020000030300F8" />
+
+   <Cmd NAME="startAppliWithoutReset" VALUE=":0400000303010000F5" />
+
+   <Cmd NAME="erase_flash" VALUE=":0100000307F5" />
+
+   <Cmd NAME="blank_check_flash" VALUE=":05000004AAAABBBB01" />
+
+   <Cmd NAME="read_memory" VALUE=":05000004AAAABBBB00" />
+
+   <Cmd NAME="read_flash_byte" VALUE="00" />
+
+   <Cmd NAME="read_eeprom_byte" VALUE="02" />
+
+   <Cmd NAME="read_custom_byte" VALUE="03" />
+
+   <Cmd NAME="progFlashByte" VALUE="00" />
+
+   <Cmd NAME="progEepromByte" VALUE="07" />
+
+   <Cmd NAME="progCustomByte" VALUE="08" />
+
+   <Cmd NAME="writeProtection" VALUE="P" />
+
+   <Cmd NAME="readWriteProtection" VALUE="L" />
+</Protocol>
+

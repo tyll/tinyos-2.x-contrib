@@ -1,0 +1,77 @@
+NEWS - FLIP - 3.2.1
+
+               
+Atmel
+
+Please read the LICENSE file.
+
+
+DESCRIPTION
+-----------
+
+This Atmel In-System Programming software runs under Windows 98/Me/NT/2000/XP/Linux.
+
+Communicating with the target device may be done through RS232, CAN (not under Linux) or USB link.
+
+This program is named FLIP, which stands for: FLexible In-system Programmer.
+
+
+DOWNLOAD
+--------
+
+This program can be downloaded from the Atmel website: 
+http://www.atmel.com
+
+
+MAIN FEATURES
+-------------
+
+- performs In-System Programming  through RS232, USB or CAN interfaces.
+
+- may be used through its intuitive Graphical User Interface or launched
+  from a DOS window (see the batchisp manual), from an embedded software IDE
+  like KEIL's uVision2, or even from your own application (see the ISP
+  Functions Library manual).
+
+- runs under Windows 9x / Me / NT / 2000 / XP / Linux
+
+- supports Intel MCS-86 Hexadecimal Object, Code 88 file format for data
+  file loading and saving.
+
+- buffer editing capabilities : fill, search, copy, reset, modify, goto.
+
+- target device memory control : erase, blank check, program, verify,
+  read, security level and special bytes reading and setting.
+
+- parts serialization capability (from batchisp only).
+
+- ISP hardware conditions may be set by software (AutoISP).
+
+- the demo mode emulates ISP operations without any target hardware.
+
+- the debug mode lets you log the traffic on the selected medium.
+
+- on-line help.
+
+
+
+KNOWN BUGS AND LIMITATIONS
+--------------------------
+
+
+PROBLEMS
+--------
+
+If you find any problem, please report it to
+Atmel Microcontrollers hotline:
+http://support.norway.atmel.com/bin/customer
+
+
+
+CHANGES
+-------
+
+- Support of the RS232 protocol added to the T89C51CC01 device.
+- AT89C51CC03 device supported.
+
+

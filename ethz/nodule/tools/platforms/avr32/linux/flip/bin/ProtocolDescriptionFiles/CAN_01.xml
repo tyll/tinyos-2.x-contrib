@@ -1,0 +1,102 @@
+<?xml version="1.0"?>
+<!DOCTYPE Protocol SYSTEM "protocol.dtd">
+<Protocol>
+   <Ptcl NAME="CAN_01" />
+
+   <Cmd NAME="wfl" VALUE="8" />
+
+   <Cmd NAME="rfl" VALUE="8" />
+
+   <Cmd NAME="select_can_node" VALUE="00001NN" />
+
+   <Cmd NAME="read_manuf_id" MEM_TYPE="signature" VALUE="003050000000000" />
+
+   <Cmd NAME="read_family_code_id" MEM_TYPE="signature" VALUE="003050000010001" />
+
+   <Cmd NAME="read_device_name_id" MEM_TYPE="signature" VALUE="003050000020002" />
+
+   <Cmd NAME="read_device_rev_id" MEM_TYPE="signature" VALUE="003050000030003" />
+
+   <Cmd NAME="read_boot_loader_version" MEM_TYPE="bootinfo" VALUE="003050000000000" />
+
+   <Cmd NAME="read_device_boot_id_1" MEM_TYPE="bootinfo" VALUE="003050000010001" />
+
+   <Cmd NAME="read_device_boot_id_2" MEM_TYPE="bootinfo" VALUE="003050000020002" />
+
+   <Cmd NAME="read_BSB" MEM_TYPE="bootconfig" VALUE="003050000000000" />
+
+   <Cmd NAME="prog_BSB" MEM_TYPE="bootconfig" VALUE="001050000000000" />
+
+   <Cmd NAME="read_ssb" MEM_TYPE="bootconfig" VALUE="003050000010001" />
+
+   <Cmd NAME="read_EB" MEM_TYPE="bootconfig" VALUE="003050000020002" />
+
+   <Cmd NAME="prog_EB" MEM_TYPE="bootconfig" VALUE="001050000020002" />
+
+   <Cmd NAME="read_btc1" MEM_TYPE="bootconfig" VALUE="003050000030003" />
+
+   <Cmd NAME="read_btc2" MEM_TYPE="bootconfig" VALUE="003050000040004" />
+
+   <Cmd NAME="read_btc3" MEM_TYPE="bootconfig" VALUE="003050000050005" />
+
+   <Cmd NAME="prog_btc1" MEM_TYPE="bootconfig" VALUE="001050000030003" />
+
+   <Cmd NAME="prog_btc2" MEM_TYPE="bootconfig" VALUE="001050000040004" />
+
+   <Cmd NAME="prog_btc3" MEM_TYPE="bootconfig" VALUE="001050000050005" />
+
+   <Cmd NAME="read_cbtr1" MEM_TYPE="registers" VALUE="003050000E200E2" />
+
+   <Cmd NAME="read_cbtr2" MEM_TYPE="registers" VALUE="003050000E300E3" />
+
+   <Cmd NAME="read_cbtr3" MEM_TYPE="registers" VALUE="003050000E400E4" />
+
+   <Cmd NAME="read_nnb" MEM_TYPE="bootconfig" VALUE="003050000060006" />
+
+   <Cmd NAME="prog_nnb" MEM_TYPE="bootconfig" VALUE="001050000060006" />
+
+   <Cmd NAME="read_cris" MEM_TYPE="bootconfig" VALUE="003050000070007" />
+
+   <Cmd NAME="prog_cris" MEM_TYPE="bootconfig" VALUE="001050000070007" />
+
+   <Cmd NAME="read_SA_H" MEM_TYPE="bootconfig" VALUE="003050000080008" />
+
+   <Cmd NAME="read_SA_L" MEM_TYPE="bootconfig" VALUE="003050000090009" />
+
+   <Cmd NAME="prog_SA_H" MEM_TYPE="bootconfig" VALUE="001050000080008" />
+
+   <Cmd NAME="prog_SA_L" MEM_TYPE="bootconfig" VALUE="001050000090009" />
+
+   <Cmd NAME="reset" VALUE="004020300" />
+
+   <Cmd NAME="startAppliWithReset" VALUE="004020300" />
+
+   <Cmd NAME="startAppliWithoutReset" VALUE="004040301" ></Cmd>
+
+   <Cmd NAME="select_page" VALUE="006030200" />
+
+   <Cmd VALUE="00603010000" NAME="select_memory_flash"/>
+
+   <Cmd NAME="select_memory_eeprom" VALUE="00603010100" />
+
+   <Cmd NAME="select_memory_signature" VALUE="00603010200" />
+
+   <Cmd NAME="select_memory_bootinfo" VALUE="00603010300" />
+
+   <Cmd NAME="select_memory_bootconfig" VALUE="00603010400" />
+
+   <Cmd NAME="select_memory_registers" VALUE="00603010500" />
+
+   <Cmd NAME="select_memory_n" VALUE="0060301" />
+
+   <Cmd NAME="erase" VALUE="0010380FFFF" />
+
+   <Cmd NAME="blank_check" VALUE="0030580XXXXYYYY" />
+
+   <Cmd NAME="read_memory" VALUE="0030500XXXXYYYY" />
+
+   <Cmd NAME="program_start" VALUE="0010500" />
+
+   <Cmd NAME="program_data" VALUE="002" />
+</Protocol>
+

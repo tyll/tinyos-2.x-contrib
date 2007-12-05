@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!DOCTYPE Part SYSTEM "part.dtd">
+<Part NAME="AT89C51IE2">
+   <Memory NAME="FLASH" SIZE="131072" RESET_VALUE="FF" SECURITY="true" VISIBLE="true" />
+
+   <Memory NAME="EEPROM" SIZE="2048" RESET_VALUE="FF" SECURITY="true" VISIBLE="true" />
+
+   <Memory NAME="BOOTLOADER" INDEX="3" SIZE="3" RESET_VALUE="FF" SECURITY="false" VISIBLE="false" />
+
+   <Memory NAME="SIGNATURE" INDEX="6" SIZE="98" RESET_VALUE="FF" SECURITY="false" VISIBLE="false" />
+
+   <Memory NAME="SECURITY" SIZE="2" RESET_VALUE="FF" SECURITY="false" VISIBLE="false" />
+
+   <Memory NAME="CONFIGURATION" SIZE="1" RESET_VALUE="FF" SECURITY="false" VISIBLE="false" />
+
+   <Gui FILE="at89c51ie2_gui.xml" />
+
+   <Protocol FILE="RS232_I00.xml" />
+</Part>
+

@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<!DOCTYPE Protocol SYSTEM "protocol.dtd">
+<Protocol>
+   <Ptcl NAME="USB_DFU_01" />
+
+   <Cmd NAME="wfl" VALUE="512" />
+
+   <Cmd NAME="rfl" VALUE="2048" />
+
+   <Cmd NAME="read_manuf_id" VALUE="050130" />
+
+   <Cmd NAME="read_family_code_id" VALUE="050131" />
+
+   <Cmd NAME="read_device_name_id" VALUE="050160" />
+
+   <Cmd NAME="read_device_rev_id" VALUE="050161" />
+
+   <Cmd NAME="read_device_boot_id_1" VALUE="050001" />
+
+   <Cmd NAME="read_device_boot_id_2" VALUE="050002" />
+
+   <Cmd NAME="read_boot_loader_version" VALUE="050000" />
+
+   <Cmd NAME="startAppliWithReset" VALUE="040300" />
+
+   <Cmd NAME="startAppliWithoutReset" VALUE="040301" />
+
+   <Cmd NAME="erase_flash" VALUE="0400FF" />
+
+   <Cmd NAME="blank_check_flash" VALUE="0301" />
+
+   <Cmd NAME="read_memory" VALUE="03MM" />
+
+   <Cmd NAME="read_flash_byte" VALUE="00" />
+
+   <Cmd NAME="read_eeprom_byte" VALUE="02" />
+
+   <Cmd NAME="read_custom_byte" VALUE="03" />
+
+   <Cmd NAME="program_start_byte" VALUE="01" />
+
+   <Cmd NAME="progFlashByte" VALUE="00" />
+
+   <Cmd NAME="progEepromByte" VALUE="01" />
+
+   <Cmd NAME="progCustomByte" VALUE="08" />
+
+   <Cmd NAME="writeProtection" VALUE="P" />
+
+   <Cmd NAME="readWriteProtection" VALUE="L" />
+
+   <Cmd NAME="select_memory_page" VALUE="060300PP" />
+</Protocol>
+

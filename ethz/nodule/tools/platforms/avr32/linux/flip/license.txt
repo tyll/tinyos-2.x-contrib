@@ -1,0 +1,123 @@
+
+SOFTWARE LICENSE AGREEMENT
+
+Important- Read carefully
+
+This is a legally binding agreement between Atmel Corporation, including its
+subsidiaries and affiliates ("Atmel") and You ("You"). In return for acquiring
+a license to use the Software and related documentation and hardware
+peripherals ("Software"), You agree to the following terms and conditions.
+
+1. Grant of License.    
+
+Atmel grants You a non-exclusive, non-transferable, non-sublicensable license:
+(a) to use the Software on a single computer; (b) to make one copy of the
+Software solely for backup purposes; (c) to solely use the Software with
+devices manufactured by Atmel or sold by Atmel or its distributors.
+
+2. Proprietary Rights.  
+
+Nothwithstanding the license grant set forth in Section 1 above, Atmel retains
+full rights, title and ownership including all copyrights, derivative works,
+and all other intellectual property rights in and to the Software.  The
+license set forth in Section 1 is not a sale of the Software.  You agree to
+use your best efforts to prevent any unauthorized use or disclosure of the
+Software.  
+
+3. No Other Rights.  
+
+Except as stated above, this Agreement does not grant You any rights to
+patents, copyrights, trade secrets, trade names, trademarks (whether
+registered or unregistered), or any other rights, franchises, or licenses in
+respect of the Software.  YOU MAY NOT MODIFY, TRANSLATE, DISASSEMBLE, REVERSE
+ENGINEER OR DECOMPILE THE SOFTWARE OR ANY COPY, IN WHOLE OR IN PART.
+
+4. Term and Termination.  
+
+This license is effective until terminated.  Either Atmel or You may terminate
+this Agreement at any time.  The license will automatically terminate if You
+fail to comply with any of the terms and conditions of this Agreement.  Upon
+termination for any reason, You will immediately destroy or return to Atmel
+the Software, including all documentation for and all whole or partial copies
+of the Software.
+
+5. Warranty Disclaimer. 
+
+THE SOFTWARE AND DOCUMENTATION IS PROVIDED "AS-IS" WITH NO WARRANTY
+WHATSOEVER.  ATMEL SPECIFICALLY DISCLAIMS ALL EXPRESS, IMPLIED AND/OR
+STATUTORY WARRANTIES, INCLUDING BUT NOT LIMITED TO, WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  You
+assume all responsibility for selection of the Software to achieve your
+intended results and for the installation, use and results obtained from the
+Software.  You assume the entire risk as to the quality and performance of the
+Software.  Specifically, Atmel does not warrant (a) that the functions
+contained in the Software will meet your requirements, (b) that the Software
+will operate in the hardware or Software combinations that You may select, (c)
+that the operation of the Software will be uninterrupted or error-free, (d)
+that defects in the operation of the Software will be corrected, or (e) that
+Atmel will support or maintain the Software.  Should the Software prove
+defective, You (and not Atmel or an Atmel representative) assume the entire
+cost of all necessary servicing, repair or correction.
+
+6. LIMITATION OF LIABILITY.  
+
+IN NO EVENT SHALL ATMEL BE LIABLE TO YOU OR ANY THIRD PARTY FOR ANY
+CONSEQUENTIAL, SPECIAL, INDIRECT OR INCIDENTAL DAMAGES ARISING OUT OF THE USE
+OF THE SOFTWARE EVEN IF ATMEL HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+DAMAGES.  IN NO EVENT SHALL THE LIABILITY OF ATMEL RELATING TO THE SOFTWARE OF
+THIS AGREEMENT EXCEED THE PRICE PAID TO ATMEL FOR THE SOFTWARE.  ATMEL SHALL
+NOT, UNDER ANY CIRCUMSTANCES, BE LIABLE FOR EXCESS COSTS OF REPROCUREMENT.
+
+7. Export.  
+
+You acknowledge that the laws and regulations of the United States restrict
+the export and re-export of the Software.  You agree not to export or
+re-export the Software in any form without the appropriate United States and
+foreign governmental approval.
+
+8. U.S. Government Restricted Rights Legend.	
+
+(a)  If the Software is being licensed by or on behalf of a unit or agency of
+the United States Government, this provision applies.  The Software (i) was
+developed at private expense, and no part of it was developed with government
+funds; (ii) is a trade secret of Atmel for all purposes of the Freedom of
+Information Act; (iii) is "commercial computer Software" subject to limited
+utilization as provided in the agreement between the vendor and government
+entity; and (iv) is in all respects proprietary data belonging solely to
+Atmel.	
+
+(b)  The Software and Documentation are provided with RESTRICTED RIGHTS.  Use,
+duplication, or disclosure by the Government is subject to restrictions as set
+forth in subparagraph (c) (1) (ii) of the Rights in Technical Data and
+Computer Software clause of DFARS 52.227-7013.
+
+9. General.  
+
+(a)  Some states may not allow exclusion of implied warranties or exclusion or
+limitation of incidental or consequential damages, so these exclusions and
+limitations may not apply to You.  
+
+(b)  This Agreement and all transactions concluded hereunder shall be governed
+by the laws of the State of California, as such laws are applied to contracts
+entered into and performed entirely in California by California residents.
+Any litigation relating to this Agreement shall be subject to the exclusive
+jurisdiction of the State courts located in Santa Clara County, California, or
+the federal courts located in the Northern District of California.  
+
+(c)   If any provision of this Agreement is held to be invalid, illegal or
+unenforceable, that provision shall be construed in such a manner that it
+becomes valid and enforceable and so as to reflect most closely the intent of
+the parties in agreeing upon the provision in the first place, and the
+remaining provisions of this Agreement shall continue in full force and effect
+and shall not in any way be affected or impaired by any such determination of
+invalidity, illegality or unenforceability. 
+
+(d)  YOU ACKNOWLEDGE THAT YOU HAVE READ THIS AGREEMENT, UNDERSTAND IT AND
+AGREE TO BE BOUND BY ITS TERMS AND CONDITIONS.  YOU FURTHER AGREE THAT THIS
+AGREEMENT IS THE ENTIRE AND EXCLUSIVE AGREEMENT BETWEEN ATMEL AND YOU, WHICH
+SUPERSEDES ALL PRIOR ORAL AND WRITTEN AGREEMENTS AND COMMUNICATIONS BETWEEN
+THE PARTIES PERTAINING TO THE SUBJECT MATTER OF THIS AGREEMENT.  NO DIFFERENT
+OR ADDITIONALTERMS WILL BE ENFORCEABLE AGAINST ATMEL UNLESS ATMEL GIVES ITS
+EXPRESS WRITTEN CONSENT, INCLUDING AN EXPRESS WAIVER OF THE TERMS OF THIS
+AGREEMENT.
+

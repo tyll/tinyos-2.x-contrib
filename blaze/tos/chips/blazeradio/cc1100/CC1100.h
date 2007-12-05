@@ -107,7 +107,7 @@ enum {
 
 // Default channel is at 314.996490 MHz
 #ifndef CC1100_DEFAULT_CHANNEL
-#define CC1100_DEFAULT_CHANNEL 128
+#define CC1100_DEFAULT_CHANNEL 70
 #endif
 
 #ifndef CC1100_CHANNEL_MIN

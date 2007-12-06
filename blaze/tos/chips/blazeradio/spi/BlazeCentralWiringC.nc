@@ -49,6 +49,7 @@ configuration BlazeCentralWiringC {
     interface GeneralIO as Csn[ radio_id_t id ];
     interface GeneralIO as Gdo0_io[ radio_id_t id ];
     interface GeneralIO as Gdo2_io[ radio_id_t id ];
+    interface GeneralIO as Power[ radio_id_t id ];
     interface GpioInterrupt as Gdo0_int[ radio_id_t id ];
     interface GpioInterrupt as Gdo2_int[ radio_id_t id ];
     interface BlazeConfig[ radio_id_t id ];
@@ -59,6 +60,7 @@ configuration BlazeCentralWiringC {
     interface GeneralIO as ChipCsn[ radio_id_t id ];
     interface GeneralIO as ChipGdo0_io[ radio_id_t id ];
     interface GeneralIO as ChipGdo2_io[ radio_id_t id ];
+    interface GeneralIO as ChipPower[ radio_id_t id ];
     interface GpioInterrupt as ChipGdo0_int[ radio_id_t id ];
     interface GpioInterrupt as ChipGdo2_int[ radio_id_t id ];
     interface BlazeConfig as ChipConfig[ radio_id_t id ];
@@ -73,6 +75,7 @@ implementation {
   Gdo2_io = ChipGdo2_io;
   Gdo0_int = ChipGdo0_int;
   Gdo2_int = ChipGdo2_int;
+  Power = ChipPower;
   BlazeConfig = ChipConfig;
   BlazeRegSettings = ChipRegSettings;
 }

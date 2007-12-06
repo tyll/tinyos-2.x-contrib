@@ -1,31 +1,5 @@
 
 /**
- * View of the 6- and 10-pin headers from the TOP of the tmote:
- *
- *              ------
- *              o1  2o
- *       GDO0 - o3  4o - GDO2
- *              o5  6o
- *              ------
- *              ------
- *        VCC - o1  2o              >> VCC is always on
- *        CSN - o3  4o
- *      Power - o5  6o - CLK        >> Power toggling is not connected
- *              o7  8o - SI
- *        GND - o9 10o
- *              ------
- *
- *
- * Finally, pull the SO line from the STM25P flash since it's not brought out
- * on a header:
- *
- *             ________
- *           =|O       |=   
- *      SO - =|  STM   |=
- *           =| 25P80  |=
- *           =|________|=
- *            
- *
  * @author David Moss
  */
  
@@ -71,7 +45,6 @@ implementation {
   
   components new Msp430GpioC() as power_io;
   power_io -> GeneralIOC.Port55;
-  //Power = power_io;
   HplCC1100PinsP.PowerIn -> power_io;
   Power = HplCC1100PinsP.PowerOut;
   

@@ -63,6 +63,7 @@ module BlazeInitP {
     interface GeneralIO as Csn[ radio_id_t id ];
     interface GeneralIO as Gdo0_io[ radio_id_t id ];
     interface GeneralIO as Gdo2_io[ radio_id_t id ];
+    interface GeneralIO as Power[ radio_id_t id ];
     interface GpioInterrupt as Gdo0_int[ radio_id_t id ];
     interface GpioInterrupt as Gdo2_int[ radio_id_t id ];
     
@@ -128,6 +129,7 @@ implementation {
    * It may have something to do with the corrupted register writes on burst.
    */
   command error_t SplitControl.start[ radio_id_t id ]() {
+    
     if(id >= uniqueCount(UQ_BLAZE_RADIO)) {
       return EINVAL;
     }
@@ -144,13 +146,8 @@ implementation {
     
     // We must be in state S_OFF for this radio. 
     atomic m_id = id;
-    
-    /* 
-     * We no longer enable / disable the power line - it's too inefficient
-     * call Power.set[ m_id ]();
-     *  
-     * for(pause =  0; pause < 2700; pause++);   
-     */
+
+    call Power.set[ m_id ]();
 
     state[ m_id ] = S_STARTING;
     
@@ -244,7 +241,7 @@ implementation {
     call Gdo0_io.clr[ id ]();
     call Gdo2_io.clr[ id ]();
     
-    /* call Power.clr[ id ](); */
+    call Power.clr[ id ]();
   }
   
   async command bool BlazePower.isOn[ radio_id_t id ]() {
@@ -387,7 +384,6 @@ implementation {
   default async command void Csn.makeOutput[ radio_id_t id ](){}
   default async command bool Csn.isOutput[ radio_id_t id ](){return FALSE;}
   
-  /*
   default async command void Power.set[ radio_id_t id ](){}
   default async command void Power.clr[ radio_id_t id ](){}
   default async command void Power.toggle[ radio_id_t id ](){}
@@ -396,8 +392,7 @@ implementation {
   default async command bool Power.isInput[ radio_id_t id ](){return FALSE;}
   default async command void Power.makeOutput[ radio_id_t id ](){}
   default async command bool Power.isOutput[ radio_id_t id ](){return FALSE;}
-  */
-  
+
   default async command void Gdo0_io.set[ radio_id_t id ](){}
   default async command void Gdo0_io.clr[ radio_id_t id ](){}
   default async command void Gdo0_io.toggle[ radio_id_t id ](){}

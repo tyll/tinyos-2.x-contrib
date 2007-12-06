@@ -66,6 +66,7 @@ implementation {
   BlazeInitP.Gdo2_io -> BlazeCentralWiringC.Gdo2_io;
   BlazeInitP.Gdo0_int -> BlazeCentralWiringC.Gdo0_int;
   BlazeInitP.Gdo2_int -> BlazeCentralWiringC.Gdo2_int;
+  BlazeInitP.Power -> BlazeCentralWiringC.Power;
   BlazeInitP.BlazeRegSettings -> BlazeCentralWiringC.BlazeRegSettings;
   
   BlazeInitP.ResetResource -> ResetResourceC;

@@ -19,7 +19,9 @@ module HplCC2500PinsP {
 implementation {
 
   command error_t Init.init() {
-    call PowerIn.set();
+    call CSn.makeOutput();
+    call PowerIn.makeOutput();
+    call PowerOut.clr();
     return SUCCESS;
   }
 
@@ -33,8 +35,10 @@ implementation {
   CSn pin low so it does not power the raio module through that pin. *************/
   
   async command void PowerOut.set(){
+    int i;
     call PowerIn.set();
     call CSn.set();
+    for(i = 0; i < 2700; i++);
   }
   
   async command void PowerOut.clr(){

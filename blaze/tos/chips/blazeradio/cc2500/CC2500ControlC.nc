@@ -79,7 +79,7 @@ implementation {
   BlazeCentralWiringC.ChipGdo2_io[ CC2500_RADIO_ID ] -> Pins.Gdo2_io;
   BlazeCentralWiringC.ChipGdo0_int[ CC2500_RADIO_ID ] -> Pins.Gdo0_int;
   BlazeCentralWiringC.ChipGdo2_int[ CC2500_RADIO_ID ] -> Pins.Gdo2_int;
-  BlazeCentralWiringC.ChipPower[ CC1100_RADIO_ID ] -> Pins.Power;
+  BlazeCentralWiringC.ChipPower[ CC2500_RADIO_ID ] -> Pins.Power;
   BlazeCentralWiringC.ChipConfig[ CC2500_RADIO_ID ] -> CC2500ControlP.BlazeConfig;
   
   components LedsC;

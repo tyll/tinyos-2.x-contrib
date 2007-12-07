@@ -28,10 +28,10 @@ implementation {
 		components new Msp430GpioC() as RxCTSPin;
 		RxRTSPin.HplGeneralIO -> HplMsp430GeneralIOC.Port23;
 		RxCTSPin.HplGeneralIO -> HplMsp430GeneralIOC.Port26;
-		DsnPlatformTelosbP.RxRTSPin -> RxRTSPin;	
-		DsnPlatformTelosbP.RxCTSPin -> RxCTSPin;	
+		DsnPlatformTelosbP.RxRTSPin -> RxRTSPin;
+		DsnPlatformTelosbP.RxCTSPin -> RxCTSPin;
 		components new Msp430InterruptC() as RxRTSInt;
-		components HplMsp430InterruptC; 
+		components HplMsp430InterruptC;
 		RxRTSInt.HplInterrupt -> HplMsp430InterruptC.Port23;
 		DsnPlatformTelosbP.RxRTSInt -> RxRTSInt.Interrupt;
 	#endif
@@ -39,6 +39,8 @@ implementation {
 		components new DsnPlatformTelosbP(FALSE);
 		components new Msp430Uart1C() as Uart;
 		components HplMsp430Usart1C as HplUsart;
+		components MainC;
+		DsnPlatformTelosbP.Boot->MainC.Boot;
 		TxPin.HplGeneralIO -> HplMsp430GeneralIOC.UTXD1;
 		Resource = DsnPlatformTelosbP.DummyResource;
 		DsnPlatformTelosbP.Resource -> Uart;

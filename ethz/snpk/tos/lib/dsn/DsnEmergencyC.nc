@@ -1,6 +1,6 @@
 // Emergency logging
 #include "DSN.h"
-component DsnEmergencyC {
+configuration DsnEmergencyC {
 	provides interface DsnEmergency;
 }
 implementation {

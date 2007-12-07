@@ -15,12 +15,13 @@ generic module DsnPlatformTelosbP(bool useHandshake) {
 		interface Packet;
 		interface SplitControl as RadioControl;
 		interface Resource;
+		interface Boot;
 	}
 }
 implementation {
 	
 	bool dummyResourceGranted=FALSE;
-	
+
 	msp430_uart_union_config_t dsn_config = {
   		{
   		ubr: UBR_1MHZ_115200, //UBR_32KHZ_9600,			//UBR_1MHZ_9600
@@ -52,6 +53,11 @@ implementation {
 		// setup CTS pin
 		call RxCTSPin.set();		// default hi = not ready to receive
 		call RxCTSPin.makeOutput();
+	}
+	
+	event void Boot.booted(){
+		if (!useHandshake)
+			call DummyResource.immediateRequest();
 	}
 	
 	async command void DsnPlatform.flushUart(){

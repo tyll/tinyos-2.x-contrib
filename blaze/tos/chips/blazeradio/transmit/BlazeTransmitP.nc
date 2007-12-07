@@ -167,7 +167,7 @@ implementation {
       
       state = call State.getState();
       call State.toIdle();
-    
+      
       if(state == S_LOAD_PACKET) {
         signal AsyncSend.loadDone[ id ](error);
       } else {
@@ -203,18 +203,9 @@ implementation {
     }
     
     /* 
-     * The length byte in the packet is already correct - it represents the
-     * number of bytes in the packet *AFTER* the length byte, not included CRC
-     *
-     * So in order to also get that length byte transmitted (or the LSB of the
-     * CRC, whichever way you look at it) we gotta add one byte to the transmit
-     * length.  
-     * 
-     * The appendCrc() function will add 2 more for the CRC,
-     * to be automatically subtracted by the receive branch.
+     * The length byte represents the number of bytes in the packet *AFTER* 
+     * the length byte, not included CRC
      */
-     
-    //call PacketCrc.appendCrc(msg);
     
     call TXFIFO.write(msg, (call BlazePacketBody.getHeader(msg))->length + 1);
     return SUCCESS;
@@ -229,6 +220,7 @@ implementation {
   error_t transmit(uint8_t id, bool force) {
     uint8_t state;
     uint8_t *msg;
+    uint8_t abortTx;
     
     atomic {
       m_id = id;
@@ -284,7 +276,35 @@ implementation {
      * was an overflow/underflow, fix it and make sure we're 
      * back in RX mode by the time this is done.
      */
+     
+     /**
+      * Found an issue here when two transmitters are transmitting to each
+      * other and one transmitter's radio is also duty cycling on and off.
+      * First, SplitControl should not go past RadioSelect when we're 
+      * in the middle of a send, and I verified the radio remains on when
+      * the lock-up occurs.  So I'm not sure why duty cycling would have
+      * an effect
+      * 
+      * I also verified that the only state we could
+      * be in here is STX (unless there's a state I don't know about), 
+      * and the radio never comes out of it. This
+      * causes all nearby transmitters to infinitely backoff, as if they
+      * are locked up too (but they're not). A band-aid for this fix
+      * is to abort the TX if it takes too long.  A long term fix would be
+      * to figure out why the TX FIFO is empty (my suspicion). Obviously
+      * we should have loaded a packet in, and as long as the size wasn't
+      * 0 bytes there should have been something to send.
+      *
+      * TODO We need a long term fix for this!
+      */
+    abortTx = 0;
     while((state = call RadioStatus.getRadioStatus()) != BLAZE_S_RX) {
+      abortTx++;
+      if(abortTx == 0xFF) {
+        //call Leds.set(7);
+        call SRX.strobe();
+      }
+      
       if (state == BLAZE_S_RXFIFO_OVERFLOW) {
         call SFRX.strobe();
         call SRX.strobe();
@@ -295,10 +315,11 @@ implementation {
         call SRX.strobe();
       }
       
-      if (state == BLAZE_S_IDLE) {
+      if (state != BLAZE_S_TX) {
         call SRX.strobe();
       }
     }
+    //call Leds.set(0);
     
     /*
      * Deselect the radio hardware, set our state back to idle, signal done
@@ -307,8 +328,6 @@ implementation {
     
     state = call State.getState();
     call State.toIdle();
-    
-    //call PacketCrc.removeCrc(msg);
     
     if(state == S_TX_PACKET) {
       signal AsyncSend.sendDone[ id ](SUCCESS);

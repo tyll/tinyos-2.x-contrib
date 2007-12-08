@@ -6,7 +6,7 @@ module TestLedC
 {
   uses interface Boot;
   uses interface Leds;
-  uses interface GeneralIO as SystemLed;
+  uses interface SystemLed;
 }
 implementation
 {
@@ -31,9 +31,9 @@ implementation
     call Leds.led1Off();
     delay(500);
     call Leds.led2Off();
-    delay(500);
 
-    call SystemLed.makeOutput();
-    call SystemLed.clr();
+    delay(1000);
+
+    call SystemLed.on();
   }
 }

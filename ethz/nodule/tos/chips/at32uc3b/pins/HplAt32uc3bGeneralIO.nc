@@ -9,7 +9,8 @@
 
 #include "at32uc3b.h"
 
-interface HplAt32uc3bGeneralIO {
+interface HplAt32uc3bGeneralIO
+{
   /**
    * Set pin to high.
    */
@@ -63,4 +64,23 @@ interface HplAt32uc3bGeneralIO {
   async command void selectIOFunc();
 
   async command bool isIOFunc();
+
+  /**
+   * Enable/disable pullup on pin.
+   */
+  async command void enablePullup();
+
+  async command void disablePullup();
+
+  async command bool isPullup();
+
+  /**
+   * Enable/disable open drain on pin.
+   */
+  async command void enableOpenDrain();
+
+  async command void disableOpenDrain();
+
+  async command bool isOpenDrain();
+
 }

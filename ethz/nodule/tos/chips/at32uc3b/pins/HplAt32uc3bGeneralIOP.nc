@@ -93,4 +93,11 @@ implementation
   }
   async command void IO.selectIOFunc() { setBit(AVR32_GPIO_GPERS0); }
   async command bool IO.isIOFunc() { return getBit(AVR32_GPIO_GPER0); }
+  async command void IO.enablePullup() { setBit(AVR32_GPIO_PUERS0); }
+  async command void IO.disablePullup() { setBit(AVR32_GPIO_PUERC0); }
+  async command bool IO.isPullup() { return getBit(AVR32_GPIO_PUER0); }
+  async command void IO.enableOpenDrain() { setBit(AVR32_GPIO_ODMERS0); }
+  async command void IO.disableOpenDrain() { setBit(AVR32_GPIO_ODMERC0); }
+  async command bool IO.isOpenDrain() { return getBit(AVR32_GPIO_ODMER0); }
+
 }

@@ -16,13 +16,13 @@ define AVR32_HELP
 endef
 HELP += $(AVR32_HELP)
 
+GCC = avr32-gcc
 OBJCOPY = avr32-objcopy
 OBJDUMP = avr32-objdump
 NM = avr32-nm
 SIZE = avr32-size
 SET_ID = tos-set-symbols
 NCC = ncc
-#LIBS = -lm
 
 BUILDDIR = build/$(PLATFORM)
 MAIN_EXE = $(BUILDDIR)/main.exe
@@ -39,9 +39,9 @@ VOLUMEFILE = volumes-at45db.xml
 PFLAGS += -Wall -Wshadow $(NESC_FLAGS)
 PFLAGS += -target=$(PLATFORM) -fnesc-cfile=$(BUILDDIR)/app.c
 PFLAGS += -DDEF_TOS_AM_GROUP=$(DEFAULT_LOCAL_GROUP)
-PFLAGS += -I../../tos/platforms/atevk1101 -I/usr/avr32/lib
-# dont link against (unused) standard libaries
-PFLAGS += -nostdlib -nodefaultlibs
+PFLAGS += -I../../tos/platforms/atevk1101
+# dont link against (big) standard libaries and startfile
+PFLAGS += -nostartfiles -nostdlib -nodefaultlibs
 # bootloader section size is 0x2000, application section start at 0x80002000
 PFLAGS += -Wl,--entry=_trampoline,-Map=$(BUILDDIR)/main.map,--script=../../support/make/avr32/ldscripts/avr32elf_uc3b0256.lds
 # workaround to disable the <avr32/eic_200.h> header (gcc generates warnings/error)
@@ -52,6 +52,7 @@ PFLAGS += -DTOSH_DATA_LENGTH=$(MSG_SIZE)
 endif
 
 STARTUP_FILES = ../../support/make/avr32/startup/trampoline.S ../../support/make/avr32/startup/crt0.S
+#LIBS_FILES = $(shell $(GCC) -print-libgcc-file-name) $(shell $(GCC) -print-file-name=libm.a) $(shell $(GCC) -print-file-name=libc.a)
 
 BUILDLESS_DEPS += bytes
 
@@ -89,7 +90,7 @@ exe: exe0 bytes FORCE
 
 exe0: builddir $(BUILD_EXTRA_DEPS) FORCE
 	@echo "    compiling $(COMPONENT) to a $(PLATFORM) binary"
-	$(NCC) -o $(MAIN_EXE) $(OPTFLAGS) $(PFLAGS) $(CFLAGS) $(LIBS) $(LDFLAGS) $(STARTUP_FILES) $(COMPONENT).nc
+	$(NCC) -o $(MAIN_EXE) $(OPTFLAGS) $(PFLAGS) $(CFLAGS) $(LDFLAGS) $(STARTUP_FILES) $(LIBS_FILES) $(COMPONENT).nc
 	@$(OBJDUMP) -x $(MAIN_EXE) > $(MAIN_DUMP)
 	@$(NM) $(MAIN_EXE) > $(MAIN_SYM)
 	@echo "    compiled $(COMPONENT) to $(MAIN_EXE)"

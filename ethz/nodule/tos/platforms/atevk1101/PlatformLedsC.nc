@@ -1,11 +1,19 @@
 /* $Id$ */
 
-/* @author Mustafa Yuecel <mustafa.yuecel@alumni.ethz.ch> */
+/**
+ * This component provides 3 leds as I/O pins. The leds are
+ * initialized through the componts LedsC/LedsP. The leds on the
+ * atevk1101 are active low which is the assumption made by
+ * LedsC/LedsP.
+ *
+ * @author Mustafa Yuecel <mustafa.yuecel@alumni.ethz.ch>
+ */
 
-configuration PlatformLedsC {
-  provides interface GeneralIO as Led0; // 0
-  provides interface GeneralIO as Led1; // 1
-  provides interface GeneralIO as Led2; // 2
+configuration PlatformLedsC
+{
+  provides interface GeneralIO as Led0; // LED 0
+  provides interface GeneralIO as Led1; // LED 1
+  provides interface GeneralIO as Led2; // LED 2
   uses interface Init;
 }
 implementation

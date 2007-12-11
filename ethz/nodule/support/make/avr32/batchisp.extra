@@ -24,12 +24,18 @@ show_error:
 
 endif
 
+READ_SIGNATURE = memory signature read savebuffer $(BUILDDIR)/signature_read.hex hex86
+READ_BOOTLOADER = memory bootloader read savebuffer $(BUILDDIR)/bootloader_read.hex hex86
+READ_CONFIGURATION = memory configuration read savebuffer $(BUILDDIR)/configuration_read.hex hex86
+READ_USER = memory user read savebuffer $(BUILDDIR)/user_read.hex hex86
+
 program: FORCE
 	@echo "    installing $(PLATFORM) binary using $(BATCHISP_BIN)"
-        # ugly hack because batchisp expects certain files in current/working directory (MY: ask Atmel about moving these files into flip.jar)
+        # ugly hack because batchisp expects certain files in current/working directory (ask Atmel about moving these files into flip.jar)
 	@ln -fs $(FLIP_BINDIR)/PartDescriptionFiles
 	@ln -fs $(FLIP_BINDIR)/ProtocolDescriptionFiles
-#	@PATH=$(FLIP_BINDIR) LD_LIBRARY_PATH=$(FLIP_BINDIR):$(JAVA_HOME)/lib/i386/client $(BATCHISP_BIN) -help
-	@cp -f $(INSTALL_IHEX) $(BUILDDIR)/flash.hex
-	@PATH=$(FLIP_BINDIR) LD_LIBRARY_PATH=$(FLIP_BINDIR):$(JAVA_HOME)/lib/i386/client $(BATCHISP_BIN) -device $(AVR32_MCU) -hardware usb -operation erase f memory flash blankcheck loadbuffer $(BUILDDIR)/flash.hex program verify start reset 0 || exit 0
-	@rm $(BUILDDIR)/flash.hex PartDescriptionFiles ProtocolDescriptionFiles
+	@ln -fs $(INSTALL_IHEX) flash.hex
+	@PATH=$(FLIP_BINDIR) LD_LIBRARY_PATH=$(FLIP_BINDIR):$(JAVA_HOME)/lib/i386/client $(BATCHISP_BIN) -device $(AVR32_MCU) -hardware usb -operation \
+		$(READ_SIGNATURE) $(READ_BOOTLOADER) $(READ_CONFIGURATION) $(READ_USER) \
+		erase f memory flash blankcheck loadbuffer flash.hex program verify start reset 0 || exit 0
+	@rm flash.hex PartDescriptionFiles ProtocolDescriptionFiles

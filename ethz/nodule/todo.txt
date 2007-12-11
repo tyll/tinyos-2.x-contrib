@@ -1,4 +1,4 @@
-implement interrupt handling
+implement interrupt handling (write empty EVBA callback)
 
 implement timer
 

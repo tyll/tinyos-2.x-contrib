@@ -54,9 +54,9 @@ interface HplAt32uc3bGeneralIO
 
   async command bool isPeripheralFunc();
 
-  async command void setPeripheralFunc(peripheral_func_enum_t peripheral_func);
+  async command void setPeripheralFunc(uint8_t peripheral_func);
 
-  async command peripheral_func_enum_t getPeripheralFunc();
+  async command uint8_t getPeripheralFunc();
 
   /**
    * Set pin for I/O functionality.

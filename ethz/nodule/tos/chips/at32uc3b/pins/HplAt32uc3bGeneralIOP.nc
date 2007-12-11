@@ -35,7 +35,7 @@ implementation
   async command bool IO.isOutput() { return getBit(AVR32_GPIO_ODER0); }
   async command void IO.selectPeripheralFunc() { setBit(AVR32_GPIO_GPERC0); }
   async command bool IO.isPeripheralFunc() { return !getBit(AVR32_GPIO_GPER0); }
-  async command void IO.setPeripheralFunc(peripheral_func_enum_t peripheral_func) {
+  async command void IO.setPeripheralFunc(uint8_t peripheral_func) {
     atomic {
       switch (peripheral_func) {
         case (GPIO_PERIPHERAL_FUNC_A):
@@ -65,7 +65,7 @@ implementation
       }
     }
   }
-  async command peripheral_func_enum_t IO.getPeripheralFunc() {
+  async command uint8_t IO.getPeripheralFunc() {
     atomic {
       if (getBit(AVR32_GPIO_PMR00)) {
         // x1

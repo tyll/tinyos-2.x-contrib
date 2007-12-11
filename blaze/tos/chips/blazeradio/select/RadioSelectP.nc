@@ -82,6 +82,9 @@ implementation {
   /***************** RadioSelect Commands ****************/
   /**
    * Select the radio to be used to send this message
+   * We don't prevent invalid radios from being selected here; instead,
+   * invalid radios are filtered out when they are attempted to be used.
+   * 
    * @param msg The message to configure that will be sent in the future
    * @param radioId The radio ID to use when sending this message.
    *    See CC1100.h or CC2500.h for definitions, the ID is either
@@ -90,10 +93,6 @@ implementation {
    *    an invalid radio
    */
   command error_t RadioSelect.selectRadio(message_t *msg, radio_id_t radioId) {
-    if(radioId >= uniqueCount(UQ_BLAZE_RADIO)) {
-      return EINVAL;
-    }
-    
     (call BlazePacketBody.getMetadata(msg))->radio = radioId;
     
     return SUCCESS;
@@ -124,6 +123,10 @@ implementation {
    */
   command error_t Send.send(message_t* msg, uint8_t len) {
     error_t error;
+    if(call RadioSelect.getRadio(msg) >= uniqueCount(UQ_BLAZE_RADIO)) {
+      return EINVAL;
+    }
+    
     if(state[call RadioSelect.getRadio(msg)] == S_OFF) {
       return EOFF;
     }
@@ -136,6 +139,9 @@ implementation {
   }
 
   command error_t Send.cancel(message_t* msg) {
+    if(call RadioSelect.getRadio(msg) >= uniqueCount(UQ_BLAZE_RADIO)) {
+      return EINVAL;
+    }
     return call SubSend.cancel[call RadioSelect.getRadio(msg)](msg);
   }
 
@@ -148,7 +154,11 @@ implementation {
   }
 
   /***************** SplitControl Commands ****************/
-  command error_t SplitControl.start[ radio_id_t id ]() {    
+  command error_t SplitControl.start[ radio_id_t id ]() {
+    if(id >= uniqueCount(UQ_BLAZE_RADIO)) {
+      return EINVAL;
+    }
+    
     return call SubControl.start[ id ]();
   }
   

@@ -10,8 +10,7 @@
 /* current RAM layout: data, bss, stack */
 
 /* Default linker script, for normal executables */
-OUTPUT_FORMAT("elf32-avr32", "elf32-avr32",
-	      "elf32-avr32")
+OUTPUT_FORMAT("elf32-avr32", "elf32-avr32", "elf32-avr32")
 OUTPUT_ARCH(avr32:uc)
 ENTRY(_start)
 SEARCH_DIR("/usr/avr32/lib");

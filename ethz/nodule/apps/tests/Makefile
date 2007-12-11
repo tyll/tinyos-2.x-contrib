@@ -3,7 +3,8 @@
 # author: Mustafa Yuecel <mustafa.yuecel@alumni.ethz.ch> #
 
 ifndef COMPONENT
-COMPONENT=TestLedAppC
+#COMPONENT=TestLedAppC
+COMPONENT=TestButtonAppC
 endif
 TOSMAKE_PATH += ../../support/make
 include $(MAKERULES)

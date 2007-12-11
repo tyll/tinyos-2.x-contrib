@@ -33,7 +33,6 @@ MAIN_IHEX = $(BUILDDIR)/main.ihex
 INSTALL_EXE = $(MAIN_EXE).out$(if $(NODEID),-$(NODEID),)
 INSTALL_IHEX = $(MAIN_IHEX).out$(if $(NODEID),-$(NODEID),)
 BOOTLOADER_SIZE = 8*1024
-AMADDR = ActiveMessageAddressC\$$addr
 VOLUMEFILE = volumes-at45db.xml
 
 PFLAGS += -Wall -Wshadow $(NESC_FLAGS)
@@ -74,7 +73,9 @@ endif
 
 setid: FORCE
 	@cmd () { $$@; }; if [ x = x$(NODEID) ]; then cmd cp $(MAIN_IHEX) $(INSTALL_IHEX); \
-                          else cmd $(SET_ID) $(MAIN_EXE) $(INSTALL_EXE) TOS_NODE_ID=$(NODEID) $(AMADDR)=$(NODEID); $(OBJCOPY) --output-target=ihex $(INSTALL_EXE) $(INSTALL_IHEX); fi
+				else cmd $(SET_ID) $(MAIN_EXE) $(INSTALL_EXE) TOS_NODE_ID=$(NODEID) ActiveMessageAddressC\$$\$$addr=$(NODEID) || \
+					cp $(MAIN_EXE) $(INSTALL_EXE); \
+				$(OBJCOPY) --output-target=ihex $(INSTALL_EXE) $(INSTALL_IHEX); fi
 
 delsetid: FORCE
 	@rm -f $(INSTALL_EXE) $(INSTALL_IHEX)

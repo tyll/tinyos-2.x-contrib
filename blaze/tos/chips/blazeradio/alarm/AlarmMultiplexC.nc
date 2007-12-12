@@ -42,7 +42,6 @@
 
 configuration AlarmMultiplexC {
 
-  provides interface Init;
   provides interface Alarm<T32khz,uint32_t> as Alarm32khz32;
 
 }
@@ -50,8 +49,9 @@ configuration AlarmMultiplexC {
 implementation {
 
   components new HplRadioAlarmC() as Alarm;
-
-  Init = Alarm;
+  components MainC;
+  
+  MainC.SoftwareInit -> Alarm;
   Alarm32khz32 = Alarm;
 
 }

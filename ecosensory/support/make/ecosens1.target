@@ -1,0 +1,30 @@
+/* Copyright (c) 2007, Ecosensory Austin Texas All rights reserved. 
+* BSD license full text at: 
+* http://tinyos.cvs.sourceforge.net/tinyos/tinyos-2.x-contrib/ecosensory/license.txt
+* author unknown telosb  revised John Griessen 13 Dec 2007
+*/
+#-*-Makefile-*- vim:syntax=make
+#$Id: ecosens1.target,v 1.0 
+
+PLATFORM ?= ecosens1
+
+#MSP_MCU = msp430x1611
+
+# Disable MSP430 hardware multiply because it makes MSPGCC die
+PFLAGS += -mdisable-hwmul #-I../../tos/platforms/ecosens1   #jg08dec07
+OPTFLAGS += -O
+
+MSP_BSL ?= tos-bsl
+MSP_BSL_FLAGS = --telosb
+
+VOLUME_FILE = volumes-stm25p.xml
+VOLUME_ALLOCATOR = tos-storage-stm25p
+
+ifdef CC2420_CHANNEL
+PFLAGS += -DCC2420_DEF_CHANNEL=$(CC2420_CHANNEL)
+endif
+
+$(call TOSMake_include_platform,msp)    #rules from T2 jg08dec07
+
+ecosens1: $(BUILD_DEPS)
+	@:

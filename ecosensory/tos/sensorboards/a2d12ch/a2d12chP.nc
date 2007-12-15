@@ -1,11 +1,8 @@
-/* 
- * Copyright (c) 2007, Ecosensory
- * -- Use per TOS Alliance license. If not found in your distr. 
- *     see http://tinyos.net/licenses/toslicense.txt --
- * $Revision: 1.0  a2d12chP.nc
- * $Date: 02sep2007
- * @author: John Griessen <john@ecosensory.com>
- * ============================================================
+/* Copyright (c) 2007, Ecosensory Austin Texas All rights reserved. 
+ * BSD license full text at: 
+ * http://tinyos.cvs.sourceforge.net/tinyos/tinyos-2.x-contrib/ecosensory/license.txt
+ * by John Griessen <john@ecosensory.com>
+ * Rev 1.0 14 Dec 2007
  */
 module a2d12chP {
   uses  {

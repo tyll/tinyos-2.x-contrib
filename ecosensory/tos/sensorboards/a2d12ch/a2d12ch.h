@@ -1,3 +1,9 @@
+/* Copyright (c) 2007, Ecosensory Austin Texas All rights reserved. 
+ * BSD license full text at: 
+ * http://tinyos.cvs.sourceforge.net/tinyos/tinyos-2.x-contrib/ecosensory/license.txt
+ * by John Griessen <john@ecosensory.com>
+ * Rev 1.0 14 Dec 2007
+ */
 //  A2d12ch.h
 //#ifndef A2D12CH_H
 //#define A2D12CH_H

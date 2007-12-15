@@ -1,12 +1,9 @@
-/* 
- * Copyright (c) 2007, Ecosensory All rights reserved.
+/* Copyright (c) 2007, Ecosensory Austin Texas All rights reserved. 
+ * BSD license full text at: 
+ * http://tinyos.cvs.sourceforge.net/tinyos/tinyos-2.x-contrib/ecosensory/license.txt
+ * by John Griessen <john@ecosensory.com>
+ * Rev 1.0 14 Dec 2007
  *
- * -- Use per TOS Alliance license. If not found in your distribution 
- *     see http://tinyos.net/licenses/toslicense.txt --
- * $Revision$
- * $Date: 2sep2007
- * @author: John Griessen <john@ecosensory.com>
- * ========================================================================
  * Reuses HAL of ADC12 on msp430 in banks of 6 with resource wait
  * of 10 msec for cap. moisture sensors to reach equilibrium.. 
  * the two data buffers are returned with the multichannel.getData 

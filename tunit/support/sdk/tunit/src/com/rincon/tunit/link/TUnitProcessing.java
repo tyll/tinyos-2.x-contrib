@@ -111,13 +111,7 @@ public class TUnitProcessing extends Thread implements
    * @param inMsg
    */
   private void appendFailMsg(TUnitProcessingMsg inMsg) {
-    if (inMsg.get_failMsgLength() > 0) {
-      short[] message = new short[inMsg.get_failMsgLength()];
-      for (int i = 0; i < message.length; i++) {
-        message[i] = inMsg.get_failMsg()[i];
-      }
-      currentFailMsg += Util.dataToString(message);
-    }
+    currentFailMsg += inMsg.getString_failMsg();
   }
 
   /**

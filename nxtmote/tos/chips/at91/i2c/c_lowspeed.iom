@@ -1,0 +1,82 @@
+#ifndef C_LOWSPEED_H
+#define C_LOWSPEED_H
+
+
+//// c_lowspeed.iom ////
+
+
+
+//#define   pMapLowSpeed ((IOMAPLOWSPEED*)(pHeaders[ENTRY_LOWSPEED]->pIOMap))
+
+#define   MAX_RETRY_TX_COUNT		  3
+#define   NO_OF_LOWSPEED_COM_CHANNEL  4
+#define   NO_OF_LSBUF				  NO_OF_LOWSPEED_COM_CHANNEL
+#define   SIZE_OF_LSBUF				  16
+
+//Constants referring to LowSpeedDeviceType
+enum
+{
+  ULTRA_SONIC = 2,
+  CUSTOM_LS_DEVICE
+};
+
+// Constants reffering to State
+enum
+{
+  COM_CHANNEL_NONE_ACTIVE =  0x00,
+  COM_CHANNEL_ONE_ACTIVE =   0x01,
+  COM_CHANNEL_TWO_ACTIVE =   0x02,
+  COM_CHANNEL_THREE_ACTIVE = 0x04,
+  COM_CHANNEL_FOUR_ACTIVE =  0x08
+};
+
+// Constants reffering to ChannelState
+enum
+{
+  LOWSPEED_IDLE,
+  LOWSPEED_INIT,
+  LOWSPEED_LOAD_BUFFER,
+  LOWSPEED_COMMUNICATING,
+  LOWSPEED_ERROR,
+  LOWSPEED_DONE
+};
+
+// Constants reffering to Mode
+enum
+{
+  LOWSPEED_TRANSMITTING = 1,
+  LOWSPEED_RECEIVING,
+  LOWSPEED_DATA_RECEIVED
+};
+
+// Constants reffering to ErrorType
+enum
+{
+  LOWSPEED_NO_ERROR = 0,
+  LOWSPEED_CH_NOT_READY,
+  LOWSPEED_TX_ERROR,
+  LOWSPEED_RX_ERROR
+};
+
+
+typedef   struct
+{
+  UBYTE   Buf[SIZE_OF_LSBUF];
+  UBYTE   InPtr;
+  UBYTE   OutPtr;
+  UBYTE   BytesToRx;
+}LSBUF;
+
+typedef   struct
+{
+  LSBUF   InBuf[NO_OF_LSBUF];
+  LSBUF   OutBuf[NO_OF_LSBUF];
+  UBYTE   Mode[NO_OF_LSBUF];
+  UBYTE	  ChannelState[NO_OF_LSBUF];
+  UBYTE   ErrorType[NO_OF_LSBUF];
+  UBYTE   State;
+  UBYTE   Speed;
+  UBYTE   Spare1;
+}IOMAPLOWSPEED;
+
+#endif

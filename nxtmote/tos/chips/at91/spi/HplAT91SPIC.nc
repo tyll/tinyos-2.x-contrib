@@ -31,6 +31,11 @@
  * 
  * @author Phil Buonadonna
  */
+ 
+/**
+ * Adapted for nxtmote.
+ * @author Rasmus Ulslev Pedersen
+ */
 
 configuration HplAT91SP1C 
 {

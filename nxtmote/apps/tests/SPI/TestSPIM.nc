@@ -53,7 +53,7 @@ implementation
   
   event void Boot.booted() {
     
-    sprintf(str,"NXTMOTE was here!");
+    sprintf((char *)str,"NXTMOTE was here!");
     
     call HalLCD.displayString(str,0);
     

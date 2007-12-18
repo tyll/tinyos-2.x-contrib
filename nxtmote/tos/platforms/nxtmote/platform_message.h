@@ -1,4 +1,3 @@
-// $Id$
 /*
  * Copyright (c) 2005-2006 Intel Corporation
  * All rights reserved.
@@ -20,18 +19,20 @@
 #ifndef PLATFORM_MESSAGE_H
 #define PLATFORM_MESSAGE_H
 
-#include "Serial.h"
+//#include "Serial.h"
+#include "Bc4.h"
 
 typedef union message_header {
-  serial_header_t serial;
+  //serial_header_t serial;
+  bc4_header_t bc4;
 } message_header_t;
 
 typedef union message_footer {
-  nx_uint8_t dummy;
+  bc4_footer_t bc4;
 } message_footer_t;
 
 typedef union message_metadata {
-  nx_uint8_t dummy;
+  bc4_metadata_t bc4;
 } message_metadata_t;
 
 #endif

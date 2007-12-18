@@ -75,12 +75,15 @@ implementation{
     
     //AT91C_BASE_AIC->AIC_SVR[0] = (int) AT91F_Default_FIQ_handler ;
     
+    //TODO
     AT91C_BASE_AIC->AIC_SPU  = (int) AT91F_Spurious_handler ;    
 
     *AT91C_RSTC_RMR  = 0xA5000401;
     *AT91C_AIC_DCR   = 1;
+    
     // PIT timer is for 1 ms intervals
-    *AT91C_PITC_PIMR = (0x000FFFFF | 0x01000000);
+    //*AT91C_PITC_PIMR = (0x000FFFFF | 0x01000000 ); /*original*/
+    *AT91C_PITC_PIMR = (MS_1_TIME | AT91C_PITC_PITEN | AT91C_PITC_PITIEN );
     TmpReset         = *AT91C_PITC_PIVR;
     TmpReset         = TmpReset;/* Suppress warning*/
     

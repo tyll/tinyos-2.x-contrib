@@ -7,13 +7,16 @@ push( @includes, qw(
 
   %T/platforms/nxtmote
   %T/chips/at91
+  %T/chips/at91/i2c
+  %T/chips/at91/spi
   %T/chips/at91/gpio
   %T/chips/at91/timer
-  %T/chips/at91/i2c
+  %T/chips/bc4  
   %T/chips/uc1601
-  %T/chips/at91/spi
-  %T/lib/timer
+  %T/chips/sensor
+  %T/chips/motor  
   %T/lib/serial
+  %T/lib/timer
 
 ) );
 

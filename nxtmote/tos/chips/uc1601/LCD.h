@@ -83,6 +83,9 @@
 		{ 0xB7,0x10,0x00 }
 	};
 
+  //Used in file that includes LCD.h
+  uint8_t lcdstr[100];
+
   typedef   struct
 	{
 	  UBYTE   FormatMsb;

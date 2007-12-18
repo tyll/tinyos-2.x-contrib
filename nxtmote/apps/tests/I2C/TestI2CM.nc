@@ -36,30 +36,20 @@
  */
 
 #include "I2C.h"
+#include "LCD.h"
+
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
 #define   DEVICE_ADR                    0x01
 #define   COPYRIGHTSTRING               "Let's samba nxt arm in arm, (c)LEGO System A/S"
 #define   COPYRIGHTSTRINGLENGTH         46    /* Number of bytes checked in COPYRIGHTSTRING */
 
 //Motor test
-#define   BYTES_TO_TX                   8
+//#define   BYTES_TO_TX                   8
 #define   NO_TO_TX   			BYTES_TO_TX + 1
-
-enum
-{
-  NOS_OF_AVR_OUTPUTS  = 4,
-  NOS_OF_AVR_BTNS     = 4,
-  NOS_OF_AVR_INPUTS   = 4
-};
-
-typedef   struct
-{
-  UBYTE   Power;
-  UBYTE   PwmFreq;
-  SBYTE   PwmValue[NOS_OF_AVR_OUTPUTS];
-  UBYTE   OutputMode;
-  UBYTE   InputPower;
-}IOTOAVR;
+#define   NO_TO_RX				BYTES_TO_RX + 1
 
 //Sizes (in bytes) of each scalar type
 #define SIZE_UBYTE 1
@@ -73,84 +63,66 @@ module TestI2CM
 {
   provides interface Init;
   
-  uses interface I2CPacket<TI2CBasicAddr>;
-  //uses interface HplAT91I2C;
-  uses interface Boot;
+  uses {
+    interface I2CPacket<TI2CBasicAddr>;
+    //uses interface HplAT91I2C;
+
+    interface Boot;
+    
+    interface HplAT91Pit as PitTimer;
+    
+    interface HalLCD;
+    
+    interface Init as SubInit;
+  }
 }
 
 implementation
 {
-  static    uint8_t   I2cOutBuffer[NO_TO_TX];
+  uint8_t I2cInBuffer[NO_TO_RX];
+
+  uint8_t I2cOutBuffer[NO_TO_TX];
   uint8_t CopyrightStr[] =        {"\xCC"COPYRIGHTSTRING};
+  uint8_t booted = 0;
+  uint8_t tmp = 0;
+  uint32_t cnt = 0;
   
-  void sendToAvr(){
-    IOTOAVR IoToAvr;
-    uint16_t devAddr;
-    error_t error;
-    uint8_t* mI2CBuffer;
-    uint8_t* pIrq;
-    uint8_t NoToTx;
-    
-    uint8_t I2cTmp, Sum;
-    
-    
-    
-    devAddr = DEVICE_ADR;    
-    //mI2CBuffer = &IoToAvr;
-    
-    IoToAvr.Power 	= 0;
-    IoToAvr.PwmFreq 	= 8;
-    IoToAvr.PwmValue[0] = -500;
-    IoToAvr.PwmValue[1] = -50;
-    IoToAvr.PwmValue[2] = -50;
-    IoToAvr.PwmValue[3] = -50;
-    IoToAvr.OutputMode  = 0x00;
-    IoToAvr.InputPower  = 0x00;
-    
-    pIrq                = (uint8_t*)&IoToAvr;
-    for(I2cTmp = 0, Sum = 0; I2cTmp < BYTES_TO_TX; I2cTmp++, pIrq++)
-    {
-      I2cOutBuffer[I2cTmp] = *pIrq;
-      Sum += *pIrq;
-    }
-    
-    I2cOutBuffer[I2cTmp] = ~Sum;
-    pIrq                = I2cOutBuffer;
-    NoToTx              = NO_TO_TX;
+  UBYTE State;
 
-    error = call I2CPacket.write(I2C_START | I2C_STOP, devAddr,NoToTx,I2cOutBuffer);
-
-    while(1);
-  }
-
-  event void Boot.booted()
-  {
-    error_t error;
-    uint16_t devAddr;
-    uint8_t* mI2CBuffer;
-    uint8_t len;
-
-    
-    mI2CBuffer = CopyrightStr;
-    devAddr = DEVICE_ADR;
-    len = COPYRIGHTSTRINGLENGTH + 1;
-  
-    //write something to the I2C bus here
-    error = call I2CPacket.write(I2C_START | I2C_STOP, devAddr, len, mI2CBuffer);
-
-while(1);    
-//togglepin(0);
-    //sendToAvr();
+  event void Boot.booted(){
+    uint8_t tmptemp = 1;  
   }
 
   command error_t Init.init() {
+    State = 0;
+    call SubInit.init(); //I2CMasterP
+    booted = 1;
+
     return SUCCESS;
   }
+  
+  async event void PitTimer.fired(){
+    //post cPitTask();
+	}
   
   //async event void HplAT91I2C.interruptI2C(){}
 
   async event void I2CPacket.readDone(error_t error, uint16_t addr, 
 					     uint8_t length, uint8_t* data) {
+  IOFROMAVR *pIoFromAvr;
+		if((cnt % 100) == 0){
+			pIoFromAvr = (IOFROMAVR*) data;
+			sprintf((char *)lcdstr,"s:%u",pIoFromAvr->AdValue[0]);
+			call HalLCD.displayString(lcdstr, 1);
+			sprintf((char *)lcdstr,"s:%u",pIoFromAvr->AdValue[1]);
+			call HalLCD.displayString(lcdstr, 2);			
+			sprintf((char *)lcdstr,"s:%u",pIoFromAvr->AdValue[2]);
+			call HalLCD.displayString(lcdstr, 3);			
+			sprintf((char *)lcdstr,"s:%u",pIoFromAvr->AdValue[3]);
+			call HalLCD.displayString(lcdstr, 4);			
+			//togglepin(0);
+		}
+
     return;
   }
 
@@ -158,4 +130,85 @@ while(1);
 						     uint8_t length, uint8_t* data) { 
     return;
   }
+  
+  //task void cPitTask() {
+  event void PitTimer.firedTask(uint32_t taskMiss){
+    if(booted == 1)
+    {
+  		error_t error;
+			uint16_t devAddr;
+			uint8_t* mI2CBuffer;
+			uint8_t len;
+cnt++;
+			switch(State)
+			{
+				case 0: //unlock
+				{
+					mI2CBuffer = CopyrightStr;
+					devAddr = DEVICE_ADR;
+					len = COPYRIGHTSTRINGLENGTH + 1;
+					error = call I2CPacket.write(I2C_START | I2C_STOP, devAddr, len, mI2CBuffer);
+					State++;
+				}
+				break;
+				case 1: //wait
+				{
+					State++;
+				}
+				break;
+				case 2: // tx
+				{
+					UBYTE I2cTmp, Sum, *pIrq, NoToTx;
+					
+					IoToAvr.Power 	= 0;
+					IoToAvr.PwmFreq 	= 0;
+					IoToAvr.PwmValue[0] = 0;
+					IoToAvr.PwmValue[1] = 0;
+					IoToAvr.PwmValue[2] = 0;
+					IoToAvr.PwmValue[3] = 0;
+					IoToAvr.OutputMode  = 0;
+					IoToAvr.InputPower  = 0;
+
+					pIrq = (uint8_t*)&IoToAvr;
+					
+					for(I2cTmp = 0, Sum = 0; I2cTmp < BYTES_TO_TX; I2cTmp++, pIrq++)
+					{
+						I2cOutBuffer[I2cTmp] = *pIrq;
+						Sum += *pIrq;
+					}
+
+					I2cOutBuffer[I2cTmp] = ~Sum;
+					pIrq                = I2cOutBuffer;
+					NoToTx              = NO_TO_TX;
+					devAddr = DEVICE_ADR;
+
+					error = call I2CPacket.write(I2C_START | I2C_STOP, devAddr, NoToTx, pIrq);
+tmp = 1;
+					State++;
+					State++;
+				}
+				break;
+				case 3: //wait
+				{
+					State++;
+				}
+				break;				
+				case 4: //rx
+				{
+					UBYTE NoToRx;
+					mI2CBuffer = I2cInBuffer;
+					devAddr = DEVICE_ADR;
+					NoToRx = NO_TO_RX;
+
+					error = call I2CPacket.read(I2C_START | I2C_STOP, devAddr, NoToRx, mI2CBuffer);
+				
+          State = 2;
+				}
+				break;				
+				default:
+				break;
+			}
+    }
+  }
+  
 }

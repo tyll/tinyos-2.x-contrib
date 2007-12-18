@@ -43,6 +43,7 @@ module HplUC1601LCDM {
   uses {
     interface HalAT91SPICntl as SpiControl;
     interface SpiPacket;
+    interface HplAT91Pit as PitTimer;
   }
 }
 
@@ -50,7 +51,9 @@ implementation {
   
   bool gfInitialized = FALSE;
 
-  uint8_t tmpbuff[100];  
+  uint8_t tmpbuff[DISP_LINES][100];
+  uint8_t llen[DISP_LINES];
+  uint8_t dirty[DISP_LINES];
   
   error_t writespi(uint8_t* data, uint8_t len, uint8_t type) {
     while(!(*AT91C_SPI_SR & AT91C_SPI_TXEMPTY));
@@ -63,14 +66,15 @@ implementation {
 		call SpiPacket.send((uint8_t*)data, rxbuf, len);
 		
 		// Give it time 
-	  {waitspin(10000);} //10000 ok
+	  //{waitspin(10000);} //10000 ok
     
     return SUCCESS;
   }
   
   command error_t Init.init()
   {
-
+    uint8_t i;
+    
     bool initflag;
     atomic {
       initflag = gfInitialized;
@@ -81,16 +85,21 @@ implementation {
       memset(txbuf1, 0x00, sizeof(txbuf1));
       
       call SpiControl.setSPIParams();  
-   
+      
+      for(i = 0; i < DISP_LINES; i++){
+			  dirty[i] = 0;
+			  llen[i] = 0;
+			}
+			
       // Give it time 
-		  {waitspin(100000);} //10000 ok
+		  //{waitspin(100000);} //10000 ok
     }
     
     return SUCCESS;
   }
     
   
-  async command void HplLCD.initLCD() {
+  command void HplLCD.initLCD() {
     uint32_t i;
     
     // Send init string
@@ -101,15 +110,32 @@ implementation {
       call HplLCD.write(txbuf1,sizeof(txbuf1),i);
     }
   }
-  
-  async command error_t HplLCD.write(uint8_t* data, uint8_t len, uint8_t line){
+
+  command error_t HplLCD.writefast(uint8_t* data, uint8_t len, uint8_t line){
     error_t err;
-    
-  	if(line <8){
-  	  // Tell display which line 
+
+  	if(line < DISP_LINES){
       writespi((uint8_t*)DisplayLineString[line],sizeof(DisplayLineString[line]),CMD);
+      {waitspin(10000);}
       // Write the line data
       writespi(data, len, DAT);
+      {waitspin(10000);}
+      err = SUCCESS;
+    }
+    else {
+      err = FAIL;
+    }
+    
+    return err;
+  }
+  
+  command error_t HplLCD.write(uint8_t* data, uint8_t len, uint8_t line){
+    error_t err;
+    
+  	if(line < DISP_LINES){
+      memcpy(tmpbuff[line], data, len);
+      dirty[line] = 1;
+      llen[line] = len;
       err = SUCCESS;
     }
     else {
@@ -122,4 +148,25 @@ implementation {
   async event void SpiPacket.sendDone( uint8_t* txBuf, uint8_t* rxBuf, uint16_t len,
                              error_t error ) {
   }
+  
+  //task void cPitTask(){
+  event void PitTimer.firedTask(uint32_t misses){
+    uint8_t i;
+    
+    for(i = 0; i < DISP_LINES; i++){
+      if(dirty[i] == 1) {
+     	  // Tell display which line 
+        writespi((uint8_t*)DisplayLineString[i],sizeof(DisplayLineString[i]),CMD);
+        // Write the line data
+        writespi(tmpbuff[i], llen[i], DAT);
+        llen[i] = 0;
+        dirty[i] = 0;
+        break;
+      }
+    }
+  }
+  
+  async event void PitTimer.fired(){
+	    //post cPitTask();
+	}
 }

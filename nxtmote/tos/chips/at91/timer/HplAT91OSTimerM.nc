@@ -1,6 +1,6 @@
 /**
  * Adapted for nxtmote.
- * @author Rasmus Pedersen
+ * @author Rasmus Ulslev Pedersen
  */
 #include "hardware.h"
 

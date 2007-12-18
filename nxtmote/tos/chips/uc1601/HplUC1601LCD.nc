@@ -36,7 +36,7 @@ interface HplUC1601LCD {
    * Send init string to LCD. Not the same as Init.init() that is used 
    * for SPI initialization.
    */
-  async command void initLCD();
+  command void initLCD();
   
   /**
    * Send (pixel) data to a line on the LCD.
@@ -49,5 +49,7 @@ interface HplUC1601LCD {
    *
    * @return error_t Return FAIL if unable to send.
    */
-  async command error_t write(uint8_t* data, uint8_t len, uint8_t line);
+  command error_t write(uint8_t* data, uint8_t len, uint8_t line);
+  
+  command error_t writefast(uint8_t* data, uint8_t len, uint8_t line);
 }

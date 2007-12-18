@@ -1,0 +1,7 @@
+PROGRAM = fwflash
+
+PROGRAMMER ?= fwflash.exe
+
+flashit: FORCE
+	@echo "    flash programming"
+	$(PROGRAMMER) $(MAIN_BIN)

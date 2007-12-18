@@ -1,6 +1,6 @@
 /**
  * Display module.
- * @author Rasmus Pedersen
+ * @author Rasmus Ulslev Pedersen
  */
 
 #include "LCD.h"
@@ -25,8 +25,8 @@ implementation {
 	  
 	  return error;
   }
-    
-  async command error_t HalLCD.displayString(uint8_t* str, uint8_t line){
+  
+  error_t dispStr(uint8_t* str, uint8_t line, uint8_t fast) {
     error_t status;
 
 		UBYTE   *pSource;
@@ -65,9 +65,25 @@ implementation {
 			}
 			str++;
 		}
-		
-		status = call HplLCD.write(txbuf1, sizeof(txbuf1), line);
+	  
+	  if(fast == 1) {
+		  status = call HplLCD.writefast(txbuf1, sizeof(txbuf1), line);
+		}
+		else {
+		  status = call HplLCD.write(txbuf1, sizeof(txbuf1), line);
+		}
   
     return status;
+  }
+
+  command error_t HalLCD.displayStringFast(uint8_t* str, uint8_t line){
+  
+    return dispStr(str, line, 1);
+  }
+
+  
+  command error_t HalLCD.displayString(uint8_t* str, uint8_t line){
+  
+    return dispStr(str, line, 0);
   }
 }

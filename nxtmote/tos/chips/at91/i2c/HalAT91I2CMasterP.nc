@@ -32,7 +32,7 @@
  * the AT91 I2C Hpl
  *
  * @author Rasmus Ulslev Pedersen
- * note: Derived from imote files
+ * note: Derived from imote files and LEGO files
  */
 
 #include <I2C.h>
@@ -82,10 +82,6 @@ implementation
   //uint32_t mBaseICRFlags;
   uint32_t mAllIrqFlags;
   
-  static uint8_t tmpcnt = 0;
-
-  uint8_t str[100];
-  
   static void waitclk(){
     uint32_t PitTmr;
 
@@ -101,16 +97,26 @@ implementation
   }
 
   static void readNextByte() {
+//if(mCurBufIndex == 12){
+//sprintf((char *)lcdstr,"r:%u:%u", (unsigned int)mCurBufIndex, (unsigned int)mCurBufLen);
+//call HalLCD.displayString(lcdstr, 2);
+//togglepin(0);
+//}
     if (mCurBufIndex >= (mCurBufLen - 1)) {
       atomic { mI2CState = I2C_STATE_READEND; }
       if (mCurFlags & I2C_STOP) {
-	call I2C.setTWICR(AT91C_TWI_STOP);
+	      //call I2C.setTWICR(AT91C_TWI_STOP);
+//sprintf((char *)lcdstr,"stop");
+//call HalLCD.displayString(lcdstr, 2);
+//togglepin(0);		      
+	      *AT91C_TWI_CR = AT91C_TWI_STOP;
       }
       //TODO: What if STOP is not set
     }
     else {
       atomic { mI2CState = I2C_STATE_READ; }
     }
+    mCurBuf[mCurBufIndex-1] = *AT91C_TWI_RHR;
     return;
   }
 
@@ -158,26 +164,91 @@ implementation
     }
 
     if (flags & I2C_START) {
-			*AT91C_AIC_IDCR   = (1L<<AT91C_ID_TWI);
+			if (bRnW){ //read
+				ULONG Tmp;
 
-			//*AT91C_TWI_IDR = 0x000001C7;
-			call I2C.setTWIIDR(DISABLEI2cIrqs);
+				//call I2C.setTWIIDR(DISABLEI2cIrqs);
+				
+				*AT91C_TWI_IDR = 0x000001C7;
+				
+				/* Reset error flags */
+				Tmp               = *AT91C_TWI_SR;
+				Tmp               = *AT91C_TWI_RHR;
+				Tmp               = Tmp;        /* Suppress warning */
+				*AT91C_TWI_MMR    = (AT91C_TWI_MREAD | AT91C_TWI_IADRSZ_NO | (DEVICE_ADR << 16));
+				*AT91C_TWI_CR     = AT91C_TWI_START | AT91C_TWI_MSEN;
+				//Tmp               = *AT91C_TWI_SR;
+				*AT91C_TWI_IER    = 0x000001C2;			
+				
+				
+				//*AT91C_AIC_ICCR   = (1L<<AT91C_ID_TWI);            /* Clear AIC irq      */\
+				//*AT91C_TWI_MMR      = (AT91C_TWI_MREAD | AT91C_TWI_IADRSZ_NO | (addr << 16)); /* no internal adr, write dir */
+				//*AT91C_TWI_CR       = (AT91C_TWI_MSEN | AT91C_TWI_START);
+				//*AT91C_TWI_IER      = 0x000001C2;  /* Enable RX related irq */    
+				
+				if(0)		
+				{
+					*AT91C_AIC_IDCR   = (1L<<AT91C_ID_TWI);
+					//*AT91C_TWI_IDR = 0x000001C7;
 
-			//reset();                                  
-			*AT91C_AIC_ICCR   = (1L<<AT91C_ID_TWI);            /* Clear AIC irq      */\
+					Tmp = *AT91C_TWI_SR;
+					Tmp = *AT91C_TWI_RHR;
+					Tmp = Tmp;
+					//reset();                                  
 
-			//AT91C_AIC_SVR[AT91C_ID_TWI] = (unsigned int)irqhandler;
-			AT91C_AIC_SMR[AT91C_ID_TWI] = ((AT91C_AIC_PRIOR_HIGHEST) | (AT91C_AIC_SRCTYPE_INT_EDGE_TRIGGERED));\
-			*AT91C_AIC_IECR   = (1L<<AT91C_ID_TWI);               /* Enables AIC irq */\
-			*AT91C_PIOA_ASR   = (AT91C_PA4_TWCK | AT91C_PA3_TWD); /* Sel. per. A     */\
-			*AT91C_PIOA_PDR   = (AT91C_PA4_TWCK | AT91C_PA3_TWD); /* Sel. per on pins*/\
-			*AT91C_PIOA_MDER  = (AT91C_PA4_TWCK | AT91C_PA3_TWD); /* Open drain      */\
-			*AT91C_PIOA_PPUDR = (AT91C_PA4_TWCK | AT91C_PA3_TWD); /* no pull up      */\
-			*AT91C_TWI_CWGR   = (CLDIV | (CLDIV << 8));    	  
-			*AT91C_AIC_ICCR     = (1L<<AT91C_ID_TWI);
-			*AT91C_TWI_CR       = AT91C_TWI_MSEN;// | AT91C_TWI_START;
-			*AT91C_TWI_MMR      = (AT91C_TWI_IADRSZ_NO | (addr << 16)); /* no internal adr, write dir */
-			*AT91C_TWI_IER      = 0x000001C4;  /* Enable TX related irq */
+
+					//AT91C_AIC_SVR[AT91C_ID_TWI] = (unsigned int)irqhandler;
+					AT91C_AIC_SMR[AT91C_ID_TWI] = ((AT91C_AIC_PRIOR_HIGHEST) | (AT91C_AIC_SRCTYPE_INT_EDGE_TRIGGERED));
+					*AT91C_AIC_IECR   = (1L<<AT91C_ID_TWI);               /* Enables AIC irq */\
+					*AT91C_PIOA_ASR   = (AT91C_PA4_TWCK | AT91C_PA3_TWD); /* Sel. per. A     */\
+					*AT91C_PIOA_PDR   = (AT91C_PA4_TWCK | AT91C_PA3_TWD); /* Sel. per on pins*/\
+					*AT91C_PIOA_MDER  = (AT91C_PA4_TWCK | AT91C_PA3_TWD); /* Open drain      */\
+					*AT91C_PIOA_PPUDR = (AT91C_PA4_TWCK | AT91C_PA3_TWD); /* no pull up      */\
+					*AT91C_TWI_CWGR   = (CLDIV | (CLDIV << 8));    	  
+					*AT91C_AIC_ICCR   = (1L<<AT91C_ID_TWI);
+					*AT91C_TWI_CR     = (AT91C_TWI_MSEN | AT91C_TWI_START);
+					Tmp               = *AT91C_TWI_SR;
+				}
+			}
+			else
+			{ //write
+				ULONG Tmp;
+
+				//call I2C.setTWIIDR(DISABLEI2cIrqs);
+				*AT91C_TWI_IDR = 0x000001C7;
+
+				*AT91C_AIC_ICCR   = (1L<<AT91C_ID_TWI);            /* Clear AIC irq      */\
+				*AT91C_TWI_MMR      = (AT91C_TWI_IADRSZ_NO | (addr << 16)); /* no internal adr, write dir */
+				*AT91C_TWI_CR       = AT91C_TWI_MSEN;// | AT91C_TWI_START;
+        *AT91C_TWI_IER      = 0x000001C4;  /* Enable TX related irq */\
+
+				if(0){
+					*AT91C_AIC_IDCR   = (1L<<AT91C_ID_TWI);
+
+					//*AT91C_TWI_IDR = 0x000001C7;
+					call I2C.setTWIIDR(DISABLEI2cIrqs);
+					Tmp = *AT91C_TWI_SR;
+					Tmp = *AT91C_TWI_THR;
+					Tmp = Tmp;
+					//reset();                                  
+					*AT91C_AIC_ICCR   = (1L<<AT91C_ID_TWI);            /* Clear AIC irq      */\
+
+					//AT91C_AIC_SVR[AT91C_ID_TWI] = (unsigned int)irqhandler;
+					AT91C_AIC_SMR[AT91C_ID_TWI] = ((AT91C_AIC_PRIOR_HIGHEST) | (AT91C_AIC_SRCTYPE_INT_EDGE_TRIGGERED));
+					*AT91C_AIC_IECR   = (1L<<AT91C_ID_TWI);               /* Enables AIC irq */\
+					*AT91C_PIOA_ASR   = (AT91C_PA4_TWCK | AT91C_PA3_TWD); /* Sel. per. A     */\
+					*AT91C_PIOA_PDR   = (AT91C_PA4_TWCK | AT91C_PA3_TWD); /* Sel. per on pins*/\
+					*AT91C_PIOA_MDER  = (AT91C_PA4_TWCK | AT91C_PA3_TWD); /* Open drain      */\
+					*AT91C_PIOA_PPUDR = (AT91C_PA4_TWCK | AT91C_PA3_TWD); /* no pull up      */\
+					*AT91C_TWI_CWGR   = (CLDIV | (CLDIV << 8));    	  
+					*AT91C_AIC_ICCR     = (1L<<AT91C_ID_TWI);
+					*AT91C_TWI_CR       = AT91C_TWI_MSEN;// | AT91C_TWI_START;
+					*AT91C_TWI_MMR      = (AT91C_TWI_IADRSZ_NO | (addr << 16)); /* no internal adr, write dir */
+
+					*AT91C_TWI_IER      = 0x000001C4;  /* Enable TX related irq */
+				}
+
+			}
     }
     else if (bRnW) {
       atomic {
@@ -216,7 +287,7 @@ implementation
 
     mAllIrqFlags = (AT91C_TWI_TXCOMP | AT91C_TWI_RXRDY | AT91C_TWI_TXRDY | AT91C_TWI_OVRE | AT91C_TWI_UNRE | AT91C_TWI_NACK);
     //atomic {
-    if(0) {
+    if(1) {
       // Note: The AIC is addressed from the Hpl module
       *AT91C_AIC_IDCR   = (1L<<AT91C_ID_TWI);  
       call I2C.setTWIIDR(DISABLEI2cIrqs);
@@ -224,8 +295,15 @@ implementation
       AT91C_AIC_SMR[AT91C_ID_TWI] = ((AT91C_AIC_PRIOR_HIGHEST) | (AT91C_AIC_SRCTYPE_INT_EDGE_TRIGGERED));      
       *AT91C_PMC_PCER  = (1L<<AT91C_ID_TWI);/* Enable TWI Clock        */
       *AT91C_AIC_IECR   = (1L<<AT91C_ID_TWI); 
-      call I2C.setTWIIDR(mAllIrqFlags);
-      
+      //call I2C.setTWIIDR(mAllIrqFlags);
+
+			*AT91C_PIOA_ASR   = (AT91C_PA4_TWCK | AT91C_PA3_TWD); /* Sel. per. A     */\
+			*AT91C_PIOA_PDR   = (AT91C_PA4_TWCK | AT91C_PA3_TWD); /* Sel. per on pins*/\
+			*AT91C_PIOA_MDER  = (AT91C_PA4_TWCK | AT91C_PA3_TWD); /* Open drain      */\
+			*AT91C_PIOA_PPUDR = (AT91C_PA4_TWCK | AT91C_PA3_TWD); /* no pull up      */\
+
+/*    
+      // TODO
       // Parameterized on AT91C_PA4_TWCK
       call I2CSCL.setPIOASR();
       call I2CSCL.setPIOPDR();
@@ -237,12 +315,12 @@ implementation
       call I2CSDA.setPIOPDR();
       call I2CSDA.setPIOMDER();
       call I2CSDA.setPIOPPUDR();
-
+*/
       mI2CState = I2C_STATE_IDLE;
       
       call I2C.setTWICWGR(CLDIV | (CLDIV << 8));
       
-      call I2C.setTWIIER(mAllIrqFlags);
+      //call I2C.setTWIIER(mAllIrqFlags);
     }    
 
     return SUCCESS;
@@ -287,22 +365,7 @@ implementation
 
     valTWISR = call I2C.getTWISR();
     tmpTWIErr = AT91C_TWI_OVRE | AT91C_TWI_UNRE | AT91C_TWI_NACK;
-
-    //if(mCurBufIndex == mCurBufLen){
-    if(0) {
-			if(valTWISR & AT91C_TWI_TXRDY) {
-				sprintf(str,"+%d",(int)valTWISR);
-				call HalLCD.displayString(str, 0);
-				sprintf(str,"mci=%d",mCurBufIndex);
-				call HalLCD.displayString(str, 1);
-				togglepin(0);
-			}
-			else {
-				sprintf(str,"-%d",(int)valTWISR);
-				call HalLCD.displayString(str, 0);
-				togglepin(0);
-			}
-    }
+	
     atomic {
 			switch (mI2CState) {
 			case I2C_STATE_IDLE:
@@ -315,27 +378,47 @@ implementation
 					post handleReadError();
 					break;
 				}
+				//mCurBuf[mCurBufIndex] = *AT91C_TWI_RHR;
+				//mCurBuf[mCurBufIndex] = call I2C.getTWIRHR();
+				mCurBufIndex++;				
 				readNextByte();
 				break;
 
 			case I2C_STATE_READ:
+if(0) {
+				sprintf((char *)lcdstr,"six9");
+				call HalLCD.displayString(lcdstr, 6);
+				togglepin(0);			
+
+}
+
 				if (valTWISR & tmpTWIErr) {
+				
+				sprintf((char *)lcdstr,"error");
+				call HalLCD.displayString(lcdstr, 5);
+				togglepin(0);			
 					mI2CState = I2C_STATE_ERROR;
 					post handleReadError();
 					break;
 				}
-				mCurBuf[mCurBufIndex] = call I2C.getTWIRHR();
+				
+//				mCurBuf[mCurBufIndex] = *AT91C_TWI_RHR;
+				//mCurBuf[mCurBufIndex] = call I2C.getTWIRHR();
 				mCurBufIndex++;
 				readNextByte();
 				break;
 
 			case I2C_STATE_READEND:
+//sprintf((char *)lcdstr,"end+");
+//call HalLCD.displayString(lcdstr, 5);
+//togglepin(0);			
 				if (valTWISR & tmpTWIErr) {
 					mI2CState = I2C_STATE_ERROR;
 					post handleReadError();
 					break;
 				}
-				mCurBuf[mCurBufIndex] = call I2C.getTWIRHR();
+				//mCurBuf[mCurBufIndex] = call I2C.getTWIRHR();
+				mCurBuf[mCurBufIndex] = *AT91C_TWI_RHR;
 				mI2CState = I2C_STATE_IDLE;
 				signal I2CPacket.readDone(SUCCESS,mCurTargetAddr,mCurBufLen,mCurBuf);
 				break;

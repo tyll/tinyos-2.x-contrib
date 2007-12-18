@@ -36,7 +36,7 @@
  */
 /**
  * Adapted for nxtmote.
- * @author Rasmus Pedersen
+ * @author Rasmus Ulslev Pedersen
  */
 configuration HalAT91OSTimerMapC {
 

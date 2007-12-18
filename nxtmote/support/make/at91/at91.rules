@@ -71,10 +71,13 @@ exe0: builddir asms $(BUILD_EXTRA_DEPS) FORCE
 	@echo "    compiling $(COMPONENT) to a $(PLATFORM) binary"
 	@echo "    NXTMOTE INFO: $(NCC) -v -o $(MAIN_EXE) $(OPTFLAGS) $(PFLAGS) $(CFLAGS) $(COMPONENT).nc $(LIBS) $(LDFLAGS) $(ASSEMBLY_OBJS) $(LIBRARY_OBJS)"
 	@echo "    CFLAGS: $(CFLAGS)"
-	$(NCC)  -save-temps -v -fnesc-verbose -o $(MAIN_EXE) $(OPTFLAGS) $(PFLAGS) $(CFLAGS) $(COMPONENT).nc $(LIBS) $(LDFLAGS) $(ASSEMBLY_OBJS) $(C_OBJS) $(LIBRARY_OBJS)
+	#$(NCC)  -save-temps -v -fnesc-verbose -o $(MAIN_EXE) $(OPTFLAGS) $(PFLAGS) $(CFLAGS) $(COMPONENT).nc $(LIBS) $(LDFLAGS) $(ASSEMBLY_OBJS) $(C_OBJS) $(LIBRARY_OBJS)
+	$(NCC)  -save-temps -v -o $(MAIN_EXE) $(OPTFLAGS) $(PFLAGS) $(CFLAGS) $(COMPONENT).nc $(LIBS) $(LDFLAGS) $(ASSEMBLY_OBJS) $(C_OBJS) $(LIBRARY_OBJS)
 	@echo "    compiled $(COMPONENT) to $(MAIN_EXE)"
 
 builddir: FORCE
+	rm -f *.o
+	rm -rf $(BUILDDIR)
 	mkdir -p $(BUILDDIR)
 
 hex: FORCE

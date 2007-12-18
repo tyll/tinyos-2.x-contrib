@@ -40,10 +40,18 @@ implementation {
   components MainC, TestI2CM, PlatformP, HalAT91I2CMasterC;
   
   TestI2CM.I2CPacket -> HalAT91I2CMasterC.I2CPacket;
-  TestI2CM -> MainC.Boot;
   //TestI2CM.HplAT91I2C <- HplAT91I2CC.HplAT91I2C;
   
   TestI2CM.Init <- PlatformP.InitL2;
+  TestI2CM.Boot -> MainC.Boot;
+  components HalAT91I2CMasterP;
+  TestI2CM.SubInit -> HalAT91I2CMasterP.Init;
+  
+  components HalLCDC;
+  TestI2CM -> HalLCDC.HalLCD;
+  
+  components HplAT91PitC;
+  TestI2CM.PitTimer -> HplAT91PitC.HplAT91Pit;
   
   components HplAT91_GPIOC;
   HalAT91I2CMasterC.I2CSCL -> HplAT91_GPIOC.HplAT91_GPIOPin[AT91C_PA4_TWCK];

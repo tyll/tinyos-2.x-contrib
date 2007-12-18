@@ -1,6 +1,6 @@
 /**
  * Adapted for nxtmote.
- * @author Rasmus Pedersen
+ * @author Rasmus Ulslev Pedersen
  */
 #include "hardware.h"
 module HplAT91InterruptM
@@ -23,7 +23,7 @@ implementation
     uint32_t irqID;
 
     irqID = AT91F_AIC_ActiveID(AT91C_BASE_AIC); // Current interrupt source number
-    
+
     signal AT91Irq.fired[irqID]();   
     
     return;
@@ -50,13 +50,18 @@ implementation
 
   error_t allocate(uint8_t id, bool level, uint8_t priority)
   {
+    uint32_t srctype;
     if(level) {
-      AT91F_AIC_ConfigureIt( AT91C_BASE_AIC, id, priority, AT91C_AIC_SRCTYPE_INT_HIGH_LEVEL, irqhandler);
+      srctype = AT91C_AIC_SRCTYPE_INT_HIGH_LEVEL;
+      //AT91F_AIC_ConfigureIt( AT91C_BASE_AIC, id, priority, AT91C_AIC_SRCTYPE_INT_HIGH_LEVEL, irqhandler);
     }
     else {
-      AT91F_AIC_ConfigureIt( AT91C_BASE_AIC, id, priority, AT91C_AIC_SRCTYPE_INT_EDGE_TRIGGERED, irqhandler);
+      srctype = AT91C_AIC_SRCTYPE_INT_EDGE_TRIGGERED;
+      //AT91F_AIC_ConfigureIt( AT91C_BASE_AIC, id, priority, AT91C_AIC_SRCTYPE_INT_EDGE_TRIGGERED, irqhandler);
     }
-
+    
+    AT91F_AIC_ConfigureIt( AT91C_BASE_AIC, id, priority, srctype, irqhandler);
+//AT91F_AIC_ConfigureIt( AT91C_BASE_AIC, AT91C_ID_SYS, AT91C_AIC_PRIOR_HIGHEST, AT91C_AIC_SRCTYPE_INT_HIGH_LEVEL, irqhandler);
     return TRUE;
   }
 
@@ -73,7 +78,7 @@ implementation
 
   async command error_t AT91Irq.allocate[uint8_t id]()
   {
-    return allocate(id, FALSE, TOSH_IRP_TABLE[id]);
+    return allocate(id, TOSH_IRQLEVEL_TABLE[id], TOSH_IRP_TABLE[id]);
   }
 
   async command void AT91Irq.enable[uint8_t id]()

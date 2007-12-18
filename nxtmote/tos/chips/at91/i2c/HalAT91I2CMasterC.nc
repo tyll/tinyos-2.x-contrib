@@ -49,14 +49,14 @@ implementation
 {
   components HalAT91I2CMasterP;
   components HplAT91I2CC;
-  components PlatformP;
+  //components PlatformP;
   components HalLCDC;
 
   HalAT91I2CMasterP.HalLCD -> HalLCDC.HalLCD;
 
   I2CPacket                = HalAT91I2CMasterP;
 
-  HalAT91I2CMasterP.Init   <- PlatformP.InitL2;
+  //HalAT91I2CMasterP.Init   <- PlatformP.InitL2;
 
   HalAT91I2CMasterP.I2C -> HplAT91I2CC.I2C;
 

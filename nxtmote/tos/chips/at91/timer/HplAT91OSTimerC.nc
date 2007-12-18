@@ -1,6 +1,6 @@
 /**
  * Adapted for nxtmote.
- * @author Rasmus Pedersen
+ * @author Rasmus Ulslev Pedersen
  */
 configuration HplAT91OSTimerC {
 

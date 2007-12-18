@@ -42,9 +42,11 @@ configuration HplUC1601LCDC {
 
 implementation {
   components PlatformP, HplUC1601LCDM, HalAT91SPIControlP, HalAT91SpiPioC;
+  components HplAT91PitC;
   
   HplUC1601LCD             =  HplUC1601LCDM.HplLCD;
   HplUC1601LCDM.Init       <- PlatformP.InitL2;
   HplUC1601LCDM.SpiPacket  -> HalAT91SpiPioC.SpiPacket;
   HplUC1601LCDM.SpiControl -> HalAT91SPIControlP;
+  HplUC1601LCDM.PitTimer -> HplAT91PitC.HplAT91Pit;
 }

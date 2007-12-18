@@ -465,16 +465,15 @@ AT91F_Default_IRQ_handler:
 //ldr	r0, PIOCODR
 //str	r1, [r0]
 //            b     AT91F_Default_IRQ_handler
-b     AT91F_Default_IRQ_handler
+        b     AT91F_Default_IRQ_handler
         .size   AT91F_Default_IRQ_handler, . - AT91F_Default_IRQ_handler
         .endfunc
 
         .global AT91F_Spurious_handler
         .func   AT91F_Spurious_handler
 AT91F_Spurious_handler:
-            b     AT91F_Spurious_handler
+        b     AT91F_Spurious_handler
         .size   AT91F_Spurious_handler, . - AT91F_Spurious_handler
         .endfunc
 
         .end
-

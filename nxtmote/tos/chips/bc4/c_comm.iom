@@ -1,0 +1,222 @@
+//
+// Date init       14.12.2004
+//
+// Revision date   $Date$
+//
+// Filename        $Workfile:: c_comm.iom                                    $
+//
+// Version         $Revision$
+//
+// Archive         $Archive:: /LMS2006/Sys01/Main/Firmware/Source/c_comm.iom $
+//
+// Platform        C
+//
+
+#ifndef   CCOMM_IOM
+#define   CCOMM_IOM
+
+#define   pMapComm                      ((IOMAPCOMM*)(pHeaders[ENTRY_COMM]->pIOMap))
+
+#define   SIZE_OF_USBBUF                64
+#define   USB_PROTOCOL_OVERHEAD         1 + 1    /* Command type byte + Command */
+#define   SIZE_OF_USBDATA               (SIZE_OF_USBBUF - USB_PROTOCOL_OVERHEAD)
+#define   SIZE_OF_HSBUF                 128
+#define   SIZE_OF_BTBUF                 128
+
+#define   BT_CMD_BYTE                   1
+#define   SIZE_OF_BT_DEVICE_TABLE       30
+#define   SIZE_OF_BT_CONNECT_TABLE      4               /* Index 0 is alway incomming connections */
+#define   MAX_BT_MSG_SIZE               60000L
+
+#define   BT_DEFAULT_INQUIRY_MAX        0       /* Unlimited no             */
+#define   BT_DEFAULT_INQUIRY_TIMEOUT_LO 15			/* 15 x 1,28 Sec = 19,2 Sec */
+
+
+// Constants reffering to BtState
+enum
+{
+  BT_ARM_OFF,
+  BT_ARM_CMD_MODE,
+  BT_ARM_DATA_MODE,
+};
+
+//Constant reffering to BtStateStatus
+#define BT_BRICK_VISIBILITY     0x01
+#define BT_BRICK_PORT_OPEN      0x02
+#define BT_CONNECTION_0_ENABLE  0x10
+#define BT_CONNECTION_1_ENABLE  0x20
+#define BT_CONNECTION_2_ENABLE  0x40
+#define BT_CONNECTION_3_ENABLE  0x80
+
+//Constant reffering to BtHwStatus
+#define BT_ENABLE               0x00
+#define BT_DISABLE              0x01
+
+// Constants reffering to HsFlags
+enum
+{
+  HS_UPDATE = 1
+};
+
+// Constants reffering to HsState
+enum
+{
+  HS_INITIALISE = 1,
+  HS_INIT_RECEIVER,  
+  HS_SEND_DATA,
+  HS_DISABLE
+};
+
+//Constants refering to DeviceStatus within DeviceTable
+enum
+{
+  BT_DEVICE_EMPTY   = 0x00,
+  BT_DEVICE_UNKNOWN = 0x01,
+  BT_DEVICE_KNOWN   = 0x02,
+  BT_DEVICE_NAME    = 0x40,
+  BT_DEVICE_AWAY    = 0x80
+};
+
+/* Interface between command other modules */
+enum
+{
+  SENDFILE,
+  SEARCH,
+  STOPSEARCH,
+  CONNECT,
+  DISCONNECT,
+  DISCONNECTALL,
+  REMOVEDEVICE,
+  VISIBILITY,
+  SETCMDMODE,
+  OPENSTREAM,
+  SENDDATA,
+  FACTORYRESET,
+  BTON,
+  BTOFF,
+  SETBTNAME,
+  EXTREAD,
+  PINREQ,
+  CONNECTREQ
+};
+
+
+enum
+{
+  LR_SUCCESS = 0x50,
+  LR_COULD_NOT_SAVE,
+  LR_STORE_IS_FULL,
+  LR_ENTRY_REMOVED,
+  LR_UNKOWN_ADDR
+};
+
+enum
+{
+  USB_CMD_READY  = 0x01,
+  BT_CMD_READY   = 0x02,
+  HS_CMD_READY   = 0x04
+};
+
+typedef   struct
+{
+  UBYTE       Buf[SIZE_OF_USBBUF];
+  UBYTE       InPtr;
+  UBYTE       OutPtr;
+  UBYTE       Spare1;
+  UBYTE       Spare2;
+}USBBUF;
+
+typedef   struct
+{
+  UBYTE       Buf[SIZE_OF_HSBUF];
+  UBYTE       InPtr;
+  UBYTE       OutPtr;
+  UBYTE       Spare1;
+  UBYTE       Spare2;
+}HSBUF;
+
+typedef   struct
+{
+  UBYTE       Buf[SIZE_OF_BTBUF];
+  UBYTE       InPtr;  
+  UBYTE       OutPtr;
+  UBYTE       Spare1;
+  UBYTE       Spare2;
+}BTBUF;
+
+typedef   struct
+{
+  UBYTE       Name[SIZE_OF_BT_NAME];
+  UBYTE       ClassOfDevice[SIZE_OF_CLASS_OF_DEVICE];
+  UBYTE       BdAddr[SIZE_OF_BDADDR];
+  UBYTE       DeviceStatus;
+  UBYTE       Spare1;
+  UBYTE       Spare2;
+  UBYTE       Spare3;
+}BDDEVICETABLE;
+
+typedef   struct
+{
+  UBYTE       Name[SIZE_OF_BT_NAME];
+  UBYTE       ClassOfDevice[SIZE_OF_CLASS_OF_DEVICE];
+  UBYTE       PinCode[16];
+  UBYTE       BdAddr[SIZE_OF_BDADDR];
+  UBYTE       HandleNr;
+  UBYTE       StreamStatus;
+  UBYTE       LinkQuality;
+  UBYTE       Spare;
+}BDCONNECTTABLE;
+
+typedef struct
+{
+  UBYTE       Name[SIZE_OF_BT_NAME];
+  UBYTE       BluecoreVersion[2];
+  UBYTE       BdAddr[SIZE_OF_BDADDR];
+  UBYTE       BtStateStatus;
+  UBYTE       BtHwStatus;
+  UBYTE       TimeOutValue;
+  UBYTE       Spare1;
+  UBYTE       Spare2;
+  UBYTE       Spare3;
+}BRICKDATA;
+
+typedef   struct
+{
+  UWORD          (*pFunc)(UBYTE, UBYTE, UBYTE, UBYTE, UBYTE*, UWORD*);
+  void           (*pFunc2)(UBYTE*);
+
+  // BT related entries
+  BDDEVICETABLE  BtDeviceTable[SIZE_OF_BT_DEVICE_TABLE];
+  BDCONNECTTABLE BtConnectTable[SIZE_OF_BT_CONNECT_TABLE];
+
+  //General brick data
+  BRICKDATA      BrickData;
+
+  BTBUF          BtInBuf;
+  BTBUF          BtOutBuf;
+
+  // HI Speed related entries
+  HSBUF          HsInBuf;
+  HSBUF          HsOutBuf;
+
+  // USB related entries
+  USBBUF         UsbInBuf;
+  USBBUF         UsbOutBuf;
+  USBBUF         UsbPollBuf;
+
+  UBYTE          BtDeviceCnt;
+  UBYTE          BtDeviceNameCnt;
+
+  UBYTE          HsFlags;
+  UBYTE          HsSpeed;
+  UBYTE          HsState;
+
+  UBYTE          UsbState;
+
+}IOMAPCOMM;
+
+
+#endif
+
+
+

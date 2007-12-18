@@ -20,9 +20,18 @@ configuration PlatformC {
   provides interface Init;
 }
 implementation {
-  components PlatformP, HplAT91InterruptM, NxtAvrC;
-  
+  //Must
+  components PlatformP, HplAT91InterruptM;
   Init = PlatformP;
+  
+  //Optional components
+  components HplAT91PitC;
+  PlatformP.InitL3 -> HplAT91PitC.Init;
+  
+  //components HalBtC;
 
-  PlatformP.InitL3 -> NxtAvrC.Init;  
+  //components NxtAvrC;
+  //PlatformP.InitL2 -> NxtAvrC.Init;  
+  
+  
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007 Copenhagen BUsiness School (CBS)
+ * Copyright (c) 2007 Copenhagen Business School (CBS)
  * All rights reserved. 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -29,14 +29,18 @@
  */
 /**
  * UC1601 Display Interface
- * @author Rasmus Pedersen
+ * @author Rasmus Ulslev Pedersen
  */
 interface HalLCD {
   /**
    * Display a string on a line in the display.
    * 
    * @param str  String to display (max. 16 characters can be shown).
-   * @param line There are 8 lines in the display. It starts at 0.  
+   * @param line There are 8 lines in the display: 0 to 7.  
    */
-  async command error_t displayString(uint8_t* str, uint8_t line);
+  command error_t displayString(uint8_t* str, uint8_t line);
+  
+  // Same as above except it will not wait for a task to pick it up
+  command error_t displayStringFast(uint8_t* str, uint8_t line);
+  
 }

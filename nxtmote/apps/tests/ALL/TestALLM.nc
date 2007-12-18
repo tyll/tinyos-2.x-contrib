@@ -49,13 +49,13 @@ implementation
   
   event void Boot.booted() {
     
-    sprintf(str,"NXTMOTE was here!");
+    sprintf((char *)str,"NXTMOTE was here!");
     call HalLCD.displayString(str,0);
 
-    sprintf(str,"-----------------");
+    sprintf((char *)str,"-----------------");
     call HalLCD.displayString(str,1);
     
-    togglepin(0); 
+    //togglepin(0); 
   
   }
   

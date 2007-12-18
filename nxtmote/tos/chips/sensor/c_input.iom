@@ -1,0 +1,109 @@
+//
+// Date init       14.12.2004
+//
+// Revision date   $Date$
+//
+// Filename        $Workfile:: c_input.iom                                   $
+//
+// Version         $Revision$
+//
+// Archive         $Archive:: /LMS2006/Sys01/Main/Firmware/Source/c_input.io $
+//
+// Platform        C
+//
+
+#ifndef   CINPUT_IOM
+#define   CINPUT_IOM
+
+#define   NO_OF_INPUTS     4
+//#define   pMapInput        ((IOMAPINPUT*)(pHeaders[ENTRY_INPUT]->pIOMap))
+
+
+/* Constants related to sensor type  */
+enum
+{
+  NO_SENSOR           = 0,
+  SWITCH              = 1,
+  TEMPERATURE         = 2,
+  REFLECTION          = 3,
+  ANGLE               = 4,
+  LIGHT_ACTIVE        = 5,
+  LIGHT_INACTIVE      = 6,
+  SOUND_DB            = 7,
+  SOUND_DBA           = 8,
+  CUSTOM              = 9,
+  LOWSPEED            = 10,
+  LOWSPEED_9V         = 11,
+  HIGHSPEED           = 12,
+  NO_OF_SENSOR_TYPES  = 13
+};
+
+/* Constants related to sensor mode */
+enum
+{
+  RAWMODE           = 0x00,
+  BOOLEANMODE       = 0x20,
+  TRANSITIONCNTMODE = 0x40,
+  PERIODCOUNTERMODE = 0x60,
+  PCTFULLSCALEMODE  = 0x80,
+  CELSIUSMODE       = 0xA0,
+  FAHRENHEITMODE    = 0xC0,
+  ANGLESTEPSMODE    = 0xE0,
+  SLOPEMASK         = 0x1F,
+  MODEMASK          = 0xE0
+};
+
+/* Constants related to Digital I/O */
+enum
+{
+  DIGI0             = 1,
+  DIGI1             = 2
+};
+
+enum
+{
+  CUSTOMINACTIVE    = 0x00,
+  CUSTOM9V          = 0x01,
+  CUSTOMACTIVE      = 0x02
+};
+
+enum
+{
+  INVALID_DATA   = 0x01
+};
+
+typedef   struct
+{
+  UWORD   CustomZeroOffset;    /* Set the offset of the custom sensor                          */
+  UWORD   ADRaw;
+  UWORD   SensorRaw;
+  SWORD   SensorValue;
+
+  UBYTE   SensorType;
+  UBYTE   SensorMode;
+  UBYTE   SensorBoolean;
+
+  UBYTE   DigiPinsDir;         /* Direction of the Digital pins 1 is output 0 is input         */
+  UBYTE   DigiPinsIn;          /* Contains the status of the digital pins                      */
+  UBYTE   DigiPinsOut;         /* Sets the output level of the digital pins                    */
+  UBYTE   CustomPctFullScale;  /* Sets the Pct full scale of the custom sensor                 */
+  UBYTE   CustomActiveStatus;  /* Sets the active or inactive state of the custom sensor       */
+
+  UBYTE   InvalidData;         /* Indicates wether data is invalid (1) or valid (0)            */
+  
+  UBYTE   Spare1;
+  UBYTE   Spare2;
+  UBYTE   Spare3;
+
+}INPUT;
+
+
+typedef   struct
+{
+  INPUT   Inputs[NO_OF_INPUTS];
+}IOMAPINPUT;
+
+#endif
+
+
+

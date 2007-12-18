@@ -93,7 +93,7 @@ implementation {
   /***************** Local Functions ****************/
   error_t load(uint8_t id, void *msg);
   error_t transmit(uint8_t id, bool force);
-  
+  void blockUntilRxMode();
   
   /***************** AsyncSend Commands ****************/
   /**
@@ -220,7 +220,7 @@ implementation {
   error_t transmit(uint8_t id, bool force) {
     uint8_t state;
     uint8_t *msg;
-    uint8_t abortTx;
+    uint16_t abortTx;
     
     atomic {
       m_id = id;
@@ -229,14 +229,7 @@ implementation {
         
     call Csn.clr[ id ]();
     
-    /*
-     * Put the radio in RX mode if it's not already. This covers the
-     * frequency / synthesizer startup and calibration
-     */
-    while(call RadioStatus.getRadioStatus() != BLAZE_S_RX) {
-      call SFRX.strobe();
-      call SRX.strobe();
-    }
+    blockUntilRxMode();
     
     /*
      * Attempt to transmit.  If the radio goes into TX mode, then our transmit
@@ -246,6 +239,7 @@ implementation {
     call STX.strobe();
     
     if(force) {
+      abortTx = 0;
       while((state = call RadioStatus.getRadioStatus()) != BLAZE_S_TX) {
          // Keep trying until the channel is clear enough for this to go through
          if (state == BLAZE_S_RXFIFO_OVERFLOW) {
@@ -253,11 +247,13 @@ implementation {
           call SRX.strobe();
         }
         
-        /*
-         * Read the note in the next "else" statement...
-         */
-        call SIDLE.strobe();
-        call SRX.strobe();
+        // Read the note in the next else statement...
+        abortTx++;
+        if(abortTx == 32768) {
+          call SIDLE.strobe();
+          call SRX.strobe();
+          blockUntilRxMode();
+        }
         
         call STX.strobe();
       }
@@ -265,7 +261,7 @@ implementation {
     } else {
       if((state = call RadioStatus.getRadioStatus()) != BLAZE_S_TX) {
         // CCA failed
-                
+        
         /* 
          * If we don't explicitly switch the radio back to IDLE and then RX
          * mode here, a duty cycling CCXX00 radio constantly locks up in 
@@ -276,6 +272,7 @@ implementation {
          */
         call SIDLE.strobe();
         call SRX.strobe();
+        blockUntilRxMode();
         
         call State.toIdle();
         call Csn.set[ id ]();
@@ -353,6 +350,27 @@ implementation {
     }
     
     return SUCCESS;
+  }
+  
+  
+  /**
+   * This function will block the entire system until the radio reaches 
+   * RX mode. Know what you're doing before you call it!  CSN must be
+   * already low.
+   */
+  void blockUntilRxMode() {
+    uint8_t state;
+    /*
+     * Put the radio in RX mode if it's not already. This covers the
+     * frequency / synthesizer startup and calibration
+     */
+    while((state = call RadioStatus.getRadioStatus()) != BLAZE_S_RX) {
+      if (state == BLAZE_S_RXFIFO_OVERFLOW) {
+        call SFRX.strobe();
+      }
+      
+      call SRX.strobe();
+    }
   }
   
   

@@ -85,7 +85,7 @@ implementation {
     call RadioSelect.selectRadio(&myMsg, CC1100_RADIO_ID);
     assertEquals("CC1100 not selected", CC1100_RADIO_ID, call RadioSelect.getRadio(&myMsg));
     
-    assertEquals("Didn't get EINVAL", EINVAL, call RadioSelect.selectRadio(&myMsg, 2));
+    assertEquals("selectRadio(ERROR)", SUCCESS, call RadioSelect.selectRadio(&myMsg, 2));
     
     call TestSelectRadio.done();
   }
@@ -128,14 +128,14 @@ implementation {
   
   event void TestSelectInvalid.run() {
     call State.forceState(S_TESTSELECTINVALID);
-    assertEquals("Didn't get EINVAL", EINVAL, call RadioSelect.selectRadio(&myMsg, 3));
+    assertEquals("selectRadio(ERROR)", SUCCESS, call RadioSelect.selectRadio(&myMsg, 3));
     
     // Turn on the radio our packet thinks it's being sent to, which
     // should be 0 because the above command shouldn't have been processed.
-    assertEquals("SplitControl.start(ERROR)", SUCCESS, call SplitControl.start[call RadioSelect.getRadio(&myMsg)]());
+    assertEquals("Didn't get EINVAL in SplitControl.start()", EINVAL, call SplitControl.start[call RadioSelect.getRadio(&myMsg)]());
     
     // We get success because the selectRadio call above didn't go through.
-    assertEquals("Didn't get SUCCESS", SUCCESS, call Send.send(&myMsg, 0));
+    assertEquals("Didn't get EINVAL", EINVAL, call Send.send(&myMsg, 0));
     call TestSelectInvalid.done();
   }
   

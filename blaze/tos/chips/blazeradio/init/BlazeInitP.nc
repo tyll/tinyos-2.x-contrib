@@ -266,16 +266,13 @@ implementation {
     call Gdo2_int.enableRisingEdge[ m_id ]();
     
     while(call RadioStatus.getRadioStatus() != BLAZE_S_IDLE) {
-      call Leds.set(1);
       call Idle.strobe();
     } 
-    call Leds.set(0);
     
     call PaReg.write(call BlazeRegSettings.getPa[ m_id ]());
     
     call SRX.strobe();
     while(call RadioStatus.getRadioStatus() != BLAZE_S_RX){
-      call Leds.set(2);
       cnt++;
       
       if(cnt == 0xFF){    
@@ -285,7 +282,6 @@ implementation {
         // This is an extremely rare and intermittent edge case only reproducible
         // a handful of times where the radio refuses to enter the correct state.
         if(iSwearItsGottaBeTheSilicon == 2) {
-          call Leds.led0On();
           call Csn.set[m_id]();
           call ResetResource.release();
           call BlazePower.shutdown[m_id]();
@@ -304,7 +300,6 @@ implementation {
         call SRX.strobe();
       }
     }
-    call Leds.set(0);
         
     //call Pins.clr65();
     call Csn.set[ m_id ]();
@@ -343,16 +338,13 @@ implementation {
     call Csn.clr[id]();
 
     while((call SNOP.strobe() & 0x80) != 0){
-      call Leds.set(3);
-      if(cnt == 0xFF){
+      cnt++;
+      if(cnt == 0xFF) {
         call Csn.set[id]();
         call Csn.clr[id](); 
         cnt = 0;
-      }else{
-        cnt++;
-      } 
+      }
     }
-    call Leds.set(0);
     
     //call Pins.clr64();
     call Csn.set[id]();

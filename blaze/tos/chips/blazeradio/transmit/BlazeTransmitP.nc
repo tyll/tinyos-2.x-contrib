@@ -234,11 +234,9 @@ implementation {
      * frequency / synthesizer startup and calibration
      */
     while(call RadioStatus.getRadioStatus() != BLAZE_S_RX) {
-      call Leds.set(4);
       call SFRX.strobe();
       call SRX.strobe();
     }
-    call Leds.set(0);
     
     /*
      * Attempt to transmit.  If the radio goes into TX mode, then our transmit
@@ -249,7 +247,6 @@ implementation {
     
     if(force) {
       while((state = call RadioStatus.getRadioStatus()) != BLAZE_S_TX) {
-         call Leds.set(5);
          // Keep trying until the channel is clear enough for this to go through
          if (state == BLAZE_S_RXFIFO_OVERFLOW) {
           call SFRX.strobe();
@@ -258,7 +255,6 @@ implementation {
         
         call STX.strobe();
       }
-      call Leds.set(0);
       
     } else {
       if((state = call RadioStatus.getRadioStatus()) != BLAZE_S_TX) {
@@ -316,10 +312,8 @@ implementation {
       
     abortTx = 0;
     while((state = call RadioStatus.getRadioStatus()) != BLAZE_S_RX) {
-      call Leds.set(6);
       abortTx++;
       if(abortTx == 0xFF) {
-        //call Leds.set(7);
         call SRX.strobe();
       }
       
@@ -337,7 +331,6 @@ implementation {
         call SRX.strobe();
       }
     }
-    call Leds.set(0);
     
     /*
      * Deselect the radio hardware, set our state back to idle, signal done

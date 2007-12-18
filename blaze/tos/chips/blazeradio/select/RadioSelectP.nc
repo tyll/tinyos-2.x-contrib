@@ -167,14 +167,9 @@ implementation {
       return EINVAL;
     }
     
-    if(state[id] == S_SENDING) {
-      // Queue this up for when this radio is done sending
-      currentClient = id;
-      post splitControlStop();
-      return SUCCESS;
-    }
-    
-    return call SubControl.stop[id]();
+    currentClient = id;
+    post splitControlStop();
+    return SUCCESS;
   }
   
   /***************** SubSend Events ****************/

@@ -253,6 +253,12 @@ implementation {
           call SRX.strobe();
         }
         
+        /*
+         * Read the note in the next "else" statement...
+         */
+        call SIDLE.strobe();
+        call SRX.strobe();
+        
         call STX.strobe();
       }
       
@@ -268,7 +274,6 @@ implementation {
          * doesn't enter TX mode, ever.  This is a very intermittent issue,
          * difficult to reproduce.
          */
-        
         call SIDLE.strobe();
         call SRX.strobe();
         

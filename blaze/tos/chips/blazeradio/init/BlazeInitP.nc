@@ -166,7 +166,7 @@ implementation {
     } else if(state[id] != S_ON) {
       return EBUSY;
     }
-    
+        
     call Gdo0_int.disable[ id ]();
     call Gdo2_int.disable[ id ]();
     
@@ -175,7 +175,6 @@ implementation {
     
     state[id] = S_OFF;
     signal SplitControl.stopDone[ id ](SUCCESS);
-    
     return SUCCESS;
   }
   
@@ -251,6 +250,8 @@ implementation {
   /***************** RadioInit Events ****************/
   event void RadioInit.initDone() { 
     uint8_t cnt = 0;
+    uint8_t iSwearItsGottaBeTheSilicon = 0;
+    
     call Gdo0_io.makeInput[ m_id ]();
     call Gdo2_io.makeInput[ m_id ]();
     
@@ -264,15 +265,36 @@ implementation {
     
     call Gdo2_int.enableRisingEdge[ m_id ]();
     
-    while(call RadioStatus.getRadioStatus() != BLAZE_S_IDLE){
+    while(call RadioStatus.getRadioStatus() != BLAZE_S_IDLE) {
+      call Leds.set(1);
       call Idle.strobe();
     } 
+    call Leds.set(0);
     
     call PaReg.write(call BlazeRegSettings.getPa[ m_id ]());
     
     call SRX.strobe();
     while(call RadioStatus.getRadioStatus() != BLAZE_S_RX){
-      if(cnt == 0xFF){
+      call Leds.set(2);
+      cnt++;
+      
+      if(cnt == 0xFF){    
+        iSwearItsGottaBeTheSilicon++;
+        
+        // 2 is arbitrarily chosen here to give up.
+        // This is an extremely rare and intermittent edge case only reproducible
+        // a handful of times where the radio refuses to enter the correct state.
+        if(iSwearItsGottaBeTheSilicon == 2) {
+          call Leds.led0On();
+          call Csn.set[m_id]();
+          call ResetResource.release();
+          call BlazePower.shutdown[m_id]();
+          call Power.set[ m_id ]();
+          state[ m_id ] = S_STARTING;
+          call BlazePower.reset[ m_id ]();
+          return;
+        }
+          
         cnt = 0;
         call Csn.set[m_id]();
         call Csn.clr[m_id]();
@@ -280,10 +302,10 @@ implementation {
         call SFRX.strobe();
         call SFTX.strobe();
         call SRX.strobe();
-      } else {
-        cnt++;
       }
     }
+    call Leds.set(0);
+        
     //call Pins.clr65();
     call Csn.set[ m_id ]();
     
@@ -321,6 +343,7 @@ implementation {
     call Csn.clr[id]();
 
     while((call SNOP.strobe() & 0x80) != 0){
+      call Leds.set(3);
       if(cnt == 0xFF){
         call Csn.set[id]();
         call Csn.clr[id](); 
@@ -329,6 +352,8 @@ implementation {
         cnt++;
       } 
     }
+    call Leds.set(0);
+    
     //call Pins.clr64();
     call Csn.set[id]();
     
@@ -372,7 +397,6 @@ implementation {
   /***************** Functions ****************/
     
   /***************** Tasks ****************/
-
   
   /***************** Defaults ******************/
   default async command void Csn.set[ radio_id_t id ](){}

@@ -234,9 +234,11 @@ implementation {
      * frequency / synthesizer startup and calibration
      */
     while(call RadioStatus.getRadioStatus() != BLAZE_S_RX) {
+      call Leds.set(4);
       call SFRX.strobe();
       call SRX.strobe();
     }
+    call Leds.set(0);
     
     /*
      * Attempt to transmit.  If the radio goes into TX mode, then our transmit
@@ -247,23 +249,33 @@ implementation {
     
     if(force) {
       while((state = call RadioStatus.getRadioStatus()) != BLAZE_S_TX) {
+         call Leds.set(5);
          // Keep trying until the channel is clear enough for this to go through
          if (state == BLAZE_S_RXFIFO_OVERFLOW) {
           call SFRX.strobe();
           call SRX.strobe();
         }
-      
-        if (state == BLAZE_S_TXFIFO_UNDERFLOW) {
-          call SFTX.strobe();
-          call SRX.strobe();
-        }
         
         call STX.strobe();
       }
+      call Leds.set(0);
       
     } else {
       if((state = call RadioStatus.getRadioStatus()) != BLAZE_S_TX) {
         // CCA failed
+                
+        /* 
+         * If we don't explicitly switch the radio back to IDLE and then RX
+         * mode here, a duty cycling CCXX00 radio constantly locks up in 
+         * perpetual CSMA backoffs while attempting to transmit (but not
+         * receive).  In the case we don't go back to IDLE/RX, the transmitter 
+         * doesn't enter TX mode, ever.  This is a very intermittent issue,
+         * difficult to reproduce.
+         */
+        
+        call SIDLE.strobe();
+        call SRX.strobe();
+        
         call State.toIdle();
         call Csn.set[ id ]();
         return EBUSY;
@@ -280,10 +292,14 @@ implementation {
      /**
       * Found an issue here when two transmitters are transmitting to each
       * other and one transmitter's radio is also duty cycling on and off.
-      * First, SplitControl should not go past RadioSelect when we're 
-      * in the middle of a send, and I verified the radio remains on when
+      * The radio does not exit TX mode until we force it to. This could be
+      * because there are no bytes loaded into the TX FIFO, but our software
+      * explicitly loads() before send() each time.
+      * 
+      * As far as duty cycling, SplitControl should not go past RadioSelect when
+      * we're in the middle of a send, and I verified the radio remains on when
       * the lock-up occurs.  So I'm not sure why duty cycling would have
-      * an effect
+      * an effect.
       * 
       * I also verified that the only state we could
       * be in here is STX (unless there's a state I don't know about), 
@@ -295,10 +311,12 @@ implementation {
       * we should have loaded a packet in, and as long as the size wasn't
       * 0 bytes there should have been something to send.
       *
-      * TODO We need a long term fix for this!
+      * TODO We need a long term fix for this for better performance!
       */
+      
     abortTx = 0;
     while((state = call RadioStatus.getRadioStatus()) != BLAZE_S_RX) {
+      call Leds.set(6);
       abortTx++;
       if(abortTx == 0xFF) {
         //call Leds.set(7);
@@ -319,7 +337,7 @@ implementation {
         call SRX.strobe();
       }
     }
-    //call Leds.set(0);
+    call Leds.set(0);
     
     /*
      * Deselect the radio hardware, set our state back to idle, signal done

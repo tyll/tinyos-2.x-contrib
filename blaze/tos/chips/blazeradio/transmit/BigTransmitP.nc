@@ -59,7 +59,7 @@
 #include "Blaze.h"
 #include "AM.h"
 
-module BmacTransmitP {
+module BigTransmitP {
 
   provides {
     interface AsyncSend[ radio_id_t id ];

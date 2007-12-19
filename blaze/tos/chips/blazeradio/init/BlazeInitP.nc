@@ -57,6 +57,8 @@ module BlazeInitP {
   }
   
   uses {
+    interface SplitControl as ReceiveSplitControl[radio_id_t radioId];
+    
     interface Resource as ResetResource;
     interface Resource as DeepSleepResource;
      
@@ -146,17 +148,13 @@ implementation {
     
     // We must be in state S_OFF for this radio. 
     atomic m_id = id;
-
-    call Power.set[ m_id ]();
-
-    state[ m_id ] = S_STARTING;
     
-    // Since we're in control of BlazeSpiP, we know this next command will only
-    // return SUCCESS. Therefore, there is no need to create code to undo above.
-    return call BlazePower.reset[ m_id ]();
+    call ReceiveSplitControl.start[m_id]();
+    // Continues at ReceiveSplitControl.startDone...
+    return SUCCESS;
   }
   
-  command error_t SplitControl.stop[ radio_id_t id ](){
+  command error_t SplitControl.stop[ radio_id_t id ]() {
     if(state[id] == S_OFF) {
       return EALREADY;
     
@@ -166,16 +164,33 @@ implementation {
     } else if(state[id] != S_ON) {
       return EBUSY;
     }
-        
-    call Gdo0_int.disable[ id ]();
-    call Gdo2_int.disable[ id ]();
     
-    call BlazePower.deepSleep[id]();
-    call BlazePower.shutdown[id]();
+    atomic m_id = id;
     
-    state[id] = S_OFF;
-    signal SplitControl.stopDone[ id ](SUCCESS);
+    call ReceiveSplitControl.stop[id]();
     return SUCCESS;
+    // Continues at ReceiveSplitControl.stopDone()
+  }
+  
+  
+  /***************** ReceiveSplitControl Events ****************/
+  event void ReceiveSplitControl.startDone[radio_id_t id](error_t error) {
+    call Power.set[ m_id ]();
+
+    state[ m_id ] = S_STARTING;
+    
+    call BlazePower.reset[ m_id ]();
+  }
+  
+  event void ReceiveSplitControl.stopDone[radio_id_t id](error_t error) {
+    call Gdo0_int.disable[ m_id ]();
+    call Gdo2_int.disable[ m_id ]();
+    
+    call BlazePower.deepSleep[m_id]();
+    call BlazePower.shutdown[m_id]();
+    
+    state[m_id] = S_OFF;
+    signal SplitControl.stopDone[ m_id ](SUCCESS);
   }
   
   /***************** BlazeCommit Commands ****************/
@@ -266,6 +281,7 @@ implementation {
     call Gdo2_int.enableRisingEdge[ m_id ]();
     
     while(call RadioStatus.getRadioStatus() != BLAZE_S_IDLE) {
+      ////call Leds.set(4);
       call Idle.strobe();
     } 
     
@@ -273,6 +289,7 @@ implementation {
     
     call SRX.strobe();
     while(call RadioStatus.getRadioStatus() != BLAZE_S_RX){
+      ////call Leds.set(5);
       cnt++;
       
       if(cnt == 0xFF){    
@@ -338,6 +355,7 @@ implementation {
     call Csn.clr[id]();
 
     while((call SNOP.strobe() & 0x80) != 0){
+      ////call Leds.set(6);
       cnt++;
       if(cnt == 0xFF) {
         call Csn.set[id]();

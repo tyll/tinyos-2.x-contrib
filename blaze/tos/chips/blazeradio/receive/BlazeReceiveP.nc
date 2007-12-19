@@ -45,8 +45,9 @@ module BlazeReceiveP {
     interface Receive[ radio_id_t id ];
     interface ReceiveController[ radio_id_t id ];
     interface AckReceive;
-        
+    
     interface Init;
+    interface SplitControl[ radio_id_t id ];
   }
   
   uses {
@@ -89,14 +90,16 @@ implementation {
   
   /** Default message buffer */
   message_t myMsg;
-
-  /** The ID of the other radio waiting for its packet to be received */
-  uint8_t pendingRadioRx;
+  
+  /** TRUE if SplitControl.stop() was called */
+  bool stopping;
   
   enum receive_states{
     S_IDLE,
     S_RX_LENGTH,
     S_RX_PAYLOAD,
+    
+    S_OFF,
   };
   
   enum {
@@ -123,18 +126,43 @@ implementation {
       m_msg = &myMsg;
       acknowledgement.length = ACK_FRAME_LENGTH;
       acknowledgement.fcf = IEEE154_TYPE_ACK;
-      pendingRadioRx = NO_RADIO_PENDING;
+      stopping = FALSE;
+      //pendingRadioRx = NO_RADIO_PENDING;
     }
     return SUCCESS;
   }
   
 
+  /***************** SplitControl Commands ****************/
+  command error_t SplitControl.start[radio_id_t radioId]() {
+    signal SplitControl.startDone[radioId](SUCCESS);
+    return SUCCESS;
+  }
+  
+  command error_t SplitControl.stop[radio_id_t radioId]() {
+    bool stopDone = FALSE;
+
+    atomic {
+      if(call State.isIdle()) {
+        call RxInterrupt.disable[radioId]();
+        stopDone = TRUE;
+      
+      } else {
+        stopping = TRUE;
+      }
+    }
+    
+    if(stopDone) {
+      signal SplitControl.stopDone[radioId](SUCCESS);
+    }
+    
+    return SUCCESS;
+  }
+  
   /***************** RxInterrupt Events ****************/
   async event void RxInterrupt.fired[ radio_id_t id ]() {
     call RxInterrupt.disable[id]();
-    if(call ReceiveController.beginReceive[id]() != SUCCESS) {
-      atomic pendingRadioRx = id;
-    }
+    call ReceiveController.beginReceive[id]();
   }
   
   /***************** ReceiveController Commands ***********************/
@@ -351,6 +379,9 @@ implementation {
     }
 
     call SRX.strobe();
+    
+    while(call RadioStatus.getRadioStatus() != BLAZE_S_RX);
+    
     cleanUp();
   }
   
@@ -359,37 +390,29 @@ implementation {
    */
   void cleanUp() {
     uint8_t id;
-    uint8_t localPendingRx;
     atomic id = m_id;
-    
-    
+
     call Csn.set[ id ]();
-    //call RxIo.makeInput[id]();
-   
-    if(call RxIo.get[id]()) {
-      // The GPO Rx line hasn't gone low, so there is more to receive.
-      call State.forceState(S_RX_LENGTH);
-      receive();
-      return;
-      
-    } else {
-      atomic localPendingRx = pendingRadioRx;
-      if(localPendingRx != NO_RADIO_PENDING) {
-        // Switch over to the other radio
-        atomic m_id = pendingRadioRx;
-        atomic pendingRadioRx = NO_RADIO_PENDING;
-        
-        // Now re-enable interrupts on the radio we were previously servicing
-        call RxInterrupt.enableRisingEdge[id]();
-        call State.forceState(S_RX_LENGTH);
-        receive();
-        return;
-      }
-      
-      // Re-enable the RX interrupt on this radio
+    
+    if(stopping) {
+      // Do not re-enable interrupts
+      stopping = FALSE;
       call State.toIdle();
       call Resource.release();
-      call RxInterrupt.enableRisingEdge[id]();
+      signal SplitControl.stopDone[id](SUCCESS);
+      return;
+    }
+    
+    atomic {
+      if(call RxIo.get[id]()) {
+        call State.forceState(S_RX_LENGTH);
+        receive();
+        
+      } else {
+        call State.toIdle();
+        call Resource.release();
+        call RxInterrupt.enableRisingEdge[id]();
+      }
     }
   }
   

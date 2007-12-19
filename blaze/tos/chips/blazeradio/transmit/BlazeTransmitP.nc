@@ -41,6 +41,23 @@
  * It also assumes the radio is on and configured properly
  */
  
+    
+/**
+ * NOTE 1
+ * TODO There is a nasty bug here where my radio was attempting to send
+ * but the radio was physically off. This would explain how a duty cycling
+ * transmitter would lock up in an infinite TX state - because
+ * there's nothing loaded into the FIFO to send. Both RadioSelect and
+ * RfResource (a layer in my app) should prevent a message from being
+ * sent while the radio is off.
+ *
+ * In the meantime, I've allowed the transmission to abort if we cannot
+ * get the radio into RX mode. This will ideally allow us to move onto
+ * the next packet, but we will never be able to use the current radio
+ * until we turn it off and turn on a different radio. The "wtf" abort should
+ * only occur on platforms that physically turn off the radio with a FET switch.
+ */
+   
 #include "IEEE802154.h"
 #include "Blaze.h"
 #include "AM.h"
@@ -93,7 +110,8 @@ implementation {
   /***************** Local Functions ****************/
   error_t load(uint8_t id, void *msg);
   error_t transmit(uint8_t id, bool force);
-  void blockUntilRxMode();
+  bool blockUntilRxMode();
+  void signalDone();
   
   /***************** AsyncSend Commands ****************/
   /**
@@ -217,6 +235,7 @@ implementation {
    * @param force TRUE to force the packet to go through, even if CCA fails the
    *     first few times
    */
+
   error_t transmit(uint8_t id, bool force) {
     uint8_t state;
     uint8_t *msg;
@@ -226,10 +245,13 @@ implementation {
       m_id = id;
       msg = myMsg;
     }
-        
+    
     call Csn.clr[ id ]();
     
-    blockUntilRxMode();
+    if(!blockUntilRxMode()) {
+      signalDone();
+      return SUCCESS;
+    }
     
     /*
      * Attempt to transmit.  If the radio goes into TX mode, then our transmit
@@ -252,7 +274,10 @@ implementation {
         if(abortTx == 32768) {
           call SIDLE.strobe();
           call SRX.strobe();
-          blockUntilRxMode();
+          if(!blockUntilRxMode()) {
+            signalDone();
+            return SUCCESS;
+          }
         }
         
         call STX.strobe();
@@ -268,11 +293,14 @@ implementation {
          * perpetual CSMA backoffs while attempting to transmit (but not
          * receive).  In the case we don't go back to IDLE/RX, the transmitter 
          * doesn't enter TX mode, ever.  This is a very intermittent issue,
-         * difficult to reproduce.
+         * difficult to reproduce, and seems to be hardware related.
          */
         call SIDLE.strobe();
         call SRX.strobe();
-        blockUntilRxMode();
+        if(!blockUntilRxMode()) {
+          signalDone();
+          return SUCCESS;
+        }
         
         call State.toIdle();
         call Csn.set[ id ]();
@@ -339,6 +367,19 @@ implementation {
      */
     call Csn.set[ id ]();
     
+    signalDone();
+    return SUCCESS;
+  }
+  
+  /**
+   * Finish with SUCCESS
+   */
+  void signalDone() {
+    uint8_t state;
+    uint8_t id;
+    
+    atomic id = m_id;
+    
     state = call State.getState();
     call State.toIdle();
     
@@ -348,29 +389,49 @@ implementation {
     } else if(state == S_TX_ACK) {
       signal AckSend.sendDone[ id ](SUCCESS);
     }
-    
-    return SUCCESS;
   }
-  
   
   /**
    * This function will block the entire system until the radio reaches 
    * RX mode. Know what you're doing before you call it!  CSN must be
    * already low.
+   *
+   * On my platform, I've found it possible to try to get the radio into
+   * RX mode while the radio is physically turned off. This case should
+   * have been prevented by both my RadioSelect and RfResource layers above,
+   * which guarantee SplitControl.startDone() is signaled before allowing
+   * a send to go through.  In the case that we cannot get the radio into
+   * RX mode after 255 times, we return FALSE which tells the calling
+   * function to abort the transmission.
    */
-  void blockUntilRxMode() {
+  bool blockUntilRxMode() {
     uint8_t state;
+    uint8_t wtf = 0;
+    
     /*
      * Put the radio in RX mode if it's not already. This covers the
      * frequency / synthesizer startup and calibration
      */
     while((state = call RadioStatus.getRadioStatus()) != BLAZE_S_RX) {
-      if (state == BLAZE_S_RXFIFO_OVERFLOW) {
+      if(state == BLAZE_S_RXFIFO_OVERFLOW) {
         call SFRX.strobe();
       }
       
+      call Csn.set[m_id]();
+      call Csn.clr[m_id]();
+      
+      wtf++;
+      if(wtf == 255) {
+        call SFRX.strobe();
+        call SIDLE.strobe();
+        call SRX.strobe();
+        return FALSE;
+      }
+            
       call SRX.strobe();
     }
+    
+    return TRUE;
   }
   
   

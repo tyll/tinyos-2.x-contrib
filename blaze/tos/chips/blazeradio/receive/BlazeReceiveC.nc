@@ -33,6 +33,9 @@
 /**
  * Lowest level implementation on the receive branch.
  *
+ * SplitControl.stop() must put this component in a state where it is 
+ * safe to turn off the radio before signalling stopDone()
+ *
  * @author Jared Hill
  * @author David Moss
  */
@@ -42,7 +45,9 @@ configuration BlazeReceiveC {
   provides {
     interface Receive[ radio_id_t id ];
     interface ReceiveController[ radio_id_t id ];
-    interface AckReceive;    
+    interface AckReceive;
+    
+    interface SplitControl[ radio_id_t id ];
   }
 }
 
@@ -52,6 +57,7 @@ implementation {
   Receive = BlazeReceiveP.Receive;
   ReceiveController = BlazeReceiveP;
   AckReceive = BlazeReceiveP;
+  SplitControl = BlazeReceiveP.SplitControl;
   
   components BlazeCentralWiringC;
   BlazeReceiveP.Csn -> BlazeCentralWiringC.Csn;

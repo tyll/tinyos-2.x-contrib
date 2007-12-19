@@ -82,14 +82,14 @@ implementation {
   BlazeInitP.SNOP -> BlazeSpiC.SNOP;
   
   BlazeInitP.RadioInit -> BlazeSpiC;
-
-  //components BlazeSpiC;
+  
   BlazeInitP.PaReg -> BlazeSpiC.PA;
   
   components LedsC;
   BlazeInitP.Leds -> LedsC;
   
-  //components DebugPinsC;
-  //BlazeInitP.Pins -> DebugPinsC;
+  components BlazeReceiveC;
+  BlazeInitP.ReceiveSplitControl -> BlazeReceiveC;
+  
 }
 

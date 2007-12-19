@@ -50,6 +50,7 @@ module RadioSelectP {
     interface Receive as SubReceive[ radio_id_t id ];
     interface SplitControl as SubControl[ radio_id_t id ];
     interface BlazePacketBody;
+    interface Leds;
   }
 }
 
@@ -191,7 +192,6 @@ implementation {
   }
   
   event void SubControl.stopDone[ radio_id_t id ](error_t error) {
-    state[id] = S_OFF;
     signal SplitControl.stopDone[id](error);
   }
   
@@ -205,7 +205,8 @@ implementation {
     if(state[currentClient] == S_SENDING) {
       post splitControlStop();
     
-    } else {
+    } else {  
+      state[currentClient] = S_OFF;
       call SubControl.stop[ currentClient ]();
     }
   }

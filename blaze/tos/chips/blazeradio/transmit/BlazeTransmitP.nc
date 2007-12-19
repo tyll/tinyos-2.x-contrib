@@ -269,6 +269,7 @@ implementation {
           call SRX.strobe();
         }
         
+        /*
         // Read the note in the next else statement...
         abortTx++;
         if(abortTx == 32768) {
@@ -279,6 +280,7 @@ implementation {
             return SUCCESS;
           }
         }
+        */
         
         call STX.strobe();
       }

@@ -114,7 +114,7 @@ implementation {
   
   /***************** Prototypes ****************/
   task void receiveDone();
-   
+  
   void receive();
   uint8_t getStatus();
   void failReceive();
@@ -161,7 +161,6 @@ implementation {
   
   /***************** RxInterrupt Events ****************/
   async event void RxInterrupt.fired[ radio_id_t id ]() {
-    call RxInterrupt.disable[id]();
     call ReceiveController.beginReceive[id]();
   }
   
@@ -351,7 +350,7 @@ implementation {
     cleanUp();
   }
   
-  /***************** Functions ****************/
+  /***************** Functions ****************/  
   /**
    * Receive the packet by first reading in the length byte.  The SPI
    * bus should already be allocated.
@@ -390,13 +389,18 @@ implementation {
    */
   void cleanUp() {
     uint8_t id;
+    
     atomic id = m_id;
+    
 
     call Csn.set[ id ]();
     
+    
+      
     if(stopping) {
       // Do not re-enable interrupts
       stopping = FALSE;
+      call RxInterrupt.disable[id]();
       call State.toIdle();
       call Resource.release();
       signal SplitControl.stopDone[id](SUCCESS);
@@ -404,14 +408,14 @@ implementation {
     }
     
     atomic {
+      call State.toIdle();
+      call Resource.release();
+      
       if(call RxIo.get[id]()) {
-        call State.forceState(S_RX_LENGTH);
-        receive();
-        
-      } else {
-        call State.toIdle();
-        call Resource.release();
-        call RxInterrupt.enableRisingEdge[id]();
+        if(call State.requestState(S_RX_LENGTH) == SUCCESS) {
+          call Resource.request();
+          return;
+        }
       }
     }
   }

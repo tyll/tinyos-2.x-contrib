@@ -90,6 +90,4 @@ interface CC2420Fifo {
    */
   async event void writeDone( uint8_t* data, uint8_t length, error_t error );
 
-  async command error_t writeCancel();
-
 }

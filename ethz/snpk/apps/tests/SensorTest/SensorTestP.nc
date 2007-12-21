@@ -10,7 +10,7 @@ module SensorTestP {
 implementation {
 	event void Boot.booted() {
 		call Timer.startPeriodic(1024);
-		call Leds.led1On();
+		//call Leds.led1On();
 	}
 	
 	event void Timer.fired() {
@@ -20,13 +20,23 @@ implementation {
 
 	event void Read.readDone(error_t result, uint16_t data) {
 		uint16_t hi,lo;
+		call Leds.led0Off();
+		call Leds.led1Off();
 		call Leds.led2Off();
     	if (result != SUCCESS) {
     		call Leds.led0On();
     		call DSN.log("No sensor attached");
     	}
     	else {
-    		call Leds.led0Off();
+    		// check range
+    		// valid between 19°C and 30°C
+    		if (data >= 5860 && data <= 6960) {
+    			call Leds.led1On();
+    		}
+    		else {
+    			call Leds.led0On();
+    			call Leds.led1On();
+    		}
     		hi = (data - 3960)/100;
     		lo = (data - 3960) % 100;
     		

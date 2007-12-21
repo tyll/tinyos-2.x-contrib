@@ -6,6 +6,7 @@ implementation {
 		MainC,
 		new TimerMilliC() as BeaconTimer,
 		new TimerMilliC() as UnicastTimer,
+		new TimerMilliC() as StartTimer,
 		ActiveMessageC,CC2420ActiveMessageC,CC2420ControlC,
 		new AMSenderC(1) as BroadcastSender,
 		new AMSenderC(2) as UnicastSender,
@@ -13,11 +14,13 @@ implementation {
 		new AMReceiverC(2) as UnicastRecevier,
 		LedsC,
 		DSNC,
-		RandomC;
+		RandomC,
+		CC2420PacketC;
 	
 	SyncMacP.Boot-> MainC;
 	SyncMacP.BeaconTimer-> BeaconTimer;
 	SyncMacP.UnicastTimer-> UnicastTimer;
+	SyncMacP.StartTimer->StartTimer;
 	SyncMacP.AMPacket-> ActiveMessageC;
 	SyncMacP.Packet-> ActiveMessageC;
 	SyncMacP.Leds-> LedsC;
@@ -31,4 +34,5 @@ implementation {
 	SyncMacP.LowPowerListening -> CC2420ActiveMessageC;
 	SyncMacP.PacketAcknowledgements-> ActiveMessageC;
 	SyncMacP.CC2420Config -> CC2420ControlC;
+	SyncMacP.LinkPacketMetadata -> CC2420PacketC;
 }

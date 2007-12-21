@@ -15,18 +15,17 @@ generic module DsnPlatformTelosbP(bool useHandshake) {
 		interface Packet;
 		interface SplitControl as RadioControl;
 		interface Resource;
-		interface Boot;
 	}
 }
 implementation {
 	
 	bool dummyResourceGranted=FALSE;
-
+	
 	msp430_uart_union_config_t dsn_config = {
   		{
-  		ubr: UBR_1MHZ_115200, //UBR_32KHZ_9600,			//UBR_1MHZ_9600
-  		umctl: UMCTL_1MHZ_115200, //UMCTL_32KHZ_9600, 			//UMCTL_1MHZ_9600
-  		ssel: 0x02, //0x01,		//Clock source (00=UCLKI; 01=ACLK; 10=SMCLK; 11=SMCLK)
+  		ubr: UBR_32KHZ_9600,			//UBR_1MHZ_9600
+  		umctl: UMCTL_32KHZ_9600, 			//UMCTL_1MHZ_9600
+  		ssel: 0x01,		//Clock source (00=UCLKI; 01=ACLK; 10=SMCLK; 11=SMCLK)
 		pena: 0,
 		pev: 0,
 		spb: 0,
@@ -53,11 +52,6 @@ implementation {
 		// setup CTS pin
 		call RxCTSPin.set();		// default hi = not ready to receive
 		call RxCTSPin.makeOutput();
-	}
-	
-	event void Boot.booted(){
-		if (!useHandshake)
-			call DummyResource.immediateRequest();
 	}
 	
 	async command void DsnPlatform.flushUart(){
@@ -122,12 +116,13 @@ implementation {
 	}
 	
 	async command error_t DummyResource.immediateRequest() {
-		atomic {
-			if (!dummyResourceGranted)
-				if (call Resource.immediateRequest()==SUCCESS)
-					dummyResourceGranted=TRUE;
-		}
-		return SUCCESS;
+		if (!dummyResourceGranted)
+			if (call Resource.immediateRequest()==SUCCESS) {
+				dummyResourceGranted=TRUE;
+				return SUCCESS;
+			}
+		else
+			return SUCCESS;
 	}
 	
 	async command error_t DummyResource.release() {return FAIL;}

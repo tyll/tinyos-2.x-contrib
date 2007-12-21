@@ -7,11 +7,13 @@
  */
 #include "syncmac.h"
 #include "AM.h"
+#include "CC2420.h"
 module SyncMacP {
 	uses {
 		interface Boot;
 		interface Timer<TMilli> as BeaconTimer;
 		interface Timer<TMilli> as UnicastTimer;
+		interface Timer<TMilli> as StartTimer;
 		
 		interface SplitControl as RadioControl;
 
@@ -31,6 +33,8 @@ module SyncMacP {
 	    interface AMSend as UnicastSend;
 
 	    interface Random;
+	    
+	    interface LinkPacketMetadata;
 	} 
 }
 implementation {
@@ -41,16 +45,25 @@ implementation {
 	bool radiobusy=FALSE;
 	am_addr_t unicastReceiverId=AM_BROADCAST_ADDR;
 	
+	enum {
+		SLEEPTIME = 1024,
+	};
+	
 	event void Boot.booted(){
 		call DsnSend.logInt(TOS_NODE_ID);
 		call DsnSend.log("node %i booted");
+		call StartTimer.startOneShot(call Random.rand16() >> 10);
+	}
+	
+	event void StartTimer.fired() {
 		call RadioControl.start();
 	}
 	
+	
 	event void RadioControl.startDone(error_t error) {
-		call BeaconTimer.startOneShot(2000);
-		call UnicastTimer.startPeriodic(4000);
-		call LowPowerListening.setLocalSleepInterval(200);
+		call BeaconTimer.startOneShot(call Random.rand16() & 0x0fff);
+		call UnicastTimer.startOneShot(call Random.rand16());
+		call LowPowerListening.setLocalSleepInterval(SLEEPTIME);
 
 		call DsnSend.logInt(call CC2420Config.getChannel());
 		call DsnSend.logInt(call CC2420Config.getShortAddr());
@@ -65,11 +78,11 @@ implementation {
 	
 	event void BeaconTimer.fired() {
 		beacon_msg_t * b_msg;
-		call BeaconTimer.startOneShot(60000U);
+		call BeaconTimer.startOneShot(120000U);
 		if (!radiobusy) {
 			b_msg = call Packet.getPayload(&m, sizeof(beacon_msg_t));
 			b_msg->id=TOS_NODE_ID;
-			call LowPowerListening.setRxSleepInterval(&m, 200);
+			call LowPowerListening.setRxSleepInterval(&m, SLEEPTIME);
 			if (call BeaconSend.send(AM_BROADCAST_ADDR, &m, sizeof(beacon_msg_t))==SUCCESS)
 				radiobusy=TRUE;
 		}
@@ -83,8 +96,8 @@ implementation {
 		uint8_t i;
 		bool known=FALSE;
 		am_addr_t id;
-		if (len == sizeof(beacon_msg_t) && ((beacon_msg_t*)payload)->id!=TOS_NODE_ID) {
-			call Leds.led0Toggle();
+		if (len == sizeof(beacon_msg_t) && call LinkPacketMetadata.highChannelQuality(msg)) {
+			// call Leds.led0Toggle();
 			id = ((beacon_msg_t*)payload)->id;
 			if (numNeighbours<5) {
 				for (i=0;i<numNeighbours;i++)
@@ -102,13 +115,15 @@ implementation {
 	
 	event void UnicastTimer.fired() {
 		unicast_msg_t * u_msg;
-		if (numNeighbours>1 && !radiobusy) {
+		if (!call UnicastTimer.isRunning())
+			call UnicastTimer.startPeriodic(6024);
+		if (numNeighbours>3 && !radiobusy) {
 			if (unicastReceiverId==AM_BROADCAST_ADDR) {
 				unicastReceiverId=neighbour[call Random.rand16() % numNeighbours];
 			}
 			u_msg = call Packet.getPayload(&m, sizeof(unicast_msg_t));
 			u_msg->id=TOS_NODE_ID;
-			call LowPowerListening.setRxSleepInterval(&m, 200);
+			call LowPowerListening.setRxSleepInterval(&m, 1024);
 			call PacketAcknowledgements.requestAck(&m);
 			if (call UnicastSend.send(unicastReceiverId, &m, sizeof(unicast_msg_t))==SUCCESS) {
 				radiobusy=TRUE;
@@ -125,7 +140,7 @@ implementation {
 	
 	event message_t * UnicastReceive.receive(message_t* msg, void* payload, uint8_t len) {
 		if (len == sizeof(unicast_msg_t)) {
-			call Leds.led1Toggle();
+			//call Leds.led1Toggle();
 			//call DsnSend.logInt(call AMPacket.source(msg));
 			//call DsnSend.log("msg from %i");
 		}

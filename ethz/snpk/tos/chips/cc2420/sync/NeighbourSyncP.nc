@@ -164,12 +164,23 @@ implementation {
         		meta->rxInterval=0;
         		if (n_table[idx].drift<0) { // negative drift
         			n_table[idx].drift=-n_table[idx].drift;
-        			driftCompensation=((now - lastSync) * n_table[idx].drift) >> 19;
-        			n_table[idx].drift=-n_table[idx].drift;
+        			// TODO: find more efficient calculation for this
+        			//driftCompensation=(((now - lastSync) >> 1) * n_table[idx].drift) >> 20;
+        			driftCompensation=(((now - lastSync) / 2) * n_table[idx].drift) / 1048576;
+        			n_table[idx].drift=-n_table[idx].drift;        		
+        			/*call DSN.logInt(driftCompensation);
+        			call DSN.logInt(n_table[idx].drift);
+        			call DSN.logInt(now - lastSync);
+        			call DSN.log("comp -%i, drift -%i, period %i");*/
         			driftCompensation=-driftCompensation;
         		}
         		else {	// positive drift
-        			driftCompensation=((now - lastSync) * n_table[idx].drift) >> 19;
+        			//driftCompensation=(((now - lastSync)>>1) * n_table[idx].drift) >> 20;
+        			driftCompensation=(((now - lastSync)/2) * n_table[idx].drift) / 1048576;
+        			/*call DSN.logInt(driftCompensation);
+        			call DSN.logInt(n_table[idx].drift);
+        			call DSN.logInt(now - lastSync);
+        			call DSN.log("comp %i, drift %i, period %i");*/
         		}
         		/**
         		 * past time in neighbour node since avg wakeup
@@ -184,12 +195,12 @@ implementation {
         		wakeup_delay=lplPeriod32Khz - (now - lastSync - driftCompensation + halfdrift + ALARM_OFFSET - REVERSE_SEND_OFFSET + CC2420_ACK_WAIT_DELAY) % lplPeriod32Khz;
         		if (n_table[idx].drift<0) { // negative drift
         			n_table[idx].drift=-n_table[idx].drift;
-        		    driftCompensation=(wakeup_delay * n_table[idx].drift) >> 19;
+        		    driftCompensation=(wakeup_delay * n_table[idx].drift) >> 21;
         		    n_table[idx].drift=-n_table[idx].drift;
         		    driftCompensation=-driftCompensation;
         		}
         		else {	// positive drift
-        			driftCompensation=(wakeup_delay * n_table[idx].drift) >> 19;
+        			driftCompensation=(wakeup_delay * n_table[idx].drift) >> 21;
         		}
         		wakeup_delay+=driftCompensation;
         		if (call Alarm.getNow() - (now + wakeup_delay) < 0x80000000) // getNow is later than estimated wakeup time
@@ -338,7 +349,7 @@ implementation {
 				  item->wakeupAverage = (timeSum>>1) + item->wakeupTimestamp[0];
 				  if (driftSum<0) {
 					  driftSum=-driftSum;
-					  item->drift=(driftSum << 19) / timeSum;
+					  item->drift=(driftSum << 19) / (timeSum >> 2); // effectively 2^21
 					  item->drift=-item->drift;
 #ifdef CC2420SYNC_DEBUG
 					  call DSN.logInt(item->address);
@@ -352,7 +363,7 @@ implementation {
 #endif					  
 				  }
 				  else {
-					  item->drift=(driftSum << 19) / timeSum; // 2 ^19, <<19
+					  item->drift=(driftSum << 19) / (timeSum >> 2);
 #ifdef CC2420SYNC_DEBUG					  
 					  call DSN.logInt(item->address);
 					  call DSN.logInt(timeDiff);

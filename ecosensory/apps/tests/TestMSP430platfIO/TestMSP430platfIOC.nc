@@ -35,13 +35,13 @@ implementation {
   components new TimerMilliC(); //use here once -- no rename.
   TestMSP430platfIOP.Timer -> TimerMilliC;
 
-  components  HplNew8IOsC;
-  TestMSP430platfIOP.Pin0 ->  HplNew8IOsC.Pin0;
-  TestMSP430platfIOP.Pin1 ->  HplNew8IOsC.Pin1;
-  TestMSP430platfIOP.Pin2 ->  HplNew8IOsC.Pin2;
-  TestMSP430platfIOP.Pin3 ->  HplNew8IOsC.Pin3;
-  TestMSP430platfIOP.Pin4 ->  HplNew8IOsC.Pin4;
-  TestMSP430platfIOP.Pin5 ->  HplNew8IOsC.Pin5;
-  TestMSP430platfIOP.Pin6 ->  HplNew8IOsC.Pin6;
-  TestMSP430platfIOP.Pin7 ->  HplNew8IOsC.Pin7;
+  components HplMsp430GeneralIOC;
+  TestMSP430platfIOP.Pin0 ->  HplMsp430GeneralIOC.Port60;
+  TestMSP430platfIOP.Pin1 ->  HplMsp430GeneralIOC.Port61;
+  TestMSP430platfIOP.Pin2 ->  HplMsp430GeneralIOC.Port62;
+  TestMSP430platfIOP.Pin3 ->  HplMsp430GeneralIOC.Port63;
+  TestMSP430platfIOP.Pin4 ->  HplMsp430GeneralIOC.Port64;
+  TestMSP430platfIOP.Pin5 ->  HplMsp430GeneralIOC.Port65;
+  TestMSP430platfIOP.Pin6 ->  HplMsp430GeneralIOC.Port66;
+  TestMSP430platfIOP.Pin7 ->  HplMsp430GeneralIOC.Port67;
 }

@@ -12,14 +12,14 @@ module TestMSP430platfIOP {
     interface Notify<state_t>;
     interface Leds;
     interface Timer<TMilli>;
-    interface GeneralIO as Pin0;
-    interface GeneralIO as Pin1;
-    interface GeneralIO as Pin2;
-    interface GeneralIO as Pin3;
-    interface GeneralIO as Pin4;
-    interface GeneralIO as Pin5;
-    interface GeneralIO as Pin6;
-    interface GeneralIO as Pin7;
+    interface HplMsp430GeneralIO as Pin0;
+    interface HplMsp430GeneralIO as Pin1;
+    interface HplMsp430GeneralIO as Pin2;
+    interface HplMsp430GeneralIO as Pin3;
+    interface HplMsp430GeneralIO as Pin4;
+    interface HplMsp430GeneralIO as Pin5;
+    interface HplMsp430GeneralIO as Pin6;
+    interface HplMsp430GeneralIO as Pin7;
   }
 }
 implementation {

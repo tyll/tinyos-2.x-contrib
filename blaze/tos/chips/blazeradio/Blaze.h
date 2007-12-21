@@ -32,6 +32,7 @@
 #ifndef __BLAZE_H__
 #define __BLAZE_H__
 
+#include "IEEE802154.h"
 
 typedef uint8_t blaze_status_t;
 typedef uint8_t radio_id_t;

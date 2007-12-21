@@ -14,7 +14,7 @@
 configuration TestMSP430platfIOC {
 // provides no interfaces 
 // uses  interface GeneralIO, but not directly..
-// uses HplNew8IOsC.Pin0, which uses GeneralIO
+// uses HplMsp430GeneralIO, which uses GeneralIO
 }
 
 implementation {

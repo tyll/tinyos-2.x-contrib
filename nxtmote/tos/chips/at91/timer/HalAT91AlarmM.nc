@@ -166,6 +166,7 @@ implementation
     } 
     else{ //fire
       call Alarm.stop() ;   
+      //mTc = 0;
       signal Alarm.fired();
     }
     return;

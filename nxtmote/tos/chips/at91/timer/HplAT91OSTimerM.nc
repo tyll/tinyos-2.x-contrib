@@ -89,7 +89,7 @@ __nesc_enable_interrupt();
 
 //          AT91C_BASE_TC0->TC_RC = TICKSONEMSCLK2;
 
-//          AT91C_BASE_TC0->TC_CCR = AT91C_TC_SWTRG ;
+          AT91C_BASE_TC0->TC_CCR = AT91C_TC_SWTRG ;
 /*
           while(1){
             uint16_t cv = AT91C_BASE_TC0->TC_CV;

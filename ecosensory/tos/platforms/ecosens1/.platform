@@ -1,13 +1,13 @@
 # Includes that should take precedence come first.  Platforms come before
 # chips because they may override files (first file found is the one).  These must be specified as
 # @includes instead of -I's to @opts, otherwise the %T won't be processed
-# by ncc.
+# by ncc.  the %T gets expanded to the full location of tinyos-2.x/tos, using the TOS2DIR 
+# environment variable.
 
 push( @includes, qw(
 
-  %T/platforms/ecosens1
-  %T/platforms/ecosens1/chips/stm25p
-  %T/platforms/ecosens1/chips/cc2420
+  %P/chips/stm25p
+  %P/chips/cc2420
   %T/chips/cc2420
   %T/chips/cc2420/alarm
   %T/chips/cc2420/control

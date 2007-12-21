@@ -47,7 +47,7 @@ implementation {
     //new DemoSensorC() as Sensor,
     new SensirionSht11C() as InternalSensirion,
     new SensirionSht71C() as ExternalSensirion,
-  	DSNC,
+    DSNC,
   	new DsnCommandC("set lpl", uint16_t , 1) as LplCommand;
   	
   HarvesterP.DSN -> DSNC;
@@ -74,7 +74,7 @@ implementation {
   components CC2420ActiveMessageC as Lpl;
   
   HarvesterP.LowPowerListening->Lpl;
-  // HarvesterP.CollectionLowPowerListening->Collector;
+  HarvesterP.CollectionLowPowerListening->Collector;
 
   HarvesterP.RadioControl -> ActiveMessageC;
   HarvesterP.AMPacket -> ActiveMessageC;

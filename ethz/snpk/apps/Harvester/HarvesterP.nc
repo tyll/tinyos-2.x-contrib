@@ -56,7 +56,7 @@ module HarvesterP {
     interface AMPacket as SerialAMPacket;
     interface Packet as SerialPacket;
     
-    // interface CollectionLowPowerListening;
+    interface CollectionLowPowerListening;
     interface LowPowerListening;
 
     interface Queue<message_t *> as UARTQueue;
@@ -169,7 +169,7 @@ implementation {
     	fatal_problem();
     }
     else {
-    	// call CollectionLowPowerListening.setDefaultRxSleepInterval(lplSleepInterval);
+    	call CollectionLowPowerListening.setDefaultRxSleepInterval(lplSleepInterval);
     }
   }
 
@@ -268,6 +268,70 @@ implementation {
     }
     return msg;
   }
+  
+  event message_t*
+   TopologyReceive.receive(message_t* msg, void *payload, uint8_t len) {
+  	void * out;
+      message_t *newmsg = call UARTMessagePool.get();
+      // tinfo = call Packet.getPayload(msg, NULL); 
+      m_state=__FUNCTION__;
+      if (newmsg == NULL) {
+      	// drop the message on the floor if we run out of queue space.
+          report_problem();
+     	  	call DSN.logError("UART msg pool full");
+          return msg;
+      }
+      out = call SerialPacket.getPayload(newmsg, len);
+  	memcpy(out, payload, len);
+      call SerialAMPacket.setType(newmsg, AM_HARVESTERTOPOLOGY);
+  	call SerialPacket.setPayloadLength(newmsg, len);
+      
+      //Prepare message to be sent over the uart
+      if (call UARTQueue.enqueue(newmsg) != SUCCESS) {
+          // drop the message on the floor and hang if we run out of
+          // queue space without running out of queue space first (this
+          // should not occur).
+          call UARTMessagePool.put(newmsg);
+          fatal_problem();
+          return msg;
+      }
+      report_received(msg);
+      if (uartbusy == FALSE) {
+        post uartSendTask();
+      }
+      return msg;
+    }
+
+  event message_t*
+  StatusReceive.receive(message_t* msg, void *payload, uint8_t len) {
+ 	void * out;
+     message_t *newmsg = call UARTMessagePool.get();
+     if (newmsg == NULL) {
+     	// drop the message on the floor if we run out of queue space.
+         report_problem();
+    	  	call DSN.logError("UART msg pool full");
+         return msg;
+     }
+     out = call SerialPacket.getPayload(newmsg, len);
+ 	memcpy(out, payload, len);
+     call SerialAMPacket.setType(newmsg, AM_HARVESTERSTATUS);
+ 	call SerialPacket.setPayloadLength(newmsg, len);
+     
+     //Prepare message to be sent over the uart
+     if (call UARTQueue.enqueue(newmsg) != SUCCESS) {
+         // drop the message on the floor and hang if we run out of
+         // queue space without running out of queue space first (this
+         // should not occur).
+         call UARTMessagePool.put(newmsg);
+         fatal_problem();
+         return msg;
+     }
+     report_received(msg);
+     if (uartbusy == FALSE) {
+       post uartSendTask();
+     }
+     return msg;
+   }
 
   task void uartSendTask() {
   // get packet from queue and send it
@@ -299,6 +363,8 @@ implementation {
     	}
   	}
   }
+  
+/*************** Data gathering ***************************************/
 
 // #######################################
 //	Sensor data
@@ -326,7 +392,7 @@ implementation {
     if (call TempExternalRead.read() != SUCCESS)
     	fatal_problem();
   }
-
+  
   event void SensorSend.sendDone(message_t* msg, error_t error) {
   	m_state=__FUNCTION__;
     if (error == SUCCESS)
@@ -356,9 +422,7 @@ implementation {
       report_problem();
     }
     local.temp_internal = data;
-  }
-  
-  
+  }  
   
 // #######################################
 // Harvester Topology
@@ -409,40 +473,7 @@ implementation {
   		report_problem();
   	}
   }
-  
- event message_t*
- TopologyReceive.receive(message_t* msg, void *payload, uint8_t len) {
-	void * out;
-    message_t *newmsg = call UARTMessagePool.get();
-    // tinfo = call Packet.getPayload(msg, NULL); 
-    m_state=__FUNCTION__;
-    if (newmsg == NULL) {
-    	// drop the message on the floor if we run out of queue space.
-        report_problem();
-   	  	call DSN.logError("UART msg pool full");
-        return msg;
-    }
-    out = call SerialPacket.getPayload(newmsg, len);
-	memcpy(out, payload, len);
-    call SerialAMPacket.setType(newmsg, AM_HARVESTERTOPOLOGY);
-	call SerialPacket.setPayloadLength(newmsg, len);
     
-    //Prepare message to be sent over the uart
-    if (call UARTQueue.enqueue(newmsg) != SUCCESS) {
-        // drop the message on the floor and hang if we run out of
-        // queue space without running out of queue space first (this
-        // should not occur).
-        call UARTMessagePool.put(newmsg);
-        fatal_problem();
-        return msg;
-    }
-    report_received(msg);
-    if (uartbusy == FALSE) {
-      post uartSendTask();
-    }
-    return msg;
-  }
-  
   event void TopologySend.sendDone(message_t* msg, error_t error) {
   	m_state=__FUNCTION__;
   	if (error == SUCCESS) {
@@ -482,38 +513,7 @@ implementation {
   		report_problem();
   	}
   }
-  
- event message_t*
- StatusReceive.receive(message_t* msg, void *payload, uint8_t len) {
-	void * out;
-    message_t *newmsg = call UARTMessagePool.get();
-    if (newmsg == NULL) {
-    	// drop the message on the floor if we run out of queue space.
-        report_problem();
-   	  	call DSN.logError("UART msg pool full");
-        return msg;
-    }
-    out = call SerialPacket.getPayload(newmsg, len);
-	memcpy(out, payload, len);
-    call SerialAMPacket.setType(newmsg, AM_HARVESTERSTATUS);
-	call SerialPacket.setPayloadLength(newmsg, len);
     
-    //Prepare message to be sent over the uart
-    if (call UARTQueue.enqueue(newmsg) != SUCCESS) {
-        // drop the message on the floor and hang if we run out of
-        // queue space without running out of queue space first (this
-        // should not occur).
-        call UARTMessagePool.put(newmsg);
-        fatal_problem();
-        return msg;
-    }
-    report_received(msg);
-    if (uartbusy == FALSE) {
-      post uartSendTask();
-    }
-    return msg;
-  }
-  
   event void StatusSend.sendDone(message_t* msg, error_t error) {
   	m_state=__FUNCTION__;
   	if (error == SUCCESS) {

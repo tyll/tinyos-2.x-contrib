@@ -141,6 +141,9 @@ implementation {
   Router.BeaconSend -> Estimator.Send;
   Router.BeaconReceive -> Estimator.Receive;
   Router.LinkEstimator -> Estimator.LinkEstimator;
+  
+  Router.CompareBit -> Estimator.CompareBit;
+  
   Router.AMPacket -> ActiveMessageC;
   Router.RadioControl -> ActiveMessageC;
   Router.BeaconTimer -> RoutingBeaconTimer;
@@ -184,12 +187,12 @@ implementation {
 
   LinkEstimator = Estimator;
 
+  Estimator.Random -> RandomC;
+  
   Estimator.AMSend -> SendControl;
   Estimator.SubReceive -> ReceiveControl;
   Estimator.SubPacket -> SendControl;
   Estimator.SubAMPacket -> SendControl;
-  Estimator.DSN -> DSNC;
-  MainC.SoftwareInit -> Estimator;
 
   Router.DSN->DSNC;
   Forwarder.DSN->DSNC;
@@ -209,4 +212,20 @@ implementation {
   Forwarder.CC2420Packet->CC2420PacketC;
   Forwarder.DuplicateReceive->UniqueReceiveC.DuplicateReceive;
 
+#if defined(PLATFORM_TELOSB) || defined(PLATFORM_MICAZ)
+#ifndef TOSSIM
+  components CC2420ActiveMessageC as PlatformActiveMessageC;
+#else
+  components DummyActiveMessageP as PlatformActiveMessageC;
+#endif
+#elif defined (PLATFORM_MICA2) || defined (PLATFORM_MICA2DOT)
+  components CC1000ActiveMessageC as PlatformActiveMessageC;
+#else
+  components DummyActiveMessageP as PlatformActiveMessageC;
+#endif
+  Estimator.LinkPacketMetadata -> PlatformActiveMessageC;
+
+    // eventually
+    //  Estimator.LinkPacketMetadata -> ActiveMessageC;
+  MainC.SoftwareInit -> Estimator;
 }

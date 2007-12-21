@@ -316,7 +316,7 @@ implementation {
   }
 
   ctp_data_header_t* getHeader(message_t* m) {
-    return (ctp_data_header_t*)call SubPacket.getPayload(m, NULL);
+      return (ctp_data_header_t*)call SubPacket.getPayload(m, sizeof(ctp_data_header_t));
   }
  
   /*
@@ -384,8 +384,8 @@ implementation {
     return call Packet.maxPayloadLength();
   }
 
-  command void* Send.getPayload[uint8_t client](message_t* msg) {
-    return call Packet.getPayload(msg, NULL);
+  command void* Send.getPayload[uint8_t client](message_t* msg, uint8_t len) {
+    return call Packet.getPayload(msg, len);
   }
 
   /*
@@ -482,6 +482,10 @@ implementation {
       if (call SentCache.lookup(qe->msg)) {
         call CollectionDebug.logEvent(NET_C_FE_DUPLICATE_CACHE_AT_SEND);
         call SendQueue.dequeue();
+        if (call MessagePool.put(qe->msg) != SUCCESS)
+        	call CollectionDebug.logEvent(NET_C_FE_PUT_MSGPOOL_ERR);
+        if (call QEntryPool.put(qe) != SUCCESS)
+        	call CollectionDebug.logEvent(NET_C_FE_PUT_QEPOOL_ERR);
         post sendTask();
         return;
       }
@@ -501,8 +505,8 @@ implementation {
 	
         dbg("Forwarder", "%s: I'm a root, so loopback and signal receive.\n", __FUNCTION__);
         loopbackMsgPtr = signal Receive.receive[collectid](loopbackMsgPtr,
-							  call Packet.getPayload(loopbackMsgPtr, NULL), 
-							  call Packet.payloadLength(loopbackMsgPtr));
+        							   call Packet.getPayload(loopbackMsgPtr, call Packet.payloadLength(loopbackMsgPtr)), 
+        							   call Packet.payloadLength(loopbackMsgPtr));
         signal SubSend.sendDone(qe->msg, SUCCESS);
         return;
       }
@@ -515,7 +519,7 @@ implementation {
         call LowPowerListening.setRxSleepInterval(qe->msg, lplSleepInterval);
       } else {
         // if receiver is a root or this is a subsequent packet, don't use lpl
-        if (gradient == 0 || fastPacketCount>0) {
+        if (call CtpInfo.isOneHop() || fastPacketCount>0) {
 /*
 	  call DSN.logInt(gradient);
 	  call DSN.logInt(fastPacketCount);
@@ -741,7 +745,7 @@ implementation {
     else {
       dbg("Forwarder", "%s: BUG: we have a pool entry, but the pool is full, client is %hhu.\n", __FUNCTION__, qe->client);
       sendDoneBug();    // It's a forwarded packet, but there's no room the pool;
-      // call DSN.logError("BUG:pool is full");
+      call DSN.logError("BUG:pool is full");
       // someone has double-stored a pointer somewhere and we have nowhere
       // to put this, so we have to leak it...
     }
@@ -848,7 +852,6 @@ implementation {
    */ 
   event message_t* 
   SubReceive.receive(message_t* msg, void* payload, uint8_t len) {
-    uint8_t netlen;
     collection_id_t collectid;
     bool duplicate = FALSE;
     fe_queue_entry_t* qe;
@@ -905,43 +908,23 @@ implementation {
 
     // If I'm the root, signal receive. 
     else if (call RootControl.isRoot())
-      return signal Receive.receive[collectid](msg, 
-                        call Packet.getPayload(msg, &netlen), 
-                        call Packet.payloadLength(msg));
+    	return signal Receive.receive[collectid](msg, 
+    					       call Packet.getPayload(msg, call Packet.payloadLength(msg)), 
+    					       call Packet.payloadLength(msg));
     // I'm on the routing path and Intercept indicates that I
     // should not forward the packet.
     else if (!signal Intercept.forward[collectid](msg, 
-                        call Packet.getPayload(msg, &netlen), 
-                        call Packet.payloadLength(msg)))
-      return msg;
+    						  call Packet.getPayload(msg, call Packet.payloadLength(msg)), 
+    						  call Packet.payloadLength(msg)))
+    	return msg;
     else {
-      dbg("Route", "Forwarding packet from %hu.\n", getHeader(msg)->origin);
-
-/*
-      call DSN.logInt(call AMPacket.source(msg));
-      call DSN.logDebug("Forwarding packet from %i");
-*/
-      return forward(msg);
+          dbg("Route", "Forwarding packet from %hu.\n", getHeader(msg)->origin);
+          /*
+                call DSN.logInt(call AMPacket.source(msg));
+                call DSN.logDebug("Forwarding packet from %i");
+          */
+         return forward(msg);
     }
-  }
-
-  command void* 
-  Receive.getPayload[collection_id_t id](message_t* msg, uint8_t* len) {
-    return call Packet.getPayload(msg, NULL);
-  }
-
-  command uint8_t
-  Receive.payloadLength[collection_id_t id](message_t *msg) {
-    return call Packet.payloadLength(msg);
-  }
-
-  command void *
-  Snoop.getPayload[collection_id_t id](message_t *msg, uint8_t *len) {
-    return call Packet.getPayload(msg, NULL);
-  }
-
-  command uint8_t Snoop.payloadLength[collection_id_t id](message_t *msg) {
-    return call Packet.payloadLength(msg);
   }
 
   event message_t* 
@@ -1012,14 +995,14 @@ implementation {
     return call SubPacket.maxPayloadLength() - sizeof(ctp_data_header_t);
   }
 
-  command void* Packet.getPayload(message_t* msg, uint8_t* len) {
-    uint8_t* payload = call SubPacket.getPayload(msg, len);
-    if (len != NULL) {
-      *len -= sizeof(ctp_data_header_t);
+  command void* Packet.getPayload(message_t* msg, uint8_t len) {
+    uint8_t* payload = call SubPacket.getPayload(msg, len + sizeof(ctp_data_header_t));
+    if (payload != NULL) {
+      payload += sizeof(ctp_data_header_t);
     }
-    return payload + sizeof(ctp_data_header_t);
+    return payload;
   }
-
+  
   command am_addr_t       CollectionPacket.getOrigin(message_t* msg) {return getHeader(msg)->origin;}
 
   command collection_id_t CollectionPacket.getType(message_t* msg) {return getHeader(msg)->type;}

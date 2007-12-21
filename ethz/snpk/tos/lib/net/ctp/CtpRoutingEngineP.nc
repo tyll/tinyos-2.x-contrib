@@ -114,7 +114,8 @@ generic module CtpRoutingEngineP(uint8_t routingTableSize, uint16_t minInterval,
         interface Random;
         interface CollectionDebug;
         interface CtpCongestion;
-
+        interface CompareBit;
+        
         interface DSN;
 	interface DsnCommand<uint8_t> as GetTopologyCommand;
 	interface DsnCommand<am_addr_t> as SetParentCommand;
@@ -219,7 +220,7 @@ implementation {
         routeInfoInit(&routeInfo);
         routingTableInit();
         my_ll_addr = call AMPacket.address();
-        beaconMsg = call BeaconSend.getPayload(&beaconMsgBuffer);
+        beaconMsg =  call BeaconSend.getPayload(&beaconMsgBuffer, call BeaconSend.maxPayloadLength());
         maxLength = call BeaconSend.maxPayloadLength();
         dbg("TreeRoutingCtl","TreeRouting initialized. (used payload:%d max payload:%d!\n", 
               sizeof(beaconMsg), maxLength);
@@ -514,11 +515,9 @@ implementation {
       }
     }
 
-
     ctp_routing_header_t* getHeader(message_t* m) {
-      return (ctp_routing_header_t*)call BeaconReceive.getPayload(m, NULL);
-    }
-    
+         return (ctp_routing_header_t*)call BeaconSend.getPayload(m, call BeaconSend.maxPayloadLength());
+       }
     
     /* Handle the receiving of beacon messages from the neighbors. We update the
      * table, but wait for the next route update to choose a new parent */
@@ -632,7 +631,13 @@ implementation {
             return FAIL;
         if (routeInfo.parent == INVALID_ADDR)    
             return FAIL;
-        *etx = routeInfo.etx;
+        
+        if (state_is_root == 1) {
+        	*etx = 0;
+        } else {
+          // path etx = etx(parent) + etx(link to the parent)
+          *etx = routeInfo.etx + evaluateEtx(call LinkEstimator.getLinkQuality(routeInfo.parent));
+        }
         return SUCCESS;
     }
 
@@ -726,6 +731,59 @@ implementation {
     default event void Routing.routeFound() {
     }
 
+    /* This should see if the node should be inserted in the table.
+      * If the white_bit is set, this means the LL believes this is a good
+      * first hop link. 
+      * The link will be recommended for insertion if it is better* than some
+      * link in the routing table that is not our parent.
+      * We are comparing the path quality up to the node, and ignoring the link
+      * quality from us to the node. This is because of a couple of things:
+      *   1. because of the white bit, we assume that the 1-hop to the candidate
+      *      link is good (say, etx=1)
+      *   2. we are being optimistic to the nodes in the table, by ignoring the
+      *      1-hop quality to them (which means we are assuming it's 1 as well)
+      *      This actually sets the bar a little higher for replacement
+      *   3. this is faster
+      *   4. it doesn't require the link estimator to have stabilized on a link
+      */
+    event bool CompareBit.shouldInsert(message_t *msg, void* payload, uint8_t len, bool white_bit) {
+           
+           bool found = FALSE;
+           uint16_t pathEtx;
+           //uint16_t linkEtx = evaluateEtx(0);
+           uint16_t neighEtx;
+           int i;
+           routing_table_entry* entry;
+           ctp_routing_header_t* rcvBeacon;
+
+           if ((call AMPacket.type(msg) != AM_CTP_ROUTING) ||
+               (len != sizeof(ctp_routing_header_t))) 
+               return FALSE;
+
+           /* 1.determine this packet's path quality */
+           rcvBeacon = (ctp_routing_header_t*)payload;
+
+           if (rcvBeacon->parent == INVALID_ADDR)
+               return FALSE;
+           /* the node is a root, recommend insertion! */
+           if (rcvBeacon->etx == 0) {
+               return TRUE;
+           }
+       
+           pathEtx = rcvBeacon->etx; // + linkEtx;
+
+           /* 2. see if we find some neighbor that is worse */
+           for (i = 0; i < routingTableActive && !found; i++) {
+               entry = &routingTable[i];
+               //ignore parent, since we can't replace it
+               if (entry->neighbor == routeInfo.parent)
+                   continue;
+               neighEtx = entry->info.etx;
+               //neighEtx = evaluateEtx(call LinkEstimator.getLinkQuality(entry->neighbor));
+               found |= (pathEtx < neighEtx); 
+           }
+           return found;
+       }
 
     /************************************************************/
     /* Routing Table Functions                                  */
@@ -876,6 +934,9 @@ implementation {
       return (n < routingTableActive)? routingTable[n].neighbor:AM_BROADCAST_ADDR;
     }
     
+    command bool CtpInfo.isOneHop() {
+    	return routeInfo.etx==0 && routeInfo.parent != INVALID_ADDR;;
+    }
   // DSN specific
   event void DSN.receive(void *msg, uint8_t len) { 
   }

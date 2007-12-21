@@ -1,21 +1,18 @@
 COMPONENT=HarvesterC
 # use tos libraries
-CFLAGS += -I$(TOSDIR)/lib/net/ -I$(TOSDIR)/lib/net/ctp -I$(TOSDIR)/lib/net/4bitle -I.
+CFLAGS += -I$(TOSDIR)/lib/net/ -I../../tos/lib/net/ctp -I$(TOSDIR)/lib/net/ctp -I$(TOSDIR)/lib/net/4bitle -I.
 # use snpk libraries
 CFLAGS += -I../../tos/lib/dsn -I../../tos/system
-# CFLAGS += -I../../tos/chips/cc2420
-# include bugfixes for dma spi
-# CFLAGS += -I../../tos/chips/msp430/usart -I../../tos/interfaces
 #external Sensirion Sensor
 CFLAGS += -I../../tos/platforms/telosb/chips/sht75
 CFLAGS += -I../../tos/lib/gpio
 #define cc2420 parameters
+#use neighbour sync lpl
+CC2420DIR=../../tos/chips/cc2420
+CFLAGS += -I$(CC2420DIR) -I$(CC2420DIR)/alarm -I$(CC2420DIR)/control -I$(CC2420DIR)/csma -I$(CC2420DIR)/interfaces -I$(CC2420DIR)/link -I$(CC2420DIR)/lowpan -I$(CC2420DIR)/lpl -I$(CC2420DIR)/packet -I$(CC2420DIR)/receive -I$(CC2420DIR)/spi -I$(CC2420DIR)/transmit -I$(CC2420DIR)/unique -I$(CC2420DIR)/sync
 CFLAGS += -DLOW_POWER_LISTENING
-# CFLAGS += -DMAX_LPL_CCA_CHECKS=200 -DMIN_SAMPLES_BEFORE_DETECT=10
-CFLAGS += -DMAX_LPL_CCA_CHECKS=300
-CFLAGS += -DMIN_SAMPLES_BEFORE_DETECT=3
-CFLAGS += -DCC2420_HW_ACKNOWLEDGEMENTS
 CFLAGS += -DTOSH_DATA_LENGTH=35
+CFLAGS += -DENABLE_SPI0_DMA
 # add debug symbols
 CFLAGS += -g
 include $(MAKERULES)

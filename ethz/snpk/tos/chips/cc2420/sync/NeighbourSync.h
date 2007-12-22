@@ -58,8 +58,8 @@ enum {
   SYNC_FAIL_THRESHOLD = 10, // after SYNC_FAIL_THRESHOLD non-acked packets, sync information is not valid anymore
   REQ_SYNC_FLAG = 0x8000,
   SYNC_TIMER_PERIOD = 30000UL, // period to gather sync-requests in milliseconds
-  DRIFT_CHANGE_LIMIT = 10, 	// value >> 19 that a new measured drift is allowed to differ from the last average
-  							// 10 is about 20ppm
+  DRIFT_CHANGE_LIMIT = 50, 	// value >> 21 that a new measured drift is allowed to differ from the last average
+  							// 50 is about 23ppm
   MAX_DRIFT_ERRORS = 5,	// number of false drifts until history is cleared, e.g. when neihgbour node has resetted
   MIN_MEASUREMENT_PERIOD = 32768U, // minimal drift measurement period in ticks
 };

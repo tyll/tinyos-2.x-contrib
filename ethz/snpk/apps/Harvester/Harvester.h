@@ -48,7 +48,7 @@ enum {
   INT_SENSOR = 0,
   
   AM_HARVESTERTOPOLOGY = 0x94,
-  INT_TOPOLOGY = 20000, // milliseconds
+  INT_TOPOLOGY = 24576UL, // milliseconds
   
   AM_HARVESTERSTATUS = 0x95,
   INT_STATUS = 0,

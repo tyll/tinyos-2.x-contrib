@@ -399,8 +399,10 @@ implementation {
       idx=getIndex(address);
       if (idx==NO_ENTRY) {
         if (tableFull()) {
+#ifdef CC2420SYNC_DEBUG
         	call DSN.logInt(address);
         	call DSN.log("replace entry with %i");
+#endif
         	idx=replaceLeastUsedEntry (address);
         }
         else {
@@ -433,12 +435,12 @@ implementation {
         			// add entry, if drift over last period does not differ more than DRIFT_CHANGE_LIMIT
         			driftError=(newSync-item->wakeupTimestamp[MEASURE_HISTORY_SIZE-1]) % (item->lplPeriod << T32KHZ_TO_TMILLI_SHIFT);
         			if (driftError<((item->lplPeriod << T32KHZ_TO_TMILLI_SHIFT) >> 1)) {//pos
-        				drift=(driftError << 19) /(newSync-item->wakeupTimestamp[MEASURE_HISTORY_SIZE-1]);
+        				drift=(driftError << 19) / ((newSync-item->wakeupTimestamp[MEASURE_HISTORY_SIZE-1]) / 4);
         				/*call DSN.logInt(drift);
         				call DSN.log("added drift %i");*/
         			}
         			else {
-        				drift=-((((uint32_t)((item->lplPeriod << T32KHZ_TO_TMILLI_SHIFT) - driftError)) << 19) / (newSync-item->wakeupTimestamp[MEASURE_HISTORY_SIZE-1]));
+        				drift=-((((uint32_t)((item->lplPeriod << T32KHZ_TO_TMILLI_SHIFT) - driftError)) << 19) / ((newSync-item->wakeupTimestamp[MEASURE_HISTORY_SIZE-1]) / 4));
         				/*call DSN.logInt(-drift);
         				call DSN.log("added drift -%i");*/
         			}
@@ -454,9 +456,9 @@ implementation {
         		   		item->driftLimitCount = 0;
         			}
         			else {
-#ifdef CC2420SYNC_DEBUG        				
+//#ifdef CC2420SYNC_DEBUG        				
         				call DSN.log("drift out of limit");
-#endif        				
+//#endif        				
         				item->driftLimitCount++;
         				if (item->driftLimitCount >= MAX_DRIFT_ERRORS) {
         					item->measurementCount = 0;

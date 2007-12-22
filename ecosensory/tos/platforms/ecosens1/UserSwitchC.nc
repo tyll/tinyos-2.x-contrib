@@ -2,7 +2,8 @@
  * BSD license full text at: 
  * http://tinyos.cvs.sourceforge.net/tinyos/tinyos-2.x-contrib/ecosensory/license.txt
  *
- * by John Griessen <john@ecosensory.com>    Rev 1.0 12aug07
+ * @author John Griessen <john@ecosensory.com>  
+ * @version $Revision$ $Date$
  */
 
 configuration UserSwitchC {

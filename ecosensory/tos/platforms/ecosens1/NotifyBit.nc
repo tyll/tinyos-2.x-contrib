@@ -11,12 +11,12 @@
  * guaranteed to succeed. This interface should be used when a single
  * logical unit supports both getting and setting.
  *
- * <p>
  * See TEP114 - SIDs: Source and Sink Independent Drivers for details.
  * 
  * @param val_t the type of the object that will be stored
  *
  * @author Gilman Tolle <gtolle@archrock.com>
+ * revised John Griessen
  * @version $Revision$ $Date$
  */
 

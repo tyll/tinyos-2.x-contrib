@@ -1,7 +1,7 @@
 /* Copyright (c) 2007, Ecosensory Austin Texas All rights reserved. 
 * BSD license full text at: 
 * http://tinyos.cvs.sourceforge.net/tinyos/tinyos-2.x-contrib/ecosensory/license.txt
-* drived telosb   John Griessen 13 Dec 2007
+* derived telosb   John Griessen  @version $ $Date
 */
 module Ecosens1SerialP {
   provides interface StdControl;

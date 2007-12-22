@@ -1,14 +1,10 @@
 /* Copyright (c) 2007, Ecosensory Austin Texas All rights reserved. 
  * BSD license full text at: 
  * http://tinyos.cvs.sourceforge.net/tinyos/tinyos-2.x-contrib/ecosensory/license.txt
- * Authors:		Philip Levis
+ * @author Philip Levis  Revision: 1.4 $ $Date: 2006/12/12 18:23:44 
  * Date last modified:  $Id$
  *
- * The Active Message layer on the ecosens1 platform. This is a naming wrapper
- * around the CC2420 Active Message layer.
- *
- * @author Philip Levis  Revision: 1.4 $ $Date: 2006/12/12 18:23:44 
- * revised  John Griessen 13 Dec 2007
+ * Naming wrapper around the CC2420 Active Message layer on the ecosens1 platform.
  */
 
 configuration ActiveMessageC {

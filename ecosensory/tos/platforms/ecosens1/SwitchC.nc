@@ -1,7 +1,8 @@
-/* Copyright (c) 2007 Ecosensory  MIT license  
- *
- * by John Griessen <john@ecosensory.com>
- * Rev 1.0 12aug07
+/* Copyright (c) 2007, Ecosensory Austin Texas All rights reserved. 
+ * BSD license full text at: 
+ * http://tinyos.cvs.sourceforge.net/tinyos/tinyos-2.x-contrib/ecosensory/license.txt
+ * by John Griessen <john@ecosensory.com> @version
+ * Two state switch implementation on MSP430 platforms
  */
 
 generic module SwitchC() {

@@ -1,8 +1,9 @@
 /* Copyright (c) 2007, Ecosensory Austin Texas All rights reserved. 
-* BSD license full text at: 
-* http://tinyos.cvs.sourceforge.net/tinyos/tinyos-2.x-contrib/ecosensory/license.txt
-* derived telosb   John Griessen  @version $ $Date
-*/
+ * BSD license full text at: 
+ * http://tinyos.cvs.sourceforge.net/tinyos/tinyos-2.x-contrib/ecosensory/license.txt
+ * derived telosb  @author John Griessen <john@ecosensory.com>  
+ * @version $Revision$ $Date$
+ */
 module Ecosens1SerialP {
   provides interface StdControl;
   provides interface Msp430UartConfigure;

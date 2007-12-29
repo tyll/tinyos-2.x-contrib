@@ -1,3 +1,9 @@
+/* Copyright (c) 2007, Ecosensory Austin Texas All rights reserved. 
+ * BSD license full text at: 
+ * http://tinyos.cvs.sourceforge.net/tinyos/tinyos-2.x-contrib/ecosensory/license.txt
+ * by John Griessen <john@ecosensory.com>
+ * Rev 1.0 14 Dec 2007
+ */
 #include <Timer.h>
 #include "ReadMoistureSensors.h"
 #include "Msp430Adc12.h"
@@ -17,13 +23,13 @@ module ReadMoistureSensorsP {
 implementation {
   bool busy = FALSE;  //Used by AMSend
   message_t pkt;   //Used by AMSend
+  uint8_t pktlen; //Used by AMSend
   uint16_t timestamp = 0;
   uint16_t TOS_NODEID;
 
-#define BUFFER_SIZE 12
 //uint8_t samplesperbank = 1;
-uint8_t jiffies = 0;
-uint16_t buffer[BUFFER_SIZE];
+uint8_t jiffies = JIFFIES;
+uint16_t buffer[BUFFER_SIZE];   //see a2d12ch.h
 uint16_t  bufferlen = BUFFER_SIZE;
   //  ref volt from generator = 2.50 Volts
 #define CONFIG_VREF  REFVOLT_LEVEL_2_5, SHT_SOURCE_ACLK, SHT_CLOCK_DIV_1, SAMPLE_HOLD_4_CYCLES, SAMPCON_SOURCE_SMCLK, SAMPCON_CLOCK_DIV_1
@@ -115,7 +121,7 @@ uint8_t numMemctl = 5; //numMemctl counts channels after the first one.
 
   task void MoistureSensorsMsgSend()  
   {
-    MoistureSensorsMsg* rmspkt = (MoistureSensorsMsg*) (call AMSend.getPayload(&pkt));
+    MoistureSensorsMsg* rmspkt = (MoistureSensorsMsg*) (call AMSend.getPayload(&pkt, pktlen));  //09dec07jg
     //cast result of .getPayload to pointer of nx_struct MoistureSensorsMsg*
     rmspkt->nodeid = TOS_NODEID;
     rmspkt->timestamp = timestamp;

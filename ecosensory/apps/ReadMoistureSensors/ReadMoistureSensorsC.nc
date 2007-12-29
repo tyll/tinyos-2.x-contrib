@@ -1,3 +1,9 @@
+/* Copyright (c) 2007, Ecosensory Austin Texas All rights reserved. 
+ * BSD license full text at: 
+ * http://tinyos.cvs.sourceforge.net/tinyos/tinyos-2.x-contrib/ecosensory/license.txt
+ * by John Griessen <john@ecosensory.com>
+ * Rev 1.0 14 Dec 2007
+ */
 #include <Timer.h>
 #include "ReadMoistureSensors.h"
 #include "Msp430Adc12.h"

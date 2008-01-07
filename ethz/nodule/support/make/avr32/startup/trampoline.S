@@ -4,7 +4,7 @@
 
 /* modified version of AT32UC3B-1.1.1/SERVICES/USB/CLASS/DFU/EXAMPLES/ISP/BOOT/trampiline.S */
 
-/* modified: removed include, added PROGRAM_START_OFFSET */
+/* modified: removed include, added PROGRAM_START_OFFSET, remove redunant jump to _stext */
 
 /******************************************************************************
  * \brief AVR32 UC3 ISP trampoline.

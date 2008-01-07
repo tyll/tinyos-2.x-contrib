@@ -35,30 +35,36 @@ INSTALL_IHEX = $(MAIN_IHEX).out$(if $(NODEID),-$(NODEID),)
 BOOTLOADER_SIZE = 8*1024
 VOLUMEFILE = volumes-at45db.xml
 
-PFLAGS += -Wall -Wshadow $(NESC_FLAGS)
 PFLAGS += -target=$(PLATFORM) -fnesc-cfile=$(BUILDDIR)/app.c
+PFLAGS += -Wall -Wshadow $(NESC_FLAGS)
 PFLAGS += -DDEF_TOS_AM_GROUP=$(DEFAULT_LOCAL_GROUP)
 PFLAGS += -I../../tos/platforms/atevk1101
-# dont link against (big) standard libaries and startfile
-PFLAGS += -nostartfiles -nostdlib -nodefaultlibs
-# bootloader section size is 0x2000, application section start at 0x80002000
-PFLAGS += -Wl,--entry=_trampoline,-Map=$(BUILDDIR)/main.map,--script=../../support/make/avr32/ldscripts/avr32elf_uc3b0256.lds
+PFLAGS += -I../../support/make/avr32/startup/include
+PFLAGS += -fno-common
+#PFLAGS += -muse-rodata-section
 # workaround to disable the <avr32/eic_200.h> header (gcc generates warnings/error)
 PFLAGS += -DAVR32_ABI_H_INCLUDED
 #PFLAGS += -DAVR32_EIC_200_H_INCLUDED
+CFLAGS += -Wa,-ahlns=$(BUILDDIR)/app.lst
+# dont link against (big) standard libaries and startfile
+LDFLAGS += -nostartfiles -nostdlib -nodefaultlibs
+# bootloader section size is 0x2000, application section start at 0x80002000
+LDFLAGS += -Wl,--entry=_trampoline,-Map=$(BUILDDIR)/main.map,--script=../../support/make/avr32/ldscripts/avr32elf_uc3b0256.lds
+
 ifdef MSG_SIZE
 PFLAGS += -DTOSH_DATA_LENGTH=$(MSG_SIZE)
 endif
 
-STARTUP_FILES = ../../support/make/avr32/startup/trampoline.S ../../support/make/avr32/startup/crt0.S
+STARTUP_FILES = ../../support/make/avr32/startup/trampoline.S ../../support/make/avr32/startup/crt0.S ../../support/make/avr32/startup/exception.S ../../support/make/avr32/startup/interrupt.S
+DEFHANDLER_FILES = ../../support/make/avr32/startup/exception_defhandler.S ../../support/make/avr32/startup/interrupt_defhandler.S
+STARTUP_FILES += $(DEFHANDLER_FILES)
 #LIBS_FILES = $(shell $(GCC) -print-libgcc-file-name) $(shell $(GCC) -print-file-name=libm.a) $(shell $(GCC) -print-file-name=libc.a)
 
 BUILDLESS_DEPS += bytes
 
 DEFAULT_PROGRAM ?= batchisp
 
-# Use the 'if' function instead of the 'ifdef' construct because ifdef freaks
-# out with call in there.  I don't know why.
+# Use the 'if' function instead of the 'ifdef' construct because ifdef freaks out with call in there.
 $(if $(PROGRAM),,$(call TOSMake_include,avr32/$(DEFAULT_PROGRAM).extra))
 
 ifndef NOWIRING
@@ -84,7 +90,7 @@ tosimage: ihex build_tosimage FORCE
 	@:
 
 ihex: exe FORCE
-	@$(OBJCOPY) --output-target=ihex $(MAIN_EXE) $(MAIN_IHEX)
+	@$(OBJCOPY) --output-target=ihex --remove-section=.reset $(MAIN_EXE) $(MAIN_IHEX)
 
 exe: exe0 bytes FORCE
 	@:
@@ -101,6 +107,6 @@ builddir: FORCE
 
 bytes: FORCE
 	@$(OBJDUMP) -h $(MAIN_EXE) | perl -ne \
-          '$$b{$$1}=hex $$2 if /^\s*\d+\s*\.(reset|text|data|bss)\s+(\S+)/; END { printf("%16d bytes in ROM\n%16d bytes in RAM\n",($$b{reset}-$(BOOTLOADER_SIZE))+$$b{text}+$$b{data},$$b{data}+$$b{bss}); }'
-#	@echo "    size requirements of $(COMPONENT) ($(SIZE))"
-#	@$(SIZE) --format=sysv -x $(MAIN_EXE)
+          '$$b{$$1}=hex $$2 if /^\s*\d+\s*\.(exception|interrupt|text|data|bss)\s+(\S+)/; END { printf("%16d bytes in ROM\n%16d bytes in RAM\n",$$b{interrupt}+$$b{exception}+$$b{text}+$$b{data},$$b{data}+$$b{bss}); }'
+	@echo "    section size requirements of $(COMPONENT) ($(SIZE))"
+	@$(SIZE) --format=sysv -x $(MAIN_EXE)

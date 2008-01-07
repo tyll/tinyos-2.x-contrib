@@ -4,8 +4,7 @@
 
 /* modified version of AT32UC3B-1.1.1/UTILS/STARTUP_FILES/GCC/crt0.S */
 
-/* modified: removed include "board.h", removed EVBA and exception processing, 
-             removed ifdef CONFIG_FRAME_POINTER, initialize stack with 0xff */
+/* modified: removed include "board.h", removed ifdef CONFIG_FRAME_POINTER, initialize stack with 0xff, remove redunant jump to _stext */
 
 /******************************************************************************
  * \brief AVR32UC C runtime startup file.
@@ -47,35 +46,28 @@
 
 #include <avr32/io.h>
 
-
 //! @{
 //! \verbatim
 
-
-  // This must be linked @ 0x80000000 if it is to be run upon reset.
-  .section  .reset, "ax", @progbits
-
-
-  .global _start
-  .type _start, @function
-_start:
-  // Jump to the C runtime startup routine.
-  lda.w   pc, _stext
-
-
-  // _stext is placed outside the .reset section so that the program entry point
-  // can be changed without affecting the C runtime startup.
-  .section  .text._stext, "ax", @progbits
-
-
-  .global _stext
-  .type _stext, @function
+// _stext is placed outside the .reset section so that the program entry point
+// can be changed without affecting the C runtime startup.
+.section  .text._stext, "ax", @progbits
+.global   _stext
+.type     _stext, @function
 _stext:
   // Set initial stack pointer.
-  lda.w   sp, _estack
+  lda.w   sp, _estack /*  */
 
-  // fill up whole stack section with 0xff
-  // to determine max stack usage by counting remainings 0xff
+
+  // Set up EVBA so interrupts can be enabled.
+  lda.w   r0, _evba
+  mtsr    AVR32_EVBA, r0
+
+  // Enable the exception processing.
+  csrf    AVR32_SR_EM_OFFSET
+
+
+  // Fill up whole stack section with 0xff (determine max stack usage by counting remaining 0xff).
   lda.w   r0, _stack
   lda.w   r1, _estack
   cp      r0, r1
@@ -87,6 +79,7 @@ stack_clear_loop:
   cp      r0, r1
   brlo    stack_clear_loop
 stack_clear_loop_end:
+
 
   // Load initialized data having a global lifetime from the data LMA.
   lda.w   r0, _data
@@ -101,6 +94,7 @@ idata_load_loop:
   brlo    idata_load_loop
 idata_load_loop_end:
 
+
   // Clear uninitialized data having a global lifetime in the blank static storage section.
   lda.w   r0, __bss_start
   lda.w   r1, _end
@@ -113,6 +107,7 @@ udata_clear_loop:
   cp      r0, r1
   brlo    udata_clear_loop
 udata_clear_loop_end:
+
 
   // Start the show.
   lda.w   pc, main

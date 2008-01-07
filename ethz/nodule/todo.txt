@@ -1,4 +1,4 @@
-implement interrupt handling (write empty EVBA callback)
+implement interrupt handling
 
 implement timer
 
@@ -7,3 +7,5 @@ implement MCU sleep
 enable external clocks
 
 secondary: implement PWM LED component
+
+secondary: exception and interrupt section should only size 0x102 bytes (currently: 0x148)

@@ -2,6 +2,8 @@
 
 /* @author Mustafa Yuecel <mustafa.yuecel@alumni.ethz.ch> */
 
+#include "interrupt.h"
+
 module TestButtonC
 {
   uses interface Boot;
@@ -63,5 +65,10 @@ implementation
 
       delay(100);
     }
+  }
+
+  void __attribute__((C, spontaneous)) handle_interrupt(int interrupt_level)
+  {
+
   }
 }

@@ -803,9 +803,11 @@ implementation {
         // Loop-detection code:
         if (call CtpInfo.getEtx(&gradient) == SUCCESS) {
           // We only check for loops if we know our own metric
-          if (call CtpPacket.getEtx(m) < gradient) {
-            // The incoming packet's metric (gradient) is less than our
-            // own gradient.  Trigger a route update and backoff.
+          if (call CtpPacket.getEtx(m) <= gradient) {
+        	  // If our etx metric is less than or equal to the etx value
+        	  // on the packet (etx of the previous hop node), then we believe
+        	  // we are in a loop.
+        	  // Trigger a route update and backoff.
             call CtpInfo.triggerImmediateRouteUpdate();
             startRetxmitTimer(LOOPY_WINDOW, LOOPY_OFFSET);
             call CollectionDebug.logEventMsg(NET_C_FE_LOOP_DETECTED,

@@ -73,8 +73,13 @@ module HarvesterP {
     interface DsnCommand<uint16_t> as LplCommand;
 
     // Sensor
-    interface Read<uint16_t> as TempExternalRead;
-    interface Read<uint16_t> as TempInternalRead;
+    interface Read<uint16_t> as ReadExternalTemperature;
+    interface Read<uint16_t> as ReadExternalHumidity;
+    interface Read<uint16_t> as ReadInternalTemperature;
+    interface Read<uint16_t> as ReadInternalHumidity;
+    interface Read<uint16_t> as ReadVoltage;
+    interface Read<uint16_t> as ReadLight1;
+    interface Read<uint16_t> as ReadLight2;
     interface Receive as SensorReceive;
     interface Send as SensorSend;
     
@@ -113,7 +118,8 @@ implementation {
   uint8_t * m_state;
   harvester_topology_t * tinfo;
   uint8_t sensor_sn=0, topology_sn=0, status_sn=0;
-  bool sendbusy=FALSE, uartbusy=FALSE;
+  bool sendTopologyBusy=FALSE, sendSensorBusy=FALSE, sendStatusBusy=FALSE;
+  bool uartbusy=FALSE;
   error_t e=SUCCESS;
   uint16_t lplSleepInterval=LPL_INT;
 
@@ -237,54 +243,49 @@ implementation {
   // is to forward them to the serial uart for processing on the pc
   // connected to the sensor network.
   //
-  event message_t*
-  SensorReceive.receive(message_t* msg, void *payload, uint8_t len) {
-	void * out;
-    message_t *newmsg = call UARTMessagePool.get();
-    m_state=__FUNCTION__;
-    if (newmsg == NULL) {
-    	// drop the message on the floor if we run out of queue space.
-        report_problem();
-   	    call DSN.logError("UART pool full");
-        return msg;
-    }
-    out = (message_t*)call SerialPacket.getPayload(newmsg, len);
-	memcpy(out, payload, len);
-    call SerialAMPacket.setType(newmsg, AM_HARVESTERSENSOR);
-	call SerialPacket.setPayloadLength(newmsg, len);
+  event message_t* SensorReceive.receive(message_t* msg, void *payload, uint8_t len) {
+	  void * out;
+	  message_t *newmsg = call UARTMessagePool.get();
+	  if (newmsg == NULL) {
+		  // drop the message on the floor if we run out of queue space.
+		  report_problem();
+		  call DSN.logError("UART pool full");
+   	      return msg;
+	  }
+	  out = (message_t*)call SerialPacket.getPayload(newmsg, len);
+	  memcpy(out, payload, len);
+	  call SerialAMPacket.setType(newmsg, AM_HARVESTERSENSOR);
+	  call SerialPacket.setPayloadLength(newmsg, len);
+
+	  //Prepare message to be sent over the uart
+	  if (call UARTQueue.enqueue(newmsg) != SUCCESS) {
+		  // drop the message on the floor and hang if we run out of
+		  // queue space without running out of queue space first (this
+		  // should not occur).
+		  call UARTMessagePool.put(newmsg);
+		  fatal_problem();
+		  return msg;
+	  }
     
-    //Prepare message to be sent over the uart
-    if (call UARTQueue.enqueue(newmsg) != SUCCESS) {
-        // drop the message on the floor and hang if we run out of
-        // queue space without running out of queue space first (this
-        // should not occur).
-        call UARTMessagePool.put(newmsg);
-        fatal_problem();
-        return msg;
-    }
-    
-    if (uartbusy == FALSE) {
-      post uartSendTask();
-    }
-    return msg;
+	  if (uartbusy == FALSE) {
+		  post uartSendTask();
+	  }
+	  return msg;
   }
   
-  event message_t*
-   TopologyReceive.receive(message_t* msg, void *payload, uint8_t len) {
-  	void * out;
+  event message_t* TopologyReceive.receive(message_t* msg, void *payload, uint8_t len) {
+	  void * out;
       message_t *newmsg = call UARTMessagePool.get();
-      // tinfo = call Packet.getPayload(msg, NULL); 
-      m_state=__FUNCTION__;
       if (newmsg == NULL) {
-      	// drop the message on the floor if we run out of queue space.
+    	  // drop the message on the floor if we run out of queue space.
           report_problem();
-     	  	call DSN.logError("UART msg pool full");
+     	  call DSN.logError("UART msg pool full");
           return msg;
       }
       out = call SerialPacket.getPayload(newmsg, len);
-  	memcpy(out, payload, len);
+      memcpy(out, payload, len);
       call SerialAMPacket.setType(newmsg, AM_HARVESTERTOPOLOGY);
-  	call SerialPacket.setPayloadLength(newmsg, len);
+      call SerialPacket.setPayloadLength(newmsg, len);
       
       //Prepare message to be sent over the uart
       if (call UARTQueue.enqueue(newmsg) != SUCCESS) {
@@ -300,38 +301,37 @@ implementation {
         post uartSendTask();
       }
       return msg;
-    }
+  }
 
-  event message_t*
-  StatusReceive.receive(message_t* msg, void *payload, uint8_t len) {
- 	void * out;
-     message_t *newmsg = call UARTMessagePool.get();
-     if (newmsg == NULL) {
-     	// drop the message on the floor if we run out of queue space.
-         report_problem();
-    	  	call DSN.logError("UART msg pool full");
-         return msg;
-     }
-     out = call SerialPacket.getPayload(newmsg, len);
- 	memcpy(out, payload, len);
-     call SerialAMPacket.setType(newmsg, AM_HARVESTERSTATUS);
- 	call SerialPacket.setPayloadLength(newmsg, len);
+  event message_t* StatusReceive.receive(message_t* msg, void *payload, uint8_t len) {
+	  void * out;
+	  message_t *newmsg = call UARTMessagePool.get();
+	  if (newmsg == NULL) {
+		  // drop the message on the floor if we run out of queue space.
+		  report_problem();
+    	  call DSN.logError("UART msg pool full");
+    	  return msg;
+	  }
+	  out = call SerialPacket.getPayload(newmsg, len);
+	  memcpy(out, payload, len);
+	  call SerialAMPacket.setType(newmsg, AM_HARVESTERSTATUS);
+	  call SerialPacket.setPayloadLength(newmsg, len);
      
-     //Prepare message to be sent over the uart
-     if (call UARTQueue.enqueue(newmsg) != SUCCESS) {
-         // drop the message on the floor and hang if we run out of
-         // queue space without running out of queue space first (this
-         // should not occur).
-         call UARTMessagePool.put(newmsg);
-         fatal_problem();
-         return msg;
-     }
-     report_received(msg);
-     if (uartbusy == FALSE) {
-       post uartSendTask();
-     }
-     return msg;
-   }
+	  //Prepare message to be sent over the uart
+	  if (call UARTQueue.enqueue(newmsg) != SUCCESS) {
+		  // drop the message on the floor and hang if we run out of
+		  // queue space without running out of queue space first (this
+		  // should not occur).
+		  call UARTMessagePool.put(newmsg);
+		  fatal_problem();
+		  return msg;
+	  }
+	  report_received(msg);
+	  if (uartbusy == FALSE) {
+		  post uartSendTask();
+	  }
+	  return msg;
+  }
 
   task void uartSendTask() {
   // get packet from queue and send it
@@ -374,13 +374,13 @@ implementation {
      - read next sample
   */
   event void SensorTimer.fired() {
-   	if (!sendbusy) {
+   	if (!sendSensorBusy) {
 		harvester_sensor_t *o = (harvester_sensor_t *)call SensorSend.getPayload(&sendbuf, sizeof(harvester_sensor_t));
 		local.dsn=sensor_sn++;
 		local.id=TOS_NODE_ID;
 		memcpy(o, &local, sizeof(local));
 		if (call SensorSend.send(&sendbuf, sizeof(local)) == SUCCESS)
-	  		sendbusy = TRUE;
+			sendSensorBusy = TRUE;
         else {
         	report_problem();
       		call DSN.logError("Send Sensordata radio stack failed");
@@ -389,40 +389,87 @@ implementation {
     else {
   		call DSN.logError("Radio busy while sending SensorData");
     }  	
-    if (call TempExternalRead.read() != SUCCESS)
+    if (call ReadExternalTemperature.read() != SUCCESS)
     	fatal_problem();
   }
   
   event void SensorSend.sendDone(message_t* msg, error_t error) {
-  	m_state=__FUNCTION__;
-    if (error == SUCCESS)
-      report_sent(msg);
-    else {
-      report_problem();
-  	  call DSN.logError("Send Sensordata failed");
-   }
-    sendbusy = FALSE;
+	  if (error == SUCCESS)
+		  report_sent(msg);
+	  else {
+		  report_problem();
+		  call DSN.logError("Send Sensordata failed");
+	  }
+	  sendSensorBusy = FALSE;
   }
 
-  event void TempExternalRead.readDone(error_t result, uint16_t data) {
-  	m_state=__FUNCTION__;
-    if (result != SUCCESS) {
-      data = 0xffff;
-      report_problem();
-    }
-    local.temp_external = data;
-    if (call TempInternalRead.read() != SUCCESS)
-    	fatal_problem();
+  // external Sensirion
+  event void ReadExternalTemperature.readDone(error_t result, uint16_t data) {
+	  if (result != SUCCESS) {
+		  data = 0xffff;
+		  report_problem();
+	  }
+	  local.temp_external = data;
+	  if (call ReadExternalHumidity.read() != SUCCESS)
+		  fatal_problem();
   }
-
-  event void TempInternalRead.readDone(error_t result, uint16_t data) {
-  	m_state=__FUNCTION__;
-    if (result != SUCCESS) {
-      data = 0xffff;
-      report_problem();
+  
+  event void ReadExternalHumidity.readDone(error_t result, uint16_t data) {
+       if (result != SUCCESS) {
+         data = 0xffff;
+         report_problem();
+       }
+       local.hum_external = data;
+       if (call ReadInternalTemperature.read() != SUCCESS)
+         fatal_problem();
+  }
+  // internal Sensirion
+  event void ReadInternalTemperature.readDone(error_t result, uint16_t data) {
+	  if (result != SUCCESS) {
+		  data = 0xffff;
+		  report_problem();
+	  }
+	  local.temp_internal = data;
+	  if (call ReadInternalHumidity.read() != SUCCESS)
+		  fatal_problem();
+  }
+  
+  event void ReadInternalHumidity.readDone(error_t result, uint16_t data) {
+         if (result != SUCCESS) {
+           data = 0xffff;
+           report_problem();
+         }
+         local.hum_internal = data;
+         if (call ReadVoltage.read() != SUCCESS)
+           fatal_problem();
+  }
+  // Voltage
+  event void ReadVoltage.readDone(error_t result, uint16_t data) {
+      if (result != SUCCESS) {
+        data = 0xffff;
+        report_problem();
+      }
+      local.voltage = data;
+      if (call ReadLight1.read() != SUCCESS)
+        fatal_problem();
+  }
+  // Light 1&2
+  event void ReadLight1.readDone(error_t result, uint16_t data) {
+      if (result != SUCCESS) {
+        data = 0xffff;
+        report_problem();
+      }
+      local.light1 = data;
+      if (call ReadLight2.read() != SUCCESS)
+        fatal_problem();
     }
-    local.temp_internal = data;
-  }  
+  event void ReadLight2.readDone(error_t result, uint16_t data) {
+      if (result != SUCCESS) {
+        data = 0xffff;
+        report_problem();
+      }
+      local.light2 = data;
+  }
   
 // #######################################
 // Harvester Topology
@@ -435,7 +482,7 @@ implementation {
   	uint8_t numNeighbours;
   	m_state=__FUNCTION__;
   	
-  	if (!sendbusy) {
+  	if (!sendTopologyBusy) {
   		harvester_topology_t *info = (harvester_topology_t *)call TopologySend.getPayload(&sendbuf, sizeof(harvester_topology_t));
   		for (i=0;i<5;i++)
   			info->neighbour_id[i]=0xffff;
@@ -460,7 +507,7 @@ implementation {
 		}
 		err=call TopologySend.send(&sendbuf, sizeof(harvester_topology_t));
 		if (err == SUCCESS) {
-			sendbusy = TRUE;
+			sendTopologyBusy = TRUE;
 		}
 		else {
 	    	report_problem();  	
@@ -484,7 +531,7 @@ implementation {
       report_problem();
   	  call DSN.logError("Send TreeInfo failed");
     }
-    sendbusy = FALSE;
+  	sendTopologyBusy = FALSE;
   }
   
 // #######################################
@@ -493,7 +540,7 @@ implementation {
   
   event void StatusTimer.fired() {
   	error_t err;
-  	if (!sendbusy) {
+  	if (!sendStatusBusy) {
   		harvester_status_t * status = (harvester_status_t *)call StatusSend.getPayload(&sendbuf, sizeof(harvester_status_t));
 		status->id=TOS_NODE_ID;
 		status->dsn=status_sn++;
@@ -501,7 +548,7 @@ implementation {
 
 		err=call StatusSend.send(&sendbuf, sizeof(harvester_status_t));
 		if (err == SUCCESS) {
-			sendbusy = TRUE;
+			sendStatusBusy = TRUE;
 		}
 		else {
 	    	report_problem();  	
@@ -523,7 +570,7 @@ implementation {
       report_problem();
   	  call DSN.logError("Send Status failed");
     }
-    sendbusy = FALSE;
+  	sendStatusBusy = FALSE;
   }
 
 // #######################################

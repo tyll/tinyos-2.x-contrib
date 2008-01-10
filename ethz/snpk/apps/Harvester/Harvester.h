@@ -45,10 +45,10 @@ enum {
   // NREADINGS = 1,
   /* Default sampling period. */
   AM_HARVESTERSENSOR = 0x93,
-  INT_SENSOR = 0,
+  INT_SENSOR = 15000,
   
   AM_HARVESTERTOPOLOGY = 0x94,
-  INT_TOPOLOGY = 24576UL, // milliseconds
+  INT_TOPOLOGY = 65000UL, // milliseconds
   
   AM_HARVESTERSTATUS = 0x95,
   INT_STATUS = 0,

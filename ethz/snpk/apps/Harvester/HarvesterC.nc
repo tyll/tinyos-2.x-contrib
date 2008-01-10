@@ -44,9 +44,13 @@ implementation {
   	new TimerMilliC() as SensorTimer, 
   	new TimerMilliC() as TopologyTimer,
   	new TimerMilliC() as StatusTimer,
-    //new DemoSensorC() as Sensor,
+  	// Sensors
     new SensirionSht11C() as InternalSensirion,
     new SensirionSht71C() as ExternalSensirion,
+    new VoltageC() as VoltageSensor,
+  	new HamamatsuS1087ParC() as Light1Sensor,
+    new HamamatsuS10871TsrC() as Light2Sensor,
+    
     DSNC,
   	new DsnCommandC("set lpl", uint16_t , 1) as LplCommand;
   	
@@ -58,8 +62,14 @@ implementation {
   HarvesterP.SensorTimer -> SensorTimer;
   HarvesterP.TopologyTimer -> TopologyTimer;
   HarvesterP.StatusTimer -> StatusTimer;
-  HarvesterP.TempExternalRead -> ExternalSensirion.Temperature;
-  HarvesterP.TempInternalRead -> InternalSensirion.Temperature;
+  
+  HarvesterP.ReadExternalTemperature -> ExternalSensirion.Temperature;
+  HarvesterP.ReadExternalHumidity -> ExternalSensirion.Humidity;
+  HarvesterP.ReadInternalTemperature -> InternalSensirion.Temperature;
+  HarvesterP.ReadInternalHumidity -> InternalSensirion.Humidity;
+  HarvesterP.ReadVoltage -> VoltageSensor;
+  HarvesterP.ReadLight1 -> Light1Sensor;
+  HarvesterP.ReadLight2 -> Light2Sensor;
   HarvesterP.Leds -> LedsC;
 
   //

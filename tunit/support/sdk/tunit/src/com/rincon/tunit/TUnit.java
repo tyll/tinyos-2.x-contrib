@@ -72,7 +72,7 @@ public class TUnit {
   /** List of TUnitTestRunProperties to execute */
   private List testRuns;
 
-  /** TUNIT_BASE directory */
+  /** TUNIT_BASE directory - tinyos-2.x-contrib/tunit */
   private static File tunitDirectory;
 
   /** Directory to throw reports into */
@@ -223,6 +223,7 @@ public class TUnit {
     System.out.println("\nOptions are:");
     System.out.println("\t-tunitbase [absolute tunit_base directory]");
     System.out.println("\t\tThe TUNIT_BASE directory contains TUnit's embedded libraries");
+    System.out.println("\t\tThis is tinyos-2.x-contrib/tunit");
     System.out.println();
     System.out.println("\t-testdir [absolute test directory]");
     System.out.println("\t\tThis lets you start testing in a specific directory");
@@ -232,7 +233,7 @@ public class TUnit {
     System.out.println();
     System.out.println("\t-packagedir [absolute package directory]");
     System.out.println("\t\tThis directory is where your tests will be reference from in reports");
-    System.out.println("\t\tBy default, this is the parent directory containing build.xml");
+    System.out.println("\t\tBy default, this is the parent directory containing a build.xml");
     System.out.println();
     System.out.println("\t-debug");
     System.out.println("\t\tDisplay all TUnit Java framework debug statements");
@@ -357,7 +358,7 @@ public class TUnit {
       if (buildXml.exists()) {
         // We must be in the TUnit base directory
         tunitBase = System.getProperty("user.dir");
-        log.info("Defining TUNIT_BASE as " + tunitBase);
+        log.info("Defining the base TUnit directory as " + tunitBase);
 
         
       } else if(basePackageDirectory != null) {
@@ -365,19 +366,18 @@ public class TUnit {
           // This is a good guess at what TUNIT_BASE is... let's go with it.
           tunitBase = basePackageDirectory.getAbsolutePath();
           log.info(
-              "\nTaking a guess at where TUNIT_BASE is from the base package directory" +
-              "\nNext time please set your TUNIT_BASE environment variable to point to the" +
-              "\ntinyos-2.x-contrib/tunit directory OR set your TOSCONTRIB environment" +
-              "\nvariable to point to the tinyos-2.x-contrib directory.");
-          log.info("Defining TUNIT_BASE as " + tunitBase);
+              "\nTaking a guess at where tinyos-2.x-contrib/tunit is from the base package directory" +
+              "\nNext time please set your TOSCONTRIB environment variable to point to the" +
+              "\ntinyos-2.x-contrib directory");
+          log.info("Defining the base TUnit directory as " + tunitBase);
           
         }
         
       } else {
         log.fatal("" +
-            "\nTUNIT_BASE environment variable not defined." +
-            "\nTUNIT_BASE should define the base directory of all tests." +
-            "\nPlace your tunit.xml file in the TUNIT_BASE directory." +
+            "\nTOSCONTRIB environment variable not defined." +
+            "\nTOSCONTRIB should define where the tinyos-2.x-contrib directory exists." +
+            "\nPlace your tunit.xml file in the tinyos-2.x-contrib/tunit directory." +
             "\nThere are four different methods for setting this directory: " +
             "\n  1) Don't define any environment variable and run TUnit from" +
             "\n     tinyos-2.x-contrib/tunit containing build.xml" +
@@ -388,19 +388,17 @@ public class TUnit {
             "\n       -OR-" +
             "\n  4) export TOSCONTRIB=/path/to/tinyos-2.x-contrib" +
             "\nAlso ensure you are using absolute paths. For windows/cygwin," +
-            "\nthis means \"export TUNIT_BASE=c:/cygwin/opt/tinyos-2.x-contrib/tunit\"");
+            "\nthis means \"export TOSCONTRIB=c:/cygwin/opt/tinyos-2.x-contrib\"");
         System.exit(1);
       }
 
-    } else {
-      log.debug("Found TUNIT_BASE defined as: " + tunitBase);
     }
 
     // 2. Verify it is a valid, existing directory
     tunitDirectory = new File(tunitBase);
     if (!tunitDirectory.exists()) {
       log.fatal(tunitBase + " does not exist.");
-      log.fatal("Please set your TUNIT_BASE directory properly.\n"
+      log.fatal("Please set your TOSCONTRIB directory properly.\n"
           + "Make sure it's an absolute path. If you're in cygwin, this\n"
           + "means it must start with something like C:/cygwin/...\n");
       System.exit(2);
@@ -408,9 +406,11 @@ public class TUnit {
 
     if (!tunitDirectory.isDirectory()) {
       log.fatal(tunitBase + " is not a directory.");
-      log.fatal("Please set your TUNIT_BASE directory properly");
+      log.fatal("Please set your TOSCONTRIB directory properly");
       System.exit(3);
     }
+    
+    log.debug("Found TUnit! " + tunitDirectory);
   }
 
   /**
@@ -492,7 +492,7 @@ public class TUnit {
     File tunitPropertiesFile = new File(tunitDirectory, "tunit.xml");
     if (!tunitPropertiesFile.exists()) {
       log.fatal("Cannot locate " + tunitPropertiesFile.getAbsolutePath());
-      log.fatal("Is tunit.xml in your TUNIT_BASE directory?");
+      log.fatal("Does tinyos-2.x-contrib/tunit/tunit.xml exist?");
       System.exit(4);
     }
 

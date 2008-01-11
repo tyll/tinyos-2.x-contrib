@@ -321,16 +321,16 @@ implementation {
   }
 
   // bitwise calculation, save flash and ram but takes more time
-  // TODO: begin with LSB of b (instead of MSB)
+  // reference implementation from the Sensirion's CRC application note
   void crcByte(uint8_t* crc, uint8_t b) {
     uint8_t bit_index = 8;
     while (bit_index > 0) {
       bit_index--;
       if (((b >> bit_index) & 0x01) == (*crc & 0x01)) {
-        *crc >>= 1; // shift, bit7 = 0
+        *crc >>= 1; // right bit shift, bit7 = 0
       }
       else {
-        *crc >>= 1; // shift
+        *crc >>= 1; // right bit shift
         *crc ^= 0x0c; // invert bit3 and bit2
         *crc |= 0x80; // bit7 = 1              
       }

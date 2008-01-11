@@ -25,7 +25,13 @@ implementation {
 		call Leds.led2Off();
     	if (result != SUCCESS) {
     		call Leds.led0On();
-    		call DSN.log("No sensor attached");
+		if (result == EINVAL) {
+			call Leds.led1On();
+                	call DSN.log("No valid data");
+		}
+		else {
+    			call DSN.log("No sensor attached");
+		}
     	}
     	else {
     		// check range

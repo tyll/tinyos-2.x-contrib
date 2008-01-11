@@ -47,6 +47,7 @@
  * waits to keep the Sensirion happy.
  *
  * @author Gilman Tolle <gtolle@archrock.com>
+ * @author Mustafa Yuecel <mustafa.yuecel@alumni.ethz.ch> 
  * @version $Revision$ $Date$
  */
 #warning "*** USING SHT11 driver"

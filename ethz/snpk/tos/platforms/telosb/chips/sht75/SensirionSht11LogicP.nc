@@ -83,7 +83,7 @@ implementation {
   bool on = TRUE;
   bool busy = FALSE;
   uint8_t status = 0;
-  sht_cmd_t cmd;
+  uint8_t cmd;
   uint8_t newStatus;
   bool writeFail = FALSE;
 
@@ -319,9 +319,30 @@ implementation {
     post readSensor();
   }
 
+  // bitwise calculation, save flash and ram but takes more time
+  // TODO: begin with LSB of b (instead of MSB)
+  void crcByte(uint8_t* crc, uint8_t b) {
+    uint8_t bit_index = 8;
+    while (bit_index > 0) {
+      bit_index--;
+      if (((b >> bit_index) & 0x01) == (*crc & 0x01)) {
+        *crc >>= 1; // shift, bit7 = 0
+      }
+      else {
+        *crc >>= 1; // shift
+        *crc ^= 0x0c; // invert bit3 and bit2
+        *crc |= 0x80; // bit7 = 1              
+      }
+    }
+  }
+
+  // signals EINVAL if passed data is invalid
   task void readSensor() {
     uint16_t data = 0;
     uint8_t crc = 0;
+    uint8_t crc_calc = 0;
+    uint8_t byte;
+    error_t result;
 
     if ( busy == FALSE ) {
       // the interrupt was received after the timeout. 
@@ -331,22 +352,35 @@ implementation {
 
     call Timer.stop();
 
-    data = readByte() << 8;
-    data |= readByte();
+    crcByte(&crc_calc, cmd);
+
+    byte = readByte();
+    crcByte(&crc_calc, byte);
+    data = byte << 8;
+
+    byte = readByte();
+    crcByte(&crc_calc, byte);
+    data |= byte;
 
     crc = readByte();
     
     endTransmission();
 
+    // check crc
+    if (crc == crc_calc)
+      result = SUCCESS;
+    else
+      result = EINVAL;
+
     switch( cmd ) {
     case CMD_MEASURE_TEMPERATURE:
       busy = FALSE;
-      signal SensirionSht11.measureTemperatureDone[currentClient]( SUCCESS, data );
+      signal SensirionSht11.measureTemperatureDone[currentClient]( result, data );
       break;
 
     case CMD_MEASURE_HUMIDITY:
       busy = FALSE;
-      signal SensirionSht11.measureHumidityDone[currentClient]( SUCCESS, data );
+      signal SensirionSht11.measureHumidityDone[currentClient]( result, data );
       break;
 
     default:
@@ -355,14 +389,13 @@ implementation {
   }
 
   void nop_func() {
-	  __asm volatile ("nop");
-	  __asm volatile ("nop");
-	  __asm volatile ("nop"); 
-	  __asm volatile ("nop");
-	  __asm volatile ("nop");
+    __asm volatile ("nop");
+    __asm volatile ("nop");
+    __asm volatile ("nop"); 
+    __asm volatile ("nop");
+    __asm volatile ("nop");
   }
-  
-  
+
   uint8_t readByte() {
     uint8_t byte = 0;
     uint8_t i;

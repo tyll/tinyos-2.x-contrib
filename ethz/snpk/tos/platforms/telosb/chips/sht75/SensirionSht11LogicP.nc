@@ -321,7 +321,7 @@ implementation {
   }
 
   // bitwise calculation, save flash and ram but takes more time
-  // reference implementation from the Sensirion's CRC application note
+  // reference implementation from Sensirion's CRC application note
   void crcByte(uint8_t* crc, uint8_t b) {
     uint8_t bit_index = 8;
     while (bit_index > 0) {

@@ -105,6 +105,7 @@ uint8_t numMemctl = 5; //numMemctl counts channels after the first one.
     call timer3.startOneShot(ALWAYS_SHUTOFF_MILLI);
     atomic  { bank1 = TRUE;  // next data ready goes in bank1 data slots.
     }
+    call a2dmuxdisable.clr();  //timer1 -->  LO to choose mux enabled.
     call a2dbankselect.clr();  //timer0 -->   LO to choose SENSIG1 muxed.
     call a2dsenvdd1drv.set();  //timer0 -->  set HI a2dsenvdd1drv.
     atomic {
@@ -117,7 +118,6 @@ uint8_t numMemctl = 5; //numMemctl counts channels after the first one.
 //    timerend = call  timer1.getNow();  // time senvdd2 was turned on.  del a.
     call timer2.startOneShot(ECH2O_WARMUP_MILLI);
     call a2dsenvdd2drv.set();  //timer1 -->  set HI a2dsenvdd2drv.
-    call a2dmuxdisable.clr();  //timer1 -->  LO to choose mux enabled.
     atomic  {
       if (!busy) {       //AMSend not in progress 
         call Resource.request();  // Resource --> adc12multichannel
@@ -167,7 +167,6 @@ uint8_t numMemctl = 5; //numMemctl counts channels after the first one.
   event void Resource.granted()  //resource meaning is "just the a2d channel"
   {
     const msp430adc12_channel_config_t* a2d12chconfig = call AdcConfigure.getConfiguration();  //to get setup from a2d12ch.
-    call a2dmuxdisable.clr();  //timer0 -->  LO to choose mux enabled.
         // start the adc read, ( use a2d12chconfig from above).
     atomic {
     if ( call a2d12ch.configure(a2d12chconfig, memctl, numMemctl, buffer, bufferlen, jiffies) == SUCCESS){
@@ -203,7 +202,6 @@ uint8_t numMemctl = 5; //numMemctl counts channels after the first one.
     }
     //rmspkt struct is now filled with new bank1 data.
       //  shut off bank1 related.
-      call a2dmuxdisable.set();    //dataReady -->  HI disables mux.
       call Resource.release();
       call a2dsenvdd1drv.clr();  //dataReady -->  a2dsenvdd1drv = LO.
   }

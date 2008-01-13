@@ -6,7 +6,8 @@
  * chip-specific CC2420 packet structures.
  *
  * @author Philip Levis    2006/12/12 
- * revised John Griessen 13 Dec 2007
+ * revised John Griessen 
+ * @version $Revision$ $Date$
  */
 
 

@@ -1,5 +1,5 @@
 /* Copyright (c) 2007, Ecosensory Austin Texas All rights reserved. 
- * BSD license full text at: 
+ *  This code funded by TX State San Marcos University. BSD license full text at: 
  * http://tinyos.cvs.sourceforge.net/tinyos/tinyos-2.x-contrib/ecosensory/license.txt
  * Takes readings for two banks of sensorboard a2d12ch. Bank switching is 
  * handled with the  HplMsp430GeneralIO in  ReadMoistureSensorsP.nc

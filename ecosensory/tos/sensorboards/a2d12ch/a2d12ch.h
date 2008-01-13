@@ -1,5 +1,5 @@
 /* Copyright (c) 2007, Ecosensory Austin Texas All rights reserved. 
- * BSD license full text at: 
+ *  This code funded by TX State San Marcos University.  BSD license full text at: 
  * http://tinyos.cvs.sourceforge.net/tinyos/tinyos-2.x-contrib/ecosensory/license.txt
  * by John Griessen <john@ecosensory.com>
  * Rev 1.0 14 Dec 2007
@@ -8,7 +8,7 @@
 //#ifndef A2D12CH_H
 //#define A2D12CH_H
 
-#define BUFFERLEN 6
+#define BUFFER_SIZE 6   //reconciled with other uses of a2d12ch
 #define JIFFIES 0
 //default config data
 //
@@ -22,3 +22,5 @@
 #define CHANNEL6 INPUT_CHANNEL_A5, REFERENCE_VREFplus_AVss
 #define CHANNEL7 INPUT_CHANNEL_A6, REFERENCE_VREFplus_AVss
 #define CHANNEL8 INPUT_CHANNEL_A7, REFERENCE_VREFplus_AVss
+
+

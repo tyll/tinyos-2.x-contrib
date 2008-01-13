@@ -1,15 +1,16 @@
-/* Copyright (c) 2007 Ecosensory  MIT license
-*
-* Test if GPIOs are wired as planned on new MSP430 platform. 
-* Show green LED only when user switch down, 
-* increment number of IO pin to be read,
-* display HI/LO as on/off on all LEDs at 1/2 Hz alternating
-* with display of count.  In other words, 3 bit count is displayed,
-* then binary from input pin is displayed as all LEDs on or all off.
-* by John Griessen <john@ecosensory.com>
-* wiring configuration TestMSP430platfIOC.nc  Rev 1.0 12aug07
-* 
-*/
+/* Copyright (c) 2007, Ecosensory Austin Texas All rights reserved. 
+ * This code funded by TX State San Marcos University.   BSD license full text at: 
+ * http://tinyos.cvs.sourceforge.net/tinyos/tinyos-2.x-contrib/ecosensory/license.txt
+ *
+ * Test if GPIOs are wired as planned on new MSP430 platform. 
+ * Show green LED only when user switch down, 
+ * increment number of IO pin to be read,
+ * display HI/LO as on/off on all LEDs at 1/2 Hz alternating
+ * with display of count.  In other words, 3 bit count is displayed,
+ * then binary from input pin is displayed as all LEDs on or all off.
+ * by John Griessen <john@ecosensory.com>
+ * wiring configuration TestMSP430platfIOC.nc  Rev 1.0 12aug07
+ */
   
 configuration TestMSP430platfIOC {
 // provides no interfaces 

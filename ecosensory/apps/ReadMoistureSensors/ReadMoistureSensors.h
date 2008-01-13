@@ -8,7 +8,9 @@
 #define READMOISTURESENSORS_H
 
 enum {
-  TIMER_PERIOD_MILLI = 1350,
+  ALWAYS_SHUTOFF_MILLI = 180,    // a2d reading delta t after sensors powered.
+  ECH2O_WARMUP_MILLI = 80,    // a2d reading delta t after sensors powered.
+  TIMER_PERIOD_MILLI = 1000,   // a2d reading period.
 //  AM_MOISTURESENSORSMSG is an active message type.  Depends on Makefile
 //  BUILD_EXTRA_DEPS=MoistureSensorsMsg.class
 //  MoistureSensorsMsg.class:  MoistureSensorsMsg.java

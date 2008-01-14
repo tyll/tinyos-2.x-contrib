@@ -45,8 +45,7 @@ implementation {
       new TestCaseC() as TestAsyncC;
   
   TestStateP.State -> StateC;
-  TestStateP.SetUpOneTime -> TestForceC.SetUpOneTime;
-  TestStateP.TearDownOneTime -> TestForceC.TearDownOneTime;
+  TestStateP.SetUp -> TestForceC.SetUp;
   
   TestStateP.TestForce -> TestForceC;
   TestStateP.TestToIdle -> TestToIdleC;

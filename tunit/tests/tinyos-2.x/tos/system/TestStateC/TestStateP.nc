@@ -43,8 +43,7 @@ module TestStateP {
   uses {
     interface State;
     
-    interface TestControl as SetUpOneTime;
-    interface TestControl as TearDownOneTime;
+    interface TestControl as SetUp;
     
     interface TestCase as TestForce;
     interface TestCase as TestRequest;
@@ -68,15 +67,9 @@ implementation {
   /***************** Prototypes ****************/
   
   /***************** SetUpOneTime Events ***************/
-  event void SetUpOneTime.run() {
+  event void SetUp.run() {
     call State.toIdle();
-    call SetUpOneTime.done();
-  }
-  
-  /***************** TearDownOneTime Events ***************/
-  event void TearDownOneTime.run() {
-    call State.toIdle();
-    call TearDownOneTime.done();
+    call SetUp.done();
   }
 
   /***************** Tests ****************/

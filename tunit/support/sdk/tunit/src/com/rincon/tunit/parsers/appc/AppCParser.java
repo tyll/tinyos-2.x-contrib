@@ -62,9 +62,18 @@ public class AppCParser {
   
   /** Map of the statistics and their id's */
   private Map statsMap;
+  
+  /** Map of which assertion number aligns with a Filename + line number */
+  private Map assertionMap;
 
   /** Result of parsing the app.c file */
   private TestResult result;
+  
+  /** Original source code file name extracted from the app.c file */ 
+  private String currentSourceCodeFilename;
+  
+  /** Line number in the current source code file that app.c maps to */
+  private String currentSourceCodeLineNumber;
   
   /**
    * Constructor
@@ -76,10 +85,12 @@ public class AppCParser {
     myAppFile = appcFile;
     testMap = new HashMap();
     statsMap = new HashMap();
+    assertionMap = new HashMap();
   }
 
   /**
    * Get a map of the test ID's and their names
+   * 
    * @return
    */
   public Map getTestCaseMap() {
@@ -92,6 +103,14 @@ public class AppCParser {
    */
   public Map getStatisticsMap() {
     return statsMap;
+  }
+  
+  /**
+   * 
+   * @return a map of the assertion ID's to source code line numbers
+   */
+  public Map getAssertionMap() {
+    return assertionMap;
   }
   
   /**
@@ -119,6 +138,8 @@ public class AppCParser {
       String line;
 
       while ((line = in.readLine()) != null) {
+        extractOriginalFileAndLineNumber(line);
+        extractAssertionId(line);
         extractTestCaseName(line);
         extractStatisticsName(line);
         
@@ -134,13 +155,76 @@ public class AppCParser {
   }
   
   
+  private void extractOriginalFileAndLineNumber(String line) {
+    // Filenames and line numbers are stored on lines beginning with #'s:
+    //
+    // # 17 "/opt_svn/tinyos-2.x/tos/platforms/telosa/TelosSerialP.nc"
+    // #line 17
+    // [code]
+    // #line 18
+    // [code]
+    //
+    // Notice that the line with the filename starts with "# " while the line
+    // with the line number starts with "#line". We'll use that to tell the
+    // difference.
+    
+    if(line.startsWith("# ")) {
+      // This line contains a filename. Get rid of the quotes and line number
+      // # 17 "/opt_svn/tinyos-2.x/tos/platforms/telosa/TelosSerialP.nc"
+      String lineSplit[] = line.split("\"");
+      
+      // The line is now split in two:
+      // {"# 17 ", "/opt_svn/tinyos-2.x/tos/platforms/telosa/TelosSerialP.nc"}
+      
+      if(lineSplit.length > 1) {
+        currentSourceCodeFilename = lineSplit[1];
+      } else {
+        currentSourceCodeFilename = "(unknown file)";
+      }
+      
+    } else if(line.startsWith("#line")) {
+      // This line contains a line number mapping. Simply remove the #.
+      // #line 17 ==> "line 17"
+      currentSourceCodeLineNumber = line.replace("#","");
+    }
+    
+  }
+  
+  @SuppressWarnings("unchecked")
+  private void extractAssertionId(String line) {
+    line = line.trim();
+    
+    // Catch these:
+    // assertEqualsFailed("uint8_t", (uint32_t )(uint8_t )0xFF, (uint32_t
+    // )(uint8_t )0xFF, 0U);
+    //
+    // assertTunitSuccess(1U);
+
+    if(line.startsWith("assert") && line.endsWith("U);")) {
+      
+      line = line.replace("assertTunitSuccess(", "");
+      
+      // We've found a valid assertion! Figure out which assertId it is.
+      String lineSplit[] = line.split(",");
+      
+      for(int i = 0; i < lineSplit.length; i++) {
+        if(lineSplit[i].contains("U);")) {
+          // This is the last argument containing " 0U);". Trim it, remove U);.
+          assertionMap.put(Integer.decode(lineSplit[i].trim().replace("U);","")), 
+              "\tat " + currentSourceCodeFilename + ", " + currentSourceCodeLineNumber + ":\n");
+        }
+      }
+    }
+  }
+  
+  
   @SuppressWarnings("unchecked")
   private void extractTestCaseName(String line) {
     if (line.contains("enum") && line.contains("/TestCaseC$")
         && line.contains("$__nesc_unnamed")) {
 
       // This is probably a line we're looking for. Let's parse it.
-      // Right now it looks like 
+      // Right now it looks like
       // enum /*TestStateC.Test1C*/TestCaseC$0$__nesc_unnamed4286 {
       
       line = line.replace("$", " ");
@@ -151,7 +235,7 @@ public class AppCParser {
 
       // Now our line looks like:
       // [TestName] TestCaseC [ID] __nesc_unnamedWXYZ
-      // TestStateC.Test1C TestCaseC 0 __nesc_unnamed4286  
+      // TestStateC.Test1C TestCaseC 0 __nesc_unnamed4286
       
       StringTokenizer tokenizer = new StringTokenizer(line);
       String testName = tokenizer.nextToken();
@@ -176,7 +260,7 @@ public class AppCParser {
         && line.contains("$__nesc_unnamed")) {
 
       // This is probably a line we're looking for. Let's parse it.
-      // Right now it looks like 
+      // Right now it looks like
       // enum /*TestTunitC.AckSuccessStatsC*/StatisticsC$0$__nesc_unnamed4302 {
       
       line = line.replace("$", " ");
@@ -186,7 +270,7 @@ public class AppCParser {
       line = line.replace("{", " ");
 
       // Now our line looks like:
-      // TestTunitC.AckSuccessStatsC StatisticsC 0 __nesc_unnamed4302  
+      // TestTunitC.AckSuccessStatsC StatisticsC 0 __nesc_unnamed4302
       
       StringTokenizer tokenizer = new StringTokenizer(line);
       String testName = tokenizer.nextToken();

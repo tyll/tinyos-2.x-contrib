@@ -143,7 +143,7 @@ public class WriteXmlReport {
     String xml = "";
     xml += "  <testcase classname=\"";
     xml += report.getPackage() + "\" "; // doesn't matter
-    xml += "name=\"" + result.getTestName() + "\" ";
+    xml += "name=\"" + result.getTestName() + "\n" + result.getSourceCodeLineNumber() + "\" ";
     xml += "time=\"" + result.getDuration() + "\"";
     
     if(!result.isError() && !result.isFailure()) {

@@ -99,6 +99,9 @@ public class ResultCollector extends Thread implements Messenger,
   /** Map of parameterized interface ID's to their statistics name */
   private Map statsMap;
 
+  /** Map of assertion ID's to their source code line numbers */
+  private Map assertionMap;
+  
   /** The last test result to check in */
   private int lastTestResult;
 
@@ -118,7 +121,7 @@ public class ResultCollector extends Thread implements Messenger,
   @SuppressWarnings("unchecked")
   public ResultCollector(TestReport myReport,
       TUnitTestRunProperties myRunProperties,
-      TUnitSuiteProperties mySuiteProperties, Map myTestMap, Map myStatsMap) {
+      TUnitSuiteProperties mySuiteProperties, Map myTestMap, Map myStatsMap, Map myAssertionMap) {
 
     // 1. Initialize all our local variables
     log = Logger.getLogger(getClass());
@@ -128,6 +131,7 @@ public class ResultCollector extends Thread implements Messenger,
     suiteProperties = mySuiteProperties;
     testMap = myTestMap;
     statsMap = myStatsMap;
+    assertionMap = myAssertionMap;
     allDone = false;
     initializing = true;
     lastTestResult = -1;
@@ -316,7 +320,7 @@ public class ResultCollector extends Thread implements Messenger,
    * A test result from an individual test
    */
 @SuppressWarnings("unchecked")
-  public void tUnitProcessing_testFailed(short testId, String failMsg) {
+  public void tUnitProcessing_testFailed(short testId, short assertionId, String failMsg) {
     failMsg = failMsg.replace('&', ' '); // XML doesn't like &'s.
     failMsg = failMsg.replace('<', '[');
     failMsg = failMsg.replace('>', ']');
@@ -324,14 +328,18 @@ public class ResultCollector extends Thread implements Messenger,
     TestResult result;
     
     if(testMap.get(new Integer(testId)) != null) {
-    	log.warn("Test " + testId + " ("
-    	        + (String) testMap.get(new Integer(testId)) + ") failed: " + failMsg);
+    	log.warn("\nTest " + testId + " ("
+    	        + (String) testMap.get(new Integer(testId)) + ") FAILED \n" 
+              + (String) assertionMap.get(new Integer(assertionId))
+              + failMsg);
     	
-    	result = new TestResult((String) testMap.get(new Integer(testId)));
+    	result = new TestResult((String) testMap.get(new Integer(testId)), (String) assertionMap.get(new Integer(assertionId)));
     	
     } else {
-    	log.warn("Test " + testId + " failed: " + failMsg + "; (couldn't extract test name)");
-    	result = new TestResult("Test " + testId + " (couldn't extract test name)"); 
+    	log.warn("\nTest " + testId + " FAILED \n"
+          + (String) assertionMap.get(new Integer(assertionId))
+          + failMsg + "; (couldn't extract test name)");
+    	result = new TestResult("Test " + testId + " (couldn't extract test name)", (String) assertionMap.get(new Integer(assertionId))); 
     }
     
     testIdResponses.add(new Integer(testId));
@@ -341,17 +349,22 @@ public class ResultCollector extends Thread implements Messenger,
   }
 
   @SuppressWarnings("unchecked")
-  public void tUnitProcessing_testSuccess(short testId) {
+  public void tUnitProcessing_testSuccess(short testId, short assertionId) {
     TestResult result;
     
     if(testMap.get(new Integer(testId)) != null) {
-      log.info("Test " + testId + " ("
-          + (String) testMap.get(new Integer(testId)) + ") passed"); 
-      result = new TestResult((String) testMap.get(new Integer(testId)));
+      log.info("\nTest " + testId + " ("
+          + (String) testMap.get(new Integer(testId)) + ") \n"
+          + (String) assertionMap.get(new Integer(assertionId)) + " PASSED\n"); 
+      
+      result = new TestResult((String) testMap.get(new Integer(testId)), (String) assertionMap.get(new Integer(assertionId)));
       
     } else {
-      log.info("Test " + testId + " passed; (couldn't extract test name)");
-      result = new TestResult("Test " + testId + "; (couldn't extract test name)");
+      log.info("\nTest " + testId + " \n"
+          + (String) assertionMap.get(new Integer(assertionId))
+          + " PASSED; (couldn't extract test name)");
+          
+      result = new TestResult("Test " + testId + "; (couldn't extract test name)", (String) assertionMap.get(new Integer(assertionId)));
     }
     
     testIdResponses.add(new Integer(testId));

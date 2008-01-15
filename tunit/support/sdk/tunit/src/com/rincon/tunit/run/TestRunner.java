@@ -92,6 +92,9 @@ public class TestRunner {
 
   /** App.c statistics parse results */
   private Map statsMap;
+  
+  /** App.c assertion ID numbers to source code line numbers map */
+  private Map assertionMap;
 
   /** Package we're currently working in */
   private String packageId;
@@ -174,7 +177,7 @@ public class TestRunner {
 
     log.debug("Running test");
     new ResultCollector(report, runProperties, suiteProperties, testMap,
-        statsMap);
+        statsMap, assertionMap);
     log.debug("Disconnecting serial forwarders");
     testManager.disconnectAll();
   }
@@ -344,6 +347,7 @@ public class TestRunner {
     log.info("Parse complete, running test...");
     testMap = appcParser.getTestCaseMap();
     statsMap = appcParser.getStatisticsMap();
+    assertionMap = appcParser.getAssertionMap();
     return true;
   }
 

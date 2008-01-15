@@ -36,20 +36,19 @@ configuration TestStateC {
 }
 
 implementation {
-  components new StateC(),
-      TestStateP,
-      
-      new TestCaseC() as TestForceC,
-      new TestCaseC() as TestToIdleC,
-      new TestCaseC() as TestRequestC,
-      new TestCaseC() as TestAsyncC;
   
+  components new TestCaseC() as TestForceC,
+      new TestCaseC() as TestToIdleC,
+      new TestCaseC() as TestRequestC;
+      
+  components TestStateP,
+      new StateC();
+      
   TestStateP.State -> StateC;
   TestStateP.SetUp -> TestForceC.SetUp;
   
   TestStateP.TestForce -> TestForceC;
   TestStateP.TestToIdle -> TestToIdleC;
   TestStateP.TestRequest -> TestRequestC;
-  TestStateP.TestAsync -> TestAsyncC;
     
 }

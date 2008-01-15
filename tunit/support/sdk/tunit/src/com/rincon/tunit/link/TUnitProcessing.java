@@ -145,7 +145,7 @@ public class TUnitProcessing extends Thread implements
           case TUnitProcessing_Constants.TUNITPROCESSING_EVENT_TESTRESULT_SUCCESS:
             for (Iterator it = currentListeners.iterator(); it.hasNext();) {
               ((TUnitProcessing_Events) it.next())
-                  .tUnitProcessing_testSuccess(inMsg.get_id());
+                  .tUnitProcessing_testSuccess(inMsg.get_id(), inMsg.get_assertionId());
             }
             currentFailMsg = "";
             break;
@@ -156,7 +156,7 @@ public class TUnitProcessing extends Thread implements
             if (inMsg.get_lastMsg() == 1) {
               for (Iterator it = currentListeners.iterator(); it.hasNext();) {
                 ((TUnitProcessing_Events) it.next())
-                    .tUnitProcessing_testFailed(inMsg.get_id(), currentFailMsg);
+                    .tUnitProcessing_testFailed(inMsg.get_id(), inMsg.get_assertionId(), currentFailMsg);
               }
               currentFailMsg = "";
             }
@@ -168,7 +168,7 @@ public class TUnitProcessing extends Thread implements
             if (inMsg.get_lastMsg() == 1) {
               for (Iterator it = currentListeners.iterator(); it.hasNext();) {
                 ((TUnitProcessing_Events) it.next())
-                    .tUnitProcessing_testFailed(inMsg.get_id(), currentFailMsg
+                    .tUnitProcessing_testFailed(inMsg.get_id(), inMsg.get_assertionId(), currentFailMsg
                         + "; Expected [" + inMsg.get_expected() + "] but got ["
                         + inMsg.get_actual() + "] (unsigned 32-bit form)");
               }
@@ -182,7 +182,7 @@ public class TUnitProcessing extends Thread implements
             if (inMsg.get_lastMsg() == 1) {
               for (Iterator it = currentListeners.iterator(); it.hasNext();) {
                 ((TUnitProcessing_Events) it.next())
-                    .tUnitProcessing_testFailed(inMsg.get_id(), currentFailMsg
+                    .tUnitProcessing_testFailed(inMsg.get_id(), inMsg.get_assertionId(), currentFailMsg
                         + "; Shouldn't have gotten [" + inMsg.get_actual()
                         + "] (unsigned 32-bit form)");
               }
@@ -196,7 +196,7 @@ public class TUnitProcessing extends Thread implements
             if (inMsg.get_lastMsg() == 1) {
               for (Iterator it = currentListeners.iterator(); it.hasNext();) {
                 ((TUnitProcessing_Events) it.next())
-                    .tUnitProcessing_testFailed(inMsg.get_id(), currentFailMsg
+                    .tUnitProcessing_testFailed(inMsg.get_id(), inMsg.get_assertionId(), currentFailMsg
                         + "; Actual result [" + inMsg.get_actual()
                         + "] was not below [" + inMsg.get_expected()
                         + "] (unsigned 32-bit form)");
@@ -211,7 +211,7 @@ public class TUnitProcessing extends Thread implements
             if (inMsg.get_lastMsg() == 1) {
               for (Iterator it = currentListeners.iterator(); it.hasNext();) {
                 ((TUnitProcessing_Events) it.next())
-                    .tUnitProcessing_testFailed(inMsg.get_id(), currentFailMsg
+                    .tUnitProcessing_testFailed(inMsg.get_id(), inMsg.get_assertionId(), currentFailMsg
                         + "; Actual result [" + inMsg.get_actual()
                         + "] was not above [" + inMsg.get_expected()
                         + "] (unsigned 32-bit form)");

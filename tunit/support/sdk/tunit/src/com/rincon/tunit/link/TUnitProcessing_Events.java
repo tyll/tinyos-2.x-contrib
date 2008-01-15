@@ -39,9 +39,9 @@ public interface TUnitProcessing_Events {
   public void tUnitProcessing_pong();
 
   
-  public void tUnitProcessing_testSuccess(short testId);
+  public void tUnitProcessing_testSuccess(short testId, short assertionId);
   
-  public void tUnitProcessing_testFailed(short testId, String failMsg);
+  public void tUnitProcessing_testFailed(short testId, short assertionId, String failMsg);
   
   
   public void tUnitProcessing_allDone();

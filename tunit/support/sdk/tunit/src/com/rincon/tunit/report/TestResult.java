@@ -56,6 +56,9 @@ public class TestResult {
   /** True if this test resulted in an error */
   private boolean isError;
   
+  /** Assertion identification to translate to an embedded code line number */
+  private String lineNumber;
+  
   /**
    * Constructor
    * @param myTestName
@@ -65,6 +68,14 @@ public class TestResult {
     testName = myTestName;
     problemType = "";
     failMsg = "";
+    lineNumber = "";
+  }
+  
+  public TestResult(String myTestName, String filenameAndLineNumber) {
+    testName = myTestName;
+    problemType = "";
+    failMsg = "";
+    lineNumber = filenameAndLineNumber;
   }
   
   /**
@@ -133,6 +144,10 @@ public class TestResult {
 
   public boolean isSuccess() {
     return !isError && !isFailure;
+  }
+  
+  public String getSourceCodeLineNumber() {
+    return lineNumber;
   }
   
 }

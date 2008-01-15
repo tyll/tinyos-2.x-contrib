@@ -549,8 +549,8 @@ public class TUnit {
       for (Iterator it = TestReport.getAllTunitProblems().iterator(); it
           .hasNext();) {
         problemResult = (TestResult) it.next();
-        System.out.println(problemResult.getTestName() + " ("
-            + problemResult.getProblemType() + "): "
+        System.out.println(problemResult.getTestName() + "\n"
+            + problemResult.getSourceCodeLineNumber() 
             + problemResult.getFailMsg() + "\n");
       }
     }

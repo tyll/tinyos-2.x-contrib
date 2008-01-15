@@ -29,17 +29,13 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE
  */
 
-#include "TestCase.h"
-
 /**
  * @author David Moss
  */
  
+#include "TestCase.h"
+
 module TestStateP {
-  provides {
-    async command void runTestAsync();
-  }
-  
   uses {
     interface State;
     
@@ -48,7 +44,6 @@ module TestStateP {
     interface TestCase as TestForce;
     interface TestCase as TestRequest;
     interface TestCase as TestToIdle;
-    interface TestCase as TestAsync;
   }
 }
 
@@ -108,22 +103,6 @@ implementation {
     assertTrue("TestToIdle: toIdle()/isIdle() didn't work", call State.isIdle());
     
     call TestToIdle.done();
-  }
-  
-  event void TestAsync.run() {
-    call runTestAsync();
-  }
-  
-  
-  async command void runTestAsync() {
-    call State.forceState(S_STATE3);
-    assertTrue("Async: force/getState failed", call State.getState() == S_STATE3);
-    assertTrue("Async: force/isState failed", call State.isState(S_STATE3));
-    assertFalse("Async: isIdle failed", call State.isIdle());
-    assertTrue("Async: Req succeeded improperly", call State.requestState(S_STATE2) != SUCCESS);
-    call State.toIdle();
-    assertTrue("Async: toIdle failed", call State.isIdle());
-    call TestAsync.done();
   }
   
 }

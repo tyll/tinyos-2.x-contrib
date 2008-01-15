@@ -45,15 +45,15 @@ enum {
   // NREADINGS = 1,
   /* Default sampling period. */
   AM_HARVESTERSENSOR = 0x93,
-  INT_SENSOR = 15000,
+  INT_SENSOR = 30000,
   
   AM_HARVESTERTOPOLOGY = 0x94,
-  INT_TOPOLOGY = 65000UL, // milliseconds
+  INT_TOPOLOGY = 135000UL, // milliseconds
   
   AM_HARVESTERSTATUS = 0x95,
   INT_STATUS = 0,
 
-  LPL_INT = 1000UL, // default lpl interval in milliseconds
+  LPL_INT = 500UL, // default lpl interval in milliseconds
 };
 
 typedef nx_struct harvesterSensor {

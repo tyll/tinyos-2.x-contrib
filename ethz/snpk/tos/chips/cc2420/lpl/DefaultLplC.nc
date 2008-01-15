@@ -96,5 +96,4 @@ implementation {
   DefaultLplP.RadioBackoff -> CC2420CsmaC;
   DefaultLplP.Random -> RandomC;
   DefaultLplP.Leds -> LedsC;
-  DefaultLplP.DSN -> DSNC;
 }

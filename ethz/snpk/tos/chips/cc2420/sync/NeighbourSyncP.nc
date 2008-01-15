@@ -456,9 +456,9 @@ implementation {
         		   		item->driftLimitCount = 0;
         			}
         			else {
-//#ifdef CC2420SYNC_DEBUG        				
+#ifdef CC2420SYNC_DEBUG        				
         				call DSN.log("drift out of limit");
-//#endif        				
+#endif        				
         				item->driftLimitCount++;
         				if (item->driftLimitCount >= MAX_DRIFT_ERRORS) {
         					item->measurementCount = 0;

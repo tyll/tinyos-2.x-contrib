@@ -102,7 +102,7 @@ implementation {
     }
 
     // print packet metadata
-//#ifdef CC2420SYNC_DEBUG
+#ifdef CC2420SYNC_DEBUG
     call DSN.logInt(call AMPacket.destination(msg));
     call DSN.logInt( meta->rxInterval);
     call DSN.logInt( meta->lplTransmissions);
@@ -114,7 +114,7 @@ implementation {
     call DSN.logInt( n_send);
     call DSN.logInt( n_senddone);
     call DSN.logWarning("dst: %i, meta: %ims, lpl# %i, samples %i, retries %i, snooped %i, ack %i, error %i, %i %i");
-//#endif
+#endif
     signal Send.sendDone(msg, error);
   }
   

@@ -256,24 +256,13 @@ implementation {
     return SUCCESS;
   }
 
+
   command error_t StdControl.start() {
     running = TRUE;
     return SUCCESS;
   }
 
   command error_t StdControl.stop() {
-    while (!call SendQueue.empty()) {
-    	fe_queue_entry_t *qe = call SendQueue.head();
-	if (qe->client < CLIENT_COUNT) {
-		clientPtrs[qe->client] = qe;
-	}
-	else if (call MessagePool.size() < call MessagePool.maxSize()) {
-		call MessagePool.put(qe->msg);
-		call QEntryPool.put(qe);	
-	}
-        call SendQueue.dequeue();
-    }
-    sending = FALSE;
     running = FALSE;
     return SUCCESS;
   }
@@ -622,8 +611,15 @@ implementation {
     if (qe == NULL || qe->msg != msg) {
       dbg("Forwarder", "%s: BUG: not our packet (%p != %p)!\n", __FUNCTION__, msg, qe->msg);
       sendDoneBug();      // Not our packet, something is very wrong...
-      call DSN.logError("Not our packet, something is very wrong...");
-      call DSN.logPacket(msg);
+      if (qe == NULL) {
+    	  call DSN.logError("Not our packet, something is very wrong..., queue empty");
+    	  call DSN.logPacket(msg);
+      }
+      else {
+    	  call DSN.logError("Not our packet, something is very wrong..., differing packets");
+    	  call DSN.logPacket(msg);
+    	  call DSN.logPacket(qe->msg);
+      }
       return;
     }
     else if (error != SUCCESS) {

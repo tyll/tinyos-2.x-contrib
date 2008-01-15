@@ -69,7 +69,7 @@ module HarvesterP {
     interface Leds;
     
     // DSN
-    interface DSN;
+    interface DsnSend as DSN;
     interface DsnCommand<uint16_t> as LplCommand;
 
     // Sensor
@@ -78,8 +78,8 @@ module HarvesterP {
     interface Read<uint16_t> as ReadInternalTemperature;
     interface Read<uint16_t> as ReadInternalHumidity;
     interface Read<uint16_t> as ReadVoltage;
-    interface Read<uint16_t> as ReadLight1;
-    interface Read<uint16_t> as ReadLight2;
+    //interface Read<uint16_t> as ReadLight1;
+    //interface Read<uint16_t> as ReadLight2;
     interface Receive as SensorReceive;
     interface Send as SensorSend;
     
@@ -93,12 +93,10 @@ module HarvesterP {
     interface Send as StatusSend;
 
     // for statistics
-    //interface AsyncNotify;
-    interface Counter<T32khz,uint32_t>;
     interface PacketAcknowledgements;
     
-    interface Read<uint16_t> as ReadCpuLoad;
-    interface Timer<TMilli> as LoadTimer;
+    // interface Read<uint16_t> as ReadCpuLoad;
+    // interface Timer<TMilli> as LoadTimer;
     
     // interface NeighbourSyncRequest;
   }
@@ -115,7 +113,6 @@ implementation {
   uint8_t uartlen;
   message_t sendbuf;
   message_t uartbuf;
-  uint8_t * m_state;
   harvester_topology_t * tinfo;
   uint8_t sensor_sn=0, topology_sn=0, status_sn=0;
   bool sendTopologyBusy=FALSE, sendSensorBusy=FALSE, sendStatusBusy=FALSE;
@@ -125,31 +122,6 @@ implementation {
 
   /* Current local state - interval, version and accumulated readings */
   harvester_sensor_t local;
-
-  uint8_t reading; /* 0 to NREADINGS */
-
-  /* When we head an Oscilloscope message, we check it's sample count. If
-     it's ahead of ours, we "jump" forwards (set our count to the received
-     count). However, we must then suppress our next count increment. This
-     is a very simple form of "time" synchronization (for an abstract
-     notion of time). */
-  bool suppress_count_change;
-
-  bool backoff_signaled=FALSE;
-  uint32_t packet_send, packet_backoff, packet_senddone;
-  
-  uint32_t cpuLoadSum=0;
-  uint16_t cpuLoadSamples=0;
-  
-  enum {
-  	S_BOOTUP,
-  	S_RUNNING
-  };
-  uint8_t state=S_BOOTUP;
-  
-  //tasks
-  task void stopradio();
-  task void startradio();
   
 // #######################################
 //	Bootup
@@ -180,29 +152,22 @@ implementation {
   }
 
   event void RadioControl.startDone(error_t error) {
-  	if (state==S_BOOTUP) {
-    	if (error != SUCCESS) {
-    		call DSN.logError("RadioControl.startDone() failed");
-      		fatal_problem();
-    	}
-
-    	if (
-    		sizeof(harvester_sensor_t) > call SensorSend.maxPayloadLength() ||
-    		sizeof(harvester_topology_t) > call TopologySend.maxPayloadLength() ||
-    		sizeof(harvester_status_t) > call StatusSend.maxPayloadLength() 
-    	) {
-    		call DSN.logError("Radio payload length out of range");
-      		fatal_problem();
-    	}
-
-    	if (call SerialControl.start() != SUCCESS) {
-    		call DSN.logError("SerialControl.start() failed");
-    		fatal_problem();
-    	}
-  	} else {
-  		call RoutingControl.start();
-  		call DSN.logInfo("Routing restarted.");
-  	}
+   	if (error != SUCCESS) {
+   		call DSN.logError("RadioControl.startDone() failed");
+   		fatal_problem();
+   	}
+   	if (
+   		sizeof(harvester_sensor_t) > call SensorSend.maxPayloadLength() ||
+   		sizeof(harvester_topology_t) > call TopologySend.maxPayloadLength() ||
+   		sizeof(harvester_status_t) > call StatusSend.maxPayloadLength() 
+   	) {
+   		call DSN.logError("Radio payload length out of range");
+   		fatal_problem();
+   	}
+   	if (call SerialControl.start() != SUCCESS) {
+   		call DSN.logError("SerialControl.start() failed");
+   		fatal_problem();
+   	}
   }
 
   event void SerialControl.startDone(error_t error) {
@@ -220,7 +185,6 @@ implementation {
     	call SerialControl.stop();
     	call LowPowerListening.setLocalSleepInterval(lplSleepInterval);
     }
-	state=S_RUNNING;
 	// start periodic actions
 	if (INT_SENSOR != 0)
     	call SensorTimer.startPeriodic(INT_SENSOR);
@@ -336,7 +300,6 @@ implementation {
   task void uartSendTask() {
   // get packet from queue and send it
   message_t * uartMsg=call UARTQueue.dequeue();
-	m_state=__FUNCTION__; 
 	if (uartMsg!=NULL) {
 		uint8_t type=call SerialAMPacket.type(uartMsg);
 		e=call SerialSend.send[type](local.id, uartMsg, call SerialPacket.payloadLength(uartMsg));
@@ -352,7 +315,6 @@ implementation {
   event void SerialSend.sendDone[am_id_t id](message_t *msg, error_t error) {
   	if (call RootControl.isRoot()) {
     	uartbusy = FALSE;
-    	m_state=__FUNCTION__;
     	call UARTMessagePool.put(msg);
     	if (error != SUCCESS) 
 	    	report_problem();
@@ -450,9 +412,10 @@ implementation {
         report_problem();
       }
       local.voltage = data;
-      if (call ReadLight1.read() != SUCCESS)
-        fatal_problem();
+      /*if (call ReadLight1.read() != SUCCESS)
+        fatal_problem(); */
   }
+  /*
   // Light 1&2
   event void ReadLight1.readDone(error_t result, uint16_t data) {
       if (result != SUCCESS) {
@@ -469,7 +432,7 @@ implementation {
         report_problem();
       }
       local.light2 = data;
-  }
+  }*/
   
 // #######################################
 // Harvester Topology
@@ -480,7 +443,6 @@ implementation {
   	uint8_t i;
   	error_t err;
   	uint8_t numNeighbours;
-  	m_state=__FUNCTION__;
   	
   	if (!sendTopologyBusy) {
   		harvester_topology_t *info = (harvester_topology_t *)call TopologySend.getPayload(&sendbuf, sizeof(harvester_topology_t));
@@ -501,10 +463,6 @@ implementation {
 		}
 		info->id=TOS_NODE_ID;
 		info->dsn=topology_sn++;
-		packet_send=call Counter.get();
-		atomic {
-			backoff_signaled=FALSE;
-		}
 		err=call TopologySend.send(&sendbuf, sizeof(harvester_topology_t));
 		if (err == SUCCESS) {
 			sendTopologyBusy = TRUE;
@@ -522,9 +480,7 @@ implementation {
   }
     
   event void TopologySend.sendDone(message_t* msg, error_t error) {
-  	m_state=__FUNCTION__;
   	if (error == SUCCESS) {
-  	  packet_senddone=call Counter.get();
       report_sent(msg);
   	}
     else {
@@ -562,7 +518,6 @@ implementation {
   }
     
   event void StatusSend.sendDone(message_t* msg, error_t error) {
-  	m_state=__FUNCTION__;
   	if (error == SUCCESS) {
       report_sent(msg);
   	}
@@ -579,105 +534,28 @@ implementation {
 
   // Use LEDs to report various status issues.
   static void fatal_problem() { 
-  	m_state=__FUNCTION__;
     call Leds.led0On(); 
     call Leds.led1On();
     call Leds.led2On();
   }
 
   static void report_problem() { 
-  	m_state=__FUNCTION__;
-  	//call Leds.led0Toggle();
   	}
   
   static void report_sent(message_t* msg) {
-  	m_state=__FUNCTION__;
-  	//call Leds.led1Toggle();
-  	/*
-  	atomic {
-  		call DSN.logInt(packet_backoff-packet_send); 
-  		call DSN.logInt(packet_senddone-packet_backoff);
-  	}
-  	call DSN.logInt(call PacketAcknowledgements.wasAcked(msg));
-  	call DSN.logDebug("S %i %i %i");
-  	// call DSN.logPacket(msg);
-  	 */
   }
   
   static void report_received(message_t* msg) {
-  	m_state=__FUNCTION__;
-  	//call Leds.led2Toggle();
-  	
-  	/*
-  	call DSN.logInt(call AMPacket.source(msg)); 
-  	call DSN.logInt(call AMPacket.destination(msg));
-  	call DSN.logDebug("R %i->%i");
-  	*/
   } 
-  
-  // DSN specific
-  event void DSN.receive(void *msg, uint8_t len) {
-  	//call Leds.led2Toggle(); 
-  	//call DSN.logInfo(msg);
-  }
   
   event void LplCommand.detected(uint16_t * values, uint8_t n) {
   	if (n==1) {
   		lplSleepInterval=values[0];
   		call LowPowerListening.setLocalSleepInterval(lplSleepInterval);
-  		// call CollectionLowPowerListening.setDefaultRxSleepInterval(lplSleepInterval);
+  		call CollectionLowPowerListening.setDefaultRxSleepInterval(lplSleepInterval);
   		call DSN.logInt(lplSleepInterval);
   		call DSN.logInfo("changed lpl interval to %ims");
   	}
-  }
-  
-  //*************************
-  // statistics
-  //**************************
-  /*
-   async event void AsyncNotify.notify(){
-   	if (!backoff_signaled) {
-   		packet_backoff=call Counter.get();
-   		backoff_signaled=TRUE;
-   	}
-   }
-   */
-   async event void Counter.overflow(){
-   }
-   
-   event void LoadTimer.fired() {
-   		call ReadCpuLoad.read();
-   }
-   
-   event void ReadCpuLoad.readDone(error_t result, uint16_t val) {
-   	  cpuLoadSum+=val;
-      cpuLoadSamples++;
-      if (cpuLoadSamples==30) { // calculate average each minute
-      	call DSN.logInt((cpuLoadSum*10/3)/0xffff);
-   		call DSN.logInfo("l %i");
-      	cpuLoadSum=0;
-        cpuLoadSamples=0;
-      }
-   }
-    
-  task void stopradio() {
-  	error_t eval;
-  	eval=call RadioControl.stop();
-  	if (e != SUCCESS) {
-  		call DSN.logInt(eval);
-  		call DSN.logError("Radio Stop (%i)");
-    	post stopradio();
-    }
-  }
-  
-  task void startradio() {
-  	error_t eval;
-  	eval=call RadioControl.start();
-  	if (eval != SUCCESS) {
-  		call DSN.logInt(eval);
-  		call DSN.logError("Radio Start (%i)");
-    	post startradio();
-    }
   }
   
   /****************** NeighbourSyncRequest events *******/
@@ -687,6 +565,5 @@ implementation {
   	 call CtpInfo.triggerRouteUpdate();
   }
   */
-  
 }
 

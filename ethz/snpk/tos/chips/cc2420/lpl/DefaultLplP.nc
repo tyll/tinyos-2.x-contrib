@@ -68,9 +68,6 @@ module DefaultLplP {
     interface Timer<TMilli> as SendDoneTimer;
     interface Random;
     interface Leds;
-    
-    interface DsnSend as DSN;
-
   }
 }
 

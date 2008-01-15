@@ -48,8 +48,8 @@ implementation {
     new SensirionSht11C() as InternalSensirion,
     new SensirionSht71C() as ExternalSensirion,
     new VoltageC() as VoltageSensor,
-  	new HamamatsuS1087ParC() as Light1Sensor,
-    new HamamatsuS10871TsrC() as Light2Sensor,
+  	//new HamamatsuS1087ParC() as Light1Sensor,
+    //new HamamatsuS10871TsrC() as Light2Sensor,
     
     DSNC,
   	new DsnCommandC("set lpl", uint16_t , 1) as LplCommand;
@@ -68,8 +68,8 @@ implementation {
   HarvesterP.ReadInternalTemperature -> InternalSensirion.Temperature;
   HarvesterP.ReadInternalHumidity -> InternalSensirion.Humidity;
   HarvesterP.ReadVoltage -> VoltageSensor;
-  HarvesterP.ReadLight1 -> Light1Sensor;
-  HarvesterP.ReadLight2 -> Light2Sensor;
+  //HarvesterP.ReadLight1 -> Light1Sensor;
+  //HarvesterP.ReadLight2 -> Light2Sensor;
   HarvesterP.Leds -> LedsC;
 
   //
@@ -121,17 +121,6 @@ implementation {
 
   HarvesterP.UARTMessagePool -> UARTMessagePoolP;
   HarvesterP.UARTQueue -> UARTQueueP;
-  
-  components
-  	CC2420TransmitP,
-  	Counter32khz32C;
-  HarvesterP.Counter->Counter32khz32C;
-
-  components
-  	TraceSchedulerC,
-  	new TimerMilliC() as LoadTimer;
-  HarvesterP.ReadCpuLoad->TraceSchedulerC;
-  HarvesterP.LoadTimer->LoadTimer;
   
   // neighboursync request
   // components NeighbourSyncC;

@@ -36,17 +36,17 @@
  
 interface TUnitProcessing {
   
-  async event void testSuccess(uint8_t testId);
+  async event void testSuccess(uint8_t testId, uint8_t assertionId);
   
-  async event void testEqualsFailed(uint8_t testId, char *failMsg, uint32_t expected, uint32_t actual);
+  async event void testEqualsFailed(uint8_t testId, char *failMsg, uint32_t expected, uint32_t actual, uint8_t assertionId);
   
-  async event void testNotEqualsFailed(uint8_t testId, char *failMsg, uint32_t actual);
+  async event void testNotEqualsFailed(uint8_t testId, char *failMsg, uint32_t actual, uint8_t assertionId);
   
-  async event void testResultIsBelowFailed(uint8_t testId, char *failMsg, uint32_t upperbound, uint32_t actual);
+  async event void testResultIsBelowFailed(uint8_t testId, char *failMsg, uint32_t upperbound, uint32_t actual, uint8_t assertionId);
   
-  async event void testResultIsAboveFailed(uint8_t testId, char *failMsg, uint32_t lowerbound, uint32_t actual);
+  async event void testResultIsAboveFailed(uint8_t testId, char *failMsg, uint32_t lowerbound, uint32_t actual, uint8_t assertionId);
   
-  async event void testFailed(uint8_t testId, char *failMsg);
+  async event void testFailed(uint8_t testId, char *failMsg, uint8_t assertionId);
   
   
   event void allDone();

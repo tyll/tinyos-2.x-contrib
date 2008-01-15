@@ -46,10 +46,11 @@
 #endif
 
 
-#define PROCESSING_MSG_LENGTH (TOSH_DATA_LENGTH - 12)
+#define PROCESSING_MSG_LENGTH (TOSH_DATA_LENGTH - 13)
 typedef nx_struct TUnitProcessingMsg {
   nx_uint8_t cmd;
-  nx_uint8_t id;
+  nx_uint8_t id;  // test id
+  nx_uint8_t assertionId;
   nx_uint32_t expected;
   nx_uint32_t actual;
   nx_bool lastMsg;

@@ -85,7 +85,7 @@ implementation {
   task void sendEventMsg();
   task void allDone();
   
-  error_t insert(uint8_t cmd, uint8_t testId, char *failMsg, uint32_t expected, uint32_t actual);
+  error_t insert(uint8_t cmd, uint8_t testId, char *failMsg, uint32_t expected, uint32_t actual, uint8_t assertionId);
   void attemptEventSend();
   
   /***************** Boot Events ****************/
@@ -126,28 +126,28 @@ implementation {
   }
   
   /***************** TUnitProcessing Events ****************/
-  async event void TUnitProcessing.testSuccess(uint8_t testId) {
-    insert(TUNITPROCESSING_EVENT_TESTRESULT_SUCCESS, testId, NULL, 0, 0);
+  async event void TUnitProcessing.testSuccess(uint8_t testId, uint8_t assertionId) {
+    insert(TUNITPROCESSING_EVENT_TESTRESULT_SUCCESS, testId, NULL, 0, 0, assertionId);
   }
   
-  async event void TUnitProcessing.testEqualsFailed(uint8_t testId, char *failMsg, uint32_t expected, uint32_t actual) {
-    insert(TUNITPROCESSING_EVENT_TESTRESULT_EQUALS_FAILED, testId, failMsg, expected, actual);
+  async event void TUnitProcessing.testEqualsFailed(uint8_t testId, char *failMsg, uint32_t expected, uint32_t actual, uint8_t assertionId) {
+    insert(TUNITPROCESSING_EVENT_TESTRESULT_EQUALS_FAILED, testId, failMsg, expected, actual, assertionId);
   }
   
-  async event void TUnitProcessing.testNotEqualsFailed(uint8_t testId, char *failMsg, uint32_t actual) {
-    insert(TUNITPROCESSING_EVENT_TESTRESULT_NOTEQUALS_FAILED, testId, failMsg, actual, actual);
+  async event void TUnitProcessing.testNotEqualsFailed(uint8_t testId, char *failMsg, uint32_t actual, uint8_t assertionId) {
+    insert(TUNITPROCESSING_EVENT_TESTRESULT_NOTEQUALS_FAILED, testId, failMsg, actual, actual, assertionId);
   }
   
-  async event void TUnitProcessing.testResultIsBelowFailed(uint8_t testId, char *failMsg, uint32_t upperbound, uint32_t actual) {
-    insert(TUNITPROCESSING_EVENT_TESTRESULT_BELOW_FAILED, testId, failMsg, upperbound, actual);
+  async event void TUnitProcessing.testResultIsBelowFailed(uint8_t testId, char *failMsg, uint32_t upperbound, uint32_t actual, uint8_t assertionId) {
+    insert(TUNITPROCESSING_EVENT_TESTRESULT_BELOW_FAILED, testId, failMsg, upperbound, actual, assertionId);
   }
     
-  async event void TUnitProcessing.testResultIsAboveFailed(uint8_t testId, char *failMsg, uint32_t lowerbound, uint32_t actual) {
-    insert(TUNITPROCESSING_EVENT_TESTRESULT_ABOVE_FAILED, testId, failMsg, lowerbound, actual);
+  async event void TUnitProcessing.testResultIsAboveFailed(uint8_t testId, char *failMsg, uint32_t lowerbound, uint32_t actual, uint8_t assertionId) {
+    insert(TUNITPROCESSING_EVENT_TESTRESULT_ABOVE_FAILED, testId, failMsg, lowerbound, actual, assertionId);
   }
     
-  async event void TUnitProcessing.testFailed(uint8_t testId, char *failMsg) {
-    insert(TUNITPROCESSING_EVENT_TESTRESULT_FAILED, testId, failMsg, 0, 0);
+  async event void TUnitProcessing.testFailed(uint8_t testId, char *failMsg, uint8_t assertionId) {
+    insert(TUNITPROCESSING_EVENT_TESTRESULT_FAILED, testId, failMsg, 0, 0, assertionId);
   }
   
   
@@ -156,7 +156,7 @@ implementation {
   }
 
   event void TUnitProcessing.pong() {
-    insert(TUNITPROCESSING_EVENT_PONG, 0xFF, NULL, 0, 0);
+    insert(TUNITPROCESSING_EVENT_PONG, 0xFF, NULL, 0, 0, 0xFF);
   }
 
   
@@ -171,7 +171,7 @@ implementation {
   }
   
   task void allDone() {
-    if(insert(TUNITPROCESSING_EVENT_ALLDONE, 0xFF, NULL, 0, 0) != SUCCESS) {
+    if(insert(TUNITPROCESSING_EVENT_ALLDONE, 0xFF, NULL, 0, 0, 0xFF) != SUCCESS) {
       post allDone();
     }
   }
@@ -200,7 +200,7 @@ implementation {
    * The TUnitProcessingMsg.cmd field locks the message.  If that field is 0xFF,
    * then the message is available. Otherwise, the message is in use.
    */
-  error_t insert(uint8_t cmd, uint8_t testId, char *failMsg, uint32_t expected, uint32_t actual) {
+  error_t insert(uint8_t cmd, uint8_t testId, char *failMsg, uint32_t expected, uint32_t actual, uint8_t assertionId) {
     TUnitProcessingMsg *tunitMsg;
     bool failed = (cmd == TUNITPROCESSING_EVENT_TESTRESULT_FAILED)
         || (cmd == TUNITPROCESSING_EVENT_TESTRESULT_EQUALS_FAILED)
@@ -211,12 +211,16 @@ implementation {
     atomic {
       while(TRUE) {
         if((tunitMsg = (TUnitProcessingMsg *) (&eventMsg[writingEventMsg])->data)->cmd == EMPTY) {
+
           // Found an available message
           tunitMsg->cmd = cmd;
           tunitMsg->id = testId;
           tunitMsg->failMsgLength = 0;
           tunitMsg->expected = expected;
           tunitMsg->actual = actual;
+          tunitMsg->assertionId = assertionId;
+          
+          memset(tunitMsg->failMsg, 0x0, PROCESSING_MSG_LENGTH);
           
           if(failed && failMsg != NULL) {
             while(*failMsg && tunitMsg->failMsgLength < PROCESSING_MSG_LENGTH) {

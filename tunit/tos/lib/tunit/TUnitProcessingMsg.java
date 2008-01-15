@@ -5,36 +5,6 @@
  */
 
 package com.rincon.tunit.link;
-/*
- * Copyright (c) 2005-2006 Rincon Research Corporation
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * - Redistributions of source code must retain the above copyright
- *   notice, this list of conditions and the following disclaimer.
- * - Redistributions in binary form must reproduce the above copyright
- *   notice, this list of conditions and the following disclaimer in the
- *   documentation and/or other materials provided with the
- *   distribution.
- * - Neither the name of the Rincon Research Corporation nor the names of
- *   its contributors may be used to endorse or promote products derived
- *   from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
- * FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE
- * RINCON RESEARCH OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
- * OF THE POSSIBILITY OF SUCH DAMAGE
- */
 
 public class TUnitProcessingMsg extends net.tinyos.message.Message {
 
@@ -123,6 +93,9 @@ public class TUnitProcessingMsg extends net.tinyos.message.Message {
         s += "  [id=0x"+Long.toHexString(get_id())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
+        s += "  [assertionId=0x"+Long.toHexString(get_assertionId())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
         s += "  [expected=0x"+Long.toHexString(get_expected())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
@@ -136,7 +109,7 @@ public class TUnitProcessingMsg extends net.tinyos.message.Message {
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
         s += "  [failMsg=";
-        for (int i = 0; i < 16; i++) {
+        for (int i = 0; i < 15; i++) {
           s += "0x"+Long.toHexString(getElement_failMsg(i) & 0xff)+" ";
         }
         s += "]\n";
@@ -273,9 +246,72 @@ public class TUnitProcessingMsg extends net.tinyos.message.Message {
     }
 
     /////////////////////////////////////////////////////////
+    // Accessor methods for field: assertionId
+    //   Field type: short, unsigned
+    //   Offset (bits): 16
+    //   Size (bits): 8
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'assertionId' is signed (false).
+     */
+    public static boolean isSigned_assertionId() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'assertionId' is an array (false).
+     */
+    public static boolean isArray_assertionId() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'assertionId'
+     */
+    public static int offset_assertionId() {
+        return (16 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'assertionId'
+     */
+    public static int offsetBits_assertionId() {
+        return 16;
+    }
+
+    /**
+     * Return the value (as a short) of the field 'assertionId'
+     */
+    public short get_assertionId() {
+        return (short)getUIntBEElement(offsetBits_assertionId(), 8);
+    }
+
+    /**
+     * Set the value of the field 'assertionId'
+     */
+    public void set_assertionId(short value) {
+        setUIntBEElement(offsetBits_assertionId(), 8, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'assertionId'
+     */
+    public static int size_assertionId() {
+        return (8 / 8);
+    }
+
+    /**
+     * Return the size, in bits, of the field 'assertionId'
+     */
+    public static int sizeBits_assertionId() {
+        return 8;
+    }
+
+    /////////////////////////////////////////////////////////
     // Accessor methods for field: expected
     //   Field type: long, unsigned
-    //   Offset (bits): 16
+    //   Offset (bits): 24
     //   Size (bits): 32
     /////////////////////////////////////////////////////////
 
@@ -297,14 +333,14 @@ public class TUnitProcessingMsg extends net.tinyos.message.Message {
      * Return the offset (in bytes) of the field 'expected'
      */
     public static int offset_expected() {
-        return (16 / 8);
+        return (24 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'expected'
      */
     public static int offsetBits_expected() {
-        return 16;
+        return 24;
     }
 
     /**
@@ -338,7 +374,7 @@ public class TUnitProcessingMsg extends net.tinyos.message.Message {
     /////////////////////////////////////////////////////////
     // Accessor methods for field: actual
     //   Field type: long, unsigned
-    //   Offset (bits): 48
+    //   Offset (bits): 56
     //   Size (bits): 32
     /////////////////////////////////////////////////////////
 
@@ -360,14 +396,14 @@ public class TUnitProcessingMsg extends net.tinyos.message.Message {
      * Return the offset (in bytes) of the field 'actual'
      */
     public static int offset_actual() {
-        return (48 / 8);
+        return (56 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'actual'
      */
     public static int offsetBits_actual() {
-        return 48;
+        return 56;
     }
 
     /**
@@ -401,7 +437,7 @@ public class TUnitProcessingMsg extends net.tinyos.message.Message {
     /////////////////////////////////////////////////////////
     // Accessor methods for field: lastMsg
     //   Field type: byte, unsigned
-    //   Offset (bits): 80
+    //   Offset (bits): 88
     //   Size (bits): 8
     /////////////////////////////////////////////////////////
 
@@ -423,14 +459,14 @@ public class TUnitProcessingMsg extends net.tinyos.message.Message {
      * Return the offset (in bytes) of the field 'lastMsg'
      */
     public static int offset_lastMsg() {
-        return (80 / 8);
+        return (88 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'lastMsg'
      */
     public static int offsetBits_lastMsg() {
-        return 80;
+        return 88;
     }
 
     /**
@@ -464,7 +500,7 @@ public class TUnitProcessingMsg extends net.tinyos.message.Message {
     /////////////////////////////////////////////////////////
     // Accessor methods for field: failMsgLength
     //   Field type: short, unsigned
-    //   Offset (bits): 88
+    //   Offset (bits): 96
     //   Size (bits): 8
     /////////////////////////////////////////////////////////
 
@@ -486,14 +522,14 @@ public class TUnitProcessingMsg extends net.tinyos.message.Message {
      * Return the offset (in bytes) of the field 'failMsgLength'
      */
     public static int offset_failMsgLength() {
-        return (88 / 8);
+        return (96 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'failMsgLength'
      */
     public static int offsetBits_failMsgLength() {
-        return 88;
+        return 96;
     }
 
     /**
@@ -527,7 +563,7 @@ public class TUnitProcessingMsg extends net.tinyos.message.Message {
     /////////////////////////////////////////////////////////
     // Accessor methods for field: failMsg
     //   Field type: short[], unsigned
-    //   Offset (bits): 96
+    //   Offset (bits): 104
     //   Size of each element (bits): 8
     /////////////////////////////////////////////////////////
 
@@ -549,8 +585,8 @@ public class TUnitProcessingMsg extends net.tinyos.message.Message {
      * Return the offset (in bytes) of the field 'failMsg'
      */
     public static int offset_failMsg(int index1) {
-        int offset = 96;
-        if (index1 < 0 || index1 >= 16) throw new ArrayIndexOutOfBoundsException();
+        int offset = 104;
+        if (index1 < 0 || index1 >= 15) throw new ArrayIndexOutOfBoundsException();
         offset += 0 + index1 * 8;
         return (offset / 8);
     }
@@ -559,8 +595,8 @@ public class TUnitProcessingMsg extends net.tinyos.message.Message {
      * Return the offset (in bits) of the field 'failMsg'
      */
     public static int offsetBits_failMsg(int index1) {
-        int offset = 96;
-        if (index1 < 0 || index1 >= 16) throw new ArrayIndexOutOfBoundsException();
+        int offset = 104;
+        if (index1 < 0 || index1 >= 15) throw new ArrayIndexOutOfBoundsException();
         offset += 0 + index1 * 8;
         return offset;
     }
@@ -569,7 +605,7 @@ public class TUnitProcessingMsg extends net.tinyos.message.Message {
      * Return the entire array 'failMsg' as a short[]
      */
     public short[] get_failMsg() {
-        short[] tmp = new short[16];
+        short[] tmp = new short[15];
         for (int index0 = 0; index0 < numElements_failMsg(0); index0++) {
             tmp[index0] = getElement_failMsg(index0);
         }
@@ -603,14 +639,14 @@ public class TUnitProcessingMsg extends net.tinyos.message.Message {
      * Return the total size, in bytes, of the array 'failMsg'
      */
     public static int totalSize_failMsg() {
-        return (128 / 8);
+        return (120 / 8);
     }
 
     /**
      * Return the total size, in bits, of the array 'failMsg'
      */
     public static int totalSizeBits_failMsg() {
-        return 128;
+        return 120;
     }
 
     /**
@@ -638,7 +674,7 @@ public class TUnitProcessingMsg extends net.tinyos.message.Message {
      * Return the number of elements in the array 'failMsg'
      */
     public static int numElements_failMsg() {
-        return 16;
+        return 15;
     }
 
     /**
@@ -646,7 +682,7 @@ public class TUnitProcessingMsg extends net.tinyos.message.Message {
      * for the given dimension.
      */
     public static int numElements_failMsg(int dimension) {
-      int array_dims[] = { 16,  };
+      int array_dims[] = { 15,  };
         if (dimension < 0 || dimension >= 1) throw new ArrayIndexOutOfBoundsException();
         if (array_dims[dimension] == 0) throw new IllegalArgumentException("Array dimension "+dimension+" has unknown size");
         return array_dims[dimension];
@@ -668,7 +704,7 @@ public class TUnitProcessingMsg extends net.tinyos.message.Message {
      * Read the array 'failMsg' as a String
      */
     public String getString_failMsg() { 
-         char carr[] = new char[Math.min(net.tinyos.message.Message.MAX_CONVERTED_STRING_LENGTH,16)];
+         char carr[] = new char[Math.min(net.tinyos.message.Message.MAX_CONVERTED_STRING_LENGTH,15)];
          int i;
          for (i = 0; i < carr.length; i++) {
              if ((char)getElement_failMsg(i) == (char)0) break;

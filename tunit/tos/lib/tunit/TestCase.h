@@ -36,31 +36,42 @@
 #ifndef TESTCASE_H
 #define TESTCASE_H
 
+#ifndef UQ_ASSERTION
+#define UQ_ASSERTION "TUnit.Assertion"
+#endif
+
 #ifndef UQ_TESTCASE
 #define UQ_TESTCASE "TUnit.Test"
 #endif
 
-static void assertEqualsFailed(char *failMsg, uint32_t expected, uint32_t actual);
-static void assertNotEqualsFailed(char *failMsg, uint32_t actual);
-static void assertResultIsBelowFailed(char *failMsg, uint32_t upperbound, uint32_t actual);
-static void assertResultIsAboveFailed(char *failMsg, uint32_t lowerbound, uint32_t actual);
+/***************** TUnit Private Internal Assertions ****************/
+static void assertEqualsFailed(char *failMsg, uint32_t expected, uint32_t actual, uint8_t assertionId);
+static void assertNotEqualsFailed(char *failMsg, uint32_t actual, uint8_t assertionId);
+static void assertResultIsBelowFailed(char *failMsg, uint32_t upperbound, uint32_t actual, uint8_t assertionId);
+static void assertResultIsAboveFailed(char *failMsg, uint32_t lowerbound, uint32_t actual, uint8_t assertionId);
+static void assertTunitSuccess(uint8_t assertionId);
+static void assertTunitFail(char *failMsg, uint8_t assertionId);
 
+
+/***************** Public Assertion Definitions ***************/
 /**
  * Test was a success
  */
-static void assertSuccess();
-
-/** 
+#define assertSuccess()\
+  assertTunitSuccess(unique(UQ_ASSERTION));
+  
+/**
  * Test was a failure
  */
-static void assertFail(char *failMsg);
+#define assertFail(msg)\
+  assertTunitFail(msg, unique(UQ_ASSERTION));
 
 /**
  * Assert expected == actual
  */
 #define assertEquals(msg, expected, actual)\
   if ((expected) != (actual)) {\
-    assertEqualsFailed(msg, ((uint32_t) expected), ((uint32_t) actual));\
+    assertEqualsFailed(msg, ((uint32_t) expected), ((uint32_t) actual), unique(UQ_ASSERTION));\
   } else {\
     assertSuccess();\
   }
@@ -70,7 +81,7 @@ static void assertFail(char *failMsg);
  */
 #define assertNotEquals(msg, expected, actual)\
   if ((expected) == (actual)) {\
-    assertNotEqualsFailed(msg, ((uint32_t) actual));\
+    assertNotEqualsFailed(msg, ((uint32_t) actual), unique(UQ_ASSERTION));\
   } else {\
     assertSuccess();\
   }
@@ -80,7 +91,7 @@ static void assertFail(char *failMsg);
  */
 #define assertResultIsBelow(msg, upperbound, actual)\
   if ((upperbound) <= (actual)) {\
-    assertResultIsBelowFailed(msg, ((uint32_t) upperbound), ((uint32_t) actual));\
+    assertResultIsBelowFailed(msg, ((uint32_t) upperbound), ((uint32_t) actual), unique(UQ_ASSERTION));\
   } else {\
     assertSuccess();\
   } 
@@ -90,7 +101,7 @@ static void assertFail(char *failMsg);
  */
 #define assertResultIsAbove(msg, lowerbound, actual)\
   if ((lowerbound) >= (actual)) {\
-    assertResultIsAboveFailed(msg, ((uint32_t) lowerbound), ((uint32_t) actual));\
+    assertResultIsAboveFailed(msg, ((uint32_t) lowerbound), ((uint32_t) actual), unique(UQ_ASSERTION));\
   } else {\
     assertSuccess();\
   } 

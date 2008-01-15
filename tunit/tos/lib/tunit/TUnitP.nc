@@ -194,40 +194,39 @@ implementation {
   }
 
   /***************** Assertions ****************/
-  void assertEqualsFailed(char *failMsg, uint32_t expected, uint32_t actual) __attribute__((noinline)) @C() @spontaneous() {
+  void assertEqualsFailed(char *failMsg, uint32_t expected, uint32_t actual, uint8_t assertionId) __attribute__((noinline)) @C() @spontaneous() {
     if(!call TUnitState.isIdle()) {
-      signal TUnitProcessing.testEqualsFailed(currentTest, failMsg, expected, actual);
+      signal TUnitProcessing.testEqualsFailed(currentTest, failMsg, expected, actual, assertionId);
     }
   }
   
-  void assertNotEqualsFailed(char *failMsg, uint32_t actual) __attribute__((noinline)) @C() @spontaneous() {
+  void assertNotEqualsFailed(char *failMsg, uint32_t actual, uint8_t assertionId) __attribute__((noinline)) @C() @spontaneous() {
     if(!call TUnitState.isIdle()) {
-      signal TUnitProcessing.testNotEqualsFailed(currentTest, failMsg, actual);
+      signal TUnitProcessing.testNotEqualsFailed(currentTest, failMsg, actual, assertionId);
     }
   }
   
-    void assertResultIsBelowFailed(char *failMsg, uint32_t upperbound, uint32_t actual) __attribute__((noinline)) @C() @spontaneous() {
+    void assertResultIsBelowFailed(char *failMsg, uint32_t upperbound, uint32_t actual, uint8_t assertionId) __attribute__((noinline)) @C() @spontaneous() {
     if(!call TUnitState.isIdle()) {
-      signal TUnitProcessing.testResultIsBelowFailed(currentTest, failMsg, upperbound, actual);
+      signal TUnitProcessing.testResultIsBelowFailed(currentTest, failMsg, upperbound, actual, assertionId);
     }
   }
   
-  void assertResultIsAboveFailed(char *failMsg, uint32_t lowerbound, uint32_t actual) __attribute__((noinline)) @C() @spontaneous() {
+  void assertResultIsAboveFailed(char *failMsg, uint32_t lowerbound, uint32_t actual, uint8_t assertionId) __attribute__((noinline)) @C() @spontaneous() {
     if(!call TUnitState.isIdle()) {
-      signal TUnitProcessing.testResultIsAboveFailed(currentTest, failMsg, lowerbound, actual);
+      signal TUnitProcessing.testResultIsAboveFailed(currentTest, failMsg, lowerbound, actual, assertionId);
     }
   }
   
-  void assertSuccess() __attribute__((noinline)) @C() @spontaneous() {
+  void assertTunitSuccess(uint8_t assertionId) __attribute__((noinline)) @C() @spontaneous() {
     if(!call TUnitState.isIdle()) {
-      signal TUnitProcessing.testSuccess(currentTest);
+      signal TUnitProcessing.testSuccess(currentTest, assertionId);
     }
   }
   
-
-  void assertFail(char *failMsg) __attribute__((noinline)) @C() @spontaneous() {
+  void assertTunitFail(char *failMsg, uint8_t assertionId) __attribute__((noinline)) @C() @spontaneous() {
     if(!call TUnitState.isIdle()) {
-      signal TUnitProcessing.testFailed(currentTest, failMsg);
+      signal TUnitProcessing.testFailed(currentTest, failMsg, assertionId);
     }
   }
   

@@ -10,17 +10,23 @@
 ############################################################################
 # TUNIT_BASE is the absolute path to the tunit directory
 ############################################################################
-export TUNIT_BASE="`cygpath -w /opt/tinyos-2.x-contrib/tunit`"
+export TOSCONTRIB="`cygpath -w /opt/tinyos-2.x-contrib/`"
+
+
+############################################################################
+# Allow nesC to locate .extra files in your current working directory
+############################################################################
+export TOSMAKE_PATH="./"
 
 
 ############################################################################
 # These define .jar files dependencies to run tunit.jar
 ############################################################################
-export LOG4J="`cygpath -w $TUNIT_BASE/support/sdk/tunit/depends/log4j.jar`"
-export TUNIT="`cygpath -w $TUNIT_BASE/support/sdk/tunit/tunit.jar`"
-export XERCES="`cygpath -w $TUNIT_BASE/support/sdk/tunit/depends/xerces.jar`"
-export JFREECHART="`cygpath -w $TUNIT_BASE/support/sdk/tunit/depends/jfreechart-1.0.5.jar`"
-export JCOMMON="`cygpath -w $TUNIT_BASE/support/sdk/tunit/depends/jcommon-1.0.9.jar`"
+export LOG4J="`cygpath -w $TOSCONTRIB/tunit/support/sdk/tunit/depends/log4j.jar`"
+export TUNIT="`cygpath -w $TOSCONTRIB/tunit/support/sdk/tunit/tunit.jar`"
+export XERCES="`cygpath -w $TOSCONTRIB/tunit/support/sdk/tunit/depends/xerces.jar`"
+export JFREECHART="`cygpath -w $TOSCONTRIB/tunit/support/sdk/tunit/depends/jfreechart-1.0.5.jar`"
+export JCOMMON="`cygpath -w $TOSCONTRIB/tunit/support/sdk/tunit/depends/jcommon-1.0.9.jar`"
 
 
 ############################################################################
@@ -32,5 +38,5 @@ export CLASSPATH="${CLASSPATH};${LOG4J};${TUNIT};${XERCES};${JFREECHART};${JCOMM
 ############################################################################
 # This is the optional report directory for build.xml, when the -reportdir option is used
 ############################################################################
-export REPORTDIR="`cygpath -w $TUNIT_BASE/reports`"
+export REPORTDIR="`cygpath -w $TOSCONTRIB/tunit/reports`"
 

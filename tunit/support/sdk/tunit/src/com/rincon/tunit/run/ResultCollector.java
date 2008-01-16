@@ -101,7 +101,7 @@ public class ResultCollector extends Thread implements Messenger,
 
   /** Map of assertion ID's to their source code line numbers */
   private Map assertionMap;
-  
+
   /** The last test result to check in */
   private int lastTestResult;
 
@@ -121,7 +121,8 @@ public class ResultCollector extends Thread implements Messenger,
   @SuppressWarnings("unchecked")
   public ResultCollector(TestReport myReport,
       TUnitTestRunProperties myRunProperties,
-      TUnitSuiteProperties mySuiteProperties, Map myTestMap, Map myStatsMap, Map myAssertionMap) {
+      TUnitSuiteProperties mySuiteProperties, Map myTestMap, Map myStatsMap,
+      Map myAssertionMap) {
 
     // 1. Initialize all our local variables
     log = Logger.getLogger(getClass());
@@ -143,6 +144,7 @@ public class ResultCollector extends Thread implements Messenger,
     MoteIF focusedMoteIf;
     PhoenixSource focusedSource;
     for (int i = 0; i < runProperties.totalNodes(); i++) {
+
       String source = "sf@localhost:" + (TestRunManager.BASE_PORT + i);
       focusedSource = BuildSource.makePhoenix(source, this);
       focusedSource.setPacketErrorHandler(this);
@@ -207,7 +209,8 @@ public class ResultCollector extends Thread implements Messenger,
     // 1. Ping the node and get a response.
     synchronized (this) {
       log.trace("ResultCollector.run()::initialize");
-      for (int retries = 0; retries < 3 && initializing; retries++) {
+      for (int retries = 0; retries < 5 && initializing; retries++) {
+        log.info("Ping...");
         link.ping();
 
         try {
@@ -218,6 +221,11 @@ public class ResultCollector extends Thread implements Messenger,
               "__ResultCollector.run()::initializing");
           result.error("InterruptedException", e.getMessage());
           report.addResult(result);
+        }
+
+        if (initializing) {
+          // Someone needs to fix the horrendous serial comms problems
+          log.info("No pong yet.");
         }
       }
 
@@ -257,14 +265,18 @@ public class ResultCollector extends Thread implements Messenger,
           log.error("Timeout occured in " + runProperties.getName() + " "
               + suiteProperties.getTestName());
           TestResult result;
-          
-          if(testMap.get(new Integer(lastTestResult + 1)) != null) {
-            result = new TestResult((String) testMap.get(new Integer(lastTestResult + 1)));
+
+          if (testMap.get(new Integer(lastTestResult + 1)) != null) {
+            result = new TestResult((String) testMap.get(new Integer(
+                lastTestResult + 1)));
           } else {
-            result = new TestResult("Test " + lastTestResult + 1 + "; (couldn't extract test name)");
+            result = new TestResult("Test " + lastTestResult + 1
+                + "; (couldn't extract test name)");
           }
-              
-          result.error("Timeout",
+
+          result
+              .error(
+                  "Timeout",
                   "Timeout occured!\nIf this is incorrect, add a \"@timeout [minutes]\" definition to your suite.properties file for this test.");
           report.addResult(result);
           allDone = true;
@@ -319,29 +331,32 @@ public class ResultCollector extends Thread implements Messenger,
   /**
    * A test result from an individual test
    */
-@SuppressWarnings("unchecked")
-  public void tUnitProcessing_testFailed(short testId, short assertionId, String failMsg) {
+  @SuppressWarnings("unchecked")
+  public void tUnitProcessing_testFailed(short testId, short assertionId,
+      String failMsg) {
     failMsg = failMsg.replace('&', ' '); // XML doesn't like &'s.
     failMsg = failMsg.replace('<', '[');
     failMsg = failMsg.replace('>', ']');
-    
+
     TestResult result;
-    
-    if(testMap.get(new Integer(testId)) != null) {
-    	log.warn("\nTest " + testId + " ("
-    	        + (String) testMap.get(new Integer(testId)) + ") FAILED \n" 
-              + (String) assertionMap.get(new Integer(assertionId))
-              + failMsg);
-    	
-    	result = new TestResult((String) testMap.get(new Integer(testId)), (String) assertionMap.get(new Integer(assertionId)));
-    	
+
+    if (testMap.get(new Integer(testId)) != null) {
+      log.warn("\nTest " + testId + " ("
+          + (String) testMap.get(new Integer(testId)) + ") FAILED \n"
+          + (String) assertionMap.get(new Integer(assertionId)) + failMsg);
+
+      result = new TestResult((String) testMap.get(new Integer(testId)),
+          (String) assertionMap.get(new Integer(assertionId)));
+
     } else {
-    	log.warn("\nTest " + testId + " FAILED \n"
-          + (String) assertionMap.get(new Integer(assertionId))
-          + failMsg + "; (couldn't extract test name)");
-    	result = new TestResult("Test " + testId + " (couldn't extract test name)", (String) assertionMap.get(new Integer(assertionId))); 
+      log.warn("\nTest " + testId + " FAILED \n"
+          + (String) assertionMap.get(new Integer(assertionId)) + failMsg
+          + "; (couldn't extract test name)");
+      result = new TestResult("Test " + testId
+          + " (couldn't extract test name)", (String) assertionMap
+          .get(new Integer(assertionId)));
     }
-    
+
     testIdResponses.add(new Integer(testId));
     lastTestResult = testId;
     result.failure("EmbeddedTest", failMsg);
@@ -351,22 +366,25 @@ public class ResultCollector extends Thread implements Messenger,
   @SuppressWarnings("unchecked")
   public void tUnitProcessing_testSuccess(short testId, short assertionId) {
     TestResult result;
-    
-    if(testMap.get(new Integer(testId)) != null) {
+
+    if (testMap.get(new Integer(testId)) != null) {
       log.info("\nTest " + testId + " ("
           + (String) testMap.get(new Integer(testId)) + ") \n"
-          + (String) assertionMap.get(new Integer(assertionId)) + " PASSED\n"); 
-      
-      result = new TestResult((String) testMap.get(new Integer(testId)), (String) assertionMap.get(new Integer(assertionId)));
-      
+          + (String) assertionMap.get(new Integer(assertionId)) + " PASSED\n");
+
+      result = new TestResult((String) testMap.get(new Integer(testId)),
+          (String) assertionMap.get(new Integer(assertionId)));
+
     } else {
       log.info("\nTest " + testId + " \n"
           + (String) assertionMap.get(new Integer(assertionId))
           + " PASSED; (couldn't extract test name)");
-          
-      result = new TestResult("Test " + testId + "; (couldn't extract test name)", (String) assertionMap.get(new Integer(assertionId)));
+
+      result = new TestResult("Test " + testId
+          + "; (couldn't extract test name)", (String) assertionMap
+          .get(new Integer(assertionId)));
     }
-    
+
     testIdResponses.add(new Integer(testId));
     lastTestResult = testId;
     report.addResult(result);
@@ -389,13 +407,16 @@ public class ResultCollector extends Thread implements Messenger,
 
       if (!found) {
         // This test case didn't log a result. Maybe it failed? We don't know.
-        if(testMap.get(new Integer(i)) != null) {
-          result = new TestResult((String) testMap.get(new Integer(i)));  
+        if (testMap.get(new Integer(i)) != null) {
+          result = new TestResult((String) testMap.get(new Integer(i)));
         } else {
-          result = new TestResult("Test " + i + "; (couldn't extract test name)");
+          result = new TestResult("Test " + i
+              + "; (couldn't extract test name)");
         }
-        
-        result.failure("NoAssertionError",
+
+        result
+            .failure(
+                "NoAssertionError",
                 "This test did not report any result.\nExplicitly assert some condition in the test to make it pass or fail correctly.");
         report.addResult(result);
       }
@@ -413,8 +434,9 @@ public class ResultCollector extends Thread implements Messenger,
    */
   public void statistics_log(short id, String units, long value) {
     log.trace("statistics_log");
-    log.debug("Stats Logging: id=" + id + "; units=" + units + "; value=" + value);
-    
+    log.debug("Stats Logging: id=" + id + "; units=" + units + "; value="
+        + value);
+
     try {
       StatisticsChart.write(StatisticsReport.log(report.getPackage(),
           (String) statsMap.get(new Integer(id)), units, value), 500, 325);

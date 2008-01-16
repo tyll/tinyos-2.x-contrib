@@ -126,9 +126,17 @@ public class Sf implements SerialForwarder, Messenger, PhoenixError {
     if (provider == null) {
       provider = new SfProvider(motecom, port, this, this, this);
       provider.start();
-
+      
       error = false;
       synchronized (this) {
+
+        // Initial wait period maybe helps dropped pong issues
+        try {
+          wait(2000);
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
+        
         // We wait for a message to come back saying "resynchronizing"
         // to know we're connected.
         

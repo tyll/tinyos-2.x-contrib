@@ -103,12 +103,12 @@ public class TUnitCli implements TUnitProcessing_Events {
     System.exit(0);
   }
 
-  public void tUnitProcessing_testSuccess(short testId) {
+  public void tUnitProcessing_testSuccess(short testId, short assertionId) {
     System.out.println(testId + ": PASSED\n\t");
     // Don't exit until allDone()
   }
   
-  public void tUnitProcessing_testFailed(short testId, String failMsg) {
+  public void tUnitProcessing_testFailed(short testId, short assertionId, String failMsg) {
     System.out.println(testId + ": FAILED\n\t" + failMsg);
     // Don't exit until allDone()
   }

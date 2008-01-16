@@ -69,6 +69,9 @@ public class TUnitSuiteProperties {
   /** @extra <extra> */
   private String extras;
   
+  /** CFLAGS+=<> */
+  private String cflags;
+  
   /** @ignore <target> */
   private List ignore;
   
@@ -105,6 +108,7 @@ public class TUnitSuiteProperties {
     testName = "";
     description = "";
     extras = "";
+    cflags = "";
     ignore = new ArrayList();
     only = new ArrayList();
     minNodeCount = null;
@@ -158,6 +162,10 @@ public class TUnitSuiteProperties {
     }
   }
 
+  public void addCFlags(String myCFlags) {
+	  cflags += myCFlags + "\n";
+  }
+
   public int getExactNodeCount() {
     if(exactNodeCount != null) {
       return exactNodeCount.intValue();
@@ -185,6 +193,9 @@ public class TUnitSuiteProperties {
     return extras;
   }
 
+  public String getCFlags() {
+    return cflags;
+  }
 
   public int getMaxNodeCount() {
     if(maxNodeCount != null) {
@@ -339,6 +350,7 @@ public class TUnitSuiteProperties {
     
     aggregate.addAuthor(subset.getAuthor());
     aggregate.addExtras(subset.getExtras());
+    aggregate.addCFlags(subset.getCFlags());
     
     if(!subset.getDescription().matches("")) {
       if(!getDescription().matches("")) {
@@ -397,6 +409,7 @@ public class TUnitSuiteProperties {
     clone.addAuthor(new String(getAuthor()));
     clone.addDescription(new String(getDescription()));
     clone.addExtras(new String(getExtras()));
+    clone.addCFlags(new String(getCFlags()));
     clone.setTestName(new String(getTestName()));
     clone.setSkip(skip);
     

@@ -115,7 +115,7 @@ public class SuitePropertiesParser {
             numAssertions = 5;  // The default
           }
           
-          suiteProperties.addExtras("CFLAGS+=-DMAX_TUNIT_QUEUE=" + numAssertions);
+          suiteProperties.addCFlags("CFLAGS+=-DMAX_TUNIT_QUEUE=" + numAssertions);
           
         } else if(line.toLowerCase().startsWith("@extra")) {
           suiteProperties.addExtras(line.replace("@extra","").trim());

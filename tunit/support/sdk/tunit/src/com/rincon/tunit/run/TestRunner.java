@@ -31,6 +31,8 @@ package com.rincon.tunit.run;
  * OF THE POSSIBILITY OF SUCH DAMAGE
  */
 
+import java.io.FileWriter;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
@@ -235,6 +237,8 @@ public class TestRunner {
     TUnitTargetProperties focusedTarget = null;
     TUnitNodeProperties focusedNode;
     String extras;
+    String cflags;
+    
     for (int i = 0; i < runProperties.totalTargets(); i++) {
       focusedTarget = runProperties.getTarget(i);
       if (runProperties.getTarget(i).requiresMultipleBuilds()) {
@@ -245,18 +249,38 @@ public class TestRunner {
           extras = "install." + focusedNode.getId() + " ";
           extras += focusedNode.getInstallExtras() + " ";
           extras += suiteProperties.getExtras() + " ";
-          extras += ""
-            + "CFLAGS+=-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/lib/tunit "
-            + "CFLAGS+=-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/lib/tunitstats "
-            + "CFLAGS+=-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/system "
-            + "CFLAGS+=-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/interfaces "
-            + "CFLAGS+=-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/lib/directserial "
-            + "CFLAGS+=-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/lib/fifoqueue "
-            + "CFLAGS+=-DTUNIT_TOTAL_NODES=" + runProperties.totalNodes() + " "
-            + "";
+          extras += "testrunner ";
+          
+          cflags = "CFLAGS+=-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/lib/tunit\n"
+        	  + "CFLAGS+=-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/lib/tunitstats\n"
+        	  + "CFLAGS+=-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/system\n"
+        	  + "CFLAGS+=-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/interfaces\n"
+        	  + "CFLAGS+=-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/lib/directserial \n"
+        	  + "CFLAGS+=-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/lib/fifoqueue\n"
+        	  + "CFLAGS+=-DTUNIT_TOTAL_NODES=" + runProperties.totalNodes() + "\n";
+        	  
+          cflags += suiteProperties.getCFlags();
+          
+          // delete the temporary extras file in case was not deleted previously
+          new File(buildDirectory + "\\testrunner.extra").delete();
+          
+          try {
+        	  // Create file 
+        	  FileWriter fstream = new FileWriter(buildDirectory + "\\testrunner.extra");
+        	  BufferedWriter out = new BufferedWriter(fstream);
+        	  out.write(cflags);
+        	  // Close the output stream
+        	  out.close();
+            
+          } catch (Exception e){//Catch exception if any
+        	  System.err.println("Error: " + e.getMessage());
+          }
           
           focusedResult = make.build(buildDirectory, focusedTarget
               .getTargetName(), extras);
+          
+          // delete the temporary extras file
+          new File(buildDirectory + "\\testrunner.extra").delete();
           
           if (!focusedResult.isSuccess()) {
             report.addResult(focusedResult);
@@ -268,18 +292,39 @@ public class TestRunner {
         log.debug("Build properties are identical for nodes using target "
             + focusedTarget.getTargetName());
         extras = suiteProperties.getExtras() + " ";
-        extras += ""
-          + "CFLAGS+=-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/lib/tunit "
-          + "CFLAGS+=-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/lib/tunitstats "
-          + "CFLAGS+=-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/system "
-          + "CFLAGS+=-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/interfaces "
-          + "CFLAGS+=-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/lib/directserial "
-          + "CFLAGS+=-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/lib/fifoqueue "
-          + "CFLAGS+=-DTUNIT_TOTAL_NODES=" + runProperties.totalNodes() + " "
-          + "";
+        extras += "testrunner ";
+        cflags = "CFLAGS+=-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/lib/tunit\n"
+          + "CFLAGS+=-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/lib/tunitstats\n"
+          + "CFLAGS+=-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/system\n"
+          + "CFLAGS+=-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/interfaces\n"
+          + "CFLAGS+=-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/lib/directserial\n"
+          + "CFLAGS+=-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/lib/fifoqueue\n"
+          + "CFLAGS+=-DTUNIT_TOTAL_NODES=" + runProperties.totalNodes() + "\n";
+          
+        cflags += suiteProperties.getCFlags();
+        
+        // delete the temporary extras file in case was not deleted previously
+        new File(buildDirectory + "\\testrunner.extra").delete();
+
+        // create temporary extras file
+        try {
+      	  // Create file 
+      	  FileWriter fstream = new FileWriter(buildDirectory + "\\testrunner.extra");
+      	  BufferedWriter out = new BufferedWriter(fstream);
+      	  out.write(cflags);
+      	  // Close the output stream
+      	  out.close();
+        } 
+        catch (Exception e){//Catch exception if any
+      	  System.err.println("Error: " + e.getMessage());
+        }
 
         focusedResult = make.build(buildDirectory, focusedTarget
             .getTargetName(), extras);
+        
+        // delete the temporary extras file
+        new File(buildDirectory + "\\testrunner.extra").delete();
+        
         report.addResult(focusedResult);
         if (!focusedResult.isSuccess()) {
           return false;

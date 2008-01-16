@@ -221,9 +221,9 @@ public class TUnit {
   private void syntax() {
     System.out.println("TUnit Syntax: java com.rincon.tunit.TUnit (options)");
     System.out.println("\nOptions are:");
-    System.out.println("\t-tunitbase [absolute tunit_base directory]");
-    System.out.println("\t\tThe TUNIT_BASE directory contains TUnit's embedded libraries");
-    System.out.println("\t\tThis is tinyos-2.x-contrib/tunit");
+    System.out.println("\t-tunitbase [absolute path to tinyos-2.x-contrib/tunit]");
+    System.out.println("\t\tThe tinyos-2.x-contrib/tunit directory contains");
+    System.out.println("\t\tTUnit's embedded libraries");
     System.out.println();
     System.out.println("\t-testdir [absolute test directory]");
     System.out.println("\t\tThis lets you start testing in a specific directory");
@@ -335,17 +335,18 @@ public class TUnit {
   private void establishTunitDir() {
     if (tunitBase == null) {
       // We're flexible. Pick one. Or don't, we're still flexible.
-      if((String) System.getenv().get("TUNIT_BASE") != null) {
-        log.info("Found a TUNIT_BASE environment variable");
-        tunitBase = ((String) System.getenv().get("TUNIT_BASE")).replace('\\',
-            File.separatorChar).replace('/', File.separatorChar);
-      
-      } else if((String) System.getenv().get("TOSCONTRIB") != null) {
+
+      if((String) System.getenv().get("TOSCONTRIB") != null) {
         log.info("Found a TOSCONTRIB environment variable");
         tunitBase = ((String) System.getenv().get("TOSCONTRIB")).replace('\\',
             File.separatorChar).replace('/', File.separatorChar)
                 + File.separatorChar + "tunit";
         
+      } else if((String) System.getenv().get("TUNIT_BASE") != null) {
+          log.info("Found a TUNIT_BASE environment variable");
+          tunitBase = ((String) System.getenv().get("TUNIT_BASE")).replace('\\',
+              File.separatorChar).replace('/', File.separatorChar);
+          
       } else if((String) System.getenv().get("TUNIT_HOME") != null) {
         log.info("Found a TUNIT_HOME environment variable");
         ((String) System.getenv().get("TUNIT_HOME")).replace('\\',

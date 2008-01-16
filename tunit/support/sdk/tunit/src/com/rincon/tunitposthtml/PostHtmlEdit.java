@@ -48,9 +48,9 @@ public class PostHtmlEdit {
    * Constructor
    *
    */
-  public PostHtmlEdit() {
+  public PostHtmlEdit(String[] args) {
     System.out.println("Post-editing HTML reports");
-    TUnit tunit = new TUnit(new String[]{});
+    TUnit tunit = new TUnit(args);
     new TraverseHtml(new File(TUnit.getBaseReportDirectory(), "/html"));
     System.out.println("TUnit Post HTML Edit Done");
   }
@@ -60,7 +60,7 @@ public class PostHtmlEdit {
    */
   public static void main(String[] args) {
     org.apache.log4j.BasicConfigurator.configure();
-    new PostHtmlEdit();
+    new PostHtmlEdit(args);
   }
 
 }

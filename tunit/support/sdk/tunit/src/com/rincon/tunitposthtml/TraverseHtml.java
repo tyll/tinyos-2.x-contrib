@@ -74,6 +74,12 @@ public class TraverseHtml {
       }
     });
 
+    if(htmlFiles == null) {
+      System.err.println("No HTML files found!");
+      System.err.println("Please run the ant tunitreport task to generate HTML files");
+      System.exit(1);
+    }
+    
     /*
      * Locate the corresponding png directory for each HTML file, and insert
      * png's if we can.

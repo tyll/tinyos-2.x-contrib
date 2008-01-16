@@ -79,6 +79,6 @@ typedef nx_struct harvesterTopology {
 typedef nx_struct harvesterNodeStatus {
   nx_uint8_t dsn; /* serial number */
   nx_uint16_t id; /* Mote id of sending mote. */	 	 
-  nx_uint32_t prog_version; /*	program version e.g. IDENT_UNIX_TIME */
+  nx_uint32_t prog_version; /*	program version e.g. IDENT_TIMESTAMP */
 }  harvester_status_t;
 #endif

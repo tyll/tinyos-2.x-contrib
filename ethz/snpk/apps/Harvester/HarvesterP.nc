@@ -336,16 +336,19 @@ implementation {
      - read next sample
   */
   event void SensorTimer.fired() {
+	error_t err;
    	if (!sendSensorBusy) {
 		harvester_sensor_t *o = (harvester_sensor_t *)call SensorSend.getPayload(&sendbuf, sizeof(harvester_sensor_t));
 		local.dsn=sensor_sn++;
 		local.id=TOS_NODE_ID;
 		memcpy(o, &local, sizeof(local));
-		if (call SensorSend.send(&sendbuf, sizeof(local)) == SUCCESS)
+		err = call SensorSend.send(&sendbuf, sizeof(local));
+		if (err == SUCCESS)
 			sendSensorBusy = TRUE;
         else {
         	report_problem();
-      		call DSN.logError("Send Sensordata radio stack failed");
+        	call DSN.logInt(err);
+      		call DSN.logError("Send Sensordata radio stack failed (%i)");
         }
     }
     else {
@@ -360,7 +363,8 @@ implementation {
 		  report_sent(msg);
 	  else {
 		  report_problem();
-		  call DSN.logError("Send Sensordata failed");
+		  call DSN.logInt(error);
+		  call DSN.logError("Send Sensordata failed (%i)");
 	  }
 	  sendSensorBusy = FALSE;
   }
@@ -470,22 +474,23 @@ implementation {
 		else {
 	    	report_problem();  	
 	    	call DSN.logInt(err);
-   			call DSN.logError("TInfo stack (%i)");
+	    	call DSN.logError("Send TreeInfo radio stack failed (%i)");
     	}
   	}
   	else {
-  		//call DSN.logError("Tinf busy");
+  		call DSN.logError("Radio busy while sending TreeInfo");
   		report_problem();
   	}
   }
-    
+      
   event void TopologySend.sendDone(message_t* msg, error_t error) {
   	if (error == SUCCESS) {
       report_sent(msg);
   	}
     else {
       report_problem();
-  	  call DSN.logError("Send TreeInfo failed");
+      call DSN.logInt(error);
+	  call DSN.logError("Send TreeInfo failed (%i)");
     }
   	sendTopologyBusy = FALSE;
   }
@@ -500,7 +505,7 @@ implementation {
   		harvester_status_t * status = (harvester_status_t *)call StatusSend.getPayload(&sendbuf, sizeof(harvester_status_t));
 		status->id=TOS_NODE_ID;
 		status->dsn=status_sn++;
-		status->prog_version=IDENT_UNIX_TIME;
+		status->prog_version=IDENT_TIMESTAMP;
 
 		err=call StatusSend.send(&sendbuf, sizeof(harvester_status_t));
 		if (err == SUCCESS) {

@@ -56,10 +56,12 @@ module NeighbourSyncP {
     interface State as RadioPowerState;
     interface State as SyncSendState;
     interface SplitControl as SubControl;
-    interface DSN;
+    interface DsnSend as DSN;
     interface RadioBackoff as SubBackoff[am_id_t amId];
     interface State as SendState;
-    interface Timer<TMilli> as SyncRequestTimer;
+    
+    interface AMSend;
+    interface LowPowerListening;
 
 #ifdef CC2420SYNC_DEBUG_PINS
     interface GeneralIO as GIO3;
@@ -86,6 +88,8 @@ implementation {
   uint8_t retries=0;
   
   norace uint16_t lplPeriod32Khz;
+  
+  message_t resync_msg;
   
  enum {
     CC2420_SIZE = MAC_HEADER_SIZE + MAC_FOOTER_SIZE,
@@ -243,10 +247,8 @@ implementation {
         	return SUCCESS;
         }
         else {
-          if (dest!=AM_BROADCAST_ADDR)
-            header->lplPeriod |= REQ_SYNC_FLAG; // request resynchronisation
-          else {
-            call SyncRequestTimer.stop(); // broadcast cancels all pending requests;
+          if (dest!=AM_BROADCAST_ADDR && meta->rxInterval!=0) {
+        	  header->lplPeriod |= REQ_SYNC_FLAG; // request resynchronisation
           }
           meta->synced=FALSE;
           return call SubSend.send(msg, len + SYNC_HEADER_SIZE);
@@ -486,8 +488,7 @@ implementation {
       }
     }
     if ((header->lplPeriod & REQ_SYNC_FLAG) != 0) {
-    	if (!call SyncRequestTimer.isRunning())
-    		call SyncRequestTimer.startOneShot(SYNC_TIMER_PERIOD);
+    	signal NeighbourSyncRequest.updateRequest(address, header->lplPeriod & ~REQ_SYNC_FLAG);
     }
 
     // print accuracy of packet
@@ -559,10 +560,6 @@ implementation {
   async event void CC2420Transmit.sendDone(message_t* p_msg, error_t error) {
   }
 
-  /***************** DSN events ************************/
-  event void DSN.receive(void *msg, uint8_t len) {
-  }
-
  /***************** SubControl Events ****************/
   event void SubControl.startDone(error_t error) {
     if (!error) {
@@ -593,12 +590,6 @@ implementation {
       call SubBackoff.setCca[amId](m_cca);
   }
 
-  /***************** SyncRequestTimer events ***************/
-  event void SyncRequestTimer.fired() {
-    call DSN.log("sync timer fired, signaled syncreq");
-    signal NeighbourSyncRequest.updateRequest();
-  }
-  
   /***************** NeighbourSyncInfo commands ***************/
   command error_t NeighbourSyncInfo.getRxSleepInterval(am_addr_t neighbour, uint16_t* interval) {
 	  uint8_t idx;
@@ -610,7 +601,16 @@ implementation {
   }
 
   /***************** NeighbourSyncRequest events ***************/
-  default event void NeighbourSyncRequest.updateRequest() {
+  default event void NeighbourSyncRequest.updateRequest(am_addr_t address, uint16_t lplPeriod) {
+	  call LowPowerListening.setRxSleepInterval(&resync_msg, lplPeriod);
+	  call AMSend.send(address, &resync_msg, 0);
+  }
+  
+  /***************** AMSend events *************/
+  event void AMSend.sendDone(message_t* msg, error_t error) {
+#ifdef CC2420SYNC_DEBUG 
+	  call DSN.log("sent unicast resync packet");
+#endif	  
   }
 
   /***************** Functions ***********************/

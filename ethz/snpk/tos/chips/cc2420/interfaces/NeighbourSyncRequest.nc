@@ -35,8 +35,8 @@
 interface NeighbourSyncRequest {
   
   /**
-   * tell others, that there are update requests pending
+   * tell others, that there was an update request from neighbour with address <address>
    */
-  event void updateRequest();
+  event void updateRequest(am_addr_t address, uint16_t lplPeriod);
 }
 

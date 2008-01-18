@@ -62,6 +62,8 @@ enum {
   							// 50 is about 23ppm
   MAX_DRIFT_ERRORS = 5,	// number of false drifts until history is cleared, e.g. when neihgbour node has resetted
   MIN_MEASUREMENT_PERIOD = 32768U, // minimal drift measurement period in ticks
+  
+  RESYNC_AM_TYPE = 26, 
 };
 
 typedef struct {	// 16 + MEASURE_HISTORY_SIZE * 4 bytes

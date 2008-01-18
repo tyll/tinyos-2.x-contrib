@@ -201,16 +201,13 @@ implementation {
   Forwarder.LowPowerListening->Lpl;
 
   components CC2420PacketC,
-  new DsnCommandC("getTopology", uint8_t, 0) as GetTopologyCommand,
-  new DsnCommandC("set parent", am_addr_t, 1) as SetParentCommand,
-  UniqueReceiveC;
-  //GetTopologyCommand.DSN->DSNC;
+  new DsnCommandC("get topology", uint8_t, 0) as GetTopologyCommand,
+  new DsnCommandC("set parent", am_addr_t, 1) as SetParentCommand;
   Router.GetTopologyCommand->GetTopologyCommand;
-  //SetParentCommand.DSN->DSNC;
   Router.SetParentCommand->SetParentCommand;
+
   Router.CC2420Packet->CC2420PacketC;
   Forwarder.CC2420Packet->CC2420PacketC;
-  Forwarder.DuplicateReceive->UniqueReceiveC.DuplicateReceive;
 
 #if defined(PLATFORM_TELOSB) || defined(PLATFORM_MICAZ)
 #ifndef TOSSIM

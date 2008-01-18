@@ -168,10 +168,9 @@ generic module CtpForwardingEngineP() {
     interface AMPacket;
     interface CollectionDebug;
     interface Leds;
-    interface DSN;
+    interface DsnSend as DSN;
     interface LowPowerListening;
     interface CC2420Packet;
-    interface Receive as DuplicateReceive;
   }
 }
 implementation {
@@ -240,9 +239,8 @@ implementation {
   uint8_t lastQueueSize=0; 
 
   uint8_t fastPacketCount=0;
-
   uint16_t lplSleepInterval=0;
-
+  
   command error_t Init.init() {
     int i;
     for (i = 0; i < CLIENT_COUNT; i++) {
@@ -256,10 +254,9 @@ implementation {
     return SUCCESS;
   }
 
-
   command error_t StdControl.start() {
-    running = TRUE;
-    return SUCCESS;
+	  running = TRUE;
+	  return SUCCESS;
   }
 
   command error_t StdControl.stop() {
@@ -357,7 +354,6 @@ implementation {
       
       // send a debug message to the uart
       call CollectionDebug.logEvent(NET_C_FE_SEND_QUEUE_FULL);
-
       // Return the pool entry, as it's not for me...
       return FAIL;
     }
@@ -471,10 +467,17 @@ implementation {
       if (call SentCache.lookup(qe->msg)) {
         call CollectionDebug.logEvent(NET_C_FE_DUPLICATE_CACHE_AT_SEND);
         call SendQueue.dequeue();
-        if (call MessagePool.put(qe->msg) != SUCCESS)
-        	call CollectionDebug.logEvent(NET_C_FE_PUT_MSGPOOL_ERR);
-        if (call QEntryPool.put(qe) != SUCCESS)
-        	call CollectionDebug.logEvent(NET_C_FE_PUT_QEPOOL_ERR);
+        if (qe->client < CLIENT_COUNT) {
+        	call DSN.logDebug("cache: dequeue client msg");
+        	clientPtrs[qe->client] = qe;
+        }
+        else {
+        	call DSN.logDebug("cache: dequeue forward msg");
+        	if (call MessagePool.put(qe->msg) != SUCCESS)
+        		call DSN.logError("MessagePool put FAILED");
+        	if (call QEntryPool.put(qe) != SUCCESS)
+        		call DSN.logError("QEntryPool put FAILED");
+        }
         post sendTask();
         return;
       }
@@ -509,15 +512,11 @@ implementation {
       } else {
         // if receiver is a root or this is a subsequent packet, don't use lpl
         if (call CtpInfo.isOneHop() || fastPacketCount>0) {
-/*
-	  call DSN.logInt(gradient);
-	  call DSN.logInt(fastPacketCount);
-          call DSN.logDebug("no lpl (%i, %i)");
-*/
-          call LowPowerListening.setRxSleepInterval(qe->msg, 0);
+        	call LowPowerListening.setRxSleepInterval(qe->msg, 0);
         }
-        else
-          call LowPowerListening.setRxSleepInterval(qe->msg, lplSleepInterval);
+        else {
+        	call LowPowerListening.setRxSleepInterval(qe->msg, lplSleepInterval);
+        }
       }
       call CtpPacket.setEtx(qe->msg, gradient);
       
@@ -526,17 +525,9 @@ implementation {
       // Set or clear the congestion bit on *outgoing* packets.
       if (call CtpCongestion.isCongested())
         call CtpPacket.setOption(qe->msg, CTP_OPT_ECN);
-      else
+	  else
         call CtpPacket.clearOption(qe->msg, CTP_OPT_ECN);
-
       subsendResult = call SubSend.send(dest, qe->msg, payloadLen);
-      
-/*
-      if (subsendResult != SUCCESS) {
-		call DSN.logInt(subsendResult);
-      		call DSN.logDebug("forwarding subsend result:%i");
-	}
-*/
       if (subsendResult == SUCCESS) {
         // Successfully submitted to the data-link layer.
         sending = TRUE;
@@ -559,20 +550,37 @@ implementation {
       	call CollectionDebug.logEvent(NET_C_FE_SUBSEND_OFF);
       }
       else if (subsendResult == EBUSY) {
-	// This shouldn't happen, as we sit on top of a client and
+    	// This shouldn't happen, as we sit on top of a client and
         // control our own output; it means we're trying to
         // double-send (bug). This means we expect a sendDone, so just
         // wait for that: when the sendDone comes in, // we'll try
         // sending this packet again.	
-	dbg("Forwarder", "%s: subsend failed from EBUSY.\n", __FUNCTION__);
+    	  dbg("Forwarder", "%s: subsend failed from EBUSY.\n", __FUNCTION__);
         // send a debug message to the uart
         call CollectionDebug.logEvent(NET_C_FE_SUBSEND_BUSY);
       }
       else if (subsendResult == ESIZE) {
-	dbg("Forwarder", "%s: subsend failed from ESIZE: truncate packet.\n", __FUNCTION__);
-	call Packet.setPayloadLength(qe->msg, call Packet.maxPayloadLength());
-	post sendTask();
-	call CollectionDebug.logEvent(NET_C_FE_SUBSEND_SIZE);
+          // dequeue
+          call SendQueue.dequeue();
+          if (qe->client < CLIENT_COUNT) {
+        	  call DSN.logDebug("dequeue client msg");
+        	  clientPtrs[qe->client] = qe;
+        	  signal Send.sendDone[qe->client](qe->msg, ESIZE);
+          }
+          else {
+        	  call DSN.logDebug("dequeue forward msg");
+        	  if (call MessagePool.put(qe->msg) != SUCCESS)
+        		  call DSN.logError("MessagePool put FAILED");
+        	  if (call QEntryPool.put(qe) != SUCCESS)
+        		  call DSN.logError("QEntryPool put FAILED");
+          }
+          post sendTask();
+          /*
+    	  dbg("Forwarder", "%s: subsend failed from ESIZE: truncate packet.\n", __FUNCTION__);
+    	  call Packet.setPayloadLength(qe->msg, call Packet.maxPayloadLength());
+    	  post sendTask();
+    	  call CollectionDebug.logEvent(NET_C_FE_SUBSEND_SIZE);
+    	  */
       }
     }
   }
@@ -607,7 +615,7 @@ implementation {
 	call DSN.logInt( msg_metadata->ack);
 	call DSN.logWarning("dst: %i, meta: %ims, lpl# %i, samples %i, ack %i");
 */
-
+    	
     if (qe == NULL || qe->msg != msg) {
       dbg("Forwarder", "%s: BUG: not our packet (%p != %p)!\n", __FUNCTION__, msg, qe->msg);
       sendDoneBug();      // Not our packet, something is very wrong...
@@ -628,7 +636,8 @@ implementation {
       call CollectionDebug.logEventMsg(NET_C_FE_SENDDONE_FAIL, 
 					 call CollectionPacket.getSequenceNumber(msg), 
 					 call CollectionPacket.getOrigin(msg), 
-                                         call AMPacket.destination(msg));
+                     call AMPacket.destination(msg));
+      call DSN.logError("send failed");
       startRetxmitTimer(SENDDONE_FAIL_WINDOW, SENDDONE_FAIL_OFFSET);
     }
     else if (ackPending && !call PacketAcknowledgements.wasAcked(msg)) {
@@ -641,7 +650,7 @@ implementation {
       call DSN.logWarning("noAck > %i");
 */
       fastPacketCount=0;
-      if (--qe->retries) { 
+      if (--qe->retries) {
         dbg("Forwarder", "%s: not acked\n", __FUNCTION__);
         call CollectionDebug.logEventMsg(NET_C_FE_SENDDONE_WAITACK, 
 					 call CollectionPacket.getSequenceNumber(msg), 
@@ -664,10 +673,7 @@ implementation {
         if (qe->client < CLIENT_COUNT) {
             clientPtrs[qe->client] = qe;
             signal Send.sendDone[qe->client](msg, FAIL);
-            call CollectionDebug.logEventMsg(NET_C_FE_SENDDONE_FAIL_ACK_SEND, 
-					 call CollectionPacket.getSequenceNumber(msg), 
-					 call CollectionPacket.getOrigin(msg), 
-                                         call AMPacket.destination(msg));
+            call CollectionDebug.logEventMsg(NET_C_FE_SENDDONE_FAIL_ACK_SEND, call CollectionPacket.getSequenceNumber(msg),	call CollectionPacket.getOrigin(msg), call AMPacket.destination(msg));
         } else {
            if (call MessagePool.put(qe->msg) != SUCCESS)
              call CollectionDebug.logEvent(NET_C_FE_PUT_MSGPOOL_ERR);
@@ -688,12 +694,8 @@ implementation {
       uint8_t client = qe->client;
       dbg("Forwarder", "%s: our packet for client %hhu, remove %p from queue\n", 
           __FUNCTION__, client, qe);
-      call CollectionDebug.logEventMsg(NET_C_FE_SENT_MSG, 
-					 call CollectionPacket.getSequenceNumber(msg), 
-					 call CollectionPacket.getOrigin(msg), 
-                                         call AMPacket.destination(msg));
+      call CollectionDebug.logEventMsg(NET_C_FE_SENT_MSG, call CollectionPacket.getSequenceNumber(msg), call CollectionPacket.getOrigin(msg), call AMPacket.destination(msg));
       call LinkEstimator.txAck(call AMPacket.destination(msg));
-      //call Leds.led0Toggle();
       clientPtrs[client] = qe;
       hdr = getHeader(qe->msg);
       call SendQueue.dequeue();
@@ -710,12 +712,6 @@ implementation {
     }
     else if (call MessagePool.size() < call MessagePool.maxSize()) {
       // A successfully forwarded packet.
-/*
-	call DSN.logInt(call AMPacket.destination(qe->msg));
-	call DSN.logInt(call CtpPacket.getOrigin(qe->msg));
-	call DSN.logInt(call CtpPacket.getSequenceNumber(qe->msg));
-	call DSN.logDebug("forwarded packet to %i [%i,%i]");
-*/
       dbg("Forwarder,Route", "%s: successfully forwarded packet (client: %hhu), message pool is %hhu/%hhu.\n", __FUNCTION__, qe->client, call MessagePool.size(), call MessagePool.maxSize());
       call CollectionDebug.logEventMsg(NET_C_FE_FWD_MSG, 
 					 call CollectionPacket.getSequenceNumber(msg), 
@@ -745,10 +741,6 @@ implementation {
       // someone has double-stored a pointer somewhere and we have nowhere
       // to put this, so we have to leak it...
     }
-    /*
-    call DSN.logInt(fastPacketCount);
-    call DSN.logDebug("%i fast packets");
-    */
   }
 
   /*
@@ -785,14 +777,12 @@ implementation {
         call CollectionDebug.logEvent(NET_C_FE_GET_QEPOOL_ERR);
         return m;
       }
-
       memset(newMsg, 0, sizeof(message_t));
       memset(m->metadata, 0, sizeof(message_metadata_t));
       
       qe->msg = m;
       qe->client = 0xff;
       qe->retries = MAX_RETRIES;
-
       
       if (call SendQueue.enqueue(qe) == SUCCESS) {
         dbg("Forwarder,Route", "%s forwarding packet %p with queue size %hhu\n", __FUNCTION__, m, call SendQueue.size());
@@ -863,11 +853,7 @@ implementation {
     thl = call CtpPacket.getThl(msg);
     thl++;
     call CtpPacket.setThl(msg, thl);
-
-    call CollectionDebug.logEventMsg(NET_C_FE_RCV_MSG,
-					 call CollectionPacket.getSequenceNumber(msg), 
-					 call CollectionPacket.getOrigin(msg), 
-                                         call AMPacket.destination(msg));
+    call CollectionDebug.logEventMsg(NET_C_FE_RCV_MSG, call CollectionPacket.getSequenceNumber(msg), call CollectionPacket.getOrigin(msg), call AMPacket.destination(msg));
     if (len > call SubSend.maxPayloadLength()) {
       return msg;
     }
@@ -886,11 +872,11 @@ implementation {
     //... and in the queue for duplicates
     if (call SendQueue.size() > 0) {
       for (i = call SendQueue.size(); --i;) {
-	qe = call SendQueue.element(i);
-	if (call CtpPacket.matchInstance(qe->msg, msg)) {
-	  duplicate = TRUE;
-	  break;
-	}
+    	  qe = call SendQueue.element(i);
+    	  if (call CtpPacket.matchInstance(qe->msg, msg)) {
+    		  duplicate = TRUE;
+    		  break;
+    	  }
       }
     }
     
@@ -1126,16 +1112,6 @@ implementation {
     }
     default command error_t CollectionDebug.logEventRoute(uint8_t type, am_addr_t parent, uint8_t hopcount, uint16_t metric) {
         return SUCCESS;
-    }
-
-    void event DSN.receive(void * msg, uint8_t len){}
-
-    event message_t * DuplicateReceive.receive(message_t* msg, void* payload, uint8_t len) {
-	if (call AMPacket.destination(msg)!=AM_BROADCAST_ADDR) {
-		call DSN.logInt(call AMPacket.source(msg));
-		call DSN.logDebug("duplicate from %i");
-	}
-	return msg;
     }
 
   /****************** CollectionLowPowerListening commands *******/

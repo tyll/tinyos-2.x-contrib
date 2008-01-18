@@ -65,13 +65,16 @@ typedef nx_struct cc2420_footer_t {
 } cc2420_footer_t;
 
 /**
- * CC2420 Packet metadata. Contains extra information about the message
- * that will not be transmitted
- */
+  * CC2420 Packet metadata. Contains extra information about the message
+  * that will not be transmitted.
+  *
+  * Note that the first two bytes automatically take in the values of the
+  * FCS when the payload is full. Do not modify the first two bytes of metadata.
+  */
 typedef nx_struct cc2420_metadata_t {
-  nx_uint8_t tx_power;
   nx_uint8_t rssi;
   nx_uint8_t lqi;
+  nx_uint8_t tx_power;
   nx_bool crc;
   nx_bool ack;
   nx_uint16_t time;

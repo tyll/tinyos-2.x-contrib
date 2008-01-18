@@ -322,8 +322,8 @@ implementation {
     uint8_t* buf = (uint8_t*) call CC2420PacketBody.getHeader( m_p_rx_buf );;
     
     metadata->crc = buf[ rxFrameLength ] >> 7;
-    metadata->rssi = buf[ rxFrameLength - 1 ];
     metadata->lqi = buf[ rxFrameLength ] & 0x7f;
+    metadata->rssi = buf[ rxFrameLength - 1 ];
     m_p_rx_buf = signal Receive.receive( m_p_rx_buf, m_p_rx_buf->data, 
                                          rxFrameLength );
 

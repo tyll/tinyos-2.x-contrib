@@ -39,7 +39,16 @@ Each keyword must be located at the beginning of the line in the file.
  - Any make extra's required to compile
  - Multiple @extra keywords are allowed.  They are separated with " "'s in the
    make line
- 
+ - Reference .extra files here.
+
+@cflag OR @cflags <CFLAGS+=>[compile flags]
+  Examples:
+    @cflags -I../../Mydirectory
+    @cflag -DPACKET_LINK
+    @cflags -DPACKET_LINK
+    @cflag CFLAGS+=-DPACKET_LINK
+    @cflags CFLAGS+=-DPACKET_LINK
+  
 @assertions <#>
  - If you have a single test that will make more than 5 assertions in a row, 
    use this option to bump up the default number of message_t's used by

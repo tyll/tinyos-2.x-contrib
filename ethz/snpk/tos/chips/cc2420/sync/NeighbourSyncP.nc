@@ -630,16 +630,20 @@ implementation {
   bool tableFull() {
     return numEntries >= NEIGHBOURSYNCTABLESIZE;
   }
+  
+  void initTableEntry(neighbour_sync_item_t* entry) {
+	  entry->measurementCount = 0;
+	  entry->usageCount = 0;
+	  entry->failCount = 0;
+	  entry->drift = NO_VALID_DRIFT;
+	  entry->dirty = FALSE;
+	  entry->driftLimitCount=0;
+  }
 
   uint8_t addNewEntry (am_addr_t lladdr) {
     if (tableFull()) return NO_ENTRY;
+    initTableEntry(&n_table[numEntries]);
     n_table[numEntries].address = lladdr;
-    n_table[numEntries].measurementCount = 0;
-    n_table[numEntries].usageCount = 0;
-    n_table[numEntries].failCount = 0;
-    n_table[numEntries].drift = NO_VALID_DRIFT;
-    n_table[numEntries].dirty = FALSE;
-    n_table[numEntries].driftLimitCount=0;
     return numEntries++;
   }
 
@@ -654,13 +658,8 @@ implementation {
         minUsageCount=n_table[(i+lastReplaceIndex) % NEIGHBOURSYNCTABLESIZE].usageCount;
         minUsageIndex=(i+lastReplaceIndex) % NEIGHBOURSYNCTABLESIZE;
       }
+    initTableEntry(&n_table[minUsageIndex]);
     n_table[minUsageIndex].address = lladdr;
-    n_table[numEntries].measurementCount = 0;
-    n_table[minUsageIndex].usageCount = 0;
-    n_table[minUsageIndex].failCount = 0;
-    n_table[minUsageIndex].drift = NO_VALID_DRIFT;
-    n_table[minUsageIndex].dirty = FALSE;
-    n_table[minUsageIndex].driftLimitCount=0;
     lastReplaceIndex=minUsageIndex;
     return minUsageIndex;
   }

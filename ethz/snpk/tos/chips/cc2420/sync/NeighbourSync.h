@@ -67,17 +67,18 @@ enum {
 };
 
 typedef struct {	// 16 + MEASURE_HISTORY_SIZE * 4 bytes
-  am_addr_t address;
-  uint32_t wakeupTimestamp[MEASURE_HISTORY_SIZE];
-  uint32_t wakeupAverage;
-  bool odd;
-  uint8_t measurementCount;
-  uint16_t usageCount;
-  uint8_t failCount;
-  uint8_t driftLimitCount;
-  uint16_t lplPeriod; // in ms
-  int16_t drift;
-  bool dirty;
+  am_addr_t address; // 0
+  uint32_t wakeupTimestamp[MEASURE_HISTORY_SIZE]; // 2
+  uint32_t wakeupAverage; // 18
+  bool odd; // 22
+  uint8_t measurementCount; // 23
+  uint16_t usageCount; // 24
+  uint8_t failCount; // 26
+  uint8_t driftLimitCount; // 27
+  uint16_t lplPeriod; // in ms 28
+  int16_t drift; // 30
+  bool dirty; // 32
+  // align to word address -> struct size = 34, when MEASURE_HISTORY_SIZE==4
 } neighbour_sync_item_t;
 
 typedef nx_struct {

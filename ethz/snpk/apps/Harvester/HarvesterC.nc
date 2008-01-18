@@ -102,7 +102,7 @@ implementation {
   components new CollectionSenderC(AM_HARVESTERSENSOR) as SensorCollectionSender;
   HarvesterP.SensorReceive -> Collector.Receive[AM_HARVESTERSENSOR];
   HarvesterP.SensorSend -> SensorCollectionSender;
-  
+    
   // radio communication topology
   components new CollectionSenderC(AM_HARVESTERTOPOLOGY) as TopologyCollectionSender;
   HarvesterP.TopologyReceive -> Collector.Receive[AM_HARVESTERTOPOLOGY];

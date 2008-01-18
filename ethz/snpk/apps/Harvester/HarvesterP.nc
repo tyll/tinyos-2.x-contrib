@@ -111,7 +111,7 @@ implementation {
   static void report_received(message_t* msg);
 
   uint8_t uartlen;
-  message_t sendbuf;
+  message_t sensorsendbuf, topologysendbuf, statussendbuf;
   message_t uartbuf;
   harvester_topology_t * tinfo;
   uint8_t sensor_sn=0, topology_sn=0, status_sn=0;
@@ -338,11 +338,11 @@ implementation {
   event void SensorTimer.fired() {
 	error_t err;
    	if (!sendSensorBusy) {
-		harvester_sensor_t *o = (harvester_sensor_t *)call SensorSend.getPayload(&sendbuf, sizeof(harvester_sensor_t));
+		harvester_sensor_t *o = (harvester_sensor_t *)call SensorSend.getPayload(&sensorsendbuf, sizeof(harvester_sensor_t));
 		local.dsn=sensor_sn++;
 		local.id=TOS_NODE_ID;
 		memcpy(o, &local, sizeof(local));
-		err = call SensorSend.send(&sendbuf, sizeof(local));
+		err = call SensorSend.send(&sensorsendbuf, sizeof(local));
 		if (err == SUCCESS)
 			sendSensorBusy = TRUE;
         else {
@@ -354,6 +354,8 @@ implementation {
     else {
   		call DSN.logError("Radio busy while sending SensorData");
     }  	
+   	local.light1=0;
+   	local.light2=0;
     if (call ReadExternalTemperature.read() != SUCCESS)
     	fatal_problem();
   }
@@ -375,6 +377,7 @@ implementation {
 		  data = 0xffff;
 		  report_problem();
 	  }
+	  local.light1|=result;
 	  local.temp_external = data;
 	  if (call ReadExternalHumidity.read() != SUCCESS)
 		  fatal_problem();
@@ -385,6 +388,7 @@ implementation {
          data = 0xffff;
          report_problem();
        }
+       local.light1|=result<<4;
        local.hum_external = data;
        if (call ReadInternalTemperature.read() != SUCCESS)
          fatal_problem();
@@ -395,6 +399,7 @@ implementation {
 		  data = 0xffff;
 		  report_problem();
 	  }
+	  local.light2|=result;
 	  local.temp_internal = data;
 	  if (call ReadInternalHumidity.read() != SUCCESS)
 		  fatal_problem();
@@ -405,6 +410,7 @@ implementation {
            data = 0xffff;
            report_problem();
          }
+         local.light2|=result<<4;
          local.hum_internal = data;
          if (call ReadVoltage.read() != SUCCESS)
            fatal_problem();
@@ -449,7 +455,7 @@ implementation {
   	uint8_t numNeighbours;
   	
   	if (!sendTopologyBusy) {
-  		harvester_topology_t *info = (harvester_topology_t *)call TopologySend.getPayload(&sendbuf, sizeof(harvester_topology_t));
+  		harvester_topology_t *info = (harvester_topology_t *)call TopologySend.getPayload(&topologysendbuf, sizeof(harvester_topology_t));
   		for (i=0;i<5;i++)
   			info->neighbour_id[i]=0xffff;
   		if (call CtpInfo.getParent(&parent)==SUCCESS) {
@@ -467,7 +473,7 @@ implementation {
 		}
 		info->id=TOS_NODE_ID;
 		info->dsn=topology_sn++;
-		err=call TopologySend.send(&sendbuf, sizeof(harvester_topology_t));
+		err=call TopologySend.send(&topologysendbuf, sizeof(harvester_topology_t));
 		if (err == SUCCESS) {
 			sendTopologyBusy = TRUE;
 		}
@@ -502,12 +508,12 @@ implementation {
   event void StatusTimer.fired() {
   	error_t err;
   	if (!sendStatusBusy) {
-  		harvester_status_t * status = (harvester_status_t *)call StatusSend.getPayload(&sendbuf, sizeof(harvester_status_t));
+  		harvester_status_t * status = (harvester_status_t *)call StatusSend.getPayload(&statussendbuf, sizeof(harvester_status_t));
 		status->id=TOS_NODE_ID;
 		status->dsn=status_sn++;
 		status->prog_version=IDENT_TIMESTAMP;
 
-		err=call StatusSend.send(&sendbuf, sizeof(harvester_status_t));
+		err=call StatusSend.send(&statussendbuf, sizeof(harvester_status_t));
 		if (err == SUCCESS) {
 			sendStatusBusy = TRUE;
 		}

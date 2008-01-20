@@ -13,8 +13,7 @@
  * @author Mustafa Yuecel <mustafa.yuecel@alumni.ethz.ch>
  */
 
-#include <stdint.h>
-#include <avr32/io.h>
+#include "at32uc3b.h"
 
 generic module HplAt32uc3bGeneralIOLocalBusP(uint32_t baseport, uint8_t bit)
 {

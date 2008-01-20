@@ -15,11 +15,13 @@
  *          intended use.
  */
 
-generic module At32uc3bGpioLocalBusC() {
+generic module At32uc3bGpioLocalBusC()
+{
   provides interface GeneralIO;
   uses interface GeneralIO as HplGeneralIO;
 }
-implementation {
+implementation
+{
   async command void GeneralIO.set() { call HplGeneralIO.set(); }
   async command void GeneralIO.clr() { call HplGeneralIO.clr(); }
   async command void GeneralIO.toggle() { call HplGeneralIO.toggle(); }

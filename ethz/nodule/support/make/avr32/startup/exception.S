@@ -88,7 +88,6 @@ _handle_exception:
   lsl     r12, 2 /* Shift to get evba offset. */
   lddsp   r11, sp[4+6*4]
   mcall   handle_exception
-_exception_return:
   stdsp   sp[4+6*4], r12
   popm    r8-r9, r10, r11, r12,lr
   rete

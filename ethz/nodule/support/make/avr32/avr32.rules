@@ -29,6 +29,7 @@ MAIN_EXE = $(BUILDDIR)/main.exe
 MAIN_MAP = $(BUILDDIR)/main.map
 MAIN_DUMP = $(BUILDDIR)/main.dump
 MAIN_SYM = $(BUILDDIR)/main.sym
+MAIN_S = $(BUILDDIR)/main.s
 MAIN_IHEX = $(BUILDDIR)/main.ihex
 INSTALL_EXE = $(MAIN_EXE).out$(if $(NODEID),-$(NODEID),)
 INSTALL_IHEX = $(MAIN_IHEX).out$(if $(NODEID),-$(NODEID),)
@@ -98,7 +99,7 @@ exe: exe0 bytes FORCE
 exe0: builddir $(BUILD_EXTRA_DEPS) FORCE
 	@echo "    compiling $(COMPONENT) to a $(PLATFORM) binary"
 	$(NCC) -o $(MAIN_EXE) $(OPTFLAGS) $(PFLAGS) $(CFLAGS) $(LDFLAGS) $(STARTUP_FILES) $(LIBS_FILES) $(COMPONENT).nc
-	@$(OBJDUMP) -x $(MAIN_EXE) > $(MAIN_DUMP)
+	@$(OBJDUMP) --all-headers $(MAIN_EXE) > $(MAIN_DUMP)
 	@$(NM) $(MAIN_EXE) > $(MAIN_SYM)
 	@echo "    compiled $(COMPONENT) to $(MAIN_EXE)"
 
@@ -106,7 +107,9 @@ builddir: FORCE
 	mkdir -p $(BUILDDIR)
 
 bytes: FORCE
-	@$(OBJDUMP) -h $(MAIN_EXE) | perl -ne \
+	@$(OBJDUMP) --section-headers $(MAIN_EXE) | perl -ne \
           '$$b{$$1}=hex $$2 if /^\s*\d+\s*\.(exception|interrupt|text|data|bss)\s+(\S+)/; END { printf("%16d bytes in ROM\n%16d bytes in RAM\n",$$b{interrupt}+$$b{exception}+$$b{text}+$$b{data},$$b{data}+$$b{bss}); }'
+	@$(OBJDUMP) --disassemble $(MAIN_EXE) > $(MAIN_S)
+	@echo "    disassembled $(PLATFORM) binary"
 	@echo "    section size requirements of $(COMPONENT) ($(SIZE))"
 	@$(SIZE) --format=sysv -x $(MAIN_EXE)

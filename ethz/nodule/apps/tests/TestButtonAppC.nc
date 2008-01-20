@@ -16,13 +16,16 @@ implementation
   components SystemLedC;
   TestButtonC.SystemLed -> SystemLedC;
 
-  components HplAt32uc3bGeneralIOC as Gpio;
+  components
+    HplAt32uc3bGeneralIOC as IO,
+    HplAt32uc3bGpioInterruptC as Interrupt;
 
   components new At32uc3bGpioC() as GpioImpl1;
-  GpioImpl1.HplGeneralIO -> Gpio.Gpio34;
+  GpioImpl1.HplGeneralIO -> IO.Gpio34;
   TestButtonC.Button1 -> GpioImpl1;
+  TestButtonC.InterruptButton1 -> Interrupt.Gpio34;
 
   components new At32uc3bGpioC() as GpioImpl2;
-  GpioImpl2.HplGeneralIO -> Gpio.Gpio35;
+  GpioImpl2.HplGeneralIO -> IO.Gpio35;
   TestButtonC.Button2 -> GpioImpl2;
 }

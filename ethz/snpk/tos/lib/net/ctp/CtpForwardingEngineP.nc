@@ -754,12 +754,18 @@ implementation {
       dbg("Route", "%s cannot forward, message pool empty.\n", __FUNCTION__);
       // send a debug message to the uart
       call CollectionDebug.logEvent(NET_C_FE_MSG_POOL_EMPTY);
+      call DSN.logInt(call CtpPacket.getOrigin(m));
+      call DSN.logInt(call CtpPacket.getSequenceNumber(m));
+      call DSN.log("forwarder pool empty [%i,%i]");
     }
     else if (call QEntryPool.empty()) {
       dbg("Route", "%s cannot forward, queue entry pool empty.\n", 
           __FUNCTION__);
       // send a debug message to the uart
       call CollectionDebug.logEvent(NET_C_FE_QENTRY_POOL_EMPTY);
+      call DSN.logInt(call CtpPacket.getOrigin(m));
+      call DSN.logInt(call CtpPacket.getSequenceNumber(m));
+      call DSN.log("forwarder queue empty [%i,%i]");
     }
     else {
       message_t* newMsg;

@@ -51,6 +51,7 @@ implementation {
       BlazeInitP,
       BlazeSpiC,
       BlazeCentralWiringC,
+      HplRadioResetC,
       new BlazeSpiResourceC() as ResetResourceC,
       new BlazeSpiResourceC() as DeepSleepResourceC;
       

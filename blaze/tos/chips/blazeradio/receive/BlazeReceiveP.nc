@@ -336,8 +336,8 @@ implementation {
     myRssi = buf[ rxFrameLength + 1 ];
     myLqi = buf[ rxFrameLength + 2 ] & 0x7F;
     
-    metadata->rssi = myRssi;
     metadata->lqi = myLqi;
+    metadata->rssi = myRssi;
     
     atomicMsg = signal Receive.receive[atomicId]( m_msg, m_msg->data, rxFrameLength );
     

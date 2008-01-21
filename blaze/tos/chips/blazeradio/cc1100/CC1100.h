@@ -317,6 +317,9 @@ enum CC1100_config_reg_state_enums {
   /** Switch to TX only on CCA; When done with Tx or Rx, stay in Rx */
   CC1100_CONFIG_MCSM1 = 0x3F,
   CC1100_CONFIG_MCSM0 = 0x1C,
+  
+  /*  
+   * The rest is taken care of by default radio settings
   CC1100_CONFIG_FOCCFG = 0x1D,
   CC1100_CONFIG_BSCFG = 0x1C,
   CC1100_CONFIG_AGCTRL2 = 0xC7,
@@ -331,7 +334,8 @@ enum CC1100_config_reg_state_enums {
   CC1100_CONFIG_FSCAL2 = 0x2A,
   CC1100_CONFIG_FSCAL1 = 0x00,
   CC1100_CONFIG_FSCAL0 = 0x11,
-
+   */
+   
 };
 
 

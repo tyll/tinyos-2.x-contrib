@@ -1,0 +1,3 @@
+COMPONENT=AutomaticPorC
+include $(MAKERULES)
+

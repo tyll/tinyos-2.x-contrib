@@ -219,6 +219,10 @@ implementation {
        			}
        			call DSN.log("calculations time:%i base:%i delay:%i etf:%i");
 #endif        		
+       			if (wakeup_delay > 0x10000) { // warn if timing is longer than 2s
+       				call DSN.logInt(wakeup_delay);
+       				call DSN.logWarning("long delay %i");
+       			}
         	}
         	else {
         		meta->rxInterval=20;

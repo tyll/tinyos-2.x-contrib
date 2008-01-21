@@ -72,6 +72,9 @@ module PowerCycleP {
     interface ReceiveIndicator as EnergyIndicator;
     interface ReceiveIndicator as ByteIndicator;
     interface ReceiveIndicator as PacketIndicator;
+    
+    interface DsnCommand<uint8_t> as GetStatsCommand;
+    interface DsnSend;
   }
 }
 
@@ -96,6 +99,7 @@ implementation {
     S_TURNING_OFF,
   };
   
+  uint32_t n_long_cycles=0, n_cycles=0;
   
   /***************** Prototypes ****************/
   task void stopRadio();
@@ -284,10 +288,11 @@ implementation {
         	  }
           }
         }
-        
+        n_cycles++;
         for( ; ccaChecks < MAX_LPL_CCA_CHECKS && call SendState.isIdle(); ccaChecks++) {
           if(call PacketIndicator.isReceiving()) { // packet receiving
             signal PowerCycle.detected();
+            n_long_cycles++;
             return;
           }
           
@@ -298,6 +303,7 @@ implementation {
               firstDetected = TRUE;
             if(detects > MIN_SAMPLES_BEFORE_DETECT) { // if we have MIN_SAMPLES_BEFORE_DETECT + 1 consecutive non-cca samples
               signal PowerCycle.detected();
+              n_long_cycles++;
               return;
             }
             // Leave the radio on for upper layers to perform some transaction
@@ -346,6 +352,14 @@ implementation {
     
     return FALSE;
   }
+  
+  event void GetStatsCommand.detected(uint8_t * values, uint8_t n) {
+      call DsnSend.logInt(n_cycles);
+      call DsnSend.logInt(n_long_cycles);
+      call DsnSend.logInt(call RadioPowerState.getState());
+      call DsnSend.log("PowerCycle: %i %i %i");
+    }
+  
   
   /**************** Defaults ****************/
   default event void PowerCycle.detected() {

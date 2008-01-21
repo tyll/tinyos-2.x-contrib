@@ -34,6 +34,7 @@
 configuration SendStatsC {
   provides {
     interface Send;
+    interface DsnCommand<uint8_t>;
   }
   uses {
     interface Send as SubSend;
@@ -50,6 +51,8 @@ implementation {
 
   Send = SendStatsP.Send;
   SubSend = SendStatsP.SubSend;
+  
+  DsnCommand = GetStatsCommand;
   
   SendStatsP.DSN -> DSNC;
   SendStatsP.GetStatsCommand -> GetStatsCommand;

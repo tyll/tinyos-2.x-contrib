@@ -79,6 +79,10 @@ implementation {
   PowerCycleP.SplitControlState -> SplitControlStateC;
   PowerCycleP.OnTimer -> OnTimerC;
   PowerCycleP.Leds -> LedsC;
+  
+  components SendStatsC, DSNC;
+  PowerCycleP.DsnSend -> DSNC;
+  PowerCycleP.GetStatsCommand -> SendStatsC;
     
 }
 

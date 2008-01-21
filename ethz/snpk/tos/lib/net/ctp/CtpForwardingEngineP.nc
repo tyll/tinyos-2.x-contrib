@@ -702,7 +702,7 @@ implementation {
       signal Send.sendDone[client](msg, SUCCESS);
       sending = FALSE;
       if (fastPacketCount<MAX_FAST_PACKETS) {
-      	startRetxmitTimer(SENDDONE_OK_WINDOW, SENDDONE_OK_OFFSET+fastPacketCount*FASTPACKET_DELAY);
+      	startRetxmitTimer(SENDDONE_OK_WINDOW, SENDDONE_OK_OFFSET);
       	fastPacketCount++;
       }
       else {

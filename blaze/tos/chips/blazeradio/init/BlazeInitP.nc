@@ -68,6 +68,7 @@ module BlazeInitP {
     interface GeneralIO as Power[ radio_id_t id ];
     interface GpioInterrupt as Gdo0_int[ radio_id_t id ];
     interface GpioInterrupt as Gdo2_int[ radio_id_t id ];
+    interface RadioReset[ radio_id_t id ];
     
     interface BlazeRegSettings[ radio_id_t id ];
     interface RadioStatus;
@@ -288,7 +289,8 @@ implementation {
     call PaReg.write(call BlazeRegSettings.getPa[ m_id ]());
     
     call SRX.strobe();
-    while(call RadioStatus.getRadioStatus() != BLAZE_S_RX){
+    while(call RadioStatus.getRadioStatus() != BLAZE_S_RX) {
+      /*
       ////call Leds.set(5);
       cnt++;
       
@@ -315,6 +317,7 @@ implementation {
         call SFRX.strobe();
         call SFTX.strobe();
         call SRX.strobe();
+        */
       }
     }
         
@@ -339,32 +342,21 @@ implementation {
     uint8_t cnt = 0;
     atomic id = m_id;
     
-    call Csn.set[id]();
+    call RadioReset.blockUntilPowered[id]();
+    
     call Csn.clr[id]();
     
-    /*
-     * This next line may be the first SPI command given to the radio 
-     * immediately after boot. Loop until CHIP_RDY is low in the 
-     * status byte.  This demonstrates the crystal oscillator is running 
-     * and the regulated digital supply voltage is stable.  Then we reset.
-     */
-    //call Pins.set64();
-    
-    call SRES.strobe();
-    call Csn.set[id]();
-    call Csn.clr[id]();
-
     while((call SNOP.strobe() & 0x80) != 0){
-      ////call Leds.set(6);
+      /*
       cnt++;
       if(cnt == 0xFF) {
         call Csn.set[id]();
         call Csn.clr[id](); 
         cnt = 0;
       }
+      */
     }
     
-    //call Pins.clr64();
     call Csn.set[id]();
     
     if(state[id] == S_STARTING || state[id] == S_COMMITTING) {

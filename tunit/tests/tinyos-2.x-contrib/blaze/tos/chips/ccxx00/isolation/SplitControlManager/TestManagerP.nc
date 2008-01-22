@@ -84,6 +84,9 @@ implementation {
       assertFail("start() failed");
       call TestAlreadyOn.done();
     }
+    
+    assertEquals("Trying to turn off while starting", EBUSY, call SplitControl.stop[focusedRadio]());
+    
   }
   
   event void TestAlreadyOff.run() {

@@ -1,0 +1,3 @@
+COMPONENT=TestManagerC
+include $(MAKERULES)
+

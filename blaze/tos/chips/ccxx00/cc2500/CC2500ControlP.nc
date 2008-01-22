@@ -1,0 +1,304 @@
+/*
+ * Copyright (c) 2005-2006 Rincon Research Corporation
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * - Redistributions of source code must retain the above copyright
+ *   notice, this list of conditions and the following disclaimer.
+ * - Redistributions in binary form must reproduce the above copyright
+ *   notice, this list of conditions and the following disclaimer in the
+ *   documentation and/or other materials provided with the
+ *   distribution.
+ * - Neither the name of the Rincon Research Corporation nor the names of
+ *   its contributors may be used to endorse or promote products derived
+ *   from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE
+ * RINCON RESEARCH OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+ * OF THE POSSIBILITY OF SUCH DAMAGE
+ */
+ 
+/**
+ * Manage the CC2500 SPI connection
+ * @author Jared Hill
+ * @author David Moss
+ * @author Roland Hendel
+ */
+ 
+#include "Blaze.h"
+#include "CC2500.h"
+#include "AM.h"
+
+module CC2500ControlP {
+
+  provides {
+    interface Init as SoftwareInit;
+    interface BlazeRegSettings;
+    interface BlazeConfig;
+  }
+
+  uses {
+    interface GeneralIO as Csn;
+    interface GeneralIO as Power;
+    interface GeneralIO as Gdo0_io;
+    interface GeneralIO as Gdo2_io;
+    interface ActiveMessageAddress;
+    interface BlazeCommit;
+    interface Leds;
+  }
+}
+
+implementation {
+
+  /** The personal area network address for this radio */
+  uint16_t panAddress;
+  
+  /** TRUE if address recognition is enabled */
+  bool addressRecognition;
+  
+  /** TRUE if PAN recognition is enabled */
+  bool panRecognition;
+  
+  /** TRUE if we should auto-acknowledge packets if an ack is requested */
+  bool autoAck;
+  
+  /** Default register values. Change the configuration by editing CC2500.h */
+  uint8_t regValues[] = {
+      CC2500_CONFIG_IOCFG2, 
+      CC2500_CONFIG_IOCFG1, 
+      CC2500_CONFIG_IOCFG0,
+      CC2500_CONFIG_FIFOTHR, 
+      CC2500_CONFIG_SYNC1, 
+      CC2500_CONFIG_SYNC0, 
+      CC2500_CONFIG_PKTLEN,
+      CC2500_CONFIG_PKTCTRL1, 
+      CC2500_CONFIG_PKTCTRL0, 
+      CC2500_CONFIG_ADDR, 
+      CC2500_CONFIG_CHANNR,
+      CC2500_CONFIG_FSCTRL1, 
+      CC2500_CONFIG_FSCTRL0, 
+      CC2500_CONFIG_FREQ2, 
+      CC2500_CONFIG_FREQ1,
+      CC2500_CONFIG_FREQ0, 
+      CC2500_CONFIG_MDMCFG4, 
+      CC2500_CONFIG_MDMCFG3, 
+      CC2500_CONFIG_MDMCFG2,
+      CC2500_CONFIG_MDMCFG1, 
+      CC2500_CONFIG_MDMCFG0, 
+      CC2500_CONFIG_DEVIATN, 
+      CC2500_CONFIG_MCSM2,
+      CC2500_CONFIG_MCSM1, 
+      CC2500_CONFIG_MCSM0, 
+  };
+  
+  
+  /***************** Prototypes ****************/
+  uint8_t freqToChannel( uint32_t freq );
+  uint32_t channelToFreq( uint8_t chan );
+  
+  /***************** SoftwareInit Commands ****************/
+  command error_t SoftwareInit.init() {
+    // Our header dest is an nxle. Match up our 8-bit address with it.
+    regValues[BLAZE_ADDR] = call ActiveMessageAddress.amAddress();
+    panAddress = TOS_AM_GROUP;
+    
+#if defined(NO_ACKNOWLEDGEMENTS)
+    autoAck = FALSE;
+#else
+    autoAck = TRUE;
+#endif
+
+#if defined(NO_ADDRESS_RECOGNITION)
+    regValues[CC2500_CONFIG_PKTCTRL1] &= 0xFC;
+    addressRecognition = FALSE;
+#else
+    regValues[CC2500_CONFIG_PKTCTRL1] |= 0x3;
+    addressRecognition = TRUE;
+#endif
+
+#if defined(NO_PAN_RECOGNITION)
+    panRecognition = FALSE;
+#else
+    panRecognition = TRUE;
+#endif
+
+    return SUCCESS;
+  }
+  
+  /***************** BlazeInit Commands ****************/
+  command uint8_t *BlazeRegSettings.getDefaultRegisters() {
+    return regValues;
+  }
+
+  command uint8_t BlazeRegSettings.getPa() {
+    return CC2500_PA;
+  }
+  
+  /***************** BlazeConfig Commands ****************/
+  
+  /**
+   * If changes have been made to the chip's configuration, those changes are
+   * currently stored in the microcontroller.  This command will commit those 
+   * changes to hardware.  It must be called for the changes to take effect.
+   * @return SUCCESS if the changes will be committed.
+   */
+  command error_t BlazeConfig.commit() {
+    return call BlazeCommit.commit();
+  }
+  
+  /**
+   * @param on TRUE to turn address recognition on, FALSE to turn it off
+   * You must call sync() after this to propagate changes to hardware
+   */
+  command void BlazeConfig.setAddressRecognition(bool on) {
+    atomic addressRecognition = on;
+    if(on) {
+      regValues[CC2500_CONFIG_PKTCTRL1] |= 0x3;
+    } else {
+      regValues[CC2500_CONFIG_PKTCTRL1] &= 0xFC;
+    }
+  }
+  
+  /**
+   * @return TRUE if address recognition is enabled
+   */
+  async command bool BlazeConfig.isAddressRecognitionEnabled() {
+    return addressRecognition;
+  }
+  
+  /** 
+   * @param on TRUE if we should only accept packets from other nodes in our PAN
+   */
+  command void BlazeConfig.setPanRecognition(bool on) {
+    atomic panRecognition = on;
+  }
+  
+  /**
+   * @return TRUE if PAN address recognition is enabled
+   */
+  async command bool BlazeConfig.isPanRecognitionEnabled() {
+    bool atomicPanEnabled;
+    atomic atomicPanEnabled = panRecognition;
+    return atomicPanEnabled;
+  }
+  
+  /**
+   * Sync must be called for acknowledgement changes to take effect
+   * @param enableAutoAck TRUE to enable auto acknowledgements
+   * @param hwAutoAck TRUE to default to hardware auto acks, FALSE to
+   *     default to software auto acknowledgements
+   */
+  command void BlazeConfig.setAutoAck(bool enableAutoAck) {
+    atomic autoAck = enableAutoAck;  
+  }
+  
+  /**
+   * @return TRUE if auto acks are enabled
+   */
+  async command bool BlazeConfig.isAutoAckEnabled() {
+    bool atomicAckEnabled;
+    atomic atomicAckEnabled = autoAck;
+    return atomicAckEnabled;
+  }
+  
+  
+  /** 
+   * This command is used to set the (approximate) frequency the radio.
+   * It uses the assumed base frequency, the assumed channel width and the changes the 
+   * value in the channel register.  
+   * @param freqKhz - the desired frequency in Khz to set the radio to
+   * @reutrn - FAIL if desired frequency is not in range, else SUCCESS
+   */
+  command error_t BlazeConfig.setFrequencyKhz( uint32_t freqKhz ) {
+    if((freqKhz > CC2500_FREQ_MAX) || (freqKhz < CC2500_FREQ_MIN)){
+      return FAIL;
+    } 
+    
+    regValues[BLAZE_CHANNR] = freqToChannel(freqKhz);
+    
+    return SUCCESS;
+  }
+  
+  /** 
+   * This command is used to get the current (approximate) frequency the radio is set to in KHz.
+   * It uses the assumed base frequency, the assumed channel width and the current value in the 
+   * channel register to calculate this.  
+   * @return approx. frequency in KHz
+   */
+  command uint32_t BlazeConfig.getFrequencyKhz() {
+    return channelToFreq(regValues[BLAZE_CHANNR]);
+  }
+  
+  /** 
+   * This command sets the value of the channel register on the radio
+   * @param chan - the value of the channel
+   * @return EINVAL if the channel is out of bounds
+   */
+  command error_t BlazeConfig.setChannel( uint8_t chan ) {
+    if(chan < CC2500_CHANNEL_MIN || chan > CC2500_CHANNEL_MAX) {
+      return EINVAL;
+    }
+    
+    regValues[BLAZE_CHANNR] = chan;
+    return SUCCESS;
+  }
+  
+  /** 
+   * This command returns the value of the channel register on the radio
+   * @return the value of the channel register
+   */
+  command uint8_t BlazeConfig.getChannel() {
+    return regValues[BLAZE_CHANNR];
+  }
+  
+  
+  /***************** ActiveMessageAddress Events ****************/
+  async event void ActiveMessageAddress.changed() {   
+    regValues[BLAZE_ADDR] = call ActiveMessageAddress.amAddress();
+    atomic panAddress = call ActiveMessageAddress.amGroup();
+    call BlazeCommit.commit();
+  }
+  
+  /***************** BlazeCommit Events ****************/
+  event void BlazeCommit.commitDone() {
+    signal BlazeConfig.commitDone();
+  }
+  
+  /***************** Functions ****************/
+  uint8_t freqToChannel( uint32_t freq ){
+  
+    uint32_t offset;
+    uint32_t rem;
+    uint8_t chann;
+    offset = freq - CC2500_FREQ_MIN;
+    rem = offset % CC2500_CHANNEL_WIDTH;
+    chann = (uint8_t)(offset / CC2500_CHANNEL_WIDTH); 
+    if(rem > (CC2500_CHANNEL_WIDTH >> 1)){
+      chann++;    
+    }
+    return chann;     
+  
+  }
+  
+  uint32_t channelToFreq( uint8_t chan ){
+  
+    uint32_t offset;
+    offset = (uint32_t)(((uint32_t)chan) * CC2500_CHANNEL_WIDTH);
+    return offset + CC2500_FREQ_MIN;
+  
+  }
+  
+  /***************** Defaults ****************/
+  default event void BlazeConfig.commitDone() {}
+}

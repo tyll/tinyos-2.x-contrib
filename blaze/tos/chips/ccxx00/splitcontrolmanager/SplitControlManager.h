@@ -1,0 +1,13 @@
+
+#ifndef SPLITCONTROLMANAGER_H
+#define SPLITCONTROLMANAGER_H
+
+typedef enum {
+  CCXX00_OFF,
+  CCXX00_TURNING_ON,
+  CCXX00_ON,
+  CCXX00_TURNING_OFF,
+} radio_state_t;
+
+
+#endif

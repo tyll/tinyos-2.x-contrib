@@ -317,8 +317,8 @@ implementation {
         call SFRX.strobe();
         call SFTX.strobe();
         call SRX.strobe();
-        */
-      }
+        
+      }*/
     }
         
     //call Pins.clr65();

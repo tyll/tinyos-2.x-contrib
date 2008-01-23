@@ -55,6 +55,7 @@ module CC2500ControlP {
     interface GeneralIO as Gdo2_io;
     interface ActiveMessageAddress;
     interface BlazeCommit;
+    interface SplitControlManager[radio_id_t radioId];
     interface Leds;
   }
 }
@@ -154,7 +155,13 @@ implementation {
    * @return SUCCESS if the changes will be committed.
    */
   command error_t BlazeConfig.commit() {
-    return call BlazeCommit.commit();
+    if(call SplitControlManager.isOn[CC2500_RADIO_ID]()) {
+      return call BlazeCommit.commit();
+      
+    } else {
+      // These changes will be automatically committed next time you turn it on.
+      return EOFF;
+    }
   }
   
   /**
@@ -273,6 +280,10 @@ implementation {
   /***************** BlazeCommit Events ****************/
   event void BlazeCommit.commitDone() {
     signal BlazeConfig.commitDone();
+  }
+   
+  /***************** SplitControlManager Events ****************/
+  event void SplitControlManager.stateChange[radio_id_t radioId]() {
   }
   
   /***************** Functions ****************/

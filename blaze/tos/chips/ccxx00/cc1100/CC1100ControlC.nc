@@ -46,7 +46,6 @@
 configuration CC1100ControlC {
   provides {
     interface SplitControl;
-    interface BlazePower;
     interface BlazeConfig;
   }
 }
@@ -70,7 +69,6 @@ implementation {
   
   components BlazeInitC;
   SplitControl = BlazeInitC.SplitControl[ CC1100_RADIO_ID ];
-  BlazePower = BlazeInitC.BlazePower[ CC1100_RADIO_ID ];
   CC1100ControlP.BlazeCommit -> BlazeInitC.BlazeCommit[ CC1100_RADIO_ID ];
   
   components BlazeCentralWiringC;
@@ -82,6 +80,9 @@ implementation {
   BlazeCentralWiringC.ChipGdo2_int[ CC1100_RADIO_ID ] -> Pins.Gdo2_int;
   BlazeCentralWiringC.ChipPower[ CC1100_RADIO_ID ] -> Pins.Power;
   BlazeCentralWiringC.ChipConfig[ CC1100_RADIO_ID ] -> CC1100ControlP.BlazeConfig;
+  
+  components SplitControlManagerC;
+  CC1100ControlP.SplitControlManager -> SplitControlManagerC;
   
   components LedsC;
   CC1100ControlP.Leds -> LedsC;

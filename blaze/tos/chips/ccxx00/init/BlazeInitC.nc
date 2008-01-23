@@ -41,7 +41,6 @@ configuration BlazeInitC {
   provides {
     interface SplitControl[ radio_id_t id ];
     interface BlazeCommit[ radio_id_t id ];
-    interface BlazePower[ radio_id_t id ];
   }
 }
 
@@ -51,14 +50,13 @@ implementation {
       BlazeInitP,
       BlazeSpiC,
       BlazeCentralWiringC,
-      new BlazeSpiResourceC() as ResetResourceC,
+      new BlazeSpiResourceC() as InitResourceC,
       new BlazeSpiResourceC() as DeepSleepResourceC;
       
   
   MainC.SoftwareInit -> BlazeInitP;
 
   SplitControl = BlazeInitP;
-  BlazePower = BlazeInitP;
   BlazeCommit = BlazeInitP;
 
   BlazeInitP.Csn -> BlazeCentralWiringC.Csn;
@@ -69,15 +67,15 @@ implementation {
   BlazeInitP.Power -> BlazeCentralWiringC.Power;
   BlazeInitP.BlazeRegSettings -> BlazeCentralWiringC.BlazeRegSettings;
   
-  BlazeInitP.ResetResource -> ResetResourceC;
+  BlazeInitP.InitResource -> InitResourceC;
   BlazeInitP.DeepSleepResource -> DeepSleepResourceC;
   
   BlazeInitP.Idle -> BlazeSpiC.SIDLE;
-  BlazeInitP.SRES -> BlazeSpiC.SRES;
   BlazeInitP.SXOFF -> BlazeSpiC.SXOFF;
   BlazeInitP.SFRX -> BlazeSpiC.SFRX;
   BlazeInitP.SFTX -> BlazeSpiC.SFTX;
   BlazeInitP.SRX -> BlazeSpiC.SRX;
+  BlazeInitP.SPWD -> BlazeSpiC.SPWD;
   BlazeInitP.RadioStatus -> BlazeSpiC.RadioStatus;
   BlazeInitP.SNOP -> BlazeSpiC.SNOP;
   
@@ -90,9 +88,6 @@ implementation {
   
   components LedsC;
   BlazeInitP.Leds -> LedsC;
-  
-  components BlazeReceiveC;
-  BlazeInitP.ReceiveSplitControl -> BlazeReceiveC;
   
 }
 

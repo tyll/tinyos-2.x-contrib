@@ -45,7 +45,6 @@
 configuration CC2500ControlC {
   provides {
     interface SplitControl;
-    interface BlazePower;
     interface BlazeConfig;
   }
 }
@@ -69,7 +68,6 @@ implementation {
   
   components BlazeInitC;
   SplitControl = BlazeInitC.SplitControl[ CC2500_RADIO_ID ];
-  BlazePower = BlazeInitC.BlazePower[ CC2500_RADIO_ID ];
   CC2500ControlP.BlazeCommit -> BlazeInitC.BlazeCommit[ CC2500_RADIO_ID ];
   
   components BlazeCentralWiringC;
@@ -81,6 +79,9 @@ implementation {
   BlazeCentralWiringC.ChipGdo2_int[ CC2500_RADIO_ID ] -> Pins.Gdo2_int;
   BlazeCentralWiringC.ChipPower[ CC2500_RADIO_ID ] -> Pins.Power;
   BlazeCentralWiringC.ChipConfig[ CC2500_RADIO_ID ] -> CC2500ControlP.BlazeConfig;
+  
+  components SplitControlManagerC;
+  CC2500ControlP.SplitControlManager -> SplitControlManagerC;
   
   components LedsC;
   CC2500ControlP.Leds -> LedsC;

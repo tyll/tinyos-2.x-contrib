@@ -33,37 +33,29 @@
 
 interface AsyncSend {
 
-  /**
-   * Load a message into the radio stack drivers or the actual radio itself
-   * @param msg The message to load, with the first byte being the length
-   *    of the rest of the packet (not including the length byte itself)
-   * @param rxInterval For low power transmissions, this is the amount of
-   *     time to spend transmitting to allow a duty cycling receiver to wake up
-   * @return error_t
-   */
-  async command error_t load(void *msg, uint16_t rxInterval);
-  
-  /**
-   * Attempt to transmit the message previously loaded.
 
+  /**
+   * Attempt to transmit a message.  The first byte of *msg must be the length
+   * of the rest of the packet, not including the length byte.
+   * 
+   * @param msg The first byte is the length byte of the rest of the packet,
+   *     not including the length byte itself.
+   * @param force TRUE to force this packet to be sent, i.e. an acknowledgment
+   * @param preambleDurationMs The duration of the preamble in milliseconds,
+   *     0 to send to a full power listener.
+   * 
    * @return SUCCESS if the transmission will occur
    *         EBUSY if the channel is already in use
    *         FAIL if something else is already using the transmit module
    */
-  async command error_t send();
+  async command error_t send(void *msg, bool force, uint16_t preambleDurationMs);
   
   
   /**
-   * The message has been loaded
-   * @param msg The loaded message
-   * @param error Any error that occurred
-   */
-  async event void loadDone(error_t error);
-  
-  /**
-   * The message has been sent
+   * Send is complete.
    * @param error SUCCESS if the message was sent
    *              ESIZE if there was a TX or RX FIFO underflow
+   *              EBUSY if the channel wasn't clear.
    */
   async event void sendDone(error_t error);
   

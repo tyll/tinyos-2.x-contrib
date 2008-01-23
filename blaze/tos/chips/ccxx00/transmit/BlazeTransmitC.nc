@@ -36,7 +36,7 @@
  * The microcontroller must access the SPI bus at a minimum of 500 kbps or the 
  * node will lock up.
  *
- * Point your TransmitArbiterC to the BigTransmit instead of BlazeTransmit.
+ * Point your TransmitArbiterC to the BlazeTransmit instead of BlazeTransmit.
  * This will be a change specific to your workspace until we find this
  * module can work without changes to the TinyOS baseline SPI bus.
  * 
@@ -57,7 +57,7 @@
 #include "IEEE802154.h"
 #include "Blaze.h"
 
-configuration BigTransmitC {
+configuration BlazeTransmitC {
   provides {
     interface AsyncSend[ radio_id_t id ];
   }
@@ -65,31 +65,31 @@ configuration BigTransmitC {
 
 implementation {
 
-  components BigTransmitP;
-  AsyncSend = BigTransmitP;
+  components BlazeTransmitP;
+  AsyncSend = BlazeTransmitP;
   
   components BlazeCentralWiringC;  
-  BigTransmitP.Csn -> BlazeCentralWiringC.Csn;
+  BlazeTransmitP.Csn -> BlazeCentralWiringC.Csn;
   
   components BlazeSpiC as Spi;
-  BigTransmitP.RadioStatus -> Spi.RadioStatus;
+  BlazeTransmitP.RadioStatus -> Spi.RadioStatus;
   
-  BigTransmitP.SNOP -> Spi.SNOP;
-  BigTransmitP.STX -> Spi.STX;
-  BigTransmitP.SFTX -> Spi.SFTX;
-  BigTransmitP.SFRX -> Spi.SFRX;
-  BigTransmitP.TXFIFO -> Spi.TXFIFO;
-  BigTransmitP.SIDLE -> Spi.SIDLE;
-  BigTransmitP.SRX -> Spi.SRX;
-  BigTransmitP.TxReg -> Spi.TXREG;
+  BlazeTransmitP.SNOP -> Spi.SNOP;
+  BlazeTransmitP.STX -> Spi.STX;
+  BlazeTransmitP.SFTX -> Spi.SFTX;
+  BlazeTransmitP.SFRX -> Spi.SFRX;
+  BlazeTransmitP.TXFIFO -> Spi.TXFIFO;
+  BlazeTransmitP.SIDLE -> Spi.SIDLE;
+  BlazeTransmitP.SRX -> Spi.SRX;
+  BlazeTransmitP.TxReg -> Spi.TXREG;
     
   components new StateC();
-  BigTransmitP.State -> StateC;
+  BlazeTransmitP.State -> StateC;
   
   components BlazePacketC;
-  BigTransmitP.BlazePacketBody -> BlazePacketC;
+  BlazeTransmitP.BlazePacketBody -> BlazePacketC;
   
   components LedsC;
-  BigTransmitP.Leds -> LedsC;
+  BlazeTransmitP.Leds -> LedsC;
   
 }

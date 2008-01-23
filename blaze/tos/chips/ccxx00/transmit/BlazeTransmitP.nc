@@ -37,12 +37,11 @@
  * The microcontroller must access the SPI bus at a minimum of 500 kbps or the 
  * node will lock up.
  *
- * Point your TransmitArbiterC to the BigTransmit instead of BlazeTransmit.
+ * Point your TransmitArbiterC to the BlazeTransmit instead of BlazeTransmit.
  * This will be a change specific to your workspace until we find this
  * module can work without changes to the TinyOS baseline SPI bus.
  * 
- * This module differs from BlazeTransmit in that packets are not pre-loaded
- * into the radio.  Instead, the radio is kicked into TX mode and then
+ * The radio is kicked into TX mode and then
  * the packet is shot over the SPI bus.  The radio transmits the packet
  * directly as it's coming across the SPI bus, hence the need for at least
  * a 500 kbps SPI bus clock.
@@ -59,7 +58,7 @@
 #include "Blaze.h"
 #include "AM.h"
 
-module BigTransmitP {
+module BlazeTransmitP {
 
   provides {
     interface AsyncSend[ radio_id_t id ];
@@ -97,28 +96,25 @@ implementation {
   
   /***************** Global Variables ****************/
   uint8_t m_id;
+  
   void *myMsg;
+  bool force;
+  uint16_t duration;
   
   /***************** Local Functions ****************/
   error_t transmit(uint8_t id);
   
-  /***************** AsyncSend Commands ****************/
-  async command error_t AsyncSend.load[ radio_id_t id ](void *msg, uint16_t rxInterval) {
-
-    atomic {
-      myMsg = msg;
-    }
-    
-    signal AsyncSend.loadDone[id](SUCCESS);
-    return SUCCESS;
-  }
-  
+  /***************** AsyncSend Commands ****************/  
   /**
    * Load a packet into the TX FIFO
    * @param msg Any type of message where the first byte is the length
    *    of the rest of the bytes in the message not including the length byte
    */
-  async command error_t AsyncSend.send[ radio_id_t id ]() {
+  async command error_t AsyncSend.send[ radio_id_t id ](void *msg, bool forcePkt, uint16_t preambleDurationMs) {
+    atomic myMsg = msg;
+    atomic force = forcePkt;
+    atomic duration = preambleDurationMs;
+    
     if(call State.requestState(S_TX_PACKET) != SUCCESS) {
       return FAIL;
     }
@@ -180,7 +176,6 @@ implementation {
    *     first few times
    */
   error_t transmit(uint8_t id) {
-    uint8_t state;
     uint8_t status;
     void *msg;
     
@@ -220,11 +215,18 @@ implementation {
      */
     call STX.strobe();
     
-    if((state = call RadioStatus.getRadioStatus()) != BLAZE_S_TX) {
-      // CCA failed
-      call State.toIdle();
-      call Csn.set[ id ]();
-      return EBUSY;
+    if(force) {
+      if(call RadioStatus.getRadioStatus() != BLAZE_S_TX) {
+        call STX.strobe();
+      }
+      
+    } else {
+      if(call RadioStatus.getRadioStatus() != BLAZE_S_TX) {
+        // CCA failed
+        call State.toIdle();
+        call Csn.set[ id ]();
+        return EBUSY;
+      }
     }
     
     // CCA passed; start timer in synchronous context
@@ -243,7 +245,6 @@ implementation {
   default async command void Csn.makeInput[ radio_id_t id ](){}
   default async command void Csn.makeOutput[ radio_id_t id ](){}
   
-  default async event void AsyncSend.loadDone[ radio_id_t id ](error_t error) {}
   default async event void AsyncSend.sendDone[ radio_id_t id ](error_t error) {}
     
 }

@@ -102,6 +102,13 @@ public class SuitePropertiesParser {
           parsingDescription = true;
           suiteProperties.addDescription(line.replace("@description","").trim());
           
+        } else if(line.toLowerCase().startsWith("@extras")) {
+          String extraLine = line.replace("@extras","").trim();
+          if(extraLine.toLowerCase().contains("cflag") || extraLine.toLowerCase().contains("pflag")) {
+            suiteProperties.addCFlags(extraLine);
+          } else {
+            suiteProperties.addExtras(extraLine);
+          }
           
         } else if(line.toLowerCase().startsWith("@extra")) {
           String extraLine = line.replace("@extra","").trim();
@@ -111,13 +118,13 @@ public class SuitePropertiesParser {
           } else {
             suiteProperties.addExtras(extraLine);
           }
-          
-        } else if(line.toLowerCase().startsWith("@extras")) {
-          String extraLine = line.replace("@extras","").trim();
-          if(extraLine.toLowerCase().contains("cflag") || extraLine.toLowerCase().contains("pflag")) {
-            suiteProperties.addCFlags(extraLine);
+
+        } else if(line.toLowerCase().startsWith("@cflags")) {
+          String cflagLine = line.replace("@cflags","").trim();
+          if(cflagLine.startsWith("CFLAG")) {
+            suiteProperties.addCFlags(cflagLine);
           } else {
-            suiteProperties.addExtras(extraLine);
+            suiteProperties.addCFlags("CFLAGS+=" + cflagLine);
           }
           
         } else if(line.toLowerCase().startsWith("@cflag")) {
@@ -128,14 +135,6 @@ public class SuitePropertiesParser {
             suiteProperties.addCFlags("CFLAGS+=" + cflagLine);
           }
           
-        } else if(line.toLowerCase().startsWith("@cflags")) {
-          String cflagLine = line.replace("@cflags","").trim();
-          if(cflagLine.startsWith("CFLAG")) {
-            suiteProperties.addCFlags(cflagLine);
-          } else {
-            suiteProperties.addCFlags("CFLAGS+=" + cflagLine);
-          }
-
         } else if(line.toLowerCase().startsWith("@assertions")) {
           int numAssertions;
           try {

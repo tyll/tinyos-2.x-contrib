@@ -10,25 +10,25 @@ push( @includes, qw(
   %T/platforms/tmote1100/chips/ccxx00
 
   ## Rincon CCxx00 Dual Radio Stack
-  %T/../../blaze/tos/chips/blazeradio
-  %T/../../blaze/tos/chips/blazeradio/acks
-  %T/../../blaze/tos/chips/blazeradio/alarm
-  %T/../../blaze/tos/chips/blazeradio/am
-  %T/../../blaze/tos/chips/blazeradio/cc1100
-  %T/../../blaze/tos/chips/blazeradio/cc2500
-  %T/../../blaze/tos/chips/blazeradio/crc
-  %T/../../blaze/tos/chips/blazeradio/csma
-  %T/../../blaze/tos/chips/blazeradio/init
-  %T/../../blaze/tos/chips/blazeradio/interfaces
-  %T/../../blaze/tos/chips/blazeradio/link
-  %T/../../blaze/tos/chips/blazeradio/lpl
-  %T/../../blaze/tos/chips/blazeradio/lpl/alwayson
-  %T/../../blaze/tos/chips/blazeradio/packet
-  %T/../../blaze/tos/chips/blazeradio/receive
-  %T/../../blaze/tos/chips/blazeradio/select
-  %T/../../blaze/tos/chips/blazeradio/spi
-  %T/../../blaze/tos/chips/blazeradio/transmit
-  %T/../../blaze/tos/chips/blazeradio/unique
+  %T/../../blaze/tos/chips/ccxx00
+  %T/../../blaze/tos/chips/ccxx00/acks
+  %T/../../blaze/tos/chips/ccxx00/alarm
+  %T/../../blaze/tos/chips/ccxx00/am
+  %T/../../blaze/tos/chips/ccxx00/cc1100
+  %T/../../blaze/tos/chips/ccxx00/cc2500
+  %T/../../blaze/tos/chips/ccxx00/crc
+  %T/../../blaze/tos/chips/ccxx00/csma
+  %T/../../blaze/tos/chips/ccxx00/init
+  %T/../../blaze/tos/chips/ccxx00/interfaces
+  %T/../../blaze/tos/chips/ccxx00/link
+  %T/../../blaze/tos/chips/ccxx00/lpl
+  %T/../../blaze/tos/chips/ccxx00/lpl/alwayson
+  %T/../../blaze/tos/chips/ccxx00/packet
+  %T/../../blaze/tos/chips/ccxx00/receive
+  %T/../../blaze/tos/chips/ccxx00/select
+  %T/../../blaze/tos/chips/ccxx00/spi
+  %T/../../blaze/tos/chips/ccxx00/transmit
+  %T/../../blaze/tos/chips/ccxx00/unique
 
   ## Rincon Additions to TinyOS chips
   %T/chips/rrc_stm25p

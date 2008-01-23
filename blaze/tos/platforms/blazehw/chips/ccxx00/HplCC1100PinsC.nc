@@ -18,6 +18,9 @@ configuration HplCC1100PinsC {
 implementation {
   
   components HplMsp430InterruptP;
+  components HplMsp430GeneralIOC as GeneralIOC;
+  components new HplCCxx00PinsP();
+  
   components new Msp430InterruptC() as CC1100GDO0;
   components new Msp430InterruptC() as CC1100GDO2;
   CC1100GDO2.HplInterrupt -> HplMsp430InterruptP.Port12;
@@ -25,15 +28,13 @@ implementation {
   Gdo2_int = CC1100GDO2;
   Gdo0_int = CC1100GDO0;
   
-  components HplCC1100PinsP;
-  HplCC1100PinsP.Gdo2_int -> CC1100GDO2;
-  HplCC1100PinsP.Gdo0_int -> CC1100GDO0;
+  HplCCxx00PinsP.Gdo2_int -> CC1100GDO2;
+  HplCCxx00PinsP.Gdo0_int -> CC1100GDO0;
   
-  components HplMsp430GeneralIOC as GeneralIOC;
   components new Msp430GpioC() as CSNM;
   CSNM -> GeneralIOC.Port30;
-  Csn = CSNM;
-  HplCC1100PinsP.CSn -> CSNM;
+  Csn = HplCCxx00PinsP.CsnOut;
+  HplCCxx00PinsP.Csn -> CSNM;
   
   components new Msp430GpioC() as CC1100GDO0_IO;
   CC1100GDO0_IO -> GeneralIOC.Port10;
@@ -43,14 +44,13 @@ implementation {
   CC1100GDO2_IO -> GeneralIOC.Port12;
   Gdo2_io = CC1100GDO2_IO;
   
-  components new Msp430GpioC() as power_io;
-  power_io -> GeneralIOC.Port55;
-  HplCC1100PinsP.PowerIn -> power_io;
-  Power = HplCC1100PinsP.PowerOut;
+  components new Msp430GpioC() as PowerPin;
+  PowerPin -> GeneralIOC.Port55;
+  HplCCxx00PinsP.PowerIn -> PowerPin;
+  Power = HplCCxx00PinsP.PowerOut;
   
   components MainC;
-  MainC.SoftwareInit -> HplCC1100PinsP;
-  
+  MainC.SoftwareInit -> HplCCxx00PinsP;
   
 }
 

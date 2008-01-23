@@ -82,8 +82,6 @@ module BlazeInitP {
     interface BlazeRegister as PaReg;
     
     interface Leds;
-    
-    //interface DebugPins as Pins;
   }
 }
 
@@ -190,12 +188,11 @@ implementation {
     
     call PaReg.write(call BlazeRegSettings.getPa[ m_id ]());
     
-    //call Gdo2_int.enableRisingEdge[ m_id ]();  // TODO replace
+    call Gdo2_int.enableRisingEdge[ m_id ](); 
     
     call SRX.strobe();
     while(call RadioStatus.getRadioStatus() != BLAZE_S_RX);
-        
-    //call Pins.clr65();
+    
     call Csn.set[ m_id ]();
     
     call InitResource.release();

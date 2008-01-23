@@ -1,0 +1,3 @@
+COMPONENT=PowerCycleC
+include $(MAKERULES)
+

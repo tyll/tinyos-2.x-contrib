@@ -2,9 +2,9 @@
 #$Id$
 # @author Miklos Maroti
 
-CFLAGS += -I$(TUNIT_BASE)/tos/lib/tunit
-CFLAGS += -I$(TUNIT_BASE)/tos/lib/tunitstats
-CFLAGS += -I$(TUNIT_BASE)/tos/system/
-CFLAGS += -I$(TUNIT_BASE)/tos/interfaces
-CFLAGS += -I$(TUNIT_BASE)/tos/lib/directserial
-CFLAGS += -I$(TUNIT_BASE)/tos/lib/fifoqueue
+CFLAGS += -I$(TOSCONTRIB)/tunit/tos/lib/tunit
+CFLAGS += -I$(TOSCONTRIB)/tunit/tos/lib/tunitstats
+CFLAGS += -I$(TOSCONTRIB)/tunit/tos/system/
+CFLAGS += -I$(TOSCONTRIB)/tunit/tos/interfaces
+CFLAGS += -I$(TOSCONTRIB)/tunit/tos/lib/directserial
+CFLAGS += -I$(TOSCONTRIB)/tunit/tos/lib/fifoqueue

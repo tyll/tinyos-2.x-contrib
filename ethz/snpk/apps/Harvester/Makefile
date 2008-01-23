@@ -2,7 +2,8 @@ COMPONENT=HarvesterC
 # use tos libraries
 CFLAGS += -I$(TOSDIR)/lib/net/ -I../../tos/lib/net/ctp -I$(TOSDIR)/lib/net/ctp -I$(TOSDIR)/lib/net/4bitle -I.
 # use snpk libraries
-CFLAGS += -I../../tos/lib/dsn 
+CFLAGS += -I../../tos/lib/dsn
+CFLAGS += -I../../tos/chips/msp430/usart
 #-I../../tos/system
 #external Sensirion Sensor
 CFLAGS += -I../../tos/platforms/telosb/chips/sht75

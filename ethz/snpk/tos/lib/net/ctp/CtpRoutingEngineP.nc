@@ -175,7 +175,6 @@ implementation {
     uint32_t t; 
     bool tHasPassed;
 
-    bool parent_is_root;
     am_addr_t forcedParent = AM_BROADCAST_ADDR;
 
     void chooseAdvertiseTime() {
@@ -336,10 +335,6 @@ implementation {
                     routeInfo.etx = entry->info.etx;
                     routeInfo.congested = entry->info.congested;
                 }
-		if (entry->info.etx==0)
-			parent_is_root=TRUE;
-		else
-			parent_is_root=FALSE;
                 continue;
             }
             /* Ignore links that are congested */
@@ -350,14 +345,7 @@ implementation {
               dbg("TreeRouting", "   did not pass threshold.\n");
 	      continue;
             }
-            
-	if (pathEtx < routeInfo.etx) {
-/*
-	    call DSN.logInt(entry->neighbor);
-    	    call DSN.logInt(linkEtx);
-	    call DSN.logInfo("Possible parent %i (letx:%i)");
-*/
-	}
+
             if (pathEtx < minEtx) {
                 minEtx = pathEtx;
                 best = entry;
@@ -377,7 +365,7 @@ implementation {
                 etx. Any descendent will be at least that + 10 (1 hop), so we restrict the 
                 selection to be less than that.
         */
-        if (minEtx != MAX_METRIC /* && !parent_is_root */ && forcedParent == AM_BROADCAST_ADDR) {
+        if (minEtx != MAX_METRIC && forcedParent == AM_BROADCAST_ADDR) {
             if (currentEtx == MAX_METRIC ||
                 (routeInfo.congested && (minEtx < (routeInfo.etx + 10))) ||
                 minEtx + PARENT_SWITCH_THRESHOLD < currentEtx) {
@@ -544,15 +532,6 @@ implementation {
           return msg;
         }
 
-	//need to get the am_addr_t of the source
-        //from = call AMPacket.source(msg);
-        
-/*
-	// received a message from this node
-	if (from == my_ll_addr) {
-	  return msg;
-	}
-  */      
         rcvBeacon = (ctp_routing_header_t*)payload;
 
         congested = call CtpRoutingPacket.getOption(msg, CTP_OPT_ECN);

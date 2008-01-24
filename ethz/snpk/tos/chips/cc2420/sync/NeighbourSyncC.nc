@@ -36,6 +36,9 @@ configuration NeighbourSyncC {
     interface Send;
     interface Receive;
     interface NeighbourSyncRequest;
+    interface State as SyncSendState;
+    interface NeighbourSyncPacket;
+    interface NeighbourSyncFlowPacket;
   }
   uses {
     interface Send as SubSend;
@@ -67,9 +70,13 @@ implementation {
 
   SubSend = NeighbourSyncP.SubSend;
   SubReceive = NeighbourSyncP.SubReceive;
-
+  
+  SyncSendState=SyncSendStateC;
+  
   NeighbourSyncRequest = NeighbourSyncP.NeighbourSyncRequest;
- 
+  NeighbourSyncPacket = NeighbourSyncP;
+  NeighbourSyncFlowPacket = NeighbourSyncP;
+  
   MainC.SoftwareInit -> Alarm32khz32C;
   
   NeighbourSyncP.DSN -> DSNC;

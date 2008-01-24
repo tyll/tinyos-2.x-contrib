@@ -67,6 +67,7 @@ implementation {
       new TimerMilliC() as OffTimerC,
       new TimerMilliC() as SendDoneTimerC,
       LedsC,
+      NeighbourSyncC,
       noDSNC as DSNC;
   
   LowPowerListening = DefaultLplP;
@@ -96,4 +97,5 @@ implementation {
   DefaultLplP.RadioBackoff -> CC2420CsmaC;
   DefaultLplP.Random -> RandomC;
   DefaultLplP.Leds -> LedsC;
+  DefaultLplP.NeighbourSyncPacket -> NeighbourSyncC;
 }

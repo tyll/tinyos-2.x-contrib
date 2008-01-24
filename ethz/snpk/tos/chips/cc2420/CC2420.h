@@ -85,6 +85,7 @@ typedef nx_struct cc2420_metadata_t {
   nx_bool synced;
   nx_uint8_t retries;
   nx_uint8_t snoopedAcks;
+  nx_bool more;
 
   /** Packet Link Metadata */
 #ifdef PACKET_LINK

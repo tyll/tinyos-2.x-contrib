@@ -68,6 +68,7 @@ module DefaultLplP {
     interface Timer<TMilli> as SendDoneTimer;
     interface Random;
     interface Leds;
+    interface NeighbourSyncPacket;
   }
 }
 
@@ -413,7 +414,10 @@ implementation {
     
     call SendState.toIdle();
     call SendDoneTimer.stop();
-    startOffTimer();
+    if (call NeighbourSyncPacket.isMore(msg))
+    	startOffTimer();
+    else
+    	signal OffTimer.fired();
     signal Send.sendDone(msg, error);
   }
   
@@ -427,8 +431,11 @@ implementation {
    */
   event message_t *SubReceive.receive(message_t* msg, void* payload, 
       uint8_t len) {
-    startOffTimer();
-    return signal Receive.receive(msg, payload, len);
+	  if (call NeighbourSyncPacket.isMore(msg))
+	      	startOffTimer();
+	      else
+	      	signal OffTimer.fired();
+	  return signal Receive.receive(msg, payload, len);
   }
   
   /***************** Timer Events ****************/

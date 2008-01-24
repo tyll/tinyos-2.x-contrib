@@ -238,7 +238,10 @@ implementation {
       return;
       
     } else if(isDutyCycling()) {
-      post getCca();
+    	atomic {
+    		if (ccaChecks == 1)  // only test cca if this wakeup was initiated by us
+    			post getCca();
+    	}
     }
   }
   
@@ -288,11 +291,13 @@ implementation {
         	  }
           }
         }
+        call Leds.led0On();
         n_cycles++;
         for( ; ccaChecks < MAX_LPL_CCA_CHECKS && call SendState.isIdle(); ccaChecks++) {
           if(call PacketIndicator.isReceiving()) { // packet receiving
             signal PowerCycle.detected();
             n_long_cycles++;
+            call Leds.led0Off();
             return;
           }
           
@@ -304,6 +309,7 @@ implementation {
             if(detects > MIN_SAMPLES_BEFORE_DETECT) { // if we have MIN_SAMPLES_BEFORE_DETECT + 1 consecutive non-cca samples
               signal PowerCycle.detected();
               n_long_cycles++;
+              call Leds.led0Off();
               return;
             }
             // Leave the radio on for upper layers to perform some transaction
@@ -313,7 +319,7 @@ implementation {
           }
         } // for
       }  // atomic
-      
+      call Leds.led0Off();
       if(call SendState.isIdle()) {
         post stopRadio();
       }

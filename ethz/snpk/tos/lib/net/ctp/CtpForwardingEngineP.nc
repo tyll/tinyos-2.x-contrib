@@ -171,6 +171,7 @@ generic module CtpForwardingEngineP() {
     interface DsnSend as DSN;
     interface LowPowerListening;
     interface CC2420Packet;
+    interface NeighbourSyncFlowPacket;
   }
 }
 implementation {
@@ -240,6 +241,8 @@ implementation {
 
   uint8_t fastPacketCount=0;
   uint16_t lplSleepInterval=0;
+  
+  bool queue_congested=FALSE;
   
   command error_t Init.init() {
     int i;
@@ -403,13 +406,16 @@ implementation {
     if (sending) {
       dbg("Forwarder", "%s: busy, don't send\n", __FUNCTION__);
       call CollectionDebug.logEvent(NET_C_FE_SEND_BUSY);
-      //call DSN.logDebug("forwarding sendtask busy");
+      call DSN.logDebug("forwarding sendtask busy");
       return;
     }
     else if (call SendQueue.empty()) {
       dbg("Forwarder", "%s: queue empty, don't send\n", __FUNCTION__);
       call CollectionDebug.logEvent(NET_C_FE_SENDQUEUE_EMPTY);
       //call DSN.logDebug("forwarding queue empty");
+      if (fastPacketCount>0) {
+    	  call DSN.logInt(fastPacketCount);call DSN.log("q empty,fastpackets %i");
+      }
       fastPacketCount=0;
       return;
     }
@@ -445,6 +451,7 @@ implementation {
       if (call CtpInfo.isNeighborCongested(dest)) {
         // Our parent is congested. We should wait.
         // Don't repost the task, CongestionTimer will do the job
+    	call DSN.log("parent congested, wait");
         if (! parentCongested ) {
           parentCongested = TRUE;
           call CollectionDebug.logEvent(NET_C_FE_CONGESTION_BEGIN);
@@ -461,7 +468,6 @@ implementation {
       if (parentCongested) {
         parentCongested = FALSE;
         call CollectionDebug.logEvent(NET_C_FE_CONGESTION_END);
-        //call DSN.logDebug("forwarding parent congested");
       } 
       // Once we are here, we have decided to send the packet.
       if (call SentCache.lookup(qe->msg)) {
@@ -487,6 +493,7 @@ implementation {
       if (dest != lastParent) {
         qe->retries = MAX_RETRIES;
         lastParent = dest;
+        fastPacketCount=0;
       }
  
       dbg("Forwarder", "Sending queue entry %p\n", qe);
@@ -527,6 +534,10 @@ implementation {
         call CtpPacket.setOption(qe->msg, CTP_OPT_ECN);
 	  else
         call CtpPacket.clearOption(qe->msg, CTP_OPT_ECN);
+      if (call SendQueue.size()>1)
+    	  call NeighbourSyncFlowPacket.setMore(qe->msg);
+      else
+    	  call NeighbourSyncFlowPacket.clearMore(qe->msg);
       subsendResult = call SubSend.send(dest, qe->msg, payloadLen);
       if (subsendResult == SUCCESS) {
         // Successfully submitted to the data-link layer.
@@ -649,6 +660,7 @@ implementation {
       call DSN.logInt(call AMPacket.destination(msg));
       call DSN.logWarning("noAck > %i");
 */
+      call DSN.logInt(fastPacketCount);call DSN.log("nack,fastpackets %i");
       fastPacketCount=0;
       if (--qe->retries) {
         dbg("Forwarder", "%s: not acked\n", __FUNCTION__);
@@ -701,12 +713,14 @@ implementation {
       call SendQueue.dequeue();
       signal Send.sendDone[client](msg, SUCCESS);
       sending = FALSE;
-      if (fastPacketCount<MAX_FAST_PACKETS) {
-      	startRetxmitTimer(SENDDONE_OK_WINDOW, SENDDONE_OK_OFFSET);
-      	fastPacketCount++;
+     if (fastPacketCount<MAX_FAST_PACKETS) {
+    	 fastPacketCount++;
+    	  post sendTask();
+    	  //startRetxmitTimer(SENDDONE_OK_WINDOW, SENDDONE_OK_OFFSET);
       }
       else {
-        startRetxmitTimer(SENDDONE_NOACK_WINDOW, SENDDONE_NOACK_OFFSET);
+        startRetxmitTimer(SENDDONE_OK_WINDOW, SENDDONE_OK_OFFSET);
+        call DSN.logInt(fastPacketCount);call DSN.log("fastpackets %i");
         fastPacketCount=0;
       }
     }
@@ -725,12 +739,14 @@ implementation {
       if (call QEntryPool.put(qe) != SUCCESS)
         call CollectionDebug.logEvent(NET_C_FE_PUT_QEPOOL_ERR);
       sending = FALSE;
-      if (fastPacketCount<MAX_FAST_PACKETS) {	
-        startRetxmitTimer(SENDDONE_OK_WINDOW, SENDDONE_OK_OFFSET);
-        fastPacketCount++;
+      if (fastPacketCount<MAX_FAST_PACKETS) {
+    	  fastPacketCount++;
+    	  post sendTask();
+    	  // startRetxmitTimer(SENDDONE_OK_WINDOW, SENDDONE_OK_OFFSET);
       }
       else {
-        startRetxmitTimer(SENDDONE_NOACK_WINDOW, SENDDONE_NOACK_OFFSET);
+        startRetxmitTimer(SENDDONE_OK_WINDOW, SENDDONE_OK_OFFSET);
+        call DSN.logInt(fastPacketCount);call DSN.log("fastpackets %i");
         fastPacketCount=0;
       }
     }
@@ -741,6 +757,13 @@ implementation {
       // someone has double-stored a pointer somewhere and we have nowhere
       // to put this, so we have to leak it...
     }
+    /*
+    if (queue_congested && call SendQueue.size() <= CLIENT_COUNT) {
+    	queue_congested=FALSE;
+    	call CtpInfo.triggerImmediateRouteUpdate();
+    	call DSN.log("exit congestion");
+    }
+    */
   }
 
   /*
@@ -808,15 +831,20 @@ implementation {
                                          call AMPacket.destination(m));
           }
         }
-
-        if (!call RetxmitTimer.isRunning()) {
-          // sendTask is only immediately posted if we don't detect a
-          // loop.
-	// prevent congesting the medium
-	//startRetxmitTimer(SENDDONE_NOACK_WINDOW, SENDDONE_NOACK_OFFSET);
-	post sendTask();
+        /*
+        if (!queue_congested && call CtpCongestion.isCongested()) {
+        	queue_congested=TRUE;
+        	call CtpInfo.triggerImmediateRouteUpdate();
+        	call DSN.log("enter congestion");
         }
-        
+        */
+        if (!call RetxmitTimer.isRunning()) {
+        	// sendTask is only immediately posted if we don't detect a
+        	// loop.
+        	// prevent congesting the medium
+        	//startRetxmitTimer(SENDDONE_NOACK_WINDOW, SENDDONE_NOACK_OFFSET);
+        	post sendTask();
+        }
         // Successful function exit point:
         return newMsg;
       } else {

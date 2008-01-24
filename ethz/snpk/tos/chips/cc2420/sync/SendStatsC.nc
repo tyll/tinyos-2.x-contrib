@@ -47,7 +47,8 @@ implementation {
       CC2420PacketC,
       CC2420ActiveMessageC,
       DSNC as DSNC,
-      new DsnCommandC("get stats", uint8_t , 0) as GetStatsCommand;
+      new DsnCommandC("get stats", uint8_t , 0) as GetStatsCommand,
+      NeighbourSyncC;
 
   Send = SendStatsP.Send;
   SubSend = SendStatsP.SubSend;
@@ -56,6 +57,7 @@ implementation {
   
   SendStatsP.DSN -> DSNC;
   SendStatsP.GetStatsCommand -> GetStatsCommand;
+  SendStatsP.SyncSendState -> NeighbourSyncC.SyncSendState;
   SendStatsP.CC2420PacketBody -> CC2420PacketC;
   SendStatsP.AMPacket -> CC2420ActiveMessageC;
   SendStatsP.PacketAcknowledgements -> CC2420PacketC;

@@ -57,6 +57,7 @@ enum {
 
   SYNC_FAIL_THRESHOLD = 10, // after SYNC_FAIL_THRESHOLD non-acked packets, sync information is not valid anymore
   REQ_SYNC_FLAG = 0x8000,
+  MORE_FLAG = 0x4000,
   SYNC_TIMER_PERIOD = 30000UL, // period to gather sync-requests in milliseconds
   DRIFT_CHANGE_LIMIT = 50, 	// value >> 21 that a new measured drift is allowed to differ from the last average
   							// 50 is about 23ppm
@@ -82,8 +83,12 @@ typedef struct {	// 16 + MEASURE_HISTORY_SIZE * 4 bytes
 } neighbour_sync_item_t;
 
 typedef nx_struct {
-  nx_uint16_t wakeupOffset;
-  nx_uint16_t lplPeriod;	// this field contains REQ_SYNC_FLAG (highest bit) and lpl information
-} neighbour_sync_header_t;
+  nx_uint16_t wakeupOffset; // time that has passed between senders wakeup and the time the sfd was sent 
+  nx_uint16_t lplPeriod;	// this field contains lpl information and the flags
+  							//		REQ_SYNC_FLAG (highest bit)
+							//		MORE_FLAG (second highest bit)
+  							// lplperiod can be at max 2^14 binary ms ~ 16s
+  							// but wakeupOffset is in ticks that cna represent max 2 seconds -> this is currently the limit
+  } neighbour_sync_header_t;
 
 #endif

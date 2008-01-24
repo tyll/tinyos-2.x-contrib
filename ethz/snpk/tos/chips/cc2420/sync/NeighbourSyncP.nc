@@ -42,6 +42,8 @@ module NeighbourSyncP {
     interface Receive;
     interface NeighbourSyncRequest;
     interface NeighbourSyncInfo;
+    interface NeighbourSyncPacket;
+    interface NeighbourSyncFlowPacket;
   }
   uses {
     interface Send as SubSend;
@@ -144,7 +146,7 @@ implementation {
         }
         m_rxInterval=meta->rxInterval;
         header = getSyncHeader(msg, len);
-        header->lplPeriod = call PowerCycle.getSleepInterval();
+        header->lplPeriod = call PowerCycle.getSleepInterval() | (meta->more * MORE_FLAG);
         header->wakeupOffset = NO_VALID_OFFSET;
         dest = (call CC2420PacketBody.getHeader(msg))->dest;
         idx=getIndex(dest);
@@ -152,16 +154,11 @@ implementation {
         		&& (n_table[idx].failCount<SYNC_FAIL_THRESHOLD) && (n_table[idx].measurementCount>0)) {
         	// timed send
         	atomic {
-        		// m_cca=FALSE;
         		m_timed_send=TRUE;
         	}
         	meta->synced=TRUE;
         	call SyncSendState.forceState(S_PREPARE_RADIO);
-        	lplPeriod32Khz = n_table[idx].lplPeriod << T32KHZ_TO_TMILLI_SHIFT;
-        	//lastSync=n_table[idx].wakeupTimestamp[n_table[idx].measurementCount-1];
-            /*call DSN.logInt(dest);
-            call DSN.logInt(n_table[idx].odd);
-            call DSN.log("pkt for %i,%i");*/
+        	lplPeriod32Khz = n_table[idx].lplPeriod;
         	lastSync=n_table[idx].wakeupAverage;
         	now = call Alarm.getNow();
         	if (n_table[idx].drift!=NO_VALID_DRIFT) {
@@ -341,18 +338,18 @@ implementation {
 				  periods=0;
 				  for (j=1;j<item->measurementCount;j++) {
 					  timeDiff=item->wakeupTimestamp[j]-item->wakeupTimestamp[j-1];
-					  periods += timeDiff / (item->lplPeriod << T32KHZ_TO_TMILLI_SHIFT);
+					  periods += timeDiff / item->lplPeriod;
 					  timeSum+=timeDiff;
-					  driftError=(timeDiff) % (item->lplPeriod << T32KHZ_TO_TMILLI_SHIFT);
-					  if (driftError<((item->lplPeriod << T32KHZ_TO_TMILLI_SHIFT) >> 1))
+					  driftError=timeDiff % item->lplPeriod;
+					  if (driftError<(item->lplPeriod >> 1))
 						  driftSum+=driftError;
 					  else {
-						  driftSum-=(item->lplPeriod << T32KHZ_TO_TMILLI_SHIFT) - driftError;
+						  driftSum-=item->lplPeriod - driftError;
 						  periods++;
 					  }
 				  }
 				  item->odd = periods % 2 == 1;
-				  item->wakeupAverage = (timeSum>>1) + item->wakeupTimestamp[0];
+				  item->wakeupAverage = (timeSum >> 1) + item->wakeupTimestamp[0];
 				  if (driftSum<0) {
 					  driftSum=-driftSum;
 					  item->drift=(driftSum << 19) / (timeSum >> 2); // effectively 2^21
@@ -401,26 +398,22 @@ implementation {
     
     am_addr_t address = (call CC2420PacketBody.getHeader(msg))->src;
     header = getSyncHeader(msg, len-SYNC_HEADER_SIZE);
-    if ((header->lplPeriod & ~REQ_SYNC_FLAG) > 0) {
-      idx=getIndex(address);
-      if (idx==NO_ENTRY) {
-        if (tableFull()) {
-#ifdef CC2420SYNC_DEBUG
-        	call DSN.logInt(address);
-        	call DSN.log("replace entry with %i");
-#endif
-        	idx=replaceLeastUsedEntry (address);
-        }
-        else {
-          idx=addNewEntry (address);
-        }
-      }
-      if (idx!=NO_ENTRY) {
+    if ((header->lplPeriod & ~(REQ_SYNC_FLAG|MORE_FLAG)) > 0) {
+    	idx=getIndex(address);
+    	if (idx==NO_ENTRY) {
+    		if (tableFull()) {
+    			idx=replaceLeastUsedEntry (address);
+    		}
+    		else {
+    			idx=addNewEntry (address);
+    		}
+    	}
+    	if (idx!=NO_ENTRY) {
         cc2420_metadata_t * meta;
         uint32_t now = call Alarm.getNow();
         meta = call CC2420PacketBody.getMetadata(msg);
         item = &n_table[idx];
-        item->lplPeriod=header->lplPeriod & ~REQ_SYNC_FLAG;
+        item->lplPeriod=(header->lplPeriod & ~(REQ_SYNC_FLAG|MORE_FLAG)) << T32KHZ_TO_TMILLI_SHIFT; // save in table as 32khz ticks
         if (header->wakeupOffset != NO_VALID_OFFSET && n_table[idx].lplPeriod>0) {
         	// TODO: test ((uint16_t)now - meta->time
         	// set bound to xx ticks ?
@@ -429,8 +422,8 @@ implementation {
         	newSync = now - ((uint16_t)now - meta->time) - header->wakeupOffset;
         	// save only sync times later than last one
         	if (item->measurementCount==0 || 
-        			((newSync - item->wakeupTimestamp[item->measurementCount-1] < 0x80000000) &&
-        			(newSync - item->wakeupTimestamp[item->measurementCount-1] >= MIN_MEASUREMENT_PERIOD))) {
+        		((newSync - item->wakeupTimestamp[item->measurementCount-1] < 0x80000000) &&
+        		(newSync - item->wakeupTimestamp[item->measurementCount-1] >= MIN_MEASUREMENT_PERIOD))) {
         		if (item->measurementCount<MEASURE_HISTORY_SIZE) {
         			item->wakeupTimestamp[item->measurementCount++]=newSync;        			
         			item->failCount=0;
@@ -439,16 +432,12 @@ implementation {
         		}
         		else {
         			// add entry, if drift over last period does not differ more than DRIFT_CHANGE_LIMIT
-        			driftError=(newSync-item->wakeupTimestamp[MEASURE_HISTORY_SIZE-1]) % (item->lplPeriod << T32KHZ_TO_TMILLI_SHIFT);
-        			if (driftError<((item->lplPeriod << T32KHZ_TO_TMILLI_SHIFT) >> 1)) {//pos
+        			driftError=(newSync-item->wakeupTimestamp[MEASURE_HISTORY_SIZE-1]) % item->lplPeriod;
+        			if (driftError < (item->lplPeriod >> 1)) {//pos
         				drift=(driftError << 19) / ((newSync-item->wakeupTimestamp[MEASURE_HISTORY_SIZE-1]) / 4);
-        				/*call DSN.logInt(drift);
-        				call DSN.log("added drift %i");*/
         			}
         			else {
-        				drift=-((((uint32_t)((item->lplPeriod << T32KHZ_TO_TMILLI_SHIFT) - driftError)) << 19) / ((newSync-item->wakeupTimestamp[MEASURE_HISTORY_SIZE-1]) / 4));
-        				/*call DSN.logInt(-drift);
-        				call DSN.log("added drift -%i");*/
+        				drift=-((((uint32_t)(item->lplPeriod) - driftError)) << 19) / ((newSync-item->wakeupTimestamp[MEASURE_HISTORY_SIZE-1]) / 4);
         			}
         			if ((item->drift>drift && item->drift-drift<DRIFT_CHANGE_LIMIT) ||
         				(item->drift<=drift && drift-item->drift<DRIFT_CHANGE_LIMIT)) {
@@ -492,19 +481,18 @@ implementation {
       }
     }
     if ((header->lplPeriod & REQ_SYNC_FLAG) != 0) {
-    	signal NeighbourSyncRequest.updateRequest(address, header->lplPeriod & ~REQ_SYNC_FLAG);
+    	signal NeighbourSyncRequest.updateRequest(address, header->lplPeriod & ~(REQ_SYNC_FLAG|MORE_FLAG));
     }
 
+#ifdef CC2420SYNC_DEBUG
     // print accuracy of packet
     if ((call CC2420PacketBody.getHeader(msg))->dest == TOS_NODE_ID) {
-#ifdef CC2420SYNC_DEBUG
     	call DSN.logInt(address);  	    	
     	call DSN.logInt((call CC2420PacketBody.getMetadata(msg))->time - call PowerCycle.getLastWakeUp());
     	call DSN.logInt((t_radio_on & 0xffff) - call PowerCycle.getLastWakeUp());    	
     	call DSN.log("rx packet from %i, at %i, on at %i");
-#endif    	
     }
-    
+#endif
     (call CC2420PacketBody.getHeader(msg))->length = len - SYNC_HEADER_SIZE;
     return signal Receive.receive(msg, payload, len - SYNC_HEADER_SIZE);
   }
@@ -603,7 +591,28 @@ implementation {
 	  }
 	  return FAIL;
   }
-
+  
+  /***************** NeighbourSyncPacket commands ***************/
+	/**
+	 * return state of MORE_FLAG
+	 * This command can only be applied to packets that still contain the neighboursync footer
+	 **/
+    command bool NeighbourSyncPacket.isMore(message_t* msg) {
+    	return (getSyncHeader(msg, (call CC2420PacketBody.getHeader(msg))->length-SYNC_HEADER_SIZE)->lplPeriod & MORE_FLAG) !=0;
+    }
+    
+  /***************** NeighbourSyncFlowPacket commands ***************/
+ 	/**
+ 	 * set state of MORE_FLAG
+ 	 * This command can only be applied to packets that do _not_ contain the neighboursync footer, e.g. higher
+ 	 * layer components should access this interface. 
+   	 **/
+     command void NeighbourSyncFlowPacket.setMore(message_t* msg) {
+    	(call CC2420PacketBody.getMetadata( msg ))->more=TRUE;
+     }
+     command void NeighbourSyncFlowPacket.clearMore(message_t* msg) {
+     	(call CC2420PacketBody.getMetadata( msg ))->more=FALSE;
+     }
   /***************** NeighbourSyncRequest events ***************/
   default event void NeighbourSyncRequest.updateRequest(am_addr_t address, uint16_t lplPeriod) {
 	  call LowPowerListening.setRxSleepInterval(&resync_msg, lplPeriod);
@@ -622,6 +631,7 @@ implementation {
   neighbour_sync_header_t* getSyncHeader(message_t * msg, uint8_t len ) {
     return (neighbour_sync_header_t*) (msg->data - CC2420_SIZE + len);
   }
+  /***************** Neighbourtable Functions ***********************/
 
   uint8_t getIndex(am_addr_t lladdr) {
     uint8_t i;
@@ -656,6 +666,11 @@ implementation {
     uint16_t minUsageCount=0xffff;
     uint8_t minUsageIndex=0;
 
+#ifdef CC2420SYNC_DEBUG
+    call DSN.logInt(lladdr);
+	call DSN.log("replace entry with %i");
+#endif
+
     lastReplaceIndex++;
     for (i=0;i<numEntries;i++)
       if (n_table[(i+lastReplaceIndex) % NEIGHBOURSYNCTABLESIZE].usageCount < minUsageCount) {
@@ -684,6 +699,8 @@ implementation {
     }
 */
   }
+  /***************** Time Calculation Functions ***********************/
+  /***************** Send Functions ***********************/
   
   void send() {
 	  error_t error;

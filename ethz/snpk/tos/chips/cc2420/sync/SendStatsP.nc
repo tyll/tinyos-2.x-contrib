@@ -45,6 +45,7 @@ module SendStatsP {
     interface AMPacket;
     interface DSN;
     interface DsnCommand<uint8_t> as GetStatsCommand;
+    interface State as SyncSendState;
   }
 }
 
@@ -129,6 +130,8 @@ implementation {
     call DSN.logInt(n_unicast_short);
     call DSN.logInt(n_unicast_short_acked);
     call DSN.log("Stats: %i | %i %i | %i %i");
+    call DSN.logInt(call SyncSendState.getState());
+    call DSN.log("sendstate: %i");
   }
 
   /***************** Functions ***********************/

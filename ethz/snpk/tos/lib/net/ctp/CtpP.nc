@@ -201,6 +201,7 @@ implementation {
   Forwarder.LowPowerListening->Lpl;
 
   components CC2420PacketC,
+  NeighbourSyncC,
   new DsnCommandC("get topology", uint8_t, 0) as GetTopologyCommand,
   new DsnCommandC("set parent", am_addr_t, 1) as SetParentCommand;
   Router.GetTopologyCommand->GetTopologyCommand;
@@ -208,7 +209,8 @@ implementation {
 
   Router.CC2420Packet->CC2420PacketC;
   Forwarder.CC2420Packet->CC2420PacketC;
-
+  Forwarder.NeighbourSyncFlowPacket -> NeighbourSyncC;
+  
 #if defined(PLATFORM_TELOSB) || defined(PLATFORM_MICAZ)
 #ifndef TOSSIM
   components CC2420ActiveMessageC as PlatformActiveMessageC;

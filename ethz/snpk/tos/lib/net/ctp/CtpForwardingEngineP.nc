@@ -413,9 +413,6 @@ implementation {
       dbg("Forwarder", "%s: queue empty, don't send\n", __FUNCTION__);
       call CollectionDebug.logEvent(NET_C_FE_SENDQUEUE_EMPTY);
       //call DSN.logDebug("forwarding queue empty");
-      if (fastPacketCount>0) {
-    	  call DSN.logInt(fastPacketCount);call DSN.log("q empty,fastpackets %i");
-      }
       fastPacketCount=0;
       return;
     }
@@ -660,7 +657,6 @@ implementation {
       call DSN.logInt(call AMPacket.destination(msg));
       call DSN.logWarning("noAck > %i");
 */
-      call DSN.logInt(fastPacketCount);call DSN.log("nack,fastpackets %i");
       fastPacketCount=0;
       if (--qe->retries) {
         dbg("Forwarder", "%s: not acked\n", __FUNCTION__);
@@ -668,13 +664,6 @@ implementation {
 					 call CollectionPacket.getSequenceNumber(msg), 
 					 call CollectionPacket.getOrigin(msg), 
                                          call AMPacket.destination(msg));
-	/*
-	if (qe->retries%ROUTE_UPDATE_TRIGGER_THRESHHOLD==0) {
-		call CtpInfo.triggerRouteUpdate();
-		call DSN.logInt(qe->retries);
-		call DSN.logDebug("Trigger route update after %i retries");
-	} 
-	*/
         startRetxmitTimer(SENDDONE_NOACK_WINDOW, SENDDONE_NOACK_OFFSET);
       } else {
         //max retries, dropping packet
@@ -720,7 +709,6 @@ implementation {
       }
       else {
         startRetxmitTimer(SENDDONE_OK_WINDOW, SENDDONE_OK_OFFSET);
-        call DSN.logInt(fastPacketCount);call DSN.log("fastpackets %i");
         fastPacketCount=0;
       }
     }
@@ -746,7 +734,6 @@ implementation {
       }
       else {
         startRetxmitTimer(SENDDONE_OK_WINDOW, SENDDONE_OK_OFFSET);
-        call DSN.logInt(fastPacketCount);call DSN.log("fastpackets %i");
         fastPacketCount=0;
       }
     }

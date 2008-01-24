@@ -60,7 +60,7 @@
 enum {
 #if PLATFORM_MICAZ || PLATFORM_TELOSA || PLATFORM_TELOSB || PLATFORM_TMOTE
   FORWARD_PACKET_TIME = 128, // wait longer for lpl (100 instead of 4)
-  FORWARD_PACKET_TIME_SHORT = 4,
+  FORWARD_PACKET_TIME_SHORT = 64,
 #else
   FORWARD_PACKET_TIME = 32,
   FORWARD_PACKET_TIME_SHORT = 32,
@@ -79,7 +79,7 @@ enum {
   SENDDONE_OK_WINDOW        = (SENDDONE_OK_OFFSET << 2) -1,
   CONGESTED_WAIT_OFFSET     = FORWARD_PACKET_TIME  << 2,
   CONGESTED_WAIT_WINDOW     = CONGESTED_WAIT_OFFSET - 1,
-  MAX_FAST_PACKETS          = 2,
+  MAX_FAST_PACKETS          = 4,
 };
 
 
@@ -113,14 +113,11 @@ typedef nx_struct {
  * from another node (client == 255). Retries keeps track
  * of how many times the packet has been transmitted.
  */
+
 typedef struct {
   message_t *msg;
   uint8_t client;
   uint8_t retries;
 } fe_queue_entry_t;
-
-enum {
-  ROUTE_UPDATE_TRIGGER_THRESHHOLD = 5, // amount of failed transmits for a message until a route update is triggered
-};
 
 #endif

@@ -56,7 +56,7 @@ enum {
 	AM_FRAME_PART = 1,
 	AM_OV_DBG = 2,
 	AM_PXA_DBG = 3,
-	AM_CMD = 4	
+	AM_CMD_MSG = 4	
 };
 
 typedef nx_struct frame_part{
@@ -69,7 +69,7 @@ typedef nx_struct {
 	nx_uint16_t send_next_n_parts;
 } frame_part_request_t;
 
-typedef nx_struct {
+typedef nx_struct cmd_msg{
 	nx_uint8_t cmd;
 	nx_uint16_t val1;
 	nx_uint16_t val2;

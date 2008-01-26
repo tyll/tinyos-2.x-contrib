@@ -53,7 +53,7 @@ public class CameraGUI implements MessageListener, Messenger {
     JCheckBox clearAfterSave, isColor, saveBytes;
 
     public CameraGUI(boolean connect) {
-	    try {
+		try {
 	    	guiInit();
 		}
 		catch(Exception e) {
@@ -66,7 +66,9 @@ public class CameraGUI implements MessageListener, Messenger {
 		try {
 		    /* Setup communication with the mote and request a messageReceived
 		       callback when an AlertMsg is received */
+		    System.out.print("connecting to serial forwarder: failed");
 		    mote = new MoteIF(this);
+			System.out.println("\b\b\b\b\b\bok    ");
 		    mote.registerListener(new Frame_partMsg(), this);
 		}
 		catch(Exception e) {
@@ -97,19 +99,26 @@ public class CameraGUI implements MessageListener, Messenger {
 
 	c.fill = GridBagConstraints.HORIZONTAL;
 	c.gridwidth = GridBagConstraints.REMAINDER;
+	isColor = buttonPanel.makeCheckBox("Color Image", false);
+	c.fill = GridBagConstraints.HORIZONTAL;
+	c.gridwidth = GridBagConstraints.REMAINDER;
+	ActionListener getImageAction = new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+		    getImage();
+		}
+	    };
+	buttonPanel.makeButton("Get Image", getImageAction);
 
-	buttonPanel.makeLabel("Controls", JLabel.CENTER);
-	c.gridwidth = GridBagConstraints.RELATIVE;
-	clearAfterSave = buttonPanel.makeCheckBox("Clear", false);
-	c.gridwidth = GridBagConstraints.REMAINDER;
-	isColor = buttonPanel.makeCheckBox("Color", false);
-	c.gridwidth = GridBagConstraints.REMAINDER;
-	saveBytes = buttonPanel.makeCheckBox("Save Bytes Only", false);
+	clearAfterSave = new JCheckBox(); clearAfterSave.setSelected(true);
+				   //buttonPanel.makeCheckBox("Clear", true);
+	saveBytes = new JCheckBox(); saveBytes.setSelected(false);
+			  	   //buttonPanel.makeCheckBox("Save Bytes", false);
+
 	buttonPanel.makeSeparator(SwingConstants.HORIZONTAL);
 
-	buttonPanel.makeLabel("Interval", JLabel.CENTER);
+	buttonPanel.makeLabel("Saved File Name:", JLabel.CENTER);
 	fieldInterval = buttonPanel.makeTextField(10, null);
-	fieldInterval.setText(Integer.toString(0));
+	fieldInterval.setText("c:\\tmp\\imote2\\");
 
 	ActionListener settingsAction = new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
@@ -148,10 +157,43 @@ public class CameraGUI implements MessageListener, Messenger {
     ArrayList<short[]> data = new ArrayList<short[]>();
     boolean is_picture_color = false;
     
+    public void getImage() { 
+	CmdMsg smsg = new CmdMsg();
+
+	/* Build and send command message */
+	if (isColor.isSelected())
+	    smsg.set_cmd((short)1);
+	else    
+	    smsg.set_cmd((short)0);
+
+	try {
+	    mote.send(MoteIF.TOS_BCAST_ADDR, smsg);
+	}
+	catch (IOException e) {
+	    error("Cannot send message to mote");
+	}
+    }
+
     public void save(){
     	is_picture_color = isColor.isSelected();
     	try{
-	    	String file_name = "C:\\cygwin\\tmp\\picture_" + System.currentTimeMillis();
+	    	String file_name;
+			file_name = fieldInterval.getText()+"picture_" + System.currentTimeMillis();
+	    	if (saveBytes.isSelected())
+	    		file_name += ".bytes";
+	    	else if (!is_picture_color)
+				file_name += ".pgm";
+	    	else
+	    		file_name += ".ppm";
+		    FileOutputStream fostr=null;
+			try{
+				fostr=new FileOutputStream(file_name);
+			}
+			catch (Exception e){
+				message("Can't write "+file_name+" file!\nMake sure the dir exists!\n");
+				return;
+			};
+				
 	    	OutputStreamWriter writer = null;
 	    	String pgmHeader =  "P2\r\n" +
 	    						MAX_X+" "+MAX_Y+"\r\n"+
@@ -161,21 +203,14 @@ public class CameraGUI implements MessageListener, Messenger {
 								"63\r\n";
 	    		
 	    	if (saveBytes.isSelected())
-	    	{
-	    		writer = new OutputStreamWriter(new FileOutputStream(file_name+".bytes"));
-	    	}
+	    		writer = new OutputStreamWriter(fostr);
 	    	else
 	    	{
+	    		writer = new OutputStreamWriter(fostr);
 		    	if (!is_picture_color)
-		    	{
-		    		writer = new OutputStreamWriter(new FileOutputStream(file_name+".pgm"));
 		    		writer.write(pgmHeader);
-		    	}
 		    	else
-		    	{
-		    		writer = new OutputStreamWriter(new FileOutputStream(file_name+".ppm"));
 		    		writer.write(ppmHeader);
-		    	}
 	    	}
 	    	
 	        int cnt_row=1;
@@ -231,6 +266,7 @@ public class CameraGUI implements MessageListener, Messenger {
 	        	}
 	        writer.flush();
 	        writer.close();
+			message("Saved "+file_name+"file and cleared data structures.\nReady for the next img.");
     	}
     	catch(Exception e){System.out.println(e);}
     	

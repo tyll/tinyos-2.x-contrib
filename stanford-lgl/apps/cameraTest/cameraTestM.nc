@@ -91,7 +91,7 @@ implementation
 	norace uint8_t color_picture = 0;
 	task void processFrame()
 	{
-		frame_part_t *part = (frame_part_t *)call Packet.getPayload(&fwdMsg, NULL);
+		frame_part_t *part = (frame_part_t *)call Packet.getPayload(&fwdMsg, sizeof(frame_part_t));
 		int total_size;
 		int total_parts;
 		int buf_offset;
@@ -172,11 +172,18 @@ implementation
 
 	norace uint32_t time;
 	norace uint8_t stop_timing=1;
-	async event void Alarm.fired() {
-		dbg_msg32_t *tx_data = (dbg_msg32_t *)call Packet.getPayload(&pxa_dbg_msg, NULL);
-		atomic {stop_timing = 1;}
+	task void alarmTask() {
+   		dbg_msg32_t *tx_data = (dbg_msg32_t *)call Packet.getPayload(&pxa_dbg_msg, sizeof(dbg_msg32_t));
 		tx_data->reg_val = time;
 		post send_pxa_dbg();
+	}
+	
+	async event void Alarm.fired() {
+		atomic
+		{ 
+		   stop_timing = 1;
+		}
+		post alarmTask();
 	}
 
 	task void measureCPUticks()
@@ -216,15 +223,15 @@ implementation
 			post processFrame();
 		}
 		else if (cmdMsg->cmd == 3) {
-			dbg_msg32_t *tx_data = (dbg_msg32_t *)call Packet.getPayload(&pxa_dbg_msg, NULL);
-			uint32_t *sdram = SDRAM_ADDRESS;
+			dbg_msg32_t *tx_data = (dbg_msg32_t *)call Packet.getPayload(&pxa_dbg_msg, sizeof(dbg_msg32_t));
+			uint32_t *sdram = (uint32_t *)SDRAM_ADDRESS;
 			*sdram = 0x10203040UL;
-			tx_data->addr = sdram;
+			tx_data->addr = (uint32_t)sdram;
 			tx_data->reg_val = *sdram;
 			post send_pxa_dbg();
 		}
 		else if (cmdMsg->cmd == 4) {
-			dbg_msg32_t *tx_data = (dbg_msg32_t *)call Packet.getPayload(&pxa_dbg_msg, NULL);
+			dbg_msg32_t *tx_data = (dbg_msg32_t *)call Packet.getPayload(&pxa_dbg_msg, sizeof(dbg_msg32_t));
 			time = cmdMsg->val1;
 			tx_data->addr = time;
 			post startCPUmeasurement();
@@ -241,7 +248,7 @@ implementation
 	}
 	event message_t *PXADbgReceive.receive(message_t *msg, void *payload, uint8_t len) {
 		dbg_msg32_t *rx_data = (dbg_msg32_t *)payload;
-		dbg_msg32_t *tx_data = (dbg_msg32_t *)call Packet.getPayload(&pxa_dbg_msg, NULL);
+		dbg_msg32_t *tx_data = (dbg_msg32_t *)call Packet.getPayload(&pxa_dbg_msg, sizeof(dbg_msg32_t));
 		tx_data->addr = rx_data->addr;
 		tx_data->reg_val = _PXAREG(rx_data->addr);
 		post send_pxa_dbg();
@@ -256,7 +263,7 @@ implementation
 	}
 	event message_t *OVDbgReceive.receive(message_t *msg, void *payload, uint8_t len) {
 		dbg_msg8_t *rx_data = (dbg_msg8_t *)payload;
-		dbg_msg8_t *tx_data = (dbg_msg8_t *)call Packet.getPayload(&ov_dbg_msg, NULL);
+		dbg_msg8_t *tx_data = (dbg_msg8_t *)call Packet.getPayload(&ov_dbg_msg, sizeof(dbg_msg8_t));
 		tx_data->addr = rx_data->addr;
 		tx_data->reg_val = call OVAdvanced.get_reg_val(tx_data->addr);
 		post send_ov_dbg();

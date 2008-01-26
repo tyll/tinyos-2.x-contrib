@@ -59,7 +59,7 @@ implementation {
   cameraTestM.SerialControl -> Serial; 
   cameraTestM.Packet -> Serial;
   cameraTestM.FrameSend     -> Serial.AMSend[AM_FRAME_PART];
-  cameraTestM.CmdReceive  -> Serial.Receive[AM_CMD];
+  cameraTestM.CmdReceive  -> Serial.Receive[AM_CMD_MSG];
 
   components HplOV7649C;
   cameraTestM.OVAdvanced -> HplOV7649C;

@@ -37,6 +37,7 @@
 //--EOCpr712 (do not remove this line, which terminates copyright include)
 
 #include "Beacon.h"
+#include "Timer.h"
 
 module probeTsyncP {
   uses {
@@ -44,7 +45,7 @@ module probeTsyncP {
     interface AMSend;
     interface SplitControl as AMControl;
     interface Leds;
-    interface Wakker;
+    interface Timer<TMilli>;
   }
 }
 implementation
@@ -59,7 +60,7 @@ implementation
 
   event void AMControl.startDone(error_t e) {
     if (e == SUCCESS) {
-      call Wakker.set(0,1);
+      call Timer.startOneShot(256);
       msgFree = TRUE;
       count = 0;
       }
@@ -75,34 +76,19 @@ implementation
     r = call AMSend.send(AM_BROADCAST_ADDR, &msg, sizeof(beaconProbeMsg));
     if (r == SUCCESS) { 
       msgFree = FALSE;
-      call Leds.led0Toggle();
       }
-    else call Wakker.set(1,1);
-    }
-
-  task void mainTask() {
-    // schedule probe and restart 
-    call Wakker.set(1,1);
-    call Wakker.set(0,30*8);
-    // call Wakker.set(0,5*8);
-    // call Wakker.set(0,90*8);
+    else call Timer.startOneShot(256);
     }
 
   event void AMSend.sendDone(message_t* s, error_t e) {
-    if (e == SUCCESS) call Leds.led2Toggle(); 
+    if (e == SUCCESS) call Leds.led0Toggle(); 
     msgFree = TRUE;
+    call Timer.startOneShot(30*1024u);
     }
  
   /**
-   * Wakker wakeup.  Here's where we use the index feature of wakeups
-   * to post the appropriate task for the event.  
+   * Timer wakeup
    * @author herman@cs.uiowa.edu
    */
-  event error_t Wakker.wakeup(uint8_t indx, uint32_t wake_time) {
-    switch (indx) {
-      case 0: post mainTask(); break;
-      case 1: post launch(); break;
-      }
-    return SUCCESS;
-    }
+  event void Timer.fired() { post launch(); }
 }

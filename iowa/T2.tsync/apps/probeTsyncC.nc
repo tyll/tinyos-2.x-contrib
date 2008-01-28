@@ -38,10 +38,11 @@
 
 configuration probeTsyncC {}
 implementation {
-  components MainC, probeTsyncP, OTimeC, WakkerC, LedsC, ActiveMessageC;
+  components MainC, probeTsyncP, LedsC, ActiveMessageC;
   components new AMSenderC(AM_BEACON_PROBE) as ProbeSend;
+  components new TimerMilliC() as TimerThousand;
   probeTsyncP.AMControl -> ActiveMessageC;
-  probeTsyncP.Wakker -> WakkerC.Wakker[unique("Wakker")];
+  probeTsyncP.Timer -> TimerThousand;
   probeTsyncP.AMSend -> ProbeSend; 
   probeTsyncP.Leds -> LedsC;
   probeTsyncP.Boot -> MainC;

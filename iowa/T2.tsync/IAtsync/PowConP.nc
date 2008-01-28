@@ -43,16 +43,14 @@ module PowConP {
   provides { 
     interface PowCon[uint8_t id];
     interface PowConQS;
+    interface SplitControl;
     }
   uses {
     interface Leds;
     interface Wakker;
     interface Tsync;
     interface Random;
-    interface SplitControl as CSMAControl;
-    interface Timer<TMilli> as TimerThousand; 
-    interface Timer<TMilli> as TimerForUp; 
-    interface Timer<TMilli> as TimerForDown;
+    interface SplitControl as AMControl;
     }
   }
 
@@ -65,8 +63,9 @@ implementation {
   uint8_t fireClient = WAKE_slots;  // client number in sequence of firings
   bool gotSync = FALSE;  // False until global clocks are synchronized 
   bool forceOn = TRUE;   // initially True; also by forceOn() command 
-  bool powerOn = TRUE;   // initially, radio is on
+  bool powerOn = FALSE;   // initially, radio is off
   bool IOpending = FALSE;  // and no messages in transit
+  bool initialized = FALSE;  // and even AMControl has not been called 
   uint8_t slots = 0;
   
   // a pseudo-LCM function, finds smallest value z such that
@@ -94,6 +93,16 @@ implementation {
            }
      }
 
+  // return current maximum period for all clients
+  command uint16_t PowCon.maxPeriod[uint8_t id]() {
+     uint16_t r = NORM_WAIT;  // default value to return
+     uint8_t i,j;
+     if (!slots) return r;
+     for (i=0;i<slots;i++)
+       r = ( client[i].period > r ) ? client[i].period : r;
+     return r;
+     }
+
   // sort priorities, given the sorted client powsched array & id array
   void sortPriorities() {
      uint8_t i,j;
@@ -111,25 +120,22 @@ implementation {
      // => priorityIds is list of Ids, in increasing order by priority
      }
 
-  // task and timer for turning the radio OFF 
-  task void powerDownRadio() {
-     error_t r = call CSMAControl.stop(); 
-     if (r == EALREADY) return; // should not occur
-     if (r == SUCCESS) return;  // NOTE: could actually occur 4-15ms later
-     if (r == EBUSY) call TimerForDown.startOneShot(1);  
+  // provide initialization and power-control of radio
+  command error_t SplitControl.start() { 
+     powerOn = TRUE;
+     return call AMControl.start(); 
      }
-  event void CSMAControl.stopDone( error_t e ) { }
-  event void TimerForDown.fired() { post powerDownRadio(); }
-
-  // task and timer for turning the radio ON
-  task void powerUpRadio() {
-     error_t r = call CSMAControl.start(); 
-     if (r == EALREADY) return;  // should never occur
-     if (r == SUCCESS) return;
-     if (r == EBUSY) call TimerForUp.startOneShot(1);  
+  event void AMControl.startDone( error_t r ) { 
+     if (!initialized) {
+        signal SplitControl.startDone(r);
+	initialized = TRUE;  // optimistic -- what happens if r is FAIL?
+	return;
+	}
      }
-  event void CSMAControl.startDone( error_t e ) { }
-  event void TimerForUp.fired() { post powerUpRadio(); }
+  command error_t SplitControl.stop() { }
+  event void AMControl.stopDone( error_t r ) { 
+     powerOn = FALSE;  // maybe that is wrong if r != SUCCESS ... 
+     }
 
   // task to set up client activity 
   task void fire() {  // implicit parameters:  fireOffset, fireClient
@@ -137,14 +143,14 @@ implementation {
      while (fireClient < slots) { // handle first/next client
         uint16_t a;
         if (!powerOn) { 
-	   // if power is not on yet, schedule that to occur in 
-	   // 126 milliseconds:  that will turn on the power just 
-	   // 2 milliseconds before the next "Wakker" unit (1/8 sec)
-	   // boundary;  then, if LMARGIN's livetime is 1, we get 
-	   // a most economical power control out of this ...
-	   call TimerThousand.stop();
-           call TimerThousand.startOneShot( 126 );  
-	   powerOn = TRUE;   // actually a lie, but will soon be really true 
+	   // if power is not on yet, the best ideas is to 
+	   // schedule that to occur in 126 milliseconds:  
+	   // that will turn on the power just 2 milliseconds 
+	   // before the next "Wakker" unit (1/8 sec)
+	   // UNFORTUNATELY, I couldn't reliably get TinyOS to
+	   // schedule this so tightly, hence, just call AMControl.start:
+           call AMControl.start(); 
+           powerOn = TRUE;
 	   }
         // lookup index of first/next client, by priority 
         for (i=0;i<slots;i++) if (priorityIds[fireClient] == ids[i]) break;
@@ -159,21 +165,9 @@ implementation {
         fireClient++;
         }
      // here is where one could power-down the radio
-     if (!forceOn) {
-        powerOn = FALSE;   // even if it's a lie!
-	call Leds.led0On();
-	if (!IOpending) { 
-	   post powerDownRadio();
-	   }
-	}
+     if (!forceOn) if (!IOpending) call AMControl.stop();
      for (i=0;i<WAKE_slots;i++) signal PowCon.idle[i]();
      } 
-
-  // Timer-activated event for turning power on
-  event void TimerThousand.fired() {
-     post powerUpRadio();
-     call Leds.led0Off();
-     }
 
   // Set first/next wakeup time
   //   Note:  this could be called even while a firing sequence
@@ -263,8 +257,6 @@ implementation {
 
      // first, kill any current alarm 
      call Wakker.clear();   // remove all my Wakker settings
-     // also, kill any outstanding timer events
-     call TimerThousand.stop();
 
      // signal each client to solicit period 
      for (i=slots=0;i<WAKE_slots;i++) { 
@@ -321,12 +313,11 @@ implementation {
   command void PowCon.allowOff[uint8_t id]() { forceOn = FALSE; }
 
   event error_t Wakker.wakeup(uint8_t indx, uint32_t wake_time) {
-    bool r = TRUE;
     switch (indx) {
-      case 0: r = post periodWake(); break;
-      case 1: r = post fire(); break;
+      case 0: post periodWake(); break;
+      case 1: post fire(); break;
       }
-    if (r) return SUCCESS; else return FAIL;
+    return SUCCESS; 
     }
 
   // default events for interfaces
@@ -345,5 +336,5 @@ implementation {
   // AMSend wrapper, PowAMSend
   command bool PowConQS.status() { return powerOn; }
   command void PowConQS.setIOPending(bool t) { IOpending = t; }
-  command void PowConQS.startPowerDown() { post powerDownRadio(); }
+  command void PowConQS.startPowerDown() { call AMControl.stop(); }
   }

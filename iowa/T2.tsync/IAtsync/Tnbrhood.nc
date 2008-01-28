@@ -100,6 +100,16 @@ interface Tnbrhood {
   command uint8_t age( uint16_t Id, timeSyncPtr curTime );
 
   /**
+   *  This command looks through all normal neighbors to see if 
+   *  they have all recently had "diff" values (that is, the difference
+   *  between incoming beacon global times and this node's global clock)
+   *  which are negative (behind this node) w.r.t. the median;  if not,
+   *  then return zero.  Otherwise, return the largest (nearest to zero)
+   *  of these median values, scaled, of course, to microseconds.
+   */
+  command int16_t overDiff( );
+
+  /**
    *  Find the neighborPtr corresponding to a given
    *  mote Id. Result is one of these three cases:
    *  1.  returns NULL -- means not found, and the
@@ -110,6 +120,12 @@ interface Tnbrhood {
    *      but here is a place to insert a new item.
    */
   command neighborPtr findNbr( uint16_t Id );
+
+  /**
+   *  suspect:  return TRUE if this node's recent pattern
+   *  of diff values does not pass a sanity check
+   */
+  command bool suspect( uint16_t Id );
 
   /**
    *  Return start of neighbor_t nbrTab[NUM_NEIGHBORS]

@@ -36,25 +36,26 @@
  */
 //--EOCpr712 (do not remove this line, which terminates copyright include)
 
-//:mode=c:
-
 #include "OTime.h"
 #include "Beacon.h"
 #include "Tnbrhood.h"
 #include "PowCon.h"
 
-// structure for timestamp recording, local to this module
-typedef struct timeTable {
-  uint32_t time32k;      // 32-bit value, from 32kHz counter
-  uint32_t timeMicro;    // 32-bit value, from Microsecond counter
-  uint16_t key;          // a "time" for an SFD detection event
-  } timeTable;       
-enum { timeTableSize = 3 };
+#if defined(PLATFORM_TELOSB)
 // Telosb microsecond resolution-timer has about 0.5% accuracy
 // over time;  not good!  Except, when interval is around 6200
 // microseconds, it still beats the 32kHz counter, because a 
 // jiffie for the latter is 30.5 microseconds
 enum { MICROSEC_BETTER = 6200 };
+#endif
+#if defined(PLATFORM_MICAZ) & !defined(MIXED_CC2420)
+// structure for timestamp recording, local to this module
+typedef struct timeTable {
+  uint32_t timeMicro;    // 32-bit value, from Microsecond counter
+  uint16_t key;          // a "time" for an SFD detection event
+  } timeTable;       
+enum { timeTableSize = 3 };
+#endif
 
 module TsyncP {
   provides interface Tsync;
@@ -64,21 +65,13 @@ module TsyncP {
     interface RadioTimeStamping;
     interface CC2420PacketBody;
     interface CC2420Transmit;
-    #ifdef DEMO_LIGHTS
-    interface Leds as ShowLeds;
-    #endif
+    interface Counter<T32khz,uint16_t>;
     interface SplitControl as AMControl;
     interface AMSend as BeaconSend; 
     interface Receive as BeaconReceive;
-    #ifdef TUART
-    interface AMSend as UARTSend;
-    #endif
     interface AMSend as ProbeSend;
     interface AMSend as ProbeDebug;
     interface Receive as ProbeReceive;
-    #ifdef TRACK
-    interface StdControl as skewControl;
-    #endif
     interface OTime;
     interface Leds as MsgLeds;
     interface Leds;
@@ -86,6 +79,15 @@ module TsyncP {
     interface Tnbrhood;
     interface Neighbor;
     interface PowCon;
+    #ifdef DEMO_LIGHTS
+    interface Leds as ShowLeds;
+    #endif
+    #ifdef TUART
+    interface AMSend as UARTSend;
+    #endif
+    #ifdef TRACK
+    interface StdControl as skewControl;
+    #endif
     }
   }
 implementation {
@@ -106,16 +108,19 @@ implementation {
   uint8_t mode;        // see Tnbrhood.h for a definition of modes
   uint8_t demoCounter;  // NOT NEEDED FOR PRODUCTION VERSION
   uint8_t DEBUGCOUNT = 0;   // ### just for debugging ####
+
   /*---------------- end of state variables ----------------------*/
 
   /***** variables for processing a received beacon ***************/ 
-  norace timeTable timTab[timeTableSize];
   timeSync_t receiveTime;
   int16_t theDiff;   
   int16_t showDiff;   
   beaconMsg buf;
   bool bufFree;
-  uint8_t timeIndx = 0;
+  #if defined(PLATFORM_MICAZ) & !defined(MIXED_CC2420)
+    norace timeTable timTab[timeTableSize];
+    uint8_t timeIndx = 0;
+  #endif
   /*---------------- end of variables for received beacon --------*/
 
   /***** variables for responding to a probe **********************/
@@ -123,8 +128,8 @@ implementation {
 
   /***** variables for generating a beacon ************************/ 
   message_t msg;       
-  uint32_t genSysTime; 
   norace uint32_t xDelay;    // for Delay calculation
+  norace uint32_t yDelay;    // (microsec) for Delay calculation
   norace uint8_t delay[4];   // mini-buffer for CC2420 write
   bool msgFree;
   /*---------------- end of variables for generating a beacon ----*/
@@ -136,6 +141,7 @@ implementation {
     c->ClockL = a->ClockL ^ b->ClockL;
     }
 
+  #if defined(PLATFORM_MICAZ) & !defined(MIXED_CC2420)
   /*** function for lookup by "time" in timTab array of timeTable ******/
   timeTable* ttFind(uint16_t t) {
     uint8_t i;
@@ -143,10 +149,13 @@ implementation {
     if (i < timeTableSize) return &timTab[i];
     return NULL;
     }
- 
+  #endif
+
   /*** task to initialize variables, signal other components to init ***/
   task void allInit() {
-    signal componentBoot.booted();  // tell all other components to start
+    call Wakker.init();             // tell Wakker to start first
+    call OTime.init();              // and then OTime is second;
+    signal componentBoot.booted();  // then tell all other components to start
     theDiff = 0;
     demoCounter = 0; 
     bufFree = msgFree = TRUE;
@@ -182,7 +191,7 @@ implementation {
     b = call Tnbrhood.getMaxDisplacement(&t);
     if (b != 0) {
         // check if maxdisplacement is in the "future" 
-        call OTime.pubLocalTime(&v,NULL);  // get skew-adjusted local time
+        call OTime.pubLocalTime(&v);  // get skew-adjusted local time
         call OTime.add(&v,&t,&w);    // w is conjectured maximum
         call OTime.conv1LocalTime(&v);  // now v is curr global time
         // adopt new time if larger than what we now have
@@ -199,16 +208,21 @@ implementation {
     beaconMsg bMsg;
     timeSync_t genTime;
     bMsg.mode = mode;
-    bMsg.mode |= MODE_MSP;   // indicate this is an MSP processor
-                           // (for MicaZ interoperability)
     bMsg.NbrSize = call Tnbrhood.Nsize();
     bMsg.sndId = TOS_NODE_ID;
     bMsg.prevDiff = showDiff;
     showDiff = 16000 + DEBUGCOUNT;
-    call OTime.pubLocalTime( &genTime, &genSysTime );
+    call OTime.pubLocalTime( &genTime );
     bMsg.Local = genTime;
     bMsg.Delay = 0;
-    xDelay = call OTime.getNative32();
+    #if defined(PLATFORM_TELOSB)
+     xDelay = call OTime.getNative32();
+     #if defined(USE_MICROSECOND_CLOCK)
+     yDelay = call OTime.getNativeMicro();
+     #endif
+    #elif defined(PLATFORM_MICAZ)
+    yDelay = call OTime.getNativeMicro();
+    #endif
     call OTime.conv1LocalTime( &genTime );   
     bMsg.Virtual = genTime;
     timeSyncXOR(&bMsg.Local,&bMsg.Virtual,&bMsg.Xor);
@@ -291,14 +305,18 @@ implementation {
        uint16_t x = (theDiff < 0) ? -theDiff : theDiff; 
        uint8_t n = call Tnbrhood.Nsize();
        if ( (n > 0) && 
-            ((uint32_t)x <= (uint32_t)NORM_WAIT*MAX_DRIFT) && 
+            (((uint32_t)x) <= (uint32_t)NORM_WAIT*MAX_DRIFT) && 
 	    (x != 32767) ) {
           mode |= MODE_GOTSYNC;
-          signal Tsync.synced();    // inform users of being synced 
+          call Wakker.setSync();   // align the alarm service
+          #if defined(POWCON)
+          call Neighbor.fix();     // temporarily fix the current set of neighbors
+          #endif
+          signal Tsync.synced();   // inform users of being synced 
           }
        }
+    else call Wakker.setSync();   // realign alarm service, if needed 
 
-    call Wakker.setSync();   // realign alarm service, if needed 
     #if defined(DEMO_LIGHTS) 
     doDemo();  // show some synchronized behavior in demo 
     #endif
@@ -342,10 +360,10 @@ implementation {
     // return 0 for normal neighbor who cannot be processed 
     // return 1 for normal, sane, bidirectional in-table neighbor
     #if !defined(TRACK) 
-    // this recording step really has no effect for non-tracking style
-    call Tnbrhood.record(q->mode,loc,&q->Local,&q->Virtual,theDiff,q->sndId);
-    if (q->mode & MODE_NORMAL) return 1;
-    else return -1;  // consider anyone to be a neighbor
+     // this recording step really has no effect for non-tracking style
+     call Tnbrhood.record(q->mode,loc,&q->Local,&q->Virtual,theDiff,q->sndId);
+     if (q->mode & MODE_NORMAL) return 1;
+     else return -1;  // consider anyone to be a neighbor
     #else 
     neighborPtr n;
     uint16_t x;
@@ -395,7 +413,7 @@ implementation {
     #endif
     timeSync_t saveLocal;
     timeSync_t workTime;
-    beaconMsgPtr q =&buf;
+    beaconMsgPtr q = &buf;
     uint8_t Nsize;
 
     // call MsgLeds.led0Toggle();
@@ -405,13 +423,6 @@ implementation {
       return (void)(bufFree = TRUE); 
       }
 
-    // check for a beacon from MicaZ, need to convert
-    if (!(q->mode & MODE_MSP)) {
-      call OTime.Z2Tel( &q->Local );
-      call OTime.Z2Tel( &q->Virtual );
-      call OTime.Z2Tels( &q->Delay );
-      }
-       
     // compensate for MAC delay, if that is possible to do
     if (!adjMacDelay(q)) return (void)(bufFree = TRUE); 
 
@@ -473,11 +484,13 @@ implementation {
                // consider being at least be helpful by increasing
                // the frequency of beaconing
                if (q->mode & MODE_RECOVERING) {  
+	          #if !defined(POWCON)
                   frequency = INIT_WAIT;        // time for "helping" 
                   freqcount = INIT_COUNT;
                   call PowCon.forceOn();  // abandon power schedule
                   call PowCon.restart();  // restart the schedule
                   call Wakker.clear();          // clearing Wakker could
+		  #endif
                   msgFree = bufFree = TRUE;     // require msgFree 
                                                 // and bufFree reset
                   // WARNING WARNING PREVIOUS STMT COULD BE A BUG!!!
@@ -491,6 +504,10 @@ implementation {
                if (call OTime.lesseq(&q->Virtual,&receiveTime))  
                     return (void)(bufFree = TRUE); 
                call OTime.subtract(&q->Virtual,&receiveTime,&workTime);
+	       #if defined(STOPJUMP)
+	       if (workTime.ClockH > 0) return (void)(bufFree = TRUE);
+	       if (workTime.ClockL > 10u*TPS) return (void)(bufFree = TRUE);
+	       #endif
                call OTime.adjGlobalTime( &workTime );
                return (void)(bufFree = TRUE); 
                #else
@@ -500,7 +517,15 @@ implementation {
                  // for small neighborhoods, we trust a normal neighbor
                  if (call OTime.lesseq(&q->Virtual,&receiveTime)) 
                             return (void)(bufFree = TRUE);
+	         if (call Tnbrhood.suspect(q->sndId)) // skip suspect neighbor 
+                    return (void)(bufFree = TRUE); 
+		 // neighbor is persistent (or just starting), so be 
+		 // gullible and adjust to this crazy neighbor clock
                  call OTime.subtract(&q->Virtual,&receiveTime,&workTime);
+	         #if defined(STOPJUMP)
+	         if (workTime.ClockH > 0) return (void)(bufFree = TRUE);
+	         if (workTime.ClockL > 10u*TPS) return (void)(bufFree = TRUE);
+	         #endif
                  call OTime.adjGlobalTime( &workTime );
                  return (void)(bufFree = TRUE); 
                  }
@@ -515,10 +540,10 @@ implementation {
                switch (call Tnbrhood.outlier(&otherId)) {
                  case  1:  /*** there is a single outlier **********/
                      if (otherId == TOS_NODE_ID) {
+		        uint8_t l;
                         // my node is presumably faulty 
-                        otherId = call Tnbrhood.getMaxDisplacement(&workTime);
-                        if (otherId != 0) 
-                           call OTime.setGlobalOffset(&workTime); 
+                        l = call Tnbrhood.getMaxDisplacement(&workTime);
+                        if (l != 0) call OTime.setGlobalOffset(&workTime); 
                         break;
                         }
                      //**** here is a place to "accuse" the outlier ***
@@ -543,6 +568,11 @@ implementation {
                      // to the time in the beacon
                      if (call OTime.lesseq(&q->Virtual,&receiveTime)) break;
                      call OTime.subtract(&q->Virtual,&receiveTime,&workTime);
+	             #if defined(STOPJUMP)
+	             if (workTime.ClockH > 0) return (void)(bufFree = TRUE);
+	             if (workTime.ClockL > 10u*TPS) 
+		        return (void)(bufFree = TRUE);
+	             #endif
                      call OTime.adjGlobalTime( &workTime );
                      break;
                  };
@@ -554,6 +584,10 @@ implementation {
                if (call OTime.lesseq(&q->Virtual,&receiveTime)) 
                   return (void)(bufFree = TRUE); 
                call OTime.subtract(&q->Virtual,&receiveTime,&workTime);
+	       #if defined(STOPJUMP)
+	       if (workTime.ClockH > 0) return (void)(bufFree = TRUE);
+	       if (workTime.ClockL > 10u*TPS) return (void)(bufFree = TRUE);
+	       #endif
                call OTime.adjGlobalTime( &workTime );
                return (void)(bufFree = TRUE); 
 
@@ -565,6 +599,10 @@ implementation {
                if (call OTime.lesseq(&q->Virtual,&receiveTime))
                   return (void)(bufFree = TRUE); 
                call OTime.subtract(&q->Virtual,&receiveTime,&workTime);
+	       #if defined(STOPJUMP)
+	       if (workTime.ClockH > 0) return (void)(bufFree = TRUE);
+	       if (workTime.ClockL > 10u*TPS) return (void)(bufFree = TRUE);
+	       #endif
                call OTime.adjGlobalTime( &workTime );
                return (void)(bufFree = TRUE); 
       #endif
@@ -572,40 +610,66 @@ implementation {
       bufFree = TRUE;  // shouldn't be executed.
     }
 
-  /***** Receive beacon & post fileBeacon to process **************/ 
-  event message_t* BeaconReceive.receive(message_t* m, void* lp, uint8_t l) {
-    uint32_t elapsed, recClock;
-    uint32_t nowMicro, recClockMicro;  // only for Telos
+  /***** Determine receiveTime for a Beacon or Probe message ******/
+  // return TRUE if the time is calculated, otherwise FALSE because
+  // of rollover or some other condition
+  bool calcReceiveTime(message_t* m, timeSyncPtr z) {
     timeSync_t myStamp;
     cc2420_metadata_t* q;
+    #if defined(PLATFORM_MICAZ) & !defined(MIXED_CC2420)
     timeTable* v;
-    
+    uint32_t recClockMicro;
+    #else
+    uint16_t curClock;
+    #endif
+    if (!bufFree) return FALSE; 
     q = call CC2420PacketBody.getMetadata(m);
-    v = ttFind(q->time);
+
+    #if defined(PLATFORM_MICAZ) & !defined(MIXED_CC2420)
+      v = ttFind(q->time);
+      if (v == NULL) return FALSE;
+      call OTime.getLocalTime(z);    // current Local clock 
+      recClockMicro = call OTime.getLastLTMicro();  // & associated microsec  
+      if (recClockMicro < v->timeMicro) return FALSE; // abort if clock rollover
+      myStamp.ClockL = recClockMicro - v->timeMicro;
+      myStamp.ClockH = 0;
+      call OTime.subtract(z,&myStamp,z);
+      // Postcondition:  z is the local time when msg was received
+
+    #else
+      call OTime.getLocalTime(z); 
+      curClock = call Counter.get();   // 32768Hz on Telos, 28800Hz on MicaZ
+      if (curClock <= q->time) return FALSE; // this code can't tolerate rollover
+      myStamp.ClockL = curClock - q->time;
+      // the following conversion (multiply by 32) works on either 
+      // Telos or MicaZ platforms, converting to native microseconds
+      myStamp.ClockL = myStamp.ClockL << 5;  // convert to Microseconds
+      myStamp.ClockH = 0;
+      #if defined(PLATFORM_MICAZ) & defined(MIXED_CC2420)
+      call OTime.Z2Tels(&myStamp.ClockL);   // convert to binary microseconds
+      #endif
+      call OTime.subtract(z,&myStamp,z);
+      // Postcondition:  z is the local time when msg was received
+    #endif
+
+    return TRUE;
+    }
+
+  /***** Receive beacon & post fileBeacon to process **************/ 
+  event message_t* BeaconReceive.receive(message_t* m, void* lp, uint8_t l) {
+    timeSync_t w;
     if (!bufFree) return m; 
-    if (v == NULL) return m;
-    call OTime.getLocalTime( &receiveTime, &myStamp.ClockL ); 
+    if (!calcReceiveTime(m,&receiveTime)) return m;
+
     call MsgLeds.led2Toggle();
     DEBUGCOUNT++;
-    recClock = v->time32k; 
-    recClockMicro = v->timeMicro;
     showDiff = 15000 + DEBUGCOUNT;       // for display/debug 
-    if (myStamp.ClockL < recClock) return m; // abort if clock rolled over
-    elapsed = myStamp.ClockL - recClock;    // this is how much time to retract
-    nowMicro = call OTime.getNativeMicro();
-    // 2nd time is high precision
-    if (elapsed < MICROSEC_BETTER && recClockMicro < nowMicro)     // safe
-    elapsed = nowMicro - recClockMicro;
-
-    myStamp.ClockL = elapsed;
-    myStamp.ClockH = 0;
-    call OTime.subtract( &receiveTime, &myStamp, &receiveTime );
 
     // check message for data errors (beyond CRC)
     memcpy((uint8_t*)&buf,lp,sizeof(beaconMsg));
-    timeSyncXOR(&buf.Local,&buf.Virtual,&myStamp);
-    if (myStamp.ClockH != buf.Xor.ClockH || 
-        myStamp.ClockL != buf.Xor.ClockL) return m;
+    timeSyncXOR(&buf.Local,&buf.Virtual,&w);
+    if (w.ClockH != buf.Xor.ClockH || 
+        w.ClockL != buf.Xor.ClockL) return m;
     bufFree = FALSE;
     post fileBeacon();
     return m;
@@ -615,42 +679,22 @@ implementation {
   event message_t* ProbeReceive.receive( message_t* m, void* pl, uint8_t l ) {
     beaconProbeAck pamsg;
     beaconProbeMsg q;
-    cc2420_metadata_t* md;
-    timeTable* v;
-    timeSync_t genTime;
-    timeSync_t myStamp;
-    uint32_t nowMicro, recClockMicro;
-    uint32_t recTime, elapsed;
+    timeSync_t probeTime;
 
-    md = call CC2420PacketBody.getMetadata(m);
-    v = ttFind(md->time);
-    if (v == NULL) return m;
+    if (!bufFree) return m; 
+    if (!calcReceiveTime(m,&probeTime)) return m;
 
     call MsgLeds.led1Toggle();
-    
     memcpy((uint8_t*)&q,(uint8_t*)pl,sizeof(beaconProbeMsg));
-
-    call OTime.getLocalTime( &genTime, &myStamp.ClockL ); 
-    recTime = v->time32k; 
-    recClockMicro = v->timeMicro;
-    if (myStamp.ClockL < recTime) return m; // abort if clock rolled over
-    elapsed = myStamp.ClockL - recTime;  // amount of time to retract
-    nowMicro = call OTime.getNativeMicro();
-    if (elapsed < MICROSEC_BETTER && recClockMicro < nowMicro) // safe for high precision
-       elapsed = nowMicro - recClockMicro;
-
-    myStamp.ClockL = elapsed;       // this is how much time to retract
-    myStamp.ClockH = 0;
-    call OTime.subtract( &genTime, &myStamp, &genTime );
 
     pamsg.mode = mode;
     pamsg.skew = call OTime.getSkew();
-    pamsg.mode = mode;
+    pamsg.calibRatio = call OTime.calibrate();
     pamsg.count = q.count;
     pamsg.sndId = TOS_NODE_ID;
-    pamsg.Local = genTime;
-    call OTime.conv2LocalTime( &genTime );  // convert to global clock
-    pamsg.Virtual = genTime;
+    pamsg.Local = probeTime;
+    call OTime.conv2LocalTime( &probeTime );  // convert to global clock
+    pamsg.Virtual = probeTime;
     memcpy((uint8_t*)&probeMsg.data,(uint8_t*)&pamsg,sizeof(beaconProbeAck));
     call ProbeSend.send(AM_BROADCAST_ADDR, &probeMsg, sizeof(beaconProbeAck));
     return m;  
@@ -702,27 +746,51 @@ implementation {
     }
 
   // events for timestamping
-  //async event void transmittedSFD( uint16_t time, message_t* p_msg );
-  //async event void receivedSFD( uint16_t time );
-  async event void RadioTimeStamping.transmittedSFD(uint16_t t, message_t* m) {
+  async event void RadioTimeStamping.transmittedSFD(uint16_t time, 
+                                                    message_t* m) {
     uint32_t ct; 
     if (m != &msg) return;
-    ct = call OTime.getNative32();
-    if (ct <= xDelay) xDelay = 0;
-    else              xDelay = ct - xDelay; 
+    #if defined(PLATFORM_TELOSB)
+     #if !defined(USE_MICROSECOND_CLOCK)
+     ct = call OTime.getNative32();
+     if (ct <= xDelay ) xDelay = 0; 
+     else               xDelay = ct - xDelay; 
+     #else
+     ct = call OTime.getNative32();
+     if (ct <= xDelay ) xDelay = 0; 
+     else               xDelay = ct - xDelay; 
+     if (xDelay < MICROSEC_BETTER) {  // for Telos architecture only
+       ct = call OTime.getNativeMicro();  // can improve using Microsec timer
+       if (ct > yDelay) xDelay = ct - yDelay; 
+       }
+     #endif
+    #elif defined(PLATFORM_MICAZ)
+    ct = call OTime.getNativeMicro();
+    if (ct <= yDelay ) yDelay = 0; 
+    else               yDelay = ct - yDelay; 
+    xDelay = yDelay;
+     #if defined(MIXED_CC2420)
+     call OTime.Z2Tels(&xDelay);  // convert to binary microsecond units 
+     #endif  
+    #endif
     memcpy(delay,(uint8_t*)&xDelay,4);  // copy computed delay to stable buffer
     call CC2420Transmit.modify(
          offsetof(message_t,data)+offsetof(beaconMsg,Delay),delay,4);
     }
-  async event void RadioTimeStamping.receivedSFD(uint16_t time) {
+  async event void RadioTimeStamping.receivedSFD(uint16_t time) { 
+    #if defined(PLATFORM_MICAZ) & !defined(MIXED_CC2420)
     atomic {
+       timeIndx = (timeIndx >= timeTableSize) ? 0 : timeIndx;
        timTab[timeIndx].key = time;
-       timTab[timeIndx].time32k = call OTime.getNative32();
        timTab[timeIndx].timeMicro = call OTime.getNativeMicro();
-       timeIndx = (timeIndx + 1) % timeTableSize;
+       // += 800 result ~ 1.1msec
+       // timTab[timeIndx].timeMicro += 2000;  // an ad-hoc correction factor
+       timeIndx = timeIndx + 1;
        }
+    #endif
     }
   // provided because CC2420Transmit interface is used
   async event void CC2420Transmit.sendDone(message_t* t, error_t e) { }
+  async event void Counter.overflow() { }
   }
 

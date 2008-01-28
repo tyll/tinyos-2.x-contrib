@@ -43,7 +43,6 @@ module WakkerP {
     interface Wakker[uint8_t id];
     }
   uses {
-    interface Boot;
     interface OTime;
     interface Leds;
     interface Timer<TMilli> as TimerThousand;
@@ -56,9 +55,12 @@ implementation {
   uint32_t increment;
   sched_list schedList[ALRM_slots];
 
-  enum { TPS = 1048576u };
+  // enum { TPS = 1048576u };
 
-  void reNext() {
+  // compute & set next wakeup time 
+  //  parameter "extra" is an extra number of milliseconds to wait (for alignment)
+  //  ("extra" is signed to enable adjustment forward or backward)
+  void reNext(int8_t extra) {
      uint32_t smallTime = 0xffffffff;
      uint8_t i;
      for (i=0; i<ALRM_slots; i++) 
@@ -70,18 +72,19 @@ implementation {
         increment = 0;  // FLAG for no waiting
         }
      else {
+        int32_t s = extra;
         if (nextCheck > theClock) increment = nextCheck - theClock;
         else increment = 1;
-        call TimerThousand.startOneShot(increment << 7);
+	s += increment << 7;
+        call TimerThousand.startOneShot(s);
         }
      }
 
   /**
    * Initializes the Wakker component.
    * @author herman@cs.uiowa.edu
-   * @return Always returns SUCCESS.
    */
-  event void Boot.booted() {
+  command void Wakker.init[uint8_t id]() {
      uint8_t i;
      for(i=0;i<ALRM_slots;i++) 
        (schedList+i)->wake_time = 0xffffffff; 
@@ -96,28 +99,25 @@ implementation {
    * Clears out the list of Wakker events (intended mainly
    * for failure/reset).
    * @author herman@cs.uiowa.edu
-   * @return Always returns SUCCESS.
    */
-  command error_t Wakker.clear[uint8_t id]() {
+  command void Wakker.clear[uint8_t id]() {
      uint8_t i;
      for (i=0; i<ALRM_slots; i++)  
         if ((schedList+i)->wake_time != 0xffffffff &&
             (schedList+i)->id == id)
             (schedList+i)->wake_time = 0xffffffff;
-     return SUCCESS;
      }
 
   /**
    * Clear out list of Wakker events with a particular index
    */
-  command error_t Wakker.cancel[uint8_t id]( uint8_t indx ) {
+  command void Wakker.cancel[uint8_t id]( uint8_t indx ) {
      uint8_t i;
      for (i=0; i<ALRM_slots; i++)  
         if ((schedList+i)->wake_time != 0xffffffff &&
             (schedList+i)->id == id && 
             (schedList+i)->indx == indx)
             (schedList+i)->wake_time = 0xffffffff;
-     return SUCCESS;
      }
 
 
@@ -133,38 +133,27 @@ implementation {
      }
 
   /**
-   * Align SysAlarm to specified "absolute" time unit value
-   * according to the "Global Time" of OTime.
+   * Align Wakker's "theClock" according to the Global Clock of OTime.
    */
   command void Wakker.setSync[uint8_t id]() {
-     union {
-        struct { uint64_t g; } bigInt;
-        struct { uint32_t lo; uint32_t hi; } partsInt;
-        } u;
-     union {
-        uint64_t t;
-        struct { uint32_t lo; uint32_t hi; } partsInt;
-        timeSync_t p;
-        } v;
+     uint64_t v;
+     bigClock u;
+     timeSync_t p;
      uint32_t c,d, myClock;
      uint8_t i;
+     int8_t adjustMilli;
 
-     call OTime.getGlobalTime(&v.p);
-     u.partsInt.hi = v.p.ClockH;
-     u.partsInt.lo = v.p.ClockL;
-     v.t = u.bigInt.g;
-     //   conversion to 1/8 sec units is 
-     //   obtained by dividing time by the native units,
-     //   then multiply by 8;  or instead ...
-     u.bigInt.g /= (TPS/8);
-     c = u.partsInt.lo;   // this is # 1/8 secs on global clock
-     d = (c + 1) * (TPS/8);  // this is next whole interval
-     if (d > v.partsInt.lo) {
-        d -= v.partsInt.lo; // how long to wait until next whole interval
-        d /= 1024;         // convert from micro to milliseconds
-        increment = 1;     // CAREFUL .. clock MUST increment
-        call TimerThousand.startOneShot( d );  
-        }
+     call OTime.getGlobalTime(&p);
+     u.partsInt.lo = p.ClockL;
+     u.partsInt.hi = p.ClockH;
+     c = u.bigInt.g / (TPS/8);  // c is # 1/8 secs on global clock
+     u.bigInt.g /= 1024;        // g is # binary milliseconds on global clock 
+     v = (c + 1);  v *= 128;    // this is the next whole interval for 1/8s, in binary msecs
+     i = (v > u.bigInt.g) ? v - u.bigInt.g : 0; 
+     i = (i > 128) ? 128 : i;   // i is # milliseconds for adjustment (cap at 128 = 1/8 sec)
+     i = (i == 128) ? 0 : i;    // but 128 is same as zero, perfect alignment 
+     adjustMilli = (i > 63) ? -(128 - i) : i;   // go forward or backward, whichever is closer 
+
      atomic myClock = theClock;
 
      if (c > myClock) {   // advance clock
@@ -173,17 +162,18 @@ implementation {
             if ((schedList+i)->wake_time != 0xffffffff) 
                (schedList+i)->wake_time += d;
           atomic theClock = c;
-          reNext();
+          reNext(adjustMilli);
           }
-     else if (u.partsInt.lo < myClock) {  // backup clock
+     else if (c < myClock) {  // backup clock
           d = myClock - c;
           for (i=0; i<ALRM_slots; i++) 
             if ((schedList+i)->wake_time != 0xffffffff) 
                (schedList+i)->wake_time -= d;
           atomic theClock = c;
-          reNext();
+          reNext(adjustMilli);
           }
      }
+
 
   /**
    * Rewinds the current Wakker "clock".
@@ -200,7 +190,7 @@ implementation {
            }
         }
      atomic theClock = 0;
-     reNext();
+     reNext(0);
      }
 
   /**
@@ -215,7 +205,7 @@ implementation {
           (schedList+i)->wake_time = wake_time;
           (schedList+i)->indx = indx;
           (schedList+i)->id = id;
-          reNext();
+          reNext(0);
           return SUCCESS;
           }
      dbg(DBG_USR1, "*** Wakker setting failed for id %d, index %d, time %d\n",
@@ -317,7 +307,7 @@ implementation {
                r = signal Wakker.wakeup[id](indx,myClock);
                if (r == FAIL) { (schedList+i)->wake_time = s; break; }
                }
-     reNext();
+     reNext(0);
      }
 
   /**
@@ -327,14 +317,13 @@ implementation {
    * signals possibly one scheduled Wakker.wakeup event, and also
    * calls SysAlarm.set for the next firing. 
    * @author herman@cs.uiowa.edu
-   * @return Always returns SUCCESS.
    */
   event void TimerThousand.fired() {
      bool noTrigger;
      theClock += increment;
      noTrigger = (theClock < nextCheck);
 
-     call Leds.led1Toggle();
+     // call Leds.led1Toggle();
 
      if (noTrigger) {
         increment = nextCheck - theClock;

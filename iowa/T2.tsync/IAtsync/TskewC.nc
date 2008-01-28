@@ -41,6 +41,7 @@ configuration TskewC { }
 implementation
 {
   components TskewP, TnbrhoodC, WakkerC, OTimeC, TsyncC, PowConC;
+  components LedsC, NoLedsC;
   components new PowCommC(AM_SKEW) as Comm;
   TskewP.Tnbrhood -> TnbrhoodC;
   TskewP.OTime -> OTimeC;
@@ -49,5 +50,6 @@ implementation
   TskewP.Wakker -> WakkerC.Wakker[unique("Wakker")];
   TskewP.PowCon -> PowConC.PowCon[unique("PowCon")];
   TskewP.Boot -> TsyncC.componentBoot;
+  TskewP.Leds -> LedsC;
 }
 

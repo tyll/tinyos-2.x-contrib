@@ -48,6 +48,7 @@ module TskewP {
   uses interface Receive;
   uses interface Tnbrhood;
   uses interface Boot;
+  uses interface Leds;
   }
 implementation {
   float mySkew;  
@@ -66,7 +67,8 @@ implementation {
     started = FALSE;  // no round is active yet
     frequency = SKEW_NOISE_WAIT;  // start inactive 
     memset((uint8_t*)&msg.data, 0, sizeof(skewMsg));
-    call Wakker.soleSet(0,SKEW_NOISE_WAIT); 
+    call Wakker.soleSet(1,SKEW_NOISE_WAIT); 
+    call Wakker.soleSet(3,3*NORM_WAIT);
     }
 
   // evaluate skew wrt all neighbors
@@ -161,6 +163,29 @@ implementation {
     return m; 
     }
 
+  // Experimental:  offsetCheck -- scan neighborhood to see if this
+  // node is running "fast" compared to all normal neighbors, and 
+  // then attempt to set the clock back only in that case
+  task void offsetCheck() {
+    timeSync_t s;
+    timeSync_t g;
+    float z;
+    int16_t r;
+    r = call Tnbrhood.overDiff();   // get max-of-median in differences
+    z = call OTime.getSkew();       // get current skew
+    if (r<0 && z==0.0) { // all neighbors are behind + this node is fastest 
+      r = -r;
+      s.ClockH = 0;
+      s.ClockL = r;
+      call OTime.getGlobalOffset(&g);
+      if (call OTime.lesseq(&s,&g)) {
+        call OTime.subtract(&g,&s,&g);
+        call OTime.setGlobalOffset(&g);
+        }
+      }
+    call Wakker.soleSet(3,3*NORM_WAIT);
+    }
+
   /* Evaluate results of a gossip round */
   task void evaluate() {
     skewMsg p;
@@ -187,7 +212,8 @@ implementation {
   event error_t Wakker.wakeup(uint8_t indx, uint32_t wake_time) {
     switch (indx) {
       case 1: post sendTask(); break; 
-      case 2: post evaluate(); break;
+      case 2: post evaluate(); break; 
+      case 3: post offsetCheck(); break; 
       }
     return SUCCESS;
     }

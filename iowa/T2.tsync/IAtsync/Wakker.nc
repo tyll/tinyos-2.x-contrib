@@ -97,6 +97,11 @@ interface Wakker {
   command error_t soleSet(uint8_t indx, uint32_t delay_time);
 
   /**
+   * Init (same idea as Boot, but as synchronous command)
+   */
+  command void init();
+
+  /**
    * Clear all scheduled wakeups.  Mainly intended for a failure/restart
    * purpose, this is a less drastic measure than "StdControl.stop(); 
    * StdControl.start()".  Why?  Because only the wakeups associated
@@ -105,13 +110,13 @@ interface Wakker {
    * @return Returns SUCCESS.
    * @author herman@cs.uiowa.edu
    */
-  command error_t clear();
+  command void clear();
 
   /**
    * Cancel all wakeups of a specified index (more selective than
    * the clear operation).
    */
-  command error_t cancel(uint8_t indx);
+  command void cancel(uint8_t indx);
 
   /**
    * Read the current Wakker time, where Wakker time is approximately 
@@ -123,7 +128,9 @@ interface Wakker {
   command uint32_t clock();
 
   /**
-   * Set Wakker/Timer alignment to global time. 
+   * Set Wakker/Timer alignment to global time 
+   * (after this, the Wakker's time counter should be
+   * approximately equal to the global clock).
    */
   command void setSync( );
 
@@ -147,7 +154,6 @@ interface Wakker {
    *             easily see which scheduled wakeup this one is. 
    * @param wake_time This is the Wakker time at the instant of signalling, 
    *             which could actually be later than the scheduled time.
-   * @return Return SUCCESS or FAIL, as appropriate.
    * @author herman@cs.uiowa.edu
    */
   event error_t wakeup(uint8_t indx, uint32_t wake_time);

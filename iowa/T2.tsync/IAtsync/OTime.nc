@@ -40,6 +40,11 @@
 interface OTime {
 
   /**
+   *  Initialize OTime (necessary, to set up recurring task, etc)
+   */
+  command void init();
+
+  /**
    * Read current global time scaled to 
    * 32 bits (but dropping the two most significant
    * bits, for increased accuracy).
@@ -52,16 +57,11 @@ interface OTime {
    * timer to get 921.6 KHz (ticks/second).  That means 
    * each tick is 1.08507 microseconds.  So a 48-bit number
    * can be about (2^48)*1.08507=3.08466e8 seconds, or about
-   * 9.7747 years of time before rollover.  
-   * 
-   * Note that a 32-bit counter (the native SysTime) rolls 
-   * over every 4660 seconds, about 1.3 hours.  In fact, the
-   * lowest level counter is really only 16 bits, and this 
-   * rolls over every 71.111 milliseconds.  So SysTime keeps
-   * track of a high-order 16 bit part, and then OTime in 
-   * turn keeps track of another 16 bits (thus 48 bits total).
-   * 48 bits sure is inconvenient, but to save memory in 
-   * RAM and messages, this seems like a reasonable idea.   
+   * 9.7747 years of time before rollover.  My measurements
+   * of MicaZ platform indicated that a more accurate count
+   * for ticks per second is 921.778 KHz, but I use the 
+   * 921.6 KHz figure because 921600 = (32*30)^2, which makes
+   * conversion to Telos ticks per second, 2^20, simpler.
    * 
    * However, the interface requirement here is for 32 bits, 
    * with a desired precision around 1 millisecond, so
@@ -79,21 +79,47 @@ interface OTime {
   command uint32_t getLocalTime32( );
 
   /**
-   *  Return current native 32kHz counter value shifted to
-   *  binary microseconds.  That is, 32kHz means one jiffie 
-   *  is 1/32768 -- not 32000 (I think).  Thus one jiffie 
-   *  would be 1/(2^10).  Converting T such jiffies to 
-   *  binary microseconds (= 1/(2^20) jiffies) means just 
-   *  a multiply by 2^10 (shift left 10).  
+   *  Telos:
+   *   Return current native 32kHz counter value shifted to
+   *   binary microseconds.  That is, 32kHz means one jiffie 
+   *   is 1/32768 -- not 32000.  Thus one jiffie 
+   *   would be 1/(2^10).  Converting T such jiffies to 
+   *   binary microseconds (= 1/(2^20) jiffies) means just 
+   *   a multiply by 2^10 (shift left 10).  
+   *  MicaZ:
+   *   Return the native microsecond clock, but converted
+   *   to Telos units of 1/(2^10).  This conversion is included
+   *   basically because I can see no reason to offer the 
+   *   ersatz 32kHz counter given by TinyOS.
    */
   async command uint32_t getNative32( );
 
   /**
-   *  Return current native microsecond counter value (different from
-   *  getLocalTime32, because there is no 48-bit clock backing up carries,
-   *  and on msp430 platform, getLocalTime uses the 32kHz counter).
+   *   Return current native microsecond counter value (different from
+   *   getLocalTime32, because there is no 48-bit clock backing up carries,
+   *   and on msp430 platform, getLocalTime uses the 32kHz counter).
+   *  Telos:
+   *   The getNativeMicro is *unstable* for duration more than 6400
+   *   ticks, because the microsecond clock's skew is +/- 0.5% (the
+   *   figure 6400 is derived from 
+   *       (6400 / (2^20)) * 0.005 = 3.05176e-5 
+   *   and 1/32768 = 30.5176 microseconds;  hence it is better to 
+   *   use the 32KHz clock for longer durations.
+   *  MicaZ:
+   *   The getNativeMicro works well, but as noted above, the 
+   *   the jiffies are determined by 921.6 or 921.778 KHz.
    */
   async command uint32_t getNativeMicro( );
+
+
+  /**
+   *  All platforms:  this is a wrapper for LocalTime.get()
+   *  as documented in TEP 102.  It returns a value
+   *  from the _binary_ millisecond counter.  With the 32-bit
+   *  width, it will roll over in about 48 days.  Conversion
+   *  from binary milliseconds to 1/32768 jiffies:  x <<= 5.
+   */
+  command uint32_t getBinaryMilli();
 
   /**
    *  Convert a timeSync to 145.636-second-jiffies, truncated 
@@ -167,16 +193,17 @@ interface OTime {
   command void adjGlobalTime( timeSyncPtr t );
 
   /**
+   * Set a "set back" amount, to be applied with the next local or
+   * global time fetch.
+   */
+  command void setStepBack( uint16_t amt );
+
+  /**
    * Read current local time.  
    *         In provided structure, getLocalTime puts the current 
    *         number of ticks on the clock.  Each tick represents 
-   *         1/921.6e3 = 1.08507 microseconds (Mica2) or similar,
-   *         architecture-dependent definition of jiffie.   
-   *         The second parameter provides a pointer to 
-   *         a 4-byte area where the native SysTime or other 
-   *         TinyOS measure of approximately one microsecond value
-   *         associated with the result can be stored;  if this second 
-   *         parameter is NULL, second parameter will be ignored.
+   *         1/2^20 = 0.953674 microseconds (Telos) or similar,
+   *         after conversion from local architecture.
    * Implementation Notes:
    *      1. getLocalTime calculates the current skew factor as a 
    *         side-effect, but DOES NOT apply this skew adjustment to
@@ -190,7 +217,12 @@ interface OTime {
    *         jiffies between calls (ie, a crude interpolation).  
    *      2. Currently, there is no explicit support for rollover.
    */
-  command void getLocalTime( timeSyncPtr t, uint32_t * v );
+  command void getLocalTime( timeSyncPtr t );
+  /**
+   *  Adjoint to getLocalTime:  return the native Microsec clock value 
+   *  associated with the last call of getLocalTime
+   */
+  command uint32_t getLastLTMicro();  
 
   /**
    * Read current local time, but also apply skew to it; 
@@ -200,7 +232,7 @@ interface OTime {
    * consisting of calling getLocalTime and then adding the 
    * skew adjustment that getLocalTime has already calculated.
    */
-  command void pubLocalTime( timeSyncPtr t, uint32_t * v );
+  command void pubLocalTime( timeSyncPtr t );
 
   /**
    * The following just returns the most recent previous
@@ -234,17 +266,44 @@ interface OTime {
   command bool lesseq( timeSyncPtr a, timeSyncPtr b );
 
   /**
-   * Convert a TelosB-based clock (2^{20} jiffies/sec) to
-   * a MicaZ-based clock (921.6e3 jiffies/sec)
+   * sanity checking function (bigCheck)
+   *  returns TRUE if two timeSync_t objects differ by 
+   *  more than a threshold (given as a uint32_t value) 
    */
-  command void Tel2Z( timeSyncPtr p );
-  command void Tel2Zs( uint32_t * p );
+  command bool bigjump( timeSyncPtr a, timeSyncPtr b, uint32_t t );
+
   /**
-   * Convert a MicaZ-based clock (921.6e3 jiffies/sec) to
-   * a TelosB-based clock (2^{20} jiffies/sec)
+   * Conversion from 921600 ticks per second to 2^20 ticks per second
+   * (but also works for 32 KHz conversion, ie 28800 to 32768)
    */
   command void Z2Tel( timeSyncPtr p );
-  command void Z2Tels( uint32_t * p );
+  async command void Z2Tels( uint32_t * p );
 
-}
+  /**
+   * Calibrate method is just for fun.  It returns the ratio of 
+   * the native, non-CPU 32KHz clock (2^15=32768 ticks per second)
+   * to the CPU microsecond clock over a "long" period, that is, 
+   * for at least one minute before calculation.  In the case of 
+   * MicaZ, the CPU microsecond clock is first converted, using 
+   * the Z2Tel method above, to approximately binary microseconds.
+   *
+   * Notes on the (float) value returned:
+   *
+   * 1.  If zero, then either the ratio is perfect 1/1, or there 
+   *     haven't been enough clock measurements yet to determine
+   *     the ratio.  The measurement and calculation is driven
+   *     by calling calibrate(), so you should call calibrate() 
+   *     periodically to get a measurement.
+   *
+   * 2.  Instead of just the ratio (32KHz-rate)/(microsecond-rate)
+   *     which would be some number close to 1.0, we calculate 
+   *          (32KHz-rate * 32) - (microsecond-rate) 
+   *          -------------------------------------- 
+   *                   microsecond-rate
+   *     because this gets higher precision (more significant digits)
+   *     and should be some number in [0,+/-10^-5], according to 
+   *     datasheets for current platform technology.
+   */
+  command float calibrate( );
+  }
 

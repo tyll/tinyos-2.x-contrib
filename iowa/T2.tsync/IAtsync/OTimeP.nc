@@ -42,16 +42,19 @@ module OTimeP
 {
   provides { interface OTime; }
   uses {
-    interface Boot;
-    #if defined(PLATFORM_TELOSB)
-    interface Counter<T32khz,uint32_t> as Counter32;
-    interface Counter<TMicro,uint32_t> as CounterMicro;
-    #endif
+    interface LocalTime<TMilli>;  // supposedly 32768 ticks per sec
+    interface Counter<T32khz,uint32_t> as Counter32;  // varies with platform
+    interface Counter<TMicro,uint32_t> as CounterMicro;  // ditto
     interface Wakker;
     interface Leds as SkewLeds;
+    interface Leds as EmergencyLeds;
     }
   }
 implementation {
+ 
+  /*** Crucial Constant:  at most 200 seconds between native clock reads ***/
+  enum { BETWEEN_INTERVAL = 200 };
+  
   /*** Variables that determine OTime's State ***/
 
   norace timeSync_t LastClock; // result of most recent call to get Local Time
@@ -60,10 +63,10 @@ implementation {
 
   norace timeSync_t LastLocalClock;  // most recent value of get Local Time
                             
-  norace timeSync_t LastSysTime;   // records most recent call to SysTime, 
+  norace timeSync_t LastSysTime;   // records most recent call to system time, 
                             // but extending to 48 bits from 32 bits
                             
-  norace timeSync_t LastRefTime;   // this is the SysTime value at the instant
+  norace timeSync_t LastRefTime;   // this is the system value at the instant
                             // when getLocalTime was called AND applied skew;
                             // it is used heuristically to skip the overhead
                             // of applying skew too often, hopefully thus
@@ -78,18 +81,16 @@ implementation {
                             // be zero until skew is applied
   norace bool OffsetSign;   // TRUE if LocalOffset is positive, else FALSE
 
-  norace uint16_t cleep;    // counter for "deep sleep" iterations
-                            // where each iteration is about 8 seconds
-
-  norace uint32_t sleepUnit;       // # jiffies in a 255/7 interval, measured
-                            // empirically 
-  norace bool sleepUnitStable;
-
-  norace int16_t skewAdjust;       // amount to adjust clock by on each reading
+  norace uint16_t stepBack;    // amount to adjust clock by on next reading
 
   norace float skew;        // skew factor:  skew is 1.0 + this value
 
   const timeSync_t ZeroTime = { 0u, 0u };
+
+  uint32_t lastLTMicro;     // saved by getLocalTime for later access
+  uint32_t calibrateMilli;  // clock rate measurement variables
+  uint32_t calibrateMicro;  
+  float    calibrateRatio; 
 
   command void OTime.setSkew( float newSkew ) { atomic  skew = newSkew; }
   command float OTime.getSkew( ) { 
@@ -98,19 +99,20 @@ implementation {
     return readSkew; 
     }
 
-  event void Boot.booted() {
+  command void OTime.init() {
     LastLocalClock = LastClock = LastSysTime = 
             LastRefTime = Displacement = 
             LocalOffset = ZeroTime;
     OffsetSign = TRUE;
-    cleep = 0;
-    skew = 0.0;
-    skewAdjust = 0;
-    call Wakker.set(0,200*8);    // for proper handling of SysTime 
+    calibrateMilli = calibrateMicro = 0; 
+    skew = calibrateRatio = 0.0;
+    stepBack = 0;
+    Displacement.ClockL = 62914560u;  // extra minute enables stepBack 
+    call Wakker.soleSet(0,BETWEEN_INTERVAL*8); // for native time 
                                 // extended to 48 bits, we need to 
-                                // invoke SysTime with some frequency,
+                                // invoke system clock with some frequency,
                                 // so waking up at least once every 
-                                // 200 seconds is a good idea
+                                // BETWEEN_INTERVAL seconds is a good idea
     }
 
   /**
@@ -123,24 +125,86 @@ implementation {
     Displacement = *p;
     }
 
+  // Emergency!  Crash Here ...
+  task void crash() {
+    call EmergencyLeds.led0On();
+    call EmergencyLeds.led1On();
+    call EmergencyLeds.led2On();
+    post crash();
+    }
+  
+  /**
+   * Test for a "big jump" between two timeSync_t 
+   * objects (w.r.t. a given threshold) 
+   */
+  command bool OTime.bigjump( timeSyncPtr p, 
+          timeSyncPtr q, uint32_t threshold ) {
+    timeSync_t d;
+    if (call OTime.lesseq(q,p)) 
+         call OTime.subtract(p,q,&d);
+    else call OTime.subtract(q,p,&d);
+    if (d.ClockH) return TRUE;
+    if (d.ClockL > threshold) return TRUE;
+    return FALSE;
+    }
+
+  // perform sanity check on proposed new, native clock
+  // reading -- if it is bizarre, then there is some kind
+  // of software error:  TinyOS, Application writing over
+  // data/code, who knows?  best just to crash here ...
+  void sanityCheck( timeSyncPtr p ) { 
+    uint32_t lim = BETWEEN_INTERVAL + 10;
+    lim *= TPS;    // maximum number of jiffies
+
+    // assume LastSysTime is either zero or meaningful
+    // and that proposed new time value is within 
+    // BETWEEN_INTERVAL seconds of LastSysTime value, 
+    // plus or minus a few seconds
+
+    if (LastSysTime.ClockH == 0 && LastSysTime.ClockL == 0) return;
+    if (call OTime.bigjump(&LastSysTime,p,lim)) post crash();
+    return;
+    }
+
   /**
    * OTime.getLocalTime returns current local clock,
-   * provided by SysTime.get(), with skew computed to
+   * provided by system clock, with skew computed to
    * update the LocalOffset value.  BUT RESULT DOES NOT
    * APPLY SKEW to the time value returned -- this is important!
    */
-  command void OTime.getLocalTime( timeSyncPtr p, uint32_t * r ) { 
+  command void OTime.getLocalTime( timeSyncPtr p ) { 
     bigClock a;
     timeSync_t v;
     int32_t w;
+
     #if defined(PLATFORM_TELOSB)
-    atomic p->ClockL = call Counter32.get() << 5;
+     atomic p->ClockL = call Counter32.get();  // binary 32KHz
+     p->ClockL <<= 5;   // convert to binary microseconds
+     lastLTMicro = p->ClockL;  // save for possible later reference
+     p->ClockH = LastSysTime.ClockH;   // presume no carry, initially
+     if (p->ClockL < LastSysTime.ClockL) p->ClockH++;  // else do the carry
+     sanityCheck(p);    // check before overwrite
+     LastSysTime = *p;  // now, there is a new, previous system clock time
+
+    #elif defined(PLATFORM_MICAZ)
+     atomic p->ClockL = call CounterMicro.get(); // get native microseconds
+     lastLTMicro = p->ClockL;  // save for possible later reference
+     p->ClockH = LastSysTime.ClockH;   // presume no carry, initially
+     if (p->ClockL < LastSysTime.ClockL) p->ClockH++;  // else do the carry
+     sanityCheck(p);    // check before overwrite
+     LastSysTime = *p;  // now, there is a new, previous system clock time
+     #if defined(MIXED_CC2420)
+     call OTime.Z2Tel(p);   // convert to binary microseconds
+     #endif
     #endif
-    if (r != NULL) *r = p->ClockL;
-    // add to high-order part if carry implied by clock wrapping around
-    if ( p->ClockL < LastSysTime.ClockL ) LastSysTime.ClockH++;
-    LastSysTime.ClockL = p->ClockL;
-    p->ClockH = LastSysTime.ClockH;
+
+    // apply "step back" amount and reset to zero
+    if (stepBack != 0) {
+       v.ClockH = 0;
+       v.ClockL = stepBack;
+       if (call OTime.lesseq(&v,p)) call OTime.subtract(p,&v,p);
+       stepBack = 0;
+       }
 
     // compute adjustment due to skew
     // first step:  compute elapsed time since last clock reading
@@ -157,10 +221,7 @@ implementation {
        return;
        }
      
-    LastRefTime = LastSysTime;
-
-    // the following takes care of skew slope = 1.0, leaving only the 
-    // fractional part to deal with, which is in 'skewAdjust' variable
+    LastRefTime = *p;
     LastClock = *p;
 
     if (!DO_SKEW_ADJUST) {
@@ -223,11 +284,21 @@ implementation {
    * provided so that only one incarnation of Counter32khz is
    * is used across different modules of timesync.  Units are 
    * "microseconds" (binary microseconds, that is, equal to 
-   * 1024 * 32kHz)
+   * 1024 * 32kHz) for Telos, but based on ticks of 921600 in
+   * the case of MicaZ.  Most likely, don't use this for 
+   * MicaZ.
    */
   async command uint32_t OTime.getNative32() {
-    return (call Counter32.get() << 5);
+    uint32_t v;
+    atomic v = call Counter32.get() << 5;
+    return v;
     }
+
+  /**
+   * Return most recent native microsecond clock value
+   * of getLocalTime() invocation 
+   */
+  command uint32_t OTime.getLastLTMicro() { return lastLTMicro; }
 
   /**
    * OTime.getNativeMicro() is a wrapper for CounterMicro, 
@@ -235,7 +306,9 @@ implementation {
    * used across different modules of timesync.
    */
   async command uint32_t OTime.getNativeMicro() {
-    return (call CounterMicro.get());
+    uint32_t v;
+    atomic v = call CounterMicro.get();
+    return v;
     }
 
   /**
@@ -247,7 +320,7 @@ implementation {
     uint32_t s;
     timeSync_t t;
 
-    call OTime.getLocalTime(&t,NULL);
+    call OTime.getLocalTime( &t );
     // isolate "middle" 32 bits
     r = t.ClockL >> 10;  // discard low-order 10 bits.
     s = t.ClockH;        // s = hi order 16 bits from 48-bit clock
@@ -260,8 +333,8 @@ implementation {
    * OTime.pubLocalTime obtains the Local Time and
    * then applies a skew adjustment to the result.
    */
-  command void OTime.pubLocalTime( timeSyncPtr p, uint32_t * t) {
-    call OTime.getLocalTime(p,t);
+  command void OTime.pubLocalTime( timeSyncPtr p ) {
+    call OTime.getLocalTime(p);
     if (OffsetSign) call OTime.add(p,&LocalOffset,p);
     else if (call OTime.lesseq(&LocalOffset,p))
             call OTime.subtract(p,&LocalOffset,p);
@@ -272,7 +345,7 @@ implementation {
    * to the localTime. 
    */
   command void OTime.getGlobalTime( timeSyncPtr p ) { 
-    call OTime.pubLocalTime(p,NULL);
+    call OTime.pubLocalTime(p);
     call OTime.add(p,&Displacement,p);
     }
 
@@ -347,7 +420,7 @@ implementation {
 
   /**
    *  Convert a 32-bit, eight-of-second value to a 1-byte
-   *  time value (where each jiffied is 145.636 seconds)
+   *  time value (where each jiffie is 145.636 seconds)
    */
   command uint8_t OTime.convEightTimeByte( uint32_t time ) {
      return (uint8_t)( time / (uint32_t)(ONE_BYTE_TIME_UNIT * 8) );
@@ -361,24 +434,10 @@ implementation {
    */
   command uint8_t OTime.convTimeByte( timeSyncPtr t ) {
      uint8_t v,w;
-     if (TPS == 921600u) { // fast method for MicaZ
-        v = (t->ClockL >> 27);
-        w = (t->ClockH & 0x07);
-        return (w<<5) + v;   // convert to new jiffie
-        }
-     // resolution for Mica128 will be 134.218 seconds
-     if (TPS == 500000u) { // fast method for Mica128
-        v = (t->ClockL >> 26);  
-        w = (t->ClockH & 0x03);
-        return (w<<6) + v;   // convert to new jiffie
-        }
      // resolution for Telos will be like MicaZ
-     if (TPS == 1048576u) { // fast method for Telos 
-        v = (t->ClockL >> 27);
-        w = (t->ClockH & 0x07);
-        return (w<<5) + v;   // convert to new jiffie
-        }
-     return 0;
+     v = (t->ClockL >> 27);
+     w = (t->ClockH & 0x07);
+     return (w<<5) + v;   // convert to new jiffie
      }
 
   /**
@@ -387,7 +446,7 @@ implementation {
    */
   command uint8_t OTime.getLocalTimeByte( ) {
      timeSync_t t; 
-     call OTime.getLocalTime(&t,NULL);
+     call OTime.getLocalTime(&t);
      return call OTime.convTimeByte(&t);
      }
 
@@ -400,7 +459,6 @@ implementation {
      call OTime.getGlobalTime(&p);
      return call OTime.convTimeByte(&p);
      }
-
 
   /**
    * OTime.conv1LocalTime adds current displacement 
@@ -424,6 +482,14 @@ implementation {
    */
   command void OTime.adjGlobalTime( timeSyncPtr p ) { 
     call OTime.add(p,&Displacement,&Displacement);
+    }
+
+  /**
+   * OTime.setStepBack schedules a backward adjustment
+   * to Local/Global clock, upon next reading
+   */
+  command void OTime.setStepBack( uint16_t amt ) {
+    stepBack = amt;
     }
 
   /**
@@ -451,7 +517,8 @@ implementation {
   /**
    * OTime.subtract does c = a - b  (works only if a > b)
    */
-  async command void OTime.subtract( timeSyncPtr a, timeSyncPtr b, timeSyncPtr c ) {
+  async command void OTime.subtract( timeSyncPtr a, timeSyncPtr b, 
+  				     timeSyncPtr c ) {
     timeSync_t v;   // in case pointer c=b or c=a
     v.ClockH = a->ClockH - b->ClockH;
     v.ClockL = a->ClockL - b->ClockL;
@@ -460,61 +527,94 @@ implementation {
     }
 
   /**
-   * Periodic firing of Wakker so we get a recent base
-   * on the current value of SysTime
-   */
-  event error_t Wakker.wakeup(uint8_t indx, uint32_t wake_time) {
-    timeSync_t m;
-    call OTime.getGlobalTime( &m ); 
-    call Wakker.set(0,200*8);   // reschedule self  
-    return SUCCESS;
-    }
-
-  /**
-   * Convert a TelosB-based clock (2^{20} jiffies/sec) to
-   * a MicaZ-based clock (921.6e3 jiffies/sec)
-   *
-   * The method is simple:  conversion from TelosB to 
-   * MicaZ is just multiplication by  921600/(1024*1024)
-   * which reduces to multiplication by (15/16)^2
-   **/
-  command void OTime.Tel2Z( timeSyncPtr p ) {
-    bigClock u;
-    u.partsInt.hi = p->ClockH;
-    u.partsInt.lo = p->ClockL;
-    u.bigInt.g *= 225;
-    u.bigInt.g /= 256;
-    p->ClockH = u.partsInt.hi;
-    p->ClockL = u.partsInt.lo;
-    }
-  command void OTime.Tel2Zs( uint32_t * p ) {  
-    // RESEARCH: can this be more accurate
-	// using bit shifting?
-    *p *= 225;
-    *p /= 256;
-    }
-
-  /**
-   * Convert a MicaZ-based clock (921.6e3 jiffies/sec) to
-   * a TelosB-based clock (2^{20} jiffies/sec)
-   *
-   * The method is simple:  conversion from MicaZ to 
-   * Telosb is just multiplication by  (1024*1024)/921600
-   * which reduces to multiplication by (16/15)^2 
+   *  Convert MicaZ time value (microsec) to Telos (microsec)
    */
   command void OTime.Z2Tel( timeSyncPtr p ) {
     bigClock u;
+    uint64_t d;
     u.partsInt.hi = p->ClockH;
     u.partsInt.lo = p->ClockL;
-    u.bigInt.g *= 256;
+    d = u.bigInt.g / 4096;      // correction factor
+    u.bigInt.g *= 256;          // jiffies 921600 -> jiffies 1024^2
     u.bigInt.g /= 225;
+    u.bigInt.g -= d;        
     p->ClockH = u.partsInt.hi;
     p->ClockL = u.partsInt.lo;
     }
-  command void OTime.Z2Tels( uint32_t * p ) {
+  async command void OTime.Z2Tels( uint32_t * p ) {
+    uint32_t d = (*p) / 4096;
     *p *= 256;
     *p /= 225;
+    *p -= d;
     }
+
+  /**
+   * return current calibration ratio
+   */
+  command float OTime.calibrate() { return calibrateRatio; }
+
+  /**
+   * Internal Calibration:  measure native microsecond rate versus
+   * native, binary millisecond clock rate.
+   */
+  task void doCalibrate() {
+    int64_t a,b;
+    float x,y;
+    uint32_t curMilli;
+    uint32_t curMicro;
+    timeSync_t v;   
+    curMilli = call OTime.getBinaryMilli();
+    call OTime.getLocalTime( &v );
+    #if defined(PLATFORM_MICAZ) 
+     call OTime.Z2Tel( &v );  // convert to Telos-style, binary milliseconds
+    #endif
+    curMicro = v.ClockL;
+
+    // initialize if this is a first-time call or there is a rollover
+    if (calibrateMilli == 0 || calibrateMicro == 0 || 
+        calibrateMilli > curMilli || calibrateMicro > curMicro) {
+       calibrateMilli = curMilli; 
+       calibrateMicro = curMicro;   
+       return;   // no ratio known yet
+       }
+
+    // ensure that interval between previous recorded value
+    // and the current time is at least a minute 
+    if (curMilli - calibrateMilli < 61440u) // = 1024*60 
+       return;
+
+    // calculate new rate-difference-ratio and reset the calibration variables
+    a = curMilli;
+    a -= calibrateMilli;
+    a *= 1024;      // this would be number of binary microseconds
+    b = curMicro;
+    b -= calibrateMicro;
+    x = a - b;      // this is number of binary microseconds (difference)
+    y = b;
+    calibrateRatio = x / y;  // question: what about overflow?
+    calibrateMilli = curMilli;
+    calibrateMicro = curMicro;
+    }
+
+  /**
+   * Periodic firing of Wakker so we get a recent base
+   * on the current value of system clock:  at least every  
+   * BETWEEN_INTERVAL (often enough not to skip rollover)
+   * seconds, call OTime.getLocalTime() to keep intervals between
+   * clock readings short (so as not to miss an overflow) 
+   */
+  event error_t Wakker.wakeup(uint8_t indx, uint32_t wake_time) {
+    post doCalibrate();
+    call Wakker.soleSet(0,BETWEEN_INTERVAL*8);   // reschedule self  
+    return SUCCESS;
+    }
+
   async event void Counter32.overflow() { }
   async event void CounterMicro.overflow() { }
+  command uint32_t OTime.getBinaryMilli() {
+    uint32_t v;
+    atomic v = call LocalTime.get();
+    return v;
+    }
 }
+  

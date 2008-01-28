@@ -54,15 +54,17 @@ implementation {
   components PowConP;
 
   components ActiveMessageC; 
+  components CC2420ActiveMessageC;
   components RandomLfsrC as Random;
   components WakkerC, TsyncC, LedsC, NoLedsC; 
-  components CC2420CsmaC; 
   components new TimerMilliC() as TimerThousandC;
   components new TimerMilliC() as TimerForDownC;
   components new TimerMilliC() as TimerForUpC;
 
   AMSend = PowAMSendP;
   PowAMSendP.RelaySend -> AnySend;
+  PowAMSendP.Leds -> LedsC;
+  PowAMSendP.CC2420Packet -> CC2420ActiveMessageC;
   Receive = AnyReceive;
   XPacket = AnySend.Packet;
   XAMPacket = AnySend.AMPacket;

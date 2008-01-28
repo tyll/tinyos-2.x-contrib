@@ -36,8 +36,6 @@
  */
 //--EOCpr712 (do not remove this line, which terminates copyright include)
 
-//:mode=c:
-
 configuration TsyncC {
   provides interface OTime;
   provides interface Tsync;
@@ -55,17 +53,21 @@ implementation {
   components new PowCommC(AM_PROBE_DEBUG) as CommProbeDebug;
   components MarginC;
   components CC2420PacketC;
-  components ActiveMessageC;
   components CC2420TransmitC;
+  #if defined(PLATFORM_TELOSB)
+  components Counter32khz16C;
+  #elif defined(PLATFORM_MICAZ)
+  components MicaCounter32khz16C as Counter32khz16C;
+  #endif
   #ifdef TRACK
   components TskewC;
   #endif
-  componentBoot = TsyncP;
+  componentBoot = TsyncP.componentBoot;
   Tsync = TsyncP;
   OTime = OTimeC;
   Neighbor = TnbrhoodC;
   TsyncP.Boot -> MainC;
-  TsyncP.AMControl -> ActiveMessageC;
+  TsyncP.AMControl -> PowConC;
   TsyncP.Wakker -> WakkerC.Wakker[unique("Wakker")];
   TsyncP.PowCon -> PowConC.PowCon[unique("PowCon")];
   TsyncP.OTime -> OTimeC.OTime;
@@ -84,6 +86,7 @@ implementation {
   TsyncP.Leds -> LedsC.Leds;
   TsyncP.RadioTimeStamping -> CC2420TransmitC;
   TsyncP.CC2420Transmit -> CC2420TransmitC;
+  TsyncP.Counter -> Counter32khz16C;
   // following is for a demonstration mode
   #ifdef DEMO_LIGHTS
   TsyncP.ShowLeds -> LedsC.Leds;

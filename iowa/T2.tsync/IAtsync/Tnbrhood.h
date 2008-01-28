@@ -7,12 +7,12 @@ enum { NUM_NEIGHBORS = 12,    // 12 because of payload in TinyOS msg
        INIT_WAIT = 8*5,       //  five second wait between beacons
        INIT_MAIN = 8*30,      //  one half minute to first main task
        INIT_COUNT = 5,        //  number of initializing beacons
-       // NORM_WAIT = 8*60*15,   //  normal time between beacons (15min)
-       NORM_WAIT = 8*60,      //  normal time between beacons (1 min)
+       NORM_WAIT = 8*60,        //  normal time between beacons (1 min)
        // NORM_WAIT = 8*60*2,   //  normal time between beacons (2 min)
-       // NORM_WAIT = 8*60*10,   //  normal time between beacons (10min)
-       // NORM_WAIT = 8*60*5,     //  normal time between beacons (5min)
-       EXCHANGE_INTERVAL = 1,    //  1 slots (1/8 second)
+       // NORM_WAIT = 8*60*5,   //  normal time between beacons (5min)
+       // NORM_WAIT = 8*60*10,  //  normal time between beacons (10min)
+       // NORM_WAIT = 8*60*15,  //  normal time between beacons (15min)
+       EXCHANGE_INTERVAL = 2,    //  2 slots (2/8 second)
        EXCHANGE_LMARGIN = 1,     //  1 slots "left" margin (1/8 second)
        EXCHANGE_RMARGIN = 0,     //  0 slots "right" margin (0/8 second)
        HEALTH_CHECK_FREQ = 8*60, //  check once per minute nbr health
@@ -23,29 +23,22 @@ enum { NUM_NEIGHBORS = 12,    // 12 because of payload in TinyOS msg
        MODE_NORMAL = 0x80,
        MODE_RECOVERING = 0x40,
        MODE_GOTSYNC = 0x20,
-       MODE_MSP = 0x10,       // PLATFORM_TELOSB indicator 
        MODE_BIDIRECTIONAL = 0x04,  // communication goes two-way 
        MODE_EVALUATE = 0x02,  // protect from restart until evaluated
        MODE_DISCARD = 0x01,   // discard next message (a special case) 
        DEMO_SYNC = 3*8,       // waiting period between beeps (3 sec)
-       MAX_MAC_DELAY = 11800, // max jiffies allowed for MAC delay
-       #if defined(PLATFORM_TMOTE) || defined(PLATFORM_TMOTEINVENT)
+       MAX_MAC_DELAY = 16000, // max jiffies allowed for MAC delay
        MAX_DRIFT = 65,        //  how many jiffies 
                               //    two motes can drift in one second
-       SANE_JIFFIES = 900,    //  threshold for automatically sane  
-       #else
-       MAX_DRIFT = 25,        //  how many jiffies 
-                              //    two motes can drift in one second
-       SANE_JIFFIES = 300,    //  threshold for automatically sane  
-       #endif
+       SANE_JIFFIES = 1500,   //  threshold for automatically sane  
        SKEW_PU = ONE_BYTE_TIME_UNIT*MAX_DRIFT, 
                               //  allowed # jiffies skew per 1-byte unit 
-       // SKEW_NOISE_WAIT = 8*60*3, // wait this long before calculating skew
        SKEW_NOISE_WAIT = 8*60*12, // wait this long before calculating skew
        SKEW_DIFFUSION_TIME = 8*60*3, // a few minutes to diffuse  
+       // following are unused, but may be useful someday ...
        // values of zero for radio power => do not adjust
-       MICAZ_RADIO_POWER = 0, // 1 is lowest, 31 is highest 
-           //  2 => max about 4-5 inches,  3 => up to 20 inches
+       CC2420_RADIO_POWER = 15, // 1 is lowest, 31 is highest 
+           //  2 => max about 2 feet,  3 => up to 20 feet or so
        MICA128_RADIO_POWER = 0, 
            // 99 => 0 inches,90 => 1-2 inches, 80 => 3 inches
            //     // 64 => 8 inches, 32 => 15 inches, 16 => 25 inches
@@ -73,6 +66,15 @@ typedef struct neighbor_t {
   timeSync_t oldRemoteLocal; // an older value of RemoteLocal
   timeSync_t oldLocal;       // with accompanying Local clock
   float slope;               // current computed slope
+  uint8_t byteMem;           // 8 bits:  
+                             //   First four bits are for index into
+			     //   diffs array, below.  Second four bits
+			     //   are history of recent beacons being
+			     //   "sane" or not;  these bits are managed
+			     //   as a shift register (newest on front)
+  int8_t  diffs[5];          // circular buffer:  last 5 "diff" values for
+                             // incoming beacons of this neighbor, but divided
+			     // by 256 so as to fit into a single byte
   #endif
 
   /*--- state variables to track a neighbor ----------------*/

@@ -116,6 +116,16 @@ implementation
   uint8_t bitUnSet( uint8_t byte, uint8_t indx ) {
     return (~(1<<indx))&byte;
     }
+  // calculate median of a 5-element "diffs" array
+  int8_t medianFive( int8_t * b ) { 
+    uint8_t i,j;
+    int8_t x, c[5];
+    for (i=0; i<5; i++) c[i] = b[i];
+    for (i=0; i<5; i++) 
+      for (j=i; j<5; j++) 
+        if (c[i]<c[j]) { x = c[i]; c[i] = c[j];  c[j] = x; } 
+    return c[2];   // middle of sorted array is median
+    }
 
   // swap two byte arrays 
   void swap( char * a, char * b, int8_t n ) {
@@ -129,6 +139,10 @@ implementation
  
   /**
    * Filter incoming message by Id of sender 
+   *   
+   *      ***************************************
+   *      *  CHANGE ME TO GET TOPOLOGY CONTROL  *
+   *      ***************************************
    */
   command bool Neighbor.allow[uint8_t type]( uint16_t addr ) {
     return TRUE;
@@ -199,6 +213,8 @@ implementation
     if (n > 1) 
         for (k=n; k>0; k--) { // locate maximum
             for (i=0, c=0; i<k; i++) {
+	       // fear not that this subtraction can fail
+	       // because of overflow - it's only in balancing
                call OTime.subtract(&nbrTab[i].RemoteVirtual,
                                    &nbrTab[i].Local,&t);
                x = call OTime.convTimeEights(&t);
@@ -358,7 +374,7 @@ implementation
        return;
        }
     // sendFreq > 0  ==>  only count wrt current period
-    call OTime.getLocalTime(&W,NULL);
+    call OTime.getLocalTime(&W);
     w = call OTime.convTimeEights(&W);
     v = w - sendTime[type];   
     // v is elapsed time since last send
@@ -367,6 +383,45 @@ implementation
        for (p=nbrTab;  p<nbrTab+NUM_NEIGHBORS; p++) p->rcvHist[type] <<= 1;
        sendTime[type] = w;   // remember new period starting
        }
+    }
+
+  /**
+   * "fixate" the current set of neighbors 
+   */
+  command void Neighbor.fix[uint8_t type]() {
+    // for any connected neighbor, pretend a perfect history
+    // of messages received;  this will effectively "freeze"
+    // the current set of neighbors for a while
+    neighborPtr p;
+    for (p=nbrTab;  p<nbrTab+NUM_NEIGHBORS; p++) 
+       // question:  should it be even more liberal, just looking
+       // for normal, biconnected neighbors?
+       if (p->Id != 0 && bitOn(p->connected,type)) 
+          p->rcvHist[type] = 0xff;     
+    }    
+
+  /**
+   *  Return TRUE if a neighbor's recent history of "diff" values is 
+   *  suspicious.
+   */
+  command bool Tnbrhood.suspect( uint16_t Id ) {
+    #if defined(TRACK)
+    neighborPtr p;
+    uint8_t i; 
+    p = call Tnbrhood.findNbr( Id );   // locate record for recording
+    if (p == NULL) return FALSE;       // no reason to suspect stranger
+    i = p->byteMem & 0xf;       // i is recent "history" 
+    if (i == 0) return FALSE;   // zero history is VERY BAD, so bad, in fact,
+                                // that I don't know the right answer;  so
+				// I will let this pass, even if it is some
+				// kind of persistent error!
+    if (i == 0xf) return FALSE; // flawless history!  
+    return TRUE;                // somewhere in last four values, there was
+                                // a flaw;  let the flaws die out naturally
+				// through continued recording
+    #else
+    return FALSE;
+    #endif
     }
 
   /**
@@ -410,8 +465,11 @@ implementation
        p->Local = *Local;
        p->RemoteVirtual = *RemoteVirtual;
        p->oldLocal = *Local;
-       if (saneDiff(diff)) p->oldRemoteLocal = *RemoteLocal;
-       // NOTE:  if not saneDiff(diff), field will be zero
+       if (saneDiff(diff)) {
+         p->oldRemoteLocal = *RemoteLocal;
+         // NOTE:  if not saneDiff(diff), field will be zero
+	 p->byteMem = 0x8;  // set bit for sane value recorded 
+	 }
        return;
        }
         
@@ -429,6 +487,8 @@ implementation
        if (saneDiff(diff)){
           p->oldLocal = *Local;
           p->oldRemoteLocal = *RemoteLocal;
+          i = (p->byteMem & 0xf) >> 1;
+	  p->byteMem = i | 0x8 | (p->byteMem & 0xf0);
           }
        // NOTE:  if not saneDiff, fields not set!
        return;
@@ -461,6 +521,8 @@ implementation
 
        if ( (e.bigInt.g > (SKEW_NOISE_WAIT/8)*TPS) 
                 && saneDiff(diff)) {
+          i = (p->byteMem & 0xf) >> 1;
+	  p->byteMem = i | 0x8 | (p->byteMem & 0xf0);
           // e.bigInt.g is "delta y" in slope calculation
           a.partsInt.lo = p->oldLocal.ClockL; 
           a.partsInt.hi = p->oldLocal.ClockH; 
@@ -484,12 +546,16 @@ implementation
              a.bigInt.g = f.bigInt.g - e.bigInt.g;
              m = - (float) a.bigInt.g;
              }
-           m = m / (float) f.bigInt.g;
-           #ifdef SKEW_SAFETY
-           if (m > SKEW_SAFETY) m -= SKEW_SAFETY; // heuristic safety margin
-           #endif
-           p->slope = m;
-           }
+          m = m / (float) f.bigInt.g;
+          #ifdef SKEW_SAFETY
+          if (m > SKEW_SAFETY) m -= SKEW_SAFETY; // heuristic safety margin
+          #endif
+          p->slope = m;
+          }
+       else {  // for insane diff value, note that
+          i = (p->byteMem & 0xf) >> 1;
+	  p->byteMem = i | (p->byteMem & 0xf0);
+          }
        }
 
     // post-processing of a normal neighbor:  take care of eights field
@@ -506,6 +572,16 @@ implementation
           p->eights = d;
           }
        }
+    // more post-processing of a normal neighbor: record diff value 
+    if ( (p->mode & MODE_NORMAL) && 
+         (p->mode & MODE_BIDIRECTIONAL) &&
+	 saneDiff(diff) ) {
+       uint8_t k = p->byteMem >> 4;  // isolate 4 bits of index
+       int8_t y = diff / 256;
+       k = (k >= 4) ? 0 : (k + 1);   // increment modulo 5
+       p->byteMem = (k << 4) | (p->byteMem & 0xf);  
+       p->diffs[k] = y;              // store in circular buffer 
+       }
     #else
     // "recording" for non-tracking implementation just tries to 
     // add a new neighbor for the incoming beacon
@@ -517,6 +593,33 @@ implementation
     if (p->Id == Id) return;           // consider this as "recorded"
     // else p->Id must be zero -- we can grab this entry
     p->Id = Id;
+    #endif
+    }
+
+  /**
+   *  Look for the maximum of the median diff values, supposing that
+   *  all are negative values, considering only normal neighbors.
+   */
+  command int16_t Tnbrhood.overDiff() {
+    #if defined(TRACK)
+    neighborPtr p, q;
+    int16_t s, max;
+    bool found;
+    // commence a scan/search for maximum median
+    max = -32767;   // no maximum known
+    found = FALSE;  // no neighbors found
+    for (p=q=nbrTab;  p<nbrTab+NUM_NEIGHBORS; p++) {
+       if (p->Id == 0) continue;
+       if ((p->mode & MODE_NORMAL) && (p->mode & MODE_BIDIRECTIONAL)) {
+	  found = TRUE;
+	  s = medianFive(p->diffs) << 8;
+	  max = (max < s) ? s : max;  
+	  }
+       }
+    if (!found) max = 0;
+    return max;
+    #else
+    return 0;
     #endif
     }
 
@@ -544,6 +647,8 @@ implementation
     if (n > 0) { // get maximum displacement among friends
        for (p=nbrTab;  p<nbrTab+NUM_NEIGHBORS; p++) 
           if (p->mode & MODE_BIDIRECTIONAL) {
+	     if (call OTime.lesseq(&p->RemoteVirtual,&p->Local)) 
+	        return 0;  // don't try goofy subtraction!
              call OTime.subtract(&p->RemoteVirtual,&p->Local,&v);
              if (call OTime.lesseq(t,&v)) *t = v;
              }
@@ -552,6 +657,8 @@ implementation
     if (k > 0) { // get maximum displacement among friends
        for (p=nbrTab;  p<nbrTab+NUM_NEIGHBORS; p++) 
           if (p->mode & MODE_NORMAL) {
+	     if (call OTime.lesseq(&p->RemoteVirtual,&p->Local)) 
+	        return 0;  // don't try goofy subtraction!
              call OTime.subtract(&p->RemoteVirtual,&p->Local,&v);
              if (call OTime.lesseq(t,&v)) *t = v;
              }
@@ -560,6 +667,8 @@ implementation
     if (j > 0) { // get maximum displacement among friends
        for (p=nbrTab;  p<nbrTab+NUM_NEIGHBORS; p++) 
           if (p->mode & MODE_RECOVERING) {
+	     if (call OTime.lesseq(&p->RemoteVirtual,&p->Local)) 
+	        return 0;  // don't try goofy subtraction!
              call OTime.subtract(&p->RemoteVirtual,&p->Local,&v);
              if (call OTime.lesseq(t,&v)) *t = v;
              }
@@ -771,15 +880,14 @@ implementation
   #endif
 
   event error_t Wakker.wakeup(uint8_t indx, uint32_t wake_time) {
-    bool r = TRUE;
     switch (indx) {
-      case 0: r = post ageTask(); break;
+      case 0: post ageTask(); break;
       #ifdef TRACK
-      case 1: r = post healthTask(); break;
-      case 2: r = post sendTask(); break;
+      case 1: post healthTask(); break;
+      case 2: post sendTask(); break;
       #endif
       }
-    if (r) return SUCCESS; else return FAIL;
+    return SUCCESS;
     }
 
   #ifdef TRACK

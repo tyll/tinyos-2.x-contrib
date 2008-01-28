@@ -33,6 +33,7 @@ typedef struct beaconProbeAck {
   timeSync_t Local;  // local clock for Ack (48 bit, H and L)
   timeSync_t Virtual; // virtual time for Ack (48 bit, H and L)
   float skew;      // current skew adjustment factor 
+  float calibRatio;  // current OTime.calibrate() value
   uint8_t mode;    // mode of mote (important only for spy)
   } beaconProbeAck;
 typedef beaconProbeAck * beaconProbeAckPtr; 

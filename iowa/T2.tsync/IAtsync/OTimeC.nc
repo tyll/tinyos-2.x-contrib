@@ -41,17 +41,20 @@ configuration OTimeC {
   }
 
 implementation {
-  components MainC, WakkerC, OTimeP, NoLedsC, LedsC;
-  #if defined(PLATFORM_TELOSB)
+  components WakkerC, OTimeP, NoLedsC, LedsC;
+  components HilTimerMilliC;
   components Counter32khz32C;
-  components CounterMicro32C; 
+  #if defined(PLATFORM_TELOSB) 
+  components Msp430CounterMicro32C as CounterMicro32C; 
+  #elif defined(PLATFORM_MICAZ)
+  components CounterMicro32C;
   #endif
   OTime = OTimeP;
-  OTimeP.Boot -> MainC;
   OTimeP.Wakker -> WakkerC.Wakker[unique("Wakker")];
-  #if defined(PLATFORM_TELOSB)
   OTimeP.Counter32 -> Counter32khz32C;
-  OTimeP.CounterMicro -> CounterMicro32C.CounterMicro32;
-  #endif
+  // OTimeP.CounterMicro -> CounterMicro32C.CounterMicro32;
+  OTimeP.CounterMicro -> CounterMicro32C.Counter;
   OTimeP.SkewLeds -> NoLedsC;
+  OTimeP.EmergencyLeds -> LedsC;
+  OTimeP.LocalTime -> HilTimerMilliC;
   }

@@ -76,5 +76,8 @@ interface Neighbor {
   // implement this for topology control
   command bool allow( uint16_t Id );
 
+  // invoke this to "fix" a neighborhood for a while
+  command void fix();  
+
 }
 

@@ -83,4 +83,9 @@ interface PowCon {
    *   before message send (to decrease contention on MAC) 
    */
   command uint8_t randelay();
+
+  /**
+   *   Client command:  get maximum period of all clients
+   */
+  command uint16_t maxPeriod();
 }

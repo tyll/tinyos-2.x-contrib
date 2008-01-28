@@ -36,13 +36,15 @@
  */
 //--EOCpr712 (do not remove this line, which terminates copyright include)
 
-//:mode=c:
+#include "Tnbrhood.h"
 
 generic module PowAMSendP(uint8_t mid) { 
   provides interface AMSend; 
   uses {
     interface AMSend as RelaySend;
+    interface CC2420Packet;
     interface PowConQS;
+    interface Leds;
     }
   }
 
@@ -56,6 +58,7 @@ implementation {
        signal RelaySend.sendDone(msg,SUCCESS);
        return SUCCESS; 
        }
+    call CC2420Packet.setPower(msg,CC2420_RADIO_POWER);
     r = call RelaySend.send(address,msg,length);
     if (r == SUCCESS) call PowConQS.setIOPending(TRUE);
     return r;
@@ -66,6 +69,8 @@ implementation {
     return call RelaySend.maxPayloadLength(); }
   command void* AMSend.getPayload(message_t* m, uint8_t l) {
     return call RelaySend.getPayload(m,l); }
+  // command void* AMSend.getPayload(message_t* m) {
+  //    return call RelaySend.getPayload(m); }
   event void RelaySend.sendDone(message_t* m, error_t r) {
     //error_t v;
     call PowConQS.setIOPending(FALSE);
@@ -76,3 +81,4 @@ implementation {
     }
   default event void AMSend.sendDone(message_t* msg, error_t err) { }
   }
+

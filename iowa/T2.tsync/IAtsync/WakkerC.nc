@@ -40,12 +40,13 @@ configuration WakkerC {
   provides interface Wakker[uint8_t id];
   }
 implementation {
-  components WakkerP, OTimeC, MainC; 
+  components WakkerP, OTimeC; 
   components NoLedsC, LedsC;
-  components new TimerMilliC() as TimerThousandC;
+  components HilTimerMilliC;
+  // components new TimerMilliC() as TimerThousandC;
   WakkerP.OTime -> OTimeC;
-  WakkerP.Boot -> MainC;
   Wakker = WakkerP;
-  WakkerP.TimerThousand -> TimerThousandC;
+  // WakkerP.TimerThousand -> TimerThousandC;
+  WakkerP.TimerThousand -> HilTimerMilliC.TimerMilli[unique("UQ_TIMER_MILLI")]; 
   WakkerP.Leds -> NoLedsC;
   }

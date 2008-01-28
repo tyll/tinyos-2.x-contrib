@@ -38,24 +38,20 @@
 
 configuration PowConC {
   provides interface PowCon[uint8_t id];
+  provides interface SplitControl;
   }
   
 implementation {
   components PowConP;
   components RandomLfsrC as Random;
   components WakkerC, TsyncC, LedsC, NoLedsC; 
-  components new TimerMilliC() as TimerThousandC;
-  components new TimerMilliC() as TimerForDownC;
-  components new TimerMilliC() as TimerForUpC;
-  components CC2420CsmaC;
+  components ActiveMessageC;
 
+  SplitControl = PowConP;
   PowCon = PowConP;
-  PowConP.Leds -> NoLedsC;
+  PowConP.Leds -> LedsC;
   PowConP.Wakker -> WakkerC.Wakker[unique("Wakker")];
   PowConP.Tsync -> TsyncC;
   PowConP.Random -> Random;
-  PowConP.CSMAControl -> CC2420CsmaC;
-  PowConP.TimerThousand -> TimerThousandC;
-  PowConP.TimerForDown -> TimerForDownC;
-  PowConP.TimerForUp -> TimerForUpC;
+  PowConP.AMControl -> ActiveMessageC;
   }

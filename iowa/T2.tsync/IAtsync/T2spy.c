@@ -66,10 +66,12 @@
 typedef struct micaTOS_Msg
 {
    /* The following fields are transmitted/received by serial forwarder. */
-   uint16_t addr;
-   uint8_t type;
-   uint8_t group;
+   uint8_t pad;
+   uint8_t fcf[2];
+   uint8_t dest[2];
    uint8_t length;
+   uint8_t pad2;
+   uint8_t type;
    uint8_t data[29];  
    } micaTOS_Msg;
 typedef micaTOS_Msg * micaTOS_MsgPtr;
@@ -113,7 +115,8 @@ typedef struct beaconProbeAck {
   uint16_t sndId;     // id of sender
   uint8_t Local[6];   // local clock for Ack (48 bit, H and L)
   uint8_t Virtual[6]; // virtual time for Ack (48 bit, H and L)
-  float  skew;      // current skew adjustment amount
+  float  skew;        // current skew adjustment amount
+  float calibRatio;   // reported OTime.calibrate() value
   } beaconProbeAck; 
 typedef beaconProbeAck * beaconProbeAckPtr; 
 
@@ -210,6 +213,8 @@ void getStreamMica( int socket, micaTOS_MsgPtr p ) {
       if (r < 0) { perror("getStream error"); exit(errno); }
       if (r == 0) { fprintf(stderr,"connection broken!\n"); exit(0); }
       }
+   // showhex(s,n);
+   // printf("\n");
    return;
 } 
 
@@ -343,9 +348,9 @@ void displaySkew(skewMsgPtr p) {
    V = (double) *(uint16_t *)p->initStamp;
    V *= 4294967295.0 / (double) TPS;
    V += (double) moteInt(&p->initStamp[2]) / (double) TPS;
-   printf(" initStamp=%f ",V);
+   printf("initStamp=%f ",V);
    // minimum known skew 
-   printf(" skewMin=%e\n",p->skewMin);
+   printf("skewMin=%e\n",p->skewMin);
    }
 
 void displayProbeAck(beaconProbeAckPtr p ) {
@@ -358,6 +363,7 @@ void displayProbeAck(beaconProbeAckPtr p ) {
       int seqno;
       double Vclock;
       float skew;
+      float calibRatio;
       };
    static struct recordProbe R[50] = { -1, -1 };
 
@@ -451,6 +457,21 @@ void displayProbeAck(beaconProbeAckPtr p ) {
          else printf(" %d(-)",R[i].id);
          }
       printf("\n");
+
+      // display calib values for the motes in the recorded array
+      for (i=n=0, j=R[0].seqno; i<50; i++) {
+         if (R[i].seqno!=j) break;
+         if (R[i].calibRatio != 0.0) n++; 
+         }
+	  printf("t=%d.%03d ",T.tv_sec,T.tv_usec/1000);
+      printf("calibration ratios are:");
+      for (i=0, j=R[0].seqno; i<50; i++) {
+         if (R[i].seqno!=j) break;
+         if (R[i].calibRatio != 0.0) printf(" %d(%e)",R[i].id,R[i].calibRatio); 
+         else printf(" %d(-)",R[i].id);
+         }
+      printf("\n");
+
       }
 
    // add entry table, if possible
@@ -463,6 +484,7 @@ void displayProbeAck(beaconProbeAckPtr p ) {
    R[i].id = p->sndId;
    R[i].Vclock = V;
    R[i].skew = p->skew;
+   R[i].calibRatio = p->calibRatio;
    }
 
 void displayBeac( beaconMsgPtr p ) {
@@ -515,8 +537,7 @@ void displayBeac( beaconMsgPtr p ) {
    }
 
 void printHelp() { 
-   printf("Syntax   spy  [-8|-z|-t]\n");
-   printf("\t\t -8 for a mica128 mote and MIB serial forwarding\n");
+   printf("Syntax   spy  [-z|-t]\n");
    printf("\t\t -z for a micaz mote and MIB serial forwarding\n");
    printf("\t\t -t for a telos-type mote and USB serial forwarding\n");
    }
@@ -551,8 +572,7 @@ int main(int argc, char **argv) {
        }
      }
    if (motetype == 0) { printHelp(); exit(1); }
-   if (motetype == MICA128) TPS = 500000;  
-   if (motetype == MICAZ) TPS = 921600;  
+   if (motetype == MICAZ) TPS = 1024*1024;  // (native could be 921778)  
    if (motetype == TELOS) TPS = 1024*1024;
 
    gettimeofday( &startT, NULL );

@@ -342,8 +342,9 @@ public class ResultCollector extends Thread implements Messenger,
 
     if (testMap.get(new Integer(testId)) != null) {
       log.warn("\nTest " + testId + " ("
-          + (String) testMap.get(new Integer(testId)) + ") FAILED \n"
-          + (String) assertionMap.get(new Integer(assertionId)) + failMsg);
+          + (String) testMap.get(new Integer(testId)) + ") "
+          + (String) assertionMap.get(new Integer(assertionId))
+          + "\n  FAILED\n" + failMsg + "\n");
 
       result = new TestResult((String) testMap.get(new Integer(testId)),
           (String) assertionMap.get(new Integer(assertionId)));

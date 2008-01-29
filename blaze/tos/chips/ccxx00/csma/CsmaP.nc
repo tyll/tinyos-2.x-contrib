@@ -339,8 +339,7 @@ implementation {
   /***************** Defaults ****************/
   default event void Send.sendDone[radio_id_t id](message_t* msg, error_t error) { }
   
-  default async command error_t AsyncSend.load[radio_id_t id](void *msg, uint16_t rxInterval) { }
-  default async command error_t AsyncSend.send[radio_id_t id]() { }
+  default async command error_t AsyncSend.send[radio_id_t id](void *msg, bool force, uint16_t preamble) { }
   
   default async event void Csma.requestInitialBackoff[am_id_t amId](message_t *msg) { }
   default async event void Csma.requestCongestionBackoff[am_id_t amId](message_t *msg) { }

@@ -193,10 +193,6 @@ implementation {
   
   
   /***************** AckSend Events ****************/
-  async event void AckSend.loadDone[ radio_id_t id ](error_t error) {
-    call AckSend.send[id]();
-  }
-  
   async event void AckSend.sendDone[ radio_id_t id ](error_t error) {
     call Csn.set[ id ]();
     post receiveDone();
@@ -286,8 +282,8 @@ implementation {
             }
             
             call Csn.clr[ id ]();
-            call AckSend.load[ id ](&acknowledgement, 0);
-            // Continues at AckSend.loadDone() and AckSend.sendDone()
+            call AckSend.send[ id ](&acknowledgement, TRUE, 0);
+            // Continues at AckSend.sendDone()
             return;
           }
         }
@@ -350,6 +346,15 @@ implementation {
     cleanUp();
   }
   
+  /**
+   * Get out of async context
+   */
+  task void stopDone() {
+    uint8_t atomicId;
+    atomic atomicId = m_id;
+    signal SplitControl.stopDone[atomicId](SUCCESS);
+  }
+  
   /***************** Functions ****************/  
   /**
    * Receive the packet by first reading in the length byte.  The SPI
@@ -389,18 +394,21 @@ implementation {
    */
   void cleanUp() {
     uint8_t id;
-    
-    atomic id = m_id;
+    bool stop;
+    atomic {
+      id = m_id;
+      stop = stopping;
+    }
     
     call Csn.set[ id ]();
     
-    if(stopping) {
+    if(stop) {
       // Do not re-enable interrupts
-      stopping = FALSE;
+      atomic stopping = FALSE;
       call RxInterrupt.disable[id]();
       call State.toIdle();
       call Resource.release();
-      signal SplitControl.stopDone[id](SUCCESS);
+      post stopDone();
       return;
     }
     
@@ -417,6 +425,8 @@ implementation {
     }
   }
   
+  
+  
   /***************** Defaults ****************/
   default event message_t *Receive.receive[ radio_id_t id ](message_t* msg, void* payload, uint8_t len){
     return msg;
@@ -425,12 +435,7 @@ implementation {
   default async event void AckReceive.receive( am_addr_t source, am_addr_t destination, uint8_t dsn ) {
   }
   
-    
-  default async command error_t AckSend.load[ radio_id_t id ](void *msg, uint16_t rxInterval) {
-    return FAIL;
-  }
-  
-  default async command error_t AckSend.send[ radio_id_t id ]() {
+  default async command error_t AckSend.send[ radio_id_t id ](void *msg, bool force, uint16_t preamble) {
     return FAIL;
   }
   
@@ -506,6 +511,10 @@ implementation {
   default async command error_t RxInterrupt.disable[radio_id_t id]() {
     return FAIL;
   }
+  
+  default event void SplitControl.startDone[radio_id_t radioId](error_t error) {}
+  default event void SplitControl.stopDone[radio_id_t radioId](error_t error) {}
+  
  
 }
 

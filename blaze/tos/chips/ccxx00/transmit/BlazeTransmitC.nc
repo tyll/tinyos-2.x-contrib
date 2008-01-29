@@ -60,13 +60,15 @@
 configuration BlazeTransmitC {
   provides {
     interface AsyncSend[ radio_id_t id ];
+    interface AsyncSend as AckSend[ radio_id_t radioId ];
   }
 }
 
 implementation {
 
   components BlazeTransmitP;
-  AsyncSend = BlazeTransmitP;
+  AsyncSend = BlazeTransmitP.AsyncSend;
+  AckSend = BlazeTransmitP.AckSend;
   
   components BlazeCentralWiringC;  
   BlazeTransmitP.Csn -> BlazeCentralWiringC.Csn;

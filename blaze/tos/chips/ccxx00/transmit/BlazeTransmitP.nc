@@ -61,6 +61,7 @@ module BlazeTransmitP {
 
   provides {
     interface AsyncSend[ radio_id_t id ];
+    interface AsyncSend as AckSend[ radio_id_t radioId ];
   }
   
   uses {
@@ -92,6 +93,7 @@ implementation {
     S_IDLE,
     
     S_TX_PACKET,
+    S_TX_ACK,
   };
   
   /***************** Global Variables ****************/
@@ -101,24 +103,36 @@ implementation {
   bool force;
   uint16_t duration;
   
-  /***************** Local Functions ****************/
+  /***************** Prototypes ****************/
   error_t transmit();
+  task void startTimer();
   
   /***************** AsyncSend Commands ****************/  
-  /**
-   * Load a packet into the TX FIFO
-   * @param msg Any type of message where the first byte is the length
-   *    of the rest of the bytes in the message not including the length byte
-   */
   async command error_t AsyncSend.send[ radio_id_t id ](void *msg, bool forcePkt, uint16_t preambleDurationMs) {
+      
+    if(call State.requestState(S_TX_PACKET) != SUCCESS) {
+      return FAIL;
+    }
+    
     atomic m_id = id;
     atomic myMsg = msg;
     atomic force = forcePkt;
     atomic duration = preambleDurationMs;
+
+    return transmit();
+  }
+  
+  /***************** AckSend Commands ****************/  
+  async command error_t AckSend.send[ radio_id_t id ](void *msg, bool forcePkt, uint16_t preambleDurationMs) {
     
-    if(call State.requestState(S_TX_PACKET) != SUCCESS) {
+    if(call State.requestState(S_TX_ACK) != SUCCESS) {
       return FAIL;
     }
+    
+    atomic m_id = id;
+    atomic myMsg = msg;
+    atomic force = forcePkt;
+    atomic duration = preambleDurationMs;
     
     return transmit();
   }
@@ -130,6 +144,7 @@ implementation {
     
     uint8_t id;
     uint8_t status;
+    uint8_t myState;
     
     if(!call State.isIdle()) {
       atomic id = m_id;
@@ -161,9 +176,16 @@ implementation {
       }
       
       call Csn.set[ id ]();
+      
+      myState = call State.getState();
       call State.toIdle();
       
-      signal AsyncSend.sendDone[ id ](error);
+      if(myState == S_TX_PACKET) {
+        signal AsyncSend.sendDone[ id ](error);
+        
+      } else {
+        signal AckSend.sendDone[ id ](error);
+      }
     }
   }
 
@@ -182,7 +204,7 @@ implementation {
     uint8_t status;
     void *msg;
     uint8_t id;
-    bool forcing;
+    bool forcing;    
     uint16_t transmitDelay;
     
     atomic {
@@ -229,7 +251,7 @@ implementation {
     
     // CCA Passed
     if(transmitDelay > 0) {
-      call Timer.startOneShot(transmitDelay);
+      post startTimer();
       
     } else {
       call TXFIFO.write(msg, (call BlazePacketBody.getHeader(msg))->length + 1);
@@ -246,6 +268,14 @@ implementation {
   
   
   /***************** Tasks ****************/
+  /**
+   * Move out of async context
+   */
+  task void startTimer() {
+    uint16_t transmitDelay;
+    atomic transmitDelay = duration;
+    call Timer.startOneShot(transmitDelay);
+  }
   
   /***************** Defaults ****************/
   default async command void Csn.set[ radio_id_t id ](){}
@@ -255,6 +285,8 @@ implementation {
   default async command void Csn.makeOutput[ radio_id_t id ](){}
   
   default async event void AsyncSend.sendDone[ radio_id_t id ](error_t error) {}
+  
+  default async event void AckSend.sendDone[ radio_id_t id ](error_t error) {}
     
 }
 

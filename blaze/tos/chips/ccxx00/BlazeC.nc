@@ -113,6 +113,9 @@ implementation {
   components CsmaC;
   Csma = CsmaC;
   
+  components SplitControlManagerC;
+  components PowerManagerC;
+  
   components UniqueSendC;
   components UniqueReceiveC;
   components BlazeReceiveC;
@@ -137,9 +140,9 @@ implementation {
   RadioSelectC.SubReceive -> BlazeReceiveC.Receive;
     
   /***************** SplitControl Layers ****************/
-  SplitControl = RadioSelectC.SplitControl[0];
-  BlazeSplitControl = LplC.SplitControl;
-  LplC.SubControl -> RadioSelectC.SplitControl;
-  RadioSelectC.SubControl -> BlazeInitC;
+  SplitControl = SplitControlManagerC.SplitControl[0];
+  BlazeSplitControl = SplitControlManagerC.SplitControl;
+  SplitControlManagerC.SubControl -> LplC.SplitControl;
+  LplC.SubControl -> PowerManagerC.SplitControl;
 }
 

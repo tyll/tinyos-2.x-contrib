@@ -30,14 +30,22 @@
  */
 
 /**
- * @author David Moss
+ * Make sure we aren't trying to compile multiple LPL directories into the
+ * radio stack
  */
-#ifndef BLAZEINIT_H
-#define BLAZEINIT_H
+ 
+#ifndef ALWAYSON_H
+#define ALWAYSON_H
 
-#define blaze_init_t uint8_t
+#warning "*** Low Power Listening Disabled ***"
 
-#define BLAZE_TOTAL_INIT_REGISTERS 31
+#ifndef BLAZE_TRANSMIT_ARBITER_DEFINED
+#define BLAZE_TRANSMIT_ARBITER_DEFINED
+#else
+#warning "You are attempting to include multiple LPL paths at compile time." 
+#error "Choose a single LPL directory in your compiler path and recompile."
+#endif
+
 
 #endif
 

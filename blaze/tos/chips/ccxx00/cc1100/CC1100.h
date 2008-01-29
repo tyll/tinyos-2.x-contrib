@@ -314,17 +314,17 @@ enum CC1100_config_reg_state_enums {
   CC1100_CONFIG_DEVIATN = 0x00,
   CC1100_CONFIG_MCSM2 = 0x07,
   
-  /** Switch to TX only on CCA; When done with Tx or Rx, stay in Rx */
-  CC1100_CONFIG_MCSM1 = 0x3F,
+  /** TX on CCA; Stay in Rx after Rx and Tx */
+  CC1100_CONFIG_MCSM1 = 0x3F, 
   CC1100_CONFIG_MCSM0 = 0x1C,
+  CC1100_CONFIG_FOCCFG = 0x1D,
+  CC1100_CONFIG_BSCFG = 0x1C,
+  CC1100_CONFIG_AGCTRL2 = 0xDB,  // If your node doesn't Tx, lower the LNA.
+  CC1100_CONFIG_AGCTRL1 = 0x70,  // CCA thresholds
+  CC1100_CONFIG_AGCTRL0 = 0xB2,
   
   /*  
    * The rest is taken care of by default radio settings
-  CC1100_CONFIG_FOCCFG = 0x1D,
-  CC1100_CONFIG_BSCFG = 0x1C,
-  CC1100_CONFIG_AGCTRL2 = 0xC7,
-  CC1100_CONFIG_AGCTRL1 = 0x00,
-  CC1100_CONFIG_AGCTRL0 = 0xB2,
   CC1100_CONFIG_WOREVT1 = 0x87,
   CC1100_CONFIG_WOREVT0 = 0x6B,
   CC1100_CONFIG_WORCTRL = 0xF8,

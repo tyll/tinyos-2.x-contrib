@@ -28,16 +28,57 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE
  */
-
+ 
 /**
+ * Dummy low power listening interface used when LowPowerListening is not
+ * compiled in with the application.
+ * Sleep interval is always 0, and duty cycle is always 100%
  * @author David Moss
  */
-#ifndef BLAZEINIT_H
-#define BLAZEINIT_H
+ 
+module LplP {
+  provides {
+    interface LowPowerListening[radio_id_t id];
+  }
+}
 
-#define blaze_init_t uint8_t
+implementation {
 
-#define BLAZE_TOTAL_INIT_REGISTERS 31
-
-#endif
+  command void LowPowerListening.setLocalSleepInterval[radio_id_t id](uint16_t sleepIntervalMs) {
+  }
+  
+  command uint16_t LowPowerListening.getLocalSleepInterval[radio_id_t id]() {
+    return 0;
+  }
+  
+  command void LowPowerListening.setLocalDutyCycle[radio_id_t id](uint16_t dutyCycle) {
+  }
+  
+  command uint16_t LowPowerListening.getLocalDutyCycle[radio_id_t id]() {
+    return 10000;
+  }
+  
+  command void LowPowerListening.setRxSleepInterval[radio_id_t id](message_t *msg, uint16_t sleepIntervalMs) {
+  }
+  
+  command uint16_t LowPowerListening.getRxSleepInterval[radio_id_t id](message_t *msg) {
+    return 0;
+  }
+  
+  command void LowPowerListening.setRxDutyCycle[radio_id_t id](message_t *msg, uint16_t dutyCycle) {
+  }
+  
+  command uint16_t LowPowerListening.getRxDutyCycle[radio_id_t id](message_t *msg) {
+    return 10000;
+  }
+  
+  command uint16_t LowPowerListening.dutyCycleToSleepInterval[radio_id_t id](uint16_t dutyCycle) {
+    return 0;
+  }
+  
+  command uint16_t LowPowerListening.sleepIntervalToDutyCycle[radio_id_t id](uint16_t sleepInterval) {
+    return 10000;
+  }
+  
+}
 

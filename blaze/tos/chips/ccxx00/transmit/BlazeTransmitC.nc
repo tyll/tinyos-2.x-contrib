@@ -83,6 +83,9 @@ implementation {
   BlazeTransmitP.SRX -> Spi.SRX;
   BlazeTransmitP.TxReg -> Spi.TXREG;
     
+  components new TimerMilliC();
+  BlazeTransmitP.Timer -> TimerMilliC;
+  
   components new StateC();
   BlazeTransmitP.State -> StateC;
   

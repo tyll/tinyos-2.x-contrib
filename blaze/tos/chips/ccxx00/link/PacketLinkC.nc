@@ -30,14 +30,39 @@
  */
 
 /**
+ * Reliable Packet Link Functionality
  * @author David Moss
+ * @author Jon Wyant
  */
-#ifndef BLAZEINIT_H
-#define BLAZEINIT_H
 
-#define blaze_init_t uint8_t
+configuration PacketLinkC {
+  provides {
+    interface Send;
+    interface PacketLink;
+  }
+  
+  uses {
+    interface Send as SubSend;
+  }
+}
 
-#define BLAZE_TOTAL_INIT_REGISTERS 31
+implementation {
 
-#endif
+  components PacketLinkP,
+      ActiveMessageC,
+      BlazePacketC,
+      RandomC,
+      new StateC() as SendStateC,
+      new TimerMilliC() as DelayTimerC;
+  
+  PacketLink = PacketLinkP;
+  Send = PacketLinkP.Send;
+  SubSend = PacketLinkP.SubSend;
+  
+  PacketLinkP.SendState -> SendStateC;
+  PacketLinkP.DelayTimer -> DelayTimerC;
+  PacketLinkP.PacketAcknowledgements -> ActiveMessageC;
+  PacketLinkP.AMPacket -> ActiveMessageC;
+  PacketLinkP.BlazePacketBody -> BlazePacketC;
 
+}

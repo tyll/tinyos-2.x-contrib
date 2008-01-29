@@ -28,16 +28,55 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE
  */
-
+ 
 /**
- * @author David Moss
+ * Use this component to duty cycle the radio. When a message is heard, 
+ * disable DutyCycling.
+ *
+ * @author David Moss dmm@rincon.com
  */
-#ifndef BLAZEINIT_H
-#define BLAZEINIT_H
 
-#define blaze_init_t uint8_t
+configuration PowerCycleC {
+  provides {
+    interface PowerCycle;
+    interface SplitControl;
+    interface State as SplitControlState;
+    interface State as RadioPowerState;
+  }
+}
 
-#define BLAZE_TOTAL_INIT_REGISTERS 31
+implementation {
+  components PowerCycleP,
+      CC2420TransmitC,
+      CC2420ReceiveC,
+      CC2420CsmaC,
+      LedsC,
+      new StateC() as RadioPowerStateC,
+      new StateC() as SplitControlStateC,
+      new TimerMilliC() as OnTimerC,
+      new TimerMilliC() as CheckTimerC;
 
+#if defined(LOW_POWER_LISTENING) || defined(ACK_LOW_POWER_LISTENING)
+  components DefaultLplC as LplC;
+#else
+  components DummyLplC as LplC;
 #endif
+
+  PowerCycle = PowerCycleP;
+  SplitControl = PowerCycleP;
+  SplitControlState = SplitControlStateC;
+  RadioPowerState = RadioPowerStateC;
+  
+  PowerCycleP.EnergyIndicator -> CC2420TransmitC.EnergyIndicator;
+  PowerCycleP.ByteIndicator -> CC2420TransmitC.ByteIndicator;
+  PowerCycleP.PacketIndicator -> CC2420ReceiveC.PacketIndicator;
+  PowerCycleP.SubControl -> CC2420CsmaC;
+  PowerCycleP.SendState -> LplC;
+  PowerCycleP.RadioPowerState -> RadioPowerStateC;
+  PowerCycleP.SplitControlState -> SplitControlStateC;
+  PowerCycleP.OnTimer -> OnTimerC;
+  PowerCycleP.Leds -> LedsC;
+    
+}
+
 

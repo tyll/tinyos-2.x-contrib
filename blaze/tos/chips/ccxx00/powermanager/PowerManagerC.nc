@@ -28,16 +28,28 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE
  */
-
+ 
 /**
+ * This component is responsible for properly powering the radio on and off.
  * @author David Moss
  */
-#ifndef BLAZEINIT_H
-#define BLAZEINIT_H
 
-#define blaze_init_t uint8_t
+#include "Blaze.h"
 
-#define BLAZE_TOTAL_INIT_REGISTERS 31
+configuration PowerManagerC {
+  provides {
+    interface SplitControl[ radio_id_t radioId ];
+  }
+}
 
-#endif
+implementation {
+  components PowerManagerP,
+      CsmaC,
+      BlazeReceiveC,
+      BlazeInitC;
+      
+  PowerManagerP.CsmaSplitControl -> CsmaC;
+  PowerManagerP.ReceiveSplitControl -> BlazeRecieveC;
+  PowerManagerP.InitSplitControl -> BlazeInitC;
 
+}

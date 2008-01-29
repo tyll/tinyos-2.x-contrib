@@ -30,14 +30,26 @@
  */
 
 /**
+ * This component determines whether to send a message using the standard
+ * BlazeTransmit component or some other low power listening component.
+ * 
+ * It must be implemented for each type of low power listening to direct
+ * messages
+ * 
  * @author David Moss
  */
-#ifndef BLAZEINIT_H
-#define BLAZEINIT_H
 
-#define blaze_init_t uint8_t
+#include "Blaze.h"
+#include "AlwaysOn.h"
 
-#define BLAZE_TOTAL_INIT_REGISTERS 31
+configuration TransmitArbiterC {
+  provides {
+    interface AsyncSend[ radio_id_t id ];
+  }
+}
 
-#endif
-
+implementation {
+  components BlazeTransmitC;
+  
+  AsyncSend = BlazeTransmitC.AsyncSend;
+}

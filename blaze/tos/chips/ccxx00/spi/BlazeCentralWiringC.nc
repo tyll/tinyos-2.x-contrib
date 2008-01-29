@@ -44,6 +44,8 @@
  * @author David Moss
  */
 
+#include "Blaze.h"
+
 configuration BlazeCentralWiringC {
   provides {
     interface GeneralIO as Csn[ radio_id_t id ];

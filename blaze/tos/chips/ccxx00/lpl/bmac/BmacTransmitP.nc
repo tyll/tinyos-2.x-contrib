@@ -31,33 +31,25 @@
 
 
 /**
- * To use this on the MSP430, DMA MUST be enabled. Also, it is highly 
- * recommended the SMCLK used for SPI is increased above its default minimum.  
- * The microcontroller must access the SPI bus at a minimum of 500 kbps or the 
- * node will lock up.
- *
- * Point your TransmitArbiterC to the BlazeTransmit instead of BlazeTransmit.
- * This will be a change specific to your workspace until we find this
- * module can work without changes to the TinyOS baseline SPI bus.
- * 
- * The radio is kicked into TX mode and then
- * the packet is shot over the SPI bus.  The radio transmits the packet
- * directly as it's coming across the SPI bus, hence the need for at least
- * a 500 kbps SPI bus clock.
- *
- * The parameterized ID is, of course, a unique value of UQ_BLAZE_RADIO
- * which you'll find in each individual radio's header file (CC1100.h or 
- * CC2500.h).  
- *
  * @author Jared Hill
  * @author David Moss
+ * @author Roland Hendel
  */
-
+ 
+/**
+ * This Module assumes it already has control of the Spi Bus when called
+ * It also assumes the radio is on and configured properly
+ *
+ * For the MSP430, you MUST get the SPI bus fast enough to keep up with
+ * the radio.  For standard platforms, enabling DMA should be enough to do so.
+ * If the SPI bus is too slow, you'll be in a TXFIFO_UNDERFLOW state.
+ */
+ 
 #include "IEEE802154.h"
 #include "Blaze.h"
 #include "AM.h"
 
-module BlazeTransmitP {
+module BmacTransmitP {
 
   provides {
     interface AsyncSend[ radio_id_t id ];
@@ -66,7 +58,7 @@ module BlazeTransmitP {
   uses {
     interface GeneralIO as Csn[ radio_id_t id ];
     interface BlazePacketBody;
-    
+   
     interface BlazeFifo as TXFIFO;
   
     interface BlazeStrobe as SNOP;
@@ -78,8 +70,8 @@ module BlazeTransmitP {
   
     interface BlazeRegister as TxReg;
     
-    interface Timer<TMilli>;
     interface RadioStatus;
+    interface Timer<TMilli>;
     interface State;
     interface Leds;
   }
@@ -96,31 +88,37 @@ implementation {
   
   /***************** Global Variables ****************/
   uint8_t m_id;
-  
   void *myMsg;
-  bool force;
-  uint16_t duration;
+  uint16_t interval;
   
   /***************** Local Functions ****************/
-  error_t transmit();
+  error_t transmit(uint8_t id, uint16_t rxInterval);
+  task void startTimer();
   
-  /***************** AsyncSend Commands ****************/  
+  
+  /***************** AsyncSend Commands ****************/
+  async command error_t AsyncSend.load[ radio_id_t id ](void *msg, uint16_t rxInterval) {
+
+    atomic {
+      myMsg = msg;
+      interval = rxInterval;
+    }
+    
+    signal AsyncSend.loadDone[id](SUCCESS);
+    return SUCCESS;
+  }
+  
   /**
    * Load a packet into the TX FIFO
    * @param msg Any type of message where the first byte is the length
    *    of the rest of the bytes in the message not including the length byte
    */
-  async command error_t AsyncSend.send[ radio_id_t id ](void *msg, bool forcePkt, uint16_t preambleDurationMs) {
-    atomic m_id = id;
-    atomic myMsg = msg;
-    atomic force = forcePkt;
-    atomic duration = preambleDurationMs;
-    
+  async command error_t AsyncSend.send[ radio_id_t id ]() {
     if(call State.requestState(S_TX_PACKET) != SUCCESS) {
       return FAIL;
     }
     
-    return transmit();
+    return transmit(id, rxInterval);
   }
   
   
@@ -138,6 +136,7 @@ implementation {
       call Csn.clr[id]();
       
       while((status = call RadioStatus.getRadioStatus()) != BLAZE_S_RX) {
+        
         call Csn.set[id]();
         call Csn.clr[id]();
         
@@ -151,9 +150,6 @@ implementation {
           call SFTX.strobe();
           call SRX.strobe();
 
-        } else if (status == BLAZE_S_CALIBRATE) {
-          // do nothing but don't quit the loop
-          
         } else if (status != BLAZE_S_TX) {
           error = FAIL;
           call SRX.strobe();
@@ -170,7 +166,14 @@ implementation {
   async event void TXFIFO.readDone( uint8_t* tx_buf, uint8_t tx_len, 
       error_t error ) {
   }
-
+  
+  /***************** Timer Events ****************/
+  event void Timer.fired() {
+    void *msg;
+    atomic msg = myMsg;
+    call TXFIFO.write(msg, (call BlazePacketBody.getHeader(msg))->length + 1);
+  }
+  
   /***************** Local Functions ****************/  
   /**
    * Transmit the given message through the given radio ID
@@ -178,27 +181,30 @@ implementation {
    * @param force TRUE to force the packet to go through, even if CCA fails the
    *     first few times
    */
-  error_t transmit() {
+  error_t transmit(uint8_t id, uint16_t rxInterval) {
+    uint8_t state;
     uint8_t status;
-    void *msg;
-    uint8_t id;
-    bool forcing;
-    uint16_t transmitDelay;
-    
-    atomic {
-      msg = myMsg;
-      id = m_id;
-      forcing = force;
-      transmitDelay = duration;
-    }
+    atomic m_id = id;
     
     call Csn.clr[ id ]();
+    
+    status = call RadioStatus.getRadioStatus();
+    
+    if(status != BLAZE_S_RX) {
+      if (status == BLAZE_S_RXFIFO_OVERFLOW) {
+        call SFRX.strobe();
+      } else if (status == BLAZE_S_TXFIFO_UNDERFLOW) {
+        call SFTX.strobe();
+      }
+      
+      call SRX.strobe();
+    }
     
     /*
      * Put the radio in RX mode if it's not already. This covers the
      * frequency / synthesizer startup and calibration
      */
-    while((status = call RadioStatus.getRadioStatus()) != BLAZE_S_RX) {
+    while(call RadioStatus.getRadioStatus() != BLAZE_S_RX) {
       call SFTX.strobe();
       call SFRX.strobe();
       call SRX.strobe();
@@ -211,41 +217,24 @@ implementation {
      */
     call STX.strobe();
     
-    if(forcing) {
-      while(call RadioStatus.getRadioStatus() != BLAZE_S_TX) {
-        call STX.strobe();
-      }
-      
-    } else {
-      status = call RadioStatus.getRadioStatus();
-      
-      if(status != BLAZE_S_TX) {
-        // CCA failed
-        call Csn.set[ id ]();
-        call State.toIdle();
-        return EBUSY;
-      }
+    if((state = call RadioStatus.getRadioStatus()) != BLAZE_S_TX) {
+      // CCA failed
+      call State.toIdle();
+      call Csn.set[ id ]();
+      return EBUSY;
     }
     
-    // CCA Passed
-    if(transmitDelay > 0) {
-      call Timer.startOneShot(transmitDelay);
-      
-    } else {
-      call TXFIFO.write(msg, (call BlazePacketBody.getHeader(msg))->length + 1);
-    }
+    // CCA passed; start timer in synchronous context
+    post startTimer();
+    
     return SUCCESS;
-  }
-  
-  /***************** Timer Events ****************/
-  event void Timer.fired() {
-    void *msg;
-    atomic msg = myMsg;
-    call TXFIFO.write(msg, (call BlazePacketBody.getHeader(msg))->length + 1);
   }
   
   
   /***************** Tasks ****************/
+  task void startTimer() {
+    call Timer.startOneShot(interval + 3);
+  }
   
   /***************** Defaults ****************/
   default async command void Csn.set[ radio_id_t id ](){}
@@ -254,6 +243,7 @@ implementation {
   default async command void Csn.makeInput[ radio_id_t id ](){}
   default async command void Csn.makeOutput[ radio_id_t id ](){}
   
+  default async event void AsyncSend.loadDone[ radio_id_t id ](error_t error) {}
   default async event void AsyncSend.sendDone[ radio_id_t id ](error_t error) {}
     
 }

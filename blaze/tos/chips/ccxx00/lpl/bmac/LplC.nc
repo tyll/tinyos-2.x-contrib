@@ -30,14 +30,69 @@
  */
 
 /**
+ * BMAC behavior and detect implementation
  * @author David Moss
  */
-#ifndef BLAZEINIT_H
-#define BLAZEINIT_H
 
-#define blaze_init_t uint8_t
 
-#define BLAZE_TOTAL_INIT_REGISTERS 31
+#include "Lpl.h"
 
-#endif
+configuration LplC {
+  provides {
+    interface LowPowerListening;
+    interface Send;
+    interface Receive;
+    interface SplitControl;
+    interface State as SendState;
+  }
+  
+  uses {
+    interface Send as SubSend;
+    interface Receive as SubReceive;
+    interface SplitControl as SubControl;
+  }
+}
 
+implementation {
+  components MainC,
+      LplP,
+      PowerCycleC,
+      CC2420ActiveMessageC,
+      CC2420CsmaC,
+      CC2420TransmitC,
+      CC2420PacketC,
+      RandomC,
+      new StateC() as SendStateC,
+      new TimerMilliC() as OffTimerC,
+      new TimerMilliC() as SendDoneTimerC,
+      LedsC;
+  
+  LowPowerListening = LplP;
+  Send = LplP;
+  Receive = LplP;
+  SplitControl = PowerCycleC;
+  SendState = SendStateC;
+  
+  SubControl = LplP.SubControl;
+  SubReceive = LplP.SubReceive;
+  SubSend = LplP.SubSend;
+  
+  
+  MainC.SoftwareInit -> LplP;
+  
+  
+  LplP.SplitControlState -> PowerCycleC.SplitControlState;
+  LplP.RadioPowerState -> PowerCycleC.RadioPowerState;
+  LplP.SendState -> SendStateC;
+  LplP.OffTimer -> OffTimerC;
+  LplP.SendDoneTimer -> SendDoneTimerC;
+  LplP.PowerCycle -> PowerCycleC;
+  LplP.Resend -> CC2420TransmitC;
+  LplP.PacketAcknowledgements -> CC2420ActiveMessageC;
+  LplP.AMPacket -> CC2420ActiveMessageC;
+  LplP.CC2420PacketBody -> CC2420PacketC;
+  LplP.RadioBackoff -> CC2420CsmaC;
+  LplP.Random -> RandomC;
+  LplP.Leds -> LedsC;
+  
+}

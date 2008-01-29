@@ -28,16 +28,41 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE
  */
-
+ 
 /**
+ * Dummy low power listening interface used when LowPowerListening is not
+ * compiled in with the application.
+ * Sleep interval is always 0, and duty cycle is always 100%
  * @author David Moss
  */
-#ifndef BLAZEINIT_H
-#define BLAZEINIT_H
+ 
+#include "Blaze.h"
 
-#define blaze_init_t uint8_t
+configuration LplC {
+  provides {
+    interface Send;
+    interface Receive;
+    interface LowPowerListening[radio_id_t id];
+    interface SplitControl[radio_id_t id];
+    interface State as SendState;
+  }
+  
+  uses {
+    interface Send as SubSend;
+    interface Receive as SubReceive;
+    interface SplitControl as SubControl[radio_id_t id];
+  }
+}
 
-#define BLAZE_TOTAL_INIT_REGISTERS 31
-
-#endif
+implementation {
+  components LplP;
+  components new StateC();
+  
+  Send = SubSend;
+  Receive = SubReceive;
+  SplitControl = SubControl;
+  LowPowerListening = LplP;
+  SendState = StateC;
+  
+}
 

@@ -32,12 +32,17 @@
 /**
  * @author David Moss
  */
-#ifndef BLAZEINIT_H
-#define BLAZEINIT_H
+#ifndef ACKNOWLEDGEMENTS_H
+#define ACKNOWLEDGEMENTS_H
 
-#define blaze_init_t uint8_t
-
-#define BLAZE_TOTAL_INIT_REGISTERS 31
+/**
+ * This number was determined in a network of 3 transmitters sending
+ * packets a maximum speed to a single receiver.
+ * Acknowledgement success rate was found to be between 79-89%.
+ */
+#ifndef BLAZE_ACK_WAIT
+#define BLAZE_ACK_WAIT 300
+#endif
 
 #endif
 

@@ -44,7 +44,7 @@ typedef uint8_t radio_id_t;
 typedef nx_struct blaze_header_t {
   nxle_uint8_t length;
   nxle_uint16_t dest;
-  nxle_uint16_t fcf;
+  nxle_uint8_t fcf;
   nxle_uint8_t dsn;
   nxle_uint16_t src;
   nxle_uint16_t destpan;

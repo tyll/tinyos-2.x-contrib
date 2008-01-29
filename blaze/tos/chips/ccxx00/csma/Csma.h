@@ -32,12 +32,17 @@
 /**
  * @author David Moss
  */
-#ifndef BLAZEINIT_H
-#define BLAZEINIT_H
+ 
+#ifndef CSMA_H
+#define CSMA_H
 
-#define blaze_init_t uint8_t
-
-#define BLAZE_TOTAL_INIT_REGISTERS 31
-
+#ifndef BLAZE_BACKOFF_PERIOD
+#define BLAZE_BACKOFF_PERIOD 10
 #endif
 
+#ifndef BLAZE_MIN_BACKOFF
+#define BLAZE_MIN_BACKOFF 10
+#endif
+
+
+#endif

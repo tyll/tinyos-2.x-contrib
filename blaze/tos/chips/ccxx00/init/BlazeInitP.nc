@@ -169,10 +169,6 @@ implementation {
   
   /***************** RadioInit Events ****************/
   event void RadioInit.initDone() { 
-    uint8_t cnt = 0;
-    uint8_t iSwearItsGottaBeTheSilicon = 0;
-    
-    
     call Gdo0_io.makeInput[ m_id ]();
     call Gdo2_io.makeInput[ m_id ]();
     
@@ -208,7 +204,6 @@ implementation {
   /***************** Resource Events ****************/
   event void InitResource.granted() {
     uint8_t id;
-    uint8_t cnt = 0;
     atomic id = m_id;
     
     call RadioReset.blockUntilPowered[id]();

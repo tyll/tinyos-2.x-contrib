@@ -30,14 +30,30 @@
  */
 
 /**
+ * Dummy configuration for PacketLink Layer
  * @author David Moss
+ * @author Jon Wyant
  */
-#ifndef BLAZEINIT_H
-#define BLAZEINIT_H
+ 
+configuration PacketLinkDummyC {
+  provides {
+    interface Send;
+    interface PacketLink;
+  }
+  
+  uses {
+    interface Send as SubSend;
+  }
+}
 
-#define blaze_init_t uint8_t
-
-#define BLAZE_TOTAL_INIT_REGISTERS 31
-
-#endif
+implementation {
+  components PacketLinkDummyP,
+      ActiveMessageC;
+  
+  PacketLink = PacketLinkDummyP;
+  Send = SubSend;
+  
+  PacketLinkDummyP.PacketAcknowledgements -> ActiveMessageC;
+  
+}
 

@@ -27,22 +27,27 @@
  * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE
+ */
+ 
+/**
+ * @author Jonathan Hui
+ * @author David Moss
  *
- * @author Jonathan Hui <jhui@archrock.com>
- * @version $Revision$ $Date$
+ * Modified the 802.15.4 header, removing garbage to decrease the FCF word
+ * to a single byte.
  */
 
 #ifndef __IEEE802154_H__
 #define __IEEE802154_H__
 
+/**
+ * This defines the bit-fields of our CCxx00 non-802.15.4 compliant FCF byte
+ */
 enum ieee154_fcf_enums {
   IEEE154_FCF_FRAME_TYPE = 0,
   IEEE154_FCF_SECURITY_ENABLED = 3,
   IEEE154_FCF_FRAME_PENDING = 4,
   IEEE154_FCF_ACK_REQ = 5,
-  IEEE154_FCF_INTRAPAN = 6,
-  IEEE154_FCF_DEST_ADDR_MODE = 10,
-  IEEE154_FCF_SRC_ADDR_MODE = 14,
 };
 
 enum ieee154_fcf_type_enums {

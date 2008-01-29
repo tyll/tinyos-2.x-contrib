@@ -28,16 +28,40 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE
  */
-
+ 
 /**
+ * This layer keeps a history of the past RECEIVE_HISTORY_SIZE received messages
+ * If the source address and dsn number of a newly received message matches
+ * our recent history, we drop the message because we've already seen it.
+ * This should sit at the bottom of the stack
  * @author David Moss
  */
-#ifndef BLAZEINIT_H
-#define BLAZEINIT_H
+ 
+#include "UniqueReceive.h"
 
-#define blaze_init_t uint8_t
+configuration UniqueReceiveC {
+  provides {
+    interface Receive;
+    interface Receive as DuplicateReceive;
+  }
+  
+  uses {
+    interface Receive as SubReceive;
+  }
+}
 
-#define BLAZE_TOTAL_INIT_REGISTERS 31
-
-#endif
+implementation {
+  components UniqueReceiveP,
+      BlazePacketC,
+      MainC;
+  
+  Receive = UniqueReceiveP.Receive;
+  DuplicateReceive = UniqueReceiveP.DuplicateReceive;
+  SubReceive = UniqueReceiveP.SubReceive;
+      
+  MainC.SoftwareInit -> UniqueReceiveP;
+  
+  UniqueReceiveP.BlazePacketBody -> BlazePacketC;
+  
+}
 

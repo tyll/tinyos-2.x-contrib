@@ -32,12 +32,17 @@
 /**
  * @author David Moss
  */
-#ifndef BLAZEINIT_H
-#define BLAZEINIT_H
+ 
+#ifndef UNIQUERECEIVE_H
+#define UNIQUERECEIVE_H
 
-#define blaze_init_t uint8_t
-
-#define BLAZE_TOTAL_INIT_REGISTERS 31
+/**
+ * Ideally, your receive history size should be equal to the number of
+ * RF neighbors your node will have
+ */
+#ifndef RECEIVE_HISTORY_SIZE
+#define RECEIVE_HISTORY_SIZE 5
+#endif
 
 #endif
 

@@ -96,10 +96,11 @@ implementation
 		// start up the slave nodes
 		if( state == STATE_READY )
 		{
-			if( TOS_NODE_ID == 0 )
+			if( TOS_NODE_ID == 0 ) {
 				assertFail("unexpected test message before startup");
-			else
+			} else {
 				realStart();
+			}
 		}
 		else if( state != STATE_RUNNING )
 			return;
@@ -288,9 +289,10 @@ implementation
 
 	event void TestCase.run()
 	{
-		if( TOS_NODE_ID != 0 )
+		if( TOS_NODE_ID != 0 ) {
 			assertFail("unexpected testcase run");
-		else
+		} else {
 			realStart();
+	  	}
 	}
 }

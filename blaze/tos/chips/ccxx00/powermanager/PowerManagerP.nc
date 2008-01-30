@@ -71,19 +71,21 @@ implementation {
   
   /***************** Prototypes ****************/
   task void startRadios();
-  task void killRadios();
+  task void stopRadios();
 
   /***************** SplitControl Commands ****************/  
   command error_t SplitControl.start[radio_id_t radioId]() {
     focusedRadio = radioId;
     myState = S_BEGIN;
     post startRadios();
+    return SUCCESS;
   }
   
   command error_t SplitControl.stop[radio_id_t radioId]() {
     focusedRadio = radioId;
     myState = S_BEGIN;
-    post killRadios();
+    post stopRadios();
+    return SUCCESS;
   }
   
   

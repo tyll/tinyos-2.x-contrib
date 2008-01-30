@@ -58,7 +58,7 @@ module BlazeInitP {
   uses {
     interface Resource as InitResource;
     interface Resource as DeepSleepResource;
-     
+
     interface GeneralIO as Csn[ radio_id_t id ];
     interface GeneralIO as Gdo0_io[ radio_id_t id ];
     interface GeneralIO as Gdo2_io[ radio_id_t id ];
@@ -78,6 +78,8 @@ module BlazeInitP {
     interface BlazeStrobe as SFTX;
     interface BlazeStrobe as SRX;
     interface BlazeStrobe as SNOP;
+    
+    interface BusyWait<TMicro, uint16_t>;
     
     interface BlazeRegister as PaReg;
     
@@ -127,6 +129,8 @@ implementation {
     atomic m_id = id;
     atomic currentOperation = S_STARTING;
     call Power.set[ m_id ]();
+    
+    call BusyWait.wait(10000);
     
     burstInit();
     

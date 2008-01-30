@@ -227,6 +227,7 @@ implementation {
       
       if(rxFrameLength + 1 > BLAZE_RXFIFO_LENGTH) {
         // Flush everything if the length is bigger than our FIFO
+        
         failReceive();
         return;
       

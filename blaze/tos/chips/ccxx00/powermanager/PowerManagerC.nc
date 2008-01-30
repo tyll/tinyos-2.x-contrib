@@ -48,8 +48,10 @@ implementation {
       BlazeReceiveC,
       BlazeInitC;
       
+  SplitControl = PowerManagerP;
+  
   PowerManagerP.CsmaSplitControl -> CsmaC;
-  PowerManagerP.ReceiveSplitControl -> BlazeRecieveC;
+  PowerManagerP.ReceiveSplitControl -> BlazeReceiveC;
   PowerManagerP.InitSplitControl -> BlazeInitC;
 
 }

@@ -63,7 +63,6 @@ implementation {
   Send = AcknowledgementsP;
   PacketAcknowledgements = AcknowledgementsP;
   SubSend = AcknowledgementsP;
-  SplitControl = AcknowledgementsP;
   
   components BlazeSpiC;
   AcknowledgementsP.ChipSpiResource -> BlazeSpiC;

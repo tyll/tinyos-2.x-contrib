@@ -73,7 +73,7 @@ typedef nx_struct blaze_metadata_t {
 typedef nx_struct blaze_ack_t {
   nxle_uint8_t length;
   nxle_uint16_t dest;
-  nxle_uint16_t fcf;
+  nxle_uint8_t fcf;
   nxle_uint8_t dsn;
   nxle_uint16_t src;
 } blaze_ack_t;

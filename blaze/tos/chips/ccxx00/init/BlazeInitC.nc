@@ -83,6 +83,9 @@ implementation {
   
   BlazeInitP.PaReg -> BlazeSpiC.PA;
   
+  components BusyWaitMicroC;
+  BlazeInitP.BusyWait -> BusyWaitMicroC;
+  
   components HplRadioResetC;
   BlazeInitP.RadioReset -> HplRadioResetC;
   

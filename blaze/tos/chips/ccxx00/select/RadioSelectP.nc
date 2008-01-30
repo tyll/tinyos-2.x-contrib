@@ -41,7 +41,6 @@ module RadioSelectP {
     interface RadioSelect;
     interface Send;
     interface Receive;
-    interface Init;
   }
   
   uses {

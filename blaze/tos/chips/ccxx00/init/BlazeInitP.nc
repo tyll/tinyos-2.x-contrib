@@ -128,6 +128,7 @@ implementation {
   command error_t SplitControl.start[ radio_id_t id ]() {
     atomic m_id = id;
     atomic currentOperation = S_STARTING;
+    
     call Power.set[ m_id ]();
     
     call BusyWait.wait(10000);
@@ -183,7 +184,9 @@ implementation {
     call SFRX.strobe();
     call SFTX.strobe();
     call Idle.strobe();
-        
+    
+    call BusyWait.wait(1000);
+    
     while(call RadioStatus.getRadioStatus() != BLAZE_S_IDLE);
     
     call PaReg.write(call BlazeRegSettings.getPa[ m_id ]());
@@ -191,6 +194,7 @@ implementation {
     call Gdo2_int.enableRisingEdge[ m_id ](); 
     
     call SRX.strobe();
+    
     while(call RadioStatus.getRadioStatus() != BLAZE_S_RX);
     
     call Csn.set[ m_id ]();
@@ -238,6 +242,7 @@ implementation {
     
     shutDown();
     
+    call BusyWait.wait(1000);
     signal SplitControl.stopDone[m_id](SUCCESS);
   }
   

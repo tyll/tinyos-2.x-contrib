@@ -145,6 +145,7 @@ implementation {
   
   
   /***************** Defaults ****************/
+  
   default event void SplitControl.startDone[radio_id_t radioId](error_t error) {
   }
   
@@ -153,14 +154,15 @@ implementation {
   
   default event void SplitControlManager.stateChange[radio_id_t radioId]() {
   }
+
+  default event void Send.sendDone[radio_id_t radioId](message_t *msg, error_t error) {
+  }
   
+ /*  
   default command error_t SubControl.start[radio_id_t radioId]() {
   }
   
   default command error_t SubControl.stop[radio_id_t radioId]() {
-  }
-  
-  default event void Send.sendDone[radio_id_t radioId](message_t *msg, error_t error) {
   }
   
   default command error_t SubSend.send[radio_id_t radioId](message_t* msg, uint8_t len) {
@@ -178,6 +180,6 @@ implementation {
   default command void* SubSend.getPayload[radio_id_t radioId](message_t* msg, uint8_t len) { 
     return 0;
   }
-
+  */
 }
 

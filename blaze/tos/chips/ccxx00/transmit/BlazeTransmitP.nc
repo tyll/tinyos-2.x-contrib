@@ -226,6 +226,7 @@ implementation {
       call SRX.strobe();
     }
     
+    
     /*
      * Attempt to transmit.  If the radio goes into TX mode, then our transmit
      * is occurring.  Otherwise, there was something on the channel that

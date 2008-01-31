@@ -128,7 +128,8 @@ implementation {
   LplC.SubSend -> RadioSelectC;
   
   /* Layers below this are parameterized by radio id */
-  RadioSelectC.SubSend -> AcknowledgementsC.Send;
+  RadioSelectC.SubSend -> SplitControlManagerC.Send;
+  SplitControlManagerC.SubSend -> AcknowledgementsC.Send;
   AcknowledgementsC.SubSend -> CsmaC;
   
   /***************** Receive Layers ****************/

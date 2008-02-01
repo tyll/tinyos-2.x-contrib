@@ -70,6 +70,9 @@ implementation {
   AsyncSend = BlazeTransmitP.AsyncSend;
   AckSend = BlazeTransmitP.AckSend;
   
+  components new StateC();
+  BlazeTransmitP.State -> StateC;
+  
   components BlazeCentralWiringC;  
   BlazeTransmitP.Csn -> BlazeCentralWiringC.Csn;
   
@@ -87,9 +90,6 @@ implementation {
     
   components new TimerMilliC();
   BlazeTransmitP.Timer -> TimerMilliC;
-  
-  components new StateC();
-  BlazeTransmitP.State -> StateC;
   
   components BlazePacketC;
   BlazeTransmitP.BlazePacketBody -> BlazePacketC;

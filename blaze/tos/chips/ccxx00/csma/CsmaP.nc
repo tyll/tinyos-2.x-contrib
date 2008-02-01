@@ -148,11 +148,10 @@ implementation {
     
     if(!useCca) {
       call State.forceState(S_FORCING);
-      post forceSend();
-      
+      call Resource.request();
+            
     } else {
       call State.forceState(S_BACKOFF);
-      call Resource.release();
       initialBackoff();
     }
     
@@ -186,11 +185,28 @@ implementation {
   /***************** Resource Events ****************/
   event void Resource.granted() {
     if(call State.isState(S_BACKOFF)) {
+      if(call BlazePacket.getPower(myMsg) > 0) {
+        // This packet has custom PA settings
+        call PaReg.write(call BlazePacket.getPower(myMsg));
+      }
+      
       if(call AsyncSend.send[myRadio](myMsg, FALSE, (call BlazePacketBody.getMetadata(myMsg))->rxInterval) != SUCCESS) {
+        if(call BlazePacket.getPower(myMsg) > 0) {
+          // Set the PA back to default for whatever ack's are taking place
+          call PaReg.write(call BlazeRegSettings.getPa[myRadio]());
+        }
+        
         call Resource.release();
         congestionBackoff();
       }
     
+    } else if(call State.isState(S_FORCING)) {
+      if(call BlazePacket.getPower(myMsg) > 0) {
+        // This packet has custom PA settings
+        call PaReg.write(call BlazePacket.getPower(myMsg));
+      }
+      post forceSend();
+      
     } else if(call State.isState(S_CANCEL) || call State.isState(S_STOPPING)) {
       atomic myError = ECANCEL;
       post sendDone();
@@ -272,8 +288,14 @@ implementation {
   task void sendDone() {
     error_t atomicError;
     atomic atomicError = myError;
-    call Resource.release();
     
+    if(call BlazePacket.getPower(myMsg) > 0) {
+      // Set the radio back to default PA settings
+      call PaReg.write(call BlazeRegSettings.getPa[myRadio]());
+    }
+    
+    call Resource.release();
+        
     if(call State.isState(S_STOPPING)) {
       signal SplitControl.stopDone[myRadio](SUCCESS);
     }
@@ -350,6 +372,9 @@ implementation {
   
   default event void SplitControl.startDone[radio_id_t radioId](error_t error) { }
   default event void SplitControl.stopDone[radio_id_t radioId](error_t error) { }
+  
+  default command blaze_init_t *BlazeRegSettings.getDefaultRegisters[ radio_id_t id ]() { return NULL; }
+  default command uint8_t BlazeRegSettings.getPa[ radio_id_t id ]() { return 0xC0; }
   
 }
 

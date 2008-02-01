@@ -78,7 +78,7 @@ implementation {
   CsmaP.BlazeRegSettings -> BlazeCentralWiringC;
   
   components BlazeSpiC;
-  CsmaP.PaReg -> BlazeSpiC;
+  CsmaP.PaReg -> BlazeSpiC.PA;
   
   components TransmitArbiterC;
   CsmaP.AsyncSend -> TransmitArbiterC.AsyncSend;

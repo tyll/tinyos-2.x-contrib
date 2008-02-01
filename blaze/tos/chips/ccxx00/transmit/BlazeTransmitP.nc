@@ -56,6 +56,7 @@
 #include "IEEE802154.h"
 #include "Blaze.h"
 #include "AM.h"
+#include "BlazeTransmit.h"
 
 module BlazeTransmitP {
 
@@ -206,6 +207,7 @@ implementation {
     uint8_t id;
     bool forcing;    
     uint16_t transmitDelay;
+    int forceAttempts = 0;
     
     atomic {
       msg = myMsg;
@@ -235,7 +237,8 @@ implementation {
     call STX.strobe();
     
     if(forcing) {
-      while(call RadioStatus.getRadioStatus() != BLAZE_S_TX) {
+      for(forceAttempts = 0; call RadioStatus.getRadioStatus() != BLAZE_S_TX
+          && forceAttempts < MAX_FORCE_ATTEMPTS; forceAttempts++) {
         call STX.strobe();
       }
       

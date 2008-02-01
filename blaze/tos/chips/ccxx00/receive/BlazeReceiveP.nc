@@ -43,7 +43,6 @@ module BlazeReceiveP {
 
   provides {
     interface Receive[ radio_id_t id ];
-    interface ReceiveController[ radio_id_t id ];
     interface AckReceive;
     
     interface Init;
@@ -120,6 +119,12 @@ implementation {
   void failReceive();
   void cleanUp();
   
+  bool isAckPacket(blaze_header_t *header, radio_id_t id);
+  bool isDataPacket(blaze_header_t *header, radio_id_t id);
+  bool passesAddressFilter(blaze_header_t *header, radio_id_t id);
+  bool passesPanFilter(blaze_header_t *header, radio_id_t id);
+  bool shouldAck(blaze_header_t *header, radio_id_t id);
+  
   /***************** Init Commands ****************/
   command error_t Init.init() {
     atomic {
@@ -161,14 +166,9 @@ implementation {
   
   /***************** RxInterrupt Events ****************/
   async event void RxInterrupt.fired[ radio_id_t id ]() {
-    call ReceiveController.beginReceive[id]();
-  }
-  
-  /***************** ReceiveController Commands ***********************/
-  async command error_t ReceiveController.beginReceive[ radio_id_t id ]() {
     
     if(call State.requestState(S_RX_LENGTH) != SUCCESS) {
-      return EBUSY;
+      return;
     }
     
     atomic m_id = id;
@@ -183,7 +183,6 @@ implementation {
       call Resource.request();
     }
     
-    return SUCCESS;
   }
   
   /***************** Resource Events ****************/
@@ -260,44 +259,42 @@ implementation {
       
       // The FCF_FRAME_TYPE bit in the FCF byte tells us if this is an ack or 
       // data.  If it's data, make sure it meets the minimum size requirement.
-      if ((( header->fcf >> IEEE154_FCF_FRAME_TYPE ) & 7) == IEEE154_TYPE_ACK) {    
+      if (isAckPacket(header, id)) {    
+        // This is a valid ACK packet.
         signal AckReceive.receive( header->src, header->dest, header->dsn );
         cleanUp();
         
       } else if(rxFrameLength >= sizeof(blaze_header_t) - 1) {
-        // IEEE_TYPE_DATA frame; check if we need to ack
-        
-        if(call BlazeConfig.isAutoAckEnabled[ id ]()) {
-          if (((( header->fcf >> IEEE154_FCF_ACK_REQ ) & 0x01) == 1)
-              && ((header->dest == call ActiveMessageAddress.amAddress())
-                  || (header->dest == AM_BROADCAST_ADDR))
-              && (header->destpan == call ActiveMessageAddress.amGroup())
-              && ((( header->fcf >> IEEE154_FCF_FRAME_TYPE ) & 7) == IEEE154_TYPE_DATA)
-              && (header->length >= sizeof(blaze_header_t) - 1)) {
+        // The amount of data in this packet is at least a valid header size
+        if(isDataPacket(header, id)) {
+          if(passesAddressFilter(header, id)) {
+            if(passesPanFilter(header, id)) {
+              if(shouldAck(header, id)) {
+                // Send an ack and then receive the packet in AckSend.sendDone()
+                atomic {
+                  acknowledgement.dest = header->src;
+                  acknowledgement.dsn = header->dsn;
+                  acknowledgement.src = call ActiveMessageAddress.amAddress();
+                }
             
-            // Send an ack and then receive the packet in AckSend.sendDone()
-            atomic {
-              acknowledgement.dest = header->src;
-              acknowledgement.dsn = header->dsn;
-              acknowledgement.src = call ActiveMessageAddress.amAddress();
+                call Csn.clr[ id ]();
+                call AckSend.send[ id ](&acknowledgement, TRUE, 0);
+                // Continues at AckSend.sendDone()
+                return;
+                
+              } else {
+                // Do not send an acknowledgement, just receive this packet
+                post receiveDone();
+              }
             }
-            
-            call Csn.clr[ id ]();
-            call AckSend.send[ id ](&acknowledgement, TRUE, 0);
-            // Continues at AckSend.sendDone()
-            return;
           }
         }
-        
-        // Do not send an acknowledgement, just receive this packet
-        post receiveDone();
-        
+             
       } else {
-        // Didn't meet the minimum size requirement
+        // Didn't pass through our filters
         cleanUp();
       }
       break;
-      
       
     default:
       break;
@@ -325,7 +322,7 @@ implementation {
     uint8_t myLqi;
     message_t *atomicMsg;
     uint8_t atomicId;
-    
+   
     atomic atomicId = m_id;
     
     
@@ -425,6 +422,32 @@ implementation {
       }
     }
   }
+  
+  
+  bool isAckPacket(blaze_header_t *header, radio_id_t id) {
+    return ((header->fcf >> IEEE154_FCF_FRAME_TYPE ) & 7) == IEEE154_TYPE_ACK;
+  }
+  
+  bool isDataPacket(blaze_header_t *header, radio_id_t id) {
+    return ((header->fcf >> IEEE154_FCF_FRAME_TYPE ) & 7) == IEEE154_TYPE_DATA;
+  }
+  
+  bool passesAddressFilter(blaze_header_t *header, radio_id_t id) {
+    return (((header->dest == call ActiveMessageAddress.amAddress())
+        || (header->dest == AM_BROADCAST_ADDR)))
+            || !(call BlazeConfig.isAddressRecognitionEnabled[id]());
+  }
+  
+  bool passesPanFilter(blaze_header_t *header, radio_id_t id) {
+    return ((header->destpan == call ActiveMessageAddress.amGroup()) 
+        || !(call BlazeConfig.isPanRecognitionEnabled[id]()));
+  }
+  
+  bool shouldAck(blaze_header_t *header, radio_id_t id) {
+    return (call BlazeConfig.isAutoAckEnabled[id]())
+        && ((( header->fcf >> IEEE154_FCF_ACK_REQ ) & 0x01) == 1);
+  }
+  
   
   
   

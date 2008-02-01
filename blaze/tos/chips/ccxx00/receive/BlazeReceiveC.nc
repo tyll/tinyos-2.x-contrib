@@ -44,7 +44,6 @@
 configuration BlazeReceiveC {
   provides {
     interface Receive[ radio_id_t id ];
-    interface ReceiveController[ radio_id_t id ];
     interface AckReceive;
     
     interface SplitControl[ radio_id_t id ];
@@ -55,7 +54,6 @@ implementation {
 
   components BlazeReceiveP;  
   Receive = BlazeReceiveP.Receive;
-  ReceiveController = BlazeReceiveP;
   AckReceive = BlazeReceiveP;
   SplitControl = BlazeReceiveP.SplitControl;
   

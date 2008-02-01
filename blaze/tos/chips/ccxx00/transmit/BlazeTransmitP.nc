@@ -68,6 +68,7 @@ module BlazeTransmitP {
   uses {
     interface GeneralIO as Csn[ radio_id_t id ];
     interface BlazePacketBody;
+    interface BlazeRegSettings;
     
     interface BlazeFifo as TXFIFO;
   
@@ -77,7 +78,8 @@ module BlazeTransmitP {
     interface BlazeStrobe as SFRX;
     interface BlazeStrobe as SIDLE;
     interface BlazeStrobe as SRX;
-  
+    
+    interface BlazeRegister as PaReg;
     interface BlazeRegister as TxReg;
     
     interface Timer<TMilli>;

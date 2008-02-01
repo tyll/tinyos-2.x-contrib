@@ -51,7 +51,10 @@ module CsmaP {
     interface Resource;
     interface AsyncSend[radio_id_t id];
     interface Alarm<T32khz,uint32_t> as BackoffTimer;
+    interface BlazePacket;
     interface BlazePacketBody;
+    interface BlazeRegister as PaReg;
+    interface BlazeRegSettings[radio_id_t radioId];
     interface Random;
     interface State;
     interface Leds;

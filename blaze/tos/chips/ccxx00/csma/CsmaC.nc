@@ -74,11 +74,18 @@ implementation {
   components new BlazeSpiResourceC();
   CsmaP.Resource -> BlazeSpiResourceC;
   
+  components BlazeCentralWiringC;
+  CsmaP.BlazeRegSettings -> BlazeCentralWiringC;
+  
+  components BlazeSpiC;
+  CsmaP.PaReg -> BlazeSpiC;
+  
   components TransmitArbiterC;
   CsmaP.AsyncSend -> TransmitArbiterC.AsyncSend;
 
   components BlazePacketC;
   CsmaP.BlazePacketBody -> BlazePacketC;
+  CsmaP.BlazePacket -> BlazePacketC;
   
   components new StateC();
   CsmaP.State -> StateC;

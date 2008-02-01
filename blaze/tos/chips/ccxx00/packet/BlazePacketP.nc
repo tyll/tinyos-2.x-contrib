@@ -58,8 +58,6 @@ implementation {
 
   /***************** BlazePacket Commands ****************/
   async command void BlazePacket.setPower( message_t* p_msg, uint8_t power ) {
-    if ( power > 31 )
-      power = 31;
     getMetadata( p_msg )->txPower = power;
   }
 

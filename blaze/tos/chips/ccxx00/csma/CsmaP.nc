@@ -39,6 +39,7 @@
  
 #include "Blaze.h"
 #include "Csma.h"
+#include "BlazeInit.h"
 
 module CsmaP {
   provides {

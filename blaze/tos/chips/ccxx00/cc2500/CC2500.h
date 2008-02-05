@@ -127,8 +127,6 @@ enum{
 #define CC2500_CHANNEL_WIDTH 324 // kHz : Do not edit
 #define CC2500_FREQ_MIN (CC2500_LOWEST_FREQ + (CC2500_CHANNEL_MIN * CC2500_CHANNEL_WIDTH))
 #define CC2500_FREQ_MAX (CC2500_LOWEST_FREQ + (CC2500_CHANNEL_MAX * CC2500_CHANNEL_WIDTH))
- 
-  
 
 enum cc2500_config_reg_state_enums {
   /** GDO2 asserts at Rx sync and deasserts at end of packet */
@@ -138,7 +136,7 @@ enum cc2500_config_reg_state_enums {
   CC2500_CONFIG_IOCFG1 = 0x2E,
   
   /** GDO0 goes high when the channel is clear */
-  CC2500_CONFIG_IOCFG0 = 0x0F, 
+  CC2500_CONFIG_IOCFG0 = 0x0E, 
   
   CC2500_CONFIG_FIFOTHR = 0x0E,
   CC2500_CONFIG_SYNC1 = 0xD3,

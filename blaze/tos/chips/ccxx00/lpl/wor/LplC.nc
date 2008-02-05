@@ -30,53 +30,39 @@
  */
  
 /**
- * Use this component to duty cycle the radio. When a message is heard, 
- * disable DutyCycling.
- *
- * @author David Moss dmm@rincon.com
+ * Dummy low power listening interface used when LowPowerListening is not
+ * compiled in with the application.
+ * Sleep interval is always 0, and duty cycle is always 100%
+ * @author David Moss
  */
+ 
+#include "Blaze.h"
 
-configuration PowerCycleC {
+configuration LplC {
   provides {
-    interface PowerCycle;
-    interface SplitControl;
-    interface State as SplitControlState;
-    interface State as RadioPowerState;
+    interface Send;
+    interface Receive;
+    interface LowPowerListening[radio_id_t id];
+    interface SplitControl[radio_id_t id];
+    interface State as SendState;
+  }
+  
+  uses {
+    interface Send as SubSend;
+    interface Receive as SubReceive;
+    interface SplitControl as SubControl[radio_id_t id];
   }
 }
 
 implementation {
-  components PowerCycleP,
-      CC2420TransmitC,
-      CC2420ReceiveC,
-      CC2420CsmaC,
-      LedsC,
-      new StateC() as RadioPowerStateC,
-      new StateC() as SplitControlStateC,
-      new TimerMilliC() as OnTimerC,
-      new TimerMilliC() as CheckTimerC;
-
-#if defined(LOW_POWER_LISTENING) || defined(ACK_LOW_POWER_LISTENING)
-  components DefaultLplC as LplC;
-#else
-  components DummyLplC as LplC;
-#endif
-
-  PowerCycle = PowerCycleP;
-  SplitControl = PowerCycleP;
-  SplitControlState = SplitControlStateC;
-  RadioPowerState = RadioPowerStateC;
+  components LplP;
+  components new StateC();
   
-  PowerCycleP.EnergyIndicator -> CC2420TransmitC.EnergyIndicator;
-  PowerCycleP.ByteIndicator -> CC2420TransmitC.ByteIndicator;
-  PowerCycleP.PacketIndicator -> CC2420ReceiveC.PacketIndicator;
-  PowerCycleP.SubControl -> CC2420CsmaC;
-  PowerCycleP.SendState -> LplC;
-  PowerCycleP.RadioPowerState -> RadioPowerStateC;
-  PowerCycleP.SplitControlState -> SplitControlStateC;
-  PowerCycleP.OnTimer -> OnTimerC;
-  PowerCycleP.Leds -> LedsC;
-    
+  Send = SubSend;
+  Receive = SubReceive;
+  SplitControl = SubControl;
+  LowPowerListening = LplP;
+  SendState = StateC;
+  
 }
-
 

@@ -28,71 +28,57 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE
  */
-
+ 
 /**
- * BMAC behavior and detect implementation
+ * Dummy low power listening interface used when LowPowerListening is not
+ * compiled in with the application.
+ * Sleep interval is always 0, and duty cycle is always 100%
  * @author David Moss
  */
-
-
-#include "Lpl.h"
-
-configuration LplC {
+ 
+module LplP {
   provides {
-    interface LowPowerListening;
-    interface Send;
-    interface Receive;
-    interface SplitControl;
-    interface State as SendState;
-  }
-  
-  uses {
-    interface Send as SubSend;
-    interface Receive as SubReceive;
-    interface SplitControl as SubControl;
+    interface LowPowerListening[radio_id_t id];
   }
 }
 
 implementation {
-  components MainC,
-      LplP,
-      PowerCycleC,
-      CC2420ActiveMessageC,
-      CC2420CsmaC,
-      CC2420TransmitC,
-      CC2420PacketC,
-      RandomC,
-      new StateC() as SendStateC,
-      new TimerMilliC() as OffTimerC,
-      new TimerMilliC() as SendDoneTimerC,
-      LedsC;
+
+  command void LowPowerListening.setLocalSleepInterval[radio_id_t id](uint16_t sleepIntervalMs) {
+  }
   
-  LowPowerListening = LplP;
-  Send = LplP;
-  Receive = LplP;
-  SplitControl = PowerCycleC;
-  SendState = SendStateC;
+  command uint16_t LowPowerListening.getLocalSleepInterval[radio_id_t id]() {
+    return 0;
+  }
   
-  SubControl = LplP.SubControl;
-  SubReceive = LplP.SubReceive;
-  SubSend = LplP.SubSend;
+  command void LowPowerListening.setLocalDutyCycle[radio_id_t id](uint16_t dutyCycle) {
+  }
   
+  command uint16_t LowPowerListening.getLocalDutyCycle[radio_id_t id]() {
+    return 10000;
+  }
   
-  MainC.SoftwareInit -> LplP;
+  command void LowPowerListening.setRxSleepInterval[radio_id_t id](message_t *msg, uint16_t sleepIntervalMs) {
+  }
   
+  command uint16_t LowPowerListening.getRxSleepInterval[radio_id_t id](message_t *msg) {
+    return 0;
+  }
   
-  LplP.SplitControlState -> PowerCycleC.SplitControlState;
-  LplP.RadioPowerState -> PowerCycleC.RadioPowerState;
-  LplP.SendState -> SendStateC;
-  LplP.OffTimer -> OffTimerC;
-  LplP.SendDoneTimer -> SendDoneTimerC;
-  LplP.PowerCycle -> PowerCycleC;
-  LplP.Resend -> CC2420TransmitC;
-  LplP.PacketAcknowledgements -> CC2420ActiveMessageC;
-  LplP.AMPacket -> CC2420ActiveMessageC;
-  LplP.CC2420PacketBody -> CC2420PacketC;
-  LplP.RadioBackoff -> CC2420CsmaC;
-  LplP.Random -> RandomC;
-  LplP.Leds -> LedsC;
+  command void LowPowerListening.setRxDutyCycle[radio_id_t id](message_t *msg, uint16_t dutyCycle) {
+  }
+  
+  command uint16_t LowPowerListening.getRxDutyCycle[radio_id_t id](message_t *msg) {
+    return 10000;
+  }
+  
+  command uint16_t LowPowerListening.dutyCycleToSleepInterval[radio_id_t id](uint16_t dutyCycle) {
+    return 0;
+  }
+  
+  command uint16_t LowPowerListening.sleepIntervalToDutyCycle[radio_id_t id](uint16_t sleepInterval) {
+    return 10000;
+  }
   
 }
+

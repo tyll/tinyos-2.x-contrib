@@ -34,10 +34,18 @@
  * radio stack
  */
  
-#ifndef BMAC_H
-#define BMAC_H
+#ifndef WOR_H
+#define WOR_H
 
-#warning "*** Using BMAC Low Power Listening ***"
+#warning "*** Using Wake-on-Radio ***"
+
+/**
+ * The crystal used for the radio must be defined for WoR calculations
+ */
+#ifndef CCXX00_CRYSTAL_KHZ
+#define CCXX00_CRYSTAL_KHZ 26000
+#endif
+
 
 #ifndef BLAZE_TRANSMIT_ARBITER_DEFINED
 #define BLAZE_TRANSMIT_ARBITER_DEFINED
@@ -46,6 +54,19 @@
 #error "Choose a single LPL directory in your compiler path and recompile."
 #endif
 
+enum ccxx00_worctrl_register {
+  CCXX00_WORCTRL_RC_PD = 7,
+  CCXX00_WORCTRL_EVENT1 = 4,
+  CCXX00_WORCTRL_RC_CAL = 3,
+  CCXX00_WORCTRL_WOR_RES = 0,
+};
+
+enum ccxx00_mcsm2_register {
+  CCXX00_MCSM2_RX_TIME_RSSI = 4,
+  CCXX00_MCSM2_RX_TIME_QUAL = 3,
+  CCXX00_MCSM2_RX_TIME = 0,
+};
+  
 
 #endif
 

@@ -80,8 +80,8 @@ implementation {
   components BlazeSpiC;
   CsmaP.PaReg -> BlazeSpiC.PA;
   
-  components TransmitArbiterC;
-  CsmaP.AsyncSend -> TransmitArbiterC.AsyncSend;
+  components BlazeTransmitC;
+  CsmaP.AsyncSend -> BlazeTransmitC.AsyncSend;
 
   components BlazePacketC;
   CsmaP.BlazePacketBody -> BlazePacketC;

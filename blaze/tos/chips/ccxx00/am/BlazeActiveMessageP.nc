@@ -44,6 +44,7 @@
 module BlazeActiveMessageP {
   provides {
     interface AMSend[am_id_t id];
+    interface SendNotifier[am_id_t id];
     interface Receive[am_id_t id];
     interface Receive as Snoop[am_id_t id];
     interface AMPacket;
@@ -77,6 +78,8 @@ implementation {
     header->dest = addr;
     header->destpan = call ActiveMessageAddress.amGroup();
     header->src = call ActiveMessageAddress.amAddress();
+    
+    signal SendNotifier.aboutToSend[id](addr, msg);
     
     return call SubSend.send( msg, header->length + 1);
   }
@@ -203,7 +206,9 @@ implementation {
   }
 
   default event void AMSend.sendDone[am_id_t id](message_t* msg, error_t err) {
-    return;
+  }
+  
+  default event void SendNotifier.aboutToSend[am_id_t amId](am_addr_t addr, message_t *msg) {
   }
 
 }

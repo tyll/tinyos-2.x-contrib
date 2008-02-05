@@ -40,6 +40,7 @@
 configuration BlazeActiveMessageC {
   provides {
     interface AMSend[am_id_t id];
+    interface SendNotifier[am_id_t id];
     interface Receive[am_id_t id];
     interface Receive as Snoop[am_id_t id];
     interface AMPacket;
@@ -57,6 +58,7 @@ implementation {
 
   components BlazeActiveMessageP;
   AMSend = BlazeActiveMessageP.AMSend;
+  SendNotifier = BlazeActiveMessageP.SendNotifier;
   Receive = BlazeActiveMessageP.Receive;
   Snoop = BlazeActiveMessageP.Snoop;
   AMPacket = BlazeActiveMessageP.AMPacket;

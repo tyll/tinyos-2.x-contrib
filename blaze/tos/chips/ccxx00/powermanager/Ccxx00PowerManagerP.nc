@@ -36,7 +36,7 @@
 
 #include "Blaze.h"
 
-module PowerManagerP {
+module Ccxx00PowerManagerP {
   provides {
     interface SplitControl[radio_id_t radioId];
   }

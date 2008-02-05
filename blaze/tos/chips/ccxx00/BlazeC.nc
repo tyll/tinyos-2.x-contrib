@@ -53,6 +53,9 @@ configuration BlazeC {
     /** Send a packet */
     interface AMSend[am_id_t amId];
     
+    /** Notification that a packet is about to be transmitted */
+    interface SendNotifier[am_id_t amId];
+    
     /** Receive a packet */
     interface Receive[am_id_t amId];
     
@@ -93,6 +96,7 @@ implementation {
   Snoop = BlazeActiveMessageC.Snoop;
   AMPacket = BlazeActiveMessageC;
   Packet = BlazeActiveMessageC;
+  SendNotifier = BlazeActiveMessageC;
   
   components RadioSelectC;
   RadioSelect = RadioSelectC;
@@ -114,7 +118,7 @@ implementation {
   Csma = CsmaC;
   
   components SplitControlManagerC;
-  components PowerManagerC;
+  components Ccxx00PowerManagerC;
   
   components UniqueSendC;
   components UniqueReceiveC;
@@ -144,6 +148,6 @@ implementation {
   SplitControl = SplitControlManagerC.SplitControl[0];
   BlazeSplitControl = SplitControlManagerC.SplitControl;
   SplitControlManagerC.SubControl -> LplC.SplitControl;
-  LplC.SubControl -> PowerManagerC.SplitControl;
+  LplC.SubControl -> Ccxx00PowerManagerC.SplitControl;
 }
 

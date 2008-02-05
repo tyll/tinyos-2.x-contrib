@@ -36,22 +36,22 @@
 
 #include "Blaze.h"
 
-configuration PowerManagerC {
+configuration Ccxx00PowerManagerC {
   provides {
     interface SplitControl[ radio_id_t radioId ];
   }
 }
 
 implementation {
-  components PowerManagerP,
+  components Ccxx00PowerManagerP,
       CsmaC,
       BlazeReceiveC,
       BlazeInitC;
       
-  SplitControl = PowerManagerP;
+  SplitControl = Ccxx00PowerManagerP;
   
-  PowerManagerP.CsmaSplitControl -> CsmaC;
-  PowerManagerP.ReceiveSplitControl -> BlazeReceiveC;
-  PowerManagerP.InitSplitControl -> BlazeInitC;
+  Ccxx00PowerManagerP.CsmaSplitControl -> CsmaC;
+  Ccxx00PowerManagerP.ReceiveSplitControl -> BlazeReceiveC;
+  Ccxx00PowerManagerP.InitSplitControl -> BlazeInitC;
 
 }

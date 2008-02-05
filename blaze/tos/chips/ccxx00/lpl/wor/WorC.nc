@@ -1,6 +1,6 @@
 
 /** 
- * Wake-on-Radio
+ * This is sort of the hardware implementation layer of Wake-on-Radio
  * @author David Moss
  */
 
@@ -14,11 +14,13 @@ configuration WorC {
 }
 
 implementation {
-  components WorP,
+  components MainC,
+    WorP,
     new BlazeSpiResourceC(),
     BlazeSpiC, 
-    BlazeCentralWiringC,
-    new StateC();
+    BlazeCentralWiringC;
+  
+  MainC.SoftwareInit -> WorP;
   
   Wor = WorP;
   
@@ -34,6 +36,9 @@ implementation {
   WorP.SFTX -> BlazeSpiC.SFTX;
   WorP.RadioStatus -> BlazeSpiC;
   WorP.Csn -> BlazeCentralWiringC.Csn;
-  WorP.State -> StateC;
+  
+  components LedsC;
+  WorP.Leds -> LedsC;
+  
 }
 

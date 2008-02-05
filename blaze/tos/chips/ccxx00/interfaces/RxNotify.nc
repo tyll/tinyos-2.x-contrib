@@ -28,59 +28,15 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE
  */
-
+ 
 /**
- * Make sure we aren't trying to compile multiple LPL directories into the
- * radio stack
+ * This interface is mainly so Wake-on-Radio can know when the microcontroller
+ * is done receiving a packet and put the radio back into WoR mode.
+ * @author David Moss
  */
  
-#ifndef WOR_H
-#define WOR_H
-
-#warning "*** Using Wake-on-Radio ***"
-
-/**
- * The crystal used for the radio must be defined for WoR calculations
- */
-#ifndef CCXX00_CRYSTAL_KHZ
-#define CCXX00_CRYSTAL_KHZ 26000
-#endif
-
-
-#ifndef BLAZE_TRANSMIT_ARBITER_DEFINED
-#define BLAZE_TRANSMIT_ARBITER_DEFINED
-#else
-#warning "You are attempting to include multiple LPL paths at compile time." 
-#error "Choose a single LPL directory in your compiler path and recompile."
-#endif
-
-/**
- * WORCTRL register bitfields
- */
-enum ccxx00_worctrl_register {
-  CCXX00_WORCTRL_RC_PD = 7,
-  CCXX00_WORCTRL_EVENT1 = 4,
-  CCXX00_WORCTRL_RC_CAL = 3,
-  CCXX00_WORCTRL_WOR_RES = 0,
-};
-
-/**
- * MCSM2 register bitfields
- */
-enum ccxx00_mcsm2_register {
-  CCXX00_MCSM2_RX_TIME_RSSI = 4,
-  CCXX00_MCSM2_RX_TIME_QUAL = 3,
-  CCXX00_MCSM2_RX_TIME = 0,
-};
-
-/**
- * Mask the fields to 0
- */
-enum ccxx00_mcsm2_mask {
-  CCXX00_MCSM2_RX_TIME_RSSI_MASK = 0xEF,
-  CCXX00_MCSM2_RX_TIME_QUAL_MASK = 0xF7,
-  CCXX00_MCSM2_RX_TIME_MASK = 0xF8,
-};
-
-#endif
-
+interface RxNotify {
+  
+  event void doneReceiving();
+  
+}

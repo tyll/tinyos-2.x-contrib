@@ -46,14 +46,31 @@ interface Wor {
    */
   command void enableWor(bool on);
   
+  /**
+   * @return TRUE if WoR is enabled for the given parameterized radio id
+   */
+  command bool isEnabled();
+  
+  /**
+   * If WoR is enabled on the selected parameterized radio, then the 
+   * radio is re-sync'd with the latest settings. Otherwise
+   * we assume the radio is off and will be resync'd automatically when it's
+   * turned back on.
+   */
+  command void synchronizeSettings();
   
   /** 
    * Calculate the EVENT0 register based on the number of milliseconds you'd
    * like to have between sleep intervals.  This is dependent upon the
    * CCXX00_CRYSTAL_KHZ preprocessor variable.
-   * @param evt0_ms The desired duration between rx checks, in exact ms
+   * @param evt0_ms The desired duration between rx checks, in true ms
    */
   command void calculateAndSetEvent0(uint16_t evt0_ms);
+  
+  /** 
+   * @return EVENT0, converted back to true milliseconds
+   */
+  command uint16_t getEvent0Ms();
   
   /**
    * Set EVENT0 directly. Default is 1 second sleep interval on a 26 MHz xosc.
@@ -69,14 +86,12 @@ interface Wor {
   command void setRxTime(uint8_t rxTime);
   
   /**
-   * Default is TRUE
    * @param sleepOnNoCarrier If a carrier is not detected within the first 8
    *     symbol periods, go back to sleep.
    */
   command void setRxTimeRssi(bool sleepOnNoCarrier);
   
   /**
-   * Default is TRUE
    * @param enablePqi Extend the on-time of the radio during an Rx check if
    *     a valid preamble has been detected.
    */
@@ -95,7 +110,7 @@ interface Wor {
    * WoR just got enabled or disabled
    * @bool enabled TRUE if WoR is now turned on, FALSE if it's off
    */
-  event void stateChanged(bool enabled);
+  event void stateChange(bool enabled);
   
 }
 

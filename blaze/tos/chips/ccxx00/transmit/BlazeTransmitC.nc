@@ -66,7 +66,7 @@ configuration BlazeTransmitC {
 
 implementation {
 
-  components BlazeTransmitP;
+  components CyclicBlazeTransmitP as BlazeTransmitP;
   AsyncSend = BlazeTransmitP.AsyncSend;
   AckSend = BlazeTransmitP.AckSend;
   

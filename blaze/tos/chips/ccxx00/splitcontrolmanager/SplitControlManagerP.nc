@@ -158,28 +158,5 @@ implementation {
   default event void Send.sendDone[radio_id_t radioId](message_t *msg, error_t error) {
   }
   
- /*  
-  default command error_t SubControl.start[radio_id_t radioId]() {
-  }
-  
-  default command error_t SubControl.stop[radio_id_t radioId]() {
-  }
-  
-  default command error_t SubSend.send[radio_id_t radioId](message_t* msg, uint8_t len) {
-    return EINVAL;
-  }
-
-  default command error_t SubSend.cancel[radio_id_t radioId](message_t* msg) {
-    return EINVAL;
-  }
-  
-  default command uint8_t SubSend.maxPayloadLength[radio_id_t radioId]() {
-    return 0;
-  }
-
-  default command void* SubSend.getPayload[radio_id_t radioId](message_t* msg, uint8_t len) { 
-    return 0;
-  }
-  */
 }
 

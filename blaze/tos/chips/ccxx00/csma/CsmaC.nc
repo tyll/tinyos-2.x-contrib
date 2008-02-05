@@ -82,7 +82,7 @@ implementation {
   
   components BlazeTransmitC;
   CsmaP.AsyncSend -> BlazeTransmitC.AsyncSend;
-
+  
   components BlazePacketC;
   CsmaP.BlazePacketBody -> BlazePacketC;
   CsmaP.BlazePacket -> BlazePacketC;

@@ -128,18 +128,17 @@ implementation {
   /***************** Send Layers ****************/
   BlazeActiveMessageC.SubSend -> UniqueSendC.Send;
   UniqueSendC.SubSend -> PacketLinkC.Send;
-  PacketLinkC.SubSend -> LplC.Send;
-  LplC.SubSend -> RadioSelectC;
+  PacketLinkC.SubSend -> RadioSelectC.Send;
   
   /* Layers below this are parameterized by radio id */
   RadioSelectC.SubSend -> SplitControlManagerC.Send;
-  SplitControlManagerC.SubSend -> AcknowledgementsC.Send;
+  SplitControlManagerC.SubSend -> LplC.Send;
+  LplC.SubSend -> AcknowledgementsC.Send;
   AcknowledgementsC.SubSend -> CsmaC;
   
   /***************** Receive Layers ****************/
   BlazeActiveMessageC.SubReceive -> UniqueReceiveC.Receive;
-  UniqueReceiveC.SubReceive -> LplC.Receive;
-  LplC.SubReceive -> RadioSelectC.Receive;
+  UniqueReceiveC.SubReceive -> RadioSelectC.Receive;
   
   /* Layers below this are parameterized by radio id */
   RadioSelectC.SubReceive -> BlazeReceiveC.Receive;

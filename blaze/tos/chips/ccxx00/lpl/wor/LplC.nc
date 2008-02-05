@@ -29,40 +29,45 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE
  */
  
-/**
- * Dummy low power listening interface used when LowPowerListening is not
- * compiled in with the application.
- * Sleep interval is always 0, and duty cycle is always 100%
- * @author David Moss
- */
+
  
 #include "Blaze.h"
 
 configuration LplC {
   provides {
-    interface Send;
-    interface Receive;
+    interface Send[radio_id_t radioId];
     interface LowPowerListening[radio_id_t id];
     interface SplitControl[radio_id_t id];
-    interface State as SendState;
   }
   
   uses {
-    interface Send as SubSend;
-    interface Receive as SubReceive;
+    interface Send as SubSend[radio_id_t radioId];
     interface SplitControl as SubControl[radio_id_t id];
   }
 }
 
 implementation {
   components LplP;
-  components new StateC();
-  
   Send = SubSend;
-  Receive = SubReceive;
-  SplitControl = SubControl;
+  SubSend = LplP.SubSend;
+  SplitControl = LplP.SplitControl;
+  SubControl = LplP.SubControl;
   LowPowerListening = LplP;
-  SendState = StateC;
+  
+  components SplitControlManagerC;
+  LplP.SplitControlManager -> SplitControlManagerC;
+  
+  components BlazeReceiveC;
+  LplP.RxNotify -> BlazeReceiveC;
+  
+  components WorC;
+  LplP.Wor -> WorC;
+  
+  components BlazePacketC;
+  LplP.BlazePacketBody -> BlazePacketC;
+  
+  components LedsC;
+  LplP.Leds -> LedsC;
   
 }
 

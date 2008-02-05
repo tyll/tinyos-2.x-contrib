@@ -1,5 +1,6 @@
 
 /**
+ * This is sort of the hardware presentation layer of Wake-on-Radio
  * @author David Moss
  */
 
@@ -27,7 +28,8 @@ module WorP {
     interface RadioStatus;
     
     interface GeneralIO as Csn[radio_id_t radioId];
-    interface State;
+    
+    interface Leds;
   }
 }
 
@@ -56,7 +58,7 @@ implementation {
   command error_t Init.init() {
     int i;
     for(i = 0; i < uniqueCount(UQ_BLAZE_RADIO); i++) {
-      worSettings[i].mcsm2 = 0xF8;
+      worSettings[i].mcsm2 = 0xFE;
       worSettings[i].worEnabled = FALSE;
       worSettings[i].event0 = 0x876B;  
       worSettings[i].event1 = 0x7;
@@ -79,6 +81,23 @@ implementation {
     enabling = on;
     
     call Resource.request();
+  }
+  
+  command void Wor.synchronizeSettings[radio_id_t radioId]() {
+    worSettings[radioId].worEnabled = FALSE;
+    call Wor.enableWor[radioId](TRUE);
+  }
+  
+  command uint16_t Wor.getEvent0Ms[radio_id_t radioId]() {
+    return (((uint32_t) 750) * ((uint32_t) worSettings[radioId].event0)) / CCXX00_CRYSTAL_KHZ;
+  }
+  
+  
+  /**
+   * @return TRUE if WoR is enabled for the given parameterized radio id
+   */
+  command bool Wor.isEnabled[radio_id_t radioId]() {
+    return worSettings[radioId].worEnabled;
   }
   
   /** 
@@ -108,7 +127,9 @@ implementation {
    * @param rxTime The RX_TIME field value in MCSM2
    */
   command void Wor.setRxTime[radio_id_t radioId](uint8_t rxTime) {
-    worSettings[radioId].mcsm2 = (rxTime << CCXX00_MCSM2_RX_TIME);
+    worSettings[radioId].mcsm2 = 
+        (worSettings[radioId].mcsm2 & CCXX00_MCSM2_RX_TIME_MASK)
+            | (rxTime << CCXX00_MCSM2_RX_TIME);
   }
   
   /**
@@ -117,16 +138,20 @@ implementation {
    *     symbol periods, go back to sleep.
    */
   command void Wor.setRxTimeRssi[radio_id_t radioId](bool sleepOnNoCarrier) {
-    worSettings[radioId].mcsm2 = (sleepOnNoCarrier << CCXX00_MCSM2_RX_TIME_RSSI);
+    worSettings[radioId].mcsm2 = 
+        (worSettings[radioId].mcsm2 & CCXX00_MCSM2_RX_TIME_RSSI_MASK)
+            | (sleepOnNoCarrier << CCXX00_MCSM2_RX_TIME);
   }
   
   /**
-   * Default is TRUE
+   * Default is FALSE
    * @param enablePqi Extend the on-time of the radio during an Rx check if
    *     a valid preamble has been detected.
    */
   command void Wor.setRxTimeQual[radio_id_t radioId](bool enablePqi) {
-    worSettings[radioId].mcsm2 = (enablePqi << CCXX00_MCSM2_RX_TIME_QUAL);
+    worSettings[radioId].mcsm2 = 
+      (worSettings[radioId].mcsm2 & CCXX00_MCSM2_RX_TIME_QUAL_MASK)
+          | (enablePqi << CCXX00_MCSM2_RX_TIME_QUAL);
   }
   
   /**
@@ -155,6 +180,8 @@ implementation {
         
       } else {
         // Setup RX_TIME_RSSI, RX_TIME_QUAL, and RX_TIME
+        assertEquals("MCSM2", 0x0, worSettings[focusedRadio].mcsm2);
+        
         call MCSM2.write(worSettings[focusedRadio].mcsm2);
         
         // Setup EVENT0, the time between receive checks.
@@ -167,7 +194,8 @@ implementation {
             (worSettings[focusedRadio].event1 << CCXX00_WORCTRL_EVENT1) |
             (1 << CCXX00_WORCTRL_RC_CAL) |
             (0 << CCXX00_WORCTRL_WOR_RES));
-            
+         
+        worSettings[focusedRadio].worEnabled = TRUE;
         call SWOR.strobe();
       }
       
@@ -191,7 +219,7 @@ implementation {
     
     call Csn.set[focusedRadio]();
     call Resource.release();
-    signal Wor.stateChanged[focusedRadio](enabling);
+    signal Wor.stateChange[focusedRadio](enabling);
   }
   
   
@@ -222,7 +250,7 @@ implementation {
   }
   
   /***************** Defaults *****************/
-  default event void Wor.stateChanged[radio_id_t radioId](bool enabled) {
+  default event void Wor.stateChange[radio_id_t radioId](bool enabled) {
   }
   
   default async command void Csn.set[ radio_id_t id ](){}

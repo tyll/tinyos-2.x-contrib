@@ -44,6 +44,7 @@ module BlazeReceiveP {
   provides {
     interface Receive[ radio_id_t id ];
     interface AckReceive;
+    interface RxNotify[ radio_id_t id ];
     
     interface Init;
     interface SplitControl[ radio_id_t id ];
@@ -113,6 +114,7 @@ implementation {
   
   /***************** Prototypes ****************/
   task void receiveDone();
+  task void notifyRxDone();
   
   void receive();
   uint8_t getStatus();
@@ -353,6 +355,14 @@ implementation {
     signal SplitControl.stopDone[atomicId](SUCCESS);
   }
   
+  task void notifyRxDone() {
+    uint8_t id;
+    atomic id = m_id;
+    if(call State.isIdle()) {
+      signal RxNotify.doneReceiving[id]();
+    }
+  }
+  
   /***************** Functions ****************/  
   /**
    * Receive the packet by first reading in the length byte.  The SPI
@@ -420,6 +430,8 @@ implementation {
           return;
         }
       }
+      
+      post notifyRxDone();
     }
   }
   
@@ -539,6 +551,7 @@ implementation {
   default event void SplitControl.startDone[radio_id_t radioId](error_t error) {}
   default event void SplitControl.stopDone[radio_id_t radioId](error_t error) {}
   
- 
+  default event void RxNotify.doneReceiving[radio_id_t radioId]() {}
+  
 }
 

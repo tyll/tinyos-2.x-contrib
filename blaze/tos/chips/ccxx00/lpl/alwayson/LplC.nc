@@ -40,14 +40,14 @@
 
 configuration LplC {
   provides {
-    interface Send;
+    interface Send[radio_id_t radioId];
     interface LowPowerListening[radio_id_t id];
     interface SplitControl[radio_id_t id];
     interface State as SendState;
   }
   
   uses {
-    interface Send as SubSend;
+    interface Send as SubSend[radio_id_t radioId];
     interface SplitControl as SubControl[radio_id_t id];
   }
 }

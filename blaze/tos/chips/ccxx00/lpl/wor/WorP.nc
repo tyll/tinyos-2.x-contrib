@@ -179,9 +179,7 @@ implementation {
         call SWOR.strobe();
         
       } else {
-        // Setup RX_TIME_RSSI, RX_TIME_QUAL, and RX_TIME
-        assertEquals("MCSM2", 0x0, worSettings[focusedRadio].mcsm2);
-        
+        // Setup RX_TIME_RSSI, RX_TIME_QUAL, and RX_TIME        
         call MCSM2.write(worSettings[focusedRadio].mcsm2);
         
         // Setup EVENT0, the time between receive checks.

@@ -113,6 +113,7 @@ implementation {
   /***************** Prototypes ****************/
   uint8_t freqToChannel( uint32_t freq );
   uint32_t channelToFreq( uint8_t chan );
+  task void commit();
   
   /***************** SoftwareInit Commands ****************/
   command error_t SoftwareInit.init() {
@@ -280,7 +281,7 @@ implementation {
   async event void ActiveMessageAddress.changed() {   
     regValues[BLAZE_ADDR] = call ActiveMessageAddress.amAddress();
     atomic panAddress = call ActiveMessageAddress.amGroup();
-    call BlazeCommit.commit();
+    post commit();
   }
   
   /***************** BlazeCommit Events ****************/
@@ -310,6 +311,13 @@ implementation {
     uint32_t offset;
     offset = (uint32_t)(((uint32_t)chan) * CC1100_CHANNEL_WIDTH);
     return offset + CC1100_FREQ_MIN;
+  }
+  
+  /**
+   * Out of async context
+   */
+  task void commit() {
+    call BlazeCommit.commit();
   }
   
   /***************** Defaults ****************/

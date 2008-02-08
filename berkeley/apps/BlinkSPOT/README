@@ -1,0 +1,10 @@
+This is a simple test program that runs Blink while taking SPOT/energy readings. The readings are forwarded via UART. 
+
+SPOT driver is in the sensorboards directory. 
+
+Please refer to http://buzzing.cs.berkeley.edu/~xjiang/papers/jiang07spot.pdf for more information. 
+
+Xiaofan Jiang (Fred)
+fxjiang@eecs.berkeley.edu
+
+

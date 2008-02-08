@@ -1,0 +1,3 @@
+COMPONENT=PushAppC
+
+include $(MAKERULES)

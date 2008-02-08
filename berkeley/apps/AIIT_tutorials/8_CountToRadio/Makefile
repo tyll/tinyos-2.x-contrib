@@ -1,0 +1,4 @@
+COMPONENT=CountToRadioAppC
+
+include $(MAKERULES)
+

@@ -1,0 +1,3 @@
+COMPONENT=CountAppC
+
+include $(MAKERULES)

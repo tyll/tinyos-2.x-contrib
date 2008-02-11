@@ -1065,7 +1065,7 @@ implementation {
 
   default event bool
   Intercept.forward[collection_id_t collectid](message_t* msg, void* payload, 
-                                               uint16_t len) {
+                                               uint8_t len) {
     return TRUE;
   }
 

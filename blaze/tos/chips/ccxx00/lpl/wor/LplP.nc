@@ -61,14 +61,28 @@ implementation {
   /** TRUE if WoR is enabled on a system level, regardless of radio power */
   bool worSystemEnabled[uniqueCount(UQ_BLAZE_RADIO)];
   
+  /** Current radio we're dealing with */
+  radio_id_t focusedRadio;
+  
+  
+  /**
+   * States
+   */
   enum {
     S_IDLE,
     S_SPLITCONTROL_STOP,
     S_SPLITCONTROL_STARTDONE,
   };
+  
+  enum {
+    /** The amount of extra time to send a wake-up transmission, in bms */
+    EXTRA_TRANSMIT_TIME = 5,
+  };
+  
     
   /***************** Prototypes ****************/
-  uint16_t convertToBms(uint16_t ms);
+  uint16_t convertMsToBms(uint16_t ms);
+  uint16_t convertBmsToMs(uint16_t bms);
   
   /***************** SplitControl Commands ****************/
   command error_t SplitControl.start[radio_id_t radioId]() {
@@ -110,7 +124,8 @@ implementation {
   /** 
    * Use true milliseconds!
    */
-  command void LowPowerListening.setLocalSleepInterval[radio_id_t radioId](uint16_t sleepIntervalMs) {
+  command void LowPowerListening.setLocalSleepInterval[radio_id_t radioId](uint16_t sleepIntervalMs) {  
+    call Wor.calculateAndSetEvent0[radioId](sleepIntervalMs);
     if(sleepIntervalMs == 0) {
       // Disable WoR if it is currently active.
       worSystemEnabled[radioId] = FALSE;
@@ -121,7 +136,6 @@ implementation {
      
     } else {
       worSystemEnabled[radioId] = TRUE;
-      call Wor.calculateAndSetEvent0[radioId](convertToBms(sleepIntervalMs));
       if(call SplitControlManager.isOn[radioId]()) {
         call Wor.synchronizeSettings[radioId]();
       }
@@ -136,8 +150,18 @@ implementation {
    * Use true milliseconds!
    */
   command void LowPowerListening.setRxSleepInterval[radio_id_t radioId](message_t *msg, uint16_t sleepIntervalMs) {
-    (call BlazePacketBody.getMetadata(msg))->rxInterval = convertToBms(sleepIntervalMs);
+    (call BlazePacketBody.getMetadata(msg))->rxInterval = 
+        convertMsToBms(sleepIntervalMs) + EXTRA_TRANSMIT_TIME;
   }
+  
+  
+  /**
+   * @return true milliseconds
+   */
+  command uint16_t LowPowerListening.getRxSleepInterval[radio_id_t radioId](message_t *msg) {
+    return convertMsToBms((call BlazePacketBody.getMetadata(msg))->rxInterval);
+  }
+  
   
   
   command void LowPowerListening.setLocalDutyCycle[radio_id_t radioId](uint16_t dutyCycle) {
@@ -145,11 +169,6 @@ implementation {
   }
   
   command uint16_t LowPowerListening.getLocalDutyCycle[radio_id_t radioId]() {
-    // Not supported!
-    return 10000;
-  }
-  
-  command uint16_t LowPowerListening.getRxSleepInterval[radio_id_t radioId](message_t *msg) {
     // Not supported!
     return 10000;
   }
@@ -175,13 +194,14 @@ implementation {
   
   /***************** SubControl Events ****************/
   event void SubControl.startDone[radio_id_t radioId](error_t error) {
-    myState = S_SPLITCONTROL_STARTDONE;
-    
+
     if(worSystemEnabled[radioId]) {
+      myState = S_SPLITCONTROL_STARTDONE;  
       call Wor.enableWor[radioId](TRUE);
       // continues at Wor.stateChanged()...
       
     } else {
+      myState = S_IDLE;
       signal SplitControl.startDone[radioId](error);
     }
   }
@@ -190,15 +210,13 @@ implementation {
     signal SplitControl.stopDone[radioId](error);
   }
   
-  
   /***************** RxNotify Events ****************/
   event void RxNotify.doneReceiving[radio_id_t radioId]() {
     if(call SplitControlManager.isOn[radioId]() && worSystemEnabled[radioId]) {
       call Wor.enableWor[radioId](TRUE);
     }
   }
-  
-  
+
   /***************** SubSend Events ****************/
   event void SubSend.sendDone[radio_id_t radioId](message_t *msg, error_t error) {
     if(worSystemEnabled[radioId]) {
@@ -231,9 +249,13 @@ implementation {
   event void SplitControlManager.stateChange[radio_id_t radioId]() {
   }
   
-  /***************** Functions ****************/
-  uint16_t convertToBms(uint16_t ms) {
+  /***************** Tasks and Functions ****************/
+  uint16_t convertMsToBms(uint16_t ms) {
     return (((uint32_t) ms) * ((uint32_t) 1024)) / 1000;
+  }
+  
+  uint16_t convertBmsToMs(uint16_t bms) {
+    return (((uint32_t) bms) * ((uint32_t) 1000)) / 1024;
   }
   
   
@@ -246,5 +268,6 @@ implementation {
   
   default event void Send.sendDone[radio_id_t radioId](message_t *msg, error_t error) {
   }
+
 }
 

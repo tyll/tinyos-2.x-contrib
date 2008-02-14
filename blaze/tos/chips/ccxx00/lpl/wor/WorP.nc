@@ -37,6 +37,7 @@ implementation {
 
   radio_id_t focusedRadio;
   bool enabling;
+  uint8_t state;
   
   struct {
     uint8_t mcsm2;
@@ -47,14 +48,19 @@ implementation {
   
   enum {
     S_IDLE,
-    S_ENABLING,
-    S_DISABLING,
+    S_TOGGLING,
   };
   
   /***************** Prototypes ****************/
+  void setupWor();
   void verifyRxMode();
   
+  
   /***************** Init Commands ****************/
+  /**
+   * Testing demonstrates that event1=0x7 is actually more energy efficient 
+   * than event1=0x0
+   */
   command error_t Init.init() {
     int i;
     for(i = 0; i < uniqueCount(UQ_BLAZE_RADIO); i++) {
@@ -77,10 +83,21 @@ implementation {
    * @param on Turn WoR on or off
    */
   command void Wor.enableWor[radio_id_t radioId](bool on) {
+    if(state != S_IDLE) {
+      return;
+    }
+    
+    state = S_TOGGLING;
+    
     focusedRadio = radioId;
     enabling = on;
     
-    call Resource.request();
+    if(call Resource.immediateRequest() == SUCCESS) {
+      setupWor();
+      
+    } else {
+      call Resource.request();
+    }
   }
   
   command void Wor.synchronizeSettings[radio_id_t radioId]() {
@@ -167,6 +184,13 @@ implementation {
   
   /***************** Resource Events ****************/
   event void Resource.granted() {
+    setupWor();
+  }
+  
+  
+  /***************** Functions ****************/
+  void setupWor() {
+  
     call Csn.set[focusedRadio]();
     call Csn.clr[focusedRadio]();
     
@@ -217,11 +241,11 @@ implementation {
     
     call Csn.set[focusedRadio]();
     call Resource.release();
+    state = S_IDLE;
     signal Wor.stateChange[focusedRadio](enabling);
   }
   
   
-  /***************** Functions ****************/
   void verifyRxMode() {
     uint8_t status;
     

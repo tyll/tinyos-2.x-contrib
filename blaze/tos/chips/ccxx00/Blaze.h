@@ -47,7 +47,7 @@ typedef nx_struct blaze_header_t {
   nxle_uint8_t fcf;
   nxle_uint8_t dsn;
   nxle_uint16_t src;
-  nxle_uint16_t destpan;
+  nxle_uint8_t destpan;
   nxle_uint8_t type;
 } blaze_header_t;
 
@@ -56,11 +56,10 @@ typedef nx_struct blaze_footer_t {
 
 typedef nx_struct blaze_metadata_t {
   nx_uint8_t rssi;
-  nx_uint8_t lqi; 
-  nx_bool ack;  // TODO combine or take advantage of the FCF ack bit?
-  nx_uint8_t radio;  // TODO combine 
+  nx_uint8_t lqi;
+  nx_bool ack;
+  nx_uint8_t radio;
   nx_uint8_t txPower;
-  nx_uint32_t timestamp;
   nx_uint16_t rxInterval;
   nx_uint16_t maxRetries;
   nx_uint16_t retryDelay;

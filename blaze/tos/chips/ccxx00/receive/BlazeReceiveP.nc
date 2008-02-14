@@ -134,7 +134,6 @@ implementation {
       acknowledgement.length = ACK_FRAME_LENGTH;
       acknowledgement.fcf = IEEE154_TYPE_ACK;
       stopping = FALSE;
-      //pendingRadioRx = NO_RADIO_PENDING;
     }
     return SUCCESS;
   }
@@ -264,12 +263,13 @@ implementation {
       if (isAckPacket(header, id)) {    
         // This is a valid ACK packet.
         signal AckReceive.receive( header->src, header->dest, header->dsn );
-        cleanUp();
+        
+        /** Fall through and cleanUp() */
         
       } else if(rxFrameLength >= sizeof(blaze_header_t) - 1) {
         // The amount of data in this packet is at least a valid header size
         if(isDataPacket(header, id)) {
-          if(passesAddressFilter(header, id)) {
+          if(passesAddressFilter(header, id)) {        
             if(passesPanFilter(header, id)) {
               if(shouldAck(header, id)) {
                 // Send an ack and then receive the packet in AckSend.sendDone()
@@ -287,15 +287,15 @@ implementation {
               } else {
                 // Do not send an acknowledgement, just receive this packet
                 post receiveDone();
+                return;
               }
             }
           }
         }
-             
-      } else {
-        // Didn't pass through our filters
-        cleanUp();
       }
+      
+      // Didn't pass through our filters
+      cleanUp();
       break;
       
     default:

@@ -290,7 +290,7 @@ enum CC1100_config_reg_state_enums {
   CC1100_CONFIG_PKTLEN = 0x3D,
   
   /** 0x0 and 0xFF are broadcasts, append 2 status bytes */
-  CC1100_CONFIG_PKTCTRL1 = 0x07,
+  CC1100_CONFIG_PKTCTRL1 = 0x27,
   
   /** CRC appending, variable length packets */
   CC1100_CONFIG_PKTCTRL0 = 0x45,

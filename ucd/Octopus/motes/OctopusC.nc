@@ -22,13 +22,13 @@
  * OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
  * MODIFICATIONS.
  *
- * Authors:	Raja Jurdak, Antonio Ruzzelli, and Samuel Boivineau
+ * Authors:	Raja Jurdak, Antonio Ruzzelli, Samuel Boivineau, and Alessio Barbirato
  * Date created: 2007/09/07
  *
  */
 
 /**
- * @author Raja Jurdak, Antonio Ruzzelli, and Samuel Boivineau
+ * @author Raja Jurdak, Antonio Ruzzelli,  Samuel Boivineau, and Alessio Barbirato
  */
 
 
@@ -47,6 +47,7 @@ module OctopusC {
   uses {
     // Interfaces for initialization:
     interface Boot;
+    
     interface SplitControl as RadioControl;
     interface SplitControl as SerialControl;
 	
@@ -86,6 +87,7 @@ module OctopusC {
 	
     // Miscalleny:
     interface Timer<TMilli>;
+    interface Timer<TMilli> as WaitTimer;
     interface Read<uint16_t>; // sensor
     interface Leds;
     interface Random;
@@ -95,12 +97,12 @@ implementation {
 	/*
 		Variables
 	*/
-	
 	octopus_collected_msg_t localCollectedMsg;
 	message_t fwdMsg;
 	message_t sndMsg, serialMsg;
 	bool fwdBusy, sendBusy, uartBusy;
 	uint16_t samplingPeriod;
+	uint16_t waitT;
 	uint16_t threshold;
 	bool modeAuto, sleeping, root=FALSE;
 	uint16_t battery, sleepDutyCycle, awakeDutyCycle;
@@ -143,6 +145,8 @@ implementation {
 		sleeping = FALSE;
 		sleepDutyCycle = DEFAULT_SLEEP_DUTY_CYCLE;
 		awakeDutyCycle = DEFAULT_AWAKE_DUTY_CYCLE;
+		sendBusy = FALSE;
+		uartBusy = FALSE;
 		// battery = getBatteryValue(); ???
 	}
 	event void RadioControl.startDone(error_t error) {
@@ -158,7 +162,16 @@ implementation {
 		} else
 			fatalProblem();
 	}
-	event void RadioControl.stopDone(error_t error) { }
+	event void RadioControl.stopDone(error_t error) {
+		if (error == SUCCESS){
+			if (call CollectControl.stop() != SUCCESS)
+				fatalProblem();
+			if (call BroadcastControl.stop() != SUCCESS)
+				fatalProblem();
+		} else
+			fatalProblem();
+	}
+	//default command error_t SoftwareInit.init() {} 
 	event void SerialControl.startDone(error_t error) { 
   		if (error != SUCCESS)
 			fatalProblem();
@@ -175,7 +188,9 @@ implementation {
 			case SET_MODE_AUTO_REQUEST:
 				modeAuto = TRUE;
 				call Timer.stop();
-				call Timer.startPeriodic(samplingPeriod); 
+				//This waiting time avoids all nodes starting at the same time, which may cause a lot of collisions
+				waitT = 1+TOS_NODE_ID*32;
+				call WaitTimer.startOneShot(waitT); 
 				break;
 			case SET_MODE_QUERY_REQUEST:
 				modeAuto = FALSE;
@@ -184,8 +199,10 @@ implementation {
 			case SET_PERIOD_REQUEST:
 				samplingPeriod = newRequest->parameters;
 				call Timer.stop();
+				//This waiting time avoids all nodes starting at the same time, which may cause a lot of collisions
+				waitT = 1+TOS_NODE_ID*32;
 				if(sleeping == FALSE)
-					call Timer.startPeriodic(samplingPeriod);   
+					call WaitTimer.startOneShot(waitT);   
 				break;
 			case SET_THRESHOLD_REQUEST:
 				threshold = newRequest->parameters;
@@ -257,6 +274,9 @@ implementation {
 				fillPacket();
 				SEND_TASK
 				break;
+			case BOOT_REQUEST:
+				break;
+				
 			}
 		}
 	}
@@ -284,9 +304,6 @@ implementation {
 		if (!sendBusy && !root) {
 			octopus_collected_msg_t *o = (octopus_collected_msg_t *)call CollectSend.getPayload(&sndMsg);
 			memcpy(o, &localCollectedMsg, sizeof(octopus_collected_msg_t));
-			
-			call LowPowerListening.setRxSleepInterval(&sndMsg, call LowPowerListening.dutyCycleToSleepInterval(awakeDutyCycle));	
-			
 			if (call CollectSend.send(&sndMsg, sizeof(octopus_collected_msg_t)) == SUCCESS)
 				sendBusy = TRUE;
 			else
@@ -298,7 +315,6 @@ implementation {
 		if (!uartBusy && root) {
 			octopus_collected_msg_t * o = (octopus_collected_msg_t *)call SerialSend.getPayload(&sndMsg);
 			memcpy(o, &localCollectedMsg, sizeof(octopus_collected_msg_t));
-			call LowPowerListening.setRxSleepInterval(&sndMsg, call LowPowerListening.dutyCycleToSleepInterval(awakeDutyCycle));
 			if (call SerialSend.send(0xffff, &sndMsg, sizeof(octopus_collected_msg_t)) == SUCCESS)
 				uartBusy = TRUE;
 			else
@@ -361,6 +377,9 @@ implementation {
 	event void Timer.fired() {
 		if (!sleeping && modeAuto) // Reading of the sensor in timer-driven mode
 			call Read.read();
+	}
+	event void WaitTimer.fired() {
+		call Timer.startPeriodic(samplingPeriod); //WaitTimer implements an application layer backoff to avoid collisions of nodes' packets when they receive a new request
 	}
 
 	/*

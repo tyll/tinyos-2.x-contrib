@@ -142,7 +142,8 @@ implementation {
     call CSN.makeOutput();
     call SFD.makeInput();
 #ifdef CC2420SYNC_DEBUG_PINS
-    TOSH_MAKE_GIO2_OUTPUT();
+    TOSH_MAKE_URXD0_OUTPUT();
+    TOSH_MAKE_UTXD0_OUTPUT();
 #endif
     return SUCCESS;
   }
@@ -259,7 +260,7 @@ implementation {
         
       case S_SFD:
 #ifdef CC2420SYNC_DEBUG_PINS
-        TOSH_SET_GIO2_PIN();
+        TOSH_SET_UTXD0_PIN();
 #endif
         m_state = S_EFD;
         sfdHigh = TRUE;
@@ -284,7 +285,7 @@ implementation {
         
       case S_EFD:
 #ifdef CC2420SYNC_DEBUG_PINS
-        TOSH_CLR_GIO2_PIN();
+        TOSH_CLR_UTXD0_PIN();
 #endif  
         sfdHigh = FALSE;
         call CaptureSFD.captureRisingEdge();
@@ -303,6 +304,9 @@ implementation {
         
       default:
         if ( !m_receiving ) {
+#ifdef CC2420SYNC_DEBUG_PINS
+        TOSH_SET_URXD0_PIN();
+#endif 	
           sfdHigh = TRUE;
           call CaptureSFD.captureFallingEdge();
           signal TimeStamp.receivedSFD( time );
@@ -314,7 +318,9 @@ implementation {
             return;
           }
         }
-        
+#ifdef CC2420SYNC_DEBUG_PINS
+        TOSH_CLR_URXD0_PIN();
+#endif 	        
         sfdHigh = FALSE;
         call CaptureSFD.captureRisingEdge();
         m_receiving = FALSE;

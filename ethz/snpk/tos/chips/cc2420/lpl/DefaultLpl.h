@@ -56,7 +56,7 @@ enum {
  * a successful receive addressed to this node
  */
 #ifndef DELAY_AFTER_RECEIVE
-#define DELAY_AFTER_RECEIVE 10
+#define DELAY_AFTER_RECEIVE 30
 #endif
 
 /**
@@ -100,7 +100,7 @@ enum {
  * that show the channel is not clear before a detection event is issued
  */
 #ifndef MIN_SAMPLES_BEFORE_DETECT
-#define MIN_SAMPLES_BEFORE_DETECT 5
+#define MIN_SAMPLES_BEFORE_DETECT 3
 #endif
 
 #endif

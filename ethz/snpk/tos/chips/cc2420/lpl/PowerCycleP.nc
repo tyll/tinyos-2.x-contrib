@@ -173,7 +173,7 @@ implementation {
       return EBUSY;
     }
 #ifdef CC2420SYNC_DEBUG_PINS
-     TOSH_MAKE_GIO3_OUTPUT();
+     TOSH_MAKE_ADC3_OUTPUT();
 #endif
     // Radio was off, now has been told to turn on or duty cycle.
     call SplitControlState.forceState(S_TURNING_ON);
@@ -208,9 +208,6 @@ implementation {
   /***************** Timer Events ****************/
   async event void OnTimer.fired() {
     if(isDutyCycling()) {
-#ifdef CC2420SYNC_DEBUG_PINS
-      TOSH_SET_GIO3_PIN();
-#endif
       call OnTimer.startAt(call OnTimer.getAlarm(), sleepInterval32khz);
       if(call RadioPowerState.getState() == S_OFF) {
         ccaChecks = 0;
@@ -219,9 +216,6 @@ implementation {
           * have this issue when running on an external crystal.
           */
          post getCca();
-#ifdef CC2420SYNC_DEBUG_PINS
-        TOSH_CLR_GIO3_PIN();
-#endif
       }
     }
   }
@@ -229,7 +223,7 @@ implementation {
   /***************** SubControl Events ****************/
   event void SubControl.startDone(error_t error) {
 #ifdef CC2420SYNC_DEBUG_PINS
-    TOSH_SET_GIO3_PIN();
+    TOSH_SET_ADC3_PIN();
 #endif
     call RadioPowerState.forceState(S_ON);
     call Leds.led2On();
@@ -247,7 +241,7 @@ implementation {
   
   event void SubControl.stopDone(error_t error) {
 #ifdef CC2420SYNC_DEBUG_PINS
-    TOSH_CLR_GIO3_PIN();
+    TOSH_CLR_ADC3_PIN();
 #endif  
     call RadioPowerState.forceState(S_OFF);
     call Leds.led2Off();

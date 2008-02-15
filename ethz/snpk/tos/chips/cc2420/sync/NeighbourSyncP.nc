@@ -65,9 +65,6 @@ module NeighbourSyncP {
     interface AMSend;
     interface LowPowerListening;
 
-#ifdef CC2420SYNC_DEBUG_PINS
-    interface GeneralIO as GIO3;
-#endif
   }
 }
 

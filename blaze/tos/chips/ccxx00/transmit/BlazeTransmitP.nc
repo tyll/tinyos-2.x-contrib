@@ -112,7 +112,7 @@ implementation {
   
   /***************** AsyncSend Commands ****************/  
   async command error_t AsyncSend.send[ radio_id_t id ](void *msg, bool forcePkt, uint16_t preambleDurationMs) {
-      
+    
     if(call State.requestState(S_TX_PACKET) != SUCCESS) {
       return FAIL;
     }
@@ -230,13 +230,11 @@ implementation {
       call SRX.strobe();
     }
     
-    
     /*
      * Attempt to transmit.  If the radio goes into TX mode, then our transmit
      * is occurring.  Otherwise, there was something on the channel that
      * prevented CCA from passing
      */
-    call STX.strobe();
     
     if(forcing) {
       for(forceAttempts = 0; call RadioStatus.getRadioStatus() != BLAZE_S_TX
@@ -245,7 +243,11 @@ implementation {
       }
       
     } else {
-      status = call RadioStatus.getRadioStatus();
+      
+      do {
+        call STX.strobe();
+        status = call RadioStatus.getRadioStatus();
+      } while((status != BLAZE_S_RX) && (status != BLAZE_S_TX));
       
       if(status != BLAZE_S_TX) {
         // CCA failed

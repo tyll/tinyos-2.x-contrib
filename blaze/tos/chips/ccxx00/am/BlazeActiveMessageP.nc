@@ -72,7 +72,10 @@ implementation {
   command error_t AMSend.send[am_id_t id](am_addr_t addr,
 					  message_t* msg,
 					  uint8_t len) {
+
+    
     blaze_header_t *header = call BlazePacketBody.getHeader( msg );
+        
     header->length = len + BLAZE_SIZE;
     header->type = id;
     header->dest = addr;
@@ -183,11 +186,13 @@ implementation {
   
   /***************** SubReceive Events ****************/
   event message_t* SubReceive.receive(message_t* msg, void* payload, uint8_t len) {
+    signal Snoop.receive[call AMPacket.type(msg)](msg, payload, len - BLAZE_SIZE);
+  
     if (call AMPacket.isForMe(msg)) {
       return signal Receive.receive[call AMPacket.type(msg)](msg, payload, len - BLAZE_SIZE);
-    } else {
-      return signal Snoop.receive[call AMPacket.type(msg)](msg, payload, len - BLAZE_SIZE);
     }
+    
+    return msg;
   }
   
 

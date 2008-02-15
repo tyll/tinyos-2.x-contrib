@@ -45,6 +45,7 @@ module Ccxx00PowerManagerP {
     interface SplitControl as CsmaSplitControl[radio_id_t radioId];
     interface SplitControl as ReceiveSplitControl[radio_id_t radioId];
     interface SplitControl as InitSplitControl[radio_id_t radioId];
+    interface SplitControl as LplSplitControl[radio_id_t radioId];
   }
 }
 
@@ -57,16 +58,33 @@ implementation {
   uint8_t myState;
   
   /**
-   * This enum defines the order in which components get turned on and off.
+   * Define the order in which components get turned on
+   * Lpl gets turned on after the physical radio is turned on
    */
   enum {
-    S_BEGIN,
+    S_START_BEGIN,
     
-    S_CSMA,
-    S_RECEIVE,
-    S_INIT,
+    S_START_CSMA,
+    S_START_RECEIVE,
+    S_START_INIT,
+    S_START_LPL,
     
-    S_END,
+    S_START_END,
+  };
+  
+  /**
+   * Define the order in which components get turned off
+   * Lpl gets turned off before the physical radio is turned off.
+   */
+  enum {
+    S_STOP_BEGIN,
+    
+    S_STOP_CSMA,
+    S_STOP_RECEIVE,
+    S_STOP_LPL,
+    S_STOP_INIT,
+    
+    S_STOP_END,
   };
   
   /***************** Prototypes ****************/
@@ -76,14 +94,14 @@ implementation {
   /***************** SplitControl Commands ****************/  
   command error_t SplitControl.start[radio_id_t radioId]() {
     focusedRadio = radioId;
-    myState = S_BEGIN;
+    myState = S_START_BEGIN;
     post startRadios();
     return SUCCESS;
   }
   
   command error_t SplitControl.stop[radio_id_t radioId]() {
     focusedRadio = radioId;
-    myState = S_BEGIN;
+    myState = S_STOP_BEGIN;
     post stopRadios();
     return SUCCESS;
   }
@@ -116,24 +134,36 @@ implementation {
     post stopRadios();
   }
 
+  /***************** LplSplitControl Events ****************/  
+  event void LplSplitControl.startDone[radio_id_t radioId](error_t error) {
+    post startRadios();
+  }
+    
+  event void LplSplitControl.stopDone[radio_id_t radioId](error_t error) {
+    post stopRadios();
+  }
 
   /***************** Tasks ****************/  
   task void startRadios() {
     myState++;
     switch(myState) {
-      case S_CSMA:
+      case S_START_CSMA:
         call CsmaSplitControl.start[focusedRadio]();
         break;
         
-      case S_RECEIVE:
+      case S_START_RECEIVE:
         call ReceiveSplitControl.start[focusedRadio]();
         break;
         
-      case S_INIT:
+      case S_START_INIT:
         call InitSplitControl.start[focusedRadio]();
         break;
         
-      case S_END:
+      case S_START_LPL:
+        call LplSplitControl.start[focusedRadio]();
+        break;
+        
+      case S_START_END:
         signal SplitControl.startDone[focusedRadio](SUCCESS);
         break;
         
@@ -145,19 +175,23 @@ implementation {
   task void stopRadios() {
     myState++;
     switch(myState) {
-      case S_CSMA:
+      case S_STOP_CSMA:
         call CsmaSplitControl.stop[focusedRadio]();
         break;
         
-      case S_RECEIVE:
+      case S_STOP_RECEIVE:
         call ReceiveSplitControl.stop[focusedRadio]();
         break;
         
-      case S_INIT:
+      case S_STOP_LPL:
+        call LplSplitControl.stop[focusedRadio]();
+        break;
+        
+      case S_STOP_INIT:
         call InitSplitControl.stop[focusedRadio]();
         break;
         
-      case S_END:
+      case S_STOP_END:
         signal SplitControl.stopDone[focusedRadio](SUCCESS);
         break;
         

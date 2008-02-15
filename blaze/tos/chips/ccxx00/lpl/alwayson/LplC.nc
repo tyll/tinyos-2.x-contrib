@@ -37,6 +37,7 @@
  */
  
 #include "Blaze.h"
+#include "AlwaysOn.h"
 
 configuration LplC {
   provides {

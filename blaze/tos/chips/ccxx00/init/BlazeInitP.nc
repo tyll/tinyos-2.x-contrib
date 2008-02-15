@@ -191,7 +191,7 @@ implementation {
     
     call PaReg.write(call BlazeRegSettings.getPa[ m_id ]());
     
-    call Gdo2_int.enableRisingEdge[ m_id ](); 
+    call Gdo0_int.enableRisingEdge[ m_id ](); 
     
     call SRX.strobe();
     

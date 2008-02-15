@@ -26,7 +26,8 @@ module WorP {
     interface BlazeStrobe as SFRX;
     interface BlazeStrobe as SFTX;
     interface RadioStatus;
-    
+
+    interface GeneralIO as ChipRdy[radio_id_t radioId];    
     interface GeneralIO as Csn[radio_id_t radioId];
     
     interface Leds;
@@ -92,7 +93,10 @@ implementation {
     focusedRadio = radioId;
     enabling = on;
     
-    if(call Resource.immediateRequest() == SUCCESS) {
+    if(call Resource.isOwner()) {
+      setupWor();
+      
+    } else if(call Resource.immediateRequest() == SUCCESS) {
       setupWor();
       
     } else {
@@ -190,10 +194,11 @@ implementation {
   
   /***************** Functions ****************/
   void setupWor() {
-  
     call Csn.set[focusedRadio]();
     call Csn.clr[focusedRadio]();
     
+    while(call ChipRdy.get[focusedRadio]());
+      
     if(enabling) {
       // Enable WoR
       call SIDLE.strobe();
@@ -222,6 +227,7 @@ implementation {
       }
       
     } else {
+      
       // Disable WoR
       call SIDLE.strobe();
 
@@ -237,6 +243,8 @@ implementation {
       
       call SRX.strobe();
       verifyRxMode();
+      
+      worSettings[focusedRadio].worEnabled = FALSE;
     }
     
     call Csn.set[focusedRadio]();
@@ -269,6 +277,8 @@ implementation {
         call SRX.strobe();
       }
     }
+    
+    call Csn.set[focusedRadio]();
   }
   
   /***************** Defaults *****************/
@@ -284,5 +294,13 @@ implementation {
   default async command void Csn.makeOutput[ radio_id_t id ](){}
   default async command bool Csn.isOutput[ radio_id_t id ](){return FALSE;}
   
+  default async command void ChipRdy.set[ radio_id_t id ](){}
+  default async command void ChipRdy.clr[ radio_id_t id ](){}
+  default async command void ChipRdy.toggle[ radio_id_t id ](){}
+  default async command bool ChipRdy.get[ radio_id_t id ](){return FALSE;}
+  default async command void ChipRdy.makeInput[ radio_id_t id ](){}
+  default async command bool ChipRdy.isInput[ radio_id_t id ](){return FALSE;}
+  default async command void ChipRdy.makeOutput[ radio_id_t id ](){}
+  default async command bool ChipRdy.isOutput[ radio_id_t id ](){return FALSE;}
 }
 

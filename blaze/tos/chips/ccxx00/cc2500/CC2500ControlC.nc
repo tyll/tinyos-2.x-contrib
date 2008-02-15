@@ -60,10 +60,6 @@ implementation {
   
   BlazeConfig = CC2500ControlP;
   
-  CC2500ControlP.Csn -> Pins.Csn;
-  CC2500ControlP.Power -> Pins.Power;
-  CC2500ControlP.Gdo0_io -> Pins.Gdo0_io;
-  CC2500ControlP.Gdo2_io -> Pins.Gdo2_io;
   CC2500ControlP.ActiveMessageAddress -> ActiveMessageAddressC;
   
   components BlazeInitC;

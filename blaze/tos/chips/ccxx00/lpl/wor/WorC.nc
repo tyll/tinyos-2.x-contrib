@@ -35,6 +35,7 @@ implementation {
   WorP.SFRX -> BlazeSpiC.SFRX;
   WorP.SFTX -> BlazeSpiC.SFTX;
   WorP.RadioStatus -> BlazeSpiC;
+  WorP.ChipRdy -> BlazeCentralWiringC.Gdo2_io;
   WorP.Csn -> BlazeCentralWiringC.Csn;
   
   components LedsC;

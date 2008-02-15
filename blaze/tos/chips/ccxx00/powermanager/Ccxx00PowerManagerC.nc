@@ -46,12 +46,14 @@ implementation {
   components Ccxx00PowerManagerP,
       CsmaC,
       BlazeReceiveC,
+      LplC,
       BlazeInitC;
       
   SplitControl = Ccxx00PowerManagerP;
   
   Ccxx00PowerManagerP.CsmaSplitControl -> CsmaC;
   Ccxx00PowerManagerP.ReceiveSplitControl -> BlazeReceiveC;
+  Ccxx00PowerManagerP.LplSplitControl -> LplC;
   Ccxx00PowerManagerP.InitSplitControl -> BlazeInitC;
 
 }

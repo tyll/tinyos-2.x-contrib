@@ -60,9 +60,9 @@ implementation {
   
   components BlazeCentralWiringC;
   BlazeReceiveP.Csn -> BlazeCentralWiringC.Csn;
-  BlazeReceiveP.RxIo -> BlazeCentralWiringC.Gdo2_io;
+  BlazeReceiveP.RxIo -> BlazeCentralWiringC.Gdo0_io;
   BlazeReceiveP.BlazeConfig -> BlazeCentralWiringC.BlazeConfig;
-  BlazeReceiveP.RxInterrupt -> BlazeCentralWiringC.Gdo2_int;
+  BlazeReceiveP.RxInterrupt -> BlazeCentralWiringC.Gdo0_int;
   
   components MainC;
   MainC.SoftwareInit -> BlazeReceiveP;

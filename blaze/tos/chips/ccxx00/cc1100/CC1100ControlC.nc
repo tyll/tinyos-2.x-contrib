@@ -61,10 +61,6 @@ implementation {
   
   BlazeConfig = CC1100ControlP;
   
-  CC1100ControlP.Csn -> Pins.Csn;
-  CC1100ControlP.Power -> Pins.Power;
-  CC1100ControlP.Gdo0_io -> Pins.Gdo0_io;
-  CC1100ControlP.Gdo2_io -> Pins.Gdo2_io;
   CC1100ControlP.ActiveMessageAddress -> ActiveMessageAddressC;
   
   components BlazeInitC;

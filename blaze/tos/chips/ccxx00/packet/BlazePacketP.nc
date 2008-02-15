@@ -92,7 +92,7 @@ implementation {
   
   /**************** LinkPacketMetadata Commands **************/
   async command bool LinkPacketMetadata.highChannelQuality(message_t* msg) {
-    return call BlazePacket.getLqi(msg) > 105; //TODO: IS THIS ARBITRARY???
+    return call BlazePacket.getLqi(msg) > 105; // Taken from the CC2420 stack
   }
 
 }

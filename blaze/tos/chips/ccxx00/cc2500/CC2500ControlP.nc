@@ -49,10 +49,6 @@ module CC2500ControlP {
   }
 
   uses {
-    interface GeneralIO as Csn;
-    interface GeneralIO as Power;
-    interface GeneralIO as Gdo0_io;
-    interface GeneralIO as Gdo2_io;
     interface ActiveMessageAddress;
     interface BlazeCommit;
     interface SplitControlManager[radio_id_t radioId];

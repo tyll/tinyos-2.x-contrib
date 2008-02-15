@@ -270,17 +270,14 @@ enum{
 #define CC1100_FREQ_MAX (CC1100_LOWEST_FREQ + (CC1100_CHANNEL_MAX * CC1100_CHANNEL_WIDTH))
 
 enum CC1100_config_reg_state_enums {
-  /**
-   * GDO2 asserts when RX FIFO is filled at or above RXFIFO_THR or the end of 
-   * packet is reached. Deasserts when RX FIFO empty
-   */
-  CC1100_CONFIG_IOCFG2 = 0x01,
+  /** GDO2 is CHIP_RDY, even when the chip is first powered */
+  CC1100_CONFIG_IOCFG2 = 0x29,
   
   /** GDO1 is High Impedance */
   CC1100_CONFIG_IOCFG1 = 0x2E,
   
-  /** GDO0 goes high when the channel is clear */
-  CC1100_CONFIG_IOCFG0 = 0x0E, 
+  /** GDO0 asserts when there is data in the RX FIFO */
+  CC1100_CONFIG_IOCFG0 = 0x01, 
   
   CC1100_CONFIG_FIFOTHR = 0x0F,
   CC1100_CONFIG_SYNC1 = 0xD3,

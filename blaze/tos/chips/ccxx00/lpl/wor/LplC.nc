@@ -32,6 +32,8 @@
 
  
 #include "Blaze.h"
+#include "Lpl.h"
+#include "Wor.h"
 
 configuration LplC {
   provides {
@@ -42,16 +44,14 @@ configuration LplC {
   
   uses {
     interface Send as SubSend[radio_id_t radioId];
-    interface SplitControl as SubControl[radio_id_t id];
   }
 }
 
 implementation {
   components LplP;
-  Send = SubSend;
+  Send = LplP.Send;
   SubSend = LplP.SubSend;
   SplitControl = LplP.SplitControl;
-  SubControl = LplP.SubControl;
   LowPowerListening = LplP;
   
   components SplitControlManagerC;

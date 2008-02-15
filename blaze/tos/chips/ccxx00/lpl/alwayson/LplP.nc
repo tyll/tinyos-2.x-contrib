@@ -35,7 +35,9 @@
  * Sleep interval is always 0, and duty cycle is always 100%
  * @author David Moss
  */
- 
+
+#include "AlwaysOn.h"
+
 module LplP {
   provides {
     interface LowPowerListening[radio_id_t id];

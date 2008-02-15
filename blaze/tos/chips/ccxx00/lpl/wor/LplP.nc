@@ -33,7 +33,10 @@
 /**
  * @author David Moss
  */
- 
+
+#include "Lpl.h"
+#include "Wor.h"
+
 module LplP {
   provides {
     interface SplitControl[radio_id_t radioId];
@@ -43,7 +46,6 @@ module LplP {
   }
   
   uses {
-    interface SplitControl as SubControl[radio_id_t radioId];
     interface Send as SubSend[radio_id_t radioId];
     interface Wor[radio_id_t radioId];
     interface SplitControlManager[radio_id_t radioId];
@@ -64,6 +66,11 @@ implementation {
   /** Current radio we're dealing with */
   radio_id_t focusedRadio;
   
+  /** Message just sent */
+  message_t *focusedMsg;
+  
+  /** Temporary variable used for length and error code on send and sendDone */
+  uint8_t temp;
   
   /**
    * States
@@ -71,12 +78,15 @@ implementation {
   enum {
     S_IDLE,
     S_SPLITCONTROL_STOP,
-    S_SPLITCONTROL_STARTDONE,
+    S_SPLITCONTROL_START,
+    S_SENDING,
+    S_SENDDONE,
+    S_CONFIGURING,
   };
   
   enum {
     /** The amount of extra time to send a wake-up transmission, in bms */
-    EXTRA_TRANSMIT_TIME = 5,
+    EXTRA_TRANSMIT_TIME = 3,
   };
   
     
@@ -86,26 +96,54 @@ implementation {
   
   /***************** SplitControl Commands ****************/
   command error_t SplitControl.start[radio_id_t radioId]() {
-    return call SubControl.start[radioId]();
+    if(worSystemEnabled[radioId]) {
+      myState = S_SPLITCONTROL_START;  
+      call Wor.enableWor[radioId](TRUE);
+      // continues at Wor.stateChanged()...
+      
+    } else {
+      myState = S_IDLE;
+      signal SplitControl.startDone[radioId](SUCCESS);
+    }
+    
+    return SUCCESS;
   }
   
   command error_t SplitControl.stop[radio_id_t radioId]() {
-    myState = S_SPLITCONTROL_STOP;
-    
     if(worSystemEnabled[radioId]) {
+      myState = S_SPLITCONTROL_STOP;
       call Wor.enableWor[radioId](FALSE);
       return SUCCESS;
       // continues at Wor.stateChanged()...
       
     } else {
-      return call SubControl.stop[radioId]();
+      myState = S_IDLE;
+      signal SplitControl.stopDone[radioId](SUCCESS);
     }
+    
+    return SUCCESS;
   }
   
   
   /***************** Send Commands ****************/
   command error_t Send.send[radio_id_t radioId](message_t* msg, uint8_t len) {
-    return call SubSend.send[radioId](msg, len);
+
+    if(myState != S_IDLE) {
+      return EBUSY;
+    }
+    
+    myState = S_SENDING;
+    
+    if(call Wor.isEnabled[radioId]()) {
+      focusedMsg = msg;
+      temp = len;
+      call Wor.enableWor[radioId](FALSE);
+      return SUCCESS;
+      // continues at stateChange()...
+      
+    } else {
+      return call SubSend.send[radioId](msg, len);
+    }
   }
 
   command error_t Send.cancel[radio_id_t radioId](message_t* msg) {
@@ -131,12 +169,14 @@ implementation {
       worSystemEnabled[radioId] = FALSE;
       
       if(call Wor.isEnabled[radioId]()) {
+        myState = S_CONFIGURING;
         call Wor.enableWor[radioId](FALSE);
       }
      
     } else {
       worSystemEnabled[radioId] = TRUE;
       if(call SplitControlManager.isOn[radioId]()) {
+        myState = S_CONFIGURING;
         call Wor.synchronizeSettings[radioId]();
       }
     }
@@ -192,24 +232,6 @@ implementation {
     return 10000;
   }
   
-  /***************** SubControl Events ****************/
-  event void SubControl.startDone[radio_id_t radioId](error_t error) {
-
-    if(worSystemEnabled[radioId]) {
-      myState = S_SPLITCONTROL_STARTDONE;  
-      call Wor.enableWor[radioId](TRUE);
-      // continues at Wor.stateChanged()...
-      
-    } else {
-      myState = S_IDLE;
-      signal SplitControl.startDone[radioId](error);
-    }
-  }
-  
-  event void SubControl.stopDone[radio_id_t radioId](error_t error) {
-    signal SplitControl.stopDone[radioId](error);
-  }
-  
   /***************** RxNotify Events ****************/
   event void RxNotify.doneReceiving[radio_id_t radioId]() {
     if(call SplitControlManager.isOn[radioId]() && worSystemEnabled[radioId]) {
@@ -219,30 +241,47 @@ implementation {
 
   /***************** SubSend Events ****************/
   event void SubSend.sendDone[radio_id_t radioId](message_t *msg, error_t error) {
-    if(worSystemEnabled[radioId]) {
+    if(call SplitControlManager.isOn[radioId]() && worSystemEnabled[radioId]) {
+      myState = S_SENDDONE;
+      focusedMsg = msg;
+      temp = error;
+      
       call Wor.enableWor[radioId](TRUE);
+      // Continues at stateChange()...
+      
+    } else {
+      myState = S_IDLE;
+      signal Send.sendDone[radioId](msg, error);
     }
-    
-    signal Send.sendDone[radioId](msg, error);
   }
   
   
   /***************** Wor Events ****************/
   event void Wor.stateChange[radio_id_t radioId](bool enabled) {
-    switch(myState) {
+    uint8_t lastState = myState;
+    myState = S_IDLE;
+    
+    switch(lastState) {
     case S_SPLITCONTROL_STOP:
-      call SubControl.stop[radioId]();
+      signal SplitControl.stopDone[radioId](SUCCESS);
       break;
     
-    case S_SPLITCONTROL_STARTDONE:
+    case S_SPLITCONTROL_START:
       signal SplitControl.startDone[radioId](SUCCESS);
+      break;
+    
+    case S_SENDING:
+      call SubSend.send[radioId](focusedMsg, temp);
+      break;
+      
+    case S_SENDDONE:
+      signal Send.sendDone[radioId](focusedMsg, temp);
       break;
       
     default:
       break;
     }
     
-    myState = S_IDLE;
   }
   
   /***************** SplitControlManager Events ****************/

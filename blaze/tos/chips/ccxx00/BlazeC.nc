@@ -146,7 +146,6 @@ implementation {
   /***************** SplitControl Layers ****************/
   SplitControl = SplitControlManagerC.SplitControl[0];
   BlazeSplitControl = SplitControlManagerC.SplitControl;
-  SplitControlManagerC.SubControl -> LplC.SplitControl;
-  LplC.SubControl -> Ccxx00PowerManagerC.SplitControl;
+  SplitControlManagerC.SubControl -> Ccxx00PowerManagerC.SplitControl;
 }
 

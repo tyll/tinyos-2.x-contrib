@@ -1,0 +1,414 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- $Revision$ -->
+<!-- $Date$ -->
+
+
+<!DOCTYPE ps_attribute_list [
+     <!ELEMENT ps_attribute_list (ps_attribute*)>
+     <!ELEMENT ps_attribute (attribute_name,attribute_description,attribute_type,attribute_min?,attribute_max?,ps_metric*,attribute_endianness?,attribute_component*,attribute_preferred_visualization?,ps_operation*)>
+     <!ATTLIST ps_attribute id CDATA #REQUIRED>
+     <!ELEMENT attribute_name (#PCDATA)>
+     <!ELEMENT attribute_description (#PCDATA)>
+     <!ELEMENT attribute_type (#PCDATA)>
+     <!ELEMENT attribute_min (#PCDATA)>
+     <!ELEMENT attribute_max (#PCDATA)>
+     <!ELEMENT ps_metric (metric_conversion)>
+     <!ATTLIST ps_metric name CDATA #REQUIRED>
+     <!ELEMENT metric_conversion (#PCDATA)>
+     <!ELEMENT attribute_endianness (#PCDATA)>
+     <!ELEMENT attribute_component (#PCDATA)>
+     <!ELEMENT attribute_preferred_visualization (#PCDATA)>
+     <!ELEMENT ps_operation (operation_name, operation_description?)>
+     <!ATTLIST ps_operation id CDATA #REQUIRED>
+     <!ELEMENT operation_name (#PCDATA)>
+     <!ELEMENT operation_description (#PCDATA)>
+     ]>
+
+<ps_attribute_list>
+  <ps_attribute id='0'>
+    <attribute_name>EyesIFXTemperature</attribute_name>
+    <attribute_description>The temperature sensor on the eyesIFX node family.</attribute_description>
+    <attribute_type>uint16</attribute_type>
+    <attribute_min>0</attribute_min>
+    <attribute_max>4095</attribute_max>
+    <ps_metric name="Degree Celsius">
+    <!-- With VREF at 1.5V a raw value of 1638 equals 0 degree celsius.
+         The output is linear with 27.3 equal to a 1 degree celsius offset. -->
+      <metric_conversion>(X - 1638) / 27.3</metric_conversion> 
+    </ps_metric>
+    <attribute_endianness>big</attribute_endianness>
+    <attribute_component>AttributeEyesIFXTemperature.nc</attribute_component>
+    <attribute_preferred_visualization>number</attribute_preferred_visualization>
+    <ps_operation id="0">
+      <operation_name>=</operation_name>
+      <operation_description>equals</operation_description>
+    </ps_operation>
+    <ps_operation id="1">
+      <operation_name>&lt;</operation_name>
+      <operation_description>smaller than</operation_description>
+    </ps_operation>
+    <ps_operation id="2">
+      <operation_name>&lt;=</operation_name>
+      <operation_description>smaller or equal</operation_description>
+    </ps_operation>
+    <ps_operation id="3">
+      <operation_name>&gt;</operation_name>
+      <operation_description>greater than</operation_description>
+    </ps_operation>
+    <ps_operation id="4">
+      <operation_name>&gt;=</operation_name>
+      <operation_description>greater or equal</operation_description>
+    </ps_operation>
+    <ps_operation id="5">
+      <operation_name>ANY</operation_name>
+      <operation_description>true</operation_description>
+    </ps_operation>
+  </ps_attribute>
+  <ps_attribute id="2">
+    <attribute_name>EyesIFXLight</attribute_name>
+    <attribute_description>The light sensor on the eyesIFX node family.</attribute_description>
+    <attribute_type>uint16</attribute_type>
+    <attribute_min>0</attribute_min>
+    <attribute_max>4095</attribute_max>
+    <!--
+    <ps_metric name="Lux">
+      <metric_conversion>10^(((log(((100*1500)/((X*1500)/4095))-100))-2)/(-0.75))</metric_conversion> 
+    </ps_metric>
+    -->
+    <attribute_endianness>big</attribute_endianness>
+    <attribute_component>AttributeEyesIFXLight.nc</attribute_component>
+    <attribute_preferred_visualization>background</attribute_preferred_visualization>
+    <ps_operation id="0">
+      <operation_name>=</operation_name>
+      <operation_description>equals</operation_description>
+    </ps_operation>
+    <ps_operation id="1">
+      <operation_name>&lt;</operation_name>
+      <operation_description>smaller than</operation_description>
+    </ps_operation>
+    <ps_operation id="2">
+      <operation_name>&lt;=</operation_name>
+      <operation_description>smaller or equal</operation_description>
+    </ps_operation>
+    <ps_operation id="3">
+      <operation_name>&gt;</operation_name>
+      <operation_description>greater than</operation_description>
+    </ps_operation>
+    <ps_operation id="4">
+      <operation_name>&gt;=</operation_name>
+      <operation_description>greater or equal</operation_description>
+    </ps_operation>
+    <ps_operation id="5">
+      <operation_name>ANY</operation_name>
+      <operation_description>true</operation_description>
+    </ps_operation>
+  </ps_attribute>
+  <ps_attribute id="3">
+    <attribute_name>EyesIFXRSSI</attribute_name>
+    <attribute_description>RSSI measured by the TDA5250 on the eyesIFX node family.</attribute_description>
+    <attribute_type>uint16</attribute_type>
+    <attribute_min>0</attribute_min>
+    <attribute_max>4095</attribute_max>
+    <attribute_endianness>big</attribute_endianness>
+    <attribute_component>AttributeEyesIFXRSSI.nc</attribute_component>
+    <attribute_preferred_visualization>number</attribute_preferred_visualization>
+    <ps_operation id="0">
+      <operation_name>=</operation_name>
+      <operation_description>equals</operation_description>
+    </ps_operation>
+    <ps_operation id="1">
+      <operation_name>&lt;</operation_name>
+      <operation_description>smaller than</operation_description>
+    </ps_operation>
+    <ps_operation id="2">
+      <operation_name>&lt;=</operation_name>
+      <operation_description>smaller or equal</operation_description>
+    </ps_operation>
+    <ps_operation id="3">
+      <operation_name>&gt;</operation_name>
+      <operation_description>greater than</operation_description>
+    </ps_operation>
+    <ps_operation id="4">
+      <operation_name>&gt;=</operation_name>
+      <operation_description>greater or equal</operation_description>
+    </ps_operation>
+    <ps_operation id="5">
+      <operation_name>ANY</operation_name>
+      <operation_description>true</operation_description>
+    </ps_operation>
+  </ps_attribute>
+  <ps_attribute id="10">
+    <attribute_name>Msp430Temperature</attribute_name>
+    <attribute_description>The internal temperature sensor on MSP430.</attribute_description>
+    <attribute_type>uint16</attribute_type>
+    <attribute_min>0</attribute_min>
+    <attribute_max>4095</attribute_max>
+    <ps_metric name="Degree Celsius">
+      <metric_conversion>((X/2730)-0.986)/0.00355</metric_conversion> 
+    </ps_metric>
+    <attribute_endianness>big</attribute_endianness>
+    <attribute_component>AttributeMsp430TemperatureC.nc</attribute_component>
+    <attribute_preferred_visualization>number</attribute_preferred_visualization>
+    <ps_operation id="0">
+      <operation_name>=</operation_name>
+      <operation_description>equals</operation_description>
+    </ps_operation>
+    <ps_operation id="1">
+      <operation_name>&lt;</operation_name>
+      <operation_description>smaller than</operation_description>
+    </ps_operation>
+    <ps_operation id="2">
+      <operation_name>&lt;=</operation_name>
+      <operation_description>smaller or equal</operation_description>
+    </ps_operation>
+    <ps_operation id="3">
+      <operation_name>&gt;</operation_name>
+      <operation_description>greater than</operation_description>
+    </ps_operation>
+    <ps_operation id="4">
+      <operation_name>&gt;=</operation_name>
+      <operation_description>greater or equal</operation_description>
+    </ps_operation>
+    <ps_operation id="5">
+      <operation_name>ANY</operation_name>
+      <operation_description>true</operation_description>
+    </ps_operation>
+  </ps_attribute>
+  <ps_attribute id="11">
+    <attribute_name>Msp430Voltage</attribute_name>
+    <attribute_description>The input voltage on the MSP430.</attribute_description>
+    <attribute_type>uint16</attribute_type>
+    <attribute_min>0</attribute_min>
+    <attribute_max>4095</attribute_max>
+    <ps_metric name="Volt">
+      <!-- TODO: check formula -->
+      <metric_conversion>(X / 1365)</metric_conversion> 
+    </ps_metric>
+    <attribute_endianness>big</attribute_endianness>
+    <attribute_component>AttributeMsp430VoltageC.nc</attribute_component>
+    <attribute_preferred_visualization>number</attribute_preferred_visualization>
+    <ps_operation id="0">
+      <operation_name>=</operation_name>
+      <operation_description>equals</operation_description>
+    </ps_operation>
+    <ps_operation id="1">
+      <operation_name>&lt;</operation_name>
+      <operation_description>smaller than</operation_description>
+    </ps_operation>
+    <ps_operation id="2">
+      <operation_name>&lt;=</operation_name>
+      <operation_description>smaller or equal</operation_description>
+    </ps_operation>
+    <ps_operation id="3">
+      <operation_name>&gt;</operation_name>
+      <operation_description>greater than</operation_description>
+    </ps_operation>
+    <ps_operation id="4">
+      <operation_name>&gt;=</operation_name>
+      <operation_description>greater or equal</operation_description>
+    </ps_operation>
+    <ps_operation id="5">
+      <operation_name>ANY</operation_name>
+      <operation_description>true</operation_description>
+    </ps_operation>
+  </ps_attribute>
+  <ps_attribute id="12">
+    <attribute_name>SensirionTemperature</attribute_name>
+    <attribute_description>Temperature provided by the Sensirion SHT11 (e.g. on TelosB)</attribute_description>
+    <attribute_type>uint16</attribute_type>
+    <attribute_min>0</attribute_min>
+    <attribute_max>16383</attribute_max>
+    <ps_metric name="">
+      <!-- TODO: check formula -->
+      <metric_conversion>X</metric_conversion> 
+    </ps_metric>
+    <attribute_endianness>big</attribute_endianness>
+    <attribute_component>AttributeSensirionHumidityC.nc</attribute_component>
+    <attribute_preferred_visualization>number</attribute_preferred_visualization>
+    <ps_operation id="0">
+      <operation_name>=</operation_name>
+      <operation_description>equals</operation_description>
+    </ps_operation>
+    <ps_operation id="1">
+      <operation_name>&lt;</operation_name>
+      <operation_description>smaller than</operation_description>
+    </ps_operation>
+    <ps_operation id="2">
+      <operation_name>&lt;=</operation_name>
+      <operation_description>smaller or equal</operation_description>
+    </ps_operation>
+    <ps_operation id="3">
+      <operation_name>&gt;</operation_name>
+      <operation_description>greater than</operation_description>
+    </ps_operation>
+    <ps_operation id="4">
+      <operation_name>&gt;=</operation_name>
+      <operation_description>greater or equal</operation_description>
+    </ps_operation>
+    <ps_operation id="5">
+      <operation_name>ANY</operation_name>
+      <operation_description>true</operation_description>
+    </ps_operation>
+  </ps_attribute>  
+  <ps_attribute id="13">
+    <attribute_name>SensirionHumidity</attribute_name>
+    <attribute_description>Humidity provided by the Sensirion SHT11 (e.g. on TelosB)</attribute_description>
+    <attribute_type>uint16</attribute_type>
+    <attribute_min>0</attribute_min>
+    <attribute_max>4096</attribute_max>
+    <ps_metric name="">
+      <!-- TODO: check formula -->
+      <metric_conversion>X</metric_conversion> 
+    </ps_metric>
+    <attribute_endianness>big</attribute_endianness>
+    <attribute_component>AttributeSensirionHumidityC.nc</attribute_component>
+    <attribute_preferred_visualization>number</attribute_preferred_visualization>
+    <ps_operation id="0">
+      <operation_name>=</operation_name>
+      <operation_description>equals</operation_description>
+    </ps_operation>
+    <ps_operation id="1">
+      <operation_name>&lt;</operation_name>
+      <operation_description>smaller than</operation_description>
+    </ps_operation>
+    <ps_operation id="2">
+      <operation_name>&lt;=</operation_name>
+      <operation_description>smaller or equal</operation_description>
+    </ps_operation>
+    <ps_operation id="3">
+      <operation_name>&gt;</operation_name>
+      <operation_description>greater than</operation_description>
+    </ps_operation>
+    <ps_operation id="4">
+      <operation_name>&gt;=</operation_name>
+      <operation_description>greater or equal</operation_description>
+    </ps_operation>
+    <ps_operation id="5">
+      <operation_name>ANY</operation_name>
+      <operation_description>true</operation_description>
+    </ps_operation>
+  </ps_attribute>  
+  <ps_attribute id="17">
+    <attribute_name>Ping</attribute_name>
+    <attribute_description>Incremented for each notification.</attribute_description>
+    <attribute_type>uint16</attribute_type>
+    <attribute_min>0</attribute_min>
+    <attribute_max>65535</attribute_max>
+    <attribute_endianness>big</attribute_endianness>
+    <attribute_component>AttributePingC.nc</attribute_component>
+    <attribute_preferred_visualization>number</attribute_preferred_visualization>
+    <ps_operation id="5">
+      <operation_name>ANY</operation_name>
+      <operation_description>true</operation_description>
+    </ps_operation>
+  </ps_attribute>
+  <ps_attribute id="18">
+    <!-- Service Discovery attribute-->
+    <attribute_name>Discovery</attribute_name>
+    <attribute_description>A list of all registered attributes.</attribute_description>
+    <attribute_type>uint8[]</attribute_type>
+    <attribute_endianness>big</attribute_endianness>
+    <attribute_component>AttributeDiscoveryC.nc</attribute_component>
+    <attribute_preferred_visualization>number</attribute_preferred_visualization>
+    <ps_operation id="5">
+      <operation_name>ANY</operation_name>
+      <operation_description>true</operation_description>
+    </ps_operation>
+  </ps_attribute>
+  <ps_attribute id="19">
+    <attribute_name>Random</attribute_name>
+    <attribute_description>A random 16-bit value.</attribute_description>
+    <attribute_type>uint16</attribute_type>
+    <attribute_min>0</attribute_min>
+    <attribute_max>65535</attribute_max>
+    <attribute_endianness>big</attribute_endianness>
+    <attribute_component>AttributeRandomC.nc</attribute_component>
+    <attribute_preferred_visualization>number</attribute_preferred_visualization>
+    <ps_operation id="0">
+      <operation_name>=</operation_name>
+      <operation_description>equals</operation_description>
+    </ps_operation>
+    <ps_operation id="1">
+      <operation_name>&lt;</operation_name>
+      <operation_description>smaller than</operation_description>
+    </ps_operation>
+    <ps_operation id="2">
+      <operation_name>&lt;=</operation_name>
+      <operation_description>smaller or equal</operation_description>
+    </ps_operation>
+    <ps_operation id="3">
+      <operation_name>&gt;</operation_name>
+      <operation_description>greater than</operation_description>
+    </ps_operation>
+    <ps_operation id="4">
+      <operation_name>&gt;=</operation_name>
+      <operation_description>greater or equal</operation_description>
+    </ps_operation>
+    <ps_operation id="5">
+      <operation_name>ANY</operation_name>
+      <operation_description>true</operation_description>
+    </ps_operation>
+  </ps_attribute>
+  <ps_attribute id="20">
+    <attribute_name>False</attribute_name>
+    <attribute_description>An attribute that cannot be matched (equivalent to an unsubscribe).</attribute_description>
+    <attribute_type>uint8</attribute_type>
+    <attribute_min>0</attribute_min>
+    <attribute_max>0</attribute_max>
+    <attribute_endianness>big</attribute_endianness>
+    <attribute_component>AgentP.nc</attribute_component>
+    <attribute_preferred_visualization>number</attribute_preferred_visualization>
+    <ps_operation id="0">
+      <operation_name>ANY</operation_name>
+      <operation_description>False</operation_description>
+    </ps_operation>
+  </ps_attribute>
+  <ps_attribute id="100">
+    <attribute_name>Rate</attribute_name>
+    <attribute_description>Preferred sampling/collection frequency.</attribute_description>
+    <attribute_type>uint16</attribute_type>
+    <attribute_min>0</attribute_min>
+    <attribute_max>65535</attribute_max>
+    <ps_metric name="binary milliseconds">
+    <metric_conversion>X * 100</metric_conversion> 
+    </ps_metric>
+    <attribute_endianness>big</attribute_endianness>
+    <attribute_component>none</attribute_component>
+    <attribute_preferred_visualization>none</attribute_preferred_visualization>
+  </ps_attribute>
+  <ps_attribute id="101">
+    <attribute_name>Count</attribute_name>
+    <attribute_description>Number of samplings/collection (including not-matching).</attribute_description>
+    <attribute_type>uint16</attribute_type>
+    <attribute_min>0</attribute_min>
+    <attribute_max>65535</attribute_max>
+    <ps_metric name="counter">
+    <metric_conversion>X</metric_conversion> 
+    </ps_metric>
+    <attribute_endianness>big</attribute_endianness>
+    <attribute_component>none</attribute_component>
+    <attribute_preferred_visualization>none</attribute_preferred_visualization>
+  </ps_attribute>
+  <ps_attribute id="104">
+    <attribute_name>Reboot</attribute_name>
+    <attribute_description>Reboots the node.</attribute_description>
+    <attribute_type>uint8_t</attribute_type>
+    <attribute_min>0</attribute_min>
+    <attribute_max>0</attribute_max>
+    <attribute_endianness>big</attribute_endianness>
+    <attribute_component>none</attribute_component>
+    <attribute_preferred_visualization>none</attribute_preferred_visualization>
+  </ps_attribute>
+  <ps_attribute id="111">
+    <attribute_name>ParentAddress</attribute_name>
+    <attribute_description>The node ID of the parent in a routing tree.</attribute_description>
+    <attribute_type>uint16</attribute_type>
+    <attribute_min>0</attribute_min>
+    <attribute_max>65535</attribute_max>
+    <attribute_endianness>big</attribute_endianness>
+    <attribute_component>none</attribute_component>
+    <attribute_preferred_visualization>none</attribute_preferred_visualization>
+  </ps_attribute>
+<!-- further attributes can be put here (attribute IDs must be unique!). -->
+
+</ps_attribute_list>

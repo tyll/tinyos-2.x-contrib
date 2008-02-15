@@ -1,16 +1,57 @@
 <html>
 <head>
-   <title>Index Placeholder</title>
+   <title>TUB Contributions</title>
 </head>
 <body TEXT="#000000" BGCOLOR="#FFFFFF" LINK="#0000EF" VLINK="#55188A" ALINK="#FF0000">
 
 <img src="http://www.tinyos.net/scoop/images/tos-jwall.jpg"></img>
+<img src="http://www.tkn.tu-berlin.de/pictures/tkn-logo-lg.gif"></img>
+<img src="http://www.tkn.tu-berlin.de/pictures/tkn-logo-tkn1.gif"></img>
 
-<h1>Index Placeholder</h1>
+<h1>Technical University of Berlin, Telecommunication Networks Group</h1>
+
+
 
 <p>
-This file is a placeholder for your personal index file.  It is linked to from your entry in the main index file found in <i>tinyos-2.x-contrib/index.html</i>.  It should be used to document any projects contained in this directory.  Please update it as appropriate. 
-</p>
+Currently available projects from TUB:
+
+<h3>IEEE 802.15.4 Packet Sniffer</h3>
+
+    A 802.15.4 packet sniffer for telosb motes including a plugin for wireshark.
+
+<pre>
+tub
++--apps
+   +--PacketSniffer_802_15_4
+</pre>
+
+
+<h3>TinyCOPS</h3>
+
+    Implementation of a content-based publish/subscribe component framework that is described
+    <a href="http://www.tkn.tu-berlin.de/publications/papers/ewsn08.pdf">here</a> in more detail.
+
+<pre>
+tub
++--apps
+|  +-- TinyCOPS               - example application
++--tos
+|  +--lib
+|     +--tinycops             - core components
+|        +--asec              - attribute service extension components
+|        +--csec              - communication service extension components
+|        +--attributes        - attribute components
+|        +--net               - protocol wrappers
+|        +--gateway           - subscriber gateway
++--support
+   +--sdk
+      +--java
+         +--net
+            +--tinyos
+               +--tinycops    - java classes for subscription injection / notification extraction
+</pre>
+
+
 
 </body>
 </html>

@@ -51,6 +51,7 @@ configuration CC2420ActiveMessageC {
     interface RadioBackoff[am_id_t amId];
     interface LowPowerListening;
     interface PacketLink;
+    interface SendNotifier[am_id_t amId];
   }
 }
 implementation {
@@ -82,6 +83,7 @@ implementation {
   RadioBackoff = CsmaC;
   Packet = AM;
   AMSend = AM;
+  SendNotifier = AM;
   Receive = AM.Receive;
   Snoop = AM.Snoop;
   AMPacket = AM;

@@ -176,7 +176,7 @@ implementation {
     bool tHasPassed;
 
     am_addr_t forcedParent = AM_BROADCAST_ADDR;
-
+    
     void chooseAdvertiseTime() {
        t = currentInterval;
        t *= 512; // * 1024 / 2
@@ -228,6 +228,30 @@ implementation {
 
     command error_t StdControl.start() {
       //start will (re)start the sending of messages
+#ifdef CC2420SYNC_DEBUG_TREE
+    	bool changed=TRUE;
+        switch (TOS_NODE_ID) {
+        case 1:
+        	forcedParent = 0;
+        	break;
+        case 2:
+        case 3:
+        case 4:   
+        	forcedParent = 1;
+        	break;
+        default:
+        	changed=FALSE;
+        	;
+        }
+        if (changed) {
+        	routingTableUpdateEntry(forcedParent, 0, 1);
+        	call LinkEstimator.pinNeighbor(forcedParent);
+        	atomic {
+        		routeInfo.parent = forcedParent;
+       			routeInfo.etx = 1;	// prevent this node to fell as a root 
+        	}
+        }
+#endif
       if (!running) {
 	running = TRUE;
 	resetInterval();

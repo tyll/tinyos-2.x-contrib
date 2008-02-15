@@ -177,7 +177,7 @@ implementation
   task void uartSendTask() {
     uint8_t len;
     am_id_t id;
-    am_addr_t addr;
+    am_addr_t addr, src;
     message_t* msg;
     atomic
       if (uartIn == uartOut && !uartFull)
@@ -190,7 +190,10 @@ implementation
     tmpLen = len = call RadioPacket.payloadLength(msg);
     id = call RadioAMPacket.type(msg);
     addr = call RadioAMPacket.destination(msg);
+    src = call RadioAMPacket.source(msg);
+    call UartAMPacket.setSource(msg, src);
 
+    memset(msg->header, 0x0, sizeof(message_header_t));
     if (call UartSend.send[id](addr, uartQueue[uartOut], len) == SUCCESS)
       call Leds.led1Toggle();
     else
@@ -265,6 +268,8 @@ implementation
     len = call UartPacket.payloadLength(msg);
     addr = call UartAMPacket.destination(msg);
     id = call UartAMPacket.type(msg);
+    
+    memset(msg->header, 0x0, sizeof(message_header_t));
     if (call RadioSend.send[id](addr, msg, len) == SUCCESS)
       call Leds.led0Toggle();
     else

@@ -56,7 +56,7 @@ enum {
  * a successful receive addressed to this node
  */
 #ifndef DELAY_AFTER_RECEIVE
-#define DELAY_AFTER_RECEIVE 30
+#define DELAY_AFTER_RECEIVE 10
 #endif
 
 /**

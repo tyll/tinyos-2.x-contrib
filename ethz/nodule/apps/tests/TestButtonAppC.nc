@@ -28,4 +28,5 @@ implementation
   components new At32uc3bGpioC() as GpioImpl2;
   GpioImpl2.HplGeneralIO -> IO.Gpio35;
   TestButtonC.Button2 -> GpioImpl2;
+  TestButtonC.InterruptButton2 -> Interrupt.Gpio35;
 }

@@ -9,24 +9,43 @@
 
 #include "at32uc3b.h"
 
-generic module HplAt32uc3bGpioInterruptP(uint32_t baseport, uint8_t bit)
+generic module HplAt32uc3bGpioInterruptP(uint32_t BASEPORT, uint8_t BIT, uint8_t GPIO)
 {
   provides interface HplAt32uc3bGpioInterrupt as Interrupt;
+  uses interface InterruptController;
 }
 implementation
 {
-  uint32_t counter = 0;
+  bool registered = FALSE;
 
   inline void setBit(uint8_t offset) {
-    *((volatile uint32_t *) (baseport + offset)) = (uint32_t) 1 << bit;
+    get_register(BASEPORT + offset) = (uint32_t) 1 << BIT;
   }
 
   inline bool getBit(uint8_t offset) {
-    return (*((volatile uint32_t *) (baseport + offset)) & ((uint32_t) 1 << bit));
+    return (get_register(BASEPORT + offset) & ((uint32_t) 1 << BIT));
+  }
+
+  inline void clear_gpio_interrupt_flag() {
+    setBit(AVR32_GPIO_IFRC0);
+  }
+
+  void _gpio_interrupt_handler() {
+    signal Interrupt.fired();
+    clear_gpio_interrupt_flag();
+  }
+
+  inline void register_gpio_interrupt_handler() {
+    if (!registered)
+    {
+      call InterruptController.registerGpioInterruptHandler(GPIO, &_gpio_interrupt_handler);
+      registered = TRUE;
+    }
   }
 
   async command error_t Interrupt.enableChangingEdge() {
     atomic {
+      register_gpio_interrupt_handler();
       setBit(AVR32_GPIO_IMR0C0);
       setBit(AVR32_GPIO_IMR1C0);
       setBit(AVR32_GPIO_IERS0);
@@ -35,6 +54,7 @@ implementation
   }
   async command error_t Interrupt.enableRisingEdge() {
     atomic {
+      register_gpio_interrupt_handler();
       setBit(AVR32_GPIO_IMR0S0);
       setBit(AVR32_GPIO_IMR1C0);
       setBit(AVR32_GPIO_IERS0);
@@ -43,6 +63,7 @@ implementation
   }
   async command error_t Interrupt.enableFallingEdge() {
     atomic {
+      register_gpio_interrupt_handler();
       setBit(AVR32_GPIO_IMR0C0);
       setBit(AVR32_GPIO_IMR1S0);
       setBit(AVR32_GPIO_IERS0);
@@ -57,8 +78,7 @@ implementation
   async command bool Interrupt.isInterruptEnabled() { return getBit(AVR32_GPIO_IER0); }
   async command uint8_t Interrupt.getInterruptMode() {
     atomic {
-      if (!getBit(AVR32_GPIO_IER0))
-      {
+      if (!getBit(AVR32_GPIO_IER0)) {
         return AVR32_GPIO_INTERRUPT_MODE_DISABLED;
       }
 
@@ -87,9 +107,7 @@ implementation
     }
   }
 
-  default async event void Interrupt.fired() { counter++; }
-  async command void Interrupt.clear() { setBit(AVR32_GPIO_IFRC0); }
-  async command uint32_t Interrupt.getCounter() { return counter; }
+  default async event void Interrupt.fired() { }
 
   async command error_t Interrupt.enableGlitchFilter() {
     atomic {

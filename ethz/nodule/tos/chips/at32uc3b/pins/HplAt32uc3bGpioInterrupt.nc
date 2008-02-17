@@ -41,11 +41,6 @@ interface HplAt32uc3bGpioInterrupt
    * NOTE: Interrupts keep running until "disable()" is called
    */
   async event void fired();
-  async command void clear();
-  /**
-   * Returns number of triggered interrupts.
-   */
-  async command uint32_t getCounter();
 
   /**
    * Enables/disables glitch filter (if the filter is enabled, the pulse must 

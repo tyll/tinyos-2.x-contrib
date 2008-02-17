@@ -8,6 +8,7 @@ configuration PlatformC
 }
 implementation
 {
-  components PlatformP;
+  components PlatformP, InterruptControllerC;
   Init = PlatformP;
+  PlatformP.InterruptInit -> InterruptControllerC;
 }

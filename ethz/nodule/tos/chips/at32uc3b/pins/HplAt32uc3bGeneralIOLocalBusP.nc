@@ -15,18 +15,18 @@
 
 #include "at32uc3b.h"
 
-generic module HplAt32uc3bGeneralIOLocalBusP(uint32_t baseport, uint8_t bit)
+generic module HplAt32uc3bGeneralIOLocalBusP(uint32_t BASEPORT, uint8_t BIT)
 {
   provides interface GeneralIO as IO;
 }
 implementation
 {
   inline void setBit(uint8_t offset) {
-    *((volatile uint32_t *) (baseport + offset)) = (uint32_t) 1 << bit;
+    get_register(BASEPORT + offset) = (uint32_t) 1 << BIT;
   }
 
   inline bool getBit(uint8_t offset) {
-    return (*((volatile uint32_t *) (baseport + offset)) & ((uint32_t) 1 << bit));
+    return (get_register(BASEPORT + offset) & ((uint32_t) 1 << BIT));
   }
 
   async command void IO.set() { setBit(AVR32_GPIO_OVRS0); }

@@ -1,7 +1,5 @@
 implement UART output for debugging
 
-implement interrupt handling
-
 implement timer
 
 implement MCU sleep

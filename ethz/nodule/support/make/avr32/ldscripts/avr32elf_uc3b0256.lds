@@ -64,7 +64,7 @@ SECTIONS
   .init               :
   {
     KEEP (*(.init))
-  } >FLASH AT>FLASH =0xd703d703
+  } >FLASH AT>FLASH
   .plt                : { *(.plt) } >FLASH AT>FLASH
   .text               :
   {
@@ -72,11 +72,14 @@ SECTIONS
     KEEP (*(.text.*personality*))
     /* .gnu.warning sections are handled specially by elf32.em.  */
     *(.gnu.warning)
-  } >FLASH AT>FLASH =0xd703d703
+  } >FLASH AT>FLASH
+  .ealign             : { . = ALIGN(1024); } >FLASH AT>FLASH
+  .exception          : { *(.exception) } >FLASH AT>FLASH
+  .interrupt          : { *(.interrupt) } >FLASH AT>FLASH
   .fini               :
   {
     KEEP (*(.fini))
-  } >FLASH AT>FLASH =0xd703d703
+  } >FLASH AT>FLASH
   PROVIDE (__etext = .);
   PROVIDE (_etext = .);
   PROVIDE (etext = .);

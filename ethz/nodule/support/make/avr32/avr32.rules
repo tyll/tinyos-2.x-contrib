@@ -46,6 +46,7 @@ PFLAGS += -fno-common
 # workaround to disable the <avr32/eic_200.h> header (gcc generates warnings/error)
 PFLAGS += -DAVR32_ABI_H_INCLUDED
 #PFLAGS += -DAVR32_EIC_200_H_INCLUDED
+# create assembler file
 CFLAGS += -Wa,-ahlns=$(BUILDDIR)/app.lst
 # dont link against (big) standard libaries and startfile
 LDFLAGS += -nostartfiles -nostdlib -nodefaultlibs
@@ -56,8 +57,11 @@ ifdef MSG_SIZE
 PFLAGS += -DTOSH_DATA_LENGTH=$(MSG_SIZE)
 endif
 
+# currently O2 optimization results to smaller sections than 0s
+OPTFLAGS = -O2
+
 STARTUP_FILES = ../../support/make/avr32/startup/trampoline.S ../../support/make/avr32/startup/crt0.S ../../support/make/avr32/startup/exception.S ../../support/make/avr32/startup/interrupt.S
-DEFHANDLER_FILES = ../../support/make/avr32/startup/exception_defhandler.S ../../support/make/avr32/startup/interrupt_defhandler.S
+DEFHANDLER_FILES = ../../support/make/avr32/startup/exception_defhandler.S
 STARTUP_FILES += $(DEFHANDLER_FILES)
 #LIBS_FILES = $(shell $(GCC) -print-libgcc-file-name) $(shell $(GCC) -print-file-name=libm.a) $(shell $(GCC) -print-file-name=libc.a)
 
@@ -113,3 +117,5 @@ bytes: FORCE
 	@echo "    disassembled $(PLATFORM) binary"
 	@echo "    section size requirements of $(COMPONENT) ($(SIZE))"
 	@$(SIZE) --format=sysv -x $(MAIN_EXE)
+	@echo "    show metrics about $(PLATFORM) binary (sloccount)"
+	@sloccount $(MAIN_S) 2>/dev/null | tail -n 14 | head -n 1

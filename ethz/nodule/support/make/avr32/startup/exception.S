@@ -10,7 +10,7 @@
 #include <sys/sysregs.h>
 
 .section  .exception,"ax"
-.align    3
+.align    1
 .global   _evba
 _evba:
 .org      AVR32_EVBA_OFFSET_UNRECOVERABLE

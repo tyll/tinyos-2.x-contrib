@@ -11,9 +11,9 @@ module TestButtonC
   uses interface SystemLed;
 
   uses interface GeneralIO as Button1;
-  uses interface HplAt32uc3bGpioInterrupt as InterruptButton1;
+  uses interface GpioInterrupt as InterruptButton1;
   uses interface GeneralIO as Button2;
-  uses interface HplAt32uc3bGpioInterrupt as InterruptButton2;
+  uses interface GpioInterrupt as InterruptButton2;
 }
 implementation
 {

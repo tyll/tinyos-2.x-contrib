@@ -22,11 +22,13 @@ implementation
 
   components new At32uc3bGpioC() as GpioImpl1;
   GpioImpl1.HplGeneralIO -> IO.Gpio34;
+  GpioImpl1.HplGpioInterrupt -> Interrupt.Gpio34;
   TestButtonC.Button1 -> GpioImpl1;
-  TestButtonC.InterruptButton1 -> Interrupt.Gpio34;
+  TestButtonC.InterruptButton1 -> GpioImpl1;
 
   components new At32uc3bGpioC() as GpioImpl2;
   GpioImpl2.HplGeneralIO -> IO.Gpio35;
+  GpioImpl2.HplGpioInterrupt -> Interrupt.Gpio35;
   TestButtonC.Button2 -> GpioImpl2;
-  TestButtonC.InterruptButton2 -> Interrupt.Gpio35;
+  TestButtonC.InterruptButton2 -> GpioImpl2;
 }

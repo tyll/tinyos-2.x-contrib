@@ -1,6 +1,7 @@
 PLATFORM ?= tmote2500
 
 #MSP_MCU = msp430x1611
+CFLAGS+=-DENABLE_SPI0_DMA
 
 # Disable MSP430 hardware multiply because it makes MSPGCC die
 PFLAGS += -mdisable-hwmul

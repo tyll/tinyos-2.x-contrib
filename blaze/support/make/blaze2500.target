@@ -4,14 +4,16 @@
 PLATFORM ?= blaze2500
 
 #MSP_MCU = msp430x1611
-CFLAGS += -DPLATFORM_BLAZE
+CFLAGS += -DPLATFORM_BLAZE2500
+CFLAGS+=-DENABLE_SPI0_DMA
 
 # Disable MSP430 hardware multiply because it makes MSPGCC die
 PFLAGS += -mdisable-hwmul
 OPTFLAGS += -O
 
-MSP_BSL ?= tos-bsl
-MSP_BSL_FLAGS = --telosb
+BSL ?= UMPH
+MSP_BSL ?= ${TOSROOT}/support/bin/tos-bsl 
+MSP_BSL_FLAGS = --telosb --rincon-usb
 
 VOLUME_FILE = volumes-stm25p.xml
 VOLUME_ALLOCATOR = tos-storage-stm25p

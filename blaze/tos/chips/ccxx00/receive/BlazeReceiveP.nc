@@ -280,8 +280,11 @@ implementation {
                 }
             
                 call Csn.clr[ id ]();
-                call AckSend.send[ id ](&acknowledgement, TRUE, 0);
-                // Continues at AckSend.sendDone()
+                if(call AckSend.send[ id ](&acknowledgement, TRUE, 0) != SUCCESS) {
+                  post receiveDone();
+                }
+                
+                // else, drop the ack and continue at AckSend.sendDone()...
                 return;
                 
               } else {

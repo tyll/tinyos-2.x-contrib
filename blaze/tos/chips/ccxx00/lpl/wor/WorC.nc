@@ -37,6 +37,7 @@ implementation {
   WorP.RadioStatus -> BlazeSpiC;
   WorP.ChipRdy -> BlazeCentralWiringC.Gdo2_io;
   WorP.Csn -> BlazeCentralWiringC.Csn;
+  WorP.RxInterrupt -> BlazeCentralWiringC.Gdo0_int;
   
   components LedsC;
   WorP.Leds -> LedsC;

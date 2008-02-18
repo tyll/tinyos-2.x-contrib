@@ -59,6 +59,7 @@ implementation {
   
   components BlazeReceiveC;
   LplP.RxNotify -> BlazeReceiveC;
+  LplP.ReceiveState -> BlazeReceiveC;
   
   components WorC;
   LplP.Wor -> WorC;
@@ -68,6 +69,9 @@ implementation {
   
   components LedsC;
   LplP.Leds -> LedsC;
+  
+  components new StateC();
+  LplP.State -> StateC;
   
 }
 

@@ -67,6 +67,7 @@ module BlazeTransmitP {
   
   uses {
     interface GeneralIO as Csn[ radio_id_t id ];
+    interface GeneralIO as ChipRdy[radio_id_t radioId];
     interface BlazePacketBody;
     interface BlazeRegSettings;
     
@@ -220,14 +221,33 @@ implementation {
     
     call Csn.clr[ id ]();
     
+    while(call ChipRdy.get[id]());
+    
     /*
      * Put the radio in RX mode if it's not already. This covers the
      * frequency / synthesizer startup and calibration
      */
     while((status = call RadioStatus.getRadioStatus()) != BLAZE_S_RX) {
-      call SFTX.strobe();
-      call SFRX.strobe();
-      call SRX.strobe();
+      call Csn.set[id]();
+      call Csn.clr[id]();
+      
+      while(call ChipRdy.get[id]());
+      
+      if (status == BLAZE_S_RXFIFO_OVERFLOW) {
+        call SFRX.strobe();
+        call SRX.strobe();
+        
+      } else if (status == BLAZE_S_TXFIFO_UNDERFLOW) {
+        call SFTX.strobe();
+        call SRX.strobe();
+        
+     } else if (status == BLAZE_S_CALIBRATE) {
+        // do nothing but don't quit the loop
+        
+      } else {
+        call SIDLE.strobe();
+        call SRX.strobe();
+      }
     }
     
     /*
@@ -291,6 +311,15 @@ implementation {
   default async command void Csn.toggle[ radio_id_t id ](){}
   default async command void Csn.makeInput[ radio_id_t id ](){}
   default async command void Csn.makeOutput[ radio_id_t id ](){}
+  
+  default async command void ChipRdy.set[ radio_id_t id ](){}
+  default async command void ChipRdy.clr[ radio_id_t id ](){}
+  default async command void ChipRdy.toggle[ radio_id_t id ](){}
+  default async command bool ChipRdy.get[ radio_id_t id ](){return FALSE;}
+  default async command void ChipRdy.makeInput[ radio_id_t id ](){}
+  default async command bool ChipRdy.isInput[ radio_id_t id ](){return FALSE;}
+  default async command void ChipRdy.makeOutput[ radio_id_t id ](){}
+  default async command bool ChipRdy.isOutput[ radio_id_t id ](){return FALSE;}
   
   default async event void AsyncSend.sendDone[ radio_id_t id ](error_t error) {}
   

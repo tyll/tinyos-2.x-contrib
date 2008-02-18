@@ -27,8 +27,9 @@ module WorP {
     interface BlazeStrobe as SFTX;
     interface RadioStatus;
 
-    interface GeneralIO as ChipRdy[radio_id_t radioId];    
+    interface GeneralIO as ChipRdy[radio_id_t radioId];
     interface GeneralIO as Csn[radio_id_t radioId];
+    interface GpioInterrupt as RxInterrupt[radio_id_t radioId];
     
     interface Leds;
   }
@@ -186,6 +187,11 @@ implementation {
   }
   
   
+  /***************** RxInterrupt Events ****************/
+  async event void RxInterrupt.fired[radio_id_t radioId]() {
+    //atomic worSettings[radioId].worEnabled = FALSE;
+  }
+  
   /***************** Resource Events ****************/
   event void Resource.granted() {
     setupWor();
@@ -198,7 +204,7 @@ implementation {
     call Csn.clr[focusedRadio]();
     
     while(call ChipRdy.get[focusedRadio]());
-      
+    
     if(enabling) {
       // Enable WoR
       call SIDLE.strobe();
@@ -261,6 +267,8 @@ implementation {
       call Csn.set[focusedRadio]();
       call Csn.clr[focusedRadio]();
       
+      while(call ChipRdy.get[focusedRadio]());
+    
       if (status == BLAZE_S_RXFIFO_OVERFLOW) {
         call SFRX.strobe();
         call SRX.strobe();
@@ -302,5 +310,18 @@ implementation {
   default async command bool ChipRdy.isInput[ radio_id_t id ](){return FALSE;}
   default async command void ChipRdy.makeOutput[ radio_id_t id ](){}
   default async command bool ChipRdy.isOutput[ radio_id_t id ](){return FALSE;}
+  
+  default async command error_t RxInterrupt.enableRisingEdge[radio_id_t id]() {
+    return FAIL;
+  }
+  
+  default async command error_t RxInterrupt.enableFallingEdge[radio_id_t id]() {
+    return FAIL;
+  }
+  
+  default async command error_t RxInterrupt.disable[radio_id_t id]() {
+    return FAIL;
+  }
+  
 }
 

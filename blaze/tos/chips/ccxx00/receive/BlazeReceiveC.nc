@@ -47,6 +47,7 @@ configuration BlazeReceiveC {
     interface AckReceive;
     interface RxNotify[ radio_id_t id ];
     interface SplitControl[ radio_id_t id ];
+    interface State as ReceiveState;
   }
 }
 
@@ -57,6 +58,10 @@ implementation {
   AckReceive = BlazeReceiveP;
   SplitControl = BlazeReceiveP.SplitControl;
   RxNotify = BlazeReceiveP.RxNotify;
+  
+  components new StateC();
+  BlazeReceiveP.State -> StateC;
+  ReceiveState = StateC;
   
   components BlazeCentralWiringC;
   BlazeReceiveP.Csn -> BlazeCentralWiringC.Csn;
@@ -89,9 +94,6 @@ implementation {
     
   components ActiveMessageAddressC;
   BlazeReceiveP.ActiveMessageAddress -> ActiveMessageAddressC;
-  
-  components new StateC();
-  BlazeReceiveP.State -> StateC;
   
   components LedsC;
   BlazeReceiveP.Leds -> LedsC;

@@ -4,7 +4,7 @@
  * Keep this for unit tests that only use the lowest parts of the stack
  * @author David Moss
  */
- 
+
 generic module HplCCxx00PinsP() {
 
   provides {
@@ -28,7 +28,7 @@ implementation {
   command error_t Init.init() {
     call Csn.makeOutput();
     call PowerIn.makeOutput();
-    call PowerOut.clr();
+    call PowerIn.clr();
     return SUCCESS;
   }
 
@@ -42,19 +42,15 @@ implementation {
   Csn pin low so it does not power the raio module through that pin. *************/
   
   async command void PowerOut.set(){
-    int i;
     powerOn = TRUE;
     call PowerIn.set();
     call Csn.set();
-    for(i = 0; i < 3000; i++);
   }
   
   async command void PowerOut.clr(){
-    int i;
     powerOn = FALSE;
     call Csn.clr();
     call PowerIn.clr();
-    for(i = 0; i < 1000; i++);
   }
   
   async command void PowerOut.toggle(){

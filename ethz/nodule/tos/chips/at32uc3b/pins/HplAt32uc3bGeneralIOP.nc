@@ -9,18 +9,18 @@
 
 #include "at32uc3b.h"
 
-generic module HplAt32uc3bGeneralIOP(uint32_t BASEPORT, uint8_t BIT)
+generic module HplAt32uc3bGeneralIOP(uint32_t GPIO)
 {
   provides interface HplAt32uc3bGeneralIO as IO;
 }
 implementation
 {
   inline void setBit(uint8_t offset) {
-    get_register(BASEPORT + offset) = (uint32_t) 1 << BIT;
+    get_register(get_baseport(GPIO) + offset) = (uint32_t) 1 << get_bit(GPIO);
   }
 
   inline bool getBit(uint8_t offset) {
-    return (get_register(BASEPORT + offset) & ((uint32_t) 1 << BIT));
+    return (get_register(get_baseport(GPIO) + offset) & ((uint32_t) 1 << get_bit(GPIO)));
   }
 
   async command void IO.set() { setBit(AVR32_GPIO_OVRS0); }

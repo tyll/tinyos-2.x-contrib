@@ -138,7 +138,7 @@ implementation {
           post grant();
           
         } else {
-          call SpiResource.request();
+          return call SpiResource.request();
         }
         
       } else {

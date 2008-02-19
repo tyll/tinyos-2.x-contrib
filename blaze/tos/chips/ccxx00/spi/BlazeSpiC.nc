@@ -137,7 +137,7 @@ implementation {
   
   components BlazeSpiP,
       BlazeSpiWireC;
- 
+      
   RadioInit = BlazeSpiWireC;
   ChipSpiResource = BlazeSpiWireC;
   

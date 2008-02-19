@@ -8,6 +8,7 @@
  * @author David Moss
  */
 
+#include "CC2500.h"
 #include "Blaze.h"
 
 configuration ActiveMessageC {

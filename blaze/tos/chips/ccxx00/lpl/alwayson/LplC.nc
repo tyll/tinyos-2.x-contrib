@@ -49,7 +49,6 @@ configuration LplC {
   
   uses {
     interface Send as SubSend[radio_id_t radioId];
-    interface SplitControl as SubControl[radio_id_t id];
   }
 }
 
@@ -58,7 +57,7 @@ implementation {
   components new StateC();
   
   Send = SubSend;
-  SplitControl = SubControl;
+  SplitControl = LplP;
   LowPowerListening = LplP;
   SendState = StateC;
   

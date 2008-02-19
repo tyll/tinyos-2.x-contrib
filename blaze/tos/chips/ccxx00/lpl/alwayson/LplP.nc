@@ -41,11 +41,27 @@
 module LplP {
   provides {
     interface LowPowerListening[radio_id_t id];
+    interface SplitControl[radio_id_t radioId];
   }
 }
 
 implementation {
 
+  
+
+  /***************** SplitControl Commands ****************/
+  command error_t SplitControl.start[radio_id_t radioId]() {
+    signal SplitControl.startDone[radioId](SUCCESS);
+    return SUCCESS;
+  }
+  
+  command error_t SplitControl.stop[radio_id_t radioId]() {
+    signal SplitControl.stopDone[radioId](SUCCESS);
+    return SUCCESS;
+  }
+  
+  
+  /***************** LowPowerListening Commands ****************/
   command void LowPowerListening.setLocalSleepInterval[radio_id_t id](uint16_t sleepIntervalMs) {
   }
   
@@ -81,6 +97,7 @@ implementation {
   command uint16_t LowPowerListening.sleepIntervalToDutyCycle[radio_id_t id](uint16_t sleepInterval) {
     return 10000;
   }
-  
+
+
 }
 

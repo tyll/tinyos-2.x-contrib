@@ -1,3 +1,0 @@
-COMPONENT=TestPacketCrcC
-include $(MAKERULES)
-

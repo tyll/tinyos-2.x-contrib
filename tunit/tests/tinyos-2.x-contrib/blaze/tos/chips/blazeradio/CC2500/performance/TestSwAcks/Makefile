@@ -1,4 +1,0 @@
-COMPONENT=TestTunitC
-
-include $(MAKERULES)
-

@@ -1,3 +1,0 @@
-COMPONENT=BroadcastC
-include $(MAKERULES)
-

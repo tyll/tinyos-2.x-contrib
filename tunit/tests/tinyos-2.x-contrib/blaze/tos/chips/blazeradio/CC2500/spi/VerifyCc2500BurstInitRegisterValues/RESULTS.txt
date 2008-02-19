@@ -1,6 +1,0 @@
-/** 
- * Even after a burst initialization, the MDMCFG0 register still reads 0x0 
- * instead of 0xF8 like we programmed.
- * 
- * @author David Moss
- */

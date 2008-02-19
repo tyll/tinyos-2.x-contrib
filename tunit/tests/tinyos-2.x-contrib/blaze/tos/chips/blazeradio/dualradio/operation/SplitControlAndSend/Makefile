@@ -1,3 +1,0 @@
-COMPONENT=DualRadioTestC
-include $(MAKERULES)
-

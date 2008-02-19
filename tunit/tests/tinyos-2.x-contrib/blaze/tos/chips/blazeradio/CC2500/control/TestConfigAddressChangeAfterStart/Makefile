@@ -1,3 +1,0 @@
-COMPONENT=TestRadioC
-include $(MAKERULES)
-

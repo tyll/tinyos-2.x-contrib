@@ -1,7 +1,0 @@
-/** 
- * TWO REGISTERS DO NOT MATCH WITH THE DATASHEET:
- *  MDMCFG0: Default value is 0x0 (datasheet says 0xF8)
- *  FREND1: Default value is 0x56 (datasheet says 0xA6)
- *
- * @author David Moss
- */

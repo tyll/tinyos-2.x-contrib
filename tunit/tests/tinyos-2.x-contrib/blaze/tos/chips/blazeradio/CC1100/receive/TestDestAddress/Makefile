@@ -1,3 +1,0 @@
-COMPONENT=TestDestAddressC
-include $(MAKERULES)
-

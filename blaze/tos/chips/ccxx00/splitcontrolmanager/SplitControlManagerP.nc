@@ -38,7 +38,10 @@ implementation {
    * All radios must be off in order to start up one of the radios
    */
   command error_t SplitControl.start[radio_id_t radioId]() {
-  
+    if(radioId > uniqueCount(UQ_BLAZE_RADIO)) {
+      return EINVAL;
+    }
+    
     if(radioState[radioId] == CCXX00_ON) {
       return EALREADY;
     } else if(radioState[radioId] == CCXX00_TURNING_ON) {
@@ -63,6 +66,10 @@ implementation {
    * The radio must be on in order to turn it off.
    */
   command error_t SplitControl.stop[radio_id_t radioId]() {
+    if(radioId > uniqueCount(UQ_BLAZE_RADIO)) {
+      return EINVAL;
+    }
+    
     if(radioState[radioId] == CCXX00_OFF) {
       return EALREADY;
     } else if(radioState[radioId] == CCXX00_TURNING_ON) {

@@ -32,7 +32,6 @@ implementation {
   TestP.Leds -> LedsC;
    
   TestP.Receive -> BlazeReceiveC.Receive[ CC1100_RADIO_ID ];
-  TestP.ReceiveController -> BlazeReceiveC.ReceiveController[ CC1100_RADIO_ID ];
   TestP.BlazePacketBody -> BlazePacketC;
   
   TestP.AsyncSend -> BlazeTransmitC.AsyncSend[ CC1100_RADIO_ID ];

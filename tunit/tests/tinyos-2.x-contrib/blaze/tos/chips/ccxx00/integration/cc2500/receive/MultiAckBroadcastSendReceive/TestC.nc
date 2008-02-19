@@ -15,6 +15,7 @@ implementation {
   components new TestCaseC() as TestReceiveC;
   
   components TestP,
+      new BlazeSpiResourceC(),
       CC2500ControlC,
       BlazeReceiveC,
       HplCC2500PinsC,

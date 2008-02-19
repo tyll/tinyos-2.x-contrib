@@ -23,7 +23,6 @@ module TestP {
     interface BlazePacketBody;
     interface AsyncSend;
     interface Receive;
-    interface ReceiveController;
     interface Leds;
   }
 }
@@ -128,11 +127,6 @@ implementation {
     call Resource.release();
     // The receiver must stop the test by receiving one of those or we timeout
   }
-  
-  
-  /***************** Receive Events ****************
-
-  /***************** ReceiveController Events ****************/
   
   /***************** Receive Events ****************/
   event message_t *Receive.receive(message_t *msg, void *payload, uint8_t len) {

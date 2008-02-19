@@ -15,6 +15,7 @@ implementation {
   components new TestCaseC() as TestReceiveC;
   
   components TestP,
+      new BlazeSpiResourceC(),
       CC2500ControlC,
       AcknowledgementsC,
       CsmaC,
@@ -28,7 +29,6 @@ implementation {
   TestP.TearDownOneTime -> TestReceiveC.TearDownOneTime;
   TestP.TestReceive -> TestReceiveC;
   
-
   TestP.SplitControl -> CC2500ControlC;
   TestP.Leds -> LedsC; 
    

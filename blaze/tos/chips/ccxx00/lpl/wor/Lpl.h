@@ -36,6 +36,13 @@
 #ifndef LPL_H
 #define LPL_H
 
+#ifndef BLAZE_LPL_DEFINED
+#define BLAZE_LPL_DEFINED
+#else
+#warning "You are attempting to include multiple LPL paths at compile time." 
+#error "Choose a single LPL directory in your compiler path and recompile."
+#endif
+
 /**
  * Low Power Listening Send States
  */

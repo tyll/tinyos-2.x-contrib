@@ -195,6 +195,10 @@ enum cc2500_config_reg_state_enums {
 };
 
 
+#ifndef CCXX00_RADIO_DEFINED
+#define CCXX00_RADIO_DEFINED
+#endif
+
 #endif
 
 

@@ -46,7 +46,6 @@ enum {
   CC1100_RADIO_ID = unique( UQ_BLAZE_RADIO ),
 };
 
-
 #define CC1100_315_MHZ 0
 #define CC1100_433_MHZ 1
 #define CC1100_868_MHZ 2
@@ -335,6 +334,10 @@ enum CC1100_config_reg_state_enums {
    
 };
 
+
+#ifndef CCXX00_RADIO_DEFINED
+#define CCXX00_RADIO_DEFINED
+#endif
 
 #endif
 

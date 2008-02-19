@@ -204,6 +204,13 @@ enum blaze_config_reg_addr_enums {
 #define UQ_BLAZE_RADIO "Unique_Blaze_Radio"
 #endif
 
+
+#ifndef CCXX00_RADIO_DEFINED
+#warning No CC1100 or CC2500 radios defined! 
+#error Include ActiveMessageC, CC2500.h, or CC1100.h to compile in a radio.
+#endif
+
+
 #endif
 
 

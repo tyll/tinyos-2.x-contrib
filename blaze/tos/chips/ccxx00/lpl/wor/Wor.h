@@ -46,14 +46,6 @@
 #define CCXX00_CRYSTAL_KHZ 26000
 #endif
 
-
-#ifndef BLAZE_TRANSMIT_ARBITER_DEFINED
-#define BLAZE_TRANSMIT_ARBITER_DEFINED
-#else
-#warning "You are attempting to include multiple LPL paths at compile time." 
-#error "Choose a single LPL directory in your compiler path and recompile."
-#endif
-
 /**
  * WORCTRL register bitfields
  */

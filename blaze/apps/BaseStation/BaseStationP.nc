@@ -191,9 +191,10 @@ implementation
     id = call RadioAMPacket.type(msg);
     addr = call RadioAMPacket.destination(msg);
     src = call RadioAMPacket.source(msg);
-    call UartAMPacket.setSource(msg, src);
 
     memset(msg->header, 0x0, sizeof(message_header_t));
+    call UartAMPacket.setSource(msg, src);
+    
     if (call UartSend.send[id](addr, uartQueue[uartOut], len) == SUCCESS)
       call Leds.led1Toggle();
     else
@@ -270,6 +271,7 @@ implementation
     id = call UartAMPacket.type(msg);
     
     memset(msg->header, 0x0, sizeof(message_header_t));
+    
     if (call RadioSend.send[id](addr, msg, len) == SUCCESS)
       call Leds.led0Toggle();
     else

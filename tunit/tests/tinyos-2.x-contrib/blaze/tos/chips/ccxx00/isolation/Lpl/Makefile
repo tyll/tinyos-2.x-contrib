@@ -1,0 +1,3 @@
+COMPONENT=TestLplC
+include $(MAKERULES)
+

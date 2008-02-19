@@ -1,0 +1,3 @@
+COMPONENT=TestAckC
+include $(MAKERULES)
+

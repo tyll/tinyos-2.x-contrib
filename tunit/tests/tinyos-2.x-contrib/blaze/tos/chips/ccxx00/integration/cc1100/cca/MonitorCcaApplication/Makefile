@@ -1,4 +1,0 @@
-COMPONENT=CcaC
-
-include $(MAKERULES)
-

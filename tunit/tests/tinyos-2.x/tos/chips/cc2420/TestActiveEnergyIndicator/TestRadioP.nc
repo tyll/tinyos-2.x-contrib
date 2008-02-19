@@ -75,7 +75,7 @@ implementation {
     } else {
       detecting = FALSE;
       call Leds.led1Off();
-      assertResultIsAbove("Too few energy detects", 1500, detects);
+      assertResultIsAbove("Too few energy detects", 1300, detects);
       assertResultIsAbove("Too few energy gaps", 10000, misses);
       call Statistics.log("[Energy Detects]", detects);
       call TestIndicator.done();

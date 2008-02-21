@@ -1,0 +1,11 @@
+/*
+ * Copyright (c) 2007 dexma sensors sl
+ * All rights reserved.
+ *
+ */
+/**
+ * Configuration file for sample dexCell application.
+ * Instantiates the sensors, components, services and does all the necessary wiring
+ *
+ * @author Xavier Orduna
+ */

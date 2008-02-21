@@ -140,9 +140,11 @@ implementation {
 
  
   /***************** Packet Commands ****************/
-  command void Packet.clear(message_t* msg) {
-  }
- 
+ command void Packet.clear(message_t* msg) {
+	 memset(call CC2420PacketBody.getHeader(msg), sizeof(cc2420_header_t), 0);
+	 memset(call CC2420PacketBody.getMetadata(msg), sizeof(cc2420_metadata_t), 0);
+ }
+  
  command uint8_t Packet.payloadLength(message_t* msg) {
     return (call CC2420PacketBody.getHeader(msg))->length - CC2420_SIZE;
  }

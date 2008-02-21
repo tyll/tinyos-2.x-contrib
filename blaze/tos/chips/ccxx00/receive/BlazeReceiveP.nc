@@ -54,6 +54,7 @@ module BlazeReceiveP {
     interface AsyncSend as AckSend[ radio_id_t id ];
     interface GeneralIO as Csn[ radio_id_t id ];
     interface GeneralIO as RxIo[ radio_id_t id ];
+    interface GeneralIO as ChipRdy[ radio_id_t id ];
     interface GpioInterrupt as RxInterrupt[ radio_id_t id ];
     interface BlazeConfig[ radio_id_t id ];
    
@@ -385,17 +386,39 @@ implementation {
   
   void failReceive() {
     uint8_t state;
-    call SIDLE.strobe();
-    call SFRX.strobe();
-    state = call RadioStatus.getRadioStatus();
-    if(state == BLAZE_S_TXFIFO_UNDERFLOW) {
-      call SIDLE.strobe();
-      call SFTX.strobe();
-    }
-
+    uint8_t id;
+    uint8_t status;
+    atomic id = m_id;
+    
     call SRX.strobe();
     
-    while(call RadioStatus.getRadioStatus() != BLAZE_S_RX);
+    ////call Leds.set(4);
+    while((status = call RadioStatus.getRadioStatus()) != BLAZE_S_RX) {
+      call Csn.set[id]();
+      call Csn.clr[id]();
+      
+      while(call ChipRdy.get[id]());
+      
+      if (status == BLAZE_S_RXFIFO_OVERFLOW) {
+        call SFRX.strobe();
+        call SRX.strobe();
+        
+      } else if (status == BLAZE_S_TXFIFO_UNDERFLOW) {
+        call SFTX.strobe();
+        call SRX.strobe();
+        
+      } else if (status == BLAZE_S_CALIBRATE) {
+        // do nothing but don't quit the loop
+        
+      } else if (status == BLAZE_S_SETTLING) {
+        // do nothing but don't quit the loop
+        
+      } else {
+        call SIDLE.strobe();
+        call SRX.strobe();
+      }
+    }
+    ////call Leds.set(0);
     
     cleanUp();
   }
@@ -496,6 +519,14 @@ implementation {
   default async command void RxIo.makeOutput[ radio_id_t id ](){}
   default async command bool RxIo.isOutput[ radio_id_t id ](){ return 0; }
     
+  default async command void ChipRdy.set[ radio_id_t id ](){}
+  default async command void ChipRdy.clr[ radio_id_t id ](){}
+  default async command void ChipRdy.toggle[ radio_id_t id ](){}
+  default async command bool ChipRdy.get[ radio_id_t id ](){return FALSE;}
+  default async command void ChipRdy.makeInput[ radio_id_t id ](){}
+  default async command bool ChipRdy.isInput[ radio_id_t id ](){return FALSE;}
+  default async command void ChipRdy.makeOutput[ radio_id_t id ](){}
+  default async command bool ChipRdy.isOutput[ radio_id_t id ](){return FALSE;}
   
   
   default command error_t BlazeConfig.commit[ radio_id_t id ]() {

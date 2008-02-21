@@ -76,6 +76,7 @@ implementation {
   components BlazeCentralWiringC;  
   BlazeTransmitP.Csn -> BlazeCentralWiringC.Csn;
   BlazeTransmitP.ChipRdy -> BlazeCentralWiringC.Gdo2_io;
+  
   components BlazeSpiC as Spi;
   BlazeTransmitP.RadioStatus -> Spi.RadioStatus;
   

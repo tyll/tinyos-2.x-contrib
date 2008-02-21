@@ -68,6 +68,7 @@ implementation {
   BlazeReceiveP.RxIo -> BlazeCentralWiringC.Gdo0_io;
   BlazeReceiveP.BlazeConfig -> BlazeCentralWiringC.BlazeConfig;
   BlazeReceiveP.RxInterrupt -> BlazeCentralWiringC.Gdo0_int;
+  BlazeReceiveP.ChipRdy -> BlazeCentralWiringC.Gdo2_io;
   
   components MainC;
   MainC.SoftwareInit -> BlazeReceiveP;

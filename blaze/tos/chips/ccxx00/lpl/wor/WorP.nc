@@ -263,12 +263,13 @@ implementation {
   void verifyRxMode() {
     uint8_t status;
     
+    ////call Leds.set(5);
     while((status = call RadioStatus.getRadioStatus()) != BLAZE_S_RX) {
       call Csn.set[focusedRadio]();
       call Csn.clr[focusedRadio]();
       
       while(call ChipRdy.get[focusedRadio]());
-    
+      
       if (status == BLAZE_S_RXFIFO_OVERFLOW) {
         call SFRX.strobe();
         call SRX.strobe();
@@ -277,7 +278,10 @@ implementation {
         call SFTX.strobe();
         call SRX.strobe();
         
-     } else if (status == BLAZE_S_CALIBRATE) {
+      } else if (status == BLAZE_S_CALIBRATE) {
+        // do nothing but don't quit the loop
+        
+      } else if (status == BLAZE_S_SETTLING) {
         // do nothing but don't quit the loop
         
       } else {
@@ -285,6 +289,7 @@ implementation {
         call SRX.strobe();
       }
     }
+    ////call Leds.set(0);
     
     call Csn.set[focusedRadio]();
   }

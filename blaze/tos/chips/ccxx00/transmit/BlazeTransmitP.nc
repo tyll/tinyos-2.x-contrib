@@ -156,6 +156,7 @@ implementation {
       call Csn.set[id]();
       call Csn.clr[id]();
       
+      ////call Leds.set(1);
       while((status = call RadioStatus.getRadioStatus()) != BLAZE_S_RX) {
         call Csn.set[id]();
         call Csn.clr[id]();
@@ -178,6 +179,7 @@ implementation {
           call SRX.strobe();
         }
       }
+      ////call Leds.set(0);
       
       call Csn.set[ id ]();
       
@@ -227,6 +229,7 @@ implementation {
      * Put the radio in RX mode if it's not already. This covers the
      * frequency / synthesizer startup and calibration
      */
+    ////call Leds.set(2);
     while((status = call RadioStatus.getRadioStatus()) != BLAZE_S_RX) {
       call Csn.set[id]();
       call Csn.clr[id]();
@@ -241,7 +244,10 @@ implementation {
         call SFTX.strobe();
         call SRX.strobe();
         
-     } else if (status == BLAZE_S_CALIBRATE) {
+      } else if (status == BLAZE_S_CALIBRATE) {
+        // do nothing but don't quit the loop
+        
+      } else if (status == BLAZE_S_SETTLING) {
         // do nothing but don't quit the loop
         
       } else {
@@ -249,6 +255,7 @@ implementation {
         call SRX.strobe();
       }
     }
+    ////call Leds.set(0);
     
     /*
      * Attempt to transmit.  If the radio goes into TX mode, then our transmit
@@ -264,10 +271,12 @@ implementation {
       
     } else {
       
+      ////call Leds.set(3);
       do {
         call STX.strobe();
         status = call RadioStatus.getRadioStatus();
       } while((status != BLAZE_S_RX) && (status != BLAZE_S_TX));
+      ////call Leds.set(0);
       
       if(status != BLAZE_S_TX) {
         // CCA failed

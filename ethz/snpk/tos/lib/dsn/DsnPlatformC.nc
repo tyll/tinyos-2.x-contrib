@@ -15,7 +15,7 @@ implementation {
 	components HplMsp430GeneralIOC;
    	components new Msp430GpioC() as TxPin;
 	#if USART == 0
-		components new DsnPlatformTelosbP(TRUE);
+		components DsnPlatformTelosbP;
 		components new Msp430Uart0C() as Uart;
 		components HplMsp430Usart0C as HplUsart;
 		TxPin.HplGeneralIO -> HplMsp430GeneralIOC.UTXD0;
@@ -35,7 +35,7 @@ implementation {
 		DsnPlatformTelosbP.RxRTSInt -> RxRTSInt.Interrupt;
 	#endif
 	#if USART == 1
-		components new DsnPlatformTelosbP(FALSE);
+		components DsnPlatformTelosbP;
 		components new Msp430Uart1C() as Uart;
 		components HplMsp430Usart1C as HplUsart;
 		TxPin.HplGeneralIO -> HplMsp430GeneralIOC.UTXD1;

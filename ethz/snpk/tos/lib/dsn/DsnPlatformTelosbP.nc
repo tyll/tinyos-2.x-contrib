@@ -1,5 +1,8 @@
 #include "DSN.h"
-generic module DsnPlatformTelosbP(bool useHandshake) {
+#if USART == 0
+#define DSN_HANDSHAKE
+#endif
+module DsnPlatformTelosbP {
 	provides {
 		interface DsnPlatform;
 		interface Msp430UartConfigure;
@@ -49,22 +52,22 @@ implementation {
 		// a low pin would cause framing errors in the dsn uart
 		call TxPin.set();
 		call TxPin.makeOutput();
-		if (useHandshake) {
-			// setup pin for rx RTS interrupt
-			call RxRTSPin.makeInput();
-			// setup CTS pin
-			call RxCTSPin.set();		// default hi = not ready to receive
-			call RxCTSPin.makeOutput();
-		}
+#ifdef DSN_HANDSHAKE
+		// setup pin for rx RTS interrupt
+		call RxRTSPin.makeInput();
+		// setup CTS pin
+		call RxCTSPin.set();		// default hi = not ready to receive
+		call RxCTSPin.makeOutput();
+#endif		
 	}
 	
 	event void Boot.booted(){
-		if (!useHandshake)
-			call DsnResource.immediateRequest();
-		else {
-			call RxRTSInt.disable(); // this clears pending interrupt flags
-			call RxRTSInt.enableRisingEdge();
-		}
+#ifdef DSN_HANDSHAKE		
+		call RxRTSInt.disable(); // this clears pending interrupt flags
+		call RxRTSInt.enableRisingEdge();
+#else
+		call DsnResource.immediateRequest();
+#endif
 	}
 	
 	async command void DsnPlatform.flushUart(){
@@ -106,7 +109,11 @@ implementation {
 	}
 	
 	async command bool DsnPlatform.isHandshake() {
-		return useHandshake;
+#ifdef DSN_HANDSHAKE		
+		return TRUE;
+#else
+		return FALSE;
+#endif		
 	}
 	  	
 	event void RadioControl.startDone(error_t error) {}
@@ -121,41 +128,49 @@ implementation {
  	}
  	
 	async command error_t DsnResource.request() {
-		if (useHandshake)
-			return call Resource.request();
+#ifdef DSN_HANDSHAKE
+		return call Resource.request();
+#else
 		if (!dummyResourceGranted)
 			call Resource.request();
 		else
 			post grantedTask();
 		return SUCCESS;
+#endif		
 	}
 	
 	async command error_t DsnResource.immediateRequest() {
-		if (useHandshake)
-			return call Resource.immediateRequest();
+#ifdef DSN_HANDSHAKE
+		return call Resource.immediateRequest();
+#else		
 		atomic {
 			if (!dummyResourceGranted)
 				if (call Resource.immediateRequest()==SUCCESS)
 					dummyResourceGranted=TRUE;
 		}
 		return SUCCESS;
+#endif		
 	}
 	
 	async command error_t DsnResource.release() {
-		if (useHandshake)
-			return call Resource.release();
+#ifdef DSN_HANDSHAKE
+		return call Resource.release();
+#else
 		return FAIL;
+#endif
 	}
 	async command bool DsnResource.isOwner() {
-		if (useHandshake)
-			return call Resource.isOwner();
+#ifdef DSN_HANDSHAKE
+		return call Resource.isOwner();
+#else		
 		return dummyResourceGranted;
+#endif		
 	}
 	
 	event void Resource.granted() {
-		if (!useHandshake) {
-			atomic dummyResourceGranted=TRUE;
-		}
+#ifndef DSN_HANDSHAKE
+		atomic dummyResourceGranted=TRUE;
+#endif
 		signal DsnResource.granted();
 	} 
 

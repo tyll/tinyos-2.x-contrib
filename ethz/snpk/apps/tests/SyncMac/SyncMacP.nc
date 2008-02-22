@@ -117,7 +117,7 @@ implementation {
 		unicast_msg_t * u_msg;
 		if (!call UnicastTimer.isRunning())
 			call UnicastTimer.startPeriodic(6024);
-		if (numNeighbours>3 && !radiobusy) {
+		if (numNeighbours>SYNCMAC_MIN_NEIGHBOURS && !radiobusy) {
 			if (unicastReceiverId==AM_BROADCAST_ADDR) {
 				unicastReceiverId=neighbour[call Random.rand16() % numNeighbours];
 			}

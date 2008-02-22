@@ -7,6 +7,7 @@ enum {
 	RXBUFFERSIZE = 128,
 	NO_ID = 0xffff,
 	LOG_NR_BUFFERSIZE = 32,
+	RX_TIMEOUT_MILLI = 5,
 };
 
 typedef struct VarStruct {

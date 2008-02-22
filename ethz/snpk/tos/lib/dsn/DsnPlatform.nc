@@ -15,4 +15,8 @@ interface DsnPlatform {
 	command uint8_t getHeaderLength();
 	command uint8_t getPayloadLength(message_t * msg);
 	async command bool isHandshake();
+	command void startTimeoutMonitor(uint8_t timeout);
+	command void stopTimeoutMonitor();
+	async command void updateTimeoutMonitor();
+	event void timeoutMonitorFired();
 }

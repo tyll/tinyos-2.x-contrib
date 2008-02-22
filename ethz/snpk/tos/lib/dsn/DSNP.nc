@@ -82,6 +82,8 @@ implementation
 	/* prototype */
 	void stop();
 	void requestUSART();
+	task void startRxTimer();
+	task void stopRxTimer();
 	
 	/**
 	 * Initialization (before SoftwareInit)
@@ -417,6 +419,7 @@ implementation
   		atomic {
   			if (data==LOG_DELIMITER) {
   				// last byte received
+  				post stopRxTimer();
   				rxreq=FALSE;
   				call DsnPlatform.rxRelease();
   				if ((bufferStart != bufferEnd) && running)
@@ -429,13 +432,41 @@ implementation
   			else {
   				if (rxlen < RXBUFFERSIZE-1) // last byte is reserved for LOG_DELIMITER
   					rxbuffer[rxlen++]=data;
+  				call DsnPlatform.updateTimeoutMonitor();
   			}
   		}
 	}
 
 	async event void DsnPlatform.rxRequest() { // this event is only signaled when handshake is enabled
 		rxreq=TRUE;
+		post startRxTimer();
 		requestUSART();
+	}
+	
+//******* rx timeout ***************
+	
+	event void DsnPlatform.timeoutMonitorFired() {
+		// handshake has generated a timeout
+		atomic {
+			if (rxreq) {
+				rxreq=FALSE;
+				call DsnPlatform.rxRelease();
+				if ((bufferStart != bufferEnd) && running)
+					post sendBuf();
+				else // the timeout monitor is only used in handshake mode
+					stop();
+			}
+		}
+	}
+	
+	task void startRxTimer() {
+		atomic if (call DsnPlatform.isHandshake() && rxreq)
+			call DsnPlatform.startTimeoutMonitor(RX_TIMEOUT_MILLI);
+	}
+	
+	task void stopRxTimer() {
+		atomic if (call DsnPlatform.isHandshake() && !rxreq)
+			call DsnPlatform.stopTimeoutMonitor();
 	}
 	
 	command error_t DSN.stopLog(){

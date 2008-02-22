@@ -19,7 +19,6 @@ implementation {
 		components new Msp430Uart0C() as Uart;
 		components HplMsp430Usart0C as HplUsart;
 		TxPin.HplGeneralIO -> HplMsp430GeneralIOC.UTXD0;
-		Resource = Uart;
 		// rx handshake interrupt 23
 		// tmote pin 23 <- 
 		// tmote pin 26 ->
@@ -39,12 +38,13 @@ implementation {
 		components new DsnPlatformTelosbP(FALSE);
 		components new Msp430Uart1C() as Uart;
 		components HplMsp430Usart1C as HplUsart;
-		components MainC;
-		DsnPlatformTelosbP.Boot->MainC.Boot;
 		TxPin.HplGeneralIO -> HplMsp430GeneralIOC.UTXD1;
-		Resource = DsnPlatformTelosbP.DummyResource;
-		DsnPlatformTelosbP.Resource -> Uart;
 	#endif
+	components MainC, new TimerMilliC() as TimeoutTimer;
+	DsnPlatformTelosbP.Boot->MainC.Boot;
+	DsnPlatformTelosbP.Resource -> Uart;
+	DsnPlatformTelosbP.TimeoutTimer->TimeoutTimer;
+	Resource = DsnPlatformTelosbP.DsnResource;
 	DsnPlatform = DsnPlatformTelosbP;
 	UartStream = Uart;
 	Uart.Msp430UartConfigure -> DsnPlatformTelosbP;

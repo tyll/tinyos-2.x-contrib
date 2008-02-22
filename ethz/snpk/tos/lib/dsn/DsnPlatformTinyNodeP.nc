@@ -131,6 +131,14 @@ implementation {
 		atomic dummyResourceGranted=TRUE;
 		signal DummyResource.granted();
 	} 
+	
+	// ************* Timeout monitor for rx line ***********
+	command void DsnPlatform.startTimeoutMonitor(uint8_t timeout) {
+	}
+	command void DsnPlatform.stopTimeoutMonitor() {
+	}	
+	async command void DsnPlatform.updateTimeoutMonitor() {
+	}	
 
   	default async command void RxCTSPin.set() {}
   	default async command void RxCTSPin.clr() {}

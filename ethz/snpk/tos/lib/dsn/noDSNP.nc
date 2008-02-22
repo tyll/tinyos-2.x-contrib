@@ -88,7 +88,7 @@ implementation
 		#endif
 		return SUCCESS;
   }
-  
+  event void DsnPlatform.timeoutMonitorFired() {}
   async event void  DsnPlatform.rxRequest() {}
 
 /****************** DsnSend commands *******************/

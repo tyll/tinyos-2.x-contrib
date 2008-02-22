@@ -3,7 +3,8 @@ generic module DsnPlatformTelosbP(bool useHandshake) {
 	provides {
 		interface DsnPlatform;
 		interface Msp430UartConfigure;
-		interface Resource as DummyResource; // this resource is once granted, never released
+		interface Resource as DsnResource; // no handshake:this resource is once granted, never released
+											 // handshake: wire through to uart
 	}
 	uses {
 		interface HplMsp430Usart;
@@ -16,6 +17,7 @@ generic module DsnPlatformTelosbP(bool useHandshake) {
 		interface SplitControl as RadioControl;
 		interface Resource;
 		interface Boot;
+		interface Timer<TMilli> as TimeoutTimer;
 	}
 }
 implementation {
@@ -47,17 +49,22 @@ implementation {
 		// a low pin would cause framing errors in the dsn uart
 		call TxPin.set();
 		call TxPin.makeOutput();
-		// setup pin for rx RTS interrupt
-		call RxRTSPin.makeInput();
-		call RxRTSInt.enableRisingEdge();
-		// setup CTS pin
-		call RxCTSPin.set();		// default hi = not ready to receive
-		call RxCTSPin.makeOutput();
+		if (useHandshake) {
+			// setup pin for rx RTS interrupt
+			call RxRTSPin.makeInput();
+			// setup CTS pin
+			call RxCTSPin.set();		// default hi = not ready to receive
+			call RxCTSPin.makeOutput();
+		}
 	}
 	
 	event void Boot.booted(){
 		if (!useHandshake)
-			call DummyResource.immediateRequest();
+			call DsnResource.immediateRequest();
+		else {
+			call RxRTSInt.disable(); // this clears pending interrupt flags
+			call RxRTSInt.enableRisingEdge();
+		}
 	}
 	
 	async command void DsnPlatform.flushUart(){
@@ -108,12 +115,14 @@ implementation {
   	async command msp430_uart_union_config_t* Msp430UartConfigure.getConfig() {
 	    return &dsn_config;
   	}
- /********* DummyResource ****************************/
+ /********* DsnResource ****************************/
  	task void grantedTask() {
- 		signal DummyResource.granted();
+ 		signal DsnResource.granted();
  	}
  	
-	async command error_t DummyResource.request() {
+	async command error_t DsnResource.request() {
+		if (useHandshake)
+			return call Resource.request();
 		if (!dummyResourceGranted)
 			call Resource.request();
 		else
@@ -121,7 +130,9 @@ implementation {
 		return SUCCESS;
 	}
 	
-	async command error_t DummyResource.immediateRequest() {
+	async command error_t DsnResource.immediateRequest() {
+		if (useHandshake)
+			return call Resource.immediateRequest();
 		atomic {
 			if (!dummyResourceGranted)
 				if (call Resource.immediateRequest()==SUCCESS)
@@ -130,17 +141,53 @@ implementation {
 		return SUCCESS;
 	}
 	
-	async command error_t DummyResource.release() {return FAIL;}
-	async command bool DummyResource.isOwner() {return dummyResourceGranted; }
+	async command error_t DsnResource.release() {
+		if (useHandshake)
+			return call Resource.release();
+		return FAIL;
+	}
+	async command bool DsnResource.isOwner() {
+		if (useHandshake)
+			return call Resource.isOwner();
+		return dummyResourceGranted;
+	}
+	
 	event void Resource.granted() {
-		atomic dummyResourceGranted=TRUE;
-		signal DummyResource.granted();
+		if (!useHandshake) {
+			atomic dummyResourceGranted=TRUE;
+		}
+		signal DsnResource.granted();
 	} 
 
+	// ************* Timeout monitor for rx line ***********
+	
+	bool rxhandled;
+	
+	command void DsnPlatform.startTimeoutMonitor(uint8_t timeout) {
+		atomic rxhandled=FALSE;
+		call TimeoutTimer.startPeriodic(timeout);
+	}
+	command void DsnPlatform.stopTimeoutMonitor() {
+		call TimeoutTimer.stop();
+	}
+	
+	async command void DsnPlatform.updateTimeoutMonitor() {
+		rxhandled=TRUE;
+	}
+	
+	event void TimeoutTimer.fired() {
+		atomic if (!rxhandled) {
+			call TimeoutTimer.stop();
+			signal DsnPlatform.timeoutMonitorFired();
+		}
+	}
+	
+	// ************* default stuff
+	
   	default async command void RxCTSPin.set() {}
   	default async command void RxCTSPin.clr() {}
   	default async command void RxCTSPin.makeOutput() {}
   	default async command void RxRTSPin.makeInput() {}
   	default async command error_t RxRTSInt.enableRisingEdge() {return SUCCESS;}
-  	default event void DummyResource.granted() {}
+  	default event void DsnResource.granted() {}
 }

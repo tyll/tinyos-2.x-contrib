@@ -88,9 +88,9 @@ enum {
 #ifndef MAX_LPL_CCA_CHECKS
 
 #if defined(PLATFORM_TELOSB) || defined(PLATFORM_TMOTE)
-#define MAX_LPL_CCA_CHECKS 300
+#define MAX_LPL_CCA_CHECKS 180
 #else
-#define MAX_LPL_CCA_CHECKS 300
+#define MAX_LPL_CCA_CHECKS 180
 #endif
 
 #endif
@@ -100,7 +100,7 @@ enum {
  * that show the channel is not clear before a detection event is issued
  */
 #ifndef MIN_SAMPLES_BEFORE_DETECT
-#define MIN_SAMPLES_BEFORE_DETECT 3
+#define MIN_SAMPLES_BEFORE_DETECT 10
 #endif
 
 #endif

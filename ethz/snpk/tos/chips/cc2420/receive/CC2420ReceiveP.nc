@@ -73,7 +73,7 @@ implementation {
   enum {
     RXFIFO_SIZE = 128,
     TIMESTAMP_QUEUE_SIZE = 8,
-    SACK_HEADER_LENGTH = 7,
+    SACK_HEADER_LENGTH = 2,
   };
 
   uint16_t m_timestamp_queue[ TIMESTAMP_QUEUE_SIZE ];

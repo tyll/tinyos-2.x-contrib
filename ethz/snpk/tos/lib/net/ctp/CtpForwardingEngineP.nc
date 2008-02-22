@@ -406,7 +406,7 @@ implementation {
     if (sending) {
       dbg("Forwarder", "%s: busy, don't send\n", __FUNCTION__);
       call CollectionDebug.logEvent(NET_C_FE_SEND_BUSY);
-      call DSN.logDebug("forwarding sendtask busy");
+      // call DSN.logDebug("forwarding sendtask busy");
       return;
     }
     else if (call SendQueue.empty()) {

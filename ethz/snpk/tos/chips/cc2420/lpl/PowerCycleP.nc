@@ -174,6 +174,7 @@ implementation {
     }
 #ifdef CC2420SYNC_DEBUG_PINS
      TOSH_MAKE_ADC3_OUTPUT();
+     TOSH_MAKE_GIO3_OUTPUT();
 #endif
     // Radio was off, now has been told to turn on or duty cycle.
     call SplitControlState.forceState(S_TURNING_ON);
@@ -284,17 +285,20 @@ implementation {
         		  return;
         	  }
           }
+    	  return;
         }
         call Leds.led0On();
         n_cycles++;
+        if(call PacketIndicator.isReceiving()) { // packet receiving
+        	signal PowerCycle.detected();
+        	n_long_cycles++;
+        	call Leds.led0Off();
+        	return;
+        }
+#ifdef CC2420SYNC_DEBUG_PINS
+     TOSH_SET_GIO3_PIN();
+#endif
         for( ; ccaChecks < MAX_LPL_CCA_CHECKS && call SendState.isIdle(); ccaChecks++) {
-          if(call PacketIndicator.isReceiving()) { // packet receiving
-            signal PowerCycle.detected();
-            n_long_cycles++;
-            call Leds.led0Off();
-            return;
-          }
-          
           if(call EnergyIndicator.isReceiving()) { // CCA
             if (firstDetected)
               detects++;
@@ -304,6 +308,9 @@ implementation {
               signal PowerCycle.detected();
               n_long_cycles++;
               call Leds.led0Off();
+#ifdef CC2420SYNC_DEBUG_PINS
+     TOSH_CLR_GIO3_PIN();
+#endif
               return;
             }
             // Leave the radio on for upper layers to perform some transaction
@@ -312,6 +319,9 @@ implementation {
             detects=0;
           }
         } // for
+#ifdef CC2420SYNC_DEBUG_PINS
+     TOSH_CLR_GIO3_PIN();
+#endif
       }  // atomic
       call Leds.led0Off();
       if(call SendState.isIdle()) {

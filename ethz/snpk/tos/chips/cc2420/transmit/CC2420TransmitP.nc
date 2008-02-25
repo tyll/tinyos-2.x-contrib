@@ -165,9 +165,13 @@ implementation {
       m_state = S_STOPPED;
       call BackoffTimer.stop();
       call CaptureSFD.disable();
+      sfdHigh = FALSE;
       call SpiResource.release();  // REMOVE
       call CSN.set();
     }
+#ifdef CC2420SYNC_DEBUG_PINS
+    TOSH_CLR_URXD0_PIN();
+#endif 	 
     return SUCCESS;
   }
 
@@ -481,7 +485,6 @@ implementation {
       switch( m_state ) {
         
       case S_SAMPLE_CCA : 
-    	  call Leds.led0On();
         // sample CCA and wait a little longer if free, just in case we
         // sampled during the ack turn-around window
         if ( call CCA.get() ) {
@@ -627,6 +630,9 @@ implementation {
       
       m_state = congestion ? S_SAMPLE_CCA : S_SFD;
       call CSN.set();
+      if(!congestion && m_receiving) {
+    	  call CC2420Receive.corrupted();
+      }
     }
     
     if ( congestion ) {
@@ -635,7 +641,6 @@ implementation {
       totalCcaChecks=0;
       congestionBackoff();
     } else {
-      call Leds.led0Off();
       call BackoffTimer.start(CC2420_ABORT_PERIOD);
       (call CC2420PacketBody.getMetadata( m_msg ))->backoffSamples+=totalCcaChecks;
     }

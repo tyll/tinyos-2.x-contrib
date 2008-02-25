@@ -59,6 +59,12 @@ interface CC2420Receive {
    * @param message pointer to message received.
    */
   async event void receive( uint8_t type, message_t* message );
+  
+  /**
+     * Notification that the packet may contain corrupt content due to
+     * transmit interception
+     */
+  async command void corrupted();
 
 }
 

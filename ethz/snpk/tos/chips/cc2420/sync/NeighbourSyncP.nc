@@ -434,10 +434,21 @@ implementation {
         				drift=(driftError << 19) / ((newSync-item->wakeupTimestamp[MEASURE_HISTORY_SIZE-1]) / 4);
         			}
         			else {
-        				drift=-((((uint32_t)(item->lplPeriod) - driftError)) << 19) / ((newSync-item->wakeupTimestamp[MEASURE_HISTORY_SIZE-1]) / 4);
+        				driftError=item->lplPeriod - driftError;
+        				drift=-((driftError << 19) / ((newSync-item->wakeupTimestamp[MEASURE_HISTORY_SIZE-1]) / 4));
         			}
         			if ((item->drift>drift && item->drift-drift<DRIFT_CHANGE_LIMIT) ||
         				(item->drift<=drift && drift-item->drift<DRIFT_CHANGE_LIMIT)) {
+#ifdef CC2420SYNC_DEBUG
+        				if (drift>=0) {
+        					call DSN.logInt(drift);
+        					call DSN.log("drift: %i");
+        				}
+        				else {
+        					call DSN.logInt(-drift);
+        					call DSN.log("drift: -%i");
+        				}
+#endif  
         				// shift stamps
         				for (i=0;i<MEASURE_HISTORY_SIZE-1;i++)
         					item->wakeupTimestamp[i]=item->wakeupTimestamp[i+1];
@@ -448,8 +459,15 @@ implementation {
         		   		item->driftLimitCount = 0;
         			}
         			else {
-#ifdef CC2420SYNC_DEBUG        				
-        				call DSN.log("drift out of limit");
+#ifdef CC2420SYNC_DEBUG
+        				if (drift>=0) {
+        					call DSN.logInt(drift);
+        					call DSN.log("drift out of limit: %i");
+        				}
+        				else {
+        					call DSN.logInt(-drift);
+        					call DSN.log("drift out of limit: -%i");
+        				}
 #endif        				
         				item->driftLimitCount++;
         				if (item->driftLimitCount >= MAX_DRIFT_ERRORS) {

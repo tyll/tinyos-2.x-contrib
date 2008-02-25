@@ -77,6 +77,7 @@ implementation {
   };
 
   uint16_t m_timestamp_queue[ TIMESTAMP_QUEUE_SIZE ];
+  bool m_timestamp_dirty[ TIMESTAMP_QUEUE_SIZE ];
   
   uint8_t m_timestamp_head;
   
@@ -145,6 +146,7 @@ implementation {
       uint8_t tail =  ( ( m_timestamp_head + m_timestamp_size ) % 
                         TIMESTAMP_QUEUE_SIZE );
       m_timestamp_queue[ tail ] = time;
+      m_timestamp_dirty[ tail ] = FALSE;
       m_timestamp_size++;
     }
   }
@@ -153,6 +155,11 @@ implementation {
     if ( m_timestamp_size ) {
       m_timestamp_size--;
     }
+  }
+  
+  async command void CC2420Receive.corrupted() {
+	  uint8_t tail = ( ( m_timestamp_head + m_timestamp_size -1 ) % TIMESTAMP_QUEUE_SIZE );
+	  m_timestamp_dirty[ tail ] = TRUE;
   }
 
   /***************** PacketIndicator Commands ****************/
@@ -208,6 +215,12 @@ implementation {
         
         if(rxFrameLength <= MAC_PACKET_SIZE) {
           if(rxFrameLength > 0) {
+        	if ( rxFrameLength <= 10 && m_timestamp_size && m_timestamp_dirty[ m_timestamp_head ]) {
+        		// remove corrupt timestamp from queue
+        		call Leds.led1On();
+        		m_timestamp_head = ( m_timestamp_head + 1 ) % TIMESTAMP_QUEUE_SIZE;
+        	    m_timestamp_size--;
+   	        }
             if(rxFrameLength > SACK_HEADER_LENGTH) {
               // This packet has an FCF byte plus at least one more byte to read
               call RXFIFO.continueRead(buf + 1, SACK_HEADER_LENGTH);

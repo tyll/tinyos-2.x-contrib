@@ -96,6 +96,6 @@ implementation {
   CC2420TransmitP.CC2420Packet -> CC2420PacketC;
   CC2420TransmitP.CC2420PacketBody -> CC2420PacketC;
   
-  components NoLedsC as LedsC;
+  components LedsC as LedsC;
   CC2420TransmitP.Leds -> LedsC;
 }

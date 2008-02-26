@@ -48,7 +48,7 @@ typedef enum {
 } lpl_sendstate_t;
 
 enum {
-	LPL_DUTYCYCLE_CRITICAL_PERIOD = 130, // jiffys after radio startup in which lplc does not start radio
+	LPL_DUTYCYCLE_CRITICAL_PERIOD = 130, // jiffys after radio startup in which lplc does not start radio 
 };
 
 /**
@@ -88,9 +88,14 @@ enum {
 #ifndef MAX_LPL_CCA_CHECKS
 
 #if defined(PLATFORM_TELOSB) || defined(PLATFORM_TMOTE)
-#define MAX_LPL_CCA_CHECKS 180
+// # samples	time [ms]
+// 180			4.5
+// 100			2.5
+// 400			10
+// 200			4.9
+#define MAX_LPL_CCA_CHECKS 200
 #else
-#define MAX_LPL_CCA_CHECKS 180
+#define MAX_LPL_CCA_CHECKS 200
 #endif
 
 #endif
@@ -100,7 +105,7 @@ enum {
  * that show the channel is not clear before a detection event is issued
  */
 #ifndef MIN_SAMPLES_BEFORE_DETECT
-#define MIN_SAMPLES_BEFORE_DETECT 10
+#define MIN_SAMPLES_BEFORE_DETECT 5
 #endif
 
 #endif

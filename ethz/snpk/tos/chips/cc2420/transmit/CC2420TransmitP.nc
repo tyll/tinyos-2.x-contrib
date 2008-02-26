@@ -489,12 +489,11 @@ implementation {
         // sampled during the ack turn-around window
         if ( call CCA.get() ) {
           totalCcaChecks++;
-          if (totalCcaChecks>= CC2420_ACK_WAIT_DELAY / CC2420_TIME_ACK_TURNAROUND + 1)
+          if (totalCcaChecks >= CC2420_ACK_WAIT_DELAY / (CC2420_TIME_ACK_TURNAROUND) + 1)
         	  m_state = S_BEGIN_TRANSMIT;
-          call BackoffTimer.start( CC2420_TIME_ACK_TURNAROUND );
+          call BackoffTimer.startAt(call BackoffTimer.getAlarm(), CC2420_TIME_ACK_TURNAROUND);
+          //call BackoffTimer.start(CC2420_TIME_ACK_TURNAROUND);
         } else {
-          (call CC2420PacketBody.getMetadata( m_msg ))->backoffSamples+=totalCcaChecks;
-          totalCcaChecks=0;
           congestionBackoff();
         }
         break;

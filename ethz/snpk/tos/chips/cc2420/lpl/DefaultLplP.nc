@@ -311,7 +311,7 @@ implementation {
   async event void RadioBackoff.requestInitialBackoff[am_id_t amId](message_t *msg) {
 	  if ((call CC2420PacketBody.getMetadata(msg))->synced) {
 		  call RadioBackoff.setInitialBackoff[amId](call Random.rand16() 
-				  % (0x3 * CC2420_BACKOFF_PERIOD));
+				  % 96); // [0..95] jiffies 
 	  } else if((call CC2420PacketBody.getMetadata(msg))->rxInterval > ONE_MESSAGE) {
 		  call RadioBackoff.setInitialBackoff[amId]( call Random.rand16() 
 				  % (0x4 * CC2420_BACKOFF_PERIOD) + CC2420_MIN_BACKOFF);
@@ -345,7 +345,6 @@ implementation {
     // Wait long enough to see if we actually receive a packet, which is
     // just a little longer in case there is more than one lpl transmitter on
     // the channel.
-    
     startOffTimer();
   }
   
@@ -414,10 +413,13 @@ implementation {
     
     call SendState.toIdle();
     call SendDoneTimer.stop();
-    if (call NeighbourSyncPacket.isMore(msg))
+    if (call NeighbourSyncPacket.isMore(msg)) {
     	startOffTimer();
-    else
+    }
+    else {
+    	call OffTimer.stop();
     	signal OffTimer.fired();
+    }
     signal Send.sendDone(msg, error);
   }
   
@@ -433,8 +435,10 @@ implementation {
       uint8_t len) {
 	  if (call NeighbourSyncPacket.isMore(msg))
 	      	startOffTimer();
-	      else
+	      else {
+	      	call OffTimer.stop();
 	      	signal OffTimer.fired();
+	      }
 	  return signal Receive.receive(msg, payload, len);
   }
   
@@ -447,7 +451,7 @@ implementation {
     if(call SplitControlState.getState() == S_OFF
         || (call PowerCycle.getSleepInterval() > 0
             && call SplitControlState.getState() != S_OFF
-                && call SendState.getState() == S_LPL_NOT_SENDING)) { 
+                && call SendState.getState() == S_LPL_NOT_SENDING)) {
       post stopRadio();
     }
   }
@@ -496,9 +500,8 @@ implementation {
   
   task void stopRadio() {
     if(call SendState.getState() == S_LPL_NOT_SENDING) {
-      if(call SubControl.stop() != SUCCESS) {
+      if(call SubControl.stop() != SUCCESS)
         post stopRadio();
-      }
     }
   }
   

@@ -67,8 +67,7 @@ implementation {
       new TimerMilliC() as OffTimerC,
       new TimerMilliC() as SendDoneTimerC,
       LedsC,
-      NeighbourSyncC,
-      noDSNC as DSNC;
+      NeighbourSyncC;
   
   LowPowerListening = DefaultLplP;
   Send = DefaultLplP;

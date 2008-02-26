@@ -259,10 +259,7 @@ implementation {
        * while acknowledging packets that were destined for our local address.
        */
       if(call CC2420Config.isAutoAckEnabled() && !call CC2420Config.isHwAutoAckDefault()) {
-        if (((( header->fcf >> IEEE154_FCF_ACK_REQ ) & 0x01) == 1)
-            && ((header->dest == call CC2420Config.getShortAddr())
-                || (header->dest == AM_BROADCAST_ADDR))
-            && ((( header->fcf >> IEEE154_FCF_FRAME_TYPE ) & 7) == IEEE154_TYPE_DATA)) {
+        if ((( header->fcf >> IEEE154_FCF_ACK_REQ ) & 0x01) == 1) {
           // CSn flippage cuts off our FIFO; SACK and begin reading again
           call CSN.set();
           call CSN.clr();

@@ -76,7 +76,7 @@ typedef struct {	// 16 + MEASURE_HISTORY_SIZE * 4 bytes
   uint16_t usageCount; // 24
   uint8_t failCount; // 26
   uint8_t driftLimitCount; // 27
-  uint16_t lplPeriod; // in ms 28
+  uint16_t lplPeriod; // in ticks 28
   int16_t drift; // 30
   bool dirty; // 32
   // align to word address -> struct size = 34, when MEASURE_HISTORY_SIZE==4
@@ -88,7 +88,7 @@ typedef nx_struct {
   							//		REQ_SYNC_FLAG (highest bit)
 							//		MORE_FLAG (second highest bit)
   							// lplperiod can be at max 2^14 binary ms ~ 16s
-  							// but wakeupOffset is in ticks that cna represent max 2 seconds -> this is currently the limit
+  							// but wakeupOffset is in ticks that can represent max 2 seconds -> this is currently the limit
   } neighbour_sync_header_t;
 
 #endif

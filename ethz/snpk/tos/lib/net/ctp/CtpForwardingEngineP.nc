@@ -448,7 +448,6 @@ implementation {
       if (call CtpInfo.isNeighborCongested(dest)) {
         // Our parent is congested. We should wait.
         // Don't repost the task, CongestionTimer will do the job
-    	call DSN.log("parent congested, wait");
         if (! parentCongested ) {
           parentCongested = TRUE;
           call CollectionDebug.logEvent(NET_C_FE_CONGESTION_BEGIN);
@@ -471,11 +470,11 @@ implementation {
         call CollectionDebug.logEvent(NET_C_FE_DUPLICATE_CACHE_AT_SEND);
         call SendQueue.dequeue();
         if (qe->client < CLIENT_COUNT) {
-        	call DSN.logDebug("cache: dequeue client msg");
+        	call DSN.logDebug("cache: dequeue cmsg");
         	clientPtrs[qe->client] = qe;
         }
         else {
-        	call DSN.logDebug("cache: dequeue forward msg");
+        	call DSN.logDebug("cache: dequeue fmsg");
         	if (call MessagePool.put(qe->msg) != SUCCESS)
         		call DSN.logError("MessagePool put FAILED");
         	if (call QEntryPool.put(qe) != SUCCESS)
@@ -571,12 +570,12 @@ implementation {
           // dequeue
           call SendQueue.dequeue();
           if (qe->client < CLIENT_COUNT) {
-        	  call DSN.logDebug("dequeue client msg");
+        	  call DSN.logDebug("dequeue cmsg");
         	  clientPtrs[qe->client] = qe;
         	  signal Send.sendDone[qe->client](qe->msg, ESIZE);
           }
           else {
-        	  call DSN.logDebug("dequeue forward msg");
+        	  call DSN.logDebug("dequeue fmsg");
         	  if (call MessagePool.put(qe->msg) != SUCCESS)
         		  call DSN.logError("MessagePool put FAILED");
         	  if (call QEntryPool.put(qe) != SUCCESS)
@@ -628,11 +627,11 @@ implementation {
       dbg("Forwarder", "%s: BUG: not our packet (%p != %p)!\n", __FUNCTION__, msg, qe->msg);
       sendDoneBug();      // Not our packet, something is very wrong...
       if (qe == NULL) {
-    	  call DSN.logError("Not our packet, something is very wrong..., queue empty");
+    	  call DSN.logError("BUG:queue empty");
     	  call DSN.logPacket(msg);
       }
       else {
-    	  call DSN.logError("Not our packet, something is very wrong..., differing packets");
+    	  call DSN.logError("BUG:differing packets");
     	  call DSN.logPacket(msg);
     	  call DSN.logPacket(qe->msg);
       }
@@ -645,7 +644,7 @@ implementation {
 					 call CollectionPacket.getSequenceNumber(msg), 
 					 call CollectionPacket.getOrigin(msg), 
                      call AMPacket.destination(msg));
-      call DSN.logError("send failed");
+      call DSN.logError("ctp:send failed");
       startRetxmitTimer(SENDDONE_FAIL_WINDOW, SENDDONE_FAIL_OFFSET);
     }
     else if (ackPending && !call PacketAcknowledgements.wasAcked(msg)) {
@@ -740,7 +739,7 @@ implementation {
     else {
       dbg("Forwarder", "%s: BUG: we have a pool entry, but the pool is full, client is %hhu.\n", __FUNCTION__, qe->client);
       sendDoneBug();    // It's a forwarded packet, but there's no room the pool;
-      call DSN.logError("BUG:pool is full");
+      call DSN.logError("BUG:pool full");
       // someone has double-stored a pointer somewhere and we have nowhere
       // to put this, so we have to leak it...
     }

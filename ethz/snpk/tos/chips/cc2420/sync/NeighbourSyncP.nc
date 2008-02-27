@@ -57,14 +57,16 @@ module NeighbourSyncP {
     interface PacketAcknowledgements;
     interface State as RadioPowerState;
     interface State as SyncSendState;
-    interface SplitControl as SubControl;
-    interface DsnSend as DSN;
-    interface RadioBackoff as SubBackoff[am_id_t amId];
     interface State as SendState;
     
+    interface SplitControl as SubControl;
+    interface RadioBackoff as SubBackoff[am_id_t amId];
+ 
     interface AMSend;
     interface LowPowerListening;
-
+    
+    interface DsnSend as DSN;
+    interface DsnCommand<uint8_t> as SyncstatCommand;
   }
 }
 
@@ -81,7 +83,7 @@ implementation {
   uint16_t m_rxInterval;
   uint16_t packetCounter=0;
   
-  uint32_t t[10];
+  //uint32_t t[10];
   uint32_t t_radio_on;
   uint8_t state_error;
   uint8_t retries=0;
@@ -119,7 +121,7 @@ implementation {
   
   task void startRadio();
   task void signalSendDoneFail();
-  task void reportTimes();
+  //task void reportTimes();
 
   /***************** Send Commands ***************/
   command error_t Send.send(message_t *msg, uint8_t len) {
@@ -139,7 +141,7 @@ implementation {
           m_cca=TRUE;
           m_timed_send=FALSE;
           m_msg = msg;
-          t[0]=call Alarm.getNow();
+          //t[0]=call Alarm.getNow();
         }
         m_rxInterval=meta->rxInterval;
         header = getSyncHeader(msg, len);
@@ -233,7 +235,6 @@ implementation {
         	if (++packetCounter == TOTAL_AGING_PERIOD) {
         		uint8_t i;
         		// do aging of table entires
-        		call DSN.log("aging");
         		for (i=0;i<numEntries;i++) {
         			if (n_table[i].usageCount<AGING_PERIOD)
         				n_table[i].usageCount=0;
@@ -392,6 +393,8 @@ implementation {
     uint32_t newSync;
     uint32_t driftError;
     int16_t drift;
+    cc2420_metadata_t * meta;
+    uint32_t now;
     
     am_addr_t address = (call CC2420PacketBody.getHeader(msg))->src;
     header = getSyncHeader(msg, len-SYNC_HEADER_SIZE);
@@ -405,9 +408,7 @@ implementation {
     			idx=addNewEntry (address);
     		}
     	}
-    	if (idx!=NO_ENTRY) {
-        cc2420_metadata_t * meta;
-        uint32_t now = call Alarm.getNow();
+        now = call Alarm.getNow();
         meta = call CC2420PacketBody.getMetadata(msg);
         item = &n_table[idx];
         item->lplPeriod=(header->lplPeriod & ~(REQ_SYNC_FLAG|MORE_FLAG)) << T32KHZ_TO_TMILLI_SHIFT; // save in table as 32khz ticks
@@ -490,10 +491,6 @@ implementation {
         }
         else
           call DSN.log("no valid offset");
-      }
-      else {
-        call DSN.log("sync table full");
-      }
     }
     if ((header->lplPeriod & REQ_SYNC_FLAG) != 0) {
     	signal NeighbourSyncRequest.updateRequest(address, header->lplPeriod & ~(REQ_SYNC_FLAG|MORE_FLAG));
@@ -524,15 +521,15 @@ implementation {
 				  state_error=1;
 				  post signalSendDoneFail();
 			  }
-			  t[1]=call Alarm.getAlarm();
+			  //t[1]=call Alarm.getAlarm();
 			  break;
 		  case S_SEND:
 			  if (call CC2420Transmit.resend(m_cca)!=SUCCESS) {
 				  state_error=2;
 				  post signalSendDoneFail();
 			  }
-			  if (m_timed_send) post reportTimes();
-			  t[5]=call Alarm.getAlarm();
+			  //if (m_timed_send) post reportTimes();
+			  //t[5]=call Alarm.getAlarm();
 			  break;
 		}
 	  }
@@ -545,7 +542,7 @@ implementation {
   async event void RadioTimeStamping.transmittedSFD(uint16_t time, message_t *p_msg) {
     offset=time - (call PowerCycle.getLastWakeUp());
     call CC2420Transmit.modify( m_len -1 , (uint8_t * )&offset, 2 );
-    t[6]=call Alarm.getNow();
+    //t[6]=call Alarm.getNow();
   }
 
   /***************** TimedPacket Events ******************/
@@ -553,7 +550,7 @@ implementation {
 	  atomic {
 		  if (call SyncSendState.getState()==S_PACKET_READY) { 
 			  call SyncSendState.forceState(S_SEND);
-			  t[4]=call Alarm.getNow();
+			  //t[4]=call Alarm.getNow();
 			  if ((call Alarm.getAlarm()+RADIO_STARTUP_OFFSET) - call Alarm.getNow() < 0x8000)
 				  call Alarm.startAt(call Alarm.getAlarm(), RADIO_STARTUP_OFFSET);
 			  else 
@@ -641,6 +638,11 @@ implementation {
 #endif	  
   }
 
+  /***************** DSN events *************/
+  event void SyncstatCommand.detected(uint8_t * values, uint8_t n) {
+	  printtable();
+  }
+  
   /***************** Functions ***********************/
 
   neighbour_sync_header_t* getSyncHeader(message_t * msg, uint8_t len ) {
@@ -699,27 +701,36 @@ implementation {
   }
 
   void printtable() {
-/*
+	  
     uint8_t i;
+    neighbour_sync_item_t* item;
     for (i=0;i<numEntries;i++) {
+    	item=&n_table[i];
       call DSN.logInt(i);
-      call DSN.logInt(n_table[i].address);
-      call DSN.logInt(n_table[i].lastSync);
-      call DSN.logInt(n_table[i].usageCount);
-      call DSN.logInt(n_table[i].failCount);
-      call DSN.logInt(n_table[i].lplPeriod);
-      call DSN.logInt(n_table[i].drift);
-      call DSN.logInt(n_table[i].positiveDrift);
-      call DSN.log("{%i: node %i, last:%i, used:%i, failed:%i, lpl:%ims, drift:%i(+%i)}");
-    }
-*/
+      call DSN.logInt(item->address);
+      call DSN.logInt(item->wakeupTimestamp[item->measurementCount-1]);
+      call DSN.logInt(item->measurementCount);
+      call DSN.logInt(item->usageCount);
+      call DSN.logInt(item->failCount);
+      call DSN.logInt(item->driftLimitCount);
+      call DSN.logInt(item->lplPeriod>>T32KHZ_TO_TMILLI_SHIFT);
+      call DSN.appendLog("{%i: %i, l:%i, m:%i, u:%i, f:%i, d:%i, lpl:%ims, ");
+      if (item->drift>=0) {
+    	  call DSN.logInt(item->drift);
+    	  call DSN.log("drift:%i}");
+      }
+      else {
+    	  call DSN.logInt(-item->drift);
+    	  call DSN.log("drift:-%i}");
+      }
+    
   }
-  /***************** Time Calculation Functions ***********************/
+  }
   /***************** Send Functions ***********************/
   
   void send() {
 	  error_t error;
-	  atomic t[3]=call Alarm.getNow();
+	  // atomic t[3]=call Alarm.getNow();
 	  if (call RadioPowerState.getState()!=S_ON) {
 		  call DSN.logWarning("Radio off when sending started");
 	  }
@@ -750,7 +761,7 @@ implementation {
   }
 
   task void startRadio() {
-	atomic t[2]=call Alarm.getNow();
+	//atomic t[2]=call Alarm.getNow();
 	call SyncSendState.forceState(S_LOAD_DATA);
     if (call RadioPowerState.getState()!=S_ON) {
       call SubControl.start();
@@ -759,8 +770,8 @@ implementation {
     	send();
     } 
    }
-    
-  task void reportTimes() { /*
+/*    
+  task void reportTimes() {
 	  atomic {
 		  call DSN.logInt(t[1]-t[0]); // alarm offset
 		  call DSN.logInt(t[2]-t[0]); // task offset
@@ -769,6 +780,7 @@ implementation {
 		  call DSN.logInt(t[5]-t[0]); // send allarm offset
 		  call DSN.logInt(t[6]-t[0]); // sfd offset
 	  }
-	  call DSN.log("Times: %i,%i,%i,%i,%i,%i");*/
+	  call DSN.log("Times: %i,%i,%i,%i,%i,%i");
   }
+  */
 }

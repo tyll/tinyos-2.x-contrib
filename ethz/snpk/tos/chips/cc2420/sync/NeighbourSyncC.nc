@@ -58,6 +58,9 @@ implementation {
       CC2420CsmaC,
       new AMSenderC(RESYNC_AM_TYPE) as ResyncSender, CC2420ActiveMessageC,
       DSNC as DSNC;
+ 
+  	components new DsnCommandC("get syncstats", uint8_t , 0) as SyncstatCommand;
+  	NeighbourSyncP.SyncstatCommand->SyncstatCommand;
   
 #if defined(LOW_POWER_LISTENING) || defined(ACK_LOW_POWER_LISTENING)
   components DefaultLplC as LplC;

@@ -305,8 +305,13 @@ implementation {
           && idx!=NO_ENTRY && (call CC2420PacketBody.getMetadata( msg ))->synced) {
     		if (call PacketAcknowledgements.wasAcked(msg))
     			n_table[idx].failCount=0;
-    		else
+    		else {
     			n_table[idx].failCount++;
+    			if ((call CC2420PacketBody.getMetadata( msg ))->snoopedAcks > 0) {
+    				call DSN.logInt((call CC2420PacketBody.getMetadata( msg ))->snoopedAcks);
+    				call DSN.log("delayed ack %i");
+    			}
+    		}
     	}
     	(call CC2420PacketBody.getMetadata( msg ))->retries = retries;
     	retries=0;
@@ -326,8 +331,15 @@ implementation {
 	  uint16_t periods;
 	  int32_t driftSum;
 	  uint32_t driftError;
+	  if (!call SyncSendState.isIdle()) {
+		  post calculateDrift();
+	  }
+	  else
 	  for (i=0;i<NEIGHBOURSYNCTABLESIZE;i++) {
 		  if (n_table[i].dirty) {
+#ifdef CC2420SYNC_DEBUG_PINS
+     TOSH_SET_GIO2_PIN();
+#endif
 			  item = &n_table[i];
 			  if (n_table[i].measurementCount>1) {
 				  // calculate drift				  
@@ -381,6 +393,9 @@ implementation {
 		    	item->wakeupAverage = item->wakeupTimestamp[0];
 		    }
 		 item->dirty=FALSE;
+#ifdef CC2420SYNC_DEBUG_PINS
+     TOSH_CLR_GIO2_PIN();
+#endif
 		 }
 	  }
   }
@@ -399,6 +414,9 @@ implementation {
     am_addr_t address = (call CC2420PacketBody.getHeader(msg))->src;
     header = getSyncHeader(msg, len-SYNC_HEADER_SIZE);
     if ((header->lplPeriod & ~(REQ_SYNC_FLAG|MORE_FLAG)) > 0) {
+#ifdef CC2420SYNC_DEBUG_PINS
+     TOSH_SET_GIO2_PIN();
+#endif
     	idx=getIndex(address);
     	if (idx==NO_ENTRY) {
     		if (tableFull()) {
@@ -504,6 +522,9 @@ implementation {
     	call DSN.logInt((t_radio_on & 0xffff) - call PowerCycle.getLastWakeUp());    	
     	call DSN.log("rx packet from %i, at %i, on at %i");
     }
+#endif
+#ifdef CC2420SYNC_DEBUG_PINS
+     TOSH_CLR_GIO2_PIN();
 #endif
     (call CC2420PacketBody.getHeader(msg))->length = len - SYNC_HEADER_SIZE;
     return signal Receive.receive(msg, payload, len - SYNC_HEADER_SIZE);

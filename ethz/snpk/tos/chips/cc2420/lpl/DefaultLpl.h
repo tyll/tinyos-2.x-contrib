@@ -93,9 +93,9 @@ enum {
 // 100			2.5
 // 400			10
 // 200			4.9
-#define MAX_LPL_CCA_CHECKS 200
+#define MAX_LPL_CCA_CHECKS 225
 #else
-#define MAX_LPL_CCA_CHECKS 200
+#define MAX_LPL_CCA_CHECKS 225
 #endif
 
 #endif

@@ -62,7 +62,7 @@ enum {
   DRIFT_CHANGE_LIMIT = 50, 	// value >> 21 that a new measured drift is allowed to differ from the last average
   							// 50 is about 23ppm
   MAX_DRIFT_ERRORS = 5,	// number of false drifts until history is cleared, e.g. when neihgbour node has resetted
-  MIN_MEASUREMENT_PERIOD = 32768U, // minimal drift measurement period in ticks
+  MIN_MEASUREMENT_PERIOD = 131072UL, // 4s, minimal drift measurement period in ticks
   
   RESYNC_AM_TYPE = 26, 
 };

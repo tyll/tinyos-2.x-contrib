@@ -175,6 +175,7 @@ implementation {
 #ifdef CC2420SYNC_DEBUG_PINS
      TOSH_MAKE_ADC3_OUTPUT();
      TOSH_MAKE_GIO3_OUTPUT();
+     TOSH_MAKE_GIO2_OUTPUT();
 #endif
     // Radio was off, now has been told to turn on or duty cycle.
     call SplitControlState.forceState(S_TURNING_ON);

@@ -311,7 +311,7 @@ implementation {
   async event void RadioBackoff.requestInitialBackoff[am_id_t amId](message_t *msg) {
 	  if ((call CC2420PacketBody.getMetadata(msg))->synced) {
 		  call RadioBackoff.setInitialBackoff[amId](call Random.rand16() 
-				  % 96); // [0..95] jiffies 
+				  % 114); // [0..115] jiffies 
 	  } else if((call CC2420PacketBody.getMetadata(msg))->rxInterval > ONE_MESSAGE) {
 		  call RadioBackoff.setInitialBackoff[amId]( call Random.rand16() 
 				  % (0x4 * CC2420_BACKOFF_PERIOD) + CC2420_MIN_BACKOFF);

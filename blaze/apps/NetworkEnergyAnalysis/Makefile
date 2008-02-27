@@ -1,0 +1,4 @@
+COMPONENT=AnalysisC
+
+include $(MAKERULES)
+

@@ -138,12 +138,10 @@ implementation {
 
     // Beginning our initialization phases:
     if (call RadioControl.start() != SUCCESS) {
-    	call DSN.logError("RadioControl.start() failed");
       	fatal_problem();
     }
 
     if (call RoutingControl.start() != SUCCESS) {
-    	call DSN.logError("RoutingControl.start() failed");
     	fatal_problem();
     }
     else {
@@ -153,7 +151,6 @@ implementation {
 
   event void RadioControl.startDone(error_t error) {
    	if (error != SUCCESS) {
-   		call DSN.logError("RadioControl.startDone() failed");
    		fatal_problem();
    	}
    	if (
@@ -161,18 +158,15 @@ implementation {
    		sizeof(harvester_topology_t) > call TopologySend.maxPayloadLength() ||
    		sizeof(harvester_status_t) > call StatusSend.maxPayloadLength() 
    	) {
-   		call DSN.logError("Radio payload length out of range");
    		fatal_problem();
    	}
    	if (call SerialControl.start() != SUCCESS) {
-   		call DSN.logError("SerialControl.start() failed");
    		fatal_problem();
    	}
   }
 
   event void SerialControl.startDone(error_t error) {
     if (error != SUCCESS) {
-    	call DSN.logError("SerialControl.startDone() failed");
       	fatal_problem();
     }
 
@@ -213,7 +207,6 @@ implementation {
 	  if (newmsg == NULL) {
 		  // drop the message on the floor if we run out of queue space.
 		  report_problem();
-		  call DSN.logError("UART pool full");
    	      return msg;
 	  }
 	  out = (message_t*)call SerialPacket.getPayload(newmsg, len);
@@ -243,7 +236,6 @@ implementation {
       if (newmsg == NULL) {
     	  // drop the message on the floor if we run out of queue space.
           report_problem();
-     	  call DSN.logError("UART msg pool full");
           return msg;
       }
       out = call SerialPacket.getPayload(newmsg, len);
@@ -273,7 +265,6 @@ implementation {
 	  if (newmsg == NULL) {
 		  // drop the message on the floor if we run out of queue space.
 		  report_problem();
-    	  call DSN.logError("UART msg pool full");
     	  return msg;
 	  }
 	  out = call SerialPacket.getPayload(newmsg, len);
@@ -305,7 +296,6 @@ implementation {
 		e=call SerialSend.send[type](local.id, uartMsg, call SerialPacket.payloadLength(uartMsg));
 	    if (e != SUCCESS) {
     	  report_problem();
-    	  call DSN.logError("UART msg to stack failed");
 	    } else {
     	  uartbusy = TRUE;
     	}
@@ -348,11 +338,11 @@ implementation {
         else {
         	report_problem();
         	call DSN.logInt(err);
-      		call DSN.logError("Send Sensordata radio stack failed (%i)");
+      		call DSN.logError("SensorData:Send failed (%i)");
         }
     }
     else {
-  		call DSN.logError("Radio busy while sending SensorData");
+  		call DSN.logError("SensorData:Radio busy");
     }  	
    	local.light1=0;
    	local.light2=0;
@@ -366,7 +356,7 @@ implementation {
 	  else {
 		  report_problem();
 		  call DSN.logInt(error);
-		  call DSN.logError("Send Sensordata failed (%i)");
+		  call DSN.logError("Sensordata:SendDone failed (%i)");
 	  }
 	  sendSensorBusy = FALSE;
   }
@@ -480,11 +470,11 @@ implementation {
 		else {
 	    	report_problem();  	
 	    	call DSN.logInt(err);
-	    	call DSN.logError("Send TreeInfo radio stack failed (%i)");
+	    	call DSN.logError("TreeInfo:Send failed (%i)");
     	}
   	}
   	else {
-  		call DSN.logError("Radio busy while sending TreeInfo");
+  		call DSN.logError("TreeInfo:Radio busy");
   		report_problem();
   	}
   }
@@ -496,7 +486,7 @@ implementation {
     else {
       report_problem();
       call DSN.logInt(error);
-	  call DSN.logError("Send TreeInfo failed (%i)");
+	  call DSN.logError("TreeInfo:SendDone failed (%i)");
     }
   	sendTopologyBusy = FALSE;
   }
@@ -565,16 +555,9 @@ implementation {
   		call LowPowerListening.setLocalSleepInterval(lplSleepInterval);
   		call CollectionLowPowerListening.setDefaultRxSleepInterval(lplSleepInterval);
   		call DSN.logInt(lplSleepInterval);
-  		call DSN.logInfo("changed lpl interval to %ims");
+  		call DSN.logInfo("changed lpl %ims");
   	}
   }
   
-  /****************** NeighbourSyncRequest events *******/
-  /*
-  event void NeighbourSyncRequest.updateRequest(){
-  	 call DSN.logDebug("Update synced neihbours with routing info");
-  	 call CtpInfo.triggerRouteUpdate();
-  }
-  */
 }
 

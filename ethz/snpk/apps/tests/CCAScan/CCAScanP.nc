@@ -30,6 +30,8 @@ implementation {
 	task void sampleCCA();
 	uint8_t inrow=0;
 	
+	void printConfig();
+	
 	event void Boot.booted(){
 		call DsnSend.logInt(TOS_NODE_ID);
 		call DsnSend.log("node %i booted");
@@ -39,20 +41,15 @@ implementation {
 	
 	event void RadioControl.startDone(error_t error) {
 		call LowPowerListening.setLocalSleepInterval(0);
-
-		call DsnSend.logInt(call CC2420Config.getChannel());
-		call DsnSend.logInt(call CC2420Config.getShortAddr());
-		call DsnSend.logInt(call CC2420Config.getPanAddr());
-		call DsnSend.logInt(call CC2420Config.isAddressRecognitionEnabled());
-		call DsnSend.logInt(call CC2420Config.isHwAutoAckDefault());
-		call DsnSend.logInt(call CC2420Config.isAutoAckEnabled());
-		call DsnSend.log("CC2420 configuration: ch %i, addr %i, pan %i, addrrec %i, hwAck %i, autoAck %i");
+		printConfig();
 		post sampleCCA();
 	}
 	
 	event void RadioControl.stopDone(error_t error) {	}
 		
-	event void CC2420Config.syncDone( error_t error ) {}
+	event void CC2420Config.syncDone( error_t error ) {
+		printConfig();
+	}
 	
 	task void sampleCCA() {
 		if (call EnergyIndicator.isReceiving()) {
@@ -79,5 +76,15 @@ implementation {
 	event void SetChannelCommand.detected(uint8_t * values, uint8_t n) {
 		call CC2420Config.setChannel( values[0] );
 		call CC2420Config.sync();
+	}
+	
+	void printConfig() {
+		call DsnSend.logInt(call CC2420Config.getChannel());
+		call DsnSend.logInt(call CC2420Config.getShortAddr());
+		call DsnSend.logInt(call CC2420Config.getPanAddr());
+		call DsnSend.logInt(call CC2420Config.isAddressRecognitionEnabled());
+		call DsnSend.logInt(call CC2420Config.isHwAutoAckDefault());
+		call DsnSend.logInt(call CC2420Config.isAutoAckEnabled());
+		call DsnSend.log("CC2420 configuration: ch %i, addr %i, pan %i, addrrec %i, hwAck %i, autoAck %i");
 	}
 }

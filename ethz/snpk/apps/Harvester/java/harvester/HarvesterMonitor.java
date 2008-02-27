@@ -41,7 +41,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Iterator;
+import java.util.TimeZone;
 import java.util.Vector;
 
 import javax.swing.JFrame;
@@ -103,6 +109,9 @@ public class HarvesterMonitor implements MessageListener, ActionListener, Window
     HarvesterMsg hmsg;
     StatusMsg smsg;
     
+    BufferedWriter logfileStream;
+    FileWriter file;
+    
     private final static int NO_ADDR=0xffff;
     
     public HarvesterMonitor() {
@@ -137,7 +146,25 @@ public class HarvesterMonitor implements MessageListener, ActionListener, Window
     	t = new Timer(500, this);
     	t.start();
     	// end graph
+    	
+    	// create log file
+    	System.out.println("default time zone:"+TimeZone.getDefault());
+    	SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmm");
+    	String logfilename = "HarvesterMonitor."+ sdf.format(System.currentTimeMillis())+".log";
+    	System.out.println("logging packets to "+logfilename);
+    	try {
+			file = new FileWriter(logfilename);
+			logfileStream =  new BufferedWriter(file);
+			logfileStream.write("# Harvester Monitor Logfile");
+			logfileStream.newLine();
+			logfileStream.write("# <timestamp> <am-type> <data 0>..<data n>");
+			logfileStream.newLine();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     
+		// setup connections to basestations
     	timsg=new TreeInfoMsg();
     	hmsg=new HarvesterMsg();
     	smsg=new StatusMsg();
@@ -157,6 +184,22 @@ public class HarvesterMonitor implements MessageListener, ActionListener, Window
     }
     
     synchronized public void messageReceived(int dest_addr, Message msg) {
+    	long timestamp = System.currentTimeMillis();
+    	// log packet
+		try {
+			logfileStream.write(Long.toString(timestamp));
+			logfileStream.write(" "+msg.amType());
+			for (int i=0; i<msg.dataLength(); i++) {
+				logfileStream.write(" ");
+				logfileStream.write(Integer.toString(0xff & msg.dataGet()[i]));
+			}
+			logfileStream.newLine();
+			logfileStream.flush();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    	// process
     	if (msg instanceof TreeInfoMsg) {
     		TreeInfoMsg tmsg = (TreeInfoMsg) msg;
     		// add node if not already part of the graph
@@ -188,7 +231,7 @@ public class HarvesterMonitor implements MessageListener, ActionListener, Window
     		moteListModel.updateMote(tmsg.get_id(),thisNode.getLostPackets(), thisNode.getPRR()*100);
 			moteList.repaint();
     		if (thisNode.getLostPackets()!=oldLost) {
-    			System.out.println(System.currentTimeMillis()+":"+nodeWithTwoDigits(tmsg.get_id())+": Lost packets:"+thisNode.getLostPackets()+" PRR:"+thisNode.getPRR());
+    			System.out.println(timestamp+":"+nodeWithTwoDigits(tmsg.get_id())+": Lost packets:"+thisNode.getLostPackets()+" PRR:"+thisNode.getPRR());
     		}
     		if (thisNode.findEdge(parentNode)==null && tmsg.get_parent()!=NO_ADDR) {
     			// remove all egdes from this vertex
@@ -287,6 +330,12 @@ public class HarvesterMonitor implements MessageListener, ActionListener, Window
 	public void windowClosing(WindowEvent e) {
 		// TODO Auto-generated method stub
 		 t.stop();
+		 try {
+			file.close();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		 Iterator<MoteIF> i = motes.iterator();
 		 while (i.hasNext()) {
 			 MoteIF mote=(MoteIF) i.next();

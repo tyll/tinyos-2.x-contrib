@@ -67,19 +67,20 @@ enum {
   RESYNC_AM_TYPE = 26, 
 };
 
-typedef struct {	// 16 + MEASURE_HISTORY_SIZE * 4 bytes
+typedef struct {	// 18 + MEASURE_HISTORY_SIZE * 4 bytes
   am_addr_t address; // 0
   uint32_t wakeupTimestamp[MEASURE_HISTORY_SIZE]; // 2
-  uint32_t wakeupAverage; // 18
-  bool odd; // 22
-  uint8_t measurementCount; // 23
-  uint16_t usageCount; // 24
-  uint8_t failCount; // 26
-  uint8_t driftLimitCount; // 27
-  uint16_t lplPeriod; // in ticks 28
-  int16_t drift; // 30
-  bool dirty; // 32
-  // align to word address -> struct size = 34, when MEASURE_HISTORY_SIZE==4
+  uint32_t newTimestamp; // 4
+  uint32_t wakeupAverage; // 20
+  bool odd; // 24
+  uint8_t measurementCount; // 25
+  uint16_t usageCount; // 26
+  uint8_t failCount; // 28
+  uint8_t driftLimitCount; // 29
+  uint16_t lplPeriod; // in ticks 30
+  int16_t drift; // 32
+  bool dirty; // 34
+  // align to word address -> struct size = 36, when MEASURE_HISTORY_SIZE==4
 } neighbour_sync_item_t;
 
 typedef nx_struct {

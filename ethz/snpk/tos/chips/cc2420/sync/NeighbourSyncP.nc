@@ -87,6 +87,7 @@ implementation {
   uint32_t t_radio_on;
   uint8_t state_error;
   uint8_t retries=0;
+  bool delayedDriftUpdate=FALSE;
   
   norace uint16_t lplPeriod32Khz;
   
@@ -116,11 +117,14 @@ implementation {
   bool tableFull();
   uint8_t addNewEntry (am_addr_t lladdr);
   uint8_t replaceLeastUsedEntry (am_addr_t lladdr);
+  void calculateDrift(neighbour_sync_item_t* item);
   void printtable();
   void send();
+  void finishDriftUpdate();
   
   task void startRadio();
   task void signalSendDoneFail();
+  task void updateDriftTable();
   //task void reportTimes();
 
   /***************** Send Commands ***************/
@@ -285,6 +289,7 @@ implementation {
     uint8_t idx;
     error_t senderror;
     call SyncSendState.toIdle();
+    finishDriftUpdate();
     if (error==ERETRY && m_timed_send) {
     	// setup new timed message
     	(call CC2420PacketBody.getHeader(msg))->length = m_len;	// set the right length
@@ -323,91 +328,11 @@ implementation {
   
   /***************** SubReceive Events ***************/
   
-  task void calculateDrift() {
-	  uint8_t i, j;
-	  neighbour_sync_item_t * item;
-	  uint32_t timeSum;
-	  uint32_t timeDiff;
-	  uint16_t periods;
-	  int32_t driftSum;
-	  uint32_t driftError;
-	  if (!call SyncSendState.isIdle()) {
-		  post calculateDrift();
-	  }
-	  else
-	  for (i=0;i<NEIGHBOURSYNCTABLESIZE;i++) {
-		  if (n_table[i].dirty) {
-#ifdef CC2420SYNC_DEBUG_PINS
-     TOSH_SET_GIO2_PIN();
-#endif
-			  item = &n_table[i];
-			  if (n_table[i].measurementCount>1) {
-				  // calculate drift				  
-				  timeSum=0;
-				  driftSum=0;
-				  periods=0;
-				  for (j=1;j<item->measurementCount;j++) {
-					  timeDiff=item->wakeupTimestamp[j]-item->wakeupTimestamp[j-1];
-					  periods += timeDiff / item->lplPeriod;
-					  timeSum+=timeDiff;
-					  driftError=timeDiff % item->lplPeriod;
-					  if (driftError<(item->lplPeriod >> 1))
-						  driftSum+=driftError;
-					  else {
-						  driftSum-=item->lplPeriod - driftError;
-						  periods++;
-					  }
-				  }
-				  item->odd = periods % 2 == 1;
-				  item->wakeupAverage = (timeSum >> 1) + item->wakeupTimestamp[0];
-				  if (driftSum<0) {
-					  driftSum=-driftSum;
-					  item->drift=(driftSum << 19) / (timeSum >> 2); // effectively 2^21
-					  item->drift=-item->drift;
-#ifdef CC2420SYNC_DEBUG
-					  call DSN.logInt(item->address);
-					  call DSN.logInt(timeDiff);
-					  call DSN.logInt(driftError);
-					  call DSN.logInt(-item->drift);
-					  call DSN.logInt(item->odd);
-					  call DSN.logInt(item->wakeupAverage);
-					  call DSN.logInt(item->wakeupTimestamp[0]);
-					  call DSN.log("node %i, measure period: %i, drift error=%i, rel=-%i %i %i %i");
-#endif					  
-				  }
-				  else {
-					  item->drift=(driftSum << 19) / (timeSum >> 2);
-#ifdef CC2420SYNC_DEBUG					  
-					  call DSN.logInt(item->address);
-					  call DSN.logInt(timeDiff);
-					  call DSN.logInt(driftError);
-					  call DSN.logInt(item->drift);
-					  call DSN.logInt(item->odd);
-					  call DSN.logInt(item->wakeupAverage);
-					  call DSN.logInt(item->wakeupTimestamp[0]);
-					  call DSN.log("node %i, measure period: %i, drift error=%i, rel=%i %i %i %i");
-#endif					  
-				  }
-			}
-		    else {
-		    	item->wakeupAverage = item->wakeupTimestamp[0];
-		    }
-		 item->dirty=FALSE;
-#ifdef CC2420SYNC_DEBUG_PINS
-     TOSH_CLR_GIO2_PIN();
-#endif
-		 }
-	  }
-  }
-  
   event message_t *SubReceive.receive(message_t* msg, void* payload, 
       uint8_t len) {    
     neighbour_sync_header_t * header;
     neighbour_sync_item_t * item;
-    uint8_t idx, i;
-    uint32_t newSync;
-    uint32_t driftError;
-    int16_t drift;
+    uint8_t idx;
     cc2420_metadata_t * meta;
     uint32_t now;
     
@@ -415,7 +340,7 @@ implementation {
     header = getSyncHeader(msg, len-SYNC_HEADER_SIZE);
     if ((header->lplPeriod & ~(REQ_SYNC_FLAG|MORE_FLAG)) > 0) {
 #ifdef CC2420SYNC_DEBUG_PINS
-     TOSH_SET_GIO2_PIN();
+    	TOSH_SET_GIO2_PIN();
 #endif
     	idx=getIndex(address);
     	if (idx==NO_ENTRY) {
@@ -426,89 +351,19 @@ implementation {
     			idx=addNewEntry (address);
     		}
     	}
-        now = call Alarm.getNow();
-        meta = call CC2420PacketBody.getMetadata(msg);
-        item = &n_table[idx];
-        item->lplPeriod=(header->lplPeriod & ~(REQ_SYNC_FLAG|MORE_FLAG)) << T32KHZ_TO_TMILLI_SHIFT; // save in table as 32khz ticks
-        if (header->wakeupOffset != NO_VALID_OFFSET && n_table[idx].lplPeriod>0) {
-        	// TODO: test ((uint16_t)now - meta->time
-        	// set bound to xx ticks ?
-        	// call DSN.logInt((uint16_t)now - meta->time);
-        	// call DSN.log("stackdelay %i");
-        	newSync = now - ((uint16_t)now - meta->time) - header->wakeupOffset;
-        	// save only sync times later than last one
-        	if (item->measurementCount==0 || 
-        		((newSync - item->wakeupTimestamp[item->measurementCount-1] < 0x80000000) &&
-        		(newSync - item->wakeupTimestamp[item->measurementCount-1] >= MIN_MEASUREMENT_PERIOD))) {
-        		if (item->measurementCount<MEASURE_HISTORY_SIZE) {
-        			item->wakeupTimestamp[item->measurementCount++]=newSync;        			
-        			item->failCount=0;
-        			item->dirty=TRUE;
-        			post calculateDrift();
-        		}
-        		else {
-        			// add entry, if drift over last period does not differ more than DRIFT_CHANGE_LIMIT
-        			driftError=(newSync-item->wakeupTimestamp[MEASURE_HISTORY_SIZE-1]) % item->lplPeriod;
-        			if (driftError < (item->lplPeriod >> 1)) {//pos
-        				drift=(driftError << 19) / ((newSync-item->wakeupTimestamp[MEASURE_HISTORY_SIZE-1]) / 4);
-        			}
-        			else {
-        				driftError=item->lplPeriod - driftError;
-        				drift=-((driftError << 19) / ((newSync-item->wakeupTimestamp[MEASURE_HISTORY_SIZE-1]) / 4));
-        			}
-        			if ((item->drift>drift && item->drift-drift<DRIFT_CHANGE_LIMIT) ||
-        				(item->drift<=drift && drift-item->drift<DRIFT_CHANGE_LIMIT)) {
-#ifdef CC2420SYNC_DEBUG
-        				if (drift>=0) {
-        					call DSN.logInt(drift);
-        					call DSN.log("drift: %i");
-        				}
-        				else {
-        					call DSN.logInt(-drift);
-        					call DSN.log("drift: -%i");
-        				}
-#endif  
-        				// shift stamps
-        				for (i=0;i<MEASURE_HISTORY_SIZE-1;i++)
-        					item->wakeupTimestamp[i]=item->wakeupTimestamp[i+1];
-        				item->wakeupTimestamp[item->measurementCount-1]=newSync;
-        		   		item->dirty=TRUE;
-        		   		post calculateDrift();
-        		   		item->failCount=0;     
-        		   		item->driftLimitCount = 0;
-        			}
-        			else {
-#ifdef CC2420SYNC_DEBUG
-        				if (drift>=0) {
-        					call DSN.logInt(drift);
-        					call DSN.log("drift out of limit: %i");
-        				}
-        				else {
-        					call DSN.logInt(-drift);
-        					call DSN.log("drift out of limit: -%i");
-        				}
-#endif        				
-        				item->driftLimitCount++;
-        				if (item->driftLimitCount >= MAX_DRIFT_ERRORS) {
-        					item->measurementCount = 0;
-        					item->drift = NO_VALID_DRIFT;
-        					item->driftLimitCount = 0;
-#ifdef CC2420SYNC_DEBUG					
-        					call DSN.logInt(item->address);
-        					call DSN.log("max limits reached, flush history node %i");
-#endif        					
-        				}
-        			}
-        		}        		 
-        	}
-        	else {
-#ifdef CC2420SYNC_DEBUG
-        		call DSN.log("bad timestamp (earlier than last)");
-#endif        		
-        	}
+        // add new measurement
+        if (header->wakeupOffset != NO_VALID_OFFSET) {
+        	now = call Alarm.getNow();
+        	meta = call CC2420PacketBody.getMetadata(msg);
+            item = &n_table[idx];
+        	item->lplPeriod=(header->lplPeriod & ~(REQ_SYNC_FLAG|MORE_FLAG)) << T32KHZ_TO_TMILLI_SHIFT; // save in table as 32khz ticks
+        	item->newTimestamp = now - ((uint16_t)now - meta->time) - header->wakeupOffset;
+        	item->failCount=0;
+        	item->dirty=TRUE;
+        	post updateDriftTable();
         }
         else
-          call DSN.log("no valid offset");
+        	call DSN.log("no valid offset");
     }
     if ((header->lplPeriod & REQ_SYNC_FLAG) != 0) {
     	signal NeighbourSyncRequest.updateRequest(address, header->lplPeriod & ~(REQ_SYNC_FLAG|MORE_FLAG));
@@ -516,12 +371,14 @@ implementation {
 
 #ifdef CC2420SYNC_DEBUG
     // print accuracy of packet
+    /*
     if ((call CC2420PacketBody.getHeader(msg))->dest == TOS_NODE_ID) {
     	call DSN.logInt(address);  	    	
     	call DSN.logInt((call CC2420PacketBody.getMetadata(msg))->time - call PowerCycle.getLastWakeUp());
     	call DSN.logInt((t_radio_on & 0xffff) - call PowerCycle.getLastWakeUp());    	
     	call DSN.log("rx packet from %i, at %i, on at %i");
     }
+    */
 #endif
 #ifdef CC2420SYNC_DEBUG_PINS
      TOSH_CLR_GIO2_PIN();
@@ -747,6 +604,74 @@ implementation {
     
   }
   }
+  
+  void finishDriftUpdate() {
+	  if (delayedDriftUpdate) {
+		  delayedDriftUpdate=FALSE;
+		  post updateDriftTable();
+	  }
+  }
+  
+  void calculateDrift(neighbour_sync_item_t* item) {
+	  uint8_t j;
+	  uint32_t timeSum;
+	  uint32_t timeDiff=0;
+	  uint16_t periods;
+	  int32_t driftSum;
+	  uint32_t driftError=0;
+	  if (item->measurementCount>1) {
+		  // calculate drift				  
+		  timeSum=0;
+		  driftSum=0;
+		  periods=0;
+		  for (j=1;j<item->measurementCount;j++) {
+			  timeDiff=item->wakeupTimestamp[j]-item->wakeupTimestamp[j-1];
+			  periods += timeDiff / item->lplPeriod;
+			  timeSum+=timeDiff;
+			  driftError=timeDiff % item->lplPeriod;
+			  if (driftError<(item->lplPeriod >> 1))
+				  driftSum+=driftError;
+			  else {
+				  driftSum-=item->lplPeriod - driftError;
+				  periods++;
+			  }
+		  }
+		  item->odd = periods % 2 == 1;
+		  item->wakeupAverage = (timeSum >> 1) + item->wakeupTimestamp[0];
+		  if (driftSum<0) {
+			  driftSum=-driftSum;
+			  item->drift=(driftSum << 19) / (timeSum >> 2); // effectively 2^21
+			  item->drift=-item->drift;
+#ifdef CC2420SYNC_DEBUG
+			  call DSN.logInt(item->address);
+			  call DSN.logInt(timeDiff);
+			  call DSN.logInt(driftError);
+			  call DSN.logInt(-item->drift);
+			  call DSN.logInt(item->odd);
+			  call DSN.logInt(item->wakeupAverage);
+			  call DSN.logInt(item->wakeupTimestamp[0]);
+			  call DSN.log("node %i, measure period: %i, drift error=%i, rel=-%i %i %i %i");
+#endif					  
+		  }
+		  else {
+			  item->drift=(driftSum << 19) / (timeSum >> 2);
+#ifdef CC2420SYNC_DEBUG					  
+			  call DSN.logInt(item->address);
+			  call DSN.logInt(timeDiff);
+			  call DSN.logInt(driftError);
+			  call DSN.logInt(item->drift);
+			  call DSN.logInt(item->odd);
+			  call DSN.logInt(item->wakeupAverage);
+			  call DSN.logInt(item->wakeupTimestamp[0]);
+			  call DSN.log("node %i, measure period: %i, drift error=%i, rel=%i %i %i %i");
+#endif					  
+		  }
+	}
+	else { // only one measurement available
+		item->wakeupAverage = item->wakeupTimestamp[0];
+	}  
+  }
+  
   /***************** Send Functions ***********************/
   
   void send() {
@@ -757,6 +682,7 @@ implementation {
 	  }
 	  if ((error = call SubSend.send(m_msg, m_len + SYNC_HEADER_SIZE))!= SUCCESS) {
 		  call SyncSendState.toIdle();
+		  finishDriftUpdate();
 		  (call CC2420PacketBody.getHeader(m_msg))->length = m_len;	// set the right length
 	      (call CC2420PacketBody.getMetadata(m_msg))->rxInterval = m_rxInterval;
 	      signal Send.sendDone(m_msg, error);
@@ -774,6 +700,7 @@ implementation {
 
   task void signalSendDoneFail() {
 	  call SyncSendState.toIdle();
+	  finishDriftUpdate();
 	  atomic call DSN.logInt(state_error);
 	  call DSN.log("send failed (state %i)");
 	  (call CC2420PacketBody.getHeader(m_msg))->length = m_len;	// set the right length
@@ -791,6 +718,102 @@ implementation {
     	send();
     } 
    }
+  
+  task void updateDriftTable() {
+	  uint8_t i, j;
+	  neighbour_sync_item_t * item;
+	  uint32_t newSync, lastSync;
+	  uint32_t driftError;
+	  int16_t drift;
+	  if (!call SyncSendState.isIdle()) { // avoid critical sections for timing calculations
+		  delayedDriftUpdate=TRUE;
+		  return;
+	  }
+	  for (i=0;i<numEntries;i++) {
+		  if (n_table[i].dirty) {
+#ifdef CC2420SYNC_DEBUG_PINS
+     TOSH_SET_GIO2_PIN();
+#endif
+			  item = &n_table[i];
+			  // check new measurement for sanity
+			  // decide whether to add the measurment or not
+			  newSync=item->newTimestamp;
+			  lastSync=item->wakeupTimestamp[item->measurementCount-1];
+			  if (item->measurementCount==0 ||																	// fill empty history 
+				  ((newSync - lastSync < 0x80000000) &&					// save only sync times later than last one
+			      (newSync - lastSync >= MIN_MEASUREMENT_PERIOD))) {		// short measurement periods ar of little use
+				  if (item->measurementCount < MEASURE_HISTORY_SIZE) {	// a short measurement history
+					  item->wakeupTimestamp[item->measurementCount++]=item->newTimestamp;
+					  // calculate new drift...
+					  calculateDrift(item);
+				  }
+				  else {
+					  // add entry, if drift over last period does not differ more than DRIFT_CHANGE_LIMIT
+					  driftError=(newSync - lastSync) % item->lplPeriod;
+					  if (driftError < (item->lplPeriod >> 1)) //positive
+						  drift=(driftError << 19) / ((newSync - lastSync) / 4);
+					  else {
+						  driftError=item->lplPeriod - driftError;
+						  drift=-((driftError << 19) / ((newSync - lastSync) / 4));
+					  }
+			          if ((item->drift>drift && item->drift-drift<DRIFT_CHANGE_LIMIT) ||
+			        	  (item->drift<=drift && drift-item->drift<DRIFT_CHANGE_LIMIT)) {
+#ifdef CC2420SYNC_DEBUG
+			        	  if (drift>=0) {
+			        		  call DSN.logInt(drift);
+			        		  call DSN.log("drift: %i");
+			        	  }
+			        	  else {
+			        		  call DSN.logInt(-drift);
+			        		  call DSN.log("drift: -%i");
+			        	  }
+#endif  
+			        	  // shift stamps
+			        	  for (j=0;j<MEASURE_HISTORY_SIZE-1;j++)
+			        		  item->wakeupTimestamp[j]=item->wakeupTimestamp[j+1];
+			        	  item->wakeupTimestamp[item->measurementCount-1]=newSync;  
+			        	  item->driftLimitCount = 0;
+			        	  // calculate new drift...
+			        	  calculateDrift(item);
+			          }
+			          else { // drift measurment seems too big 
+#ifdef CC2420SYNC_DEBUG
+			        	  if (drift>=0) {
+			        		  call DSN.logInt(drift);
+			        		  call DSN.log("drift out of limit: %i");
+			        	  }
+			        	  else {
+			        		  call DSN.logInt(-drift);
+			        		  call DSN.log("drift out of limit: -%i");
+			        	  }
+#endif        				
+			        	  item->driftLimitCount++;
+			        	  if (item->driftLimitCount >= MAX_DRIFT_ERRORS) {
+			        		  item->measurementCount = 0;
+			        		  item->drift = NO_VALID_DRIFT;
+			        		  item->driftLimitCount = 0;
+#ifdef CC2420SYNC_DEBUG					
+			        		  call DSN.logInt(item->address);
+			        		  call DSN.log("max limits reached, flush history node %i");
+#endif        					
+			        	  }
+			          } // drift too big
+				  }  // check drift      		 
+			  } // lpl not 0 or earlier than last
+			  else {
+#ifdef CC2420SYNC_DEBUG
+				  call DSN.log("bad timestamp (earlier than last)");
+#endif        		
+			  }
+			  item->dirty=FALSE;
+		  }
+		  
+#ifdef CC2420SYNC_DEBUG_PINS
+     TOSH_CLR_GIO2_PIN();
+#endif
+	  } // for
+  }
+  
 /*    
   task void reportTimes() {
 	  atomic {

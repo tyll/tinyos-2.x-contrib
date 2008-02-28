@@ -70,8 +70,12 @@ enum {
 	SET_SLEEP_DUTY_CYCLE_REQUEST = 13,
 	SET_AWAKE_DUTY_CYCLE_REQUEST = 14,
 	BROADCAST_DIS_KEY = 42,
+	BOOT_REQUEST = 15,
+	SET_NUM_NODES_REQUEST = 16,
 	MODE_AUTO = 1,
+	MAX_NUM_NODES = 41,
 	MODE_QUERY = 0 // useful ?
+
 };
 
 #include "OctopusConfig.h"
@@ -84,6 +88,7 @@ typedef nx_struct octopus_collected_msg {
 	nx_am_addr_t moteId; /* Mote id of sending mote. */
 	nx_uint16_t count; /* The readings are samples count * NREADINGS onwards */
 	nx_uint16_t reading;
+	//nx_uint16_t hops;
 	nx_uint16_t quality;
 	nx_am_addr_t parentId;
 	nx_uint8_t reply;
@@ -101,6 +106,7 @@ typedef nx_struct octopus_collected_msg {
 	type (8 bits)					parameters	(16 bits)	reply (8 bits)		reading (16 bits)
 
 	SET_MODE_AUTO_REQUEST			none					none				none
+	SET_NUM_NODES_REQUEST			none					none				none
 	SET_MODE_QUERY_REQUEST			none					none				none
 	SET_PERIOD_REQUEST				period (16 bits)		none				none
 	SET_THRESHOLD_REQUEST			threshold (8 bits)		none				none

@@ -22,13 +22,13 @@
  * OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
  * MODIFICATIONS.
  *
- * Authors:	Raja Jurdak, Antonio Ruzzelli, Samuel Boivineau, and Alessio Barbirato
+ * Authors:	Raja Jurdak, Antonio Ruzzelli, and Samuel Boivineau
  * Date created: 2007/09/07
  *
  */
 
 /**
- * @author Raja Jurdak, Antonio Ruzzelli,  Samuel Boivineau, and Alessio Barbirato
+ * @author Raja Jurdak, Antonio Ruzzelli, and Samuel Boivineau
  */
 
 
@@ -47,7 +47,6 @@ module OctopusC {
   uses {
     // Interfaces for initialization:
     interface Boot;
-    
     interface SplitControl as RadioControl;
     interface SplitControl as SerialControl;
 	
@@ -87,7 +86,7 @@ module OctopusC {
 	
     // Miscalleny:
     interface Timer<TMilli>;
-    interface Timer<TMilli> as WaitTimer;
+	interface Timer<TMilli> as WaitTimer;
     interface Read<uint16_t>; // sensor
     interface Leds;
     interface Random;
@@ -97,12 +96,23 @@ implementation {
 	/*
 		Variables
 	*/
+	
 	octopus_collected_msg_t localCollectedMsg;
 	message_t fwdMsg;
 	message_t sndMsg, serialMsg;
 	bool fwdBusy, sendBusy, uartBusy;
 	uint16_t samplingPeriod;
 	uint16_t waitT;
+	uint16_t vet[100];
+	uint16_t array[100];
+	uint16_t counter = 0;
+	uint8_t counter2 = 0;
+	uint16_t count = 0;
+	//uint16_t flag;
+	uint16_t nodes = 0;
+	uint16_t idRec = 0;
+	uint16_t alpha = 40;
+	nx_am_addr_t t;
 	uint16_t threshold;
 	bool modeAuto, sleeping, root=FALSE;
 	uint16_t battery, sleepDutyCycle, awakeDutyCycle;
@@ -147,6 +157,9 @@ implementation {
 		awakeDutyCycle = DEFAULT_AWAKE_DUTY_CYCLE;
 		sendBusy = FALSE;
 		uartBusy = FALSE;
+		call Leds.led0Off();
+		call Leds.led1Off();
+		call Leds.led2Off();
 		// battery = getBatteryValue(); ???
 	}
 	event void RadioControl.startDone(error_t error) {
@@ -162,16 +175,7 @@ implementation {
 		} else
 			fatalProblem();
 	}
-	event void RadioControl.stopDone(error_t error) {
-		if (error == SUCCESS){
-			if (call CollectControl.stop() != SUCCESS)
-				fatalProblem();
-			if (call BroadcastControl.stop() != SUCCESS)
-				fatalProblem();
-		} else
-			fatalProblem();
-	}
-	//default command error_t SoftwareInit.init() {} 
+	event void RadioControl.stopDone(error_t error) { }
 	event void SerialControl.startDone(error_t error) { 
   		if (error != SUCCESS)
 			fatalProblem();
@@ -188,9 +192,8 @@ implementation {
 			case SET_MODE_AUTO_REQUEST:
 				modeAuto = TRUE;
 				call Timer.stop();
-				//This waiting time avoids all nodes starting at the same time, which may cause a lot of collisions
-				waitT = 1+TOS_NODE_ID*32;
-				call WaitTimer.startOneShot(waitT); 
+				waitT = (1+TOS_NODE_ID%MAX_NUM_NODES)*alpha;		
+				call WaitTimer.startOneShot(waitT);
 				break;
 			case SET_MODE_QUERY_REQUEST:
 				modeAuto = FALSE;
@@ -199,8 +202,8 @@ implementation {
 			case SET_PERIOD_REQUEST:
 				samplingPeriod = newRequest->parameters;
 				call Timer.stop();
-				//This waiting time avoids all nodes starting at the same time, which may cause a lot of collisions
-				waitT = 1+TOS_NODE_ID*32;
+				alpha = samplingPeriod/MAX_NUM_NODES;
+				waitT = (1+TOS_NODE_ID%MAX_NUM_NODES)*alpha;
 				if(sleeping == FALSE)
 					call WaitTimer.startOneShot(waitT);   
 				break;
@@ -276,7 +279,71 @@ implementation {
 				break;
 			case BOOT_REQUEST:
 				break;
-				
+			case SET_NUM_NODES_REQUEST:
+				/*idRec = newRequest->parameters;
+				call Leds.led1On();
+				if(idRec == 0){
+					call Leds.led0On();
+					call Leds.led2Off();
+					call Leds.led1Off();
+				}
+				else if(idRec == 1){
+					call Leds.led0On();
+					call Leds.led2Off();
+					call Leds.led1Off();
+				}
+				else if(idRec == 2){
+					call Leds.led0On();
+					call Leds.led2Off();
+					call Leds.led1On();
+				}
+				else if(idRec == 3){
+					call Leds.led0Off();
+					call Leds.led2On();
+					call Leds.led1Off();
+				}
+				else if(nodes == 5){
+					call Leds.led0On();
+					call Leds.led2On();
+					call Leds.led1Off();
+				}
+				else if(nodes == 6){
+					call Leds.led0Off();
+					call Leds.led2On();
+					call Leds.led1On();
+				}
+				else if(nodes == 7){
+					call Leds.led0On();
+					call Leds.led2On();
+					call Leds.led1On();
+				}
+				else if(nodes == 8){
+					call Leds.led0Toggle();
+					call Leds.led2Off();
+					call Leds.led1Off();
+				}
+				else if(nodes == 9){
+					call Leds.led0Off();
+					call Leds.led2Off();
+					call Leds.led1Toggle();
+				}
+				else if(nodes == 10){
+					call Leds.led0Toggle();
+					call Leds.led2Off();
+					call Leds.led1Toggle();
+				}
+				else if(nodes == 11){
+					call Leds.led0Off();
+					call Leds.led2Toggle();
+					call Leds.led1Off();
+				}
+				else if(nodes == 12){
+					call Leds.led0Toggle();
+					call Leds.led2Toggle();
+					call Leds.led1Off();
+				}*/
+				//alpha = samplingPeriod/(2+nodes);
+				break;
 			}
 		}
 	}
@@ -379,9 +446,8 @@ implementation {
 			call Read.read();
 	}
 	event void WaitTimer.fired() {
-		call Timer.startPeriodic(samplingPeriod); //WaitTimer implements an application layer backoff to avoid collisions of nodes' packets when they receive a new request
+		call Timer.startPeriodic(samplingPeriod); 
 	}
-
 	/*
 		Once the sensor is read, the value is computed to check if it's
 		out of the range of the threshold, if so the value is sent.
@@ -420,13 +486,46 @@ implementation {
 	/*
 		GATEWAY : When we receive a collected message,
 		we forward it to the PC via the serial port 
-! we assume the protocol used implements an interface called 
-! receive for the reception of frames by the gateway
+		! we assume the protocol used implements an interface called 
+		! receive for the reception of frames by the gateway
 	*/
 
 	event message_t *CollectReceive.receive(message_t* msg, void* payload, uint8_t len) {
 		octopus_collected_msg_t *collectedMsg = payload;
 		
+		/*PROBLEM WITH THE id MOTE*************************************************
+		Using the sequent function the Id mote is not recognised anyomre in Octopus.
+		Maybe there is a conflict between Java code and nesC code
+		***************************************************************************/
+		
+		/*octopus_collected_msg_t test = *collectedMsg;
+		octopus_sent_msg_t *newR;
+		uint16_t a;
+		uint16_t flag=0;
+
+		t = test.moteId;
+
+		newR->targetId = 0xFFFF;
+		newR->request = SET_NUM_NODES_REQUEST;
+
+		for(a=0;a<counter;a++){
+			if(vet[a]==t)
+				flag = 1;					
+		}
+		if(flag == 0){
+			
+			vet[counter]=t;
+				counter++;
+			for(a=0;a<counter;a++){
+				newR->parameters = counter;
+			#if defined(DISSEMINATION_PROTOCOL)
+				call RequestUpdate.change(newR);
+			#elif defined(DUMMY_BROADCAST_PROTOCOL)
+				call DummyBroadcast.send(newR);
+			#endif
+				processRequest(newR); // add an option GATEWAY_SENSING_ENV
+			}
+        }*/
 		if (len == sizeof(octopus_collected_msg_t) && !fwdBusy) {
 			/* Copy payload (collectedMsg) from collection system to our serial
 			   message buffer (fwdCollectedMsg), then send our serial message */

@@ -33,16 +33,17 @@
 
 
 #include <Octopus.h>
-
+#include "printf.h"
 configuration OctopusAppC { }
 implementation {
 	// Miscalleny:
 	components MainC, OctopusC, LedsC, new TimerMilliC(), 
-	new OctopusSensorC() as Sensor, RandomC;
+	new OctopusSensorC() as Sensor, RandomC, PlatformC;
 
-	//MainC.SoftwareInit -> Sensor;
+
 	OctopusC.Boot -> MainC;
 	OctopusC.Timer -> TimerMilliC;
+	OctopusC.WaitTimer -> TimerMilliC;
 	OctopusC.Read -> Sensor;
 	OctopusC.Leds -> LedsC;
 	OctopusC.Random -> RandomC;

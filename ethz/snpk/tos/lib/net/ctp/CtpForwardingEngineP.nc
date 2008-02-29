@@ -532,8 +532,12 @@ implementation {
         call CtpPacket.clearOption(qe->msg, CTP_OPT_ECN);
       if (call SendQueue.size()>1)
     	  call NeighbourSyncFlowPacket.setMore(qe->msg);
-      else
+      else {
     	  call NeighbourSyncFlowPacket.clearMore(qe->msg);
+    	  fastPacketCount=MAX_FAST_PACKETS; // advice senddone to reset fastpackets
+    	  									// if our sendqueue increases between send and senddone
+    	  									// the recevier will already be sleeping at the time the second fast packet arrives
+      }
       subsendResult = call SubSend.send(dest, qe->msg, payloadLen);
       if (subsendResult == SUCCESS) {
         // Successfully submitted to the data-link layer.

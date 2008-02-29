@@ -139,9 +139,7 @@ implementation {
       uint16_t halfdrift;
       uint32_t wakeup_delay;
       cc2420_metadata_t * meta = (call CC2420PacketBody.getMetadata( msg ));
-#ifdef CC2420SYNC_DEBUG_PINS
-    	TOSH_SET_GIO2_PIN();
-#endif
+
       if (len - CC2420_SIZE + SYNC_HEADER_SIZE <= call SubSend.maxPayloadLength()) {
         atomic  {
           m_len = len;
@@ -328,9 +326,6 @@ implementation {
     	retries=0;
     	(call CC2420PacketBody.getHeader(msg))->length = m_len;	// set the right length
     	(call CC2420PacketBody.getMetadata( msg ))->rxInterval = m_rxInterval;
-#ifdef CC2420SYNC_DEBUG_PINS
-     TOSH_CLR_GIO2_PIN();
-#endif
     	signal Send.sendDone(msg, error);
     }
   }

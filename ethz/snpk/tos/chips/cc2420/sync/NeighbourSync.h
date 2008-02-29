@@ -38,11 +38,11 @@
 #include "CC2420.h"
 
 enum {
-  NEIGHBOURSYNCTABLESIZE = 10, // size of sync neighbour table
+  NEIGHBOURSYNCTABLESIZE = 8, // size of sync neighbour table
+  TABLE_UPDATE_DELAY = 100, // the neighbour table is updated after this delay [ms], or when radio is off
   MEASURE_HISTORY_SIZE = 4,
   NO_VALID_OFFSET = 0xffff,
   NO_VALID_DRIFT = 32767,
-  NO_ENTRY = 0xff,
   NO_SYNC = 0xffffffff,
   T32KHZ_TO_TMILLI_SHIFT = 5, // factor for conversion TMilli > T32khz
 
@@ -63,7 +63,7 @@ enum {
   							// 50 is about 23ppm
   MAX_DRIFT_ERRORS = 5,	// number of false drifts until history is cleared, e.g. when neihgbour node has resetted
   MIN_MEASUREMENT_PERIOD = 131072UL, // 4s, minimal drift measurement period in ticks
-  
+ 
   RESYNC_AM_TYPE = 26, 
 };
 

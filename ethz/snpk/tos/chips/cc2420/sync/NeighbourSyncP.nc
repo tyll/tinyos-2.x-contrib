@@ -58,6 +58,7 @@ module NeighbourSyncP {
     interface State as RadioPowerState;
     interface State as SyncSendState;
     interface State as SendState;
+    interface Timer<TMilli> as UpdateTimer;
     
     interface SplitControl as SubControl;
     interface RadioBackoff as SubBackoff[am_id_t amId];
@@ -113,10 +114,10 @@ implementation {
 
   /***************** Prototypes *********/
   neighbour_sync_header_t* getSyncHeader(message_t * msg, uint8_t len ) ;
-  uint8_t getIndex(am_addr_t lladdr);
   bool tableFull();
-  uint8_t addNewEntry (am_addr_t lladdr);
-  uint8_t replaceLeastUsedEntry (am_addr_t lladdr);
+  neighbour_sync_item_t* getSyncItem(am_addr_t lladdr);
+  neighbour_sync_item_t* addNewEntry (am_addr_t lladdr);
+  neighbour_sync_item_t* replaceLeastUsedEntry (am_addr_t lladdr);
   void calculateDrift(neighbour_sync_item_t* item);
   void printtable();
   void send();
@@ -131,7 +132,7 @@ implementation {
   command error_t Send.send(message_t *msg, uint8_t len) {
       neighbour_sync_header_t * header;
       am_addr_t dest;
-      uint8_t idx;
+      neighbour_sync_item_t* item;
       uint32_t now;
       int32_t driftCompensation;
       uint32_t lastSync;
@@ -152,26 +153,26 @@ implementation {
         header->lplPeriod = call PowerCycle.getSleepInterval() | (meta->more * MORE_FLAG);
         header->wakeupOffset = NO_VALID_OFFSET;
         dest = (call CC2420PacketBody.getHeader(msg))->dest;
-        idx=getIndex(dest);
-        if ((idx!=NO_ENTRY) && (n_table[idx].lplPeriod!=0) && (meta->rxInterval > 0)
-        		&& (n_table[idx].failCount<SYNC_FAIL_THRESHOLD) && (n_table[idx].measurementCount>0)) {
+        item=getSyncItem(dest);
+        if ((item!=NULL) && (item->lplPeriod!=0) && (meta->rxInterval > 0)
+        		&& (item->failCount<SYNC_FAIL_THRESHOLD) && (item->measurementCount>0)) {
         	// timed send
         	atomic {
         		m_timed_send=TRUE;
         	}
         	meta->synced=TRUE;
         	call SyncSendState.forceState(S_PREPARE_RADIO);
-        	lplPeriod32Khz = n_table[idx].lplPeriod;
-        	lastSync=n_table[idx].wakeupAverage;
+        	lplPeriod32Khz = item->lplPeriod;
+        	lastSync=item->wakeupAverage;
         	now = call Alarm.getNow();
-        	if (n_table[idx].drift!=NO_VALID_DRIFT) {
+        	if (item->drift!=NO_VALID_DRIFT) {
         		meta->rxInterval=0;
-        		if (n_table[idx].drift<0) { // negative drift
-        			n_table[idx].drift=-n_table[idx].drift;
+        		if (item->drift<0) { // negative drift
+        			item->drift=-item->drift;
         			// TODO: find more efficient calculation for this
         			//driftCompensation=(((now - lastSync) >> 1) * n_table[idx].drift) >> 20;
-        			driftCompensation=(((now - lastSync) / 2) * n_table[idx].drift) / 1048576;
-        			n_table[idx].drift=-n_table[idx].drift;        		
+        			driftCompensation=(((now - lastSync) / 2) * item->drift) / 1048576;
+        			item->drift=-item->drift;        		
         			/*call DSN.logInt(driftCompensation);
         			call DSN.logInt(n_table[idx].drift);
         			call DSN.logInt(now - lastSync);
@@ -180,7 +181,7 @@ implementation {
         		}
         		else {	// positive drift
         			//driftCompensation=(((now - lastSync)>>1) * n_table[idx].drift) >> 20;
-        			driftCompensation=(((now - lastSync)/2) * n_table[idx].drift) / 1048576;
+        			driftCompensation=(((now - lastSync)/2) * item->drift) / 1048576;
         			/*call DSN.logInt(driftCompensation);
         			call DSN.logInt(n_table[idx].drift);
         			call DSN.logInt(now - lastSync);
@@ -194,17 +195,17 @@ implementation {
         		 * time until next wakeup on this node
         		 * 		lplPeriod32Khz - ( now - lastSync - driftCompensation+ halfdrift) % lplPeriod32Khz + driftCompensation(time until next wakeup on neighbour node)
         		 **/
-        		halfdrift=n_table[idx].odd * (lplPeriod32Khz >> 1);
+        		halfdrift=item->odd * (lplPeriod32Khz >> 1);
         		// wakeup_delay [1..lplPeriod32Khz]
         		wakeup_delay=lplPeriod32Khz - (now - lastSync - driftCompensation + halfdrift + ALARM_OFFSET - REVERSE_SEND_OFFSET + CC2420_ACK_WAIT_DELAY) % lplPeriod32Khz;
-        		if (n_table[idx].drift<0) { // negative drift
-        			n_table[idx].drift=-n_table[idx].drift;
-        		    driftCompensation=(wakeup_delay * n_table[idx].drift) >> 21;
-        		    n_table[idx].drift=-n_table[idx].drift;
+        		if (item->drift<0) { // negative drift
+        			item->drift=-item->drift;
+        		    driftCompensation=(wakeup_delay * item->drift) >> 21;
+        		    item->drift=-item->drift;
         		    driftCompensation=-driftCompensation;
         		}
         		else {	// positive drift
-        			driftCompensation=(wakeup_delay * n_table[idx].drift) >> 21;
+        			driftCompensation=(wakeup_delay * item->drift) >> 21;
         		}
         		wakeup_delay+=driftCompensation;
         		if (call Alarm.getNow() - (now + wakeup_delay) < 0x80000000) // getNow is later than estimated wakeup time
@@ -234,8 +235,8 @@ implementation {
         	call DSN.log("timed packet in %i ticks, startup in %i ticks");
         	*/
         	// save some statistics for table maintenance 
-        	if (n_table[idx].usageCount < 0xffff)
-        		n_table[idx].usageCount++;
+        	if (item->usageCount < 0xffff)
+        		item->usageCount++;
         	if (++packetCounter == TOTAL_AGING_PERIOD) {
         		uint8_t i;
         		// do aging of table entires
@@ -286,7 +287,7 @@ implementation {
   event void SubSend.sendDone(message_t* msg, error_t error) {
 	  // return ERETRY on cca fail for synced packets,
 	  // retry later
-    uint8_t idx;
+	neighbour_sync_item_t* item;
     error_t senderror;
     call SyncSendState.toIdle();
     finishDriftUpdate();
@@ -305,13 +306,13 @@ implementation {
     		retries++;
     }
     else {
-    	idx = getIndex((call CC2420PacketBody.getHeader(msg))->dest);
+    	item = getSyncItem((call CC2420PacketBody.getHeader(msg))->dest);
     	if (((call CC2420PacketBody.getHeader(msg))->fcf & IEEE154_FCF_ACK_REQ)!=0
-          && idx!=NO_ENTRY && (call CC2420PacketBody.getMetadata( msg ))->synced) {
+          && item!=NULL && (call CC2420PacketBody.getMetadata( msg ))->synced) {
     		if (call PacketAcknowledgements.wasAcked(msg))
-    			n_table[idx].failCount=0;
+    			item->failCount=0;
     		else {
-    			n_table[idx].failCount++;
+    			item->failCount++;
     			if ((call CC2420PacketBody.getMetadata( msg ))->snoopedAcks > 0) {
     				call DSN.logInt((call CC2420PacketBody.getMetadata( msg ))->snoopedAcks);
     				call DSN.log("delayed ack %i");
@@ -332,9 +333,9 @@ implementation {
       uint8_t len) {    
     neighbour_sync_header_t * header;
     neighbour_sync_item_t * item;
-    uint8_t idx;
     cc2420_metadata_t * meta;
     uint32_t now;
+    uint32_t newSync;
     
     am_addr_t address = (call CC2420PacketBody.getHeader(msg))->src;
     header = getSyncHeader(msg, len-SYNC_HEADER_SIZE);
@@ -342,25 +343,27 @@ implementation {
 #ifdef CC2420SYNC_DEBUG_PINS
     	TOSH_SET_GIO2_PIN();
 #endif
-    	idx=getIndex(address);
-    	if (idx==NO_ENTRY) {
+    	item=getSyncItem(address);
+    	if (item==NULL) {
     		if (tableFull()) {
-    			idx=replaceLeastUsedEntry (address);
+    			item=replaceLeastUsedEntry (address);
     		}
     		else {
-    			idx=addNewEntry (address);
+    			item=addNewEntry (address);
     		}
     	}
         // add new measurement
         if (header->wakeupOffset != NO_VALID_OFFSET) {
         	now = call Alarm.getNow();
         	meta = call CC2420PacketBody.getMetadata(msg);
-            item = &n_table[idx];
-        	item->lplPeriod=(header->lplPeriod & ~(REQ_SYNC_FLAG|MORE_FLAG)) << T32KHZ_TO_TMILLI_SHIFT; // save in table as 32khz ticks
-        	item->newTimestamp = now - ((uint16_t)now - meta->time) - header->wakeupOffset;
-        	item->failCount=0;
-        	item->dirty=TRUE;
-        	post updateDriftTable();
+        	newSync = now - ((uint16_t)now - meta->time) - header->wakeupOffset;
+        	if (newSync - item->newTimestamp >= MIN_MEASUREMENT_PERIOD) {
+        		item->lplPeriod=(header->lplPeriod & ~(REQ_SYNC_FLAG|MORE_FLAG)) << T32KHZ_TO_TMILLI_SHIFT; // save in table as 32khz ticks
+        		item->newTimestamp = newSync;
+        		item->failCount=0;
+        		item->dirty=TRUE;
+       			call UpdateTimer.startOneShot(TABLE_UPDATE_DELAY);
+        	}
         }
         else
         	call DSN.log("no valid offset");
@@ -385,6 +388,15 @@ implementation {
 #endif
     (call CC2420PacketBody.getHeader(msg))->length = len - SYNC_HEADER_SIZE;
     return signal Receive.receive(msg, payload, len - SYNC_HEADER_SIZE);
+  }
+  
+  /***************** UpdateTimer Events ***************/
+  
+  event void UpdateTimer.fired() {
+#ifdef CC2420SYNC_DEBUG 
+  	  call DSN.log("update timer: posted update");
+#endif	  
+  	  post updateDriftTable();
   }
 
   /***************** Alarm Events ***************/
@@ -454,8 +466,16 @@ implementation {
   }
   
   event void SubControl.stopDone(error_t error) {
-    if (!error)
+    if (!error) {
       call RadioPowerState.forceState(S_OFF);
+      if (call UpdateTimer.isRunning()) {
+    	  call UpdateTimer.stop();
+#ifdef CC2420SYNC_DEBUG 
+    	  call DSN.log("radio stop: posted update");
+#endif	  
+    	  post updateDriftTable();
+      }
+    }
   }
 
  /***************** PowerCycle Events ****************/
@@ -474,9 +494,9 @@ implementation {
 
   /***************** NeighbourSyncInfo commands ***************/
   command error_t NeighbourSyncInfo.getRxSleepInterval(am_addr_t neighbour, uint16_t* interval) {
-	  uint8_t idx;
-	  if ((idx=getIndex(neighbour)) != NO_ENTRY) {
-		  *interval=n_table[idx].lplPeriod;
+	  neighbour_sync_item_t* item;
+	  if ((item=getSyncItem(neighbour)) != NULL) {
+		  *interval=item->lplPeriod;
 		  return SUCCESS;
 	  }
 	  return FAIL;
@@ -528,12 +548,12 @@ implementation {
   }
   /***************** Neighbourtable Functions ***********************/
 
-  uint8_t getIndex(am_addr_t lladdr) {
+  neighbour_sync_item_t* getSyncItem(am_addr_t lladdr) {
     uint8_t i;
     for (i=0;i<numEntries;i++)
       if (n_table[i].address == lladdr)
-        return i;
-    return NO_ENTRY;
+        return &n_table[i];
+    return NULL;
   }
 
   bool tableFull() {
@@ -542,6 +562,7 @@ implementation {
   
   void initTableEntry(neighbour_sync_item_t* entry) {
 	  entry->measurementCount = 0;
+	  entry->newTimestamp = call Alarm.getNow() - (MIN_MEASUREMENT_PERIOD << 1);
 	  entry->usageCount = 0;
 	  entry->failCount = 0;
 	  entry->drift = NO_VALID_DRIFT;
@@ -549,14 +570,14 @@ implementation {
 	  entry->driftLimitCount=0;
   }
 
-  uint8_t addNewEntry (am_addr_t lladdr) {
-    if (tableFull()) return NO_ENTRY;
+  neighbour_sync_item_t* addNewEntry (am_addr_t lladdr) {
+    if (tableFull()) return NULL;
     initTableEntry(&n_table[numEntries]);
     n_table[numEntries].address = lladdr;
-    return numEntries++;
+    return &n_table[numEntries++];
   }
 
-  uint8_t replaceLeastUsedEntry (am_addr_t lladdr) {
+  neighbour_sync_item_t* replaceLeastUsedEntry (am_addr_t lladdr) {
     uint8_t i;
     uint16_t minUsageCount=0xffff;
     uint8_t minUsageIndex=0;
@@ -575,7 +596,7 @@ implementation {
     initTableEntry(&n_table[minUsageIndex]);
     n_table[minUsageIndex].address = lladdr;
     lastReplaceIndex=minUsageIndex;
-    return minUsageIndex;
+    return &n_table[minUsageIndex];
   }
 
   void printtable() {
@@ -636,7 +657,7 @@ implementation {
 				  periods++;
 			  }
 		  }
-		  item->odd = periods % 2 == 1;
+		  item->odd = periods & 0x1;
 		  item->wakeupAverage = (timeSum >> 1) + item->wakeupTimestamp[0];
 		  if (driftSum<0) {
 			  driftSum=-driftSum;
@@ -740,8 +761,7 @@ implementation {
 			  newSync=item->newTimestamp;
 			  lastSync=item->wakeupTimestamp[item->measurementCount-1];
 			  if (item->measurementCount==0 ||																	// fill empty history 
-				  ((newSync - lastSync < 0x80000000) &&					// save only sync times later than last one
-			      (newSync - lastSync >= MIN_MEASUREMENT_PERIOD))) {		// short measurement periods ar of little use
+				  (newSync - lastSync < 0x80000000)) {					// save only sync times later than last one
 				  if (item->measurementCount < MEASURE_HISTORY_SIZE) {	// a short measurement history
 					  item->wakeupTimestamp[item->measurementCount++]=item->newTimestamp;
 					  // calculate new drift...

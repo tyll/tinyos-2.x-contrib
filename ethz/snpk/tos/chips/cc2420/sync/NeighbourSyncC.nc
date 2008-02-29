@@ -56,7 +56,9 @@ implementation {
       new StateC() as RadioPowerStateC,
       new StateC() as SyncSendStateC,
       CC2420CsmaC,
-      new AMSenderC(RESYNC_AM_TYPE) as ResyncSender, CC2420ActiveMessageC,
+      new TimerMilliC() as UpdateTimer,
+      new AMSenderC(RESYNC_AM_TYPE) as ResyncSender,
+      CC2420ActiveMessageC,
       DSNC as DSNC;
  
   	components new DsnCommandC("get syncstats", uint8_t , 0) as SyncstatCommand;
@@ -95,6 +97,7 @@ implementation {
   NeighbourSyncP.SubControl -> CC2420CsmaC;
   NeighbourSyncP.SubBackoff -> CC2420CsmaC;
   NeighbourSyncP.SendState -> LplC;
+  NeighbourSyncP.UpdateTimer -> UpdateTimer;
   
   NeighbourSyncP.AMSend->ResyncSender;
   NeighbourSyncP.LowPowerListening -> CC2420ActiveMessageC;

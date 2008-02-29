@@ -139,7 +139,9 @@ implementation {
       uint16_t halfdrift;
       uint32_t wakeup_delay;
       cc2420_metadata_t * meta = (call CC2420PacketBody.getMetadata( msg ));
-
+#ifdef CC2420SYNC_DEBUG_PINS
+    	TOSH_SET_GIO2_PIN();
+#endif
       if (len - CC2420_SIZE + SYNC_HEADER_SIZE <= call SubSend.maxPayloadLength()) {
         atomic  {
           m_len = len;
@@ -254,6 +256,9 @@ implementation {
           if (dest!=AM_BROADCAST_ADDR && meta->rxInterval!=0) {
         	  header->lplPeriod |= REQ_SYNC_FLAG; // request resynchronisation
           }
+          else if (item!=NULL && item->lplPeriod>0 && meta->rxInterval==0) { // subsequent packet
+        	  atomic m_cca=FALSE;
+          }
           meta->synced=FALSE;
           return call SubSend.send(msg, len + SYNC_HEADER_SIZE);
         }
@@ -323,6 +328,9 @@ implementation {
     	retries=0;
     	(call CC2420PacketBody.getHeader(msg))->length = m_len;	// set the right length
     	(call CC2420PacketBody.getMetadata( msg ))->rxInterval = m_rxInterval;
+#ifdef CC2420SYNC_DEBUG_PINS
+     TOSH_CLR_GIO2_PIN();
+#endif
     	signal Send.sendDone(msg, error);
     }
   }
@@ -340,9 +348,6 @@ implementation {
     am_addr_t address = (call CC2420PacketBody.getHeader(msg))->src;
     header = getSyncHeader(msg, len-SYNC_HEADER_SIZE);
     if ((header->lplPeriod & ~(REQ_SYNC_FLAG|MORE_FLAG)) > 0) {
-#ifdef CC2420SYNC_DEBUG_PINS
-    	TOSH_SET_GIO2_PIN();
-#endif
     	item=getSyncItem(address);
     	if (item==NULL) {
     		if (tableFull()) {
@@ -382,9 +387,6 @@ implementation {
     	call DSN.log("rx packet from %i, at %i, on at %i");
     }
     */
-#endif
-#ifdef CC2420SYNC_DEBUG_PINS
-     TOSH_CLR_GIO2_PIN();
 #endif
     (call CC2420PacketBody.getHeader(msg))->length = len - SYNC_HEADER_SIZE;
     return signal Receive.receive(msg, payload, len - SYNC_HEADER_SIZE);
@@ -752,9 +754,6 @@ implementation {
 	  }
 	  for (i=0;i<numEntries;i++) {
 		  if (n_table[i].dirty) {
-#ifdef CC2420SYNC_DEBUG_PINS
-     TOSH_SET_GIO2_PIN();
-#endif
 			  item = &n_table[i];
 			  // check new measurement for sanity
 			  // decide whether to add the measurment or not
@@ -827,11 +826,7 @@ implementation {
 			  }
 			  item->dirty=FALSE;
 		  }
-		  
-#ifdef CC2420SYNC_DEBUG_PINS
-     TOSH_CLR_GIO2_PIN();
-#endif
-	  } // for
+	} // for
   }
   
 /*    

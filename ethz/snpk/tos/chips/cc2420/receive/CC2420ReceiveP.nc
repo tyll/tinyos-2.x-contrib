@@ -217,7 +217,7 @@ implementation {
           if(rxFrameLength > 0) {
         	if ( rxFrameLength <= 10 && m_timestamp_size && m_timestamp_dirty[ m_timestamp_head ]) {
         		// remove corrupt timestamp from queue
-        		call Leds.led1On();
+        		// call Leds.led1On();
         		m_timestamp_head = ( m_timestamp_head + 1 ) % TIMESTAMP_QUEUE_SIZE;
         	    m_timestamp_size--;
    	        }

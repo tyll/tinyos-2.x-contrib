@@ -1,0 +1,82 @@
+directory: tinyos-1.x/tools/scripts/codeGeneration
+author: kamin whitehouse
+date: 9/23/05
+
+This directory holds the generateNescDecls.pl file, which generates
+the nescDecls.xml file.  This file holds all nesc declarations such as
+types, enums, rpc functions, modules, module variables, etc. that a
+set of pc-side tools might want to use (e.g. python).  
+
+This directory also holds scripts that automatically generate files from @tags in your code:
+
+generateRegistry.pl:   
+tags:    @registry
+files:   RegistryC.nc, Registry.h
+
+generateHood.pl:
+tags:    @reflection, @scribble, @hood
+files:   XxxHoodC.nc, Hood.h
+
+generateRpc.pl:        
+tags:    @rpc
+files:   RpcC.nc, RpcM.nc
+
+These scripts are called by placing this directory in the
+TOSMAKE_PATH, and indicating that the makefile should use the
+registry.extra, hood.extra, and rpc.extra targets when the user calls
+"make pc registry", "make pc hood", or "make pc rpc".  hood.extra
+automatically includes registry.extra because hood relies on registry.
+
+The files FindInclude.pm, NescProgramFiles.pm, and SlurpFile.pm are
+derived from the contrib/SystemC/scripts.  These are only necessary
+because nesC XML generation is currently underdeveloped: 
+1. it does not give any XML output when the missing yet
+to-be-generated file causes compiler errors, even though only a
+superficial parse should be required, not a full compilation. 
+(necessary for registry and hood).
+2. it does not provide any info about tagged functions, only
+interfaces (this is necessary for rpc).
+3. it does not provide any info about the names of function
+parameters, only parameter types (this is necessary for rpc).
+4. it does not support abstract interfaces (necessary for rpc)
+When nesC XML generation is completed, the AtTags.pm module can be
+removed and the AtTagsFromXML.pm module can be used instead, and the 3
+files mentioned above can be removed permanently.
+
+The NescParser.pm file is currently based on perl scripts actually
+parsing the nesc files, but should later be adapted to the xml files
+(ie. it will not be removed like the other files above)
+
+KNOWN LIMITATIONS:
+
+1. The parser that I wrote may not support full nesC syntax.  For
+example, if you declare @tags with anything other than the expected
+syntax, eg.
+
+uses interface Interface<type> as MyInterface @registry("AttributeName");
+
+or 
+
+uses{
+ interface Interface<type> as MyInterface @registry("AttributeName");
+...
+}
+
+the parser may not detect it.  This will be fixed once the code
+generation is based on nesC-generated XML files, because the
+acceptable syntax will be the same by definition. Until then, please
+limit your syntax to that described above.
+
+2.  The parser does not search the complete search path for program
+files.  The directories it searches must be passed as -I directives
+from the *.extra file.  Current default is the compiler PFLAGS
+variable, plus a few standard directories such as tos/types,
+tos/interfaces, tos/system, and pwd.  All directories that are
+searched by the temporary perl parser are printed to the screen during
+compilation.  
+
+3.  There is a maximum number of "required" attributes that a hood can
+declare, because the @hood struct must be statically defined for
+parsing.  That number is currently 8, and can be changed by going into
+the Hood.h file (if AtTagsFromXML.pm is used) or the generateHood.pl
+file (if AtTags.pm is used).

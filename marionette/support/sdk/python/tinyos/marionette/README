@@ -1,0 +1,7 @@
+directory: tinyos-1.x/tools/python
+author: kamin whitehouse
+date: 9/23/05
+
+Please see the following two wiki pages for documentation:
+http://today.cs.berkeley.edu/nestfe/index.php/Pytos_Installation_Instructions
+http://today.cs.berkeley.edu/nestfe/index.php/Pytos_Development_Environment

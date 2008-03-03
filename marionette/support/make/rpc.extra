@@ -1,0 +1,14 @@
+#-*-Makefile-*- vim:syntax=make
+#$Id$
+
+RPC_GEN_PL ?= $(TOSROOT)/../tinyos-2.x-contrib/marionette/tools/codeGeneration/generateRpc.pl
+BUILD_EXTRA_DEPS += rpc_dep
+
+PFLAGS += -I$(BUILDDIR)
+
+rpc_dep: FORCE
+	@echo
+	@echo "*** GENERATING RPC ***"
+	rm -f $(BUILDDIR)/RpcM.nc $(BUILDDIR)/RpcC.nc
+	$(NCC) -fsyntax-only -fnesc-dump=interfacedefs -fnesc-dump=components -fnesc-dump=interfaces -fnesc-dump=tags $(OPTFLAGS) $(PFLAGS) $(CFLAGS) $(COMPONENT).nc $(LIBS) $(LDFLAGS) > $(BUILDDIR)/nesc.xml
+	@perl $(RPC_GEN_PL) -d $(BUILDDIR) $(PFLAGS) $(CFLAGS) $(COMPONENT).nc $(BUILDDIR)/nesc.xml

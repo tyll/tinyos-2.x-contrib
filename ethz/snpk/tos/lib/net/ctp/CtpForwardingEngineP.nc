@@ -168,10 +168,12 @@ generic module CtpForwardingEngineP() {
     interface AMPacket;
     interface CollectionDebug;
     interface Leds;
-    interface DsnSend as DSN;
     interface LowPowerListening;
     interface CC2420Packet;
     interface NeighbourSyncFlowPacket;
+
+    interface DsnSend as DSN;
+    interface DsnCommand<uint8_t> as GetDroppedPacketsCommand;
   }
 }
 implementation {
@@ -237,10 +239,9 @@ implementation {
   message_t loopbackMsg;
   message_t* loopbackMsgPtr;
 
-  uint8_t lastQueueSize=0; 
-
   uint8_t fastPacketCount=0;
   uint16_t lplSleepInterval=0;
+  uint32_t droppedPackets=0;
   
   bool queue_congested=FALSE;
   
@@ -396,13 +397,6 @@ implementation {
   task void sendTask() {
     dbg("Forwarder", "%s: Trying to send a packet. Queue size is %hhu.\n", __FUNCTION__, call SendQueue.size());
     
-/*
-    if (call SendQueue.size() != lastQueueSize) {
-      call DSN.logInt(call SendQueue.size());
-      call DSN.logDebug("q %i");
-      lastQueueSize=call SendQueue.size();
-    }
-  */  
     if (sending) {
       dbg("Forwarder", "%s: busy, don't send\n", __FUNCTION__);
       call CollectionDebug.logEvent(NET_C_FE_SEND_BUSY);
@@ -669,11 +663,11 @@ implementation {
                                          call AMPacket.destination(msg));
         startRetxmitTimer(SENDDONE_NOACK_WINDOW, SENDDONE_NOACK_OFFSET);
       } else {
-        //max retries, dropping packet
-	call DSN.logInt(call CtpPacket.getOrigin(qe->msg));
-	call DSN.logInt(call CtpPacket.getSequenceNumber(qe->msg));
-	call DSN.logError("dropping packet [%i,%i]");
-
+    	//max retries, dropping packet
+    	call DSN.logInt(call CtpPacket.getOrigin(qe->msg));
+    	call DSN.logInt(call CtpPacket.getSequenceNumber(qe->msg));
+    	call DSN.logError("dropping packet [%i,%i]");
+		droppedPackets++;
         if (qe->client < CLIENT_COUNT) {
             clientPtrs[qe->client] = qe;
             signal Send.sendDone[qe->client](msg, FAIL);
@@ -787,12 +781,14 @@ implementation {
       
       qe = call QEntryPool.get();
       if (qe == NULL) {
+        droppedPackets++;
         call CollectionDebug.logEvent(NET_C_FE_GET_MSGPOOL_ERR);
         return m;
       }
 
       newMsg = call MessagePool.get();
       if (newMsg == NULL) {
+    	droppedPackets++; 
         call CollectionDebug.logEvent(NET_C_FE_GET_QEPOOL_ERR);
         return m;
       }
@@ -849,6 +845,7 @@ implementation {
     // NB: at this point, we have a resource acquistion problem.
     // Trigger an immediate route update, log the event, and drop the
     // packet on the floor.
+    droppedPackets++;
     call CtpInfo.triggerImmediateRouteUpdate();
     call CollectionDebug.logEvent(NET_C_FE_SEND_QUEUE_FULL);
     return m;
@@ -1147,6 +1144,11 @@ implementation {
     lplSleepInterval=call LowPowerListening.dutyCycleToSleepInterval(dutyCycle);
   }
 
+  event void GetDroppedPacketsCommand.detected(uint8_t * values, uint8_t n) {
+	  call DSN.logInt(droppedPackets);
+	  call DSN.log("dropped packets %i");
+  }
+  
 }
 
 /* Rodrigo. This is an alternative

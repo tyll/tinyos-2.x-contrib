@@ -92,7 +92,7 @@ configuration CtpP {
 implementation {
   enum {
     CLIENT_COUNT = uniqueCount(UQ_CTP_CLIENT),
-    FORWARD_COUNT = 20,
+    FORWARD_COUNT = 50,
     TREE_ROUTING_TABLE_SIZE = 10,
     QUEUE_SIZE = CLIENT_COUNT + FORWARD_COUNT,
     CACHE_SIZE = 4,
@@ -227,4 +227,7 @@ implementation {
     // eventually
     //  Estimator.LinkPacketMetadata -> ActiveMessageC;
   MainC.SoftwareInit -> Estimator;
+  
+  components new DsnCommandC("get dropped", uint8_t , 0) as GetDroppedPacketsCommand;
+  Forwarder.GetDroppedPacketsCommand->GetDroppedPacketsCommand;
 }

@@ -52,7 +52,11 @@ implementation {
       CC2420TransmitC,
       CC2420ReceiveC,
       CC2420CsmaC,
+#ifdef CC2420SYNC_DEBUG_LEDS
       LedsC,
+#else
+      NoLedsC as LedsC,
+#endif
       new StateC() as RadioPowerStateC,
       new StateC() as SplitControlStateC,
       new Alarm32khz16C() as OnTimerC,

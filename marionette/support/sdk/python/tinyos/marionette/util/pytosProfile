@@ -1,0 +1,4 @@
+# source this file from your .bashrc in order to setup your pytos environment variables
+export PYTHONPATH=$TOSROOT/../tinyos-2.x-contrib/marionette/support/sdk/python/tinyos/marionette:$PYTHONPATH
+export PATH=$TOSROOT/../tinyos-2.x-contrib/marionette/support/sdk/python/tinyos/marionette/apps:$TOSROOT/../tinyos-2.x-contrib/marionette/support/sdk/python/tinyos/marionette/util:$PATH
+

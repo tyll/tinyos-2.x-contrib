@@ -1,10 +1,13 @@
 COMPONENT=HarvesterC
+ifndef LPL_INTERVAL
+LPL_INTERVAL = 1000
+endif
+CFLAGS += -DLPL_INT=$(LPL_INTERVAL)
 # use tos libraries
 CFLAGS += -I$(TOSDIR)/lib/net/ -I../../tos/lib/net/ctp -I$(TOSDIR)/lib/net/ctp -I$(TOSDIR)/lib/net/4bitle -I.
 # use snpk libraries
 CFLAGS += -I../../tos/lib/dsn
 CFLAGS += -I../../tos/chips/msp430/usart
-#-I../../tos/system
 #external Sensirion Sensor
 CFLAGS += -I../../tos/platforms/telosb/chips/sht75
 CFLAGS += -I../../tos/lib/gpio
@@ -15,7 +18,5 @@ CFLAGS += -I$(CC2420DIR) -I$(CC2420DIR)/alarm -I$(CC2420DIR)/control -I$(CC2420D
 CFLAGS += -DLOW_POWER_LISTENING
 CFLAGS += -DTOSH_DATA_LENGTH=35
 CFLAGS += -DENABLE_SPI0_DMA
-# add debug symbols
-CFLAGS += -g
-LDFLAGS += -Wl,-Map=$(BUILDDIR)/main.map
+#LDFLAGS += -Wl,-Map=$(BUILDDIR)/main.map
 include $(MAKERULES)

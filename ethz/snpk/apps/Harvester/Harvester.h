@@ -52,8 +52,6 @@ enum {
   
   AM_HARVESTERSTATUS = 0x95,
   INT_STATUS = 0,
-
-  LPL_INT = 1000UL, // default lpl interval in milliseconds
 };
 
 typedef nx_struct harvesterSensor {

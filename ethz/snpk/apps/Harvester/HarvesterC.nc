@@ -51,11 +51,11 @@ implementation {
   	//new HamamatsuS1087ParC() as Light1Sensor,
     //new HamamatsuS10871TsrC() as Light2Sensor,
     
-    DSNC,
-  	new DsnCommandC("set lpl", uint16_t , 1) as LplCommand;
+    DSNC;
+  	//new DsnCommandC("set lpl", uint16_t , 1) as LplCommand;
   	
   HarvesterP.DSN -> DSNC;
-  HarvesterP.LplCommand->LplCommand;
+  //HarvesterP.LplCommand->LplCommand;
 
   
   HarvesterP.Boot -> MainC;

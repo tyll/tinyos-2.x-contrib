@@ -99,6 +99,7 @@ public class HarvesterMonitor implements MessageListener, ActionListener, Window
     PluggableRenderer r;
     VisualizationViewer vv;
     Layout l;
+    int moveLayoutCount=0;
     Timer t;
     
     PacketLossTableModel moteListModel;
@@ -143,12 +144,11 @@ public class HarvesterMonitor implements MessageListener, ActionListener, Window
     	graphFrame.getContentPane().add(vv);
     	graphFrame.addWindowListener(this);
     	
-    	t = new Timer(500, this);
+    	t = new Timer(100, this);
     	t.start();
     	// end graph
     	
     	// create log file
-    	System.out.println("default time zone:"+TimeZone.getDefault());
     	SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmm");
     	String logfilename = "HarvesterMonitor."+ sdf.format(System.currentTimeMillis())+".log";
     	System.out.println("logging packets to "+logfilename);
@@ -241,6 +241,8 @@ public class HarvesterMonitor implements MessageListener, ActionListener, Window
     			}
     			// add edge
     			networkGraph.addEdge(new DirectedSparseEdge(thisNode, parentNode));
+    			// let layout run for 10 iterations
+    			moveLayoutCount+=10;
     		}
   		  	// make your changes to the graph here
     		layoutMut.update();
@@ -294,6 +296,10 @@ public class HarvesterMonitor implements MessageListener, ActionListener, Window
 	public void actionPerformed(ActionEvent e) {
 		LayoutMutable layoutMut = (LayoutMutable) vv.getGraphLayout();
 		vv.suspend();
+		if (moveLayoutCount>0) {
+			moveLayoutCount--;
+			l.advancePositions();
+		}
     	layoutMut.update();
 		vv.unsuspend();
 		vv.repaint();   

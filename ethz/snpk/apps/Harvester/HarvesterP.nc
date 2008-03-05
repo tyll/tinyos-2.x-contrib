@@ -70,7 +70,7 @@ module HarvesterP {
     
     // DSN
     interface DsnSend as DSN;
-    interface DsnCommand<uint16_t> as LplCommand;
+    //interface DsnCommand<uint16_t> as LplCommand;
 
     // Sensor
     interface Read<uint16_t> as ReadExternalTemperature;
@@ -549,6 +549,7 @@ implementation {
   static void report_received(message_t* msg) {
   } 
   
+  /*
   event void LplCommand.detected(uint16_t * values, uint8_t n) {
   	if (n==1) {
   		lplSleepInterval=values[0];
@@ -558,6 +559,7 @@ implementation {
   		call DSN.logInfo("changed lpl %ims");
   	}
   }
+  */
   
 }
 

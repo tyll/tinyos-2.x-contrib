@@ -118,7 +118,7 @@ generic module CtpRoutingEngineP(uint8_t routingTableSize, uint16_t minInterval,
         
         interface DSN;
 	interface DsnCommand<uint8_t> as GetTopologyCommand;
-	interface DsnCommand<am_addr_t> as SetParentCommand;
+	// interface DsnCommand<am_addr_t> as SetParentCommand;
         interface LowPowerListening;
         interface Leds;
 	interface Queue<fe_queue_entry_t*> as SendQueue;
@@ -962,6 +962,7 @@ implementation {
      call DSN.log("(%i %i)");
   }
 
+  /*
   event void SetParentCommand.detected(am_addr_t * newForcedParent, uint8_t n) {
     if (n==0) {
       forcedParent = AM_BROADCAST_ADDR;
@@ -984,6 +985,7 @@ implementation {
     call DSN.logInt(forcedParent);
     call DSN.log("forced parent node %i");
   }
+  */
 
   /****************** CollectionLowPowerListening commands *******/
   command void CollectionLowPowerListening.setDefaultRxSleepInterval(uint16_t sleepIntervalMs) {

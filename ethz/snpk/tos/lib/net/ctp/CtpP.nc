@@ -202,10 +202,10 @@ implementation {
 
   components CC2420PacketC,
   NeighbourSyncC,
-  new DsnCommandC("get topology", uint8_t, 0) as GetTopologyCommand,
-  new DsnCommandC("set parent", am_addr_t, 1) as SetParentCommand;
+  new DsnCommandC("get topology", uint8_t, 0) as GetTopologyCommand;
+  //new DsnCommandC("set parent", am_addr_t, 1) as SetParentCommand;
   Router.GetTopologyCommand->GetTopologyCommand;
-  Router.SetParentCommand->SetParentCommand;
+  //Router.SetParentCommand->SetParentCommand;
 
   Router.CC2420Packet->CC2420PacketC;
   Forwarder.CC2420Packet->CC2420PacketC;

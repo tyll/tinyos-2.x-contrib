@@ -140,7 +140,7 @@ implementation {
       uint32_t halfdrift;
       uint32_t wakeup_delay;
       cc2420_metadata_t * meta = (call CC2420PacketBody.getMetadata( msg ));
-
+            
       if (len - CC2420_SIZE + SYNC_HEADER_SIZE <= call SubSend.maxPayloadLength()) {
         atomic  {
           m_len = len;
@@ -158,6 +158,8 @@ implementation {
         if ((item!=NULL) && (item->lplPeriod!=0) && (meta->rxInterval > 0)
         		&& (item->failCount<SYNC_FAIL_THRESHOLD) && (item->measurementCount>0)) {
         	// timed send
+        	// these caclulations take about 5ms without debug output
+
         	atomic {
         		m_timed_send=TRUE;
         	}
@@ -217,6 +219,7 @@ implementation {
         			wakeup_delay+=lplPeriod32Khz;
        			call Alarm.startAt(now, wakeup_delay);
 #ifdef CC2420SYNC_DEBUG
+       			/*
        			atomic {
        				call DSN.logInt(call Alarm.getNow());
        				call DSN.logInt(now);
@@ -224,6 +227,7 @@ implementation {
        				call DSN.logInt(now+wakeup_delay);
        			}
        			call DSN.log("calculations time:%i base:%i delay:%i etf:%i");
+       			*/
 #endif        		
         	}
         	else {
@@ -356,6 +360,9 @@ implementation {
     			item=addNewEntry (address);
     		}
     	}
+#ifdef CC2420SYNC_NO_HISTORY_REFILL
+    	if (item->measurementCount < MEASURE_HISTORY_SIZE)
+#endif    		
         // add new measurement
         if (header->wakeupOffset != NO_VALID_OFFSET) {
         	now = call Alarm.getNow();
@@ -403,6 +410,9 @@ implementation {
 		  switch (call SyncSendState.getState()) {
 		  case S_PREPARE_RADIO:
 			  if (call SendState.requestState(S_LPL_SYNCWAIT)==SUCCESS) {
+#ifdef CC2420SYNC_DEBUG_PINS
+     TOSH_SET_GIO2_PIN();
+#endif
 				  post startRadio();
 			  }
 			  else {
@@ -437,7 +447,10 @@ implementation {
   /***************** TimedPacket Events ******************/
   async event bool TimedPacket.requestImmediatePacket(message_t* p_msg) { 
 	  atomic {
-		  if (call SyncSendState.getState()==S_PACKET_READY) { 
+		  if (call SyncSendState.getState()==S_PACKET_READY) {
+#ifdef CC2420SYNC_DEBUG_PINS
+     TOSH_CLR_GIO2_PIN();
+#endif
 			  call SyncSendState.forceState(S_SEND);
 			  //t[4]=call Alarm.getNow();
 			  if ((call Alarm.getAlarm()+RADIO_STARTUP_OFFSET) - call Alarm.getNow() < 0x8000)

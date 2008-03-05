@@ -46,7 +46,7 @@ enum {
   NO_SYNC = 0xffffffff,
   T32KHZ_TO_TMILLI_SHIFT = 5, // factor for conversion TMilli > T32khz
 
-  RADIO_STARTUP_OFFSET = 400, // jiffys until the radio is started and FIFO is loaded, should be calculated from packet length
+  RADIO_STARTUP_OFFSET = 170, // jiffys until the radio is started and FIFO is loaded, should be calculated from packet length
   REVERSE_SEND_OFFSET = 104, //use 104 if no initial backoff  // less means: transmission begins earlier 
   NO_COMPENSATION_OFFSET = 100,  // less means: transmission begins later. This offset is used to begin transmission earlier when no compensation is done
 

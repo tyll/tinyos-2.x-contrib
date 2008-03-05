@@ -46,7 +46,9 @@ implementation {
 	am_addr_t unicastReceiverId=AM_BROADCAST_ADDR;
 	
 	enum {
-		SLEEPTIME = 1024,
+		SLEEPTIME = 7000,
+		BEACON_INTERVAL = 120000UL,
+		UNICAST_INTERVAL = 14000UL,		
 	};
 	
 	event void Boot.booted(){
@@ -78,7 +80,7 @@ implementation {
 	
 	event void BeaconTimer.fired() {
 		beacon_msg_t * b_msg;
-		call BeaconTimer.startOneShot(120000U);
+		call BeaconTimer.startOneShot(BEACON_INTERVAL);
 		if (!radiobusy) {
 			b_msg = call Packet.getPayload(&m, sizeof(beacon_msg_t));
 			b_msg->id=TOS_NODE_ID;
@@ -116,26 +118,33 @@ implementation {
 	event void UnicastTimer.fired() {
 		unicast_msg_t * u_msg;
 		if (!call UnicastTimer.isRunning())
-			call UnicastTimer.startPeriodic(6024);
+			call UnicastTimer.startPeriodic(UNICAST_INTERVAL);
 		if (numNeighbours>SYNCMAC_MIN_NEIGHBOURS && !radiobusy) {
 			if (unicastReceiverId==AM_BROADCAST_ADDR) {
+				/*
+				if (TOS_NODE_ID!=44 && TOS_NODE_ID!=133)
+					unicastReceiverId=44;
+				else if (TOS_NODE_ID==44)
+					unicastReceiverId=133;
+				*/
 				unicastReceiverId=neighbour[call Random.rand16() % numNeighbours];
+				
 			}
-			u_msg = call Packet.getPayload(&m, sizeof(unicast_msg_t));
-			u_msg->id=TOS_NODE_ID;
-			call LowPowerListening.setRxSleepInterval(&m, 1024);
-			call PacketAcknowledgements.requestAck(&m);
-			if (call UnicastSend.send(unicastReceiverId, &m, sizeof(unicast_msg_t))==SUCCESS) {
-				radiobusy=TRUE;
-				//call Leds.led2Toggle();
+			if (unicastReceiverId!=AM_BROADCAST_ADDR) {
+				u_msg = call Packet.getPayload(&m, sizeof(unicast_msg_t));
+				u_msg->id=TOS_NODE_ID;
+				call LowPowerListening.setRxSleepInterval(&m, SLEEPTIME);
+				call PacketAcknowledgements.requestAck(&m);
+				if (call UnicastSend.send(unicastReceiverId, &m, sizeof(unicast_msg_t))==SUCCESS) {
+					radiobusy=TRUE;
+					//call Leds.led2Toggle();
+				}
 			}
 		}
 	}
 	
 	event void UnicastSend.sendDone(message_t* msg, error_t error) {
 		radiobusy=FALSE;
-		//call DsnSend.logInt(unicastReceiverId);
-		call DsnSend.log("senddone");
 	}
 	
 	event message_t * UnicastReceive.receive(message_t* msg, void* payload, uint8_t len) {

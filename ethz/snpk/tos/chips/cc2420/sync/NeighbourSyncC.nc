@@ -36,7 +36,6 @@ configuration NeighbourSyncC {
     interface Send;
     interface Receive;
     interface NeighbourSyncRequest;
-    interface State as SyncSendState;
     interface NeighbourSyncPacket;
     interface NeighbourSyncFlowPacket;
   }
@@ -75,8 +74,6 @@ implementation {
 
   SubSend = NeighbourSyncP.SubSend;
   SubReceive = NeighbourSyncP.SubReceive;
-  
-  SyncSendState=SyncSendStateC;
   
   NeighbourSyncRequest = NeighbourSyncP.NeighbourSyncRequest;
   NeighbourSyncPacket = NeighbourSyncP;

@@ -57,12 +57,12 @@ interface PowerCycle {
   /**
    * @return the counter value of the last wake up [clocks]
    */
-  async command uint16_t getLastWakeUp();
+  async command uint32_t getLastWakeUp();
 
   /**
    * @return the number of 32khz ticks since last wake up
    */
-  async command uint16_t getElapsedSleepTime();
+  async command uint32_t getElapsedSleepTime();
 
 }
 

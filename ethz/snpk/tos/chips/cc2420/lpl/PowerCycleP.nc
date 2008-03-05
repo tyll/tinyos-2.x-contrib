@@ -63,7 +63,7 @@ module PowerCycleP {
   }
 
   uses {
-    interface Alarm<T32khz,uint16_t> as OnTimer;
+    interface Alarm<T32khz,uint32_t> as OnTimer;
     interface SplitControl as SubControl;
     interface State as RadioPowerState;
     interface State as SplitControlState;
@@ -87,7 +87,7 @@ implementation {
   uint16_t ccaChecks;
   
   /** The sleep interval transformed into 32kHz precision */
-  uint16_t sleepInterval32khz = 0;
+  uint32_t sleepInterval32khz = 0;
  
   /**
    * Radio Power, Check State, and Duty Cycling State
@@ -118,13 +118,13 @@ implementation {
   command void PowerCycle.setSleepInterval(uint16_t sleepIntervalMs) {
     if (!sleepInterval && sleepIntervalMs) {
       // We were always on, now lets duty cycle
-      call OnTimer.start(sleepIntervalMs << 5);
+      call OnTimer.start((uint32_t)sleepIntervalMs << 5);
       post stopRadio();  // Might want to delay turning off the radio
     }
     
     atomic {
     	sleepInterval = sleepIntervalMs;
-    	sleepInterval32khz = sleepIntervalMs << 5;
+    	sleepInterval32khz = (uint32_t)sleepIntervalMs << 5;
     }
     
     if(sleepInterval == 0 && call SplitControlState.isState(S_ON)) {
@@ -148,14 +148,14 @@ implementation {
   /**
    * @return the counter value of the last wake up [clocks]
    */
-  async command uint16_t PowerCycle.getLastWakeUp() {
+  async command uint32_t PowerCycle.getLastWakeUp() {
     return call OnTimer.getAlarm() - sleepInterval32khz;
   }
 
   /**
    * @return the number of 32khz ticks since last wake up
    */
-  async command uint16_t PowerCycle.getElapsedSleepTime() {
+  async command uint32_t PowerCycle.getElapsedSleepTime() {
     return call OnTimer.getNow() - call PowerCycle.getLastWakeUp();
   }
 

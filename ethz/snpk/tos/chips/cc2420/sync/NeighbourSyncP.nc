@@ -77,7 +77,8 @@ implementation {
   uint8_t numEntries=0;
   uint32_t lastWakeup;
   uint8_t m_len;
-  nx_uint16_t offset;
+  norace nx_uint32_t offset; // offset has a well defined write order
+  norace uint16_t offset_stamp; // offset has a well defined write order
   message_t * m_msg;
   uint8_t lastReplaceIndex=0;
   bool m_cca, m_timed_send=FALSE;
@@ -90,7 +91,7 @@ implementation {
   uint8_t retries=0;
   bool delayedDriftUpdate=FALSE;
   
-  norace uint16_t lplPeriod32Khz;
+  norace uint32_t lplPeriod32Khz;
   
   message_t resync_msg;
   
@@ -136,7 +137,7 @@ implementation {
       uint32_t now;
       int32_t driftCompensation;
       uint32_t lastSync;
-      uint16_t halfdrift;
+      uint32_t halfdrift;
       uint32_t wakeup_delay;
       cc2420_metadata_t * meta = (call CC2420PacketBody.getMetadata( msg ));
 
@@ -172,20 +173,24 @@ implementation {
         			// TODO: find more efficient calculation for this
         			//driftCompensation=(((now - lastSync) >> 1) * n_table[idx].drift) >> 20;
         			driftCompensation=(((now - lastSync) / 2) * item->drift) / 1048576;
-        			item->drift=-item->drift;        		
-        			/*call DSN.logInt(driftCompensation);
-        			call DSN.logInt(n_table[idx].drift);
+        			item->drift=-item->drift;      
+        			/*        			
+        			call DSN.logInt(driftCompensation);
+        			call DSN.logInt(-item->drift);
         			call DSN.logInt(now - lastSync);
-        			call DSN.log("comp -%i, drift -%i, period %i");*/
+        			call DSN.log("comp -%i, drift -%i, period %i");
+        			*/
         			driftCompensation=-driftCompensation;
         		}
         		else {	// positive drift
         			//driftCompensation=(((now - lastSync)>>1) * n_table[idx].drift) >> 20;
         			driftCompensation=(((now - lastSync)/2) * item->drift) / 1048576;
-        			/*call DSN.logInt(driftCompensation);
-        			call DSN.logInt(n_table[idx].drift);
+        			/*
+        			call DSN.logInt(driftCompensation);
+        			call DSN.logInt(item->drift);
         			call DSN.logInt(now - lastSync);
-        			call DSN.log("comp %i, drift %i, period %i");*/
+        			call DSN.log("comp %i, drift %i, period %i");
+        			*/
         		}
         		/**
         		 * past time in neighbour node since avg wakeup
@@ -220,10 +225,6 @@ implementation {
        			}
        			call DSN.log("calculations time:%i base:%i delay:%i etf:%i");
 #endif        		
-       			if (wakeup_delay > 0x10000) { // warn if timing is longer than 2s
-       				call DSN.logInt(wakeup_delay);
-       				call DSN.logWarning("long delay %i");
-       			}
         	}
         	else {
         		meta->rxInterval=20;
@@ -258,6 +259,9 @@ implementation {
         	  atomic m_cca=FALSE;
           }
           meta->synced=FALSE;
+          now = call Alarm.getNow();
+          offset_stamp=(uint16_t) now;
+          offset=now - call PowerCycle.getLastWakeUp();
           return call SubSend.send(msg, len + SYNC_HEADER_SIZE);
         }
       }
@@ -358,7 +362,7 @@ implementation {
         	meta = call CC2420PacketBody.getMetadata(msg);
         	newSync = now - ((uint16_t)now - meta->time) - header->wakeupOffset;
         	if (newSync - item->newTimestamp >= MIN_MEASUREMENT_PERIOD) {
-        		item->lplPeriod=(header->lplPeriod & ~(REQ_SYNC_FLAG|MORE_FLAG)) << T32KHZ_TO_TMILLI_SHIFT; // save in table as 32khz ticks
+        		item->lplPeriod=((uint32_t)(header->lplPeriod & ~(REQ_SYNC_FLAG|MORE_FLAG))) << T32KHZ_TO_TMILLI_SHIFT; // save in table as 32khz ticks
         		item->newTimestamp = newSync;
         		item->failCount=0;
         		item->dirty=TRUE;
@@ -390,9 +394,6 @@ implementation {
   /***************** UpdateTimer Events ***************/
   
   event void UpdateTimer.fired() {
-#ifdef CC2420SYNC_DEBUG 
-  	  call DSN.log("update timer: posted update");
-#endif	  
   	  post updateDriftTable();
   }
 
@@ -427,8 +428,9 @@ implementation {
   } 
  
   async event void RadioTimeStamping.transmittedSFD(uint16_t time, message_t *p_msg) {
-    offset=time - (call PowerCycle.getLastWakeUp());
-    call CC2420Transmit.modify( m_len -1 , (uint8_t * )&offset, 2 );
+	offset+= time - offset_stamp;
+    call CC2420Transmit.modify( m_len -1 , (uint8_t * )&offset, 4 );
+    offset_stamp = time;
     //t[6]=call Alarm.getNow();
   }
 
@@ -467,9 +469,6 @@ implementation {
       call RadioPowerState.forceState(S_OFF);
       if (call UpdateTimer.isRunning()) {
     	  call UpdateTimer.stop();
-#ifdef CC2420SYNC_DEBUG 
-    	  call DSN.log("radio stop: posted update");
-#endif	  
     	  post updateDriftTable();
       }
     }
@@ -693,11 +692,15 @@ implementation {
   /***************** Send Functions ***********************/
   
   void send() {
+	  uint32_t now;
 	  error_t error;
 	  // atomic t[3]=call Alarm.getNow();
 	  if (call RadioPowerState.getState()!=S_ON) {
 		  call DSN.logWarning("Radio off when sending started");
 	  }
+	  now = call Alarm.getNow();
+	  offset_stamp=(uint16_t) now;
+	  offset=now - call PowerCycle.getLastWakeUp();
 	  if ((error = call SubSend.send(m_msg, m_len + SYNC_HEADER_SIZE))!= SUCCESS) {
 		  call SyncSendState.toIdle();
 		  finishDriftUpdate();

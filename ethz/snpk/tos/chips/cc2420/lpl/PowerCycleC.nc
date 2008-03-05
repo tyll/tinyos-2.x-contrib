@@ -59,7 +59,7 @@ implementation {
 #endif
       new StateC() as RadioPowerStateC,
       new StateC() as SplitControlStateC,
-      new Alarm32khz16C() as OnTimerC,
+      new Alarm32khz32C() as OnTimerC,
       new TimerMilliC() as CheckTimerC;
 
 #if defined(LOW_POWER_LISTENING) || defined(ACK_LOW_POWER_LISTENING)

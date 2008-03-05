@@ -57,7 +57,6 @@ implementation {
   
   SendStatsP.DSN -> DSNC;
   SendStatsP.GetStatsCommand -> GetStatsCommand;
-  SendStatsP.SyncSendState -> NeighbourSyncC.SyncSendState;
   SendStatsP.CC2420PacketBody -> CC2420PacketC;
   SendStatsP.AMPacket -> CC2420ActiveMessageC;
   SendStatsP.PacketAcknowledgements -> CC2420PacketC;

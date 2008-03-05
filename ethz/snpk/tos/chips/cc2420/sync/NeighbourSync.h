@@ -41,7 +41,7 @@ enum {
   NEIGHBOURSYNCTABLESIZE = 8, // size of sync neighbour table
   TABLE_UPDATE_DELAY = 100, // the neighbour table is updated after this delay [ms], or when radio is off
   MEASURE_HISTORY_SIZE = 4,
-  NO_VALID_OFFSET = 0xffff,
+  NO_VALID_OFFSET = 0xffffffff,
   NO_VALID_DRIFT = 32767,
   NO_SYNC = 0xffffffff,
   T32KHZ_TO_TMILLI_SHIFT = 5, // factor for conversion TMilli > T32khz
@@ -77,14 +77,14 @@ typedef struct {	// 18 + MEASURE_HISTORY_SIZE * 4 bytes
   uint16_t usageCount; // 26
   uint8_t failCount; // 28
   uint8_t driftLimitCount; // 29
-  uint16_t lplPeriod; // in ticks 30
-  int16_t drift; // 32
-  bool dirty; // 34
-  // align to word address -> struct size = 36, when MEASURE_HISTORY_SIZE==4
+  uint32_t lplPeriod; // in ticks 30
+  int16_t drift; // 34
+  bool dirty; // 36
+  // align to word address -> struct size = 38, when MEASURE_HISTORY_SIZE==4
 } neighbour_sync_item_t;
 
 typedef nx_struct {
-  nx_uint16_t wakeupOffset; // time that has passed between senders wakeup and the time the sfd was sent 
+  nx_uint32_t wakeupOffset; // time that has passed between senders wakeup and the time the sfd was sent 
   nx_uint16_t lplPeriod;	// this field contains lpl information and the flags
   							//		REQ_SYNC_FLAG (highest bit)
 							//		MORE_FLAG (second highest bit)

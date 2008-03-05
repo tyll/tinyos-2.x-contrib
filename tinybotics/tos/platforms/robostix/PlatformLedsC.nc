@@ -70,7 +70,7 @@ implementation
   components HplAtm128GeneralIOC as IO;
   components PlatformP;
 
-  Init = PlatformP.MoteInit;
+  Init = PlatformP.SubInit;
 
   Led0 = IO.PortG4;  // Pin G4 = Red LED
   Led1 = IO.PortG3;  // Pin G3 = Blue LED

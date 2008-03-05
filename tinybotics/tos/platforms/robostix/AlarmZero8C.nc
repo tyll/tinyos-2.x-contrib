@@ -7,8 +7,7 @@
  * Intel Research Berkeley, 2150 Shattuck Avenue, Suite 1300, Berkeley, CA, 
  * 94704.  Attention:  Intel License Inquiry.
  *
- * Copyright (c) 2007 University of Padova
- * Copyright (c) 2007 Orebro University
+ * Copyright (c) 2007 University of Southern Denmark
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,21 +36,30 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 /**
+ * 8-bit 64kHz Alarm component as per TEP102 HAL guidelines. The robostix
+ * 64kHz Alarm is built on hardware timer 0, and actually runs at
+ * CPU frequency / 256.
+ * <p>
+ * Assumes a ~16MHz CPU clock, replace this component if you are running at
+ * a radically different frequency.
+ * <p>
+ *
  * @author David Gay <dgay@intel-research.net>
  * @author Mirko Bordignon <mirko.bordignon@ieee.org>
  */
 
 #include <RobostixTimer.h>
 
-configuration AlarmTwo8C
+configuration AlarmZero8C
 {
-  provides interface Alarm<TTwo, uint8_t>;
+  provides interface Alarm<TZero, uint8_t>;
 }
 implementation
 {
-  components HplAtm128Timer2C as HWTimer, InitTwoP,
-    new Atm128AlarmC(TTwo, uint8_t, 3) as NAlarm;
+  components HplAtm128Timer0C as HWTimer, InitZeroP,
+    new Atm128AlarmC(T64khz, uint8_t, 10) as NAlarm; // 10 is a conservative number, to be used until we come up with a better estimate
 
   Alarm = NAlarm;
 

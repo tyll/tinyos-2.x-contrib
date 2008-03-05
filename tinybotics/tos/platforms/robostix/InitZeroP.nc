@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005 Intel Corporation
+ * Copyright (c) 2005-2006 Intel Corporation
  * All rights reserved.
  *
  * This file is distributed under the terms in the attached INTEL-LICENSE     
@@ -7,8 +7,7 @@
  * Intel Research Berkeley, 2150 Shattuck Avenue, Suite 1300, Berkeley, CA, 
  * 94704.  Attention:  Intel License Inquiry.
  *
- * Copyright (c) 2007 University of Padova
- * Copyright (c) 2007 Orebro University
+ * Copyright (c) 2007 University of Southern Denmark
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -39,24 +38,21 @@
  */
 
 /**
- * The portion of a mica-family initialisation that is mote-specific.
- * @author David Gay
+ * Internal robostix timer component. Sets up hardware timer 0 to run
+ * at cpu clock / 256, at boot time. Assumes a ~16MHz CPU clock, replace
+ * this component if you are running at a radically different frequency.
+ *
+ * @author David Gay <dgay@intel-research.net>
  * @author Mirko Bordignon <mirko.bordignon@ieee.org>
  */
 
-module MotePlatformP
-{
-  provides interface Init as PlatformInit;
-  uses interface Init as SubInit;
-}
+#include <RobostixTimer.h>
+
+configuration InitZeroP { }
 implementation {
+  components PlatformC, HplAtm128Timer0C as HWTimer,
+    new Atm128TimerInitC(uint8_t, ROBOSTIX_PRESCALER_ZERO) as InitZero;
 
-  command error_t PlatformInit.init() {
-    // Place here eventual init operations
-    return call SubInit.init();
-  }
-
-  default command error_t SubInit.init() {
-    return SUCCESS;
-  }
+  PlatformC.SubInit -> InitZero;
+  InitZero.Timer -> HWTimer;
 }

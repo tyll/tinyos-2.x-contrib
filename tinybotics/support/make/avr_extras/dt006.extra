@@ -1,8 +1,10 @@
-# dt006.extra
-# mirko.bordignon@ieee.org
+#-*-Makefile-*- vim:syntax=make
 
 PROGRAM = dt006
-PROGRAMMER_FLAGS = -dprog=dt006 --wr_fuse_h=$(AVR_FUSE_H) $(PROGRAMMER_PART) $(PROGRAMMER_EXTRA_FLAGS)
+
+ifeq ($(PROGRAMMER),uisp)
+  PROGRAMMER_FLAGS = -dprog=dt006 --wr_fuse_h=$(AVR_FUSE_H) $(PROGRAMMER_PART) $(PROGRAMMER_EXTRA_FLAGS)
+endif
 
 program: FORCE
 	@echo "    installing $(PLATFORM) binary with dt006"

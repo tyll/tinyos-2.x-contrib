@@ -1,12 +1,10 @@
 # .platform file for robostix
+# Remember: includes that should take precedence come first.
 # mirko.bordignon@ieee.org
 
 push( @includes, qw(
 
   %T/../../tinyos-2.x-contrib/tinybotics/tos/platforms/robostix
-  %T/../../tinyos-2.x-contrib/tinybotics/tos/platforms/robostix/system
-  %T/../../tinyos-2.x-contrib/tinybotics/tos/platforms/robostix/chips/atm128
-  %T/../../tinyos-2.x-contrib/tinybotics/tos/interfaces
   %T/../../tinyos-2.x-contrib/tinybotics/tos/chips/atm128
   %T/../../tinyos-2.x-contrib/tinybotics/tos/chips/atm128/timer
   %T/chips/atm128
@@ -27,9 +25,8 @@ push( @includes, qw(
   -mmcu=atmega128
   -fnesc-target=avr
   -fnesc-no-debug
-  -fnesc-scheduler=TinySchedulerC,TinySchedulerC.TaskBasic,TaskBasic,TaskBasic,runTask,postTask
 
 );
 
+push @opts, "-fnesc-scheduler=TinySchedulerC,TinySchedulerC.TaskBasic,TaskBasic,TaskBasic,runTask,postTask" if !$with_scheduler_flag;
 push @opts, "-mingw-gcc" if $cygwin;
-

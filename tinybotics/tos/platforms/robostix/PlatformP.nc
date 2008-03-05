@@ -51,8 +51,7 @@
  */
 
 /**
- *  Internal platform boot code adapted to the robostix platform, disable sleep modes for now
- *  (an implementation of the McuPowerOverride interface is currently not provided)
+ *  Internal platform boot code adapted to the robostix platform
  *  @author Martin Turon <mturon@xbow.com>
  *  @author Mirko Bordignon <mirko.bordignon@ieee.org>
  */
@@ -60,7 +59,7 @@
 module PlatformP
 {
   provides interface Init;
-  uses interface Init as MoteInit;
+  uses interface Init as SubInit;
   uses interface Init as MeasureClock;
 
 }
@@ -69,25 +68,15 @@ implementation
 {
   void power_init() {
       atomic {
-	MCUCR = _BV(SE);      // Internal RAM, IDLE, rupt vector at 0x0002,
+	MCUCR = _BV(SE);      // Internal RAM, IDLE, interrupt vector at 0x0002,
 			      // enable sleep instruction!
       }
   }
 
   command error_t Init.init()
   {
-    error_t ok;
-
-    /* First thing is to measure the clock frequency */
-    ok = call MeasureClock.init();
-    ok = ecombine(ok, call MoteInit.init());
-
-    if (ok != SUCCESS)
-      return ok;
-
-    // power management disabled for the moment
-    //power_init();
-
-    return SUCCESS;
+    power_init();
+    // Place here eventual general-purpose init operations
+    return call SubInit.init();
   }
 }

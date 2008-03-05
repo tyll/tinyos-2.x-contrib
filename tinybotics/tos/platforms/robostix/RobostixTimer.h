@@ -52,7 +52,6 @@
    at.
  */
 typedef struct { } T64khz;
-typedef struct { } T2mhz;
 
 /* TX is the typedef for the rate of timer X, 
    ROBOSTIX_PRESCALER_X is the prescaler for timer X,
@@ -64,31 +63,13 @@ typedef struct { } T2mhz;
 
 // default settings
 #if MHZ == 16
-typedef T64khz TTwo;
-typedef uint32_t counter_two_overflow_t;
+typedef T64khz TZero;
+typedef uint32_t counter_zero_overflow_t;
 
 enum {
-  // ATM128_CLK16_DIVIDE_256 is correct for timer2 even if it is 8-bit wide
-  // see p.159 of the datasheet
-  ROBOSTIX_PRESCALER_TWO = ATM128_CLK16_DIVIDE_256,
-  ROBOSTIX_DIVIDE_TWO_FOR_32KHZ_LOG2 = 1,
-  ROBOSTIX_DIVIDE_TWO_FOR_MILLI_LOG2 = 6,
-  ROBOSTIX_DIVIDE_TWO_FOR_32HZ_LOG2 = 11,
+  ROBOSTIX_PRESCALER_ZERO = ATM128_CLK8_DIVIDE_256,
+  ROBOSTIX_DIVIDE_ZERO_FOR_MILLI_LOG2 = 6,
 };
-
-// alternative settings
-/*
-#if MHZ == 16
-typedef T2mhz TTwo;
-typedef uint32_t counter_two_overflow_t;
-
-enum {
-  ROBOSTIX_PRESCALER_TWO = ATM128_CLK16_DIVIDE_8,
-  ROBOSTIX_DIVIDE_TWO_FOR_MICRO_LOG2 = 1,
-  ROBOSTIX_DIVIDE_TWO_FOR_32KHZ_LOG2 = 6,
-  ROBOSTIX_DIVIDE_TWO_FOR_MILLI_LOG2 = 11,
-};
-*/
 
 #else
 #error "Unknown clock rate. MHZ must be defined to one of 1, 2, 4, or 8."

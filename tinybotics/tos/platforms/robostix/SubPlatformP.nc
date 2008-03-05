@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005-2006 Intel Corporation
+ * Copyright (c) 2005 Intel Corporation
  * All rights reserved.
  *
  * This file is distributed under the terms in the attached INTEL-LICENSE     
@@ -39,24 +39,27 @@
  */
 
 /**
- * 32-bit 1khz counter, built from hardware timer 2
- * @author David Gay <dgay@intel-research.net>
+ * Left as a stub for eventual specific init operations
+ * to be performed before SoftwareInit.
+ * This is a dummy, empty implementation for the plain robostix target,
+ * intended to be overridden by application/subplatform specific versions.
+ * @author David Gay
  * @author Mirko Bordignon <mirko.bordignon@ieee.org>
  */
 
-#include <RobostixTimer.h>
-
-configuration Counter32khz32C
+module SubPlatformP
 {
-  provides interface Counter<T32khz, uint32_t>;
+  provides interface Init as PlatformInit;
+  uses interface Init as SubInit;
 }
-implementation
-{
-  components CounterTwo8C as Counter8, 
-    new TransformCounterC(T32khz, uint32_t, TTwo, uint8_t,
-			  ROBOSTIX_DIVIDE_TWO_FOR_32KHZ_LOG2,
-			  counter_two_overflow_t) as Transform32;
+implementation {
 
-  Counter = Transform32;
-  Transform32.CounterFrom -> Counter8;
+  command error_t PlatformInit.init() {
+    // Place here eventual application-specific init operations
+    return call SubInit.init();
+  }
+
+  default command error_t SubInit.init() {
+    return SUCCESS;
+  }
 }

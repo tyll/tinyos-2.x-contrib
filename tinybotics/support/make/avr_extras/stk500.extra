@@ -1,10 +1,14 @@
-# stk500.extra
-# mirko.bordignon@ieee.org
+#-*-Makefile-*- vim:syntax=make
 
-STK500 ?= /dev/ttyS0
+ifeq ($(STK500),)
+$(error STK500 must be defined, try "make $(TARGETS) help")
+endif
 
 PROGRAM = stk500
-PROGRAMMER_FLAGS = -dprog=stk500 -dserial=$(STK500) $(PROGRAMMER_PART) $(PROGRAMMER_EXTRA_FLAGS)
+
+ifeq ($(PROGRAMMER),uisp)
+  PROGRAMMER_FLAGS = -dprog=stk500 -dserial=$(STK500) $(PROGRAMMER_PART) $(PROGRAMMER_EXTRA_FLAGS)
+endif
 
 program: FORCE
 	@echo "    installing $(PLATFORM) binary using stk500"

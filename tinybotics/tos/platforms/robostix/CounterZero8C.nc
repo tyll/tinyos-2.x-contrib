@@ -1,25 +1,14 @@
+// $Id$
 /*
- * "Copyright (c) 2005 The Regents of the University  of California.  
+ * Copyright (c) 2005-2006 Intel Corporation
  * All rights reserved.
  *
- * Permission to use, copy, modify, and distribute this software and its
- * documentation for any purpose, without fee, and without written agreement is
- * hereby granted, provided that the above copyright notice, the following
- * two paragraphs and the author appear in all copies of this software.
- * 
- * IN NO EVENT SHALL THE UNIVERSITY OF CALIFORNIA BE LIABLE TO ANY PARTY FOR
- * DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING OUT
- * OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF THE UNIVERSITY OF
- * CALIFORNIA HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
- * THE UNIVERSITY OF CALIFORNIA SPECIFICALLY DISCLAIMS ANY WARRANTIES,
- * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
- * AND FITNESS FOR A PARTICULAR PURPOSE.  THE SOFTWARE PROVIDED HEREUNDER IS
- * ON AN "AS IS" BASIS, AND THE UNIVERSITY OF CALIFORNIA HAS NO OBLIGATION TO
- * PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS."
+ * This file is distributed under the terms in the attached INTEL-LICENSE     
+ * file. If you do not find these files, copies can be found by writing to
+ * Intel Research Berkeley, 2150 Shattuck Avenue, Suite 1300, Berkeley, CA, 
+ * 94704.  Attention:  Intel License Inquiry.
  *
- * Copyright (c) 2007 University of Padova
- * Copyright (c) 2007 Orebro University
+ * Copyright (c) 2007 University of Southern Denmark
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -50,24 +39,25 @@
  */
 
 /**
- * @author Philip Levis
- * @author Cory Sharp
+ * 8-bit 64kHz Counter component as per TEP102 HAL guidelines. The robostix
+ * 64kHz clock is built on hardware timer 0, and actually runs at
+ * CPU frequency / 256.
+ *
+ * @author David Gay <dgay@intel-research.net>
  * @author Mirko Bordignon <mirko.bordignon@ieee.org>
- */ 
+ */
 
-/* Redefined, since the millisecond timer on the robostix platform
-  is based on hardware timer2, which gets initialized through PlatformC
-  by the purposely developed InitTwoP.
-*/
+#include <RobostixTimer.h>
 
-#include "Timer.h"
-
-configuration TimerMilliP {
-  provides interface Timer<TMilli> as TimerMilli[uint8_t id];
+configuration CounterZero8C
+{
+  provides interface Counter<TZero, uint8_t>;
 }
-implementation {
-  components HilTimerMilliC; //, MainC;
-  //MainC.SoftwareInit -> HilTimerMilliC;
-  TimerMilli = HilTimerMilliC;
+implementation
+{
+  components HplAtm128Timer0C as HWTimer, InitZeroP,
+    new Atm128CounterC(TZero, uint8_t) as NCounter;
+  
+  Counter = NCounter;
+  NCounter.Timer -> HWTimer;
 }
-

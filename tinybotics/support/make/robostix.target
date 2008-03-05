@@ -1,9 +1,13 @@
-# robostix.target
-# mirko.bordignon@ieee.org
+#-*-Makefile-*- vim:syntax=make
 
 PLATFORM = robostix
-PROGRAMMER_PART ?= -dpart=ATmega128
-PFLAGS += --param max-inline-insns-single=100000 -I$(TOSROOT)/../tinyos-2.x-contrib/tinybotics/tos/platforms/$(PLATFORM)
+PROGRAMMER ?= uisp
+
+ifeq ($(PROGRAMMER),uisp)
+  PROGRAMMER_PART ?= -dpart=ATmega128
+endif
+
+PFLAGS += -I$(TOSROOT)/../tinyos-2.x-contrib/tinybotics/tos/platforms/$(PLATFORM)
 
 AVR_FUSE_H ?= 0xc4
 

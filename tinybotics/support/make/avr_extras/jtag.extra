@@ -1,0 +1,26 @@
+#-*-Makefile-*- vim:syntax=make
+
+ifeq ($(JTAG),)
+$(error JTAG must be defined, try "make $(TARGETS) help")
+endif
+
+PROGRAM = jtag
+
+ifeq ($(PROGRAMMER),avarice)
+    ifdef BOOTLOADER
+      ifeq ($(shell [ -f /bin/cygwin1.dll ] && echo cygwin),cygwin)
+        BOOTLOADER := $(shell cygpath -m $(BOOTLOADER))
+      endif
+    endif
+    PROGRAMMER_FLAGS = --jtag $(JTAG) $(PROGRAMMER_PART) $(PROGRAMMER_EXTRA_FLAGS) $(PROGRAMMER_EXTRA_FLAGS_JTAG)
+    PROGRAMMER_INSTALL_SREC_FLAGS = --erase --program --file $(INSTALL_SREC)
+    PROGRAMMER_INSTALL_BOOTLOADER_FLAGS = --erase --program --file $(BOOTLOADER)
+endif
+
+program: FORCE
+	@echo "    installing $(PLATFORM) binary using jtag"
+	$(PROGRAMMER) $(PROGRAMMER_FLAGS) $(PROGRAMMER_INSTALL_SREC_FLAGS)
+
+program_bl: FORCE
+	@echo "    installing $(PLATFORM) bootloader using jtag"
+	$(PROGRAMMER) $(PROGRAMMER_FLAGS) $(PROGRAMMER_INSTALL_BOOTLOADER_FLAGS)

@@ -7,8 +7,7 @@
  * Intel Research Berkeley, 2150 Shattuck Avenue, Suite 1300, Berkeley, CA, 
  * 94704.  Attention:  Intel License Inquiry.
  *
- * Copyright (c) 2007 University of Padova
- * Copyright (c) 2007 Orebro University
+ * Copyright (c) 2007 University of Southern Denmark
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -38,23 +37,40 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 /**
+ * Configure hardware timer 0 for use as the mica family's millisecond
+ * timer.  This component does not follow the TEP102 HAL guidelines as
+ * there is only one compare register for timer 0, which is used to
+ * implement HilTimerMilliC. Hence it isn't useful to expose an
+ * AlarmMilliC or CounterMillIC component.
+ * 
  * @author David Gay <dgay@intel-research.net>
- * @author Mirko Bordignon <mirko.bordignon@ieee.org> 
+ * @author Martin Turon <mturon@xbow.com>
+ * @author Mirko Bordignon <mirko.bordignon@ieee.org>
  */
 
-#include <RobostixTimer.h>
+#include "RobostixTimer.h"
 
-configuration AlarmMilli32C
+configuration AlarmCounterMilliP
 {
-  provides interface Alarm<TMilli, uint32_t>;
+  provides interface Init;
+  provides interface Alarm<TMilli, uint32_t> as AlarmMilli32;
+  provides interface Counter<TMilli, uint32_t> as CounterMilli32;
 }
 implementation
 {
-  components AlarmTwo8C as Alarm8, CounterMilli32C as Counter32,
-    new TransformAlarmC(TMilli, uint32_t, TTwo, uint8_t,
-			ROBOSTIX_DIVIDE_TWO_FOR_MILLI_LOG2) as Transform32;
+  components HplAtm128Timer0C as Timer0, PlatformC, NoInitC,
+    AlarmZero8C as Alarm64khz, CounterZero8C as Counter64khz, 
+    new TransformAlarmCounterC(TMilli, uint32_t, T64khz, uint8_t,
+			       ROBOSTIX_DIVIDE_ZERO_FOR_MILLI_LOG2, counter_zero_overflow_t)
+      as Transform32;
 
-  Alarm = Transform32;
-  Transform32.AlarmFrom -> Alarm8;
-  Transform32.Counter -> Counter32;
+  // Top-level interface wiring
+  AlarmMilli32 = Transform32;
+  CounterMilli32 = Transform32;
+
+  // Alarm Transform Wiring
+  Transform32.AlarmFrom -> Alarm64khz;
+  Transform32.CounterFrom -> Counter64khz;
+
+  Init = NoInitC;
 }

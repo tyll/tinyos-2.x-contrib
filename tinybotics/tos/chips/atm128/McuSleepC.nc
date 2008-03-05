@@ -55,7 +55,7 @@
  * Implementation of TEP 112 (Microcontroller Power Management) for
  * the Atmega128. Power state calculation code copied from Rob
  * Szewczyk's 1.x code in HPLPowerManagementM.nc.
- * --stripped down version not to interfere with normal timer operations--
+ * --stripped down version to provide a stub for future implementation--
  *
  * @author Philip Levis
  * @author Robert Szewczyk
@@ -90,7 +90,7 @@ implementation {
 
   mcu_power_t getPowerState() {
 
-    // to ease debugging, for the moment we assume there's always something running
+    // for the moment we assume there's always something running
     // and therefore the MCU cannot be put in low-power modes
     return ATM128_POWER_IDLE;
 

@@ -1,22 +1,19 @@
-# avr_extras.rules
-# mirko.bordignon@ieee.org
+#-*-Makefile-*- vim:syntax=make
 
 define AVR_EXTRAS_HELP
 
  TinyBotics AVR extras:
 
    dt006        : use a DT006 compatible parallel port programmer
-
+   jtag,<dev>   : use a JTAG dongle connected at port <dev>
    stk500,<dev> : use STK500 serial port programming board at port <dev>
                   (default for robostix and pmote targets)
-   The dev parameter need not be specified, in which case it is expected
-   to be defined either as in the environment variable STK500 or on the
-   command line. If unspecified, it will default to /dev/ttyS0.
+   The dev or host parameter for the programmer option need not be specified,
+   in which case it is expected to be defined as in an environment variable of
+   the same name in all caps (such as JTAG or STK500).
 
 endef
 
 HELP += $(AVR_EXTRAS_HELP)
 
-# the same as in avr.rules
 $(if $(PROGRAM),,$(call TOSMake_include,avr_extras/$(DEFAULT_PROGRAM).extra))
-

@@ -17,7 +17,63 @@ technical support for affiliated members as well as an open community base for d
 </p>
 
 <hr/>
+<h2>Available components</h2>
 
+<h3>Low power CC2420 radio stack (for Tmote Sky)</h3>
+<h4>Overview</h4>
+This radio stack adds a per hop synchronization to the existing CC2420 low power listening radio stack.
+The main changes are:
+<ul>
+<li>make cca sampling time (radio wakeup) predictable, e.g. wake up with a fixed period</li>
+<li>add the ability to send packets exactly at a given time (32khz jiffy granularity)</li>
+<li>add time information to each packet sent, in order to share wakeuptimes and clock skews with neighbour nodes</li>
+</ul>
+This radio stack behaves as follows: As long as there is no time information about target nodes available, packets are sent with a &quot;long preamble&quot;, e.g. as a
+packet burst (see original T2 CC2420 radio stack for documentation). As time goes by, received packets add time information about the neighbourhood of a node. For every neighbour,
+a time measurement history is saved. Packets for those neighbours are then exactly scheduled at its wakeup time (plus/minus some backoff). The bigger the History gets, the more accurately
+the drift to every neighbour can be calculated.
+<br>With time information, packets can be sent with almost no extra energy wasted.
+<br><br>
+The following picture shows a typical current curve, measured on a TmoteSky. The second peak is caused by a transmission, where the others are channel samplings between sleep phases:
+<img src="harvester_power.png" width="1291" height="411">
+<h4>How to use it</h4>
+<p>
+The simplest way to add this energy saving radio stack to your application, is simply to add following lines to your Makefile (example can be found in the ./app/MultihopOscilloscope directory):
+<div style="border:1px solid;padding:0.3em;background:#ffffa0">
+<pre>CFLAGS += -DLOW_POWER_LISTENING -DLPL_DEFAULT_SLEEP_INTERVAL=250
+CC2420DIR=../../tos/chips/cc2420
+CFLAGS += -I$(CC2420DIR) -I$(CC2420DIR)/alarm -I$(CC2420DIR)/control -I$(CC2420DIR)/csma -I$(CC2420DIR)/interfaces -I$(CC2420DIR)/link
+CFLAGS += -I$(CC2420DIR)/lowpan -I$(CC2420DIR)/lpl -I$(CC2420DIR)/packet -I$(CC2420DIR)/receive -I$(CC2420DIR)/spi -I$(CC2420DIR)/transmit
+CFLAGS += -I$(CC2420DIR)/unique -I$(CC2420DIR)/sync
+CFLAGS += -DENABLE_SPI0_DMA</pre>
+</div> 
+<ul>
+<li><b>LPL_DEFAULT_SLEEP_INTERVAL</b>: This variable selects the radio sleep interval in milliseconds. Values from 100 to 16000 are possible.</li>
+<li><b>CC2420DIR</b>: This is the path to the tos/chips/cc2420 directory in this contrib folder</li>
+</ul>
+With this small modification, it should be possible to run all standard Tinyos 2.x applications.
+</p>
+<p>when <b>LPL_DEFAULT_SLEEP_INTERVAL</b> is not set, the parameters of the radio stack can be set with the LowPowerListening interface. This radio stack offers the ability, to save power by sending subsequent packets to a neighbour, after the first packets was successfully transmitted. For this purpose
+it is necessary to set the &quot;more&quot;-flag in the first packet, in order to keep the receiver node awake for some longer time. This flag can be set or cleared with the <i>NeighbourSyncFlowPacket</i> interface. This interface provides following function:
+<div style="border:1px solid;padding:0.3em;background:#ffffa0"">
+<pre>interface NeighbourSyncFlowPacket {
+	command	void setMore(message_t* msg);
+	command	void clearMore(message_t* msg);
+}</pre>
+</div>
+</p>
+<hr/>
+  
+<h3>Harvester: A data gathering demo application</h3>
+<p></p>
+<img src="harvester_40.png" width="801" height="800">
+
+<hr/>
+
+<h3>DSN-Monitor, Deployement support for TinyOS nodes</h3>
+<p>
+Information about the DSN-Monitor can be found on the BTNode webpage: <a href="http://www.btnode.ethz.ch/Projects/DSNMonitor">http://www.btnode.ethz.ch/Projects/DSNMonitor</a>
+</p>
 <a href="../content.html">back</a>
 
 </body>

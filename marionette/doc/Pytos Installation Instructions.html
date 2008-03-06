@@ -1,0 +1,615 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+  <title>Pytos Installation Instructions</title>
+</head>
+<body>
+<h1> Installation </h1>
+
+<p><span style="font-weight: bold;">Please note that some of these instructions may have changed slightly in the TinyOS 2.x version.</span></p>
+<p>To use pytos, you must install the python environment using one of
+the three sets of instructions below: windows, cygwin, or linux. Then,
+for all platforms, follow the post-install directions.
+</p>
+<p>Notes: 
+</p>
+
+<ol>
+  <li>If you want a basic setup, you only need python2.4 and jpype.
+  </li>
+  <li>If you want a full setup (required for python GUIs), you will also need Tkinter, numeric, and matplotlib
+  </li>
+  <li>If you are installing on a windows machine, we recommend the
+full win32 installation and/or the basic cygwin setup, since the cygwin
+libraries may have GUI problems.
+  </li>
+</ol>
+
+<div class="editsection" style="float: right; margin-left: 5px;">[<a href="http://nest.cs.berkeley.edu/nestfe/index.php?title=Pytos_Installation_Instructions&amp;action=edit&amp;section=2" title="Edit section: Win32">edit</a>]</div>
+<a name="Win32"></a>
+<h2> Win32 </h2>
+
+<ul>
+  <li> Python: Use python-2.4.1 win32 installer [<a href="http://www.python.org/ftp/python/2.4.1/python-2.4.1.msi" class="external text" title="http://www.python.org/ftp/python/2.4.1/python-2.4.1.msi" rel="nofollow">here</a>]
+  </li>
+  <li> JPype: Download and use the <a href="http://www.cs.berkeley.edu/%7Ekamin/marionette/JPype-20050607.win32-py2.4.exe" class="external text" title="http://www.cs.berkeley.edu/~kamin/marionette/JPype-20050607.win32-py2.4.exe" rel="nofollow">windows instaler</a> and Copy <a href="http://www.cs.berkeley.edu/%7Ekamin/marionette/msvcp71.dll" class="external text" title="http://www.cs.berkeley.edu/~kamin/marionette/msvcp71.dll" rel="nofollow">msvcp71.dll</a> to your python root directory (C:\python24 by default)
+  </li>
+  <li> Numpy: Get <a href="http://prdownloads.sourceforge.net/numpy/Numeric-23.8.win32-py2.4.exe?download" class="external text" title="http://prdownloads.sourceforge.net/numpy/Numeric-23.8.win32-py2.4.exe?download" rel="nofollow">Win32 installer</a> (Version 23.8 for python 2.4)
+  </li>
+  <li> Matplotlib: Use the <a href="http://prdownloads.sourceforge.net/matplotlib/matplotlib-0.83.1.win32-py2.4.exe?download" class="external text" title="http://prdownloads.sourceforge.net/matplotlib/matplotlib-0.83.1.win32-py2.4.exe?download" rel="nofollow">win32 installer</a> (Version 0.83.1 for Python 2.4)
+  </li>
+</ul>
+
+<div class="editsection" style="float: right; margin-left: 5px;">[<a href="http://nest.cs.berkeley.edu/nestfe/index.php?title=Pytos_Installation_Instructions&amp;action=edit&amp;section=3" title="Edit section: Cygwin">edit</a>]</div>
+<a name="Cygwin"></a>
+<h2> Cygwin </h2>
+
+<p><b>BASIC INSTALL</b>
+</p>
+
+<ul>
+  <li> Use cygwin package manager to get python-2.4
+  </li>
+</ul>
+
+<ul>
+  <li>Jpype
+    <ul>
+      <li> Get/checkout the <a href="http://sourceforge.net/projects/jpype/" class="external text" title="http://sourceforge.net/projects/jpype/" rel="nofollow">CVS version</a>
+      </li>
+      <li> In setup.py, make "cygwin" a recognized sys.platform
+        <ul>
+          <li> JAVA_HOME = "/path/to/jdk"; JDK_INCLUDE = "win32"; LIBRARIES = []; MACROS = [ ("WIN32",1) ] 
+          </li>
+        </ul>
+
+      </li>
+      <li> Some python header want sys/select.h to exist (it doesn't otherwise use it), so do this in the JPype-0.5 directory:
+        <ul>
+          <li> mkdir src/native/common/include/sys &amp;&amp; touch src/native/common/include/sys/select.h 
+          </li>
+        </ul>
+
+      </li>
+      <li> To compile: python setup.py build --compiler=mingw32
+        <ul>
+          <li>tips (<a href="http://dkc.jhu.edu/gamera/html/install.html#cygwin-mingw32" class="external free" title="http://dkc.jhu.edu/gamera/html/install.html#cygwin-mingw32" rel="nofollow">http://dkc.jhu.edu/gamera/html/install.html#cygwin-mingw32</a>)
+          </li>
+        </ul>
+
+      </li>
+      <li> To install: python setup.py install
+      </li>
+      <li><font color="red">Note:</font> The above instructions used to
+work, but recently the Cygwin install of pytos seems to segfault when
+the "startJVM" command is run and it is using sun's j2sdk1.4.2_11. If
+you get it to work (perhaps with another version of java), please
+update here (or let kamin know). </li>
+      <li><font color="red">Todo:</font> Somebody needs to debug the
+jpype segfault in cygwin with sun's j2sdk by turning on tracing before
+compilation, which should print out trace of jpype calls so we can see
+where the segfault is happening, ie.: uncomment line 23 in file
+src/native/common/include/jpype.h and do the following&nbsp;:
+        <ul>
+          <li>python setup.py build -f
+          </li>
+          <li>python setup.py install -f
+          </li>
+        </ul>
+
+      </li>
+    </ul>
+
+  </li>
+</ul>
+
+<p><b>OPTIONAL</b>
+</p>
+
+<ul>
+  <li> numpy (aka numeric) 
+    <ul>
+      <li> Get the <a href="http://prdownloads.sourceforge.net/numpy/Numeric-24.0b2.tar.gz?download" class="external text" title="http://prdownloads.sourceforge.net/numpy/Numeric-24.0b2.tar.gz?download" rel="nofollow">tarball</a> (version 24.0b2) and extract it.
+      </li>
+      <li> install the Numeric tarball: python setup.py install
+      </li>
+    </ul>
+
+  </li>
+</ul>
+
+<ul>
+  <li> matplotlib (Status: installs, but GUI seems problemic)
+    <ul>
+      <li> get the following cygwin packages (all related &amp; devel versions): python, freetype, libpng, zlib
+      </li>
+      <li> get <a href="http://prdownloads.sourceforge.net/matplotlib/matplotlib-0.83.1.tar.gz?download" class="external text" title="http://prdownloads.sourceforge.net/matplotlib/matplotlib-0.83.1.tar.gz?download" rel="nofollow">matplotlib-0.83.1</a>
+      </li>
+      <li> add some library links
+        <ul>
+          <li> ln -s /lib/libtk84.a /lib/libtk8.4.a
+          </li>
+          <li> ln -s /lib/libtcl84.a /lib/libtcl8.4.a
+          </li>
+        </ul>
+
+      </li>
+      <li> edit the setupext.py file:
+        <ul>
+          <li> add 'cygwin' to basedir dict by adding this line:  'cygwin'&nbsp;: ['/usr/local', '/usr',],
+          </li>
+        </ul>
+
+      </li>
+      <li> python setup.py build
+      </li>
+      <li> python setup.py install
+      </li>
+    </ul>
+
+  </li>
+</ul>
+
+<div class="editsection" style="float: right; margin-left: 5px;">[<a href="http://nest.cs.berkeley.edu/nestfe/index.php?title=Pytos_Installation_Instructions&amp;action=edit&amp;section=4" title="Edit section: Debian Linux 3.1">edit</a>]</div>
+<a name="Debian_Linux_3.1"></a>
+<h2> Debian Linux 3.1 </h2>
+
+<p>Download and unzip the following file to a web server directory, and make the resulting directories/files world readable: <a href="http://www.cs.berkeley.edu/%7Ekamin/pytosPackages.tgz" class="external free" title="http://www.cs.berkeley.edu/~kamin/pytosPackages.tgz" rel="nofollow">http://www.cs.berkeley.edu/~kamin/pytosPackages.tgz</a>
+</p>
+<p>Then, add the following lines to your /etc/apt/sources.list file:
+</p>
+
+<pre>deb <a href="http://www.yourservernamehere.edu/" class="external free" title="http://www.yourservernamehere.edu/" rel="nofollow">http://www.yourservernamehere.edu/</a> pytosPackages/<br></pre>
+
+<p>Install the following packages (and their dependencies) using synaptic or apt-get:
+</p>
+
+<pre>python2.4<br>python2.4-tk<br>python2.4-dev<br>python2.4-numeric<br>python2.4-numeric-ext<br>python2.4-matplotlib<br>libxml-simple-perl<br>(optionally, for java)<br>j2re1.4<br>j2sdk1.4<br>java-common<br></pre>
+
+<p>(alternatively, of course, you could have just used the .deb files
+in the .tgz file and installed them with dpkg. If somebody ends up
+putting these packages on a long-lived web server, please update the
+link above to allow others to use it)
+</p>
+<p>Make sure that "which java" returns the executable in
+/usr/lib/j2se/1.4/bin (or whichever tree your libjvm.so file is), not
+the symbolic link in /usr/bin. Now, download jpype from cvs into
+/usr/local/src and install:
+</p>
+
+<pre> sudo rm /usr/bin/python <br> sudo ln -s /usr/bin/python2.4 /usr/bin/python (to install to python2.4 instead of python2.3)<br> cd /usr/local/src<br> cvs -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/jpype login<br> cvs -z3 -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/jpype co -P jpype<br> cd jpype<br> edited ./setup.py so that line 26 of jpype/setup.py reads "JAVA_HOME = '/usr/lib/j2se/1.4'"<br> python setup.py build<br> sudo python setup.py install<br> sudo find /usr/lib/python2.4/site-packages -type d | grep jpype | xargs -i chmod a+rx {}<br> sudo find /usr/lib/python2.4/site-packages -type f | grep jpype | xargs -i chmod a+r {}<br></pre>
+
+<div class="editsection" style="float: right; margin-left: 5px;">[<a href="http://nest.cs.berkeley.edu/nestfe/index.php?title=Pytos_Installation_Instructions&amp;action=edit&amp;section=5" title="Edit section: Post-install">edit</a>]</div>
+<a name="Post-install"></a>
+<h1> Post-install </h1>
+
+<div class="editsection" style="float: right; margin-left: 5px;">[<a href="http://nest.cs.berkeley.edu/nestfe/index.php?title=Pytos_Installation_Instructions&amp;action=edit&amp;section=6" title="Edit section: all platforms">edit</a>]</div>
+<a name="all_platforms"></a>
+<h2>all platforms</h2>
+
+<ul>
+  <li> verify that your tree is up to date (or if not working from
+CVS, that you have tinyos 1.1.15 or later), and recompile all java
+tools.
+  </li>
+  <li> verify that you have perl installed, along with the XML::Simple module.  If you don't from the command line run: 
+  </li>
+</ul>
+
+<pre>cpan -i XML::Simple<br></pre>
+
+<ul>
+  <li> verify that you are using nesc version 1.2 or later.  It is best to download and compile the cvs version.
+  </li>
+  <li>create a ~/.matplotlibrc file with the following line (to use Tk instead of GTK as the default rendering engine):
+  </li>
+</ul>
+
+<pre> backend     &nbsp;: TkAgg    # the default backend<br></pre>
+
+<ul>
+  <li> Your ~/.profile must do the following: </li>
+</ul>
+
+<pre>Set TOSROOT (eg, export TOSROOT=$HOME/tinyos-1.x)<br>export MAKERULES=$TOSROOT/tools/make/Makerules<br>export CLASSPATH="`$TOSROOT/tools/java/javapath`" <br>The last line of your .profile should source the pytos profile (eg, source $TOSROOT/tools/python/util/pytosProfile)<br></pre>
+
+<ul>
+  <li>If you are not receiving any Drain packets, make sure that your
+TOSBase is programmed with the correct ID and that your tools know what
+the ID is. In general, this should be 0xfffe. if you are using
+contrib/nestfe/apps/TOSBase, you must install your TOSBase with the
+correct address "make install.0xfffe". With tinyos-1.x/apps/TOSBase,
+this is not necessary. you can comm unicate the address to your pc-side
+tools in two ways. You can <tt> export MOTEID=65534 </tt> in your <tt> .bashrc </tt> file or you can edit the tools/python/pytos/util/RoutingMessages.py file (line 158).
+  </li>
+</ul>
+
+<div class="editsection" style="float: right; margin-left: 5px;">[<a href="http://nest.cs.berkeley.edu/nestfe/index.php?title=Pytos_Installation_Instructions&amp;action=edit&amp;section=7" title="Edit section: win32 and cygwin only">edit</a>]</div>
+<a name="win32_and_cygwin_only"></a>
+<h2> win32 and cygwin only</h2>
+
+<ul>
+  <li>set PYTHONROOTWIN to your win32 python directory using win32
+path form (eg, export PYTHONROOTWIN="C:\\python24" ) </li>
+  <li>verify that PATH includes $JDKROOT/bin (where,eg, JDKROOT is
+something like /cygdrive/c/apps/java/j2sdk1.4.2_08) </li>
+  <li>verify that CLASSPATH is entirely in win32 form                                                                 
+  </li>
+  <li>verify that PYTHONPATH is empty or entirely in unix form </li>
+  <li>verify that PATH is entirely in unix form
+  </li>
+  <li>verify that cygpath.exe is in your PATH
+  </li>
+  <li>To start a win32 python session that will work with pytos, first call <b>windowsPythonEnvironment.sh</b> from a cygwin shell.  This will spawn a new DOS prompt with it's environment setup to support pytos.  To start python, type <b>python</b> from this DOS prompt.  To start a python app, type the name of the app
+  </li>
+</ul>
+
+<div class="editsection" style="float: right; margin-left: 5px;">[<a href="http://nest.cs.berkeley.edu/nestfe/index.php?title=Pytos_Installation_Instructions&amp;action=edit&amp;section=8" title="Edit section: Testing the installation">edit</a>]</div>
+<a name="Testing_the_installation"></a>
+<h1>Testing the installation</h1>
+
+<div class="editsection" style="float: right; margin-left: 5px;">[<a href="http://nest.cs.berkeley.edu/nestfe/index.php?title=Pytos_Installation_Instructions&amp;action=edit&amp;section=9" title="Edit section: Python">edit</a>]</div>
+<a name="Python"></a>
+<h2> Python </h2>
+
+<p>Try running 
+</p>
+
+<pre>$ python<br></pre>
+
+<p>from a command prompt (either a bash, cygwin, or dos prompt (using
+pytosCmdPrompt.sh)), depending on which installation you did). You
+should get a python command shell. If that works, try importing pytos
+(if you have trouble with this step on win32, you may need to put, for
+example, <i>export JAVA_HOME=c:\tinyos\j2sdk1.4.2_08</i> in your .profile and call pytosCmdPrompt.sh again from cygwin):
+</p>
+
+<pre>&gt;&gt;&gt; import pytos<br>&gt;&gt;&gt;<br></pre>
+
+<p>If you can do that, python, jpype and all of your environment variables are setup correctly. Now, try importing a pytos class:
+</p>
+
+<pre>&gt;&gt;&gt; import pytos.Comm<br></pre>
+
+<p>If you get a "no class found" type of error, then tools/python is
+not in your PYTHONPATH (if you get another kind of error, it might be a
+jpype problem; see below). To check what is in your PYTHONPATH, from
+the python prompt run
+</p>
+
+<pre>&gt;&gt;&gt; import sys<br>&gt;&gt;&gt; print sys.path<br></pre>
+
+<p>If tools/python is not in your sys.path, you can either add it from
+within python or add it to your PYTHONPATH environment variable before
+starting python.
+</p>
+<p>If these don't work, check these troubleshooting tips:
+</p>
+
+<ul>
+  <li> Make sure you do not have the environment variable $JAVA_HOME
+defined (if it is in cygwin path format, it will confuse one of the
+__init.py__() functions )
+  </li>
+  <li> If you have weird path issues, you might want to remove all
+paths with spaces from your PATH variable. For example, if you have
+'Program Files' in your paths, you could use something like (the
+example doesn't match the last path in $PATH, but whatever): </li>
+</ul>
+
+<pre>   export PATH=`echo $PATH | sed 's/\/cygdrive\/c\/Program\ Files[^:]*\://g' -`<br></pre>
+
+<div class="editsection" style="float: right; margin-left: 5px;">[<a href="http://nest.cs.berkeley.edu/nestfe/index.php?title=Pytos_Installation_Instructions&amp;action=edit&amp;section=10" title="Edit section: Jpype">edit</a>]</div>
+<a name="Jpype"></a>
+<h2>Jpype</h2>
+
+<p>From a python command prompt, run 
+</p>
+
+<pre>&gt;&gt;&gt; import jpype<br></pre>
+
+<p>If that does not give any errors, you have jpype installed.  Now, run
+</p>
+
+<pre>&gt;&gt;&gt; jpype.startJVM("path/to/my/javaLib")<br></pre>
+
+<p>where javaLib is either "jvm.dll" in Windows or "libjvm.so" in
+Linux. For both windows and cygwin python, the path should be a Windows
+path (ie "C:\...", not "/usr/..."), otherwise you could get a segfault.
+</p>
+<p>If that works but you still get a segfault when importing
+something like NescApp, check the pytos/__init__.py file to make sure
+it is passing the right location of your javaLibrary.
+</p>
+<p>If that works, try importing a java object:
+</p>
+
+<pre>&gt;&gt;&gt; from jpype import JPackage<br>&gt;&gt;&gt; i = JPackage("java.lang").Integer(100)<br>&gt;&gt;&gt; i.intValue()<br>100<br></pre>
+
+<p>If that doesn't work, you probably don't have your CLASSPATH setup
+correctly. Make sure that tools/python/pytos is in your CLASSPATH, as
+well as the tinyos java tools. In both windows and cygwin python, you
+need to have your CLASSPATH in windows path format (ie "C:\...", not
+"/usr/...". Make sure paths are separated by semicolons, not colons.)
+</p>
+
+<div class="editsection" style="float: right; margin-left: 5px;">[<a href="http://nest.cs.berkeley.edu/nestfe/index.php?title=Pytos_Installation_Instructions&amp;action=edit&amp;section=11" title="Edit section: Guis">edit</a>]</div>
+<a name="Guis"></a>
+<h2>Guis</h2>
+
+<p>To verfiy that matplotlib is working alone, try plotting a straight line:
+</p>
+
+<pre>&gt;&gt;&gt;from pylab import *<br>&gt;&gt;&gt;plot([1,2,3,4])<br>&gt;&gt;&gt;show()<br></pre>
+
+<p>To verify that Tkinter, Numberic, and Matplotlib are working together, try running Oscope.py
+</p>
+
+<pre>cd ~/tinyos-1.x/apps/Oscope<br>make telosb install <br>Oscope.py telosb serial@COM1:telos<br></pre>
+
+<p>You could also try running the RFS demo GUI:
+</p>
+
+<pre>cd ~/tinyos/contrib/nestfe/nesc/apps/TestDetectionEvent<br>make telosb install fileset,ignore<br>./RfsFieldGui.py telosb serial@COM1:telos<br></pre>
+
+<p>If you are using cygwin and this doesn't work, check these troubleshooting tips:
+</p>
+
+<ul>
+  <li> if you get the "fork_parent and child died waiting" error
+    <ul>
+      <li> get the rebaseall package from cygwin
+      </li>
+      <li> close _all_ cygwin apps (shells, rxvt, etc)
+      </li>
+      <li> open a bash shell only (no rxvt or xterm)
+      </li>
+      <li> run rebaseall
+      </li>
+      <li> Rebaseall may mess up emacs -nw (in Cygwin 1.5.17-1)
+        <ul>
+          <li> See this <a href="http://sourceware.org/ml/cygwin/2005-07/msg00819.html" class="external text" title="http://sourceware.org/ml/cygwin/2005-07/msg00819.html" rel="nofollow">hack</a> for how someone fixed it.
+          </li>
+        </ul>
+
+      </li>
+    </ul>
+
+  </li>
+  <li> you may need some X11 headers from cygwin too
+  </li>
+</ul>
+
+<div class="editsection" style="float: right; margin-left: 5px;">[<a href="http://nest.cs.berkeley.edu/nestfe/index.php?title=Pytos_Installation_Instructions&amp;action=edit&amp;section=12" title="Edit section: Notes">edit</a>]</div>
+<a name="Notes"></a>
+<h1> Notes </h1>
+
+<div class="editsection" style="float: right; margin-left: 5px;">[<a href="http://nest.cs.berkeley.edu/nestfe/index.php?title=Pytos_Installation_Instructions&amp;action=edit&amp;section=13" title="Edit section: installing JPype for win32 from CVS">edit</a>]</div>
+<a name="installing_JPype_for_win32_from_CVS"></a>
+<h2> installing JPype for win32 from CVS</h2>
+
+<ul>
+  <li> you don't need these, but in case you want to build jpype from CVS, the instructions are here
+  </li>
+  <li> Get the CVS version
+  </li>
+  <li> Follow the <a href="http://libsh.org/win32/build.html" class="external text" title="http://libsh.org/win32/build.html" rel="nofollow">instructions</a> and my modifications (below) to build msvcprt.lib
+    <ul>
+      <li> put dumpbin.exe in your path by adding the following to the
+windows PATH: C:\Program Files\Microsoft Visual
+Studio\VC98\Bin;C:\Program Files\Microsoft Visual Studio\VB98
+      </li>
+      <li> from a cmd prompt, do
+        <ul>
+          <li> cd C:\Program Files\Microsoft Visual C++ Toolkit 2003\bin
+          </li>
+          <li> wget <a href="http://libsh.org/win32/data/msvcprt/exports.sed" class="external free" title="http://libsh.org/win32/data/msvcprt/exports.sed" rel="nofollow">http://libsh.org/win32/data/msvcprt/exports.sed</a> 
+          </li>
+          <li> echo LIBRARY msvcp71.dll &gt; msvcprt.def
+          </li>
+          <li> echo EXPORTS &gt;&gt; msvcprt.def
+          </li>
+          <li> dumpbin /exports msvcp71.dll | sed -nf exports.sed &gt;&gt; msvcprt.def
+          </li>
+          <li> lib /def:msvcprt.def /machine:x86
+          </li>
+          <li> cp msvcprt.lib ..\lib\
+          </li>
+        </ul>
+
+      </li>
+    </ul>
+
+  </li>
+  <li> Follow the <a href="http://www.vrplumber.com/programming/mstoolkit/" class="external text" title="http://www.vrplumber.com/programming/mstoolkit/" rel="nofollow">instructions</a> and my modifications(below) to build jpype
+    <ul>
+      <li> Patching msvccompiler.py
+        <ul>
+          <li> I patched it by hand because I am running python 2.4.1 (not 2.4 final)
+          </li>
+          <li> I used a different reg-key: freeSDK = r"SOFTWARE\Microsoft\MicrosoftSDK\InstalledSDKs\8F9E5EF3-A9A5-491B-A889-C58EFFECE8B3"
+          </li>
+        </ul>
+
+      </li>
+      <li> In the vc7.bat file
+        <ul>
+          <li> I needed to add "Platform" to the SDK directories
+          </li>
+          <li> For jpype, I needed to add "SET JAVA_HOME=C:\apps\java\j2sdk1.4.2_07"
+          </li>
+          <li> my vc7.bat file looks like this
+            <ul>
+              <li> Set PATH=C:\Program Files\Microsoft Visual C++ Toolkit
+2003\bin;C:\Program Files\Microsoft Platform
+SDK\Bin;C:\apps\Python24;%PATH%
+              </li>
+              <li> Set INCLUDE=C:\Program Files\Microsoft Visual C++ Toolkit
+2003\include;C:\Program Files\Microsoft Platform
+SDK\Include;C:\apps\Python24\include;%INCLUDE%
+              </li>
+              <li> Set LIB=C:\Program Files\Microsoft Visual Studio .NET
+2003\Vc7\lib;C:\Program Files\Microsoft Visual C++ Toolkit
+2003\lib;C:\Program Files\Microsoft Platform
+SDK\Lib;C:\apps\Python24\libs;%LIB%
+              </li>
+              <li> SET JAVA_HOME=C:\apps\java\j2sdk1.4.2_07
+              </li>
+            </ul>
+
+          </li>
+        </ul>
+
+      </li>
+      <li> building it
+        <ul>
+          <li> from a cmd, do
+          </li>
+          <li> "C:\Program Files\Microsoft Visual C++ Toolkit 2003\bin\vc7.bat"
+          </li>
+          <li> python setup.py bdist_wininst -d C:\home
+          </li>
+        </ul>
+
+      </li>
+    </ul>
+
+  </li>
+</ul>
+
+<div class="editsection" style="float: right; margin-left: 5px;">[<a href="http://nest.cs.berkeley.edu/nestfe/index.php?title=Pytos_Installation_Instructions&amp;action=edit&amp;section=14" title="Edit section: Undoing a JPype CVS install">edit</a>]</div>
+<a name="Undoing_a_JPype_CVS_install"></a>
+<h2> Undoing a JPype CVS install </h2>
+
+<ul>
+  <li> To undo the actions of 'python setup.py build' (perhaps so that you can run it again with a modified setup.py)
+    <ul>
+      <li> remove both the lib.&lt;plat&gt; directory and the temp.&lt;plat&gt; directory
+      </li>
+      <li> running 'python setup.py clean' only remove the temp.&lt;plat&gt; directory
+      </li>
+    </ul>
+
+  </li>
+  <li> To undo the actions of 'python setup.py install', remove the files that were copied into your 'site-packages' directory
+    <ul>
+      <li> This might be for instance 'c:/ProgramFiles/Python24/Lib/site-packages' or '/usr/lib/python2.4/site-packages'
+      </li>
+      <li> 'python setup.py install' basically copies files from build/lib.&lt;plat&gt; to their appropriate places
+      </li>
+    </ul>
+
+  </li>
+  <li> for more info, look at: <a href="http://www.python.org/doc/2.4.1/inst/inst.html" class="external text" title="http://www.python.org/doc/2.4.1/inst/inst.html" rel="nofollow">installing Python modules </a>
+  </li>
+</ul>
+
+<div class="editsection" style="float: right; margin-left: 5px;">[<a href="http://nest.cs.berkeley.edu/nestfe/index.php?title=Pytos_Installation_Instructions&amp;action=edit&amp;section=15" title="Edit section: Math in python">edit</a>]</div>
+<a name="Math_in_python"></a>
+<h2> Math in python </h2>
+
+<ul>
+  <li> Numarray is a replacement (and competitor) for Numeric; it has a few missing pieces,drawbacks compared to numeric
+  </li>
+  <li> Numeric (aka Numerical Python, aka Numerical Python
+Extensions, aka NumPy) is being replaced by SciPy, but SciPy is not
+there yet
+  </li>
+  <li> Hence, probably stick with the matplotlib default of Numeric
+  </li>
+</ul>
+
+<p><br>
+
+</p>
+
+<div class="editsection" style="float: right; margin-left: 5px;">[<a href="http://nest.cs.berkeley.edu/nestfe/index.php?title=Pytos_Installation_Instructions&amp;action=edit&amp;section=16" title="Edit section: Matlab to Python Interface (experimental)">edit</a>]</div>
+<a name="Matlab_to_Python_Interface_.28experimental.29"></a>
+<h2> Matlab to Python Interface (experimental) </h2>
+
+<ul>
+  <li> Two packages available, though not well documented and little development activity
+    <ul>
+      <li> <a href="http://sourceforge.net/projects/pymat" class="external text" title="http://sourceforge.net/projects/pymat" rel="nofollow">pymat</a>
+        <ul>
+          <li> I have been unsuccessful at getting it to compile properly in cygwin
+          </li>
+        </ul>
+
+      </li>
+      <li> <a href="http://sourceforge.net/projects/mlabwrap" class="external text" title="http://sourceforge.net/projects/mlabwrap" rel="nofollow">mlabwrap</a>
+        <ul>
+          <li> Can compile and get mlabraw.eval() to work, but not
+mlabraw.get(). Thus can call functions in matlab with string inputs,
+but cannot get values back into python.
+          </li>
+          <li> Because of issuew with mlabraw, cannot get mlabwrap (higher level wrapper) to work
+          </li>
+        </ul>
+
+      </li>
+    </ul>
+
+  </li>
+</ul>
+
+<ul>
+  <li> Installation Instructions for partially working mlabraw (modify directories to your installation)
+  </li>
+  <li> Modified my setup.py to the proper directories on my computer:
+  </li>
+</ul>
+
+<pre>   MATLAB_VERSION = 6.5<br>   MATLAB_DIR='c:/ProgramFiles/MATLAB6p5'<br>   EXTRA_COMPILE_ARGS=['-mno-cygwin']<br>   #EXTRA_COMPILE_ARGS=None<br>   PLATFORM_DIR='win32/microsoft/msvc60'<br>   # hopefully these 3 won't need modification<br>   MATLAB_LIBRARIES=None<br>   PYTHON_INCLUDE_DIR='/opt/Numeric-24.0b2/Include/Numeric'<br></pre>
+
+<ul>
+  <li> Changed line setup.py line 47 to 'cygwin' instead of 'win':
+  </li>
+</ul>
+
+<pre>   if sys.platform.startswith('cygwin'):<br></pre>
+
+<ul>
+  <li> Added at line 51 of setup.py (under 'WINDOWS' section):
+  </li>
+</ul>
+
+<pre>   CPP_LIBRARIES = ['stdc++']<br></pre>
+
+<ul>
+  <li> Added an extra include_dirs (for why, see step 5):
+  </li>
+</ul>
+
+<pre>   include_dirs=MATLAB_INCLUDE_DIRS + ["/opt/mlabwrap-0.9.1/include"] + (PYTHON_INCLUDE_DIR and [PYTHON_INCLUDE_DIR] or []),<br></pre>
+
+<ul>
+  <li> Added an empty file to make the mingw32 compiler happy:
+  </li>
+</ul>
+
+<pre>   mkdir -p /opt/mlabwrap-0.9.1/include/sys &amp;&amp; touch /opt/mlabwrap-0.9.1/include/sys/select.h<br></pre>
+
+<ul>
+  <li> Set an environment variable for the compiler (not sure if makes a difference):
+  </li>
+</ul>
+
+<pre>   export LD_LIBRARY_PATH=c:/ProgramFiles/MATLAB6p5/extern/lib/win32 <br></pre>
+
+<ul>
+  <li> At the command line:
+  </li>
+</ul>
+
+<pre>   python setup.py build --compiler=mingw32<br>   python setup.py install <br></pre>
+
+<ul>
+  <li> Verified Functionality of mlabraw
+  </li>
+</ul>
+
+<pre>  phoebusc@phoebus /opt<br>  $ python<br>  Python 2.4.1 (#1, May 27 2005, 18:02:40)<br>  [GCC 3.3.3 (cygwin special)] on cygwin<br>  Type "help", "copyright", "credits" or "license" for more information.<br>  &gt;&gt;&gt; import mlabraw<br>  &gt;&gt;&gt; a = mlabraw.open(<i>)</i><br>  &gt;&gt;&gt; a.get("a")<br>  Traceback (most recent call last):<br>    File "&lt;stdin&gt;", line 1, in&nbsp;?<br>  AttributeError: 'int' object has no attribute 'get'<br>  &gt;&gt;&gt; a<br>  422257344<br>  &gt;&gt;&gt; mlabraw.get(a,'hi')<br>  Traceback (most recent call last):<br>    File "&lt;stdin&gt;", line 1, in&nbsp;?<br>  mlabraw.error: Unable to get matrix from MATLAB(TM) workspace<br>  &gt;&gt;&gt; mlabraw.get(a,abc)<br>  Traceback (most recent call last):<br>    File "&lt;stdin&gt;", line 1, in&nbsp;?<br>  NameError: name 'abc' is not defined<br>  &gt;&gt;&gt; help(mlabraw)<br>  <br>  &gt;&gt;&gt; mlabraw.eval(a,"a=123")<br>  '\na =\n\n   123\n\n'<br>  &gt;&gt;&gt; mlabraw.get(a,"a")<br>  Traceback (most recent call last):<br>    File "&lt;stdin&gt;", line 1, in&nbsp;?<br>  <br>  Segmentation fault (core dumped)<br>  <br>  phoebusc@phoebus /opt<br>  $ python<br>  Python 2.4.1 (#1, May 27 2005, 18:02:40)<br>  [GCC 3.3.3 (cygwin special)] on cygwin<br>  Type "help", "copyright", "credits" or "license" for more information.<br>  &gt;&gt;&gt; import mlabraw<br>  &gt;&gt;&gt; mlabraw.eval(a,'b=int2str(123)')<br>  '\nb =\n\n123\n\n'<br>  &gt;&gt;&gt; mlabraw.get(a,'b')<br>  '123'<br>  &gt;&gt;&gt; import sys<br>  &gt;&gt;&gt; import Numeric<br>  &gt;&gt;&gt; dir()<br>  ['Numeric', '__builtins__', '__doc__', '__name__', 'a', 'mlabraw', 'sys']<br>  &gt;&gt;&gt; mlabraw.eval(a,'c=123')<br>  '\nc =\n\n   123\n\n'<br>  &gt;&gt;&gt; mlabraw.get(a,'c')<br>  Traceback (most recent call last):<br>    File "&lt;stdin&gt;", line 1, in&nbsp;?<br>  Segmentation fault (core dumped)<br>  <br>  phoebusc@phoebus /opt<br>  $ python<br>  Python 2.4.1 (#1, May 27 2005, 18:02:40)<br>  [GCC 3.3.3 (cygwin special)] on cygwin<br>  Type "help", "copyright", "credits" or "license" for more information.<br>  &gt;&gt;&gt; import mlabraw<br>  &gt;&gt;&gt; a = mlabraw.open()<br>  &gt;&gt;&gt; mlabraw.eval(a,'c(1,1,1) = 0')<br>  '\nc =\n\n     0\n\n'<br>  &gt;&gt;&gt; mlabraw.get(a,'c')<br>  Traceback (most recent call last):<br>    File "&lt;stdin&gt;", line 1, in&nbsp;?<br>  Segmentation fault (core dumped)<br>  <br>  phoebusc@phoebus /opt<br>  $<br></pre>
+</body>
+</html>

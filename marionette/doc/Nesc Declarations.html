@@ -1,0 +1,53 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+
+  
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+
+  
+  <title>Nesc Declarations</title>
+</head>
+
+
+<body>
+
+<h2> Overview </h2>
+
+
+<p>"Nesc Declarations" are things like enums, types, structs, packet
+formats, rpc functions, module variables, etc. that the user declares
+in a nesc application. The "Nesc Declarations" script tries to avoid
+making the user re-declare these things in the pc-side tools by
+creating an XML file that contains all the nesc declarations in a
+nescApp. This file us currently being used with the <a href="Pytos%20Development%20Environment.html" title="Pytos Development Environment">Pytos Development Environment</a>
+</p>
+
+
+<div class="editsection" style="float: right; margin-left: 5px;">[<a href="http://nest.cs.berkeley.edu/nestfe/index.php?title=Nesc_Declarations&amp;action=edit&amp;section=2" title="Edit section: Setting Up">edit</a>]</div>
+
+<a name="Setting_Up"></a>
+<h2> Setting Up </h2>
+
+
+<p>In order to create the nescDecls.xml file, the user must invoke the
+nescDecls.extra file in their make process by either declaring
+"marionette" on the command line when making the application as follows
+</p>
+
+
+<pre>make telosb marionette<br></pre>
+
+
+<p>or adding it to the GOALS variable in their makefile
+</p>
+
+
+<pre>GOALS+=marionette<br></pre>
+
+
+<p>For problems, the <a href="Pytos%20Installation%20Instructions.html" title="Pytos Installation Instructions">Pytos Installation Instructions</a> may contain more details.
+</p>
+
+</body>
+</html>

@@ -1,0 +1,143 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+  <title>Rpc</title>
+</head>
+<body>
+<h2> Overview </h2>
+
+<p>Rpc is a tool that allows the user to declare a function or
+interface with @rpc and then can use the functions from a pc-side tool.
+The difference between RPC and AM is that the data is typed. This tool
+is meant to be used with the Rpc module in the <a href="Pytos%20Development%20Environment.html" title="Development Environment Demo">Pytos Development Environment</a>, which has a full typing system.  It is not intended for mote-mote communication, which should just use AM.
+</p>
+<p>Rpc can use various underlying transport mechanisms. By default,
+it communicates over drip and drain. A complete sample application can
+be found in contrib/hood/apps/TestRpc. The Hood libraries can be found
+in tos/lib/Rpc. Some documentation of the API is below.
+</p>
+
+<div class="editsection" style="float: right; margin-left: 5px;">[<a href="http://nest.cs.berkeley.edu/nestfe/index.php?title=Rpc&amp;action=edit&amp;section=2" title="Edit section: API">edit</a>]</div>
+<a name="API"></a>
+<h2> API </h2>
+
+<p>Rpc allows one to declare a function or interface rpc-able with a simple declaration as follows:
+</p>
+
+<pre>   provides interface Attribute&lt;uint16_t&gt; as Light @rpc();<br></pre>
+
+<p>or
+</p>
+
+<pre>   provides function error_t myFunc(uint8_t param) @rpc();<br></pre>
+
+<p>Once a funtion is tagged @rpc, it should show up in the pc-side
+tool. Once an interface is tagged @rpc, all functions in that interface
+should show up in the pc-side tool.
+</p>
+<p>If you are having a problem with RPC, you can use the add the following flag to your makefile:
+</p>
+
+<pre>#PFLAGS += -DRPC_LEDS<br></pre>
+
+<p>It indicates that a green light should toggle whenever an rpc
+command is received and a red led toggles whenever a response is sent.
+A yellow led toggles whenever an error in rpc is detected.
+</p>
+
+<div class="editsection" style="float: right; margin-left: 5px;">[<a href="http://nest.cs.berkeley.edu/nestfe/index.php?title=Rpc&amp;action=edit&amp;section=3" title="Edit section: Commands, Events and Pointers">edit</a>]</div>
+<a name="Commands.2C_Events_and_Pointers"></a>
+<h2> Commands, Events and Pointers</h2>
+
+<p>All rpc-able commands and events must be "provided" by the module that tags them @rpc.
+</p>
+<p>If an interface is tagged @rpc, it's commands will be made
+rpc-able if it is "provided" and it's events will be made rpc-able if
+it is "used". If a "provided" interface has any events, the RpcM module
+will handle these events. This may change the "default" behavior of
+those events, which may be undesireable, and a compile time warning is
+thrown. The same applies to "used" interfaces that have commands.
+</p>
+<p>rpc-commands <b>cannot</b> have void* parameters or return
+values, which are inherently untyped. They can, however, have typed
+pointers as parameters or return values. In such a case, it is assumed
+that the pointer is being used as a pass-by-reference, the the receiver
+of the data will copy the buffer, and that the true data buffer is
+still owned by the origini of the buffer (ie., no buffer swapping with
+the pointers!) The use of pointers in rpc commands is not intended to
+be the normal mode of use, but rather a hacky way to do things
+otherwise not possible.
+</p>
+
+<div class="editsection" style="float: right; margin-left: 5px;">[<a href="http://nest.cs.berkeley.edu/nestfe/index.php?title=Rpc&amp;action=edit&amp;section=4" title="Edit section: Setting Up">edit</a>]</div>
+<a name="Setting_Up"></a>
+<h2> Setting Up </h2>
+
+<p>In order to use the API described above, the user must:
+</p>
+
+<ol>
+  <li> use the new makesystem by setting the Makerules environment variable to point to the tinyos-2.x/support/make/Makerules file
+  </li>
+  <li> add the following include directories to their makefile 
+  </li>
+</ol>
+
+<pre>CFLAGS += -I$(TOSROOT)/../tinyos-2.x-contrib/marionette/tos/lib/Rpc<br></pre>
+
+<ol style="list-style-type: decimal;">
+  <li>wire the RpcC module somewhere in their application
+  </li>
+  <li>invoke the rpc.extra file in their make process by either
+declaring "marionette" on the command line when making the application as
+follows
+  </li>
+</ol>
+
+
+<pre>make telosb marionette<br></pre>
+
+<p>or adding it to the GOALS variable in their makefile
+</p>
+
+<pre>GOALS+=marionette<br></pre>
+
+<p>and finally, include Rpc.h in any file which tags functions with @rpc()
+</p>
+
+<pre>includes Rpc; <br></pre>
+
+<p>For problems, the <a href="Pytos%20Installation%20Instructions.html" title="Pytos Installation Instructions">Pytos Installation Instructions</a> setup instructions may contain more details.
+</p>
+
+<div class="editsection" style="float: right; margin-left: 5px;">[<a href="http://nest.cs.berkeley.edu/nestfe/index.php?title=Rpc&amp;action=edit&amp;section=5" title="Edit section: Implementation">edit</a>]</div>
+<a name="Implementation"></a>
+<h2> Implementation </h2>
+
+<p>The nesc tools simple create a module called RpcM that receive the
+rpc command message, unpack the parameters, call the function, pack the
+return value, and send the return message. This file is automatically
+generated using the marionette/tools/codeGeneration/generateRpc.pl script, along
+with the RpcC.nc file, both of which are stored in the build/platform/
+directory. The same script generates the rpcSchema.xml file, which is
+used by the pc-side tools.
+</p>
+<p><br>
+
+</p>
+
+<div class="editsection" style="float: right; margin-left: 5px;">[<a href="http://nest.cs.berkeley.edu/nestfe/index.php?title=Rpc&amp;action=edit&amp;section=6" title="Edit section: Transport Mechanisms">edit</a>]</div>
+<a name="Transport_Mechanisms"></a>
+<h2> Transport Mechanisms </h2>
+Since the TinyOS 2.x version does not support Drip and Drain, it is
+currently mostly useful when working with a single node connected to a
+PC, or
+with node(s) within direct reach of a TOSBase.
+
+<p>To get a better idea of what is going on, take a look at the
+automatically generated RpcC.nc and RpcM.nc files in
+build/&lt;platform&gt;/.
+</p>
+</body>
+</html>

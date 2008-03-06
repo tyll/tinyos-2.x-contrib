@@ -73,21 +73,21 @@ module PowerCycleP {
     interface ReceiveIndicator as ByteIndicator;
     interface ReceiveIndicator as PacketIndicator;
     
-    interface DsnCommand<uint8_t> as GetStatsCommand;
-    interface DsnSend;
+    //interface DsnCommand<uint8_t> as GetStatsCommand;
+    //interface DsnSend;
   }
 }
 
 implementation {
   
   /** The current period of the duty cycle, equivalent of wakeup interval */
-  uint16_t sleepInterval = 0;
+  uint16_t sleepInterval = LPL_DEFAULT_SLEEP_INTERVAL;
   
   /** The number of times the CCA has been sampled in this wakeup period */
   uint16_t ccaChecks;
   
-  /** The sleep interval transformed into 32kHz precision */
-  uint32_t sleepInterval32khz = 0;
+  /** The sleep interval transformed into 32kHz precision */  
+  uint32_t sleepInterval32khz = LPL_DEFAULT_SLEEP_INTERVAL << 5;
  
   /**
    * Radio Power, Check State, and Duty Cycling State
@@ -364,13 +364,14 @@ implementation {
     return FALSE;
   }
   
+  /*
   event void GetStatsCommand.detected(uint8_t * values, uint8_t n) {
       call DsnSend.logInt(n_cycles);
       call DsnSend.logInt(n_long_cycles);
       call DsnSend.logInt(call RadioPowerState.getState());
       call DsnSend.log("PowerCycle: %i %i %i");
     }
-  
+  */
   
   /**************** Defaults ****************/
   default event void PowerCycle.detected() {

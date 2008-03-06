@@ -65,9 +65,11 @@ module NeighbourSyncP {
  
     interface AMSend;
     interface LowPowerListening;
-    
+
+#ifdef CC2420SYNC_DEBUG   
     interface DsnSend as DSN;
     interface DsnCommand<uint8_t> as SyncstatCommand;
+#endif    
   }
 }
 
@@ -149,6 +151,9 @@ implementation {
           m_msg = msg;
           //t[0]=call Alarm.getNow();
         }
+#if LPL_DEFAULT_SLEEP_INTERVAL!=0
+        meta->rxInterval = LPL_DEFAULT_SLEEP_INTERVAL;
+#endif
         m_rxInterval=meta->rxInterval;
         header = getSyncHeader(msg, len);
         header->lplPeriod = call PowerCycle.getSleepInterval() | (meta->more * MORE_FLAG);
@@ -270,9 +275,9 @@ implementation {
         }
       }
       else {
-        call DSN.logInt(len);
-        call DSN.logError("packet too long: %i");
-        call DSN.logPacket(msg);
+        //call DSN.logInt(len);
+        //call DSN.logError("packet too long: %i");
+        //call DSN.logPacket(msg);
         return ESIZE;
       }
   }
@@ -310,8 +315,8 @@ implementation {
     		(call CC2420PacketBody.getHeader(msg))->length = m_len;	// set the right length
     		(call CC2420PacketBody.getMetadata( msg ))->rxInterval = m_rxInterval;
     		signal Send.sendDone(msg, senderror);
-    		call DSN.logInt(senderror);
-    		call DSN.log("resend failed %i");
+    		//call DSN.logInt(senderror);
+    		//call DSN.log("resend failed %i");
     	}
     	else
     		retries++;
@@ -325,8 +330,8 @@ implementation {
     		else {
     			item->failCount++;
     			if ((call CC2420PacketBody.getMetadata( msg ))->snoopedAcks > 0) {
-    				call DSN.logInt((call CC2420PacketBody.getMetadata( msg ))->snoopedAcks);
-    				call DSN.log("delayed ack %i");
+    				//call DSN.logInt((call CC2420PacketBody.getMetadata( msg ))->snoopedAcks);
+    				//call DSN.log("delayed ack %i");
     			}
     		}
     	}
@@ -377,7 +382,7 @@ implementation {
         	}
         }
         else
-        	call DSN.log("no valid offset");
+        	;//call DSN.log("no valid offset");
     }
     if ((header->lplPeriod & REQ_SYNC_FLAG) != 0) {
     	signal NeighbourSyncRequest.updateRequest(address, header->lplPeriod & ~(REQ_SYNC_FLAG|MORE_FLAG));
@@ -546,10 +551,11 @@ implementation {
   }
 
   /***************** DSN events *************/
+#ifdef CC2420SYNC_DEBUG
   event void SyncstatCommand.detected(uint8_t * values, uint8_t n) {
 	  printtable();
   }
-  
+#endif
   /***************** Functions ***********************/
 
   neighbour_sync_header_t* getSyncHeader(message_t * msg, uint8_t len ) {
@@ -609,7 +615,7 @@ implementation {
   }
 
   void printtable() {
-	  
+	  /*
     uint8_t i;
     neighbour_sync_item_t* item;
     for (i=0;i<numEntries;i++) {
@@ -633,6 +639,7 @@ implementation {
       }
     
   }
+  */
   }
   
   void finishDriftUpdate() {
@@ -709,7 +716,7 @@ implementation {
 	  error_t error;
 	  // atomic t[3]=call Alarm.getNow();
 	  if (call RadioPowerState.getState()!=S_ON) {
-		  call DSN.logWarning("Radio off when sending started");
+		  //call DSN.logWarning("Radio off when sending started");
 	  }
 	  now = call Alarm.getNow();
 	  offset_stamp=(uint16_t) now;
@@ -720,8 +727,8 @@ implementation {
 		  (call CC2420PacketBody.getHeader(m_msg))->length = m_len;	// set the right length
 	      (call CC2420PacketBody.getMetadata(m_msg))->rxInterval = m_rxInterval;
 	      signal Send.sendDone(m_msg, error);
-	      call DSN.logInt(call SendState.getState());
-	      call DSN.log("send failed (subsend %i)");
+	      //call DSN.logInt(call SendState.getState());
+	      //call DSN.log("send failed (subsend %i)");
 	      if (call SendState.getState()==S_LPL_SYNCWAIT)
 	    	  call SendState.toIdle(); // S_LPL_SYNCWAIT -> S_LPL_NOT_SENDING;
 	  }
@@ -735,8 +742,8 @@ implementation {
   task void signalSendDoneFail() {
 	  call SyncSendState.toIdle();
 	  finishDriftUpdate();
-	  atomic call DSN.logInt(state_error);
-	  call DSN.log("send failed (state %i)");
+	  //atomic call DSN.logInt(state_error);
+	  //call DSN.log("send failed (state %i)");
 	  (call CC2420PacketBody.getHeader(m_msg))->length = m_len;	// set the right length
 	  (call CC2420PacketBody.getMetadata(m_msg))->rxInterval = m_rxInterval;
 	  signal Send.sendDone(m_msg, FAIL);

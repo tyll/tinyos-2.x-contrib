@@ -84,9 +84,10 @@ implementation {
   PowerCycleP.OnTimer -> OnTimerC;
   PowerCycleP.Leds -> LedsC;
   
-  components SendStatsC, DSNC;
-  PowerCycleP.DsnSend -> DSNC;
-  PowerCycleP.GetStatsCommand -> SendStatsC;
+  components SendStatsC;
+  //components DSNC;
+  //PowerCycleP.DsnSend -> DSNC;
+  //PowerCycleP.GetStatsCommand -> SendStatsC;
     
 }
 

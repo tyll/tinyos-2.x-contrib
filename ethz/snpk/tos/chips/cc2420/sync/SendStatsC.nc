@@ -34,7 +34,7 @@
 configuration SendStatsC {
   provides {
     interface Send;
-    interface DsnCommand<uint8_t>;
+    //interface DsnCommand<uint8_t>;
   }
   uses {
     interface Send as SubSend;
@@ -46,19 +46,24 @@ implementation {
       SendStatsP,
       CC2420PacketC,
       CC2420ActiveMessageC,
-      DSNC as DSNC,
-      new DsnCommandC("get stats", uint8_t , 0) as GetStatsCommand,
       NeighbourSyncC;
 
   Send = SendStatsP.Send;
   SubSend = SendStatsP.SubSend;
   
-  DsnCommand = GetStatsCommand;
+  //DsnCommand = GetStatsCommand;
   
-  SendStatsP.DSN -> DSNC;
-  SendStatsP.GetStatsCommand -> GetStatsCommand;
+  
   SendStatsP.CC2420PacketBody -> CC2420PacketC;
   SendStatsP.AMPacket -> CC2420ActiveMessageC;
   SendStatsP.PacketAcknowledgements -> CC2420PacketC;
+  
+  //NeighbourSyncP.DSN -> DSNC;
+  
+#ifdef CC2420SYNC_DEBUG
+  components  DSNC as DSNC, new DsnCommandC("get stats", uint8_t , 0) as GetStatsCommand;
+  SendStatsP.DSN -> DSNC;
+  SendStatsP.GetStatsCommand -> GetStatsCommand;
+#endif  
 
 }

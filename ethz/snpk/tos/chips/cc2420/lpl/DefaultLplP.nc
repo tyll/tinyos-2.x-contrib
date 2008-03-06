@@ -80,9 +80,6 @@ implementation {
   /** The length of the current send message */
   uint8_t currentSendLen;
   
-  /** TRUE if the radio is duty cycling and not always on */
-  bool dutyCycling;
-
   /**
    * Radio Power State
    */
@@ -117,7 +114,6 @@ implementation {
   
   /***************** Init Commands ***************/
   command error_t Init.init() {
-    dutyCycling = FALSE;
     return SUCCESS;
   }
   

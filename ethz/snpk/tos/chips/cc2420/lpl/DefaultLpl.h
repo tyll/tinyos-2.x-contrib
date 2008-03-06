@@ -51,6 +51,10 @@ enum {
 	LPL_DUTYCYCLE_CRITICAL_PERIOD = 130, // jiffys after radio startup in which lplc does not start radio 
 };
 
+#ifndef LPL_DEFAULT_SLEEP_INTERVAL
+#define LPL_DEFAULT_SLEEP_INTERVAL 0
+#endif
+
 /**
  * Amount of time, in milliseconds, to keep the radio on after
  * a successful receive addressed to this node

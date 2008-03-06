@@ -43,8 +43,10 @@ module SendStatsP {
     interface CC2420PacketBody;
     interface PacketAcknowledgements;
     interface AMPacket;
-    interface DSN;
+#ifdef CC2420SYNC_DEBUG
+    interface DsnSend as DSN;
     interface DsnCommand<uint8_t> as GetStatsCommand;
+#endif    
   }
 }
 
@@ -119,9 +121,7 @@ implementation {
   }
   
   /***************** DSN events ************************/
-  event void DSN.receive(void *msg, uint8_t len) {
-  }
-  
+#ifdef CC2420SYNC_DEBUG  
   event void GetStatsCommand.detected(uint8_t * values, uint8_t n) {
     call DSN.logInt(n_broadcast);
     call DSN.logInt(n_unicast_long);
@@ -130,7 +130,7 @@ implementation {
     call DSN.logInt(n_unicast_short_acked);
     call DSN.log("Stats: %i | %i %i | %i %i");
   }
-
+#endif
   /***************** Functions ***********************/
 
 

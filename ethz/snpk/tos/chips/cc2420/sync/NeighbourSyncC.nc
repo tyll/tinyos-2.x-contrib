@@ -57,11 +57,7 @@ implementation {
       CC2420CsmaC,
       new TimerMilliC() as UpdateTimer,
       new AMSenderC(RESYNC_AM_TYPE) as ResyncSender,
-      CC2420ActiveMessageC,
-      DSNC as DSNC;
- 
-  	components new DsnCommandC("get syncstats", uint8_t , 0) as SyncstatCommand;
-  	NeighbourSyncP.SyncstatCommand->SyncstatCommand;
+      CC2420ActiveMessageC;
   
 #if defined(LOW_POWER_LISTENING) || defined(ACK_LOW_POWER_LISTENING)
   components DefaultLplC as LplC;
@@ -80,8 +76,7 @@ implementation {
   NeighbourSyncFlowPacket = NeighbourSyncP;
   
   MainC.SoftwareInit -> Alarm32khz32C;
-  
-  NeighbourSyncP.DSN -> DSNC;
+
   NeighbourSyncP.Alarm -> Alarm32khz32C;
   NeighbourSyncP.PowerCycle -> PowerCycleC;
   NeighbourSyncP.RadioTimeStamping -> CC2420TransmitC;
@@ -98,5 +93,11 @@ implementation {
   
   NeighbourSyncP.AMSend->ResyncSender;
   NeighbourSyncP.LowPowerListening -> CC2420ActiveMessageC;
-
+  
+#ifdef CC2420SYNC_DEBUG
+  components DSNC as DSNC;
+  components new DsnCommandC("get syncstats", uint8_t , 0) as SyncstatCommand;
+  NeighbourSyncP.SyncstatCommand->SyncstatCommand;
+  NeighbourSyncP.DSN -> DSNC;
+#endif
 }

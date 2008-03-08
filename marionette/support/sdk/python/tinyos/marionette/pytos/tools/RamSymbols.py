@@ -68,13 +68,13 @@ class RamSymbol( RoutingMessages.RoutingMessage ) :
     else :
       structArgs.append(xmlDefinition.getAttribute("name"))
       structArgs.append( ("value", symbolType) )
-    #now initialize this command as a TosMsg object (which is really a nescStruct)
+    #now initialize this command as a Message object (which is really a nescStruct)
     RoutingMessages.RoutingMessage.__init__(self, parent, 0, *structArgs)
     if self.isStruct :
       self.__dict__["name"] = xmlDefinition.getAttribute("name")
     if length != self.size :
         raise Exception("Ram symbol size incorrect")
-    self.pokeResponseMsg = nescDecls.TosMsg(self.memAddress, "PokeResponseMsg",
+    self.pokeResponseMsg = nescDecls.Message(self.memAddress, "PokeResponseMsg",
                                           ("value", parent.app.types.error_t))
    
 
@@ -191,7 +191,7 @@ class RamSymbol( RoutingMessages.RoutingMessage ) :
   def parsePeekResponse(self, msg) :
     #create the response message depending on if was rpc error or not
     if msg.nescType == "RpcResponseMsg":
-      response = nescDecls.TosMsg(self.memAddress, "PeekErrorMsg",
+      response = nescDecls.Message(self.memAddress, "PeekErrorMsg",
                                   ("value", self.parent.app.types.result_t))
       response.value=0
       addr = msg.sourceAddress
@@ -225,9 +225,9 @@ class RamSymbol( RoutingMessages.RoutingMessage ) :
           value = self.parent.app.types["unsigned int"]
       #create the return message from type depending if it is a struct already or must be created
       if issubclass(type(value), nescDecls.nescStruct) :
-        response = nescDecls.TosMsg(self.memAddress, value)
+        response = nescDecls.Message(self.memAddress, value)
       else :
-        response = nescDecls.TosMsg(self.memAddress, value.nescType,
+        response = nescDecls.Message(self.memAddress, value.nescType,
                                     ("value", value))
       bytes = msg.data.getBytes()
       response.setBytes(bytes[:response.size])
@@ -249,44 +249,49 @@ class RamSymbol( RoutingMessages.RoutingMessage ) :
     result.parent = self.parent
     for (callParam, defaultVal) in self.parent.defaultCallParams :
       result.__dict__[callParam] = deepcopy(self.__dict__[callParam], memo)
-    nescDecls.TosMsg.__init__(result, self.amType, self)
+    nescDecls.Message.__init__(result, self.amType, self)
     return result    
     
                     
   def registerPeek(self, listener, comm=()) :
-    self.parent.app.RamSymbolsM.peek.register(SymbolResponseListener(listener, self.parsePeekResponse), *comm)
+    self.parent.app.RamSymbolsM.peek.register(SymbolResponseListener(listener, self.parsePeekResponse, self.__call__.__hash__), *comm)
     
   def unregisterPeek(self, listener, comm=()) :
-    self.parent.app.RamSymbols.peek.unregister(SymbolResponseListener(listener, self.parsePeekResponse), *comm)
+    self.parent.app.RamSymbols.peek.unregister(SymbolResponseListener(listener, self.parsePeekResponse, self.__call__.__hash__), *comm)
 
   def registerPoke(self, listener, comm=()) :
-    self.parent.app.RamSymbolsM.poke.register(SymbolResponseListener(listener, self.parsePokeResponse), *comm)
+    self.parent.app.RamSymbolsM.poke.register(SymbolResponseListener(listener, self.parsePokeResponse, self.__call__.__hash__), *comm)
     
   def unregisterPoke(self, listener, comm=()) :
-    self.parent.app.RamSymbols.poke.unregister(SymbolResponseListener(listener, self.parsePokeResponse), *comm)
+    self.parent.app.RamSymbolsM.poke.unregister(SymbolResponseListener(listener, self.parsePokeResponse, self.__call__.__hash__), *comm)
+   
 
 
 
+class SymbolResponseListener( ):
 
-class SymbolResponseListener( Comm.MessageListener ):
-
-  def __init__(self, callback, parseFunction ):
+  def __init__(self, listener, parseFunction, hashFunction ):
     self.parseFunction = parseFunction
-    Comm.MessageListener.__init__(self, callback)
-    self._firstHashFunction = self._hashFunction
-    self._hashFunction = self._combinedHash
+    self.listener = listener
+    self.hashFunction = hashFunction()
+    
+  def __cmp__(self, other):
+    if self.listener == other.listener:
+      return 0
+    return 1
 
-  def _combinedHash(self):
-    return self._firstHashFunction() + self.parseFunction.__hash__()
+  def __hash__(self):
+    if not self:
+      return 0
+    return self.hashFunction
 
-  def messageReceived( self , addr , msg ) :
+  def receive( self , addr , msg ) :
     try:
       msg = self.parseFunction(msg)
-      self.callback(addr, msg)
+      self.messageListener.messageReceived(addr, msg)
     except Exception, e:
       pass
           
-
 
 
   

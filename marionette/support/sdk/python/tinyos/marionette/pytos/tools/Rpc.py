@@ -45,7 +45,7 @@ import pytos.Comm as Comm
 from copy import deepcopy
 
 class RpcFunction( RoutingMessages.RoutingMessage ) :
-  """a callable TosMsg used to interact with the rpc.nc module.  On
+  """a callable Message used to interact with the rpc.nc module.  On
   being called, either with positional or named arguments, this
   object will fill in the params given, pack up a message and send
   it off using comm.send.  Named arguments can have the names of the
@@ -85,7 +85,7 @@ class RpcFunction( RoutingMessages.RoutingMessage ) :
       paramType = parent.app.types[
         param[0].getElementsByTagName("type")[0].getAttribute("typeName")]
       structArgs.append( (paramName, paramType) )
-    #now initialize this command as a TosMsg object (which is really a nescStruct)
+    #now initialize this command as a Message object (which is really a nescStruct)
     RoutingMessages.RoutingMessage.__init__(self, parent,
                                             parent.app.enums.AM_RPCCOMMANDMSG, *structArgs)
     #fill in the header fields once and for all
@@ -95,14 +95,14 @@ class RpcFunction( RoutingMessages.RoutingMessage ) :
     responseType = parent.app.types[
       xmlDefinition.getElementsByTagName("returnType")[0].getAttribute("typeName")]
     if issubclass(type(responseType), nescDecls.nescStruct) :
-      self.responseMsg = nescDecls.TosMsg(self.rpcHeader.commandID, responseType)
+      self.responseMsg = nescDecls.Message(self.rpcHeader.commandID, responseType)
     else :
-      self.responseMsg = nescDecls.TosMsg(self.rpcHeader.commandID, responseType.nescType,
+      self.responseMsg = nescDecls.Message(self.rpcHeader.commandID, responseType.nescType,
                                           ("value", responseType))
 
   def __call__(self, *posArgs, **nameArgs) :
     if not self.parent.app.__dict__.has_key("RpcM") :
-      raise Exception("You must include the contrib/hood/tos/lib/Rpc/RpcM module in your nesc application in order to use rpc commands")
+      raise Exception("You must include the marionette goal in your nesc application in order to use rpc commands")
     commArgs = ()
     callParams = self.parseCallParams(nameArgs)
     self.rpcHeader.transactionID = (self.rpcHeader.transactionID+1) % 256
@@ -159,40 +159,41 @@ class RpcFunction( RoutingMessages.RoutingMessage ) :
     result.parent = self.parent
     for (callParam, defaultVal) in self.parent.defaultCallParams :
       result.__dict__[callParam] = deepcopy(self.__dict__[callParam], memo)
-    nescDecls.TosMsg.__init__(result, self.amType, self)
+    nescDecls.Message.__init__(result, self.amType, self)
     return result    
     
   def printCurrentValues(self) :
-    print nescDecls.TosMsg.__str__(self)
+    print nescDecls.Message.__str__(self)
                     
   def register(self, listener, comm=()) :
-    self.parent.receiveComm.register(self.parent.app.msgs.RpcResponseMsg,
-                              RpcResponseListener(self.parent.app, self.responseMsg,
-                                                  listener, self.nescType, self.__call__.__hash__), *comm)
+    self.parent.receiveComm.register(self.parent.app.msgs.RpcResponseMsg, RpcResponseListener(self.parent.app, self.responseMsg, listener, self.nescType, self.__call__.__hash__), *comm)
     
   def unregister(self, listener, comm=()) :
-    self.parent.receiveComm.unregister(self.parent.app.msgs.RpcResponseMsg,
-                                RpcResponseListener(self.parent.app, self.responseMsg,
-                                                    listener, self.nescType, self.__call__.__hash__), *comm)
+    self.parent.receiveComm.unregister(self.parent.app.msgs.RpcResponseMsg, RpcResponseListener(self.parent.app, self.responseMsg, listener, self.nescType, self.__call__.__hash__), *comm)
 
 
 
 
-class RpcResponseListener( Comm.MessageListener ):
+class RpcResponseListener( ):
 
-  def __init__(self, app, responseMsg, callback, rpcName, hashFunction ):
+  def __init__(self, app, responseMsg, listener, rpcName, hashFunction ):
     self.app = app
     self.responseMsg = responseMsg
     self.rpcName = rpcName
-    self._secondHashFunction = hashFunction
-    Comm.MessageListener.__init__(self, callback)
-    self._firstHashFunction = self._hashFunction
-    self._hashFunction = self._combinedHash
+    self.listener = listener
+    self.hashFunction = hashFunction()
 
-  def _combinedHash(self):
-    return self._firstHashFunction() + self._secondHashFunction()
-  
-  def messageReceived( self , addr , msg ) :
+  def __cmp__(self, other):
+    if self.listener == other.listener:
+      return 0
+    return 1
+
+  def __hash__(self):
+    if not self:
+      return 0
+    return self.hashFunction
+
+  def receive(self, addr , msg ) :
     if msg.commandID == self.responseMsg.amType :
       if msg.errorCode == self.app.enums.RPC_SUCCESS :
         response = deepcopy(self.responseMsg)
@@ -200,9 +201,9 @@ class RpcResponseListener( Comm.MessageListener ):
         response.parentMsg = msg
         response.nescType = "".join( [self.rpcName,
                                       ",  nodeID=%d"%response.parentMsg.sourceAddress] )
-        self.callback( addr, response )
+        self.listener.messageReceived( addr, response )
       else :
-        self.callback( addr, msg)
+        self.listener.messageReceived( addr, msg )
           
 
   

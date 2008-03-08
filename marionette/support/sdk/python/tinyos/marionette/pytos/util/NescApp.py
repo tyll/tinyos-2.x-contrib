@@ -360,7 +360,7 @@ class NescMsgs( object ) :
           msgName = msgName.groups()[0]
         for key in types._typeNames :
           if key.lower() == msgName.lower() :
-            msg = TosMsg(enums[msgType], types[key])
+            msg = Message(enums[msgType], types[key])
             self._msgs[key] = msg
             self._msgNames.append(key)
             break

@@ -23,7 +23,6 @@
 import sys, string, math, re, os
 from struct import *
 from xml.dom import minidom
-from jpype import JPackage
 from copy import deepcopy
 
 ###########
@@ -622,23 +621,22 @@ class nescStruct( object ) :
 
 
 
-class TosMsg ( nescStruct ) :
-    """A python representation of a TosMsg.
+class Message ( nescStruct ) :
+    """A python representation of a message_t.
     Is a nescStruct object.
     Can be used with
     pytos.comm.send, pytos.comm.register, pytos.comm.unregister.
     
     usage:
-    msg = TosMsg(amType)
-    msg = TosMsg(amType, nescStruct)
-    msg = TosMsg(amType, <nescStruct constructor args>)
+    msg = Message(amType)
+    msg = Message(amType, nescStruct)
+    msg = Message(amType, <nescStruct constructor args>)
     print msg
     msg.field = X
     comm.send(msg)
     comm.register(msg, f)
     comm.unregister(msg, f)
-    migMsg = msg.createMigMsg()
-    msg.parseMigMsg(migMsg)
+    msg.get_amType()
     """
 
     def __init__(self, amType, *varargs):
@@ -650,6 +648,10 @@ class TosMsg ( nescStruct ) :
         #otherwise, make myself into a struct with the struct args
         elif len(varargs) >= 1:
             nescStruct.__init__(self, *varargs)
+
+    def __call__(self, data, data_length, addr, gid):
+      self.setBytes(data)
+      return self
 
     def __deepcopy__(self, memo={}) :
       result = self.__class__(self.amType)
@@ -667,35 +669,17 @@ class TosMsg ( nescStruct ) :
       else :
         return self.parentMsg.getParentMsg(amOrName)
       
-    def createMigMsg(self) :
-        """Returns a java BaseTOSMsg with same amType and length
-        and with data payload of same bytes"""
-        Message = JPackage("net.tinyos.message").Message(self.size)
-        msg = Message #(self.size)
-        msg.dataSet(unpack( str(self.size) + 'b', self.getBytes() ) )
-        msg.amTypeSet(self.amType)
-#        msg.set_type( self.amType )
-#        msg.set_length(self.size)
-        return msg
-
-    def parseMigMsg(self, msg) :
-        """Takes a java BaseTOSMsg and creates TosMsg
-        with same amType and length and with data payload of same bytes"""
-        self.amType = msg.amType()
-        data = list(msg.dataGet())
-        self.setBytes(pack(str(len(data)) + 'b', *data))
-
     def __repr__(self) :
       return "%s object at %s:\n\n\t%s" % (self.__class__, hex(id(self)), str(self))
       
     def __str__(self) :
         """All fields and values as a readable string"""
-        return "TosMsg(am=%d) " % self.amType + nescStruct.__str__(self)
+        return "Message(am=%d) " % self.amType + nescStruct.__str__(self)
         
     def setBytes(self, bytes) :
         """Extend this msg to be longer, if necessary to accomodate extra data.
         This only happens if the last field is a nescArray of length 0.
-        Unlike nescStructs, TosMsg objects are not nested recursively, so it is
+        Unlike nescStructs, Message objects are not nested recursively, so it is
         Ok to do this."""
         if len(bytes) > self.size : #trueSize() :
             #print "there are more bytes than fit in this msg... trying to grow msg"
@@ -724,12 +708,15 @@ class TosMsg ( nescStruct ) :
             
         #make sure everything worked out correctly and call parent's function
         if len(bytes) != self.size :#trueSize() :
-            raise Exception("Incorrect number of bytes for TosMsg. Byte conversion error: %s %d bytes to %d" % ( self.nescType, len(bytes), self.size) )
+            raise Exception("Incorrect number of bytes for Message. Byte conversion error: %s %d bytes to %d" % ( self.nescType, len(bytes), self.size) )
         #print "passing to child to set bytes."
         nescStruct.setBytes(self,bytes)
 
+    def get_amType(self):
+      return self.amType
 
-
+    def dataGet(self):
+      return self.getBytes()
 
 
 

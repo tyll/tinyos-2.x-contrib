@@ -24,10 +24,10 @@
 # @author Kamin Whitehouse
 
 import sys, os, string, types
-from jpype import JPackage, JObject, JProxy
 from Queue import Queue
 import threading
 import pytos.util.nescDecls as nescDecls
+from tinyos.message.MoteIF import MoteIF
 from copy import deepcopy
 
 
@@ -46,66 +46,31 @@ def getCommObject(app, motecom=None) :
   app.connections.append(comm)
   return comm
 
-def migTosMsgInvariant( msg, messageListener) :
-  """This function takes either a mig or TosMsg object (with a Comm.MessageListener Object)
-  and returns a mig message (with Comm.MessageListener Object)"""
-  if issubclass(type(msg), nescDecls.TosMsg) :
-    messageListener = Mig2TosMsgConverter(msg, messageListener)
-    msg = msg.createMigMsg()
-  return (msg, messageListener)
-
-def createJavaMessageListener(messageListener) :
-  """This function will take a Comm.MessageListener object
-  and returns a java MessageListener object"""
-  messageListener = JProxy( JPackage("net.tinyos.pytos").HashableMessageListener , inst = messageListener  )
-  messageListener = JPackage("net.tinyos.pytos").MessageListenerObject(messageListener)
-  return messageListener
-
-def wrapCallbackAndTosMsg( msg, callback) :
-  messageListener = MessageListener(callback)
-  (msg, messageListener) = migTosMsgInvariant(msg, messageListener)
-  messageListener = createJavaMessageListener(messageListener)
-  return (msg, messageListener)
-
-def openMoteIF(sourceName, app) :
-
-  #tinyos = JPackage("net.tinyos")
-  BuildSource = JPackage("net.tinyos.packet").BuildSource
-  messenger = JObject( None, JPackage("net.tinyos.util").Messenger )
-  source = BuildSource.makePhoenix( sourceName, messenger )
-  source.setPacketErrorHandler( JPackage("net.tinyos.pytos").PyPhoenixError(source) )
-
-  if app != None and "TOS_DEFAULT_AM_GROUP" in app.enums._enums :
-    moteif = JPackage("net.tinyos.message").MoteIF( source, app.enums.TOS_DEFAULT_AM_GROUP )
-  else :
-    moteif = JPackage("net.tinyos.message").MoteIF( source )
-
-  #if source.isAlive() :
-    #moteif.start()
-  #else :
-    #raise RuntimeError, "could not open MoteIF %s" % sourceName
-
-  return moteif
-
 
 
 class MoteIFCache(object) :
 
   def __init__(self, parent) :
     self._moteif = {}
+    self._source = {}
     self.parent=parent
 
   def get( self , sourceStr ) :
     if self.isAlive( sourceStr ) :
       return self._moteif[ sourceStr ]
 
-    self._moteif[ sourceStr ] = openMoteIF( sourceStr, self.parent.app )
+    self._moteif[ sourceStr ] = MoteIF( )
+    self._source[ sourceStr ] = self._moteif[ sourceStr ].addSource(sourceStr)
     return self._moteif[ sourceStr ]
+
+  def getSource( self, sourceStr ) :
+    if self.isAlive( sourceStr ) :
+      return self._source[ sourceStr ]
+    raise Exception("Invalid source string")
 
   def isAlive( self , sourceStr ) :
     if self.has( sourceStr ) :
-      if self._moteif[ sourceStr ].getSource().isAlive() :
-	return True
+      return True
     return False
 
   def has( self , sourceStr ) :
@@ -116,8 +81,9 @@ class MoteIFCache(object) :
   def destroy( self , sourceStr ) :
     if self.has( sourceStr ) :
       # FIXME : this throws an exception that I cannot catch or print from being displayed
-      self._moteif[ sourceStr ].getSource().shutdown()
+      self._moteif[ sourceStr ].finishAll()
       del self._moteif[ sourceStr ]
+      del self._source[ sourceStr ]
 
 
 
@@ -132,7 +98,7 @@ class Comm( object ) :
     self._moteifCache = MoteIFCache(self)
     self._connected = []
 
-  def connect( self , *moteComStr ) :
+  def connect( self , *moteComStr ) :    
     moteComStr = self.completeMoteComStr("environmentVariable", *moteComStr)
     for newMoteComStr in moteComStr :
       if newMoteComStr not in self._connected :
@@ -151,30 +117,25 @@ class Comm( object ) :
         raise CommError , "not connected to " + oldMoteComStr
 
   def send( self , addr , msg , *moteComStr ) :
-    if issubclass(type(msg), nescDecls.TosMsg) :
-      msg = msg.createMigMsg()
     moteComStr = self.completeMoteComStr("ExistingPorts", *moteComStr)
     for mc in moteComStr :
-      # FIXME : send expects a Message, but only the TOSMsg subclass has set_addr
-      self._moteifCache.get(mc).send( addr , msg )
+      self._moteifCache.get(mc).sendMsg( self._moteifCache.getSource(mc), addr, msg.amType, msg.parent.app.enums.TOS_AM_GROUP, msg )
 
-  def register( self , msg , callback , *moteComStr ) :
+  def register( self , msg , listener , *moteComStr ) :
     """Register a function or an object to receive arriving messages.
     If an object is registered, it must implement the MessageListener
     interface, meaning it must have a messageReceived( self , addr ,
     msg ) method.  If a function is registered, it must accept two
     arguments: addr,msg"""
 
-    (msg, messageListener) = wrapCallbackAndTosMsg(msg, callback)
     moteComStr = self.completeMoteComStr("ExistingPorts", *moteComStr)
     for mc in moteComStr :
-      self._moteifCache.get(mc).registerListener( msg , messageListener )
+      self._moteifCache.get(mc).addListener( listener, msg )
 
-  def unregister( self , msg , callback , *moteComStr ) :
-    (msg, messageListener) = wrapCallbackAndTosMsg(msg, callback)
+  def unregister( self , msg , listener , *moteComStr ) :
     moteComStr = self.completeMoteComStr("ExistingPorts", *moteComStr)
     for mc in moteComStr :
-      self._moteifCache.get(mc).deregisterListener( msg , messageListener )
+      self._moteifCache.get(mc).removeListener( listener )
 
   def completeMoteComStr(self, default, *moteComStr) :
     if len(moteComStr)==0 or moteComStr[0] == None :
@@ -191,46 +152,6 @@ class Comm( object ) :
     return moteComStr
 
   
-class MessageListener( object ) :
-  """This function takes one of:
-  1.  another MessageListener object
-  2.  a python object with a messageReceived method
-  3.  a python messageReceived method itself
-  and wraps it as a java-hashable python object"""
-
-  def __init__(self, callback) :
-    if issubclass( type ( callback) , MessageListener ) :
-      self.callback = callback.messageReceived
-      self._hashFunction = callback._hashFunction
-    elif isinstance( callback, (types.FunctionType,types.MethodType) ) :
-      self.callback = callback
-      self._hashFunction = callback.__hash__
-    elif isinstance( callback ,(types.InstanceType,types.ObjectType) ) and \
-             "messageReceived" in list(dir(callback)) :
-      self.callback = callback.messageReceived
-      self._hashFunction = self.callback.__hash__
-    else :
-      raise Exception("Object is neither messageListener object nor messageReceived method")
-   
-  def messageReceived( self , addr , msg ) :
-    self.callback(addr, msg)
-
-  def hashCode(self):
-    return self._hashFunction()
-  
-class Mig2TosMsgConverter( MessageListener ) :
-  """This is a MessageListener object that takes a python TosMsg object and will convert
-  an incoming java mig message that TosMsg.  \"Callback\" is the same as for MessageListener."""
-
-  def __init__(self, msg, callback) :
-    self.msg = msg
-    MessageListener.__init__(self, callback)
-    
-  def messageReceived( self , addr , msg ) :
-    tmpMsg = deepcopy(self.msg)
-    tmpMsg.parseMigMsg(msg)
-    msg = tmpMsg
-    self.callback( addr, msg )
 
 class MessageQueue( Queue ) :
   """This is object can be created and registered as an event handler,

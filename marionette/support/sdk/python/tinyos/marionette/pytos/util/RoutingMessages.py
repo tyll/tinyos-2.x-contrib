@@ -29,11 +29,11 @@ This class is not intended to be used on its own.
 import sys, string, time, types
 import pytos.util.nescDecls as nescDecls
 import pytos.Comm as Comm
-import pytos.tools.Drip as Drip
-import pytos.tools.Drain as Drain
+#import pytos.tools.Drip as Drip
+#import pytos.tools.Drain as Drain
 from copy import deepcopy
 
-class RoutingMessage( nescDecls.TosMsg ) :
+class RoutingMessage( nescDecls.Message ) :
 
   def __init__(self, parent, amType, *structArgs) :
     #store the parent
@@ -41,7 +41,7 @@ class RoutingMessage( nescDecls.TosMsg ) :
     #initialize the default call parameters to none (ie, use the parent's defaults)
     for (callParam,default) in self.parent.defaultCallParams :
       self.__dict__[callParam] = None
-    nescDecls.TosMsg.__init__(self, parent.app.enums.AM_RPCCOMMANDMSG, *structArgs)
+    nescDecls.Message.__init__(self, parent.app.enums.AM_RPCCOMMANDMSG, *structArgs)
 
   def _assignParam(self, field, param, paramId) :
     """assign a call parameter to the correct field (checking types)"""
@@ -69,7 +69,6 @@ class RoutingMessage( nescDecls.TosMsg ) :
       if not thisCall.value.has_key(key) :
         raise Exception("parameter name %s non-existent" % key)
       thisCall._assignParam(thisCall.value[key], nameArgs[key], key)
-
     thisCall.parent.sendComm.send(address, thisCall, *commArgs)
       
   def parseCallParams(self, nameArgs) :

@@ -13,12 +13,16 @@
 
 generic module At32uc3bGpioC()
 {
-  provides interface GeneralIO;
-  provides interface GpioInterrupt;
-//  provides interface GpioCapture;
-  uses interface HplAt32uc3bGeneralIO as HplGeneralIO;
-  uses interface HplAt32uc3bGpioInterrupt as HplGpioInterrupt;
-//  uses interface HplAt32uc3bGpioCapture as HplGpioCapture;
+  provides {
+    interface GeneralIO;
+    interface GpioInterrupt;
+//    interface GpioCapture;
+  }
+  uses {
+    interface HplAt32uc3bGeneralIO as HplGeneralIO;
+    interface HplAt32uc3bGpioInterrupt as HplGpioInterrupt;
+//    interface HplAt32uc3bGpioCapture as HplGpioCapture;
+  }
 }
 implementation
 {

@@ -51,8 +51,9 @@ interface HplAt32uc3bGeneralIO
   async command void selectPeripheralFuncA();
   async command void selectPeripheralFuncB();
   async command void selectPeripheralFuncC();
+  async command void selectPeripheralFunc(uint8_t function);   // gpio_peripheral_func_enum_t
   async command bool isPeripheralFunc();
-  async command uint8_t getPeripheralFunc(); // gpio_peripheral_func_enum_t
+  async command uint8_t getPeripheralFunc();  // gpio_peripheral_func_enum_t
 
   /**
    * Set pin for I/O functionality.

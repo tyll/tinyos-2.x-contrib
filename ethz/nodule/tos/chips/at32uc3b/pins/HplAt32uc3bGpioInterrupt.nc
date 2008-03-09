@@ -52,4 +52,6 @@ interface HplAt32uc3bGpioInterrupt
   async command error_t enableGlitchFilter();
   async command error_t disableGlitchFilter();
   async command bool isGlitchFilterEnabled();
+
+  async command uint32_t getCounter();
 }

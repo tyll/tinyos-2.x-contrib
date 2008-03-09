@@ -16,14 +16,15 @@ generic module HplAt32uc3bGpioInterruptP(uint32_t GPIO)
 }
 implementation
 {
+  uint32_t interrupt_counter = 0;
   bool registered = FALSE;
 
   inline void setBit(uint8_t offset) {
-    get_register(get_baseport(GPIO) + offset) = (uint32_t) 1 << get_bit(GPIO);
+    get_register(get_avr32_gpio_baseaddress(GPIO) + offset) = (uint32_t) 1 << get_avr32_gpio_bit(GPIO);
   }
 
   inline bool getBit(uint8_t offset) {
-    return (get_register(get_baseport(GPIO) + offset) & ((uint32_t) 1 << get_bit(GPIO)));
+    return (get_register(get_avr32_gpio_baseaddress(GPIO) + offset) & ((uint32_t) 1 << get_avr32_gpio_bit(GPIO)));
   }
 
   inline void clear_gpio_interrupt_flag() {
@@ -32,12 +33,12 @@ implementation
 
   void _gpio_interrupt_handler() {
     signal Interrupt.fired();
+    interrupt_counter++;
     clear_gpio_interrupt_flag();
   }
 
   inline void register_gpio_interrupt_handler() {
-    if (!registered)
-    {
+    if (!registered) {
       call InterruptController.registerGpioInterruptHandler(GPIO, &_gpio_interrupt_handler);
       registered = TRUE;
     }
@@ -52,6 +53,7 @@ implementation
       return SUCCESS;
     }
   }
+
   async command error_t Interrupt.enableRisingEdge() {
     atomic {
       register_gpio_interrupt_handler();
@@ -61,6 +63,7 @@ implementation
       return SUCCESS;
     }
   }
+
   async command error_t Interrupt.enableFallingEdge() {
     atomic {
       register_gpio_interrupt_handler();
@@ -75,7 +78,9 @@ implementation
     setBit(AVR32_GPIO_IERC0);
     return SUCCESS;
   }
+
   async command bool Interrupt.isInterruptEnabled() { return getBit(AVR32_GPIO_IER0); }
+
   async command uint8_t Interrupt.getInterruptMode() {
     atomic {
       if (!getBit(AVR32_GPIO_IER0)) {
@@ -120,6 +125,7 @@ implementation
       return SUCCESS;
     }
   }
+
   async command error_t Interrupt.disableGlitchFilter() {
     atomic {
       if (getBit(AVR32_GPIO_IER0)) {
@@ -131,5 +137,10 @@ implementation
       return SUCCESS;
     }
   }
+
   async command bool Interrupt.isGlitchFilterEnabled() { return getBit(AVR32_GPIO_GFER0); }
+
+  async command uint32_t Interrupt.getCounter() {
+    return interrupt_counter;
+  }
 }

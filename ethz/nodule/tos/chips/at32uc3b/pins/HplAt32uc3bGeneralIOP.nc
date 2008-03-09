@@ -16,11 +16,11 @@ generic module HplAt32uc3bGeneralIOP(uint32_t GPIO)
 implementation
 {
   inline void setBit(uint8_t offset) {
-    get_register(get_baseport(GPIO) + offset) = (uint32_t) 1 << get_bit(GPIO);
+    get_register(get_avr32_gpio_baseaddress(GPIO) + offset) = (uint32_t) 1 << get_avr32_gpio_bit(GPIO);
   }
 
   inline bool getBit(uint8_t offset) {
-    return (get_register(get_baseport(GPIO) + offset) & ((uint32_t) 1 << get_bit(GPIO)));
+    return (get_register(get_avr32_gpio_baseaddress(GPIO) + offset) & ((uint32_t) 1 << get_avr32_gpio_bit(GPIO)));
   }
 
   async command void IO.set() { setBit(AVR32_GPIO_OVRS0); }
@@ -53,6 +53,21 @@ implementation
       setBit(AVR32_GPIO_PMR0C0);
       setBit(AVR32_GPIO_PMR1S0);
       setBit(AVR32_GPIO_GPERC0);
+    }
+  }
+  async command void IO.selectPeripheralFunc(uint8_t function) {
+    switch (function) {
+      case AVR32_GPIO_PERIPHERAL_FUNC_A:
+        call IO.selectPeripheralFuncA();
+        break;
+      case AVR32_GPIO_PERIPHERAL_FUNC_B:
+        call IO.selectPeripheralFuncB();
+        break;
+      case AVR32_GPIO_PERIPHERAL_FUNC_C:
+        call IO.selectPeripheralFuncC();
+        break;
+      default:
+        break;
     }
   }
   async command bool IO.isPeripheralFunc() { return !getBit(AVR32_GPIO_GPER0); }

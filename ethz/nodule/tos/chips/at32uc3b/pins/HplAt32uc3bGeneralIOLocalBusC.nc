@@ -17,51 +17,53 @@
 
 configuration HplAt32uc3bGeneralIOLocalBusC
 {
-//  provides interface Init;
-  provides interface GeneralIO as Gpio0;
-  provides interface GeneralIO as Gpio1;
-  provides interface GeneralIO as Gpio2;
-  provides interface GeneralIO as Gpio3;
-  provides interface GeneralIO as Gpio4;
-  provides interface GeneralIO as Gpio5;
-  provides interface GeneralIO as Gpio6;
-  provides interface GeneralIO as Gpio7;
-  provides interface GeneralIO as Gpio8;
-  provides interface GeneralIO as Gpio9;
-  provides interface GeneralIO as Gpio10;
-  provides interface GeneralIO as Gpio11;
-  provides interface GeneralIO as Gpio12;
-  provides interface GeneralIO as Gpio13;
-  provides interface GeneralIO as Gpio14;
-  provides interface GeneralIO as Gpio15;
-  provides interface GeneralIO as Gpio16;
-  provides interface GeneralIO as Gpio17;
-  provides interface GeneralIO as Gpio18;
-  provides interface GeneralIO as Gpio19;
-  provides interface GeneralIO as Gpio20;
-  provides interface GeneralIO as Gpio21;
-  provides interface GeneralIO as Gpio22;
-  provides interface GeneralIO as Gpio23;
-  provides interface GeneralIO as Gpio24;
-  provides interface GeneralIO as Gpio25;
-  provides interface GeneralIO as Gpio26;
-  provides interface GeneralIO as Gpio27;
-  provides interface GeneralIO as Gpio28;
-  provides interface GeneralIO as Gpio29;
-  provides interface GeneralIO as Gpio30;
-  provides interface GeneralIO as Gpio31;
-  provides interface GeneralIO as Gpio32;
-  provides interface GeneralIO as Gpio33;
-  provides interface GeneralIO as Gpio34;
-  provides interface GeneralIO as Gpio35;
-  provides interface GeneralIO as Gpio36;
-  provides interface GeneralIO as Gpio37;
-  provides interface GeneralIO as Gpio38;
-  provides interface GeneralIO as Gpio39;
-  provides interface GeneralIO as Gpio40;
-  provides interface GeneralIO as Gpio41;
-  provides interface GeneralIO as Gpio42;
-  provides interface GeneralIO as Gpio43;
+  provides {
+//    interface Init;
+    interface GeneralIO as Gpio0;
+    interface GeneralIO as Gpio1;
+    interface GeneralIO as Gpio2;
+    interface GeneralIO as Gpio3;
+    interface GeneralIO as Gpio4;
+    interface GeneralIO as Gpio5;
+    interface GeneralIO as Gpio6;
+    interface GeneralIO as Gpio7;
+    interface GeneralIO as Gpio8;
+    interface GeneralIO as Gpio9;
+    interface GeneralIO as Gpio10;
+    interface GeneralIO as Gpio11;
+    interface GeneralIO as Gpio12;
+    interface GeneralIO as Gpio13;
+    interface GeneralIO as Gpio14;
+    interface GeneralIO as Gpio15;
+    interface GeneralIO as Gpio16;
+    interface GeneralIO as Gpio17;
+    interface GeneralIO as Gpio18;
+    interface GeneralIO as Gpio19;
+    interface GeneralIO as Gpio20;
+    interface GeneralIO as Gpio21;
+    interface GeneralIO as Gpio22;
+    interface GeneralIO as Gpio23;
+    interface GeneralIO as Gpio24;
+    interface GeneralIO as Gpio25;
+    interface GeneralIO as Gpio26;
+    interface GeneralIO as Gpio27;
+    interface GeneralIO as Gpio28;
+    interface GeneralIO as Gpio29;
+    interface GeneralIO as Gpio30;
+    interface GeneralIO as Gpio31;
+    interface GeneralIO as Gpio32;
+    interface GeneralIO as Gpio33;
+    interface GeneralIO as Gpio34;
+    interface GeneralIO as Gpio35;
+    interface GeneralIO as Gpio36;
+    interface GeneralIO as Gpio37;
+    interface GeneralIO as Gpio38;
+    interface GeneralIO as Gpio39;
+    interface GeneralIO as Gpio40;
+    interface GeneralIO as Gpio41;
+    interface GeneralIO as Gpio42;
+    interface GeneralIO as Gpio43;
+  }
 }
 implementation
 {

@@ -11,50 +11,52 @@
 
 configuration HplAt32uc3bGpioInterruptC
 {
-  provides interface HplAt32uc3bGpioInterrupt as Gpio0;
-  provides interface HplAt32uc3bGpioInterrupt as Gpio1;
-  provides interface HplAt32uc3bGpioInterrupt as Gpio2;
-  provides interface HplAt32uc3bGpioInterrupt as Gpio3;
-  provides interface HplAt32uc3bGpioInterrupt as Gpio4;
-  provides interface HplAt32uc3bGpioInterrupt as Gpio5;
-  provides interface HplAt32uc3bGpioInterrupt as Gpio6;
-  provides interface HplAt32uc3bGpioInterrupt as Gpio7;
-  provides interface HplAt32uc3bGpioInterrupt as Gpio8;
-  provides interface HplAt32uc3bGpioInterrupt as Gpio9;
-  provides interface HplAt32uc3bGpioInterrupt as Gpio10;
-  provides interface HplAt32uc3bGpioInterrupt as Gpio11;
-  provides interface HplAt32uc3bGpioInterrupt as Gpio12;
-  provides interface HplAt32uc3bGpioInterrupt as Gpio13;
-  provides interface HplAt32uc3bGpioInterrupt as Gpio14;
-  provides interface HplAt32uc3bGpioInterrupt as Gpio15;
-  provides interface HplAt32uc3bGpioInterrupt as Gpio16;
-  provides interface HplAt32uc3bGpioInterrupt as Gpio17;
-  provides interface HplAt32uc3bGpioInterrupt as Gpio18;
-  provides interface HplAt32uc3bGpioInterrupt as Gpio19;
-  provides interface HplAt32uc3bGpioInterrupt as Gpio20;
-  provides interface HplAt32uc3bGpioInterrupt as Gpio21;
-  provides interface HplAt32uc3bGpioInterrupt as Gpio22;
-  provides interface HplAt32uc3bGpioInterrupt as Gpio23;
-  provides interface HplAt32uc3bGpioInterrupt as Gpio24;
-  provides interface HplAt32uc3bGpioInterrupt as Gpio25;
-  provides interface HplAt32uc3bGpioInterrupt as Gpio26;
-  provides interface HplAt32uc3bGpioInterrupt as Gpio27;
-  provides interface HplAt32uc3bGpioInterrupt as Gpio28;
-  provides interface HplAt32uc3bGpioInterrupt as Gpio29;
-  provides interface HplAt32uc3bGpioInterrupt as Gpio30;
-  provides interface HplAt32uc3bGpioInterrupt as Gpio31;
-  provides interface HplAt32uc3bGpioInterrupt as Gpio32;
-  provides interface HplAt32uc3bGpioInterrupt as Gpio33;
-  provides interface HplAt32uc3bGpioInterrupt as Gpio34;
-  provides interface HplAt32uc3bGpioInterrupt as Gpio35;
-  provides interface HplAt32uc3bGpioInterrupt as Gpio36;
-  provides interface HplAt32uc3bGpioInterrupt as Gpio37;
-  provides interface HplAt32uc3bGpioInterrupt as Gpio38;
-  provides interface HplAt32uc3bGpioInterrupt as Gpio39;
-  provides interface HplAt32uc3bGpioInterrupt as Gpio40;
-  provides interface HplAt32uc3bGpioInterrupt as Gpio41;
-  provides interface HplAt32uc3bGpioInterrupt as Gpio42;
-  provides interface HplAt32uc3bGpioInterrupt as Gpio43;
+  provides {
+    interface HplAt32uc3bGpioInterrupt as Gpio0;
+    interface HplAt32uc3bGpioInterrupt as Gpio1;
+    interface HplAt32uc3bGpioInterrupt as Gpio2;
+    interface HplAt32uc3bGpioInterrupt as Gpio3;
+    interface HplAt32uc3bGpioInterrupt as Gpio4;
+    interface HplAt32uc3bGpioInterrupt as Gpio5;
+    interface HplAt32uc3bGpioInterrupt as Gpio6;
+    interface HplAt32uc3bGpioInterrupt as Gpio7;
+    interface HplAt32uc3bGpioInterrupt as Gpio8;
+    interface HplAt32uc3bGpioInterrupt as Gpio9;
+    interface HplAt32uc3bGpioInterrupt as Gpio10;
+    interface HplAt32uc3bGpioInterrupt as Gpio11;
+    interface HplAt32uc3bGpioInterrupt as Gpio12;
+    interface HplAt32uc3bGpioInterrupt as Gpio13;
+    interface HplAt32uc3bGpioInterrupt as Gpio14;
+    interface HplAt32uc3bGpioInterrupt as Gpio15;
+    interface HplAt32uc3bGpioInterrupt as Gpio16;
+    interface HplAt32uc3bGpioInterrupt as Gpio17;
+    interface HplAt32uc3bGpioInterrupt as Gpio18;
+    interface HplAt32uc3bGpioInterrupt as Gpio19;
+    interface HplAt32uc3bGpioInterrupt as Gpio20;
+    interface HplAt32uc3bGpioInterrupt as Gpio21;
+    interface HplAt32uc3bGpioInterrupt as Gpio22;
+    interface HplAt32uc3bGpioInterrupt as Gpio23;
+    interface HplAt32uc3bGpioInterrupt as Gpio24;
+    interface HplAt32uc3bGpioInterrupt as Gpio25;
+    interface HplAt32uc3bGpioInterrupt as Gpio26;
+    interface HplAt32uc3bGpioInterrupt as Gpio27;
+    interface HplAt32uc3bGpioInterrupt as Gpio28;
+    interface HplAt32uc3bGpioInterrupt as Gpio29;
+    interface HplAt32uc3bGpioInterrupt as Gpio30;
+    interface HplAt32uc3bGpioInterrupt as Gpio31;
+    interface HplAt32uc3bGpioInterrupt as Gpio32;
+    interface HplAt32uc3bGpioInterrupt as Gpio33;
+    interface HplAt32uc3bGpioInterrupt as Gpio34;
+    interface HplAt32uc3bGpioInterrupt as Gpio35;
+    interface HplAt32uc3bGpioInterrupt as Gpio36;
+    interface HplAt32uc3bGpioInterrupt as Gpio37;
+    interface HplAt32uc3bGpioInterrupt as Gpio38;
+    interface HplAt32uc3bGpioInterrupt as Gpio39;
+    interface HplAt32uc3bGpioInterrupt as Gpio40;
+    interface HplAt32uc3bGpioInterrupt as Gpio41;
+    interface HplAt32uc3bGpioInterrupt as Gpio42;
+    interface HplAt32uc3bGpioInterrupt as Gpio43;
+  }
 }
 implementation
 {

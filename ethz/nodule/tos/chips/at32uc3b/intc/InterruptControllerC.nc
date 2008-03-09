@@ -9,45 +9,91 @@
 
 module InterruptControllerC
 {
-  provides interface Init;
-  provides interface InterruptController;
+  provides {
+    interface Init;
+    interface InterruptController;
+  }
 }
 implementation
 {
-//  void * gpio_interrupt_handlers;
   void * gpio_interrupt_handlers[AVR32_GPIO_NUMBER_OF_PINS];
-  uint32_t gpio_index;
+  bool gpio_initialized = FALSE;
+  void * pdca_interrupt_handlers[AVR32_PDCA_CHANNEL_LENGTH];
+  bool pdca_initialized = FALSE;
 
-  void __attribute__((C, spontaneous, interrupt, section(".interrupt"))) _gpio_interrupt_handler()
-  {
-    uint32_t gpio;
+  void __attribute__((C, interrupt, section(".interrupt"))) _gpio_interrupt_handler() {
+    uint8_t gpio;
     void (*gpio_interrupt_handler)();
 
     // call registered callback function of the GpioInterrupt implementation
 
-    while ((gpio = __builtin_clz(get_register(AVR32_GPIO_PORTA_BASEADDRESS + AVR32_GPIO_IFR0))) != 32)
-    {
-      atomic { gpio_interrupt_handler = gpio_interrupt_handlers[31 - gpio]; }
+    while ((gpio = __builtin_ctz(get_register(AVR32_GPIO_PORTA_BASEADDRESS + AVR32_INTC_INTGROUP_GPIO_REQ_OFFSET))) != 32) {
+      atomic gpio_interrupt_handler = gpio_interrupt_handlers[gpio];
       gpio_interrupt_handler();
     }
  
-    while ((gpio = __builtin_clz(get_register(AVR32_GPIO_PORTB_BASEADDRESS + AVR32_GPIO_IFR0))) != 32)
-    {
-      atomic { gpio_interrupt_handler = gpio_interrupt_handlers[63 - gpio]; }
+    while ((gpio = __builtin_ctz(get_register(AVR32_GPIO_PORTB_BASEADDRESS + AVR32_INTC_INTGROUP_GPIO_REQ_OFFSET))) != 32) {
+      atomic gpio_interrupt_handler = gpio_interrupt_handlers[gpio + 32];
       gpio_interrupt_handler();
     }
   }
 
-  inline void gpio_init_interrupt()
-  {
+  inline void gpio_init_interrupt() {
     extern void _evba;
 
     get_register(AVR32_INTC_ADDRESS + (AVR32_INTC_INTGROUP_GPIO << 2)) =
-      ((AVR32_INTC_INTLEVEL_GPIO << AVR32_INTC_INTLEVEL_OFFSET) | ((void *) &_gpio_interrupt_handler - (void *) &_evba));
+      ((AVR32_INTC_INTLEVEL_GPIO << AVR32_INTC_INTLEVEL_OFFSET) | (uint32_t) ((void *) &_gpio_interrupt_handler - (void *) &_evba));
   }
 
-  command error_t Init.init()
-  {
+  async command void InterruptController.registerGpioInterruptHandler(uint8_t gpio, void * handler) {
+    atomic {
+      if (!gpio_initialized) {
+        gpio_init_interrupt();
+        gpio_initialized = TRUE;
+      }
+
+      gpio_interrupt_handlers[gpio] = handler;
+    }
+  }
+
+  void __attribute__((C, interrupt, section(".interrupt"))) _pdca_interrupt_handler() {
+    uint8_t pdca;
+    void (*pdca_interrupt_handler)();
+
+    // call registered callback function
+
+    while ((pdca = __builtin_ctz(get_register(AVR32_INTC_ADDRESS + AVR32_INTC_INTGROUP_PDCA_REQ_OFFSET))) != 32) {
+      atomic pdca_interrupt_handler = pdca_interrupt_handlers[pdca];
+      pdca_interrupt_handler();
+    }
+  }
+
+  inline void pdca_init_interrupt() {
+    extern void _evba;
+
+    get_register(AVR32_INTC_ADDRESS + (AVR32_INTC_INTGROUP_PDCA << 2)) =
+      ((AVR32_INTC_INTLEVEL_PDCA << AVR32_INTC_INTLEVEL_OFFSET) | (uint32_t) ((void *) &_pdca_interrupt_handler - (void *) &_evba));
+  }
+
+  async command void InterruptController.registerPdcaInterruptHandler(uint8_t pdca, void * handler) {
+    atomic {
+      if (!pdca_initialized) {
+        pdca_init_interrupt();
+        pdca_initialized = TRUE;
+      }
+
+      pdca_interrupt_handlers[pdca] = handler;
+    }
+  }
+
+  async command void InterruptController.registerUsartInterruptHandler(uint8_t usart, void * handler) {
+    extern void _evba;
+
+    get_register(AVR32_INTC_ADDRESS + (get_avr32_intc_intgroup_usart(usart) << 2)) =
+      ((get_avr32_intc_intlevel_usart(usart) << AVR32_INTC_INTLEVEL_OFFSET) | (uint32_t) (handler - (void *) &_evba));
+  }
+
+  command error_t Init.init() {
     uint32_t regval;
     uint8_t irq;
     extern void _evba;
@@ -60,15 +106,6 @@ implementation
       get_register(AVR32_INTC_ADDRESS + (irq << 2)) = regval;
     }
 
-    gpio_init_interrupt();
-
     return SUCCESS;
-  }
-
-  async command void InterruptController.registerGpioInterruptHandler(uint32_t gpio, void * handler)
-  {
-//    gpio_interrupt_handlers = handler;
-    gpio_interrupt_handlers[gpio] = handler;
-    gpio_index = gpio;
   }
 }

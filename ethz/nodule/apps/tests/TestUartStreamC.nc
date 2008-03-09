@@ -75,6 +75,7 @@ implementation
     if (error == SUCCESS && len == 14)
     {
       call Leds.led2Off();
+      call UartStream.send((uint8_t *) "hello world!\r\n", 14);
     }
   }
 

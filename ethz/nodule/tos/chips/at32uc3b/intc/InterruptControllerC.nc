@@ -2,7 +2,8 @@
 
 /* @author Mustafa Yuecel <mustafa.yuecel@alumni.ethz.ch> */
 
-#include "at32uc3b.h"
+#include "at32uc3b_intc.h"
+#include "at32uc3b_gpio.h"
 
 // target address of the interrupt handler is calculated as 
 // (EVBA | handler_offset), not (EVBA + handler_offset)!!!

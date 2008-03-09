@@ -13,7 +13,7 @@
  * @author Mustafa Yuecel <mustafa.yuecel@alumni.ethz.ch>
  */
 
-#include "at32uc3b.h"
+#include "at32uc3b_gpio.h"
 
 configuration HplAt32uc3bGeneralIOLocalBusC
 {

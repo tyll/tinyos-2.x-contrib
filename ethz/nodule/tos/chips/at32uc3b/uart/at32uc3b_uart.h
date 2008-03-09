@@ -1,0 +1,39 @@
+/* $Id$ */
+
+/* @author Mustafa Yuecel <mustafa.yuecel@alumni.ethz.ch> */
+
+#ifndef __AT32UC3B_UART_H__
+#define __AT32UC3B_UART_H__
+
+#include "at32uc3b.h"
+
+#define get_avr32_usart_baseaddress(usart) \
+        ((usart == 0) ? AVR32_USART0_ADDRESS : ((usart == 1) ? AVR32_USART1_ADDRESS : ((usart == 2) ? AVR32_USART2_ADDRESS : AVR32_USART0_ADDRESS )))
+
+#ifndef AVR32_USART0_ALTERNATIVE_GPIO_MAPPING
+#define AVR32_GPIO_PERIPHERAL_FUNC_USART0 AVR32_GPIO_PERIPHERAL_FUNC_C
+#else
+#define AVR32_GPIO_PERIPHERAL_FUNC_USART0 AVR32_GPIO_PERIPHERAL_FUNC_A
+#endif
+
+#ifndef AVR32_USART1_ALTERNATIVE_GPIO_MAPPING
+#define AVR32_GPIO_PERIPHERAL_FUNC_USART1 AVR32_GPIO_PERIPHERAL_FUNC_A
+#else
+#define AVR32_GPIO_PERIPHERAL_FUNC_USART1 AVR32_GPIO_PERIPHERAL_FUNC_C
+#endif
+
+#ifndef AVR32_USART2_ALTERNATIVE_GPIO_MAPPING
+#define AVR32_GPIO_PERIPHERAL_FUNC_USART2 AVR32_GPIO_PERIPHERAL_FUNC_B
+#else
+#define AVR32_GPIO_PERIPHERAL_FUNC_USART2 AVR32_GPIO_PERIPHERAL_FUNC_C
+#endif
+
+#define get_avr32_usart_peripheral_function(usart) \
+        ((usart == 0) ? AVR32_GPIO_PERIPHERAL_FUNC_USART0 : ((usart == 1) ? AVR32_GPIO_PERIPHERAL_FUNC_USART1 : \
+        ((usart == 2) ? AVR32_GPIO_PERIPHERAL_FUNC_USART2 : AVR32_GPIO_PERIPHERAL_FUNC_USART0 )))
+
+#define get_avr32_usart_pbamask_offset(usart) \
+        ((usart == 0) ? AVR32_PBAMASK_USART0_OFFSET : ((usart == 1) ? AVR32_PBAMASK_USART1_OFFSET : \
+        ((usart == 2) ? AVR32_PBAMASK_USART2_OFFSET : AVR32_PBAMASK_USART0_OFFSET )))
+
+#endif /*__AT32UC3B_UART_H__*/

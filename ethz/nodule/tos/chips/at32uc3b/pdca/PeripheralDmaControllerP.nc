@@ -2,7 +2,7 @@
 
 /* @author Mustafa Yuecel <mustafa.yuecel@alumni.ethz.ch> */
 
-#include "at32uc3b.h"
+#include "at32uc3b_pdca.h"
 
 generic module PeripheralDmaControllerP(uint8_t PID)
 {

@@ -7,7 +7,7 @@
  * @author Mustafa Yuecel <mustafa.yuecel@alumni.ethz.ch>
  */
 
-#include "at32uc3b.h"
+#include "at32uc3b_gpio.h"
 
 generic module HplAt32uc3bGpioInterruptP(uint32_t GPIO)
 {

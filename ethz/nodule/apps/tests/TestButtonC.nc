@@ -10,10 +10,8 @@ module TestButtonC
   uses interface Leds;
   uses interface SystemLed;
 
-  uses interface GeneralIO as Button1;
-  uses interface GpioInterrupt as InterruptButton1;
-  uses interface GeneralIO as Button2;
-  uses interface GpioInterrupt as InterruptButton2;
+  uses interface Button as Button1;
+  uses interface Button as Button2;
 }
 implementation
 {
@@ -43,23 +41,22 @@ implementation
 
     call SystemLed.on();
 
-    call InterruptButton1.enableFallingEdge();
-    call InterruptButton2.enableFallingEdge();
+    call Button1.enable();
+    call Button2.enable();
 
     for (;;)
     {
       delay(1000);
     }
-
   }
 
-  async event void InterruptButton1.fired()
+  async event void Button1.pressed()
   {
     // make interrupt visible
     call Leds.led0Toggle();
   }
 
-  async event void InterruptButton2.fired()
+  async event void Button2.pressed()
   {
     // make interrupt visible
     call Leds.led1Toggle();

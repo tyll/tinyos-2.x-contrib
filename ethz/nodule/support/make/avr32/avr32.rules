@@ -42,7 +42,7 @@ PFLAGS += -DDEF_TOS_AM_GROUP=$(DEFAULT_LOCAL_GROUP)
 PFLAGS += -I../../tos/platforms/atevk1101
 PFLAGS += -I../../support/make/avr32/startup/include
 PFLAGS += -fno-common
-#PFLAGS += -muse-rodata-section
+PFLAGS += -muse-rodata-section
 # workaround to disable the <avr32/eic_200.h> header (gcc generates warnings/error)
 PFLAGS += -DAVR32_ABI_H_INCLUDED
 #PFLAGS += -DAVR32_EIC_200_H_INCLUDED
@@ -112,7 +112,7 @@ builddir: FORCE
 
 bytes: FORCE
 	@$(OBJDUMP) --section-headers $(MAIN_EXE) | perl -ne \
-          '$$b{$$1}=hex $$2 if /^\s*\d+\s*\.(exception|interrupt|text|data|bss)\s+(\S+)/; END { printf("%16d bytes in ROM\n%16d bytes in RAM\n",$$b{interrupt}+$$b{exception}+$$b{text}+$$b{data},$$b{data}+$$b{bss}); }'
+          '$$b{$$1}=hex $$2 if /^\s*\d+\s*\.(exception|interrupt|text|data|bss|rodata)\s+(\S+)/; END { printf("%16d bytes in ROM\n%16d bytes in RAM\n",$$b{interrupt}+$$b{exception}+$$b{text}+$$b{data}+$$b{rodata},$$b{data}+$$b{bss}); }'
 	@$(OBJDUMP) --disassemble $(MAIN_EXE) > $(MAIN_S)
 	@echo "    disassembled $(PLATFORM) binary"
 	@echo "    section size requirements of $(COMPONENT) ($(SIZE))"

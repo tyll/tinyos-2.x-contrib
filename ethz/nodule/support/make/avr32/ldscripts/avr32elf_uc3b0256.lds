@@ -73,9 +73,6 @@ SECTIONS
     /* .gnu.warning sections are handled specially by elf32.em.  */
     *(.gnu.warning)
   } >FLASH AT>FLASH
-  .ealign             : { . = ALIGN(1024); } >FLASH AT>FLASH
-  .exception          : { *(.exception) } >FLASH AT>FLASH
-  .interrupt          : { *(.interrupt) } >FLASH AT>FLASH
   .fini               :
   {
     KEEP (*(.fini))
@@ -88,6 +85,9 @@ SECTIONS
   .eh_frame_hdr       : { *(.eh_frame_hdr) } >FLASH AT>FLASH
   .eh_frame           : ONLY_IF_RO { KEEP (*(.eh_frame)) } >FLASH AT>FLASH
   .gcc_except_table   : ONLY_IF_RO { KEEP (*(.gcc_except_table)) *(.gcc_except_table.*) } >FLASH AT>FLASH
+  .ealign             : { . = ALIGN(1024); } >FLASH AT>FLASH
+  .exception          : { *(.exception) } >FLASH AT>FLASH
+  .interrupt          : { *(.interrupt) } >FLASH AT>FLASH
   .dalign	      : { . = ALIGN(8); PROVIDE(_data_lma = .); } >FLASH AT>FLASH
   PROVIDE (_data = ORIGIN(INTRAM));
   . = ORIGIN(INTRAM);

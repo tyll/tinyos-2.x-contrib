@@ -14,8 +14,10 @@ $TCD = "$TCR/ethz/nodule/tos";
 
   "$TCD/platforms/atevk1101",
   "$TCD/chips/at32uc3b",
-  "$TCD/chips/at32uc3b/pins",
   "$TCD/chips/at32uc3b/intc",
+  "$TCD/chips/at32uc3b/pdca",
+  "$TCD/chips/at32uc3b/pins",
+  "$TCD/chips/at32uc3b/uart",
   "$TCD/chips/cc2500",
   "%T/lib/timer",
   "%T/lib/serial",

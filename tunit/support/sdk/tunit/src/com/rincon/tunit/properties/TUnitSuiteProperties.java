@@ -163,7 +163,13 @@ public class TUnitSuiteProperties {
   }
 
   public void addCFlags(String myCFlags) {
-	  cflags += myCFlags + "\n";
+    // Java and regular expressions don't work in eclipse.
+    // I just want to get rid of "CFLAGS+=" and "PFLAGS+=" if they exist.
+    if(myCFlags.contains("+=")) {
+      myCFlags = myCFlags.substring(myCFlags.indexOf("+=") + 2);
+    }
+    
+    cflags += myCFlags + " ";
   }
 
   public int getExactNodeCount() {

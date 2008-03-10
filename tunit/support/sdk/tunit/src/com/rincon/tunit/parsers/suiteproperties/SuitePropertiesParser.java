@@ -121,19 +121,11 @@ public class SuitePropertiesParser {
 
         } else if(line.toLowerCase().startsWith("@cflags")) {
           String cflagLine = line.replace("@cflags","").trim();
-          if(cflagLine.startsWith("CFLAG")) {
-            suiteProperties.addCFlags(cflagLine);
-          } else {
-            suiteProperties.addCFlags("CFLAGS+=" + cflagLine);
-          }
+          suiteProperties.addCFlags(cflagLine);
           
         } else if(line.toLowerCase().startsWith("@cflag")) {
           String cflagLine = line.replace("@cflag","").trim();
-          if(cflagLine.startsWith("CFLAG")) {
-            suiteProperties.addCFlags(cflagLine);
-          } else {
-            suiteProperties.addCFlags("CFLAGS+=" + cflagLine);
-          }
+          suiteProperties.addCFlags(cflagLine);
           
         } else if(line.toLowerCase().startsWith("@assertions")) {
           int numAssertions;
@@ -145,7 +137,7 @@ public class SuitePropertiesParser {
             numAssertions = 5;  // The default
           }
           
-          suiteProperties.addCFlags("CFLAGS+=-DMAX_TUNIT_QUEUE=" + numAssertions);
+          suiteProperties.addCFlags("-DMAX_TUNIT_QUEUE=" + numAssertions);
 
         } else if(line.toLowerCase().startsWith("@ignore")) {
           suiteProperties.addIgnore(line.replace("@ignore","").trim());

@@ -31,8 +31,14 @@ How to install and use SensorScheme:
   this builds the radioblink example program into the $SENSORSCHEME/apps/SensorScheme dir.
   change dir to that location (preferrably in a new terminal window):
     cd $SENSORSCHEME/apps/SensorScheme/radioblink
-  and make it with 
-    make 
+  and make it with:
+    make telosb
+  or build the TOSSIM version:
+    make micaz sim
+
+- for now, browse the sample programs in $SENSORSCHEME/support/sdk/sensorscheme and get a 
+  feel for how sensorscheme programs are structured. 
+
 
 - Before you start programming, make sure you know the scheme language. You can
   find tutorials and other documentation at 

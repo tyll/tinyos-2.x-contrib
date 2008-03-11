@@ -38,9 +38,10 @@ implementation
   }
 
   inline void register_gpio_interrupt_handler() {
+//    if (__sync_val_compare_and_swap(&registered, FALSE, TRUE) == FALSE)
     if (!registered) {
-      call InterruptController.registerGpioInterruptHandler(GPIO, &_gpio_interrupt_handler);
       registered = TRUE;
+      call InterruptController.registerGpioInterruptHandler(GPIO, &_gpio_interrupt_handler);
     }
   }
 

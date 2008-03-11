@@ -17,7 +17,7 @@ implementation
   }
 
   async command uint32_t PeripheralDmaController.getTransferCounter[uint8_t id]() {
-     return get_register(get_avr32_pdca_baseaddress(id) + AVR32_PDCA_TCR0);
+    return get_register(get_avr32_pdca_baseaddress(id) + AVR32_PDCA_TCR0);
   }
 
   async command void PeripheralDmaController.startupTransaction[uint8_t id](void * buf, uint16_t len, bool enable_int)

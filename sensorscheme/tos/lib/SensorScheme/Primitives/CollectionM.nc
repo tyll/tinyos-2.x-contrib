@@ -143,9 +143,9 @@ implementation {
     if (call Queue.empty()) {
       return;
     } else {
-      uint8_t len, i;
       message_t* msg = call Queue.dequeue();
-      uint8_t *ptr = call Packet.getPayload(msg, &len);
+      uint8_t *ptr = call Packet.getPayload(msg, 0);
+      uint8_t i, len = call Packet.payloadLength(msg);
       dbg("CollectionM", "Sending packet to serial (from %hu):", call SerialPacket.source(msg));
       for (i = 0; i <  + len; i++) {
         dbg_clear("CollectionM", " %hhx", ptr[i]);
@@ -164,7 +164,7 @@ implementation {
     return rootReceive(msg, payload, len);
   }
   
-  event bool Intercept.forward(message_t *msg, void *payload, uint16_t len) {
+  event bool Intercept.forward(message_t *msg, void *payload, uint8_t len) {
     signal InterceptSSReceiver.receive(msg, call SerialPacket.source(msg), payload, payload+len);
     return FALSE;
   }

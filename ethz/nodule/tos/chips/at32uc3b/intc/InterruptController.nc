@@ -10,4 +10,7 @@ interface InterruptController
 
   /* USART handler must tagged with __attribute__((interrupt, section(".interrupt"))) */
   async command void registerUsartInterruptHandler(uint8_t usart, void * handler);
+
+  /* PM handler must tagged with __attribute__((interrupt, section(".interrupt"))) */
+  async command void registerPmInterruptHandler(void * handler);
 }

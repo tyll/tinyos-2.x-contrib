@@ -7,17 +7,26 @@
 
 #include "at32uc3b.h"
 
-#define AVR32_INTC_INT0             0
-#define AVR32_INTC_INT1             1
-#define AVR32_INTC_INT2             2
-#define AVR32_INTC_INT3             3
+/* interrupt priority table (0-3, 0 means highest priority) */
+#define AVR32_INTC_INTLEVEL_DEFAULT   3
+#define AVR32_INTC_INTLEVEL_PM        1
+#define AVR32_INTC_INTLEVEL_GPIO      3
+#define AVR32_INTC_INTLEVEL_PDCA      2
+#define AVR32_INTC_INTLEVEL_USART0    2
+#define AVR32_INTC_INTLEVEL_USART1    2
+#define AVR32_INTC_INTLEVEL_USART2    2
 
-/* interrupt priority table (INT[0-3], INT0 means highest priority) */
-#define AVR32_INTC_INTLEVEL_DEFAULT  AVR32_INTC_INT3
-#define AVR32_INTC_INTLEVEL_GPIO     AVR32_INTC_INT3
-#define AVR32_INTC_INTLEVEL_PDCA     AVR32_INTC_INT2
-#define AVR32_INTC_INTLEVEL_USART0   AVR32_INTC_INT2
-#define AVR32_INTC_INTLEVEL_USART1   AVR32_INTC_INT2
-#define AVR32_INTC_INTLEVEL_USART2   AVR32_INTC_INT2
+/* startup time of 32 KHz oscillator */
+/* STARTUP    clock cycles
+ * 0          0
+ * 1          128
+ * 2          8192
+ * 3          16384
+ * 4          65536
+ * 5          131072
+ * 6          262144
+ * 7          524288
+ */
+#define AVR32_PM_OSCCTRL32_DEFAULT_STARTUP    5
 
 #endif /*__AT32UC3B_CONFIG_H__*/

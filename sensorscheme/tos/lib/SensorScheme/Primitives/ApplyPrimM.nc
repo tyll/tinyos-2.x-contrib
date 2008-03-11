@@ -12,9 +12,9 @@ module ApplyPrimM {
 
 implementation {
 
-  command ss_val_t SSPrimitive.eval(uint8_t prim) {
+  command ss_val_t SSPrimitive.eval() {
     dbg("SensorSchemeC", "FN_APPLY %u.\n", car(ss_args).idx);
-    ss_set_value(arg1);
-    return arg2;
+    ss_set_value(arg_1);
+    return arg_2;
   }
 }

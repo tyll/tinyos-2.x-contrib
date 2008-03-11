@@ -38,8 +38,8 @@ implementation {
   
   command ss_val_t SSSender.eval(am_addr_t *addr) {
     dbg("SensorSchemeC", "AMSender.eval.\n");
-    *addr = C_numVal(arg1);
-    return arg2;
+    *addr = C_numVal(arg_1);
+    return arg_2;
   }
   
   command uint8_t *SSSender.getPayload(message_t* pkt) {

@@ -12,10 +12,10 @@ module SetCdrPrimM {
 
 implementation {
 
-  command ss_val_t SSPrimitive.eval(uint8_t prim) {
-    ss_val_t c = arg1;
+  command ss_val_t SSPrimitive.eval() {
+    ss_val_t c = arg_1;
     assertPair(c);
-    cdr(c) = arg2;
+    cdr(c) = arg_2;
     return SYM_FALSE;
   };
 

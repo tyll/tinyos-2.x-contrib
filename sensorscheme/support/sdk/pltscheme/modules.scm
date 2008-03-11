@@ -1,16 +1,29 @@
 (module modules mzscheme
   (require  
    (only (lib "1.ss" "srfi") lset-union lset-difference append-map append-reverse filter-map)
-     (lib "list.ss" "mzlib")
-     "symmap.scm")
+   (lib "list.ss" "mzlib")
+   "symmap.scm")
   
-  (provide read-base-conf build-base-conf select-module build-inject-msg get-gateway-requires get-module-files)
+  (provide read-node-conf build-node-conf compile-module get-gateway-requires)
   
-  (define-struct ssmodule (file name provides requires defines handlers gateway-requires macros init))
+  (define-struct ssmodule (file name defines provides includes requires gateway-requires init))
   
-  (define-struct cache (modules defines))
+  (define (put-global! mdl name kind val)
+    (if (hash-table-get (ssmodule-defines mdl) name #f)
+        (error (ssmodule-name mdl) "redefinition of symbol ~s~n" name)
+        (begin
+          #;(printf "-- defining a ~s \"~s\" to ~s~n" kind name val)
+          (hash-table-put! (ssmodule-defines mdl) name (cons kind val)))))
   
-  (define svc-path-list '("../sensorscheme/lib" "."))
+  (define (find-global-kind mdl kind)
+    (filter (lambda (l) l) (hash-table-map (ssmodule-defines mdl) 
+                                           (lambda (k v) (if (eq? (car v) kind) (cons k (cdr v)) #f)))))
+  
+  (define (get-global mdl name kind)
+    (let ([val (hash-table-get (ssmodule-defines mdl) name #f)])
+      (if (and val (eq? (car val) kind)) val #f)))
+  
+  (define mdl-path-list '("../sensorscheme" "."))
   (define (find-module file)
     (let/cc break
       (for-each 
@@ -18,93 +31,110 @@
          (let ((fp (path->complete-path (build-path p file))))
            (if (file-exists? fp)
                (break fp))))
-       svc-path-list)
+       mdl-path-list)
       (error 'find-module "module ~s not found~n" file)))
   
-  ; gets all code needed for given module and current state of cache, 
-  ; and returns code to be installed and updates cache.
-  (define (select-module mfile cache)
-    ; recursively finds all required modules
-    (define (recursive-requires svc)
-      (let ((req-svcs (ssmodule-requires svc)))
-        (if (null? req-svcs) '()
-            (apply lset-union (lambda (s1 s2) (eq? (ssmodule-name s1) (ssmodule-name s2)))
-                   (list svc) (map recursive-requires req-svcs)))))
-    ; gets all required servcies that are not yet loaded in cache
-    (define (get-new-requires svc)
-      (lset-difference (lambda (s1 s2) (eq? (ssmodule-name s1) (ssmodule-name s2)))
-                       (recursive-requires svc) (cache-modules cache)))
-    
-    (let* ([svc (process-module mfile)]
-           [new-svcs (get-new-requires svc)]
-           [inits (reverse (append-map ssmodule-init new-svcs))]
-           [handlers (append-map ssmodule-handlers new-svcs)]
-           [defines (lset-difference equal? (find-all-globals (append (map cadr handlers) inits) 
-                                                              (append handlers (cache-defines cache)) svc)
-                                     (cache-defines cache))])
-      ;(display (apply append defines)) (newline)
-      (values (if (null? defines) inits 
-                  (cons 
-               (cons '%define% (apply append defines))
-               inits))
-              (make-cache (append (cache-modules cache) new-svcs) 
-                          (append defines (cache-defines cache))))))
+  ; gets all code needed for given module 
+  ; 
+  (define (select-module todo-mdls done-mdls)
+    #;(printf "select-module  ~s ~s~n" (map ssmodule-name todo-mdls) (map ssmodule-name done-mdls))
+    (if (or (null? todo-mdls) (member (car todo-mdls) done-mdls)) (values '() '() '())          
+        (let-values ([(mdls1 inits1 defs1) 
+                      (select-module (ssmodule-requires (car todo-mdls)) done-mdls)])
+          (let* ([new-inits (ssmodule-init (car todo-mdls))]
+                 [includes (ssmodule-includes (car todo-mdls))]
+                 [new-defs (find-all-globals (append includes new-inits) '() (car todo-mdls))])
+            #;(printf "module ~s defs: ~s~n       inits:~s~n" 
+                    (ssmodule-name (car todo-mdls)) new-defs new-inits)
+            (let-values ([(mdls2 inits2 defs2) (select-module (cdr todo-mdls) (cons (car todo-mdls) done-mdls))])
+              (values (append (list (car todo-mdls)) mdls1 mdls2) 
+                      (append new-inits inits1 inits2) (append new-defs defs1 defs2)))))))
+  
+  ; get all code dependencies for the main module of a SensorScheme app
+  (define (compile-module mfile)
+    (select-module (list (process-module mfile)) '()))
   
   (define module-cache (make-hash-table 'equal))
   (define (process-module mfile)
-    (or (hash-table-get module-cache mfile (lambda () #f))
-        ; Process each clause in turn
-        (let ((svc (make-ssmodule '() '() '() '() '() '() '() '() '())))
-          (define (process-clauses clauses)
-            (unless (null? clauses)
-              (process-clause (macro-expand (car clauses) svc))
-              (process-clauses (cdr clauses))))
-          
-          ; Dispatch on the type of the clause.
-          (define (process-clause clause)
-            (if (pair? clause)
-                (case (car clause)
-                  ((require)
-                   (set-ssmodule-requires! 
-                    svc (append (map (lambda (el) (process-module el)) (cdr clause)) (ssmodule-requires svc))))
-                  ((require-for-gateway)
-                   (set-ssmodule-gateway-requires! svc (append (cdr clause) (ssmodule-gateway-requires svc))))
-                  ((provide)
-                   (set-ssmodule-provides! svc (cons (cdr clause) (ssmodule-provides svc))))
-                  ((%define%)
-                   (set-ssmodule-defines! svc (cons (cons (cadr clause) (rename-locals (cddr clause))) 
-                                                   (ssmodule-defines svc))))
-                  ((%define-handler%)
-                   (set-ssmodule-handlers! svc (cons (cons (cadr clause) (rename-locals (cddr clause)))
-                                                    (ssmodule-handlers svc))))
-                  ((%define-macro%)
-                   (set-ssmodule-macros! svc (cons (cdr clause) (ssmodule-macros svc))))
-                  (else
-                   (set-ssmodule-init! svc (cons (rename-locals clause) (ssmodule-init svc)))))))
-          
-          ; Start by doing the whole module definition
-          (let* ((exps (with-input-from-file (find-module mfile) 
-                         (lambda () (read)))))
-            (if (eq? (car exps) 'ssmodule)
-                (begin 
-                  (set-ssmodule-name! svc (cadr exps))
-                  (set-ssmodule-file! svc mfile)
-                  (process-clauses (cddr exps))
-                  #;(printf "~a : ~a, ~a~n" (ssmodule-name svc) (map car (ssmodule-defines svc)) 
-                            (ssmodule-handlers svc)) 
-                    (hash-table-put! module-cache mfile svc)
-                    svc)
-                (error 'process-module "File ~s is not a valid module (no ssmodule found at start)~n" mfile))))))
+    (or (hash-table-get module-cache mfile #f)
+        ; Start by doing the whole module definition
+        (let ([exps (with-input-from-file (find-module mfile) 
+                      (lambda () (read)))])
+          (when (not (eq? (car exps) 'ssmodule))
+            (error 'process-module "File ~s is not a valid module (no ssmodule found at start)~n" mfile))
+          (printf "process-module ~s~n" mfile)
+          (let ([mdl (make-ssmodule mfile (cadr exps) (make-hash-table) '() '() '() '() '())])
+            (define (process-clauses clauses)
+              (unless (null? clauses)
+                (process-clause (macro-expand (car clauses) mdl))
+                (process-clauses (cdr clauses))))
+            
+            ; Dispatch on the type of the clause.
+            (define (process-clause clause)
+              (if (pair? clause)
+                  (case (car clause)
+                    [(require)
+                     (let ([new-mdls (map (lambda (el) (process-module el)) (cdr clause))])
+                       (set-ssmodule-requires! mdl (append new-mdls (ssmodule-requires mdl)))
+                       (for-each (lambda (other-mdl)
+                                   (for-each (lambda (defk)
+                                               (let ([defv (hash-table-get (ssmodule-defines other-mdl) defk #f)])
+                                                 (if defv (if (hash-table-get (ssmodule-defines mdl) defk #f) 
+                                                              (error (ssmodule-name mdl) 
+                                                                     "redefinition of ~s in require~n" defk)
+                                                              (hash-table-put! (ssmodule-defines mdl) defk defv))
+                                                     (error (ssmodule-name mdl) "definition of ~s not found~n" defk)))) 
+                                             (ssmodule-provides other-mdl))) new-mdls))]
+                    [(require-for-gateway)
+                     (set-ssmodule-gateway-requires! mdl (append (cdr clause) (ssmodule-gateway-requires mdl)))]
+                    [(provide)
+                     (set-ssmodule-provides! mdl (append (cdr clause) (ssmodule-provides mdl)))]
+                    [(include)
+                     (set-ssmodule-includes! mdl (append (cdr clause) (ssmodule-includes mdl)))]
+                    [(%define%)
+                     (put-global! mdl (cadr clause) 'define (rename-locals (caddr clause)))]
+                    [(%define-handler%)
+                     (put-global! mdl (cadr clause) 'handler (rename-locals (caddr clause)))]
+                    [(%define-macro%)
+                     (put-global! mdl (cadr clause) 'macro (caddr clause))
+                     #;(printf "define-macro ~s: ~s~n" (cadr clause) 
+                               (cdr (hash-table-get (ssmodule-defines mdl) (cadr clause))))]
+                    [(define-primitive)
+                     (put-global! mdl (cadr clause) 'primitive (caddr clause))]
+                    [(define-receiver)
+                     (put-global! mdl (cadr clause) 'receiver (caddr clause))]
+                    [else
+                     (set-ssmodule-init! mdl (cons (rename-locals clause) (ssmodule-init mdl)))])))            
+            (process-clauses (cddr exps))
+            ; check that provides clause is consistent: only existing values, no doubles
+            (let loop ([ls (ssmodule-provides mdl)])
+              (when (not (null? ls))
+                (cond [(member (car ls) (cdr ls)) (error (ssmodule-name mdl) "duplicate \"~s\" in provides~n" (car ls))]
+                      [(hash-table-get (ssmodule-defines mdl) (car ls) 
+                                       (lambda () (error (ssmodule-name mdl) "provided \"~s\" not defined~n" (car ls))))])
+                (loop (cdr ls))))
+            ; same for includes
+            (let loop ([ls (ssmodule-includes mdl)])
+              (when (not (null? ls))
+                (cond [(member (car ls) (cdr ls)) (error (ssmodule-name mdl) "duplicate \"~s\" in includes~n" (car ls))]
+                      [(hash-table-get (ssmodule-defines mdl) (car ls) 
+                                       (lambda () (error (ssmodule-name mdl) "included \"~s\" not defined~n" (car ls))))])
+                (loop (cdr ls))))
+            #;(hash-table-for-each (ssmodule-defines mdl) (lambda (k v)
+                                                            (printf "~s: ~s~n" k v)))
+            (hash-table-put! module-cache mfile mdl)
+            mdl))))
   
-  (define (macro-expand exp svc)
+  (define (macro-expand exp mdl)
     ; expand macros in module
     (if (pair? exp)
-        (let ([expander (find-expander (car exp) svc)])
+        (let ([expander (get-global mdl (car exp) 'macro)])
           (if expander 
               (macro-expand 
-               (let* ([eval-exp (cons (car expander) 
+               (let* ([eval-exp (cons (cdr expander) 
                                       (map (lambda (x) (list 'quote x)) (cdr exp)))]
                       [orig-ns (current-namespace)])
+                 #;(printf "macro-expand ~s using ~s~n" (car exp) eval-exp)
                  (current-namespace macro-namespace)      
                  (let ([result (with-handlers ([exn? 
                                                 (lambda (exn)     
@@ -112,19 +142,10 @@
                                                           (car exp) (exn-message exn) exp))]) 
                                  (eval eval-exp))])
                    (current-namespace orig-ns)
-                   result)) svc)
-              (if (list? exp) (map (lambda (x) (macro-expand x svc)) exp) exp)))
+                   #;(printf "expanding ~s to ~s~n" exp result)
+                   result)) mdl)
+              (if (list? exp) (map (lambda (x) (macro-expand x mdl)) exp) exp)))
         exp))
-  
-  (define (find-expander exp svc)
-    (define (find-in-requires svclist)
-      (and (pair? svclist)
-           (or (find-expander exp (car svclist))
-               (find-in-requires (cdr svclist)))))
-    (let ((expander (assq exp (ssmodule-macros svc))))
-      (if expander
-          (cdr expander)
-          (find-in-requires (ssmodule-requires svc)))))
   
   ; make sure all required definitions are in the macroexpansion namespace
   (define macro-namespace (make-namespace))
@@ -150,15 +171,18 @@
           ;function application
           (case (car exp)
             ;lambda found, add local vars 
-            ((%lambda%)
+            [(%lambda%)
              (let ((newlocals (append (cadr exp) locals)))
-               (apply lset-union (cons eq? (map (lambda (el) (find-in-exp el newlocals)) (cddr exp))))))
+               (apply lset-union (cons eq? (map (lambda (el) (find-in-exp el newlocals)) (cddr exp)))))]
             ;if
             ((if)
              (apply lset-union eq? (dotted-map (lambda (el) (find-in-exp el locals)) (cdr exp))))
             ;quote found, ignore argument
             ((quote)
              '())
+            ((set!)
+             (when (not (symbol? (cadr exp))) (error 'set! "first argument not a variable reference: ~s~n" (cadr exp)))
+             (lset-union eq? (find-in-exp (cadr exp) locals) (find-in-exp (caddr exp) locals)))
             ; process each term in application as exression
             (else (apply lset-union eq? (dotted-map (lambda (el) (find-in-exp el locals)) exp))))
           ; code not pair, must be varref or constant
@@ -175,80 +199,63 @@
   ; recursively checks the globals referred to
   ; exps: code to look for globals 
   ; found: list of definitions of globals already found in previous call
-  (define (find-all-globals exps found svc)
-    (let ((globals-to-find (lset-difference eq? (find-globals exps) (map car found))))
-      (if (null? globals-to-find)
-          found
-          (
-           let-values (((new-found not-found) (lookup-globals svc globals-to-find)))
-            ;(display (ssmodule-name svc)) (display ": to find:") (display globals-to-find) 
-            ;(display " found:") (display (map car new-found)) 
-            ;(newline)
-            (if (pair? not-found)
-                (printf "~s: not found ~s~n" (ssmodule-name svc) not-found))            
-            (find-all-globals new-found (append-reverse new-found found) svc)))))
+  (define (find-all-globals exps found mdl)
+    (if (null? exps) found
+        (let ([globals-to-find (lset-difference eq? (find-globals exps) (map car found))])
+          ;(printf "in ~s~nto find: ~s~n" exps globals-to-find)
+          (let ([new-found (lookup-globals mdl globals-to-find)])
+            (find-all-globals (filter-map (lambda (el) (case (cadr el) 
+                                                         [(define handler) (cddr el)]
+                                                         [else #f])) new-found) 
+                              (append-reverse new-found found) mdl)))))
   
-  
-  (define (lookup-globals svc globals)
-    (define (lookup-loop svcls found globals)
-      (if (null? svcls)
-          (values found globals)
-          (
-           let-values (((new-found not-found) (lookup-globals (car svcls) globals)))
-            
-            (lookup-loop (cdr svcls) (append found new-found) not-found))))
-    
-    (let* ((new-globals (lset-difference eq? globals (map car (ssmodule-handlers svc))))
-           (found (filter-map (lambda (el) (assq el (ssmodule-defines svc))) new-globals))
-           (not-found (filter-map (lambda (el) (if (not (assq el (ssmodule-defines svc))) el #f)) new-globals)))
-      (lookup-loop (ssmodule-requires svc) found not-found)
-      ))
+  (define (lookup-globals mdl globals)
+    (map (lambda (name) (let ([val (hash-table-get (ssmodule-defines mdl) name #f)])
+                          (if val (begin #;(printf "val ~s: ~s~n" name val) (cons name val))
+                              (error (ssmodule-name mdl) "not found global ~s~n" name)))) globals))
   
   ; builds the injector message to send into the network
-  (define (build-inject-msg cache code injector-module injector . injector-params) 
-    (let* ((msg (macro-expand (append (list injector code) injector-params) (process-module injector-module)))
-           (globals-to-find (lset-difference eq? (find-globals msg) (map car (cache-defines cache)))))
-      (unless (null? globals-to-find)
-        (printf "error - unfound globals: ~s~n" globals-to-find)
-        (printf "message: ~s~n" msg))
-      msg))
+  #;(define (build-inject-msg cache code injector-module injector . injector-params) 
+      (let* ((msg (macro-expand (append (list injector code) injector-params) (process-module injector-module)))
+             (globals-to-find (lset-difference eq? (find-globals msg) (map car (cache-defines cache)))))
+        (unless (null? globals-to-find)
+          (printf "error - unfound globals: ~s~n" globals-to-find)
+          (printf "message: ~s~n" msg))
+        msg))
   
   
   ; reads the contents of a base-conf file into a cache and the application's symmap
-  (define (read-base-conf fname symmap)
+  ; todo: fix again, not tested
+  (define (read-node-conf fname symmap)
     (let* ((fcont (with-input-from-file fname (lambda () (read))))
-           (svcs (map process-module (car fcont)))
+           (mdls (map process-module (car fcont)))
            (defines (filter-map 
                      (lambda (el) (if (eq? (caddr el) '%special%) 
                                       #f
                                       (list (car el) (caddr el))))
                      (cadr fcont))))
-      (values (make-cache svcs defines)
-              (update-symmap (cadr fcont) symmap))))
+      (values (update-symmap (cadr fcont) symmap))))
   
   ; build a new base-conf file from a cache and the application's symmap.
-  (define (build-base-conf cache symmap)
-    #;(printf "modules: ~a~n" (map ssmodule-file (cache-modules cache)))
-    (list (map ssmodule-file (cache-modules cache))
+  (define (build-node-conf mdls inits defs symmap)
+    (list (map ssmodule-file mdls)
           (sort (map (lambda (el) 
                        (list (car el) (cadr el) 
-                             (let ((kv (assq (car el) (cache-defines cache))))
-                               (if kv (cadr kv) '%special%)))) 
+                             (let ((kv (assq (car el) defs)))
+                               (if kv (cdr kv) 'special)))) 
                      (symmap->list symmap))
                 (lambda (f s) (< (cadr f) (cadr s))))))
   
-  ; returns the gateway-requires that are defined in module svc and dependencies
+  ; returns the gateway-requires that are defined in module mdl and dependencies
   (define (get-gateway-requires mfile)
-    (define (gateway-sub-modules svc)
-      (lset-union eq? (list svc) (append-map gateway-sub-modules (ssmodule-requires svc))))
-    (let* ((svc (process-module mfile))
-           (subs (gateway-sub-modules svc)))
-      #;(printf "subs: ~s gw: ~s~n" (map ssmodule-name subs) 
-                (append-map ssmodule-gateway-requires subs))
+    (define (gateway-sub-modules mdl)
+      (lset-union eq? (list mdl) (append-map gateway-sub-modules (ssmodule-requires mdl))))
+    (let* ((mdl (process-module mfile))
+           (subs (gateway-sub-modules mdl)))
+      (printf "subs: ~s gw: ~s~n" (map ssmodule-name subs) 
+              (append-map ssmodule-gateway-requires subs))
       (append-map ssmodule-gateway-requires subs)))
   
-  (define (get-module-files cache)
-    (map ssmodule-file (cache-modules cache)))
   
   ; renames all local variables to the standard local-variable names, 
   ; that can be indexed by name
@@ -278,7 +285,7 @@
             [(symbol? exp) (let ((r (assoc exp locals)))
                              (if r (cdr r) exp))]
             [else exp]))
-    ;(printf "rename-locals ~s" exp)
+    #;(printf "rename-locals ~s~n" exp)
     (let ([r (rename-locals-inner exp ())])
       ; (printf ": ~s~n" r)
       r))

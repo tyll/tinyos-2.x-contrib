@@ -12,7 +12,7 @@ module NotPrimM {
 
 implementation {
 
-  command ss_val_t SSPrimitive.eval(uint8_t prim) {
-    return eq(arg1, SYM_FALSE) ? SYM_TRUE : SYM_FALSE;
+  command ss_val_t SSPrimitive.eval() {
+    return eq(arg_1, SYM_FALSE) ? SYM_TRUE : SYM_FALSE;
   }
 }

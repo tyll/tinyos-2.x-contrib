@@ -12,10 +12,10 @@ module DefinedPrimM {
 
 implementation {
 
-  command ss_val_t SSPrimitive.eval(uint8_t prim) {
+  command ss_val_t SSPrimitive.eval() {
     ss_val_t env = ss_envir;
     ss_val_t t;
-    assertSymbol(arg1); /* Variable is not symbol in defined? */
+    assertSymbol(arg_1); /* Variable is not symbol in defined? */
     while (!isNull(cdr(env))) {
         env = cdr(env);
     }

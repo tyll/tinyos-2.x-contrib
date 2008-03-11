@@ -11,13 +11,15 @@ typedef nx_struct SensorSchemeMsg {
 
 enum {
   AM_SENSORSCHEME_MSG = 7,
-  CL_SENSORSCHEME_MSG = 8,
+  AM_SSCOLLECT_MSG = 8,
+  CL_SSCOLLECT_MSG = 9,
+  CL_SSINTERCEPT_MSG = 10,
   COLLECTION_ROOTNODE = 0,
 };
 
 enum {
-  QUEUE_SIZE = 2,
-  POOL_SIZE = 2,
+  POOL_SIZE = 8,
+  ROOT_QUEUE_SIZE = 8,
   SS_TICKS_PER_SECOND = 16,
 };
 
@@ -26,7 +28,7 @@ enum entrypoint_t {
   SS_INIT,
   SS_RECEIVE,
   SS_STARTREAD,
-  SS_SENDDONE,  
+  SS_SENDDONE,
   SS_SENDLAST,
   SS_CONTINUE,
   SS_TIMER
@@ -46,7 +48,7 @@ enum errorcode_t {
   ERROR_UNKNOWN_PRIMTIIVE,
   ERROR_SYMBOL_NOT_BOUND,
   ERROR_PRIMITIVE_ARGUMENT_COUNT,
-  ERROR_MESSAGE_FORMAT, 
+  ERROR_MESSAGE_FORMAT,
   ERROR_ARG_NOT_PAIR,
   ERROR_ARG_NOT_SYMBOL,
   ERROR_ARG_NOT_NUMBER,
@@ -64,13 +66,14 @@ typedef struct sub_receive_t {
   } sub_receive_t;
 
 #define LABEL_LIST(_)  \
-  _(OP_APPLY)          \
   _(OP_EXIT)           \
   _(OP_HANDLEMSG)      \
+  _(OP_HANDLEINIT)     \
   _(OP_IF_CONT)        \
   _(OP_SET_CONT)       \
   _(OP_DEF_CONT)       \
   _(OP_ARGEVAL_CONT)   \
+  _(OP_APPLY)          \
   _(OP_APPLY_CONT)     \
   _(RD_BITS_CONT)      \
   _(RD_WORD_CONT1)     \
@@ -145,7 +148,7 @@ typedef struct sub_receive_t {
 
 #define COUNT_ITEMS(name, fn)   +1
 
-#define NUM_SYMS            (0 SYM_LIST(COUNT_ITEMS)) 
+#define NUM_SYMS            (0 SYM_LIST(COUNT_ITEMS))
 #define NUM_SIMPLEPRIMS     (NUM_SYMS SIMPLE_PRIM_LIST(COUNT_ITEMS))
 #define NUM_EVALPRIMS       (NUM_SIMPLEPRIMS EVAL_PRIM_LIST(COUNT_ITEMS))
 #define NUM_APPLYPRIMS      (NUM_EVALPRIMS APPLY_PRIM_LIST(COUNT_ITEMS))

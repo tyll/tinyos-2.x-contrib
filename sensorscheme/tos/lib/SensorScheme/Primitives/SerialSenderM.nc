@@ -39,7 +39,7 @@ implementation {
   command ss_val_t SSSender.eval(am_addr_t *addr) {
     dbg("SensorSchemeC", "FN_BCAST.\n");
     *addr = AM_BROADCAST_ADDR;
-    return arg1;
+    return arg_1;
   }
   
   command uint8_t *SSSender.getPayload(message_t* pkt) {

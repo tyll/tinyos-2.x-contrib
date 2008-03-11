@@ -12,8 +12,8 @@ module EvalPrimM {
 
 implementation {
 
-  command ss_val_t SSPrimitive.eval(uint8_t prim) {
+  command ss_val_t SSPrimitive.eval() {
     dbg("SensorSchemeC", "EvalPrim.eval %u.\n", car(ss_args).idx);
-    return arg1;
+    return arg_1;
   }
 }

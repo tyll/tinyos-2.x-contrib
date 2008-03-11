@@ -12,10 +12,10 @@ module ConsPrimM {
 
 implementation {
 
-  command ss_val_t SSPrimitive.eval(uint8_t prim) {
-   arg1;    
+  command ss_val_t SSPrimitive.eval() {
+   arg_1;    
     // reuse cons cell of arglist
-    cdr(ss_args) = arg2;
+    cdr(ss_args) = arg_2;
     return ss_args;
   };
 }

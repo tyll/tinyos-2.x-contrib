@@ -13,10 +13,10 @@ module BlinkPrimM {
 
 implementation {
 
-  command ss_val_t SSPrimitive.eval(uint8_t prim) {
-    dbg("SensorSchemeC", "FN_BLINK %i.\n", ss_numVal(arg1));
+  command ss_val_t SSPrimitive.eval() {
+    dbg("SensorSchemeC", "FN_BLINK %i.\n", ss_numVal(arg_1));
     // TODO: make this actually blink
-    call Leds.set(ss_numVal(arg1));
+    call Leds.set(ss_numVal(arg_1));
     return SYM_FALSE;
   }
 }

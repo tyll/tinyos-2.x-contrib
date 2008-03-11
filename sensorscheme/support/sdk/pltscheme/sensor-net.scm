@@ -135,7 +135,7 @@
         (cond ((or (symbol? sexpr) (boolean? sexpr)) (write-bits TOK_SYM) (write-sym sexpr))
               ((number? sexpr) (write-bits TOK_NUM) (write-num sexpr))
               ((pair? sexpr) (write-bits TOK_BROPEN) (write-list sexpr))
-              ((string? sexpr) (display "found a string in code") (newline))
+              ((string? sexpr) (error write-sexpr "found a string in code: ~s~n" sexpr))
               ((null? sexpr) (write-bits TOK_BROPEN) (write-bits TOK_BRCLOSE))))
       
       (define (flush)

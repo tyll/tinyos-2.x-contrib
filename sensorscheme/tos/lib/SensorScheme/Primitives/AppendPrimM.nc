@@ -12,7 +12,7 @@ module AppendPrimM {
 
 implementation {
 
-  command ss_val_t SSPrimitive.eval(uint8_t prim) {
+  command ss_val_t SSPrimitive.eval() {
     if (!isPair(ss_args)) return ss_args;
     {
       ss_val_t res = call SSRuntime.cons(SYM_NIL, SYM_NIL);

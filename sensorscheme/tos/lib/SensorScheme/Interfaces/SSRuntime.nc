@@ -37,10 +37,13 @@ interface SSRuntime {
   command void setEnvir(ss_val_t val);
   
   command ss_val_t makeNum(int32_t n);  
-  command int32_t numVal(ss_val_t c);
+  command int32_t numVal(ss_val_t c);  
+  command int32_t ckNumVal(ss_val_t c);
+  
+  command ss_val_t ckArg1();
+  command ss_val_t ckArg2();  
   
   command void error(int16_t v);
-
 
   command ss_val_t cons(ss_val_t a, ss_val_t b);
 

@@ -26,6 +26,7 @@ module SensorSchemeC {
 
   }
   provides interface SSRuntime;
+  provides interface Pool<message_t> as MsgPool;
 }
 implementation {
   message_t* receivePacket;
@@ -104,7 +105,35 @@ implementation {
     longjmp(jmpEnv, v);
   }
 
+  command ss_val_t SSRuntime.ckArg1() {
+    return C_car(call SSRuntime.getArgs());
+  }
+  command ss_val_t SSRuntime.ckArg2() {
+    return C_car(cdr(call SSRuntime.getArgs()));
+  }
 
+
+ command bool MsgPool.empty() {
+    return call Pool.empty();
+  }
+  
+  command message_t *MsgPool.get() {
+    return call Pool.get();
+  }
+  
+  command uint8_t MsgPool.maxSize() {
+    return call Pool.maxSize();
+  }
+  
+  command error_t MsgPool.put(message_t *newVal) {
+    return call Pool.put(newVal);
+  }
+  
+  command uint8_t MsgPool.size() {
+    return call Pool.size();
+  }
+ 
+ 
   event void Boot.booted() {
     SEND_PRIM_LIST(SENDER_BOOT)
     RECEIVER_LIST(RECEIVER_BOOT)
@@ -259,7 +288,7 @@ implementation {
 
   event void Timer.fired() {
     ss_val_t qItem;
-    dbg("SensorSchemeC", "Timer.fired() at %i.\n", call Timer.getNow());
+    dbg("SensorSchemeC", "Timer.fired() impuls %i at %s.\n", call Timer.getNow(), sim_time_string());
     // execute scheduled timer
     if (!isPair(timerQueue)) return;
     qItem = car(timerQueue);
@@ -274,11 +303,14 @@ implementation {
   }
 
   command uint32_t SSRuntime.now() {
-    return call Timer.getNow() / (1024 / SS_TICKS_PER_SECOND);
+    uint32_t now = call Timer.getNow();
+    dbg("SensorSchemeC", "SSRuntime.now() %u, %u.\n", now, now / (1024 / SS_TICKS_PER_SECOND));
+    return now / (1024 / SS_TICKS_PER_SECOND);
   }
 
   command void SSRuntime.startTimer(uint32_t t) {
-    call Timer.startOneShotAt(t * (1024 / SS_TICKS_PER_SECOND), 0);
+    dbg("SensorSchemeC", "SSRuntime.startTimer(%u): %u.\n", t, t * (1024 / SS_TICKS_PER_SECOND));
+    call Timer.startOneShotAt(0, t * (1024 / SS_TICKS_PER_SECOND));
   }
 
   command ss_val_t SSRuntime.cons(ss_val_t a, ss_val_t b) {return cons(a, b);}
@@ -291,25 +323,30 @@ implementation {
     }
   }
 
+  command int32_t SSRuntime.ckNumVal(ss_val_t c) {
+    assertNumber(c); 
+    return call SSRuntime.numVal(c);
+  }
+
   command int32_t SSRuntime.numVal(ss_val_t c) {
     return (ss_type(c) == T_BIGNUM ?
         (int32_t)(cells(bignumIdx(c)).l.lval) :
         smallnumVal(c));
   }
 
-  default command ss_val_t Primitive.eval[uint8_t pr](uint8_t prim) {
+  default command ss_val_t Primitive.eval[uint8_t pr]() {
     dbg("SensorSchemeC", "default Primitive.eval.\n");
     do_error(ERROR_UNKNOWN_PRIMTIIVE);
     return SYM_FALSE;
   }
 
-  default command ss_val_t Eval.eval[uint8_t pr](uint8_t prim) {
+  default command ss_val_t Eval.eval[uint8_t pr]() {
     dbg("SensorSchemeC", "default Eval.eval.\n");
     do_error(ERROR_UNKNOWN_PRIMTIIVE);
     return SYM_FALSE;
   }
 
-  default command ss_val_t Apply.eval[uint8_t pr](uint8_t prim) {
+  default command ss_val_t Apply.eval[uint8_t pr]() {
     dbg("SensorSchemeC", "default Apply.eval.\n");
     do_error(ERROR_UNKNOWN_PRIMTIIVE);
     return SYM_FALSE;
@@ -519,7 +556,9 @@ MARK_DOWN:
     dbg("SensorSchemeC", "sensorScheme called on entrypoint %hhu.\n", entry);
     switch (entry) {
       case SS_INIT:
-        do_call(OP_READMSG, SYM_NIL, OP_EXIT, SYM_NIL); break;
+        bitCount = 0;
+        dbg("SensorSchemeRD", "Init message: ");
+        do_call(RD_SEXPR, ss_args, OP_HANDLEINIT, ss_args);
       case SS_RECEIVE:
         goto RD_BYTE; break;
       case SS_STARTREAD:
@@ -556,14 +595,19 @@ OP_HANDLEMSG: {
     // expects: message in ss_value,
     //          sender in ss_args
     dbg_clear("SensorSchemeRD", "\n");
-    if (entry != SS_INIT) {
-      call Pool.put(receivePacket);
-      dbg("SensorSchemeC", "put Pool item: 0x%x. new size: %hhu\n", receivePacket, call Pool.size());
-  }
+    call Pool.put(receivePacket);
+    dbg("SensorSchemeC", "put Pool item: 0x%x. new size: %hhu\n", receivePacket, call Pool.size());
 //  C_symVal(C_car(ss_value)); /* Message needs to start with handler symbol. */
-  do_call(OP_EVAL, car(ss_value), OP_APPLY, cons(ss_args, cdr(ss_value)));
+    do_call(OP_EVAL, car(ss_value), OP_APPLY, cons(ss_args, cdr(ss_value)));
 }
 
+OP_HANDLEINIT: {
+    // handles init message
+    // message is a lambda body, evaluate using apply-cont
+    dbg_clear("SensorSchemeRD", "\n");
+    do_call(OP_APPLY_CONT, cons(ss_value, SYM_NIL), OP_EXIT, SYM_NIL);
+}
+        
 OP_EVAL:
     if (isSymbol(ss_args)) {
       dbg("SensorSchemeC", "OP_EVAL symbol %hu.\n", symVal(ss_args));
@@ -648,12 +692,12 @@ OP_APPLY:
       uint8_t prim = primVal(ss_value);
         dbg("SensorSchemeC", "OP_APPLY primitive %hi.\n", prim);
       if (prim < NUM_SIMPLEPRIMS) {
-        do_return(call Primitive.eval[prim](prim));
+        do_return(call Primitive.eval[prim]());
       } else if (prim < NUM_EVALPRIMS) {
-        args = call Eval.eval[prim](prim); 
+        args = call Eval.eval[prim](); 
         goto OP_EVAL;
       } else if (prim < NUM_APPLYPRIMS) {
-        args = call Apply.eval[prim](prim);
+        args = call Apply.eval[prim]();
         goto OP_APPLY;
       } else {
         sndRoutine = prim;

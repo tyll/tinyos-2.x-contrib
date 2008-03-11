@@ -54,7 +54,7 @@
 #define C_cdr(c)  ({assertPair(c); cdr(c);})
 
 #define C_symVal(c)  ({assertSymbol(c); symVal(c);})
-#define C_numVal(c)  ({assertNumber(c); ss_numVal(c);})
+//#define C_numVal(c)  ({assertNumber(c); ss_numVal(c);})
 
 #define C_first(c)    C_car(c)
 #define C_second(c)   C_first(C_cdr(c))
@@ -64,13 +64,13 @@
 
 /* -------- some shortcuts for common SSRuntime operations ------------ */
 
-#define arg1          C_first(call SSRuntime.getArgs())
-#define arg2          C_second(call SSRuntime.getArgs())
+#define arg_1              (call SSRuntime.ckArg1())
+#define arg_2              (call SSRuntime.ckArg2())
 
-#define ss_args          (call SSRuntime.getArgs())
-#define ss_value         (call SSRuntime.getValue())
-#define ss_envir         (call SSRuntime.getEnvir())
-#define ss_stack         (call SSRuntime.getStack())
+#define ss_args           (call SSRuntime.getArgs())
+#define ss_value          (call SSRuntime.getValue())
+#define ss_envir          (call SSRuntime.getEnvir())
+#define ss_stack          (call SSRuntime.getStack())
 
 #define ss_set_args(n)    (call SSRuntime.setArgs(n))
 #define ss_set_value(n)   (call SSRuntime.setValue(n))
@@ -83,7 +83,8 @@
 #define ss_cons(a, b)     (call SSRuntime.cons(a, b))
 
 #define ss_makeNum(n)     (call SSRuntime.makeNum(n))
-#define ss_numVal(v)      (call SSRuntime.numVal(v))
+#define ss_numVal(c)      (call SSRuntime.numVal(c))
+#define C_numVal(c)       (call SSRuntime.ckNumVal(c))
 
 /* ---------------- reading and writing tokens ----------------------- */
 

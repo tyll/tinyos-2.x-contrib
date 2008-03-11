@@ -18,13 +18,12 @@ generic module HplAt32uc3bUartStreamNoReceiveP(uint32_t USART)
 }
 implementation
 {
-  uint8_t * buffer;
-  uint16_t length;
+  // no atomic sections necessary as long as UartStream.send is not called before UartStream.sendDone
+  norace uint8_t * buffer;
+  norace uint16_t length;
 
   void __attribute__((interrupt, section(".interrupt"))) _usart_interrupt_handler() {
     error_t status;
-    uint8_t * buf;
-    uint16_t len;
 
     // disable USART interrupt (TXEMPTY)
     get_register(get_avr32_usart_baseaddress(USART) + AVR32_USART_IDR) = (1 << AVR32_USART_IDR_TXEMPTY_OFFSET);
@@ -32,14 +31,11 @@ implementation
     // stop USART clock
     get_register(AVR32_PM_ADDRESS + AVR32_PM_PBAMASK) &= ~(1 << (get_avr32_usart_pbamask_offset(USART)));
 
-    atomic {
-      buf = buffer;
-      len = length - call DmaTx.getTransferCounter();
-    }
+    length -= call DmaTx.getTransferCounter();
 
     status = call DmaTx.shutdownTransaction();
 
-    signal UartStream.sendDone(buf, len, status);
+    signal UartStream.sendDone(buffer, length, status);
   }
 
   inline void register_usart_interrupt_handler() {
@@ -98,10 +94,8 @@ implementation
   }
 
   async command error_t UartStream.send(uint8_t * buf, uint16_t len) {
-    atomic {
-      buffer = buf;
-      length = len;
-    }
+    buffer = buf;
+    length = len;
 
     // start USART clock
     get_register(AVR32_PM_ADDRESS + AVR32_PM_PBAMASK) |= (1 << (get_avr32_usart_pbamask_offset(USART)));
@@ -110,15 +104,6 @@ implementation
 
     // enable USART interrupt (TXEMPTY)
     get_register(get_avr32_usart_baseaddress(USART) + AVR32_USART_IER) = (1 << AVR32_USART_IER_TXEMPTY_OFFSET);
-
-    //// write 'hello world' into USART Transmit Holding Register (THR)
-    //while (len > 0)
-    //{
-    //  get_register(get_avr32_usart_baseport(USART) + AVR32_USART_THR) = *buf;
-    //  buf++;
-    //  len--;
-    //  delay(300);
-    //}
 
     return SUCCESS;
   }

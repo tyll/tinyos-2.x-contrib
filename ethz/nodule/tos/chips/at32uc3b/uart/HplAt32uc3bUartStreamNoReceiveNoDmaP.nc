@@ -17,39 +17,22 @@ generic module HplAt32uc3bUartStreamNoReceiveNoDmaP(uint32_t USART)
 }
 implementation
 {
-  uint8_t * buffer_s;
-  uint8_t * buffer;
-  uint16_t length_s;
-  uint16_t length;
+  // no atomic sections necessary as long as UartStream.send is not called before UartStream.sendDone
+  norace uint8_t * buffer_current;
+  norace uint8_t * buffer_begin;
+  norace uint8_t * buffer_end;
 
   void __attribute__((interrupt, section(".interrupt"))) _usart_interrupt_handler() {
-    uint8_t * buf;
-    uint16_t len;
-
-    atomic {
-      buf = ++buffer;
-      len = length--;
-    }
-
-    if (len > 0) {
-      get_register(get_avr32_usart_baseaddress(USART) + AVR32_USART_THR) = *buf;
+    if (++buffer_current <= buffer_end) {
+      get_register(get_avr32_usart_baseaddress(USART) + AVR32_USART_THR) = *buffer_current;
     } else {
       // disable USART interrupt (TXRDY)
       get_register(get_avr32_usart_baseaddress(USART) + AVR32_USART_IDR) = (1 << AVR32_USART_IDR_TXRDY_OFFSET);
 
-      // USART Control Register (CR)
-      // disable TX
-      get_register(get_avr32_usart_baseaddress(USART) + AVR32_USART_CR) = (1 << AVR32_USART_CR_TXDIS_OFFSET);
-
       // stop USART clock
       get_register(AVR32_PM_ADDRESS + AVR32_PM_PBAMASK) &= ~(1 << (get_avr32_usart_pbamask_offset(USART)));
 
-      atomic {
-        buf = buffer_s;
-        len = length_s;
-      }
-
-      signal UartStream.sendDone(buf, len, SUCCESS);
+      signal UartStream.sendDone(buffer_begin, (uint16_t) (buffer_end - buffer_begin), SUCCESS);
     }
   }
 
@@ -109,12 +92,9 @@ implementation
   }
 
   async command error_t UartStream.send(uint8_t * buf, uint16_t len) {
-    atomic {
-      buffer = buf;
-      buffer_s = buf;
-      length = len;
-      length_s = len;
-    }
+    buffer_current = buf;
+    buffer_begin = buf;
+    buffer_end = buf + len;
 
     // start USART clock
     get_register(AVR32_PM_ADDRESS + AVR32_PM_PBAMASK) |= (1 << (get_avr32_usart_pbamask_offset(USART)));

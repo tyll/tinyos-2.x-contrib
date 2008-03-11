@@ -22,18 +22,17 @@
  * OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
  * MODIFICATIONS.
  *
- * Authors:	Raja Jurdak, Antonio Ruzzelli, and Samuel Boivineau
+ * Authors:	Raja Jurdak, Antonio Ruzzelli, Samuel Boivineau and Alessio Barbirato
  * Date created: 2007/09/07
  *
  */
 
 /**
- * @author Raja Jurdak, Antonio Ruzzelli, and Samuel Boivineau
+ * @author Raja Jurdak, Antonio Ruzzelli, Samuel Boivineau and Alessio Barbirato
  */
 
 
 #include "Octopus.h"
-
 /*
 	TODO :	
 			Battery support
@@ -47,6 +46,8 @@ module OctopusC {
   uses {
     // Interfaces for initialization:
     interface Boot;
+	interface NetProg;
+	//interface InternalFlash;
     interface SplitControl as RadioControl;
     interface SplitControl as SerialControl;
 	
@@ -101,7 +102,7 @@ implementation {
 	message_t fwdMsg;
 	message_t sndMsg, serialMsg;
 	bool fwdBusy, sendBusy, uartBusy;
-	uint16_t samplingPeriod;
+	uint16_t samplingPeriod = DEFAULT_SAMPLING_PERIOD;
 	uint16_t waitT;
 	uint16_t vet[100];
 	uint16_t array[100];
@@ -110,8 +111,8 @@ implementation {
 	uint16_t count = 0;
 	//uint16_t flag;
 	uint16_t nodes = 0;
-	uint16_t idRec = 0;
 	uint16_t alpha = 40;
+	uint16_t max_num_nodes = 30;
 	nx_am_addr_t t;
 	uint16_t threshold;
 	bool modeAuto, sleeping, root=FALSE;
@@ -127,7 +128,7 @@ implementation {
 	}
 	static void reportProblem() { call Leds.led0Toggle(); } // if there is any problem
 	static void reportSent() { call Leds.led1Toggle(); } // when a message is sent
-	static void reportReceived() { call Leds.led2Toggle(); } // when a message is received
+	static void reportReceived() {call Leds.led2Toggle();} // when a message is received
 	void processRequest(octopus_sent_msg_t *newRequest);
 	task void collectSendTask();
 	task void serialSendTask();
@@ -140,16 +141,9 @@ implementation {
 		We also initialize the packet (to update)
 	*/
 	event void Boot.booted() {
-		if (call RadioControl.start() != SUCCESS)
-			fatalProblem();
-		if (TOS_NODE_ID == 0) {	// if we are the root, we have to use the serial port
-			root = TRUE;
-			if (call SerialControl.start() != SUCCESS)
-				fatalProblem();
-		}
 		localCollectedMsg.moteId = TOS_NODE_ID;
 		localCollectedMsg.reply = NO_REPLY;
-		samplingPeriod = DEFAULT_SAMPLING_PERIOD;
+
 		threshold = DEFAULT_THRESHOLD;
 		modeAuto = DEFAULT_MODE;
 		sleeping = FALSE;
@@ -160,6 +154,14 @@ implementation {
 		call Leds.led0Off();
 		call Leds.led1Off();
 		call Leds.led2Off();
+		samplingPeriod = DEFAULT_SAMPLING_PERIOD;
+		if (call RadioControl.start() != SUCCESS)
+			fatalProblem();
+		if (TOS_NODE_ID == 0) {	// if we are the root, we have to use the serial port
+			root = TRUE;
+			if (call SerialControl.start() != SUCCESS)
+				fatalProblem();
+		}
 		// battery = getBatteryValue(); ???
 	}
 	event void RadioControl.startDone(error_t error) {
@@ -171,6 +173,7 @@ implementation {
 			if (call BroadcastControl.start() != SUCCESS)
 				fatalProblem();
 			setLocalDutyCycle();
+			samplingPeriod = DEFAULT_SAMPLING_PERIOD;
 			call Timer.startPeriodic(samplingPeriod);
 		} else
 			fatalProblem();
@@ -202,8 +205,8 @@ implementation {
 			case SET_PERIOD_REQUEST:
 				samplingPeriod = newRequest->parameters;
 				call Timer.stop();
-				alpha = samplingPeriod/MAX_NUM_NODES;
-				waitT = (1+TOS_NODE_ID%MAX_NUM_NODES)*alpha;
+				alpha = samplingPeriod/(max_num_nodes+1);
+				waitT = (1+TOS_NODE_ID)*alpha;
 				if(sleeping == FALSE)
 					call WaitTimer.startOneShot(waitT);   
 				break;
@@ -269,6 +272,7 @@ implementation {
 				break;
 			case SET_AWAKE_DUTY_CYCLE_REQUEST:
 				awakeDutyCycle = newRequest->parameters;
+
 				setLocalDutyCycle();
 				break;
 			case GET_AWAKE_DUTY_CYCLE_REQUEST:
@@ -278,25 +282,25 @@ implementation {
 				SEND_TASK
 				break;
 			case BOOT_REQUEST:
+				//call NetProg.reboot();
 				break;
-			case SET_NUM_NODES_REQUEST:
-				/*idRec = newRequest->parameters;
-				call Leds.led1On();
-				if(idRec == 0){
+			case MAX_ID:
+				max_num_nodes = newRequest->parameters;
+				if(max_num_nodes == 36){
 					call Leds.led0On();
 					call Leds.led2Off();
 					call Leds.led1Off();
 				}
-				else if(idRec == 1){
-					call Leds.led0On();
-					call Leds.led2Off();
+				else if(max_num_nodes == 37){
+					call Leds.led0Off();
+					call Leds.led2On();
 					call Leds.led1Off();
 				}
-				else if(idRec == 2){
+				else if(max_num_nodes == 38){
 					call Leds.led0On();
-					call Leds.led2Off();
-					call Leds.led1On();
-				}
+					call Leds.led2On();
+					call Leds.led1Off();
+				}/*
 				else if(idRec == 3){
 					call Leds.led0Off();
 					call Leds.led2On();
@@ -550,7 +554,16 @@ implementation {
 	void setLocalDutyCycle() {
 		if (sleeping)
 			call LowPowerListening.setLocalDutyCycle(sleepDutyCycle);
-		else
-			call LowPowerListening.setLocalDutyCycle(awakeDutyCycle);
+		else{
+				if(awakeDutyCycle>5000){	
+					/*call Leds.led2On();
+					call Leds.led0Off();*/
+				}
+				else{	
+					//call Leds.led0On();
+					//call Leds.led2Off();
+				}
+				call LowPowerListening.setLocalDutyCycle(awakeDutyCycle);
+		}	
 	}
 }

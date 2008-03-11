@@ -11,7 +11,7 @@
  *
  * IN NO EVENT SHALL UNIVERSITY COLLEGE DUBLIN BE LIABLE TO ANY
  * PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES
- * ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF 
+ * ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF
  * UNIVERSITY COLLEGE DUBLIN HAS BEEN ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
@@ -58,9 +58,9 @@ class Scout implements Runnable, MessageListener {
 	private ChartPanel chartPanel;
 	private OctopusSentMsg sMsg;
 	private MsgSender sender;
-	
+
 	public Scout(MoteIF gateway, MoteDatabase moteDatabase, ConsolePanel consolePanel,
-		MapPanel mapPanel, RequestPanel requestPanel, 
+		MapPanel mapPanel, RequestPanel requestPanel,
 		Logger logger, ChartPanel chartPanel, MsgSender sender) {
 		this.gateway = gateway;
 		this.moteDatabase = moteDatabase;
@@ -72,14 +72,14 @@ class Scout implements Runnable, MessageListener {
 		this.sender = sender;
 		sMsg = new OctopusSentMsg();
 	}
-	
+
 	/*
 		The thread just does a loop, sleeping and incrementing
 		a counter with a frequency of 10 Hz (100 ms). The max
 		values of the counters are defined to choose the frequency
 		of repainting the mapPanel and chartPanel;
 	*/
-	
+
 	public void run() {
 		gateway.registerListener(new OctopusCollectedMsg(), this);
 		int mapPanelCounter = 0;
@@ -100,24 +100,24 @@ class Scout implements Runnable, MessageListener {
 			}
 		}
     }
-	
+
 	/*
-		This function waits until the mutex is free, 
+		This function waits until the mutex is free,
 		to update the database.
 	*/
-	
+
 	public void waitMutex() {
 		try {
 			while(!moteDatabase.getMutex())
 				Thread.sleep(Util.MUTEX_WAIT_TIME_MS);
 		} catch(Exception e) { e.printStackTrace();}
 	}
-	
+
 	/*
 		This function is called by Java when a message is received
 		through the serial port.
 	*/
-	
+
 	public void messageReceived(int dest_addr, Message msg) {
 		if (msg instanceof OctopusCollectedMsg) {
 			OctopusCollectedMsg collectedMsg = (OctopusCollectedMsg)msg;
@@ -127,7 +127,7 @@ class Scout implements Runnable, MessageListener {
 			// If the message is an automatic message
 			waitMutex();
 			if ((reply & Constants.REPLY_MASK) == Constants.NO_REPLY) {
-				consolePanel.append("Automatic Msg From Id=" + collectedMsg.get_moteId() 
+				consolePanel.append("Automatic Msg From Id=" + collectedMsg.get_moteId()
 					+ " [reading = " + collectedMsg.get_reading() + "]", Util.MSG_MESSAGE_RECEIVED);
 				if(localMote != null) { 	// if the mote is in the database
 					// we update the database
@@ -142,29 +142,29 @@ class Scout implements Runnable, MessageListener {
 				} else {					// if the mote is not in the database
 					// we add the mote
 					date = new Date();
-					moteDatabase.addMote(new Mote(	collectedMsg.get_moteId(), 
-													collectedMsg.get_count(), 
-													collectedMsg.get_reading(), 
-													collectedMsg.get_parentId(), 
-													collectedMsg.get_quality(), 
-													date.getTime()));
+					moteDatabase.addMote(new Mote(	collectedMsg.get_moteId(),
+													collectedMsg.get_count(),
+													collectedMsg.get_reading(),
+													collectedMsg.get_parentId(),
+													collectedMsg.get_quality(),
+													date.getTime()),sender);
 					localMote = moteDatabase.getMote(collectedMsg.get_moteId());
 					if (localMote != null) {
 						logger.addRecord(localMote);
 						chartPanel.addRecord(localMote);
 					}
 					// and we eventually get its status // code to put in a function called also by a button
-					if (Util.ASK_STATUS_OF_NEW_MOTE) {
-						sender.add(collectedMsg.get_moteId(), (int)Constants.GET_SLEEP_DUTY_CYCLE_REQUEST, 
+					if (Util.ASK_STATUS_OF_NEW_MOTE) {/*
+						sender.add(collectedMsg.get_moteId(), (int)Constants.GET_SLEEP_DUTY_CYCLE_REQUEST,
 							0, "Get SleepDutyCycle of new mote [Id="+collectedMsg.get_moteId()+"]");
-						sender.add(collectedMsg.get_moteId(), (int)Constants.GET_AWAKE_DUTY_CYCLE_REQUEST, 
+						sender.add(collectedMsg.get_moteId(), (int)Constants.GET_AWAKE_DUTY_CYCLE_REQUEST,
 							0, "Get SleepDutyCycle of new mote [Id="+collectedMsg.get_moteId()+"]");
-						sender.add(collectedMsg.get_moteId(), (int)Constants.GET_THRESHOLD_REQUEST, 
+						sender.add(collectedMsg.get_moteId(), (int)Constants.GET_THRESHOLD_REQUEST,
 							0, "Get SleepDutyCycle of new mote[Id="+collectedMsg.get_moteId()+"]");
-						sender.add(collectedMsg.get_moteId(), (int)Constants.GET_PERIOD_REQUEST, 
+						sender.add(collectedMsg.get_moteId(), (int)Constants.GET_PERIOD_REQUEST,
 							0, "Get SleepDutyCycle of new mote[Id="+collectedMsg.get_moteId()+"]");
-						sender.add(collectedMsg.get_moteId(), (int)Constants.GET_STATUS_REQUEST, 
-							0, "Get Status of new mote[Id="+collectedMsg.get_moteId()+"]");
+						sender.add(collectedMsg.get_moteId(), (int)Constants.GET_STATUS_REQUEST,
+							0, "Get Status of new mote[Id="+collectedMsg.get_moteId()+"]");*/
 					}
 				}
 			// else if it's a reply

@@ -1,5 +1,5 @@
 COMPONENT=OctopusAppC
-CFLAGS += -I$(TOSDIR)/lib/net/ -I$(TOSDIR)/lib/net/ctp -I$(TOSDIR)/lib/printf -I$(TOSDIR)/lib/net/le -I.
+CFLAGS += -I$(TOSDIR)/lib/net/ -I$(TOSDIR)/lib/net/ctp -I$(TOSDIR)/lib/printf -I$(TOSDIR)/lib/net/le -I$(TOSDIR)/lib/net/Deluge/extra/ -I$(TOSDIR)/lib/net/Deluge/extra/telosb -I$(TOSDIR)/lib/net/Deluge/ -I$(TOSDIR)/lib/net/Deluge/extra/msp430 -I$(TOSDIR)/lib/net/Deluge/extra/telos -I.
 BUILD_EXTRA_DEPS = OctopusSentMsg.class OctopusCollectedMsg.class
 MIGFILES = OctopusCollectedMsg.java OctopusCollectedMsg.class OctopusSentMsg.java OctopusSentMsg.class
 

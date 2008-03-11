@@ -11,7 +11,7 @@
  *
  * IN NO EVENT SHALL UNIVERSITY COLLEGE DUBLIN BE LIABLE TO ANY
  * PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES
- * ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF 
+ * ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF
  * UNIVERSITY COLLEGE DUBLIN HAS BEEN ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
@@ -34,11 +34,12 @@
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import net.tinyos.message.MoteIF;
 
 /*
 	This class is a Database that stores all the motes
 	from which we have received a message.
-	
+
 	TODO :
 			support of the delete feature
 */
@@ -47,17 +48,20 @@ public class MoteDatabase {
 	private ArrayList moteNetwork;
 	private boolean mutexFree;
 	private ConsolePanel consolePanel;
-	
+	boolean active;
+	int maxID;
+
 	public MoteDatabase(ConsolePanel consolePanel) {
 		this.consolePanel = consolePanel;
 		moteNetwork = new ArrayList();
 		mutexFree = true;
+		active =false;
 	}
-	
+
 	/*
 		This method adds a mote to the database.
 	*/
-	public synchronized void addMote(Mote m) {
+	public synchronized void addMote(Mote m,MsgSender ms) {
 		if(moteNetwork.contains(m)) {
 			Util.debug("[addMote] mote " + m.toString() + " ever in the DB");
 			return;
@@ -65,8 +69,24 @@ public class MoteDatabase {
 		moteNetwork.ensureCapacity(moteNetwork.size()+1);
 		moteNetwork.add(m);
 		consolePanel.append("Mote Id=["+m.getMoteId()+"]", Util.MSG_MOTE_ADDED);
+		int id=m.getMoteId();
+		if(id>maxID){
+			maxID=id;
+			if(active){
+				sendM(ms);
+			}
+		}
+
 	}
-	
+
+	private void sendM(MsgSender ms){
+		ms.add(MoteIF.TOS_BCAST_ADDR,Constants.MAX_ID,maxID,"Sending Maximum ID");
+	}
+	public synchronized void sendMax(MsgSender ms){
+		active=true;
+		sendM(ms);
+	}
+
 	/*
 		This method deletes a mote from the database.
 	*/
@@ -77,12 +97,12 @@ public class MoteDatabase {
 		} else
 			Util.debug("[deleteMote] Mote to delete not found");
 	}
-	
+
 	/*
-		This method returns a mote, by taking in argument 
+		This method returns a mote, by taking in argument
 		the ID of this mote, or null if the mote is not found.
 	*/
-	
+
 	public synchronized Mote getMote(int moteId) {
 		Mote tmp;
 		for (Iterator it=moteNetwork.iterator(); it.hasNext(); ) {
@@ -92,21 +112,21 @@ public class MoteDatabase {
 		}
 		return null;
 	}
-	
+
 	public Iterator getIterator() {
 		return moteNetwork.iterator();
 	}
-	
+
 	/*
 		These both functions lets someone ask for a mutex
 		on the database. If no mutex is available, getMutex()
 		returns false, without waiting.
 	*/
-	
+
 	public void releaseMutex() {
 		mutexFree = true;
 	}
-	
+
 	public boolean getMutex() {
 		if(mutexFree) {
 			mutexFree = false;

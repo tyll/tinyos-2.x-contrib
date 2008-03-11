@@ -45,7 +45,7 @@
 	Two  protocols can't have the same name, even if they are 
 	not of the same type
 */
-
+#define LOW_POWER_LISTENING
 #define COLLECTION_PROTOCOL 		//  cf TEP 119: Collection.
 //#define DUMMY_COLLECT_PROTOCOL	// 	not working
 

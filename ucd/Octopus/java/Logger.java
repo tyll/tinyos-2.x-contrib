@@ -57,7 +57,7 @@ public class Logger {
 	private boolean parentIdRecorded, lastTimeSeenRecorded;
 	
 	private int nbFieldsRecorded;
-	final static int MIN_NB_FIELDS = 2;
+	final static int MIN_NB_FIELDS = 3;
 	
 	public Logger() {
 		logging = false;
@@ -108,7 +108,7 @@ public class Logger {
 			
 			int i = 2;
 			record = new String [nbFieldsRecorded];
-			record[0] = "Mote Id"; record[1] = "Time in ms"; 
+			record[0] = "Mote Id"; record[1] = "Time in ms"; record[i++] = "Hops";
 			if (modeAutoRecorded) record[i++] = "Mode Auto(1) Or Query(0)";
 			if (modeSleepingRecorded) record[i++] = "Mode Sleeping(1) Or Awake(0)";
 			if (samplingPeriodRecorded) record[i++] = "Sampling Period (in ms)";
@@ -160,6 +160,7 @@ public class Logger {
 		i = 0;
 		record[i++] = ""+mote.getMoteId(); 
 		record[i++] = ""+(date.getTime()-startTime);
+		record[i++] = ""+mote.getHops();
 		if (modeAutoRecorded) record[i++] = "" + mote.isInModeAuto();
 		if (modeSleepingRecorded) record[i++] = "" + mote.isSleeping();
 		if (samplingPeriodRecorded) record[i++] = "" + mote.getSamplingPeriod();

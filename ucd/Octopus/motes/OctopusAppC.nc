@@ -22,26 +22,32 @@
  * OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
  * MODIFICATIONS.
  *
- * Authors:	Raja Jurdak, Antonio Ruzzelli, and Samuel Boivineau
+ * Authors:	Raja Jurdak, Antonio Ruzzelli, Samuel Boivineau and Alessio Barbirato
  * Date created: 2007/09/07
  *
  */
 
 /**
- * @author Raja Jurdak, Antonio Ruzzelli, and Samuel Boivineau
+ * @author Raja Jurdak, Antonio Ruzzelli, Samuel Boivineau and Alessio Barbirato
  */
 
 
 #include <Octopus.h>
-#include "printf.h"
+#include <NetProg.h>
+//#include <NetProg_platform.h>
+//#include <TOSBoot.h>
+//#include <TOSBoot_platform.h>
+//#include <InternalFlash.h>
+
 configuration OctopusAppC { }
 implementation {
 	// Miscalleny:
 	components MainC, OctopusC, LedsC, new TimerMilliC(), 
-	new OctopusSensorC() as Sensor, RandomC, PlatformC;
+	new OctopusSensorC() as Sensor, RandomC, PlatformC, NetProgC, InternalFlashC;
 
-
+    OctopusC.NetProg -> NetProgC;
 	OctopusC.Boot -> MainC;
+	//OctopusC.InternalFlash -> InternalFlashC;
 	OctopusC.Timer -> TimerMilliC;
 	OctopusC.WaitTimer -> TimerMilliC;
 	OctopusC.Read -> Sensor;

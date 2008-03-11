@@ -22,13 +22,13 @@
  * OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
  * MODIFICATIONS.
  *
- * Authors:	Raja Jurdak, Antonio Ruzzelli, and Samuel Boivineau
+ * Authors:	Raja Jurdak, Antonio Ruzzelli, Samuel Boivineau and Alessio Barbirato
  * Date created: 2007/09/07
  *
  */
 
 /**
- * @author Raja Jurdak, Antonio Ruzzelli, and Samuel Boivineau
+ * @author Raja Jurdak, Antonio Ruzzelli, Samuel Boivineau and Alessio Barbirato
  */
 
 #ifndef OCTOPUS_H
@@ -71,7 +71,7 @@ enum {
 	SET_AWAKE_DUTY_CYCLE_REQUEST = 14,
 	BROADCAST_DIS_KEY = 42,
 	BOOT_REQUEST = 15,
-	SET_NUM_NODES_REQUEST = 16,
+	MAX_ID = 16,
 	MODE_AUTO = 1,
 	MAX_NUM_NODES = 41,
 	MODE_QUERY = 0 // useful ?

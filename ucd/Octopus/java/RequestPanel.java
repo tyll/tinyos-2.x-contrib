@@ -11,7 +11,7 @@
  *
  * IN NO EVENT SHALL UNIVERSITY COLLEGE DUBLIN BE LIABLE TO ANY
  * PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES
- * ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF 
+ * ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF
  * UNIVERSITY COLLEGE DUBLIN HAS BEEN ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
@@ -45,11 +45,11 @@ import java.util.LinkedList;
 import net.tinyos.message.*;
 import net.tinyos.packet.*;
 import net.tinyos.util.*;
-	
+
 /*
 	This class is a panel containing the requests needed by a user.
 	The panel describes the status of the mote selected.
-	
+
 	TODO :
 	BUG :
 */
@@ -62,29 +62,29 @@ class RequestPanel extends JPanel implements ActionListener, ChangeListener, Ite
 	private JSlider sleepSlider, awakeSlider, periodSlider, thresholdSlider;
 	private JButton readingButton;
 	private JLabel readingLabel;
-	
+
 	private ChartPanel chartPanel;
 	private JButton toChartButton, allToChartButton, clearChartButton;
-	
+
 	private MsgSender sender;
 	private MoteDatabase moteDatabase;
 	private LinkedList selectedMotesList;
 	private boolean broadcastRequest;
-	
+
 	public RequestPanel(MoteDatabase moteDatabase, ChartPanel chartPanel, MsgSender sender) {
 		super(new GridBagLayout());
-		
+		new WaitThread(sender,moteDatabase).start();
 		// Mote label
 		moteLabel = new JLabel("No mote selected");
-		
+
 		// Broadcast requests
 		checkBoxBroadcast = new JCheckBox("Broadcast");
 		checkBoxBroadcast.addItemListener(this);
 		checkBoxBroadcast.setSelected(false);
-		
+
 		// Battery label
 		batteryLabel = new JLabel("Battery : 0 %");
-		
+
 		// Request Mode
 		autoModeButton = new JButton("Auto");
 		autoModeButton.setActionCommand("auto");
@@ -98,7 +98,7 @@ class RequestPanel extends JPanel implements ActionListener, ChangeListener, Ite
 		queryModeButton.setHorizontalTextPosition(AbstractButton.LEADING);
 		queryModeButton.setEnabled(true);
 		queryModeButton.addActionListener(this);
-		
+
 		// Request layout
 		JPanel tmpRequestPanel = new JPanel(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
@@ -109,7 +109,7 @@ class RequestPanel extends JPanel implements ActionListener, ChangeListener, Ite
 		c.gridx = 0; c.gridy = 0; c.gridwidth = 1; tmpRequestPanel.add(autoModeButton, c);
 		c.gridx = 1; c.gridy = 0; c.gridwidth = 1; tmpRequestPanel.add(queryModeButton, c);
 		tmpRequestPanel.setBorder(BorderFactory.createTitledBorder("Request Mode"));
-		
+
 		// Sleep
 		sleepButton = new JButton("To Sleep");
 		sleepButton.setActionCommand("sleep");
@@ -123,7 +123,7 @@ class RequestPanel extends JPanel implements ActionListener, ChangeListener, Ite
 		wakeUpButton.setHorizontalTextPosition(AbstractButton.LEADING);
 		wakeUpButton.setEnabled(true);
 		wakeUpButton.addActionListener(this);
-		
+
 		// sleep layout
 		JPanel tmpSleepPanel = new JPanel(new GridBagLayout());
 		c = new GridBagConstraints();
@@ -134,7 +134,7 @@ class RequestPanel extends JPanel implements ActionListener, ChangeListener, Ite
 		c.gridx = 0; c.gridy = 0; c.gridwidth = 1; tmpSleepPanel.add(sleepButton, c);
 		c.gridx = 1; c.gridy = 0; c.gridwidth = 1; tmpSleepPanel.add(wakeUpButton, c);
 		tmpSleepPanel.setBorder(BorderFactory.createTitledBorder("Sleep Mode"));
-		
+
 		sleepSlider = new JSlider(JSlider.HORIZONTAL, 0, 100, Util.dutyCycleToPercent(Constants.DEFAULT_SLEEP_DUTY_CYCLE));
 		sleepSlider.addChangeListener(this);
 		sleepSlider.setMajorTickSpacing(10);
@@ -142,7 +142,7 @@ class RequestPanel extends JPanel implements ActionListener, ChangeListener, Ite
 		sleepSlider.setPaintTicks(true);
 		sleepSlider.setPaintLabels(true);
 		sleepSlider.setBorder(BorderFactory.createTitledBorder("Sleep Duty Cycle (in %)"));
-		
+
 		awakeSlider = new JSlider(JSlider.HORIZONTAL, 0, 100, Util.dutyCycleToPercent(Constants.DEFAULT_AWAKE_DUTY_CYCLE));
 		awakeSlider.addChangeListener(this);
 		awakeSlider.setMajorTickSpacing(10);
@@ -150,7 +150,7 @@ class RequestPanel extends JPanel implements ActionListener, ChangeListener, Ite
 		awakeSlider.setPaintTicks(true);
 		awakeSlider.setPaintLabels(true);
 		awakeSlider.setBorder(BorderFactory.createTitledBorder("Awake Duty Cycle (in %)"));
-		
+
 		// Sensors
 		periodSlider = new JSlider(JSlider.HORIZONTAL, 0, 65535, Constants.DEFAULT_SAMPLING_PERIOD);
 		periodSlider.addChangeListener(this);
@@ -159,7 +159,7 @@ class RequestPanel extends JPanel implements ActionListener, ChangeListener, Ite
 		periodSlider.setPaintTicks(true);
 		periodSlider.setPaintLabels(true);
 		periodSlider.setBorder(BorderFactory.createTitledBorder("Period Sampling (in ms)"));
-		
+
 		thresholdSlider = new JSlider(JSlider.HORIZONTAL, 0, 100, Util.thresholdToPercent(Constants.DEFAULT_THRESHOLD));
 		thresholdSlider.addChangeListener(this);
 		thresholdSlider.setMajorTickSpacing(10);
@@ -167,7 +167,7 @@ class RequestPanel extends JPanel implements ActionListener, ChangeListener, Ite
 		thresholdSlider.setPaintTicks(true);
 		thresholdSlider.setPaintLabels(true);
 		thresholdSlider.setBorder(BorderFactory.createTitledBorder("Threshold (in %)"));
-		
+
 		// Sensor
 		readingButton = new JButton("Read the sensor");
 		readingLabel = new JLabel("No reading");
@@ -176,7 +176,7 @@ class RequestPanel extends JPanel implements ActionListener, ChangeListener, Ite
 		readingButton.setHorizontalTextPosition(AbstractButton.LEADING);
 		readingButton.setEnabled(true);
 		readingButton.addActionListener(this);
-		
+
 		// Sensor layout
 		JPanel tmpSensorPanel = new JPanel(new GridBagLayout());
 		c = new GridBagConstraints();
@@ -187,7 +187,7 @@ class RequestPanel extends JPanel implements ActionListener, ChangeListener, Ite
 		c.gridx = 0; c.gridy = 0; c.gridwidth = 2; tmpSensorPanel.add(readingLabel, c);
 		c.gridx = 2; c.gridy = 0; c.gridwidth = 1; tmpSensorPanel.add(readingButton, c);
 		tmpSensorPanel.setBorder(BorderFactory.createTitledBorder("Sensor"));
-		
+
 		// Chart
 		toChartButton = new JButton("Add Selected");
 		toChartButton.setActionCommand("add");
@@ -207,7 +207,7 @@ class RequestPanel extends JPanel implements ActionListener, ChangeListener, Ite
 		clearChartButton.setHorizontalTextPosition(AbstractButton.LEADING);
 		clearChartButton.setEnabled(true);
 		clearChartButton.addActionListener(this);
-		
+
 		// chart layout
 		JPanel tmpChartPanel = new JPanel(new GridBagLayout());
 		c = new GridBagConstraints();
@@ -219,7 +219,27 @@ class RequestPanel extends JPanel implements ActionListener, ChangeListener, Ite
 		c.gridx = 1; c.gridy = 0; c.gridwidth = 1; tmpChartPanel.add(allToChartButton, c);
 		c.gridx = 2; c.gridy = 0; c.gridwidth = 1; tmpChartPanel.add(clearChartButton, c);
 		tmpChartPanel.setBorder(BorderFactory.createTitledBorder("Choose the motes displayed in the chart"));
-		
+
+
+		// Boot
+		JButton bootButton = new JButton("Boot Network");
+		bootButton.setActionCommand("bootNet");
+		bootButton.setVerticalTextPosition(AbstractButton.CENTER);
+		bootButton.setHorizontalTextPosition(AbstractButton.LEADING);
+		bootButton.setEnabled(true);
+		bootButton.addActionListener(this);
+
+		// Boot layout
+		JPanel bootPanel = new JPanel(new GridBagLayout());
+		c = new GridBagConstraints();
+		c.weighty = 1;	c.weightx = 1;
+		c.anchor = GridBagConstraints.PAGE_START;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.insets = new Insets(2,2,2,2);
+
+		c.gridx = 2; c.gridy = 0; c.gridwidth = 1; bootPanel.add(bootButton, c);
+		bootPanel.setBorder(BorderFactory.createTitledBorder("Boot"));
+
 		// layout
 		c = new GridBagConstraints();
 		c.weighty = 1; c.weightx = 1;
@@ -236,22 +256,23 @@ class RequestPanel extends JPanel implements ActionListener, ChangeListener, Ite
 		c.gridx = 0; c.gridy = 7; c.gridwidth = 3; add(thresholdSlider, c);
 		c.gridx = 0; c.gridy = 8; c.gridwidth = 0; add(tmpSensorPanel, c);
 		c.gridx = 0; c.gridy = 9; c.gridwidth = 3; add(tmpChartPanel, c);
-		
+		c.gridx = 0; c.gridy = 10; c.gridwidth = 3; add(bootPanel, c);
+
 		// network
 		this.sender = sender;
 		this.moteDatabase = moteDatabase;
 		this.chartPanel = chartPanel;
 		broadcastRequest = false;
 		selectedMotesList = new LinkedList();
-		
+
 		displayMoteState();
 	}
-	
+
 	/*
 		Function called when a checkbox is checked
 		or unchecked.
 	*/
-	
+
 	public void itemStateChanged(ItemEvent e) {
 		Object source = e.getItemSelectable();
 		// if the checkbox was deselected
@@ -263,11 +284,11 @@ class RequestPanel extends JPanel implements ActionListener, ChangeListener, Ite
 			broadcastRequest = true;
 		displayMoteState();
 	}
-	
+
 	/*
 		Function called when a button is pressed.
-		We don't have any acknowledgement so we have to 
-		assume the request is well executed, so we have 
+		We don't have any acknowledgement so we have to
+		assume the request is well executed, so we have
 		to update the database.
 	*/
 
@@ -294,7 +315,7 @@ class RequestPanel extends JPanel implements ActionListener, ChangeListener, Ite
 		if (selectedMotesList.size()>=0 || broadcastRequest){
 			if ("sleep".equals(e.getActionCommand())) {
 				if (broadcastRequest) {
-					sender.add(MoteIF.TOS_BCAST_ADDR, (int)Constants.SLEEP_REQUEST, 
+					sender.add(MoteIF.TOS_BCAST_ADDR, (int)Constants.SLEEP_REQUEST,
 						0, "setSleeping() [Id=broadcast]");
 					for (Iterator it=moteDatabase.getIterator(); it.hasNext(); ) {
 						localMote = (Mote)it.next();
@@ -303,7 +324,7 @@ class RequestPanel extends JPanel implements ActionListener, ChangeListener, Ite
 				} else {
 					for (Iterator it=(Iterator)selectedMotesList.listIterator(); it.hasNext(); ) {
 						localMote = (Mote)it.next();
-						sender.add(localMote.getMoteId(), (int)Constants.SLEEP_REQUEST, 
+						sender.add(localMote.getMoteId(), (int)Constants.SLEEP_REQUEST,
 							0, "setSleeping() [Id="+localMote.getMoteId()+"]");
 						localMote.setSleeping();
 					}
@@ -311,7 +332,7 @@ class RequestPanel extends JPanel implements ActionListener, ChangeListener, Ite
 				displayMoteState();
 			} else if ("wakeup".equals(e.getActionCommand())) {
 				if (broadcastRequest) {
-					sender.add(MoteIF.TOS_BCAST_ADDR, (int)Constants.WAKE_UP_REQUEST, 
+					sender.add(MoteIF.TOS_BCAST_ADDR, (int)Constants.WAKE_UP_REQUEST,
 						0, "setAwake() [Id=broadcast]");
 					for (Iterator it=moteDatabase.getIterator(); it.hasNext(); ) {
 						localMote = (Mote)it.next();
@@ -320,7 +341,7 @@ class RequestPanel extends JPanel implements ActionListener, ChangeListener, Ite
 				} else {
 					for (Iterator it=(Iterator)selectedMotesList.listIterator(); it.hasNext(); ) {
 						localMote = (Mote)it.next();
-						sender.add(localMote.getMoteId(), (int)Constants.WAKE_UP_REQUEST, 
+						sender.add(localMote.getMoteId(), (int)Constants.WAKE_UP_REQUEST,
 							0, "setAwake() [Id="+localMote.getMoteId()+"]");
 						localMote.setAwake();
 					}
@@ -328,7 +349,7 @@ class RequestPanel extends JPanel implements ActionListener, ChangeListener, Ite
 				displayMoteState();
 			} else if ("auto".equals(e.getActionCommand())) {
 				if (broadcastRequest) {
-					sender.add(MoteIF.TOS_BCAST_ADDR, (int)Constants.SET_MODE_AUTO_REQUEST, 
+					sender.add(MoteIF.TOS_BCAST_ADDR, (int)Constants.SET_MODE_AUTO_REQUEST,
 						0, "setModeAuto() [Id=broadcast]");
 					for (Iterator it=moteDatabase.getIterator(); it.hasNext(); ) {
 						localMote = (Mote)it.next();
@@ -337,7 +358,7 @@ class RequestPanel extends JPanel implements ActionListener, ChangeListener, Ite
 				} else {
 					for (Iterator it=(Iterator)selectedMotesList.listIterator(); it.hasNext(); ) {
 						localMote = (Mote)it.next();
-						sender.add(localMote.getMoteId(), (int)Constants.SET_MODE_AUTO_REQUEST, 
+						sender.add(localMote.getMoteId(), (int)Constants.SET_MODE_AUTO_REQUEST,
 							0, "setModeAuto() [Id="+localMote.getMoteId()+"]");
 						localMote.setModeAuto();
 					}
@@ -345,7 +366,7 @@ class RequestPanel extends JPanel implements ActionListener, ChangeListener, Ite
 				displayMoteState();
 			} else if ("query".equals(e.getActionCommand())) {
 				if (broadcastRequest) {
-					sender.add(MoteIF.TOS_BCAST_ADDR, (int)Constants.SET_MODE_QUERY_REQUEST, 
+					sender.add(MoteIF.TOS_BCAST_ADDR, (int)Constants.SET_MODE_QUERY_REQUEST,
 						0, "setModeQuery() [Id=broadcast]");
 					for (Iterator it=moteDatabase.getIterator(); it.hasNext(); ) {
 						localMote = (Mote)it.next();
@@ -354,7 +375,7 @@ class RequestPanel extends JPanel implements ActionListener, ChangeListener, Ite
 				} else {
 					for (Iterator it=(Iterator)selectedMotesList.listIterator(); it.hasNext(); ) {
 						localMote = (Mote)it.next();
-						sender.add(localMote.getMoteId(), (int)Constants.SET_MODE_QUERY_REQUEST, 
+						sender.add(localMote.getMoteId(), (int)Constants.SET_MODE_QUERY_REQUEST,
 							0, "setModeQuery() [Id="+localMote.getMoteId()+"]");
 						localMote.setModeQuery();
 					}
@@ -362,24 +383,28 @@ class RequestPanel extends JPanel implements ActionListener, ChangeListener, Ite
 				displayMoteState();
 			} else if ("reading".equals(e.getActionCommand())) {
 				if (broadcastRequest) {
-					sender.add(MoteIF.TOS_BCAST_ADDR, (int)Constants.GET_READING_REQUEST, 
+					sender.add(MoteIF.TOS_BCAST_ADDR, (int)Constants.GET_READING_REQUEST,
 						0, "Reading() [Id=broadcast]");
 				} else {
 					for (Iterator it=(Iterator)selectedMotesList.listIterator(); it.hasNext(); ) {
 						localMote = (Mote)it.next();
-						sender.add(localMote.getMoteId(), (int)Constants.GET_READING_REQUEST, 
+						sender.add(localMote.getMoteId(), (int)Constants.GET_READING_REQUEST,
 							0, "Reading() [Id="+localMote.getMoteId()+"]");
 					}
 				}
+			}else if("bootNet".equals(e.getActionCommand())) {
+				sender.add(MoteIF.TOS_BCAST_ADDR,Constants.BOOT_REQUEST,0,"Sending Boot Message");
 			}
 		}
 	}
-	
+
+
+
 	/*
 		Function called when a slider is moved. The request is sent
 		only when the user release the button of the mouse.
 	*/
-	
+
 	public void stateChanged(ChangeEvent e) {
         JSlider source = (JSlider)e.getSource();
 		Mote localMote;
@@ -387,8 +412,8 @@ class RequestPanel extends JPanel implements ActionListener, ChangeListener, Ite
 			if (!source.getValueIsAdjusting()) { 	// we wait a release by the user
 				if(source == sleepSlider) {
 					if (broadcastRequest) {
-						sender.add(MoteIF.TOS_BCAST_ADDR, (int)Constants.SET_SLEEP_DUTY_CYCLE_REQUEST, 
-							Util.dutyCycleToInt((int)source.getValue()), 
+						sender.add(MoteIF.TOS_BCAST_ADDR, (int)Constants.SET_SLEEP_DUTY_CYCLE_REQUEST,
+							Util.dutyCycleToInt((int)source.getValue()),
 							"Set SleepDutyCycle = "+(int)source.getValue()+"% [Id=broadcast]");
 						for (Iterator it=moteDatabase.getIterator(); it.hasNext(); ) {
 							localMote = (Mote)it.next();
@@ -397,8 +422,8 @@ class RequestPanel extends JPanel implements ActionListener, ChangeListener, Ite
 					} else {
 						for (Iterator it=(Iterator)selectedMotesList.listIterator(); it.hasNext(); ) {
 							localMote = (Mote)it.next();
-							sender.add(localMote.getMoteId(), (int)Constants.SET_SLEEP_DUTY_CYCLE_REQUEST, 
-								Util.dutyCycleToInt((int)source.getValue()), 
+							sender.add(localMote.getMoteId(), (int)Constants.SET_SLEEP_DUTY_CYCLE_REQUEST,
+								Util.dutyCycleToInt((int)source.getValue()),
 								"Set SleepDutyCycle = "+(int)source.getValue()+"% [Id="+localMote.getMoteId()+"]");
 							localMote.setSleepDutyCycle(Util.dutyCycleToInt((int)source.getValue()));
 						}
@@ -406,8 +431,8 @@ class RequestPanel extends JPanel implements ActionListener, ChangeListener, Ite
 					displayMoteState();
 				} else if(source == awakeSlider) {
 					if (broadcastRequest) {
-						sender.add(MoteIF.TOS_BCAST_ADDR, (int)Constants.SET_AWAKE_DUTY_CYCLE_REQUEST, 
-							Util.dutyCycleToInt((int)source.getValue()), 
+						sender.add(MoteIF.TOS_BCAST_ADDR, (int)Constants.SET_AWAKE_DUTY_CYCLE_REQUEST,
+							Util.dutyCycleToInt((int)source.getValue()),
 							"Set AwakeDutyCycle = "+(int)source.getValue()+"% [Id=broadcast]");
 						for (Iterator it=moteDatabase.getIterator(); it.hasNext(); ) {
 							localMote = (Mote)it.next();
@@ -416,8 +441,8 @@ class RequestPanel extends JPanel implements ActionListener, ChangeListener, Ite
 					} else {
 						for (Iterator it=(Iterator)selectedMotesList.listIterator(); it.hasNext(); ) {
 							localMote = (Mote)it.next();
-							sender.add(localMote.getMoteId(), (int)Constants.SET_AWAKE_DUTY_CYCLE_REQUEST, 
-								Util.dutyCycleToInt((int)source.getValue()), 
+							sender.add(localMote.getMoteId(), (int)Constants.SET_AWAKE_DUTY_CYCLE_REQUEST,
+								Util.dutyCycleToInt((int)source.getValue()),
 								"Set AwakeDutyCycle = "+(int)source.getValue()+"% [Id="+localMote.getMoteId()+"]");
 							localMote.setAwakeDutyCycle(Util.dutyCycleToInt((int)source.getValue()));
 						}
@@ -430,7 +455,7 @@ class RequestPanel extends JPanel implements ActionListener, ChangeListener, Ite
 						periodSlider.addChangeListener(this);
 					}
 					if (broadcastRequest) {
-						sender.add(MoteIF.TOS_BCAST_ADDR, (int)Constants.SET_PERIOD_REQUEST, 
+						sender.add(MoteIF.TOS_BCAST_ADDR, (int)Constants.SET_PERIOD_REQUEST,
 							(int)source.getValue(), "Set PeriodSampling = "+(int)source.getValue()+"ms [Id=broadcast]");
 						for (Iterator it=moteDatabase.getIterator(); it.hasNext(); ) {
 							localMote = (Mote)it.next();
@@ -439,7 +464,7 @@ class RequestPanel extends JPanel implements ActionListener, ChangeListener, Ite
 					} else {
 						for (Iterator it=(Iterator)selectedMotesList.listIterator(); it.hasNext(); ) {
 							localMote = (Mote)it.next();
-							sender.add(localMote.getMoteId(), (int)Constants.SET_PERIOD_REQUEST, 
+							sender.add(localMote.getMoteId(), (int)Constants.SET_PERIOD_REQUEST,
 								(int)source.getValue(), "Set PeriodSampling = "+(int)source.getValue()+"ms [Id="+localMote.getMoteId()+"]");
 							localMote.setSamplingPeriod((int)source.getValue());
 						}
@@ -447,8 +472,8 @@ class RequestPanel extends JPanel implements ActionListener, ChangeListener, Ite
 					displayMoteState();
 				} else if(source == thresholdSlider) {
 					if (broadcastRequest) {
-						sender.add(MoteIF.TOS_BCAST_ADDR, (int)Constants.SET_THRESHOLD_REQUEST, 
-							Util.thresholdToInt((int)source.getValue()), 
+						sender.add(MoteIF.TOS_BCAST_ADDR, (int)Constants.SET_THRESHOLD_REQUEST,
+							Util.thresholdToInt((int)source.getValue()),
 							"Set Threshold = "+(int)source.getValue()+"% [Id=broadcast]");
 						for (Iterator it=moteDatabase.getIterator(); it.hasNext(); ) {
 							localMote = (Mote)it.next();
@@ -457,8 +482,8 @@ class RequestPanel extends JPanel implements ActionListener, ChangeListener, Ite
 					} else {
 						for (Iterator it=(Iterator)selectedMotesList.listIterator(); it.hasNext(); ) {
 							localMote = (Mote)it.next();
-							sender.add(localMote.getMoteId(), (int)Constants.SET_THRESHOLD_REQUEST, 
-								Util.thresholdToInt((int)source.getValue()), 
+							sender.add(localMote.getMoteId(), (int)Constants.SET_THRESHOLD_REQUEST,
+								Util.thresholdToInt((int)source.getValue()),
 								"Set Threshold = "+(int)source.getValue()+"% [Id="+localMote.getMoteId()+"]");
 							localMote.setThreshold((int)source.getValue());
 						}
@@ -468,14 +493,14 @@ class RequestPanel extends JPanel implements ActionListener, ChangeListener, Ite
 	        }
 		}
     }
-	
+
 	/*
 		Function used to display the state of the current
 		mote selected. If the checkbox for broadcast is checked,
 		all the buttons are enabled. If more than one mote is selected,
 		all the buttons are enabled.
 	*/
-	
+
 	public void displayMoteState() {
 		if (broadcastRequest || selectedMotesList.size() > 1) {
 			if (broadcastRequest)
@@ -487,27 +512,27 @@ class RequestPanel extends JPanel implements ActionListener, ChangeListener, Ite
 			autoModeButton.setEnabled(true);
 			wakeUpButton.setEnabled(true);
 			sleepButton.setEnabled(true);
-			
+
 			sleepSlider.removeChangeListener(this);
 			sleepSlider.setValue(Util.dutyCycleToPercent(Constants.DEFAULT_SLEEP_DUTY_CYCLE));
 			sleepSlider.setEnabled(true);
 			sleepSlider.addChangeListener(this);
-			
+
 			awakeSlider.removeChangeListener(this);
 			awakeSlider.setValue(Util.dutyCycleToPercent(Constants.DEFAULT_AWAKE_DUTY_CYCLE));
 			awakeSlider.setEnabled(true);
 			awakeSlider.addChangeListener(this);
-			
+
 			periodSlider.removeChangeListener(this);
 			periodSlider.setValue(Constants.DEFAULT_SAMPLING_PERIOD);
 			periodSlider.setEnabled(true);
 			periodSlider.addChangeListener(this);
-			
+
 			thresholdSlider.removeChangeListener(this);
 			thresholdSlider.setValue(Util.thresholdToPercent(Constants.DEFAULT_THRESHOLD));
 			thresholdSlider.setEnabled(true);
 			thresholdSlider.addChangeListener(this);
-			
+
 			readingButton.setEnabled(true);
 			readingLabel.setText("reading : ");
 		} else {
@@ -517,13 +542,13 @@ class RequestPanel extends JPanel implements ActionListener, ChangeListener, Ite
 				displayMoteState(null);
 		}
 	}
-	
+
 	/*
-		Function used to display the state of the current 
+		Function used to display the state of the current
 		mote selected. If mote equals null, the buttons are
 		disabled.
 	*/
-	
+
 	public void displayMoteState(Mote mote) {
 		if(mote != null) {
 			moteLabel.setText("Mote " + mote.getMoteId() + " selected");
@@ -546,28 +571,28 @@ class RequestPanel extends JPanel implements ActionListener, ChangeListener, Ite
 			sleepSlider.setValue(mote.getSleepDutyCycle());
 			sleepSlider.setEnabled(true);
 			sleepSlider.addChangeListener(this);
-			
+
 			awakeSlider.removeChangeListener(this);
 			awakeSlider.setValue(mote.getAwakeDutyCycle());
 			awakeSlider.setEnabled(true);
 			awakeSlider.addChangeListener(this);
-			
+
 			periodSlider.removeChangeListener(this);
 			periodSlider.setValue(mote.getSamplingPeriod());
 			periodSlider.setEnabled(true);
 			periodSlider.addChangeListener(this);
-			
+
 			thresholdSlider.removeChangeListener(this);
 			thresholdSlider.setValue(mote.getThreshold());
 			thresholdSlider.setEnabled(true);
 			thresholdSlider.addChangeListener(this);
-			
+
 			if (!mote.isInModeAuto())
 				readingButton.setEnabled(true);
 			else
 				readingButton.setEnabled(false);
 			readingLabel.setText("reading : " + mote.getReading());
-			
+
 		} else {
 			moteLabel.setText("No specific mote selected");
 			//batteryLabel.setText("Battery : 0%");
@@ -575,54 +600,54 @@ class RequestPanel extends JPanel implements ActionListener, ChangeListener, Ite
 			queryModeButton.setEnabled(false);
 			sleepButton.setEnabled(false);
 			wakeUpButton.setEnabled(false);
-			
+
 			sleepSlider.removeChangeListener(this);
 			sleepSlider.setValue(0);
 			sleepSlider.setEnabled(false);
 			sleepSlider.addChangeListener(this);
-			
+
 			awakeSlider.removeChangeListener(this);
 			awakeSlider.setEnabled(false);
 			awakeSlider.setValue(0);
 			awakeSlider.addChangeListener(this);
-			
+
 			periodSlider.removeChangeListener(this);
 			periodSlider.setEnabled(false);
 			periodSlider.setValue(0);
 			periodSlider.addChangeListener(this);
-			
+
 			thresholdSlider.removeChangeListener(this);
 			thresholdSlider.setEnabled(false);
 			thresholdSlider.setValue(0);
 			thresholdSlider.addChangeListener(this);
-			
+
 			readingButton.setEnabled(false);
 			readingLabel.setText("no reading");
 		}
 	}
-	
+
 	/*
 		The functions below are used to add or remove a mote to the
 		list of selected motes.
 	*/
-	
+
 	public void selectMote(Mote mote) {
 		if (mote!=null)
 			selectedMotesList.add(mote);
 		displayMoteState();
 	}
-	
+
 	public void unselectMote(Mote mote) {
 		if (mote!=null)
 			selectedMotesList.remove(mote);
 		displayMoteState();
 	}
-	
+
 	public void unselectMotes() {
 		selectedMotesList.clear();
 		displayMoteState();
 	}
-	
+
 	public boolean moteIsSelected(Mote mote) {
 		//if (broadcastRequest)
 		//	return false;
@@ -631,25 +656,25 @@ class RequestPanel extends JPanel implements ActionListener, ChangeListener, Ite
 		else
 			return false;
 	}
-	
+
 	public Iterator getSelectedMotesListIterator() {
 		return selectedMotesList.listIterator(0);
 	}
-	
+
 	public int getNumberOfSelectedMotes() {
 		return selectedMotesList.size();
 	}
-	
+
 	/*
 		Function called by any process or thread which has updated
 		a mote. The RequestPanel checks if the mote was displayed
 		and if so, its parameters are updated.
 	*/
-	
+
 	public void moteUpdatedEvent(Mote mote) {
-		if (moteIsSelected(mote) && !broadcastRequest) 
+		if (moteIsSelected(mote) && !broadcastRequest)
 			displayMoteState();
 	}
 }
 
-	
+

@@ -46,7 +46,7 @@ import java.util.Date;
 public class Mote {
 	private int moteId;
 	private int x, y;
-	private int count, reading;
+	private int count, reading, hops;
 	private int parentId;
 	private int quality; 		// quality of the route to its parent
 	private long lastTimeSeen; 	// last time a message was emitted by the mote
@@ -63,6 +63,7 @@ public class Mote {
 	public Mote(int moteId, int count, int reading, 
 				int parentId, int quality, long lastTimeSeen) {
 		this.moteId = moteId;
+		this.hops = hops;
 		this.x = (int)(Math.random() * Util.X_MAX);
 		this.y = (int)(Math.random() * Util.Y_MAX);
 		this.count = count;
@@ -89,6 +90,7 @@ public class Mote {
 			return false;
 	}
 	public int getMoteId() { return moteId;}
+
 	
 	public int getX() { return x;}
 	public int getY() { return y;}
@@ -99,7 +101,8 @@ public class Mote {
 	public int getCount() { return count;}
 	public void setReading(int reading) { this.reading = reading;}
 	public int getReading() { return reading;}
-	
+	public void setHops(int hops) { this.hops = hops;}
+	public int getHops() { return hops;}
 	public void setParentId(int parentId) { this.parentId = parentId;}
 	public int getParentId() { return parentId;}
 	public void setQuality(int quality) { this.quality = quality;}

@@ -1,0 +1,19 @@
+TestUartStreamAppC:
+
+1500 bytes in ROM
+ 200 bytes in RAM
+
+section          size         addr
+.reset         0x2000   0x80000000
+.text           0x3b8   0x80002000
+.rodata          0x10   0x800023b8
+.ealign          0x38   0x800023c8
+.exception      0x120   0x80002400
+.interrupt       0xf4   0x80002520
+.bss             0xc8          0x0
+.comment         0x1e          0x0
+.debug_frame     0xdc          0x0
+Total          0x27d6
+
+MCU average current consumption while idle (internal clock @115.2KHz, external clock no enabled, sleep modes not implemented): 0.722 mA
+Startup time (until event Boot.booted called): 220 ms

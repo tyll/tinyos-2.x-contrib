@@ -1,13 +1,22 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
+
+  
   <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+
+  
   <title>Pytos Screenshots</title>
 </head>
+
+
 <body>
+
 <h2> Basic Pytos </h2>
 
+
 <p><span style="font-weight: bold;">Note that these images are from the TinyOS 1.x version, although the types of commands and responses are largely the same.</span></p>
+
 <p>You open a basic PyTOS shell by running the PytosShell.py script, as
 shown. You are then given the "app" variable which, when printed as
 shown below, tells you how many enums, types, and messages formats have
@@ -16,12 +25,17 @@ or RAM symbols available. You can print a particular module, as shown
 below, to see what rpc functions or variables it has. This module
 (RamSymbolsM) only has two rpc functions.
 </p>
+
 <p><a href="http://nest.cs.berkeley.edu/nestfe/index.php/Image:PytosBasic.jpg" class="image" title="Image:pytosBasic.jpg"><img style="border: 0px solid ; width: 1280px; height: 1024px;" src="PytosBasic.jpg" alt="Image:pytosBasic.jpg" longdesc="/nestfe/index.php/Image:PytosBasic.jpg"></a>
 </p>
 
-<div class="editsection" style="float: right; margin-left: 5px;">[<a href="http://nest.cs.berkeley.edu/nestfe/index.php?title=Pytos_Screenshots&amp;action=edit&amp;section=2" title="Edit section: Enums, Types, and Message Formats">edit</a>]</div>
+
+<div class="editsection" style="float: right; margin-left: 5px;"><br>
+</div>
+
 <a name="Enums.2C_Types.2C_and_Message_Formats"></a>
 <h2> Enums, Types, and Message Formats </h2>
+
 
 <p>From the app variable, you can view the enums, message formats and
 AM types, or any arbitrary type declarations (such as TOS_Msg, which is
@@ -30,12 +44,17 @@ print a particular enum (drainConsts), then print a summary of all
 messages, then print a particular message format (DrainMsg), then print
 a particular type declaration (TOS_Msg).
 </p>
+
 <p><a href="http://nest.cs.berkeley.edu/nestfe/index.php/Image:PytosStage1.jpg" class="image" title="Image:pytosStage1.jpg"><img style="border: 0px solid ; width: 1280px; height: 1024px;" src="PytosStage1.jpg" alt="Image:pytosStage1.jpg" longdesc="/nestfe/index.php/Image:PytosStage1.jpg"></a>
 </p>
 
-<div class="editsection" style="float: right; margin-left: 5px;">[<a href="http://nest.cs.berkeley.edu/nestfe/index.php?title=Pytos_Screenshots&amp;action=edit&amp;section=3" title="Edit section: Rpc and Ram Symbols">edit</a>]</div>
+
+<div class="editsection" style="float: right; margin-left: 5px;"><br>
+</div>
+
 <a name="Rpc_and_Ram_Symbols"></a>
 <h2> Rpc and Ram Symbols </h2>
+
 
 <p>From a particular module name, you can print all available RPC
 functions or available RAM symbols. You can peek/poke (ie. get/set) the
@@ -46,15 +65,22 @@ StdControl rpc-able, just for this example, by adding the "@rpc()"
 symbol after the interface declaration in OscilloscopM. the start/stop
 functions don't take any parameters.)
 </p>
+
 <p><a href="http://nest.cs.berkeley.edu/nestfe/index.php/Image:PytosRpcRamSymb.jpg" class="image" title="Image:pytosRpcRamSymb.jpg"><img style="border: 0px solid ; width: 1280px; height: 1024px;" src="PytosRpcRamSymb.jpg" alt="Image:pytosRpcRamSymb.jpg" longdesc="/nestfe/index.php/Image:PytosRpcRamSymb.jpg"></a>
 </p>
+
 <p><br>
+
 
 </p>
 
-<div class="editsection" style="float: right; margin-left: 5px;">[<a href="http://nest.cs.berkeley.edu/nestfe/index.php?title=Pytos_Screenshots&amp;action=edit&amp;section=4" title="Edit section: Listen">edit</a>]</div>
+
+<div class="editsection" style="float: right; margin-left: 5px;"><br>
+</div>
+
 <a name="Listen"></a>
 <h2> Listen </h2>
+
 
 <p>Because PyTOS has complete information about the NesC application,
 it can automatically parse data packets from whatever application is
@@ -63,7 +89,9 @@ we are running in the OscilloscopeRF directory (which we compiled with
 Pytos). The Listen.py tool has a number of different verbosity levels,
 and can show higher-level packet headers if desired.
 </p>
+
 <p><a href="http://nest.cs.berkeley.edu/nestfe/index.php/Image:PytosListen.jpg" class="image" title="Image:pytosListen.jpg"><img style="border: 0px solid ; width: 1280px; height: 1024px;" src="PytosListen.jpg" alt="Image:pytosListen.jpg" longdesc="/nestfe/index.php/Image:PytosListen.jpg"></a>
 </p>
+
 </body>
 </html>

@@ -3,11 +3,15 @@
 <head>
 
 
+
+  
   
   
   <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
 
 
+
+  
   
   
   <title>Pytos Development Environment</title>
@@ -17,13 +21,12 @@
 <body>
 
 
-<h2><br>
 
 
-</h2>
 
 
 <h2><a class="mozTocH2" name="mozTocId501178"></a> Introduction </h2>
+
 
 
 
@@ -40,14 +43,19 @@ nesC code. Check out the <a href="Pytos%20Screenshots.html" title="Pytos Screens
 
 
 
+
 For the TinyOS 1.x version of this set of pages, please visit <a href="http://nest.cs.berkeley.edu/nestfe/index.php/Pytos_Development_Environment">here</a>.<br>
 
+
 <br>
+
 
 <div class="editsection" style="float: right; margin-left: 5px;"><br>
 
 
+
 </div>
+
 
 
 <a name="Getting_Started_Quickly"></a>
@@ -55,16 +63,21 @@ For the TinyOS 1.x version of this set of pages, please visit <a href="http://ne
 
 
 
+
 <p>1. First, install the python environment for your&nbsp;<a href="Pytos%20Installation%20Instructions.html" class="external text" title="http://today.cs.berkeley.edu/nestfe/index.php/Pytos_Installation_Instructions" rel="nofollow">platform</a>.</p>
+
 
 
 <p>2. Second, install jpype (soon to become unnecessary).</p>
 
 
+
 <p>3. Next, add the following line to your .bashrc or other script in order to properly set up paths for pytos:</p>
 
 
+
 <pre>source $TOSROOT/../tinyos-2.x-contrib/marionette/support/sdk/python/tinyos/marionette/util/pytosProfile</pre>
+
 
 
 <p>4.  Then, you must edit the compiler include path and invoke the <span style="font-weight: bold;">marionette.extra</span>
@@ -75,7 +88,9 @@ each application's Makefile individually).
 
 
 
+
 <pre>GOALS+=marionette<br>CFLAGS += -I$(TOSROOT)/../tinyos-2.x-contrib/marionette/tos/lib/Rpc<br>CFLAGS += -I$(TOSROOT)/../tinyos-2.x-contrib/marionette/tos/lib/RamSymbols<br><br></pre>
+
 
 
 
@@ -84,7 +99,9 @@ each application's Makefile individually).
 
 
 
+
 <pre>components RpcC, RamSymbolsM;<br>[ApplicationC].SplitControl -&gt; RpcC;<br></pre>
+
 
 
 
@@ -95,12 +112,15 @@ instructions at&nbsp;<a href="Nesc%20Declarations.html" class="external text" ti
 </p>
 
 
+
 <p>6. Once you have completed this setup, you can simply run a command similar to the one below: 
 </p>
 
 
 
+
 <pre> PytosShell.py telosb sf@localhost:9001<br></pre>
+
 
 
 
@@ -112,34 +132,43 @@ also call help() on any object. Try some of the following: </p>
 
 
 
+
 <ul>
+
 
 
   <li>type <b>app.types</b>, <b>app.enums</b>, or <b>app.msgs</b> to see more detail.  
   </li>
 
 
+
   <li>type <b>app.ModuleName</b> to see variables and functions for a particular nesc module, eg. app.DrainM
   </li>
+
 
 
   <li>set a module's variables by calling <b>app.module.variable.peek()</b> or <b>app.module.variable.poke(value)</b>.  
   </li>
 
 
+
   <li>The "dereference=True" parameter can be used to dereference a variable if it is a pointer, eg <b>app.mod.var.poke(value,dereference=True)</b>
   </li>
+
 
 
   <li>The "arrayIndex" parameter can be used to index a variable if it is an array, eg <b>app.mod.var.poke(value,arrayIndex=2)</b>
   </li>
 
 
+
   <li>You can call a function on a module eg <b>app.mod.func(val1, val2, etc)</b>
   </li>
 
 
+
 </ul>
+
 
 
 
@@ -148,14 +177,18 @@ also call help() on any object. Try some of the following: </p>
 
 
 
+
 <div class="editsection" style="float: right; margin-left: 5px;"><br>
+
 
 
 </div>
 
 
+
 <a name="Configuring_NescApp_Parameters"></a>
 <h2><a class="mozTocH2" name="mozTocId898497"></a>Configuring NescApp Parameters</h2>
+
 
 
 
@@ -167,7 +200,9 @@ takes four parameters:
 
 
 
+
 <ol>
+
 
 
   <li> The build directory, e.g. "build/telos". NescApp will look in
@@ -175,6 +210,7 @@ the build directory for the nescDecls.xml file, which is created at
 compile time (as long as you make nescDecls one of the GOALS in your
 makefile).
   </li>
+
 
 
   <li> Your MOTECOM string, e.g. sf@localhost:9001 or
@@ -186,6 +222,7 @@ testing.
   </li>
 
 
+
   <li> The tosbase and localCommmOnly parameters, which indicate
 what kind of network you have. tosbase should be true if you have a
 TosBase node plugged into your machine. localCommOnly should be true if
@@ -195,30 +232,38 @@ there are four combinations of them:
   </li>
 
 
+
 </ol>
+
 
 
 
 <ul>
 
 
+
   <li>  localCommOnly=T, tosbase=T:  all nodes are within one radio hop, and a TOSBase is plugged in
   </li>
+
 
 
   <li>  localCommOnly=T, tosbase=F:  all nodes are plugged directly into a serial port, e.g. you have a wired testbed
   </li>
 
 
+
   <li>  localCommOnly=F, tosbase=T:  some nodes are multiple hops away, and a TOSBase is plugged in
   </li>
+
 
 
   <li>  localCommOnly=F, tosbase=F:  some nodes are multiple hops away, and the root of the tree is plugged into a serial port.
   </li>
 
 
+
 </ul>
+
 
 
 
@@ -226,18 +271,23 @@ there are four combinations of them:
 
 
 
+
 </p>
+
 
 
 
 <div class="editsection" style="float: right; margin-left: 5px;"><br>
 
 
+
 </div>
+
 
 
 <a name="Importing_nesC_Applications_into_Python"></a>
 <h2><a class="mozTocH2" name="mozTocId439195"></a>Importing nesC Applications into Python</h2>
+
 
 
 
@@ -250,26 +300,33 @@ at compile time. This can be
 
 
 
+
 <ul>
+
 
 
   <li> an absolute path to the correct build directory (eg "/home/kamin/tinyos-2.x/apps/Oscilloscope/build/telosb")
   </li>
 
 
+
   <li> a relative path to the correct build directory  (eg "../apps/Oscilloscope/build/telosb")
   </li>
+
 
 
   <li> either of the above with the actual filename appended (eg. "..../nescDecls.xml")
   </li>
 
 
+
   <li> if you are in the application directory, just the name of the platform (e.g "pc" or "telosb")
   </li>
 
 
+
 </ul>
+
 
 
 
@@ -278,7 +335,9 @@ at compile time. This can be
 
 
 
+
 <pre>$ cd /opt/tinyos-2.x-contrib/marionette/apps/tests/TestMarionette/<br>kamin@kamin-mobile:/opt/tinyos-2.x-contrib/apps/tests/TestMarionette/<br>$ python<br>Python 2.4.1 (#2, May  5 2005, 11:32:06)<br>[GCC 3.3.5 (Debian 1:3.3.5-12)] on linux2<br>Type "help", "copyright", "credits" or "license" for more information.<br>&gt;&gt;&gt; import pytos.util.NescApp as NescApp<br>&gt;&gt;&gt; app = NescApp.NescApp('telosb', port='sf@localhost:9001')<br></pre>
+
 
 
 
@@ -287,7 +346,9 @@ at compile time. This can be
 
 
 
+
 <pre>&gt;&gt;&gt; print app<br><br>               Enums : 296<br>               Types : 93<br>            Messages : 2<br>       Rpc functions : 30<br>         Ram symbols : 28<br>             Modules : HdlcTranslateC<br>                       McuSleepC<br>                       RamSymbolsM<br>                       RpcM<br>                       SchedulerBasicP<br>                       SerialP<br>                       TestMarionetteC<br></pre>
+
 
 
 
@@ -296,7 +357,9 @@ at compile time. This can be
 
 
 
+
 <pre>&gt;&gt;&gt; app.enums<br>&gt;&gt;&gt; app.types<br>&gt;&gt;&gt; app.msgs<br>&gt;&gt;&gt; app.rpc<br>&gt;&gt;&gt; app.ramSymbols<br>&gt;&gt;&gt; app.DrainM<br>&gt;&gt;&gt; app.RamSymbolsM<br>&gt;&gt;&gt; app.TestRpcM<br></pre>
+
 
 
 
@@ -307,18 +370,23 @@ indicate that your computer is not connected to a TOSBase. For example:
 
 
 
+
 <pre>&gt;&gt;&gt; app = NescApp.NescApp('telosb', port='sf@localhost:9001', tosbase=False)<br></pre>
+
 
 
 
 <div class="editsection" style="float: right; margin-left: 5px;"><br>
 
 
+
 </div>
+
 
 
 <a name="Variables_and_Registry_Attributes"></a>
 <h3><a class="mozTocH3" name="mozTocId319234"></a> Variables and Registry Attributes </h3>
+
 
 
 
@@ -329,8 +397,10 @@ through module shortcuts, eg. app.moduleName.variableName
 </p>
 
 
+
 <p>You can get and set the values of module variables through the <b>poke</b> and <b>peek</b> commands.  If the variable is an array, it can be indexed into with the <i>arrayIndex</i> option.  If the variable is a pointer, it can be dereferenced with the <i>dereference</i> option.  Arrays of pointers can be indexed and then dereferenced.  For example:
 </p>
+
 
 
 <p>NOTE: Poke is a fairly dangerous operation because it is
@@ -339,7 +409,9 @@ sort of state-checking. </p>
 
 
 
+
 <pre>&gt;&gt;&gt; app.ramSymbols<br>&lt;class 'pytos.tools.RamSymbols.RamSymbols'&gt; object at 0xb1a7074cL:<br><br>             uint8_t : HdlcTranslateC.m_data<br>             uint8_t : HdlcTranslateC.txTemp<br>                bool : McuSleepC.dirty<br>         mcu_power_t : McuSleepC.powerState<br>         ramSymbol_t : RamSymbolsM.symbol<br>            uint16_t : RpcM.cmdStoreLength<br>                bool : RpcM.processingCommand<br>                bool : RpcM.sendingResponse<br>             uint8_t : SchedulerBasicP.m_head<br>          uint8_t[8] : SchedulerBasicP.m_next<br>             uint8_t : SchedulerBasicP.m_tail<br>                bool : SerialP.offPending<br>             uint8_t : SerialP.rxByteCnt<br>            uint16_t : SerialP.rxCRC<br>             uint8_t : SerialP.rxProto<br>             uint8_t : SerialP.rxSeqno<br>             uint8_t : SerialP.rxState<br>             uint8_t : SerialP.txByteCnt<br>            uint16_t : SerialP.txCRC<br>             uint8_t : SerialP.txIndex<br>             uint8_t : SerialP.txPending<br>             uint8_t : SerialP.txProto<br>             uint8_t : SerialP.txSeqno<br>             uint8_t : SerialP.txState<br>       RpcCommandMsg : TestMarionetteC.m_rpcCommandMsg<br>             uint8_t : TestMarionetteC.test<br>         uint8_t[10] : TestMarionetteC.testArray<br>            uint8_t* : TestMarionetteC.testPtr<br></pre>
+
 
 
 
@@ -347,16 +419,21 @@ sort of state-checking. </p>
 
 
 
+
 <br>
 
+
 <div class="editsection" style="float: right; margin-left: 5px;"><br>
+
 
 
 </div>
 
 
+
 <a name="RPC_Functions"></a>
 <h3><a class="mozTocH3" name="mozTocId117564"></a> RPC Functions </h3>
+
 
 
 
@@ -368,6 +445,7 @@ function in your nesc code, see <a href="Rpc.html" title="Rpc">Rpc</a>.
 </p>
 
 
+
 <p>Once the rpc object is imported, it provides all rpc-able
 functions available as methods. Modules or interfaces with rpc
 functions can also be gotten as member fields. By default, rpc
@@ -377,8 +455,10 @@ the command is blocking.
 </p>
 
 
+
 <p>To test rpc, you can do the following:
 </p>
+
 
 
 
@@ -386,18 +466,23 @@ the command is blocking.
 
 
 
+
 <br>
+
 
 
 
 <div class="editsection" style="float: right; margin-left: 5px;"><br>
 
 
+
 </div>
+
 
 
 <a name="Function_Parameters"></a>
 <h4><a class="mozTocH4" name="mozTocId719555"></a> Function Parameters </h4>
+
 
 
 
@@ -407,9 +492,11 @@ also be set as <i>fields</i> on the rpc function.
 </p>
 
 
+
 <p>In the following example, we send a rpc command to set the value
 of a cached value. We send it to the BROADCAST address and have it return
 to the local address. </p>
+
 
 
 <p>First, pass the function parameter "data" as a call-time
@@ -418,7 +505,9 @@ parameter.
 
 
 
+
 <pre><span style="font-weight: bold;">&gt;&gt;&gt; data = interface.testCommand7.data FIX THIS TO BE DEEPCOPY?</span><br style="font-weight: bold;"><span style="font-weight: bold;">&gt;&gt;&gt; data.transactionID = 101</span><br style="font-weight: bold;"><span style="font-weight: bold;">&gt;&gt;&gt; data.commandID = 250</span><br style="font-weight: bold;"><span style="font-weight: bold;">&gt;&gt;&gt; r = interface.testCommand7(data, address=app.enums.AM_BROADCAST_ADDR, returnAddress=app.enums.TOS_AM_ADDRESS)</span><br style="font-weight: bold;"><span style="font-weight: bold;">&gt;&gt;&gt; print r[0]</span><br style="font-weight: bold;"><span style="font-weight: bold;">TosMsg(am=7) TestMarionetteC.TestInterface1.testCommand7,  nodeID=0:</span><br style="font-weight: bold;"><span style="font-weight: bold;">                    void value  :</span><br style="font-weight: bold;"><br style="font-weight: bold;"><span style="font-weight: bold;">&gt;&gt;&gt; interface.testCommand7.data</span><br style="font-weight: bold;"><span style="font-weight: bold;">&lt;class 'pytos.util.nescDecls.nescStruct'&gt; object at 0xb1877decL:</span><br style="font-weight: bold;"><br style="font-weight: bold;"><span style="font-weight: bold;">        RpcCommandMsg:</span><br style="font-weight: bold;"><span style="font-weight: bold;">         uint8_t transactionID  : 101</span><br style="font-weight: bold;"><span style="font-weight: bold;">             uint8_t commandID  : 250</span><br style="font-weight: bold;"><span style="font-weight: bold;">              uint16_t address  : 0</span><br style="font-weight: bold;"><span style="font-weight: bold;">        uint16_t returnAddress  : 0</span><br style="font-weight: bold;"><span style="font-weight: bold;">       uint8_t responseDesired  : 0</span><br style="font-weight: bold;"><span style="font-weight: bold;">            uint8_t dataLength  : 0</span><br style="font-weight: bold;"><span style="font-weight: bold;">               uint8_t[0] data  :][</span><br></pre>
+
 
 
 
@@ -431,7 +520,9 @@ overridden by new call-time parameters:
 
 
 
+
 <pre>&gt;&gt;&gt; interface.testCommand7.data.transactionID = 102<br>&gt;&gt;&gt; interface.testCommand7.data.commandID = 251<br>&gt;&gt;&gt; r = interface.testCommand7(address=app.enums.AM_BROADCAST_ADDR, returnAddress=app.enums.TOS_AM_ADDRESS)<br>&gt;&gt;&gt; print r[0]<br>TosMsg(am=7) TestMarionetteC.TestInterface1.testCommand7,  nodeID=0:<br>                    void value  :<br><br>&gt;&gt;&gt; interface.testCommand7.data<br>&lt;class 'pytos.util.nescDecls.nescStruct'&gt; object at 0xb1877decL:<br><br>        RpcCommandMsg:<br>         uint8_t transactionID  : 102<br>             uint8_t commandID  : 251<br>              uint16_t address  : 0<br>        uint16_t returnAddress  : 0<br>       uint8_t responseDesired  : 0<br>            uint8_t dataLength  : 0<br>               uint8_t[0] data  :][<br></pre>
+
 
 
 
@@ -442,11 +533,14 @@ it is the same value we just sent:
 
 
 
+
 <pre>&gt;&gt;&gt; r = interface.testCommand8(address=app.enums.AM_BROADCAST_ADDR, returnAddress=app.enums.TOS_AM_ADDRESS)<br>&gt;&gt;&gt; print r[0]<br>TosMsg(am=8) TestMarionetteC.TestInterface1.testCommand8,  nodeID=0:<br>         uint8_t transactionID  : 102<br>             uint8_t commandID  : 251<br>              uint16_t address  : 0<br>        uint16_t returnAddress  : 0<br>       uint8_t responseDesired  : 0<br>            uint8_t dataLength  : 0<br>               uint8_t[0] data  :][<br></pre>
 
 
 
+
 <p><br>
+
 
 
 HINT: rpc functions are subclasses of TosMsg objects, so you can
@@ -458,14 +552,18 @@ rpc function.
 
 
 
+
 <div class="editsection" style="float: right; margin-left: 5px;"><br>
+
 
 
 </div>
 
 
+
 <a name="Call_Parameters"></a>
 <h4><a class="mozTocH4" name="mozTocId810175"></a> Call Parameters </h4>
+
 
 
 
@@ -474,30 +572,38 @@ rpc function.
 
 
 
+
 <ul>
+
 
 
   <li> the <b>address</b> is the default address that the rpc commands will be addressed to (e.g app.enums.AM_BROADCAST_ADDR)
   </li>
 
 
+
   <li> the <b>returnAddress</b> is the default address that the rpc response will be address to (eg. app.enums.TOS_AM_ADDRESS)
   </li>
+
 
 
   <li> <b>blocking</b> indicates whether or not the functions should block and return the responses
   </li>
 
 
+
   <li> <b>timeout</b> indicates how long the function should block
   </li>
+
 
 
   <li> <b>responseDesired</b> indicates whether or not the node should send a rpc response
   </li>
 
 
+
 </ul>
+
 
 
 
@@ -506,26 +612,33 @@ rpc function.
 
 
 
+
 <ol>
+
 
 
   <li> as named parameters when the function is called (it applies only to this call)
   </li>
 
 
+
   <li> by setting the value on the rpc function (it applies only to this function)
   </li>
+
 
 
   <li> by setting the value on the rpc object (it applies to all functions in that object)
   </li>
 
 
+
   <li> as a constructor argument to the Rpc object
   </li>
 
 
+
 </ol>
+
 
 
 
@@ -537,18 +650,23 @@ below:
 
 
 
+
 <pre>&gt;&gt;&gt; rpc.TestMarionetteC.testCommand1(responseDesired = False)<br>&gt;&gt;&gt; rpc.TestMarionetteC.testCommand1.responseDesired = False<br>&gt;&gt;&gt; rpc.responseDesired = False<br>&gt;&gt;&gt; rpc = Rpc.Rpc(app, 'telosb', comm, drain, responseDesired=False)<br></pre>
+
 
 
 
 <div class="editsection" style="float: right; margin-left: 5px;"><br>
 
 
+
 </div>
+
 
 
 <a name="Enums"></a>
 <h3><a class="mozTocH3" name="mozTocId505550"></a> Enums </h3>
+
 
 
 
@@ -557,23 +675,30 @@ below:
 
 
 
+
 <pre>&gt;&gt;&gt; addr = app.enums.AM_BROADCAST_ADDR<br>&gt;&gt;&gt; addr<br>65535<br></pre>
+
 
 
 
 <p>If you name your enum in the nescFile, you can access those enums as
 a group.</p>
 
+
 <br>
 
+
 <div class="editsection" style="float: right; margin-left: 5px;"><br>
+
 
 
 </div>
 
 
+
 <a name="The_Dynamic_Typing_System"></a>
 <h3><a class="mozTocH3" name="mozTocId927333"></a> The Dynamic Typing System </h3>
+
 
 
 
@@ -583,26 +708,33 @@ the types in nesC applications. There are four kinds of types:
 
 
 
+
 <ul>
+
 
 
   <li>nescType: basic types like uint8_t, char, etc
   </li>
 
 
+
   <li>nescArray: arrays of any of the four types
   </li>
+
 
 
   <li>nescPointer: pointers to any of the four types
   </li>
 
 
+
   <li>nescStruct: structs of any of the four types
   </li>
 
 
+
 </ul>
+
 
 
 
@@ -612,7 +744,9 @@ A python variable can be made a certain nesC type simply by assigning a type to 
 
 
 
+
 <pre>&gt;&gt;&gt; num = app.types.uint8_t<br>&gt;&gt;&gt; msg = app.types.TOS_Msg<br></pre>
+
 
 
 
@@ -627,6 +761,7 @@ that failed to import, call <i>app.types.printSkippedTypes()</i>.
 </p>
 
 
+
 <p><font color="red">Important Note:</font> Objects in python are
 passed by reference, not by value. If you pass a nesc-typed object and
 the value of the new reference changes, the value of the original
@@ -635,6 +770,7 @@ function to create a new copy of the variable. The nescApp object
 always returns a deepcopy, ie a new instance for all types and
 messages.
 </p>
+
 
 
 <p>The user can use the typing system to create new nesC types in
@@ -647,14 +783,18 @@ appropriate for the type. <b>If you are going to only use the types directly imp
 
 
 
+
 <div class="editsection" style="float: right; margin-left: 5px;"><br>
+
 
 
 </div>
 
 
+
 <a name="nescType"></a>
 <h4><a class="mozTocH4" name="mozTocId696168"></a> nescType </h4>
+
 
 
 
@@ -665,18 +805,23 @@ an error when you assign a value they cannot take:
 
 
 
+
 <pre>&gt;&gt;&gt; variable = app.types.uint8_t<br>&gt;&gt;&gt; variable.nescType<br>u'uint8_t'<br>&gt;&gt;&gt; print variable<br>0<br>&gt;&gt;&gt; variable.value = 255<br>&gt;&gt;&gt; print variable<br>255<br>&gt;&gt;&gt; variable.getBytes()<br>'\xff'<br>&gt;&gt;&gt; variable.setBytes('\x0f')<br>''<br>&gt;&gt;&gt; print variable<br>15<br>&gt;&gt;&gt; variable.value = 256<br>Traceback (most recent call last):<br>  File "&lt;stdin&gt;", line 1, in &lt;module&gt;<br>  File "/opt/tinyos-2.x-contrib/marionette/support/sdk/python/tinyos/marionette/pytos/util/nescDecls.py", line 105, in __setattr__<br>    pack(self._conversionString, value)<br>  File "/usr/lib/python2.5/struct.py", line 63, in pack<br>    return o.pack(*args)<br>struct.error: ubyte format requires 0 &lt;= number &lt;= 255<br></pre>
+
 
 
 
 <div class="editsection" style="float: right; margin-left: 5px;"><br>
 
 
+
 </div>
+
 
 
 <a name="nescArray"></a>
 <h4><a class="mozTocH4" name="mozTocId788070"></a> nescArray </h4>
+
 
 
 
@@ -685,18 +830,23 @@ an error when you assign a value they cannot take:
 
 
 
+
 <pre>&gt;&gt;&gt; array = pytos.util.nescDecls.nescArray(10, variable)<br>&gt;&gt;&gt; array<br>nescArray of type uint8_t[10]:<br> 0: 15<br> 1: 15<br> 2: 15<br> 3: 15<br> 4: 15<br> 5: 15<br> 6: 15<br> 7: 15<br> 8: 15<br> 9: 15<br><br>&gt;&gt;&gt; array.getBytes()<br>'\x0f\x0f\x0f\x0f\x0f\x0f\x0f\x0f\x0f\x0f'<br>&gt;&gt;&gt; array[3] = 0<br>&gt;&gt;&gt; array.getBytes()<br>'\x0f\x0f\x0f\x00\x0f\x0f\x0f\x0f\x0f\x0f'<br></pre>
+
 
 
 
 <div class="editsection" style="float: right; margin-left: 5px;"><br>
 
 
+
 </div>
+
 
 
 <a name="nescPointer"></a>
 <h4><a class="mozTocH4" name="mozTocId395101"></a> nescPointer </h4>
+
 
 
 
@@ -709,7 +859,9 @@ bytes.
 
 
 
+
 <pre>&gt;&gt;&gt; pointer = pytos.util.nescDecls.nescPointer(array)<br>&gt;&gt;&gt; pointer<br>ptr-&gt; nescArray of type uint8_t[10]:<br> 0: 15<br> 1: 15<br> 2: 15<br> 3: 0<br> 4: 15<br> 5: 15<br> 6: 15<br> 7: 15<br> 8: 15<br> 9: 15 <br><br>&gt;&gt;&gt; pointer.value[1] = 101<br>&gt;&gt;&gt; pointer<br>ptr-&gt; nescArray of type uint8_t[10]:<br> 0: 15<br> 1: 101<br> 2: 15<br> 3: 0<br> 4: 15<br> 5: 15<br> 6: 15<br> 7: 15<br> 8: 15<br> 9: 15  <br><br>&gt;&gt;&gt; pointer.getBytes()<br>'\x00\x00'<br>&gt;&gt;&gt; pointer.value.getBytes()<br>'\x0fe\x0f\x00\x0f\x0f\x0f\x0f\x0f\x0f'<br>&gt;&gt;&gt; array.getBytes()<br>'\x0fe\x0f\x00\x0f\x0f\x0f\x0f\x0f\x0f'<br></pre>
+
 
 
 
@@ -720,14 +872,18 @@ reference to the array).
 
 
 
+
 <div class="editsection" style="float: right; margin-left: 5px;"><br>
+
 
 
 </div>
 
 
+
 <a name="nescStruct"></a>
 <h4><a class="mozTocH4" name="mozTocId871555"></a> nescStruct </h4>
+
 
 
 
@@ -740,27 +896,34 @@ will correctly handle these. <font color="red">However, nescStruct objects creat
 </p>
 
 
+
 <p>nescStructs can be manually constructed in two different ways:
 </p>
+
 
 
 
 <ol>
 
 
+
   <li> a name followed by a series of (name, type) tupes
   </li>
+
 
 
   <li> another struct
   </li>
 
 
+
 </ol>
 
 
 
+
 <pre>&gt;&gt;&gt; structA = pytos.util.nescDecls.nescStruct("myStruct", ("field1", variable), ("field2", array), ("field3", pointer))<br>&gt;&gt;&gt; structA<br>myStruct:<br>                uint8_t field1 &nbsp;: 15<br>            uint8_t[10] field2 &nbsp;: [15, 101, 15, 0, 15, 15, 15, 15, 15, 15]<br>           uint8_t[10]* field3 &nbsp;: ptr-&gt; [15, 101, 15, 0, 15, 15, 15, 15, 15, 15]<br><br>&gt;&gt;&gt; structA.field1 = 169<br>&gt;&gt;&gt; structA.field3.value[9] = 253<br>&gt;&gt;&gt; structA<br>myStruct:<br>                uint8_t field1 &nbsp;: 169<br>            uint8_t[10] field2 &nbsp;: [15, 101, 15, 0, 15, 15, 15, 15, 15, 253]<br>           uint8_t[10]* field3 &nbsp;: ptr-&gt; [15, 101, 15, 0, 15, 15, 15, 15, 15, 253] <br><br>&gt;&gt;&gt; structB = pytos.util.nescDecls.nescStruct(structA)<br>&gt;&gt;&gt; structB<br>myStruct:<br>                uint8_t field1 &nbsp;: 169<br>            uint8_t[10] field2 &nbsp;: [15, 101, 15, 0, 15, 15, 15, 15, 15, 253]<br>           uint8_t[10]* field3 &nbsp;: ptr-&gt; [15, 101, 15, 0, 15, 15, 15, 15, 15, 253]<br></pre>
+
 
 
 
@@ -771,14 +934,18 @@ references to the original variables.
 
 
 
+
 <div class="editsection" style="float: right; margin-left: 5px;"><br>
+
 
 
 </div>
 
 
+
 <a name="Messages"></a>
 <h3><a class="mozTocH3" name="mozTocId776819"></a> Messages </h3>
+
 
 
 
@@ -792,14 +959,18 @@ python TosMsg objects (described below) and made available through the
 
 
 
+
 <pre>&gt;&gt;&gt; print app.msgs<br><br>          211 : RpcCommandMsg<br>          212 : RpcResponseMsg<br></pre>
+
 
 
 
 <div class="editsection" style="float: right; margin-left: 5px;"><br>
 
 
+
 </div>
+
 
 
 <a name="Sending_and_Receiving_Messages"></a>
@@ -807,14 +978,18 @@ python TosMsg objects (described below) and made available through the
 
 
 
+
 <div class="editsection" style="float: right; margin-left: 5px;"><br>
+
 
 
 </div>
 
 
+
 <a name="The_Comm_Stack"></a>
 <h3><a class="mozTocH3" name="mozTocId196094"></a>The Comm Stack</h3>
+
 
 
 
@@ -825,14 +1000,18 @@ functions:
 
 
 
+
 <ul>
+
 
 
   <li> create comm stack instance to communicate w/network.  
   </li>
 
 
+
 </ul>
+
 
 
 
@@ -840,7 +1019,9 @@ functions:
 
 
 
+
 <ul>
+
 
 
   <li> "connect or "disconnect" to a serial forwarder. These commands
@@ -850,7 +1031,9 @@ python/TOS program.
   </li>
 
 
+
 </ul>
+
 
 
 
@@ -858,7 +1041,9 @@ python/TOS program.
 
 
 
+
 <ul>
+
 
 
   <li> "send", "register" or "unregister" a message "msg." "msg" can
@@ -871,31 +1056,40 @@ on all existing connections. If the desired MOTECOM specs are not
 already connected to, the functions will first connect to them. 
     
     
+    
     <ul>
+
 
 
       <li> On send, the parameter "addr" indicates what address should be put in the msg.  
       </li>
 
 
+
       <li> On "register" and "unregister", the parameter "queue" is the Comm.MessageQueue object (Described below)
       </li>
 
 
+
+    
     
     
     </ul>
 
 
 
+
   </li>
+
 
 
 </ul>
 
 
 
+
 <pre> comm.send(addr, msg)<br> comm.send(addr, msg, "sf@localhost:9002") <br> comm.send(addr, msg, "sf@localhost:9002", "sf@otherhost:9002", ... )<br><br> comm.register(msg, queue)<br> comm.register(msg, queue, "sf@localhost:9002") <br> comm.register(msg, queue, "sf@localhost:9002", "sf@otherhost:9002", ... )<br><br> comm.unregister(msg, queue)<br> comm.unregister(msg, queue, "sf@localhost:9002") <br> comm.unregister(msg, queue, "sf@localhost:9002", "sf@otherhost:9002", ... )<br></pre>
+
 
 
 
@@ -910,14 +1104,18 @@ stack opens a new socket to the running serial forwarder.
 
 
 
+
 <div class="editsection" style="float: right; margin-left: 5px;"><br>
+
 
 
 </div>
 
 
+
 <a name="The_TosMsg_Object"></a>
 <h3><a class="mozTocH3" name="mozTocId108865"></a>The TosMsg Object</h3>
+
 
 
 
@@ -926,26 +1124,33 @@ stack opens a new socket to the running serial forwarder.
 
 
 
+
 <ol>
+
 
 
   <li> it is correctly "packed" when imported directly from the nesc app
   </li>
 
 
+
   <li> it must be manually packed when created manually
   </li>
+
 
 
   <li> it has fields that hold its values
   </li>
 
 
+
   <li> it can be constructed from either a nescStruct or a name followed by types of field/type pairs 
   </li>
 
 
+
 </ol>
+
 
 
 
@@ -954,18 +1159,23 @@ stack opens a new socket to the running serial forwarder.
 
 
 
+
 <ol>
+
 
 
   <li> it has an amType, which must always be the first parameter in the constructor
   </li>
 
 
+
   <li> it can be converted to/from java Mig messages with the createMigMsg() and parseMigMsg() functions
   </li>
 
 
+
 </ol>
+
 
 
 
@@ -983,7 +1193,9 @@ the correct length of the packet and you may have errors.
 </p>
 
 
+
 <p><br>
+
 
 
 The TosMsg is "hierarchical" because it has a parentMsg
@@ -1000,7 +1212,9 @@ following on an rpc function response:
 
 
 
+
 <pre>&gt;&gt;&gt; print r[0].parentMsg<br>TosMsg(am=212) RpcResponseMsg:<br>        uint16_t transactionID &nbsp;: 0<br>            uint16_t commandID &nbsp;: 9<br>        uint16_t sourceAddress &nbsp;: 0<br>            uint16_t errorCode &nbsp;: 0<br>               bool dataLength &nbsp;: 8<br>                  bool[8] data &nbsp;: [102, 0, 251, 0, 0, 0, 0, 0]<br><br>&gt;&gt;&gt; print r[0].parentMsg.parentMsg<br>TosMsg(am=4) DrainMsg:<br>                     bool type &nbsp;: 212<br>                      bool ttl &nbsp;: 15<br>               uint16_t source &nbsp;: 0<br>                 uint16_t dest &nbsp;: 126<br>                 bool[17] data &nbsp;: [0, 0, 9, 0, 0, 0, 0, 0, 8, 102, 0, 251, ...]<br></pre>
+
 
 
 
@@ -1010,7 +1224,9 @@ is just a parsing of the DrainMsg.data bytes based on the type=212.
 </p>
 
 
+
 <p><br>
+
 
 
 
@@ -1019,7 +1235,9 @@ The following examples show how to use and, if necessary, create your own TosMsg
 
 
 
+
 <pre>&gt;&gt;&gt; msgA = app.msgs.DripMsg<br>&gt;&gt;&gt; msgA.amType<br>3<br>&gt;&gt;&gt; msgB = nescDecls.TosMsg(104, structA)<br>&gt;&gt;&gt; msgB<br>TosMsg(am=104) myStruct:<br>                uint8_t field1 &nbsp;: 169<br>            uint8_t[10] field2 &nbsp;: [15, 15, 15, 0, 15, 15, 15, 15, 15, 254]<br>           uint8_t[10]* field3 &nbsp;: ptr-&gt; [15, 101, 15, 0, 15, 15, 15, 15, 15, 253]<br><br>&gt;&gt;&gt; migMsg = msgB.createMigMsg()<br>&gt;&gt;&gt; migMsg<br>Message &lt;BaseTOSMsg&gt;<br>  [addr=0xfa9]<br>  [type=0xf]<br>  [group=0xf]<br>  [length=0x0]<br>  [data=0xf 0xf 0xf 0xf 0xfe 0x0 0x0 0x0<br>&gt;&gt;&gt; msgC = nescDecls.nescStruct("myMsg", ("field1", variable), ("field2", array), ("field3", pointer))<br>&gt;&gt;&gt; msgC<br>myMsg:<br>                uint8_t field1 &nbsp;: 0<br>            uint8_t[10] field2 &nbsp;: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]<br>           uint8_t[10]* field3 &nbsp;: ptr-&gt; [0, 0, 0, 0, 0, 0, 0, 0, 0, 0] <br><br>&gt;&gt;&gt; msgC = nescDecls.TosMsg(99, "myMsg", ("field1", variable), ("field2", array), ("field3", pointer))<br>&gt;&gt;&gt; msgC<br>TosMsg(am=99) myMsg:<br>                uint8_t field1 &nbsp;: 0<br>            uint8_t[10] field2 &nbsp;: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]<br>           uint8_t[10]* field3 &nbsp;: ptr-&gt; [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]<br><br>&gt;&gt;&gt; msgC.parseMigMsg(migMsg)<br>&gt;&gt;&gt; msgC<br>TosMsg(am=104) myMsg:<br>                uint8_t field1 &nbsp;: 169<br>            uint8_t[10] field2 &nbsp;: [15, 15, 15, 0, 15, 15, 15, 15, 15, 254]<br>           uint8_t[10]* field3 &nbsp;: ptr-&gt; [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]<br></pre>
+
 
 
 
@@ -1030,14 +1248,18 @@ msgB.field3.
 
 
 
+
 <div class="editsection" style="float: right; margin-left: 5px;"><br>
+
 
 
 </div>
 
 
+
 <a name="Message_Queues"></a>
 <h3><a class="mozTocH3" name="mozTocId411367"></a>Message Queues</h3>
+
 
 
 
@@ -1052,7 +1274,9 @@ python session if you don't actually have messages arriving):
 
 
 
+
 <pre>&gt;&gt;&gt; import pytos.Comm as Comm<br>&gt;&gt;&gt; comm = Comm.Comm()<br>&gt;&gt;&gt; comm.connect('sf@locahost:9001')<br>&gt;&gt;&gt; msg = app.msgs.DrainMsg<br>&gt;&gt;&gt; msgQ = Comm.MessageQueue(5)<br>&gt;&gt;&gt; comm.register(msg, msgQ)<br>&gt;&gt;&gt; for i in range(100)&nbsp;: #receive 100 messages and print them<br>...   (addr, msg) = msgQ.get()<br>...   msg<br></pre>
+
 
 
 
@@ -1065,18 +1289,23 @@ Example:
 
 
 
+
 <pre>   ....main...<br>       msgThread = threading.Thread(target=self.processMessages)<br>       msgThread.setDaemon(True)<br>       msgThread.start()<br><br>   def processMessages(self)&nbsp;:<br>       while True&nbsp;:<br>           (addr,msg) = self.msgQueue.get()<br>           msg<br></pre>
+
 
 
 
 <div class="editsection" style="float: right; margin-left: 5px;"><br>
 
 
+
 </div>
+
 
 
 <a name="Listen"></a>
 <h2><a class="mozTocH2" name="mozTocId587582"></a> Listen </h2>
+
 
 
 
@@ -1087,7 +1316,9 @@ automatically parses the message payloads.
 
 
 
+
 <pre>Listen.py telosb sf@localhost:9001<br></pre>
+
 
 
 
@@ -1096,10 +1327,13 @@ automatically parses the message payloads.
 
 
 
+
 <div class="editsection" style="float: right; margin-left: 5px;"><br>
 
 
+
 </div>
+
 
 
 <a name="GUIs"></a>
@@ -1107,12 +1341,16 @@ automatically parses the message payloads.
 
 
 
+
 <p>Gui material is not yet available for the TinyOS 2.x version.</p>
+
 
 <div class="editsection" style="float: right; margin-left: 5px;"><br>
 
 
+
 </div>
+
 
 
 <a name="Advanced"></a>
@@ -1120,14 +1358,18 @@ automatically parses the message payloads.
 
 
 
+
 <div class="editsection" style="float: right; margin-left: 5px;"><br>
+
 
 
 </div>
 
 
+
 <a name="Using_Mig_Messages_Directly"></a>
 <h3><a class="mozTocH3" name="mozTocId686914"></a> Using Mig Messages Directly</h3>
+
 
 
 
@@ -1136,7 +1378,9 @@ automatically parses the message payloads.
 
 
 
+
 <pre>from jpype import JPackage<br>oscopeMsg = JPackage("net.tinyos.oscope").OscopeMsg()<br>comm.send(65535, oscopeMsg)<br></pre>
+
 
 
 
@@ -1145,14 +1389,18 @@ automatically parses the message payloads.
 
 
 
+
 <div class="editsection" style="float: right; margin-left: 5px;"><br>
+
 
 
 </div>
 
 
+
 <a name="Event_driven_programming"></a>
 <h3><a class="mozTocH3" name="mozTocId216162"></a> Event driven programming</h3>
+
 
 
 
@@ -1166,6 +1414,7 @@ handling.
 </p>
 
 
+
 <p>In fact event-driven programming in general is possible in
 python is a manner similar to that used in TinyOS when one uses the
 pytos.util.Timer object. To create a timer that will first pause for <i>waitTime</i> seconds, and then every <i>period</i> seconds invoke the function <i>callbackFcn</i> exactly <i>numFirings</i> times, do this
@@ -1173,7 +1422,9 @@ pytos.util.Timer object. To create a timer that will first pause for <i>waitTime
 
 
 
+
 <pre> t = Timer( callbackFcn , period , numFirings , waitTime )<br></pre>
+
 
 
 
@@ -1182,7 +1433,9 @@ pytos.util.Timer object. To create a timer that will first pause for <i>waitTime
 
 
 
+
 <pre> t.start()<br></pre>
+
 
 
 
@@ -1191,7 +1444,9 @@ pytos.util.Timer object. To create a timer that will first pause for <i>waitTime
 
 
 
+
 <pre> t.cancel()<br></pre>
+
 
 
 
@@ -1200,7 +1455,9 @@ pytos.util.Timer object. To create a timer that will first pause for <i>waitTime
 
 
 
+
 <pre> t.start()<br></pre>
+
 
 
 
@@ -1209,13 +1466,16 @@ pytos.util.Timer object. To create a timer that will first pause for <i>waitTime
 
 
 
+
 <ol>
+
 
 
   <li> event-based code needs to be made thread safe since it can be
 called by multiple threads. Message handling code, for example, can be
 called by multiple serialForwarder threads simultaneously.
   </li>
+
 
 
   <li> With event-driven message handling, the message handling is
@@ -1226,26 +1486,33 @@ handling messages
   </li>
 
 
+
   <li>python errors that happen on the java SerialForwarder thread of control are difficult to handle
   </li>
+
 
 
   <li> It is easier to write for-loops using threads than as event-driven loops
   </li>
 
 
+
 </ol>
+
 
 
 
 <div class="editsection" style="float: right; margin-left: 5px;"><br>
 
 
+
 </div>
+
 
 
 <a name="Inheriting_from_Java_tools"></a>
 <h3><a class="mozTocH3" name="mozTocId479200"></a> Inheriting from Java tools </h3>
+
 
 
 
@@ -1254,7 +1521,9 @@ handling messages
 
 
 
+
 <pre>from jpype import JPackage<br>drain = JPackage("net.tinyos.drain").Drain()<br></pre>
+
 
 
 
@@ -1269,27 +1538,34 @@ then adds new functions for registering as a listener of incoming
 TosMsg objects. </p>
 
 
+
 <p>To use the JavaInheritor object, follow three steps:
 </p>
+
 
 
 
 <ol>
 
 
+
   <li> create a new object that inherits from the JavaInheritor
   </li>
+
 
 
   <li> in the constructor of that object, instantiate the java objects you want it to inherit from
   </li>
 
 
+
   <li> call the JavaInheritor constructor with those objects.  
   </li>
 
 
+
 </ol>
+
 
 
 
@@ -1298,7 +1574,9 @@ TosMsg objects. </p>
 
 
 
+
 <pre>from jpype import JPackage  <br><br>drain = JPackage("net.tinyos.drain")<br><br>class Drain( JavaInheritor )&nbsp;: <br><br>    def __init__( self )&nbsp;:<br>        drainObj = drain.Drain(spAddr, moteIF)<br>        drainConnectorObj = drain.DrainConnector(spAddr, moteIF)<br>        JavaInheritor.__init__(self, (drainObj, drainConnectorObj) )<br><br></pre>
+
 
 
 
@@ -1307,14 +1585,18 @@ TosMsg objects. </p>
 
 
 
+
 <pre>&gt;&gt;&gt; drain = pytos.util.Drain.Drain()<br>&gt;&gt;&gt; drain<br>Python object derived from java classes:<br>        net.tinyos.drain.Drain<br>        net.tinyos.drain.DrainConnector<br><br>The following java fields/methods are inherited:<br>        Drain.main()<br>        Drain.buildTree()<br>        Drain.sendTo()<br>        Drain.send()<br>        DrainConnector.registerListener()<br>        DrainConnector.deregisterListener()<br>        DrainConnector.setDebug()<br>        DrainConnector.messageReceived()<br></pre>
+
 
 
 
 <div class="editsection" style="float: right; margin-left: 5px;"><br>
 
 
+
 </div>
+
 
 
 <a name="Adding_a_New_Layer_of_Dispatch"></a>
@@ -1322,8 +1604,10 @@ TosMsg objects. </p>
 
 
 
+
 <p>This section is for pytos developers.  If you are just a user of pytos, skip this section.
 </p>
+
 
 
 <p>Unlike statically typed systems like MIG, the dynamic typing
@@ -1336,18 +1620,22 @@ example.
 </p>
 
 
+
 <p>There are three steps to creating multiple layers of dispatch:
 </p>
+
 
 
 
 <ol>
 
 
+
   <li> All message listeners must subclass the Comm.MessageListener
 class, which allows java hashing to work and therefore allows both the
 java registerListener and deregisterListener commands to work
   </li>
+
 
 
   <li> When the migMsg is received and the TosMsg.parseMigMsg()
@@ -1364,11 +1652,14 @@ correct length of the packet and you may have errors.
   </li>
 
 
+
   <li> the old message should be added as the parent of the new message
   </li>
 
 
+
 </ol>
+
 
 
 
@@ -1377,7 +1668,9 @@ correct length of the packet and you may have errors.
 
 
 
+
 <pre>class DrainMsgPeeler( Comm.MessageListener )&nbsp;:<br><br>  def __init__(self, app, msg, callback)&nbsp;:<br>    self.drainMsg = nescDecls.TosMsg(app.enums.AM_DRAINMSG, app.types.DrainMsg)<br>    self.msg = msg<br>    Comm.MessageListener.__init__(self, callback )<br>    <br>  def messageReceived( self , addr , migMsg )&nbsp;:<br>    drainMsg = deepcopy(self.drainMsg)<br>    drainMsg.parseMigMsg(migMsg)      #drainMsg is expanded as necessary to hold extra data<br>    msg = deepcopy(self.msg)<br>    bytes = drainMsg.data.getBytes()  <br>    msg.setBytes( bytes )             # a new message is created from the extra data<br>    msg.parentMsg = drainMsg          #the old message is set as the new msg's parent<br>    self.callback( addr, msg )<br></pre>
+
 
 
 </body>

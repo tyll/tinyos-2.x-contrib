@@ -1,11 +1,19 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
+
+  
   <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+
+  
   <title>Ram Symbols</title>
 </head>
+
+
 <body>
+
 <h2> Overview </h2>
+
 
 <p>RamSymbolsM is a module that allows the user to get or set any
 variable in a nesC application. The pc-side tool must know the sizes
@@ -13,12 +21,17 @@ and memory addresses of all variables on the heap. This component is
 made to be used with the nescDecls system and the pytos RamSymbols
 module. See the <a href="Pytos%20Development%20Environment.html" title="Development Environment Demo">Pytos Development Environment</a><span style="text-decoration: underline;"></span> for more information on the RamSymbols module
 </p>
+
 <p>The implementation of Ram Symbols can be found in marionette/tos/lib/RamSymbols
 </p>
 
-<div class="editsection" style="float: right; margin-left: 5px;">[<a href="http://nest.cs.berkeley.edu/nestfe/index.php?title=Ram_Symbols&amp;action=edit&amp;section=2" title="Edit section: API">edit</a>]</div>
+
+<div class="editsection" style="float: right; margin-left: 5px;"><br>
+</div>
+
 <a name="API"></a>
 <h2> API </h2>
+
 
 <p>The RamSymbolsM module has two functions: "poke" and "peek". Poke is
 used to copy a value into a memory address and peek is used to read the
@@ -26,47 +39,68 @@ value at a memory address. In pythos, all of a nesc application's ram
 symbols are imported into the environment as objects with poke and peek
 functions.
 </p>
+
 <p>In pythos, the poke and peek functions can both take
 "arrayIndex" and "dereference" options to index into an array symbol or
 dereference a pointer symbol. For example:
 </p>
 
+
 <pre>&gt;&gt;&gt; app.TestMarionetteC.test.poke(150)<br>[&lt;class 'pytos.util.nescDecls.TosMsg'&gt; object at 0x86b1e0c:<br><br>        TosMsg(am=816) TestMarionetteC.test.poke(),  nodeID=0:<br>                 error_t value  : 1<br>]<br>&gt;&gt;&gt; app.TestMarionetteC.test.peek()<br>[&lt;class 'pytos.util.nescDecls.TosMsg'&gt; object at 0x86b176c:<br><br>        TosMsg(am=816) TestMarionetteC.test.peek(),  nodeID=0:<br>                 uint8_t value  : 150<br>]<br>&gt;&gt;&gt; app.TestMarionetteC.testArray.peek(arrayIndex=0)<br>[&lt;class 'pytos.util.nescDecls.TosMsg'&gt; object at 0x86b730c:<br><br>        TosMsg(am=572) TestMarionetteC.testArray.peek(),  nodeID=0:<br>                 uint8_t value  : 1<br>]<br>&gt;&gt;&gt; app.TestMarionetteC.testPtr.peek(dereference=True)<br>[&lt;class 'pytos.util.nescDecls.TosMsg'&gt; object at 0x86b764c:<br><br>        TosMsg(am=568) TestMarionetteC.testPtr.peek(),  nodeID=0:<br>                 uint8_t value  : 150<br>]<br></pre>
+
 <br>
-<div class="editsection" style="float: right; margin-left: 5px;">[<a href="http://nest.cs.berkeley.edu/nestfe/index.php?title=Ram_Symbols&amp;action=edit&amp;section=3" title="Edit section: Setting Up">edit</a>]</div>
+
+<div class="editsection" style="float: right; margin-left: 5px;"><br>
+</div>
+
 <a name="Setting_Up"></a>
 <h2> Setting Up </h2>
+
 
 <p>In order to use the API described above, the user must:
 </p>
 
+
 <ol>
+
   <li> use the new makesystem by setting the Makerules environment variable to point to the tinyos-2.x/support/make/Makerules file
   </li>
+
   <li> add the following include directories to their makefile 
   </li>
+
 </ol>
+
 
 <pre>CFLAGS += -I$(TOSROOT)/../tinyos-2.x-contrib/marionette/tos/lib/RamSymbols<br></pre>
 
+
 <ol style="list-style-type: decimal;">
+
   <li>include the RamSymbolsM module somewhere in their application
   </li>
+
   <li>invoke both the nescDecls.extra and the rpc.extra files in
 their make process by either declaring "marionette" on the command line
 when making the application as follows
   </li>
+
 </ol>
+
 
 
 <pre>make telosb marionette<br></pre>
 
+
 <p>or adding it to the GOALS variable in their makefile
 </p>
 
+
 <pre>GOALS+=marionette<br></pre>
+
 
 <p>For problems, the <a href="Pytos%20Installation%20Instructions.html" title="Pytos Installation Instructions">Pytos Installation Instructions</a> setup instructions may contain more details.
 </p>
+
 </body>
 </html>

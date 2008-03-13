@@ -23,7 +23,7 @@
  * MODIFICATIONS.
  *
  * Authors:	Raja Jurdak, Antonio Ruzzelli, Samuel Boivineau and Alessio Barbirato
- * Date created: 2007/09/07
+ * Date created: 2008/03/12
  *
  */
 
@@ -33,8 +33,10 @@
 
 
 #include <Octopus.h>
-#include <NetProg.h>
+//#include <NetProg.h>
 //#include <NetProg_platform.h>
+//#include <DelugeMsgs.h>
+//#include <DelugeMetadata.h>
 //#include <TOSBoot.h>
 //#include <TOSBoot_platform.h>
 //#include <InternalFlash.h>
@@ -43,11 +45,24 @@ configuration OctopusAppC { }
 implementation {
 	// Miscalleny:
 	components MainC, OctopusC, LedsC, new TimerMilliC(), 
-	new OctopusSensorC() as Sensor, RandomC, PlatformC, NetProgC, InternalFlashC;
+	 RandomC;
+	
+	
+	/*To choose the sensor for Octopus, you should uncomment only one of the following lines*/
+	
+	/* ********************************************************* */
+	
+	//Uncomnnet this for Sinusoidal sensor (for demo purposes)
+	//components new OctopusSensorC() as Sensor;
+	
+	//Light sensor on Telosb or Tmote Sky
+	components new HamamatsuS1087ParC() as Sensor;
+	
+	/* ********************************************************* */
 
-    OctopusC.NetProg -> NetProgC;
+    
 	OctopusC.Boot -> MainC;
-	//OctopusC.InternalFlash -> InternalFlashC;
+	
 	OctopusC.Timer -> TimerMilliC;
 	OctopusC.WaitTimer -> TimerMilliC;
 	OctopusC.Read -> Sensor;

@@ -46,7 +46,7 @@ module OctopusC {
   uses {
     // Interfaces for initialization:
     interface Boot;
-	interface NetProg;
+	//interface NetProg;
 	//interface InternalFlash;
     interface SplitControl as RadioControl;
     interface SplitControl as SerialControl;

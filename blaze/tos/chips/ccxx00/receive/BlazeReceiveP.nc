@@ -385,7 +385,6 @@ implementation {
   }
   
   void failReceive() {
-    uint8_t state;
     uint8_t id;
     uint8_t status;
     atomic id = m_id;

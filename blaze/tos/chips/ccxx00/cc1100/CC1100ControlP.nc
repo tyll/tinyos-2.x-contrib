@@ -313,8 +313,9 @@ implementation {
    * Out of async context
    */
   task void commit() {
-    call BlazeCommit.commit();
-  }
+    if(call SplitControlManager.isOn[CC1100_RADIO_ID]()) {
+      call BlazeCommit.commit();
+    }  }
   
   /***************** Defaults ****************/
   default event void BlazeConfig.commitDone() {}

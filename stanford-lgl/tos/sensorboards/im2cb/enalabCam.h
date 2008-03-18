@@ -69,6 +69,7 @@ typedef struct {
 	uint8_t color;				// color model (defined by .h file for OV)
 	uint32_t size;				// image size in bytes
 	uint32_t time_stamp;		// frame timestamp
+	uint8_t padding;
 } __attribute__ ((packed)) frame_header_t;
 
 typedef struct {

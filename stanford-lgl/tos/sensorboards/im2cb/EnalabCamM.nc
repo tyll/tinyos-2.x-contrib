@@ -51,7 +51,6 @@
  */
 
 #include "enalabCam.h"
-#include "camera.h"
 #include "OV7649.h"
 
 module EnalabCamM

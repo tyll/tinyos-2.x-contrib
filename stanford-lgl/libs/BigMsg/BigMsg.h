@@ -13,7 +13,7 @@
 *   distribution.
 * - Neither the name of the Stanford University nor the names of
 *   its contributors may be used to endorse or promote products derived
-*   from this software without specific prior written permission.
+*   from this software without specific prior written permission
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -28,35 +28,35 @@
 * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 * OF THE POSSIBILITY OF SUCH DAMAGE.
 */ 
+
 /**
- * @brief Driver module for the OmniVision OV7649 Camera
- * @author
- *		Andrew Barton-Sweeney (abs@cs.yale.edu)
- *		Evan Park (evanpark@gmail.com)
- */
-/**
- * @brief Ported to TOS2
  * @author Brano Kusy (branislav.kusy@gmail.com)
  */ 
- /** 
- * Implements a "reliable" sccb protocol.  Every sccb write is followed by a
- * read to ensure the value was actually written.  If not, the layer will
- * retry a specified number of times.
- */
 
-configuration HplSCCBReliableC
+// NOTE: please "includes AM;" before including this file
+#ifndef _BIGMSG_H_
+#define _BIGMSG_H_
+#define BIGMSG_HEADER_LENGTH 2
+#define BIGMSG_DATA_SHIFT 6
+#define BIGMSG_DATA_LENGTH (1<<BIGMSG_DATA_SHIFT)
+#define TOSH_DATA_LENGTH  (BIGMSG_HEADER_LENGTH+BIGMSG_DATA_LENGTH)
+
+enum
 {
-  provides {
-    interface HplSCCB[uint8_t id];
-  }
-}
-implementation {
-  components HplSCCBReliableM, HplSCCBC, NoLedsC as LedsC;
+	AM_BIGMSG_FRAME_PART=0x6E,
+  AM_BIGMSG_FRAME_REQUEST=0x6F,
+};
 
-  // Interface wiring
-  HplSCCB   = HplSCCBReliableM; 
+typedef nx_struct bigmsg_frame_part{
+	//nx_uint16_t source;
+	nx_uint16_t part_id;
+	nx_uint8_t buf[BIGMSG_DATA_LENGTH];
+} bigmsg_frame_part_t;
 
-  HplSCCBReliableM.Leds -> LedsC;
-  // Component wiring
-  HplSCCBReliableM.actualHplSCCB -> HplSCCBC.HplSCCB[0x42]; //OVWRITE
-}
+typedef nx_struct bigmsg_frame_request{
+	nx_uint16_t part_id;
+	nx_uint16_t send_next_n_parts;
+} bigmsg_frame_request_t;
+#endif //_BIGMSG_H_
+
+

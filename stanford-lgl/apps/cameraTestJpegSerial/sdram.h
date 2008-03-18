@@ -13,7 +13,7 @@
 *   distribution.
 * - Neither the name of the Stanford University nor the names of
 *   its contributors may be used to endorse or promote products derived
-*   from this software without specific prior written permission.
+*   from this software without specific prior written permission
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -29,34 +29,20 @@
 * OF THE POSSIBILITY OF SUCH DAMAGE.
 */ 
 /**
- * @brief Driver module for the OmniVision OV7649 Camera
- * @author
- *		Andrew Barton-Sweeney (abs@cs.yale.edu)
- *		Evan Park (evanpark@gmail.com)
- */
-/**
- * @brief Ported to TOS2
  * @author Brano Kusy (branislav.kusy@gmail.com)
  */ 
- /** 
- * Implements a "reliable" sccb protocol.  Every sccb write is followed by a
- * read to ensure the value was actually written.  If not, the layer will
- * retry a specified number of times.
- */
+ 
+#ifndef _SDRAM_H_
+#define _SDRAM_H_
 
-configuration HplSCCBReliableC
-{
-  provides {
-    interface HplSCCB[uint8_t id];
-  }
-}
-implementation {
-  components HplSCCBReliableM, HplSCCBC, NoLedsC as LedsC;
+#define BASE_FRAME_ADDRESS	(0xa0000000)
+//+260k
+#define JPEG_FRAME_ADDRESS	(0xa0040000)
+//+65k
+#define BUF1_FRAME_ADDRESS	(0xa0050000)
+//+130k
+#define BUF2_FRAME_ADDRESS	(0xa0070000)
+//+130k
+#define BUF3_FRAME_ADDRESS	(0xa0090000)
 
-  // Interface wiring
-  HplSCCB   = HplSCCBReliableM; 
-
-  HplSCCBReliableM.Leds -> LedsC;
-  // Component wiring
-  HplSCCBReliableM.actualHplSCCB -> HplSCCBC.HplSCCB[0x42]; //OVWRITE
-}
+#endif //_SDRAM_H_

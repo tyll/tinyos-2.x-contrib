@@ -13,7 +13,7 @@
 *   distribution.
 * - Neither the name of the Stanford University nor the names of
 *   its contributors may be used to endorse or promote products derived
-*   from this software without specific prior written permission.
+*   from this software without specific prior written permission
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -28,35 +28,68 @@
 * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 * OF THE POSSIBILITY OF SUCH DAMAGE.
 */ 
+
 /**
- * @brief Driver module for the OmniVision OV7649 Camera
- * @author
- *		Andrew Barton-Sweeney (abs@cs.yale.edu)
- *		Evan Park (evanpark@gmail.com)
- */
-/**
- * @brief Ported to TOS2
  * @author Brano Kusy (branislav.kusy@gmail.com)
  */ 
- /** 
- * Implements a "reliable" sccb protocol.  Every sccb write is followed by a
- * read to ensure the value was actually written.  If not, the layer will
- * retry a specified number of times.
- */
+ 
+#include <limits.h>
+#include <stdio.h>
+#include <string.h>
+#include "tinyos_macros.h"
+#include "jpeghdr.h"
+#include "jpegTOS.h"
+#include "jpegUncompress.h"
+#include "quanttables.h"
 
-configuration HplSCCBReliableC
+int getBytes(char* filename, uint8_t *dataIn)
 {
-  provides {
-    interface HplSCCB[uint8_t id];
+  FILE *fdIn;
+  if (!(fdIn = fopen(filename, "r")) ){
+    printf("Can't open file for reading\n");
+    return 0;
   }
-}
-implementation {
-  components HplSCCBReliableM, HplSCCBC, NoLedsC as LedsC;
 
-  // Interface wiring
-  HplSCCB   = HplSCCBReliableM; 
+  uint8_t line[1024];
+  int count, dataSize=0;
 
-  HplSCCBReliableM.Leds -> LedsC;
-  // Component wiring
-  HplSCCBReliableM.actualHplSCCB -> HplSCCBC.HplSCCB[0x42]; //OVWRITE
+	dataSize=0;
+  while( (count=fread(line, 1, 1024, fdIn))>0)
+  {
+    memcpy(&(dataIn[dataSize]),line,count);
+		dataSize+=count;
+  }
+  fclose(fdIn);
+  return dataSize;
 }
+
+int main()
+{
+
+  uint8_t recovered[320*240*3];
+  memset(recovered,0,sizeof(recovered));
+	code_header_t header;
+
+  //decodeJpegFile("coded.huf", recovered, &header);
+      
+  uint8_t in[320*240*3];
+  uint32_t size=getBytes("coded.huf",in);
+  decodeJpegBytes(in, size, recovered, &header);
+  
+	if (header.is_color)
+	{
+	  FILE *fdOut = fopen("testOut.ppm", "w");
+		fprintf(fdOut,"%s","P6\n\n320 240\n255\n");
+	  fwrite(recovered,1,header.width*header.height*3,fdOut);
+	  fclose(fdOut);printf("written .ppm file");
+	}
+	else
+	{
+	  FILE *fdOut = fopen("testOut.pgm", "w");
+		fprintf(fdOut,"%s","P5\n\n320 240\n255\n");
+	  fwrite(recovered,1,header.width*header.height,fdOut);
+	  fclose(fdOut); printf("written .pgm file");
+	}
+	return 1;
+}
+

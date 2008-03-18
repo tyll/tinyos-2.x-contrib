@@ -1,0 +1,16 @@
+ifeq ($(PLATFORM),intelmote2)
+	ASSEMBLY_FILES += $(LGLDIR)/tos/chips/pxa27x/memsetup-pxa.s
+	PFLAGS := -I$(LGLDIR)/tos/platforms/intelmote2 $(PFLAGS)
+	PFLAGS := -I$(LGLDIR)/tos/sensorboards/im2cb $(PFLAGS)
+	PFLAGS := -I$(LGLDIR)/tos/chips/OV7649 $(PFLAGS)
+	PFLAGS := -I$(LGLDIR)/tos/chips/pxa27x/cif $(PFLAGS)
+	PFLAGS := -I$(LGLDIR)/tos/chips/pxa27x $(PFLAGS)
+	PFLAGS := -I$(LGLDIR)/tos/chips/da9030 $(PFLAGS)
+	PFLAGS := -I$(LGLDIR)/tos/platforms/intelmote2 $(PFLAGS)
+  SENSORBOARD ?= im2cb
+endif
+
+ifeq ($(PLATFORM),micaz)
+	PFLAGS := -I$(LGLDIR)/tos/interfaces $(PFLAGS)
+	PFLAGS := -I$(LGLDIR)/tos/chips/cc2420/timestamping $(PFLAGS)
+endif

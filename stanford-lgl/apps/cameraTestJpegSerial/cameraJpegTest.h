@@ -13,7 +13,7 @@
 *   distribution.
 * - Neither the name of the Stanford University nor the names of
 *   its contributors may be used to endorse or promote products derived
-*   from this software without specific prior written permission.
+*   from this software without specific prior written permission
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -29,34 +29,50 @@
 * OF THE POSSIBILITY OF SUCH DAMAGE.
 */ 
 /**
- * @brief Driver module for the OmniVision OV7649 Camera
- * @author
- *		Andrew Barton-Sweeney (abs@cs.yale.edu)
- *		Evan Park (evanpark@gmail.com)
- */
-/**
- * @brief Ported to TOS2
  * @author Brano Kusy (branislav.kusy@gmail.com)
  */ 
- /** 
- * Implements a "reliable" sccb protocol.  Every sccb write is followed by a
- * read to ensure the value was actually written.  If not, the layer will
- * retry a specified number of times.
- */
+ 
+#ifndef _CAMERA_H_
+#define _CAMERA_H_
 
-configuration HplSCCBReliableC
-{
-  provides {
-    interface HplSCCB[uint8_t id];
-  }
-}
-implementation {
-  components HplSCCBReliableM, HplSCCBC, NoLedsC as LedsC;
+enum {
+	AM_OV_DBG = 2,
+	AM_PXA_DBG = 3,
+	AM_CMD_MSG = 4,
+	AM_IMG_STAT = 5
+};
+enum {
+  IMG_COL=1,
+  IMG_JPG=2,
+};
 
-  // Interface wiring
-  HplSCCB   = HplSCCBReliableM; 
+typedef nx_struct img_stat{
+	nx_uint8_t type;
+	nx_uint16_t width;
+	nx_uint16_t height;
+	nx_uint32_t data_size;
+	nx_uint32_t timeAcq;
+	nx_uint32_t timeProc;
+	nx_uint32_t tmp1;
+	nx_uint32_t tmp2;
+	nx_uint32_t tmp3;
+	nx_uint32_t tmp4;
+} img_stat_t;
 
-  HplSCCBReliableM.Leds -> LedsC;
-  // Component wiring
-  HplSCCBReliableM.actualHplSCCB -> HplSCCBC.HplSCCB[0x42]; //OVWRITE
-}
+typedef nx_struct cmd_msg{
+	nx_uint8_t cmd;
+	nx_uint16_t val1;
+	nx_uint16_t val2;
+} cmd_msg_t;
+
+typedef nx_struct {
+	nx_uint32_t addr;
+	nx_uint32_t reg_val;
+} dbg_msg32_t;
+
+typedef nx_struct {
+	nx_uint8_t addr;
+	nx_uint8_t reg_val;
+} dbg_msg8_t;
+
+#endif //_CAMERA_H_

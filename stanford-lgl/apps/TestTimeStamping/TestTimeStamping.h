@@ -13,7 +13,7 @@
 *   distribution.
 * - Neither the name of the Stanford University nor the names of
 *   its contributors may be used to endorse or promote products derived
-*   from this software without specific prior written permission.
+*   from this software without specific prior written permission
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -29,34 +29,32 @@
 * OF THE POSSIBILITY OF SUCH DAMAGE.
 */ 
 /**
- * @brief Driver module for the OmniVision OV7649 Camera
- * @author
- *		Andrew Barton-Sweeney (abs@cs.yale.edu)
- *		Evan Park (evanpark@gmail.com)
- */
-/**
- * @brief Ported to TOS2
  * @author Brano Kusy (branislav.kusy@gmail.com)
  */ 
- /** 
- * Implements a "reliable" sccb protocol.  Every sccb write is followed by a
- * read to ensure the value was actually written.  If not, the layer will
- * retry a specified number of times.
- */
 
-configuration HplSCCBReliableC
+#ifndef _TESTTIMESTAMPING_H
+#define _TESTTIMESTAMPING_H
+
+enum
 {
-  provides {
-    interface HplSCCB[uint8_t id];
-  }
-}
-implementation {
-  components HplSCCBReliableM, HplSCCBC, NoLedsC as LedsC;
+	AM_TIMESYNCPOLL = 0xBA,
+	AM_TIMESYNCPOLLREPORT = 0xBB
+};
 
-  // Interface wiring
-  HplSCCB   = HplSCCBReliableM; 
+typedef nx_struct TimeSyncPoll
+{
+	nx_uint16_t	senderAddr;
+	nx_uint16_t	msgID;
+	nx_uint32_t sendingTime;
+}TimeSyncPoll;
 
-  HplSCCBReliableM.Leds -> LedsC;
-  // Component wiring
-  HplSCCBReliableM.actualHplSCCB -> HplSCCBC.HplSCCB[0x42]; //OVWRITE
-}
+typedef nx_struct TimeSyncPollReport
+{
+  nx_uint16_t localAddr;
+	nx_uint16_t	senderAddr;
+	nx_uint16_t	msgID;
+	nx_uint32_t receiveTime;
+}TimeSyncPollReport;
+
+#endif //_TESTTIMESTAMPING_H
+

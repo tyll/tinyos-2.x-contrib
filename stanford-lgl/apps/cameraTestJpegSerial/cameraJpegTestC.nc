@@ -13,7 +13,7 @@
 *   distribution.
 * - Neither the name of the Stanford University nor the names of
 *   its contributors may be used to endorse or promote products derived
-*   from this software without specific prior written permission.
+*   from this software without specific prior written permission
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -29,34 +29,37 @@
 * OF THE POSSIBILITY OF SUCH DAMAGE.
 */ 
 /**
- * @brief Driver module for the OmniVision OV7649 Camera
- * @author
- *		Andrew Barton-Sweeney (abs@cs.yale.edu)
- *		Evan Park (evanpark@gmail.com)
- */
-/**
- * @brief Ported to TOS2
  * @author Brano Kusy (branislav.kusy@gmail.com)
  */ 
- /** 
- * Implements a "reliable" sccb protocol.  Every sccb write is followed by a
- * read to ensure the value was actually written.  If not, the layer will
- * retry a specified number of times.
- */
+#include "cameraJpegTest.h"
 
-configuration HplSCCBReliableC
-{
-  provides {
-    interface HplSCCB[uint8_t id];
-  }
-}
+configuration cameraJpegTestC { }
 implementation {
-  components HplSCCBReliableM, HplSCCBC, NoLedsC as LedsC;
+  components MainC, LedsC, SendBigMsgC, cameraJpegTestM, JpegM;
+  cameraJpegTestM.Boot -> MainC;
+  cameraJpegTestM.Leds -> LedsC;
+  cameraJpegTestM.SendBigMsg -> SendBigMsgC;
+  cameraJpegTestM.Jpeg ->JpegM;
+  JpegM.Leds -> LedsC;
+  components new TimerMilliC() as Timer0;
+  cameraJpegTestM.Timer0 -> Timer0;
 
-  // Interface wiring
-  HplSCCB   = HplSCCBReliableM; 
+  // Sccb interface
+  components EnalabCamC;
+  cameraJpegTestM.EnalabCam -> EnalabCamC;
+  cameraJpegTestM.CameraInit -> EnalabCamC;
 
-  HplSCCBReliableM.Leds -> LedsC;
-  // Component wiring
-  HplSCCBReliableM.actualHplSCCB -> HplSCCBC.HplSCCB[0x42]; //OVWRITE
+  // Serial Forwarder
+  components SerialActiveMessageC as Serial;
+  cameraJpegTestM.SerialControl -> Serial;
+  cameraJpegTestM.Packet -> Serial; 
+  cameraJpegTestM.CmdReceive  -> Serial.Receive[AM_CMD_MSG];
+  cameraJpegTestM.ImgStatSend     -> Serial.AMSend[AM_IMG_STAT];
+
+  components HplOV7649C;
+  cameraJpegTestM.OVAdvanced -> HplOV7649C;
+  cameraJpegTestM.OVDbgReceive  -> Serial.Receive[AM_OV_DBG];
+  cameraJpegTestM.OVDbgSend     -> Serial.AMSend[AM_OV_DBG];
+  cameraJpegTestM.PXADbgReceive  -> Serial.Receive[AM_PXA_DBG];
+  cameraJpegTestM.PXADbgSend     -> Serial.AMSend[AM_PXA_DBG];
 }

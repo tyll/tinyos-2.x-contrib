@@ -13,7 +13,7 @@
 *   distribution.
 * - Neither the name of the Stanford University nor the names of
 *   its contributors may be used to endorse or promote products derived
-*   from this software without specific prior written permission.
+*   from this software without specific prior written permission
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -29,34 +29,45 @@
 * OF THE POSSIBILITY OF SUCH DAMAGE.
 */ 
 /**
- * @brief Driver module for the OmniVision OV7649 Camera
- * @author
- *		Andrew Barton-Sweeney (abs@cs.yale.edu)
- *		Evan Park (evanpark@gmail.com)
- */
-/**
- * @brief Ported to TOS2
  * @author Brano Kusy (branislav.kusy@gmail.com)
  */ 
- /** 
- * Implements a "reliable" sccb protocol.  Every sccb write is followed by a
- * read to ensure the value was actually written.  If not, the layer will
- * retry a specified number of times.
- */
+ 
+#include "TestTimeStamping.h"
 
-configuration HplSCCBReliableC
+configuration TestTimeStampingC
 {
-  provides {
-    interface HplSCCB[uint8_t id];
-  }
 }
-implementation {
-  components HplSCCBReliableM, HplSCCBC, NoLedsC as LedsC;
 
-  // Interface wiring
-  HplSCCB   = HplSCCBReliableM; 
+implementation 
+{
+    components TestTimeStampingM,	MainC, LedsC; 
 
-  HplSCCBReliableM.Leds -> LedsC;
-  // Component wiring
-  HplSCCBReliableM.actualHplSCCB -> HplSCCBC.HplSCCB[0x42]; //OVWRITE
+    TestTimeStampingM -> MainC.Boot;
+    TestTimeStampingM.Leds -> LedsC;
+
+    
+	  components CC2420ActiveMessageC as ActiveMessageC; 
+  	TestTimeStampingM.RadioControl 	-> ActiveMessageC; 	  
+	 	TestTimeStampingM.PollSend->ActiveMessageC.AMSend[AM_TIMESYNCPOLL]; 
+	 	TestTimeStampingM.ReportSend->ActiveMessageC.AMSend[AM_TIMESYNCPOLLREPORT]; 
+	 	TestTimeStampingM.PollReceive->ActiveMessageC.Receive[AM_TIMESYNCPOLL]; 
+
+#ifdef TS_MICRO
+    components TimeStampingTMicro32C as TimeStampingC,
+    		CounterMicro32C as CounterC,
+				new CounterToLocalTimeC(TMicro);
+#else
+    components TimeStamping32khz32C as TimeStampingC,
+    		Counter32khz32C as CounterC,
+				new CounterToLocalTimeC(T32khz);
+#endif
+
+    TestTimeStampingM.TimeStamping-> TimeStampingC;
+    TestTimeStampingM.LocalTime    -> CounterToLocalTimeC;
+  	CounterToLocalTimeC.Counter -> CounterC; 
+  
+    components new TimerMilliC() as Timer1;
+    TestTimeStampingM.Timer1	    -> Timer1;
+    components new TimerMilliC() as Timer2;
+    TestTimeStampingM.Timer2	    -> Timer2;
 }

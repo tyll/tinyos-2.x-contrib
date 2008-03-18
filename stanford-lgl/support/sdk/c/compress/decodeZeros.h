@@ -13,7 +13,7 @@
 *   distribution.
 * - Neither the name of the Stanford University nor the names of
 *   its contributors may be used to endorse or promote products derived
-*   from this software without specific prior written permission.
+*   from this software without specific prior written permission
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -28,35 +28,45 @@
 * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 * OF THE POSSIBILITY OF SUCH DAMAGE.
 */ 
+
 /**
- * @brief Driver module for the OmniVision OV7649 Camera
- * @author
- *		Andrew Barton-Sweeney (abs@cs.yale.edu)
- *		Evan Park (evanpark@gmail.com)
- */
-/**
- * @brief Ported to TOS2
  * @author Brano Kusy (branislav.kusy@gmail.com)
  */ 
- /** 
- * Implements a "reliable" sccb protocol.  Every sccb write is followed by a
- * read to ensure the value was actually written.  If not, the layer will
- * retry a specified number of times.
- */
-
-configuration HplSCCBReliableC
+ 
+uint32_t decodeZeros(uint8_t *dataIn, unsigned char *dataOut,
+	 		    uint32_t size, uint32_t maxSize)
 {
-  provides {
-    interface HplSCCB[uint8_t id];
+  uint32_t i,j, idx=0;
+  
+  for (i=0; i<size; i++)
+  {
+    if ((dataIn[i]&0x80) == 0)
+    {
+  	  if (dataIn[i]==0)
+  	  {//zeroes until the end of the file
+  	    while (idx<maxSize)
+          dataOut[idx++]=0;
+    		return idx;
+  	  }
+	  
+      for (j=0; j<dataIn[i]; j++)
+        dataOut[idx++]=0;
+    }
+    else
+  	{
+      int8_t value = dataIn[i];
+      value = (value>-65)?(value&0x7F)-128:value&0x7F;
+      dataOut[idx++]=value;
+	  }
   }
+  return idx;
 }
-implementation {
-  components HplSCCBReliableM, HplSCCBC, NoLedsC as LedsC;
 
-  // Interface wiring
-  HplSCCB   = HplSCCBReliableM; 
-
-  HplSCCBReliableM.Leds -> LedsC;
-  // Component wiring
-  HplSCCBReliableM.actualHplSCCB -> HplSCCBC.HplSCCB[0x42]; //OVWRITE
+static inline void decodeDC(uint8_t *dataIn, uint8_t *dataOut, uint16_t dataSize)
+{
+  uint16_t i;
+  dataOut[0]=dataIn[0];
+  for (i=1; i<dataSize; i++)
+    dataOut[i]=dataOut[i-1]-dataIn[i];
 }
+

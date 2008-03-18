@@ -68,7 +68,16 @@ implementation {
     // Enable access to Intel WMMX enhancements
     asm volatile ("mcr p15,0,%0,c15,c1,0\n\t": : "r" (0x43));
 
-#ifdef PXA27X_13M
+#ifndef PXA27X_FREQ
+  #define PXA27X_FREQ=13
+#endif
+
+#if defined(PXA27X_FREQ) && PXA27X_FREQ!=13 && PXA27X_FREQ!=104 && PXA27X_FREQ!=208
+  !@$% unsupported frequency
+#endif
+
+#if defined(PXA27X_FREQ) && (PXA27X_FREQ==13)
+  {
      // Place PXA27X into 13M w/ PPLL enabled...
     // other bits are ignored...but might be useful later
     CCCR = (CCCR_CPDIS | CCCR_L(8) | CCCR_2N(2) | CCCR_A);
@@ -77,8 +86,10 @@ implementation {
 		  :
 		  : "r" (CLKCFG_F)
 		  );
-
-#elif PXA27X_104M
+	}
+#endif
+#if defined(PXA27X_FREQ) && (PXA27X_FREQ==104)
+  {
     // Place PXA27x into 104/104 MHz mode
     CCCR = CCCR_L(8) | CCCR_2N(2) | CCCR_A; 
     asm volatile (
@@ -86,14 +97,18 @@ implementation {
 		  :
 		  : "r" (CLKCFG_B | CLKCFG_F | CLKCFG_T)
 		  );
-#else
+  }
+#endif
+#if defined(PXA27X_FREQ) && (PXA27X_FREQ==208)
+  {
     // Place PXA27x into 208/208 MHz mode
-    CCCR = CCCR_L(16) | CCCR_2N(2) | CCCR_A; 
+    CCCR = CCCR_L(16) | CCCR_2N(2) | CCCR_A;
     asm volatile (
 		  "mcr p14,0,%0,c6,c0,0\n\t"
 		  :
 		  : "r" (CLKCFG_B | CLKCFG_F | CLKCFG_T)
 		  );
+  }
 #endif
     
 #if 0//new

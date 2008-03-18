@@ -23,3 +23,10 @@ Simulating multi-hop:
 	 using 'make micaz reinstall.0xAB', nodes 0xAB and 0xCD can communicate
 	 iff 2D grid coordinates (A,B) and (C,D) are neighbors in a 2D grid 
  
+ Experiment: 32khz11node4hop90minTest.report
+ we used 11 nodes running FTSP with 10sec period and polling performance data
+ with 3sec period. the experiment ran for about 100 minutes and FTSP achieved
+ 1.53 jiffy (~= 50 us) avg and 3.5 jiffy (~100 us) max error (measured after
+ the global time stabilized at seqnum 40). 1 jiffy is ~30.5 us. nodes were
+ deployed in a 5x3 grid (4 points were vacant as we only used 11 nodes).
+ 

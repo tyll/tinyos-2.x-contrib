@@ -7,7 +7,7 @@ end
 
 data = load(file);
 data1 = sortrows(sortrows(data,1),2);
-newdata = zeros(1000,5);
+newdata = zeros(2500,5);
 
 row1=1;
 while (row1 <= size(data1,1) && data1(row1,2)<min_seq)

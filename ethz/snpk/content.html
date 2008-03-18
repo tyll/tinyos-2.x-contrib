@@ -1,4 +1,8 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
+<head>
+<link rel="stylesheet" type="text/css" href="snpk.css">
+</head>
 <body TEXT="#000000" BGCOLOR="#FFFFFF" LINK="#0000EF" VLINK="#55188A" ALINK="#FF0000">
 
 <h1>Introduction</h1>
@@ -35,10 +39,10 @@ the drift to every neighbour can be calculated.
 <br>With time information, packets can be sent with almost no extra energy wasted.
 <br><br>
 The following picture shows a typical current curve, measured on a TmoteSky. The second peak is caused by a transmission, where the others are channel samplings between sleep phases:
-<img src="harvester_power.png" width="1291" height="411">
+<br><img src="harvester_power.png" width="1291" height="411">
 <h4>How to use it</h4>
 <p>
-The simplest way to add this energy saving radio stack to your application, is simply to add following lines to your Makefile (example can be found in the ./app/MultihopOscilloscope directory):
+The simplest way to add this energy saving radio stack to your application, is by adding following lines to your Makefile (example can be found in the ./app/MultihopOscilloscope directory):
 <div style="border:1px solid;padding:0.3em;background:#ffffa0">
 <pre>CFLAGS += -DLOW_POWER_LISTENING -DLPL_DEFAULT_SLEEP_INTERVAL=250
 CC2420DIR=../../tos/chips/cc2420
@@ -53,7 +57,7 @@ CFLAGS += -DENABLE_SPI0_DMA</pre>
 </ul>
 With this small modification, it should be possible to run all standard Tinyos 2.x applications.
 </p>
-<p>when <b>LPL_DEFAULT_SLEEP_INTERVAL</b> is not set, the parameters of the radio stack can be set with the LowPowerListening interface. This radio stack offers the ability, to save power by sending subsequent packets to a neighbour, after the first packets was successfully transmitted. For this purpose
+<p>when <b>LPL_DEFAULT_SLEEP_INTERVAL</b> is not set, the parameters of the radio stack can be set with the <i>LowPowerListening</i> interface. This radio stack offers the ability, to save power by sending subsequent packets to a neighbour, after the first packets was successfully transmitted. For this purpose
 it is necessary to set the &quot;more&quot;-flag in the first packet, in order to keep the receiver node awake for some longer time. This flag can be set or cleared with the <i>NeighbourSyncFlowPacket</i> interface. This interface provides following function:
 <div style="border:1px solid;padding:0.3em;background:#ffffa0"">
 <pre>interface NeighbourSyncFlowPacket {
@@ -62,13 +66,25 @@ it is necessary to set the &quot;more&quot;-flag in the first packet, in order t
 }</pre>
 </div>
 </p>
+<h4>Performance in a TinyOS2.x standard application: MultihopOscilloscope</h4>
+In order to get a rough comparison between the default CC2420 lpl radio stack and our partly synchronized radio stack, we traced the current for a node, running the
+MultihopOscilloscop application. Following parameters were used:
+<table border="1" cellspacing="0">
+<tr><td><b>Parameter</b></td><td><b>Value</b></td></tr>
+<tr><td>Sleep duration</td><td>250 ms</td></tr>
+<tr><td>Data generation rate</td><td>1 sample per 10 seconds</td></tr>
+<tr><td>Packet generation rate</td><td>1 packet per 40 seconds</td></tr>
+<tr><td>TX Power</td><td>20</td></tr>
+</table>
+Not counting the current drawn by the LED, we measured a mean current of 4.60 mA for the standard CC2420 stack, and 0.97 mA for
+our modified CC2420 stack.
 <hr/>
   
 <h3>Harvester: A data gathering demo application</h3>
 <p></p>
-<img src="harvester_40.png" width="801" height="800">
-
-<hr/>
+<img src="harvester_40.png" width="801" height="800" style="float:left;margin-right:0.3em;margin-bottom:0.3em">
+<p>The Harvester is a data gathering application that uses a slightly modified version of the Collection Tree Protocol (CTP). There exist also a simple tree visualization, written in java.</p> 
+<hr style="clear:left"/>
 
 <h3>DSN-Monitor, Deployement support for TinyOS nodes</h3>
 <p>

@@ -186,10 +186,10 @@ implementation {
   
   /***************** SubReceive Events ****************/
   event message_t* SubReceive.receive(message_t* msg, void* payload, uint8_t len) {
-    signal Snoop.receive[call AMPacket.type(msg)](msg, payload, len - BLAZE_SIZE);
-  
     if (call AMPacket.isForMe(msg)) {
       return signal Receive.receive[call AMPacket.type(msg)](msg, payload, len - BLAZE_SIZE);
+    } else {
+      signal Snoop.receive[call AMPacket.type(msg)](msg, payload, len - BLAZE_SIZE);
     }
     
     return msg;

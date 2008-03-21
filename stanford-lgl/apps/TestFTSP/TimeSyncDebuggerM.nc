@@ -6,12 +6,12 @@
  * documentation for any purpose, without fee, and without written agreement is
  * hereby granted, provided that the above copyright notice, the following
  * two paragraphs and the author appear in all copies of this software.
- * 
+ *
  * IN NO EVENT SHALL THE VANDERBILT UNIVERSITY BE LIABLE TO ANY PARTY FOR
  * DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING OUT
  * OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF THE VANDERBILT
  * UNIVERSITY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * THE VANDERBILT UNIVERSITY SPECIFICALLY DISCLAIMS ANY WARRANTIES,
  * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
  * AND FITNESS FOR A PARTICULAR PURPOSE.  THE SOFTWARE PROVIDED HEREUNDER IS
@@ -31,7 +31,7 @@ module TimeSyncDebuggerM
     {
         interface StdControl;
         interface Init;
-    } 
+    }
     uses
     {
         interface GlobalTime;
@@ -41,9 +41,9 @@ module TimeSyncDebuggerM
         interface Timer<TMilli>;
         interface Leds;
 #ifdef TS_MICRO
-        interface TimeStamping<TMicro,uint32_t>;
+        interface PacketTimeStamp<TMicro,uint32_t>;
 #else
-        interface TimeStamping<T32khz,uint32_t>;
+        interface PacketTimeStamp<T32khz,uint32_t>;
 #endif
         interface Boot;
         interface SplitControl as RadioControl;
@@ -62,7 +62,7 @@ implementation
 
     event void Boot.booted() {
         call RadioControl.start();
- 				call StdControl.start();
+        call StdControl.start();
     }
 
     event void RadioControl.startDone(error_t error){}
@@ -81,10 +81,10 @@ implementation
     task void report() {
         if( reporting )
         {
-			      call Leds.led2Toggle();
+            call Leds.led2Toggle();
             if (call AMSend.send(AM_BROADCAST_ADDR, &msg, sizeof(TimeSyncPollReply)) != SUCCESS){
                 if(post report()!=SUCCESS)
-                    reporting = FALSE;  
+                    reporting = FALSE;
             }
         }
     }
@@ -93,7 +93,7 @@ implementation
         reporting = FALSE;
         return;
     }
-    
+
     event void Timer.fired() {
         if( reporting )
             post report();
@@ -103,9 +103,9 @@ implementation
     {
         uint32_t localTime;
         TimeSyncPollReply* pPollReply = (TimeSyncPollReply*)(msg.data);
-        if( !reporting )
+        if( !reporting && call PacketTimeStamp.isSet(p))
         {
-            localTime = call TimeStamping.getStamp();
+            localTime = call PacketTimeStamp.get(p);
 
             pPollReply->nodeID = TOS_NODE_ID;
             pPollReply->msgID = ((TimeSyncPoll*)(p->data))->msgID;
@@ -122,4 +122,4 @@ implementation
 
         return p;
     }
- }
+}

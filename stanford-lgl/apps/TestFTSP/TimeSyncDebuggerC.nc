@@ -6,12 +6,12 @@
  * documentation for any purpose, without fee, and without written agreement is
  * hereby granted, provided that the above copyright notice, the following
  * two paragraphs and the author appear in all copies of this software.
- * 
+ *
  * IN NO EVENT SHALL THE VANDERBILT UNIVERSITY BE LIABLE TO ANY PARTY FOR
  * DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING OUT
  * OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF THE VANDERBILT
  * UNIVERSITY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * THE VANDERBILT UNIVERSITY SPECIFICALLY DISCLAIMS ANY WARRANTIES,
  * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
  * AND FITNESS FOR A PARTICULAR PURPOSE.  THE SOFTWARE PROVIDED HEREUNDER IS
@@ -30,27 +30,29 @@ configuration TimeSyncDebuggerC
     uses interface Boot;
 }
 
-implementation 
+implementation
 {
-    components TimeSyncDebuggerM, 
-				NoLedsC as LedsC,
+    components TimeSyncDebuggerM,
+        NoLedsC as LedsC,
 #ifdef TS_MICRO
-				TimeSyncMicroC as TimeSyncC, TimeStampingTMicro32C as TimeStampingC;
+        TimeSyncMicroC as TimeSyncC;
 #else
-				TimeSyncC, TimeStamping32khz32C as TimeStampingC;
+        TimeSyncC;
 #endif
     Init = TimeSyncDebuggerM;
     Boot = TimeSyncDebuggerM;
 
-		components CC2420ActiveMessageC as ActiveMessageC; 
-    TimeSyncDebuggerM.RadioControl 	-> ActiveMessageC;
-    TimeSyncDebuggerM.Receive   	-> ActiveMessageC.Receive[AM_TIMESYNCPOLL];
-    TimeSyncDebuggerM.AMSend    	-> ActiveMessageC.AMSend[AM_TIMESYNCPOLLREPLY];
+    components CC2420ActiveMessageC as ActiveMessageC;
+    TimeSyncDebuggerM.RadioControl  -> ActiveMessageC;
+    TimeSyncDebuggerM.Receive     -> ActiveMessageC.Receive[AM_TIMESYNCPOLL];
+    TimeSyncDebuggerM.AMSend      -> ActiveMessageC.AMSend[AM_TIMESYNCPOLLREPLY];
+
+    components CC2420PacketC;
+    TimeSyncDebuggerM.PacketTimeStamp -> CC2420PacketC;
 
     components new TimerMilliC();
-    TimeSyncDebuggerM.Timer         	-> TimerMilliC;
-    TimeSyncDebuggerM.GlobalTime    	-> TimeSyncC;
-    TimeSyncDebuggerM.TimeSyncInfo  	-> TimeSyncC;
-    TimeSyncDebuggerM.Leds          	-> LedsC;
-    TimeSyncDebuggerM.TimeStamping  	-> TimeStampingC;
+    TimeSyncDebuggerM.Timer           -> TimerMilliC;
+    TimeSyncDebuggerM.GlobalTime      -> TimeSyncC;
+    TimeSyncDebuggerM.TimeSyncInfo    -> TimeSyncC;
+    TimeSyncDebuggerM.Leds            -> LedsC;
 }

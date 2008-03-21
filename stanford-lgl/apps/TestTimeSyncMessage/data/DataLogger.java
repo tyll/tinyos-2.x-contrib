@@ -78,7 +78,7 @@ public class DataLogger implements MessageListener {
 		{
 			outPoll = new PrintStream(new FileOutputStream(name+".poll"));
 			outReport = new PrintStream(new FileOutputStream(name+".report"));
-    		//outPoll.println("#[SENDER_ID] [MSG_ID] [TX_TIME]");
+    		//outPoll.println("#[SENDER_ID] [MSG_ID]");
     		//outReport.println("#[RECEIVER_ID] [SENDER_ID] [MSG_ID] [RX_TIME]");
 		}
 		catch (Exception e)
@@ -89,7 +89,7 @@ public class DataLogger implements MessageListener {
 
 	public void writePoll(TimeSyncPoll tsp)
 	{
-		outPoll.println(tsp.get_senderAddr()+" "+tsp.get_msgID()+" "+tsp.get_sendingTime());
+		outPoll.println(tsp.get_senderAddr()+" "+tsp.get_msgID()+" "+tsp.get_sendTime());
 		outPoll.flush();
 	}
 	    

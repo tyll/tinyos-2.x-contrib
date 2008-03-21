@@ -28,7 +28,7 @@ configuration TestTimeSyncC {
 implementation {
 	components MainC, 
 #ifdef TS_MICRO			
-			TimeSyncMicroC as TimeSyncC,
+			#TimeSyncMicroC as TimeSyncC, !!! doesn't work right now
 #else
 			TimeSyncC,
 #endif 

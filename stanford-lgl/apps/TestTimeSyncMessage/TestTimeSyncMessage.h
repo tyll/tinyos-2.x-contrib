@@ -31,43 +31,29 @@
 /**
  * @author Brano Kusy (branislav.kusy@gmail.com)
  */ 
- 
-#include "TestTimeStamping.h"
 
-configuration TestTimeStampingC
+#ifndef _TESTTIMESYNCMESSAGE_H
+#define _TESTTIMESYNCMESSAGE_H
+
+enum
 {
-}
+	AM_TIMESYNCPOLL = 0xBA,
+	AM_TIMESYNCPOLLREPORT = 0xBB
+};
 
-implementation 
+typedef nx_struct TimeSyncPoll
 {
-    components TestTimeStampingM,	MainC, LedsC; 
+	nx_uint16_t	senderAddr;
+	nx_uint16_t	msgID;
+}TimeSyncPoll;
 
-    TestTimeStampingM -> MainC.Boot;
-    TestTimeStampingM.Leds -> LedsC;
+typedef nx_struct TimeSyncPollReport
+{
+  nx_uint16_t localAddr;
+	nx_uint16_t	senderAddr;
+	nx_uint16_t	msgID;
+	nx_uint32_t receiveTime;
+}TimeSyncPollReport;
 
-    
-	  components CC2420ActiveMessageC as ActiveMessageC; 
-  	TestTimeStampingM.RadioControl 	-> ActiveMessageC; 	  
-	 	TestTimeStampingM.PollSend->ActiveMessageC.AMSend[AM_TIMESYNCPOLL]; 
-	 	TestTimeStampingM.ReportSend->ActiveMessageC.AMSend[AM_TIMESYNCPOLLREPORT]; 
-	 	TestTimeStampingM.PollReceive->ActiveMessageC.Receive[AM_TIMESYNCPOLL]; 
+#endif //_TESTTIMESYNCMESSAGE_H
 
-#ifdef TS_MICRO
-    components TimeStampingTMicro32C as TimeStampingC,
-    		CounterMicro32C as CounterC,
-				new CounterToLocalTimeC(TMicro);
-#else
-    components TimeStamping32khz32C as TimeStampingC,
-    		Counter32khz32C as CounterC,
-				new CounterToLocalTimeC(T32khz);
-#endif
-
-    TestTimeStampingM.TimeStamping-> TimeStampingC;
-    TestTimeStampingM.LocalTime    -> CounterToLocalTimeC;
-  	CounterToLocalTimeC.Counter -> CounterC; 
-  
-    components new TimerMilliC() as Timer1;
-    TestTimeStampingM.Timer1	    -> Timer1;
-    components new TimerMilliC() as Timer2;
-    TestTimeStampingM.Timer2	    -> Timer2;
-}

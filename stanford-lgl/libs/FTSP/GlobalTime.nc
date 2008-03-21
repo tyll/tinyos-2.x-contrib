@@ -25,10 +25,7 @@
 interface GlobalTime
 {
 	/**
-	 * Returns the current local time of this mote. The local time can 
-	 * either be the SysTime as returned by SysTimeC (if the 
-	 * TS_MICRO is defined) or the ClockTime as returned by the LocalTime 
-	 * interface of the ClockC component (if TS_MICRO not defined).
+	 * Returns the current local time of this mote. 
 	 */
 	async command uint32_t getLocalTime();
 

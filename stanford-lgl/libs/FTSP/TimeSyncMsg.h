@@ -32,10 +32,10 @@ typedef nx_struct TimeSyncMsg
 	 * time. The TimeStamping component will add the current local time when the
 	 * message is actually transmitted. Thus the receiver will receive the
 	 * global time of the sender when the message is actually sent. */
-	nx_uint32_t	sendingTime;
+	nx_uint32_t	globalTime;
 	
 	//just for convenience - not transmitted
-	nx_uint32_t 	arrivalTime;
+	nx_uint32_t 	localTime;
 } TimeSyncMsg;
 
 enum {

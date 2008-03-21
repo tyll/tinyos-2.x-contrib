@@ -11,6 +11,12 @@ ifeq ($(PLATFORM),intelmote2)
 endif
 
 ifeq ($(PLATFORM),micaz)
-	PFLAGS := -I$(LGLDIR)/tos/interfaces $(PFLAGS)
-	PFLAGS := -I$(LGLDIR)/tos/chips/cc2420/timestamping $(PFLAGS)
+#	PFLAGS := -I$(LGLDIR)/tos/interfaces $(PFLAGS)
+#	PFLAGS := -I$(LGLDIR)/tos/chips/cc2420/timestamping $(PFLAGS)
+	PFLAGS := -I$(LGLDIR)/tos/chips/cc2420/ $(PFLAGS)
+	PFLAGS := -I$(LGLDIR)/tos/chips/cc2420/csma $(PFLAGS)
+	PFLAGS := -I$(LGLDIR)/tos/chips/cc2420/interfaces $(PFLAGS)
+	PFLAGS := -I$(LGLDIR)/tos/chips/cc2420/packet $(PFLAGS)
+	PFLAGS := -I$(LGLDIR)/tos/chips/cc2420/receive $(PFLAGS)
+	PFLAGS := -I$(LGLDIR)/tos/chips/cc2420/transmit $(PFLAGS)
 endif

@@ -79,4 +79,5 @@ public class Constants  {
     public static final byte BOOT_REQUEST=15;
     public static final byte MAX_ID=16;
     public static final int WAIT_TIME=2000;
+    public static final int MX_RATE=2400;
 }

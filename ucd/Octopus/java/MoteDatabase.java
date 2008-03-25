@@ -50,10 +50,15 @@ public class MoteDatabase {
 	private ConsolePanel consolePanel;
 	boolean active;
 	int maxID;
+	int newNode;
+	int indNew;
+	ArrayList<Integer>ids;
+	
 
 	public MoteDatabase(ConsolePanel consolePanel) {
 		this.consolePanel = consolePanel;
 		moteNetwork = new ArrayList();
+		ids=new ArrayList<Integer>();
 		mutexFree = true;
 		active =false;
 	}
@@ -72,14 +77,48 @@ public class MoteDatabase {
 		int id=m.getMoteId();
 		if(id>maxID){
 			maxID=id;
-			if(active){
-				sendM(ms);
+			maxVal=true;
+			if(active&&!maxWait){
+				maxWait=true;
+				new MaxThread(this,ms).start();
+			}
+		}
+		else if(active){
+			for(int i:ids){
+				if(i==id)return;
+			}
+			ids.add(id);
+			newNode++;
+			indNew=id;
+			if(!maxWait){
+				maxWait=true;
+				new MaxThread(this,ms).start();
+				
 			}
 		}
 
 	}
-
+	boolean maxVal,maxWait;
+	
+	public void send(MsgSender ms){
+		maxWait=false;
+		if(maxVal){
+			maxVal=false;
+			newNode=0;
+			sendM(ms);
+		}else{
+			if(newNode>1){
+				sendM(ms);
+			}else if(newNode==1){
+				// Unicast send
+				ms.add(indNew,Constants.MAX_ID,maxID,"Sending Maximum ID");
+				
+			}
+			newNode=0;
+		}
+	}
 	private void sendM(MsgSender ms){
+		
 		ms.add(MoteIF.TOS_BCAST_ADDR,Constants.MAX_ID,maxID,"Sending Maximum ID");
 	}
 	public synchronized void sendMax(MsgSender ms){

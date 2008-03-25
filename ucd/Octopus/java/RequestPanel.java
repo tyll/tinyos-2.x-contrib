@@ -55,6 +55,7 @@ import net.tinyos.util.*;
 */
 
 class RequestPanel extends JPanel implements ActionListener, ChangeListener, ItemListener{
+	
 	private JLabel moteLabel, batteryLabel;
 	private JCheckBox checkBoxBroadcast;
 	private JButton autoModeButton, queryModeButton;

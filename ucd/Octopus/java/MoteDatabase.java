@@ -95,7 +95,13 @@ public class MoteDatabase {
 				new MaxThread(this,ms).start();
 				
 			}
+		}else{
+			for(int i:ids){
+				if(i==id)return;
+			}
+			ids.add(id);
 		}
+		
 
 	}
 	boolean maxVal,maxWait;

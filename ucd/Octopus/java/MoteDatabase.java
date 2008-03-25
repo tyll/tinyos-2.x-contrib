@@ -84,9 +84,7 @@ public class MoteDatabase {
 			}
 		}
 		else if(active){
-			for(int i:ids){
-				if(i==id)return;
-			}
+			if(!ids.contains(id)){
 			ids.add(id);
 			newNode++;
 			indNew=id;
@@ -95,11 +93,10 @@ public class MoteDatabase {
 				new MaxThread(this,ms).start();
 				
 			}
-		}else{
-			for(int i:ids){
-				if(i==id)return;
 			}
-			ids.add(id);
+		}else{
+			
+			if(!ids.contains(id))ids.add(id);
 		}
 		
 

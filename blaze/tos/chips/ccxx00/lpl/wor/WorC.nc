@@ -18,8 +18,7 @@ implementation {
     WorP,
     new BlazeSpiResourceC(),
     BlazeSpiC, 
-    BlazeCentralWiringC,
-    new TimerMilliC();
+    BlazeCentralWiringC;
   
   MainC.SoftwareInit -> WorP;
   
@@ -39,7 +38,6 @@ implementation {
   WorP.ChipRdy -> BlazeCentralWiringC.Gdo2_io;
   WorP.Csn -> BlazeCentralWiringC.Csn;
   WorP.RxInterrupt -> BlazeCentralWiringC.Gdo0_int;
-  WorP.EnableWorTimer -> TimerMilliC;
   
   components LedsC;
   WorP.Leds -> LedsC;

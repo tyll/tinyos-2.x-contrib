@@ -46,10 +46,6 @@
 #define CCXX00_CRYSTAL_KHZ 26000
 #endif
 
-#ifndef WOR_OFF_DELAY
-#define WOR_OFF_DELAY 10
-#endif
-
 /**
  * WORCTRL register bitfields
  */

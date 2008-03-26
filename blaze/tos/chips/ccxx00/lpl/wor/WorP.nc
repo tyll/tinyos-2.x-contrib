@@ -31,6 +31,8 @@ module WorP {
     interface GeneralIO as Csn[radio_id_t radioId];
     interface GpioInterrupt as RxInterrupt[radio_id_t radioId];
     
+    interface Timer<TMilli> as EnableWorTimer;
+    
     interface Leds;
   }
 }
@@ -89,20 +91,29 @@ implementation {
       return;
     }
     
-    state = S_TOGGLING;
-    
     focusedRadio = radioId;
-    enabling = on;
     
-    if(call Resource.isOwner()) {
-      setupWor();
-      
-    } else if(call Resource.immediateRequest() == SUCCESS) {
-      setupWor();
+    if(on) {
+      call EnableWorTimer.startOneShot(WOR_OFF_DELAY);
       
     } else {
-      call Resource.request();
+      call Timer.stop();
+      
+      state = S_TOGGLING;
+      
+      enabling = on;
+      
+      if(call Resource.isOwner()) {
+        setupWor();
+        
+      } else if(call Resource.immediateRequest() == SUCCESS) {
+        setupWor();
+        
+      } else {
+        call Resource.request();
+      }
     }
+    
   }
   
   command void Wor.synchronizeSettings[radio_id_t radioId]() {
@@ -184,6 +195,28 @@ implementation {
    */
   command void Wor.setEvent1[radio_id_t radioId](uint8_t evt1) {
     worSettings[radioId].event1 = evt1;
+  }
+  
+  
+  /***************** Timer Events ***************/
+  event void EnableWorTimer.fired() {
+    if(state != S_IDLE) {
+      return;
+    }
+    
+    state = S_TOGGLING;
+    
+    enabling = TRUE;
+    
+    if(call Resource.isOwner()) {
+      setupWor();
+      
+    } else if(call Resource.immediateRequest() == SUCCESS) {
+      setupWor();
+      
+    } else {
+      call Resource.request();
+    }
   }
   
   

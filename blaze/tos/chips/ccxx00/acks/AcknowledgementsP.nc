@@ -145,7 +145,7 @@ implementation {
   }
   
   async command error_t PacketAcknowledgements.noAck( message_t *msg ) {
-    (call BlazePacketBody.getHeader( msg ))->fcf &= ~(1 << IEEE154_FCF_ACK_REQ);\
+    (call BlazePacketBody.getHeader( msg ))->fcf &= ~(1 << IEEE154_FCF_ACK_REQ);
     return SUCCESS;
   }
 
@@ -159,6 +159,7 @@ implementation {
     uint8_t myState;
     atomic myState = state;
     if(myState == S_ACK_WAIT) {
+      //call Leds.led2Off();
       // Our ack wait period expired with no luck...
       atomic state = S_SEND_DONE;
       call ChipSpiResource.attemptRelease();
@@ -175,6 +176,7 @@ implementation {
       post sendDone();
       
     } else if(myState == S_SENDING_ACK) {
+      //call Leds.led2On();
       atomic state = S_ACK_WAIT;
       call AckWaitTimer.start(BLAZE_ACK_WAIT);
       
@@ -191,11 +193,13 @@ implementation {
     header = call BlazePacketBody.getHeader(atomicMsg);
     atomic myState = state;
     
+    //call Leds.led2Off();
+      
     if(myState == S_ACK_WAIT) {
       if((source == header->dest || header->dest == AM_BROADCAST_ADDR) &&
           destination == header->src &&
               dsn == header->dsn) {
-        
+         
         // This is our acknowledgement
         atomic state = S_SEND_DONE;
         call AckWaitTimer.stop();

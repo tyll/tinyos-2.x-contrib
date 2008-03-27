@@ -138,7 +138,7 @@ enum cc2500_config_reg_state_enums {
   /** GDO0 asserts when there is data in the RX FIFO */
   CC2500_CONFIG_IOCFG0 = 0x01, 
   
-  CC2500_CONFIG_FIFOTHR = 0x0E,
+  CC2500_CONFIG_FIFOTHR = 0x01,
   CC2500_CONFIG_SYNC1 = 0xD3,
   CC2500_CONFIG_SYNC0 = 0x91,
   

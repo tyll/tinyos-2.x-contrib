@@ -76,9 +76,18 @@ implementation {
   
   components BlazeCentralWiringC;
   CsmaP.BlazeRegSettings -> BlazeCentralWiringC;
+  CsmaP.Csn -> BlazeCentralWiringC.Csn;
+  CsmaP.Gdo2_io -> BlazeCentralWiringC.Gdo2_io;
   
   components BlazeSpiC;
   CsmaP.PaReg -> BlazeSpiC.PA;
+  CsmaP.IOCFG2 -> BlazeSpiC.IOCFG2;
+  CsmaP.RadioStatus -> BlazeSpiC.RadioStatus;
+  
+  CsmaP.SFTX -> BlazeSpiC.SFTX;
+  CsmaP.SFRX -> BlazeSpiC.SFRX;
+  CsmaP.SIDLE -> BlazeSpiC.SIDLE;
+  CsmaP.SRX -> BlazeSpiC.SRX;
   
   components BlazeTransmitC;
   CsmaP.AsyncSend -> BlazeTransmitC.AsyncSend;

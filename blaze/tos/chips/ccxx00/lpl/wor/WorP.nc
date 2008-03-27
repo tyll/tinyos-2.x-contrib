@@ -89,11 +89,11 @@ implementation {
       return;
     }
     
-    state = S_TOGGLING;
-    
     focusedRadio = radioId;
-    enabling = on;
     
+    state = S_TOGGLING;
+    enabling = on;
+      
     if(call Resource.isOwner()) {
       setupWor();
       
@@ -101,7 +101,10 @@ implementation {
       setupWor();
       
     } else {
-      call Resource.request();
+      // Why are we trying to enable WoR when the radio is using the SPI bus?
+      state = S_IDLE;
+      signal Wor.stateChange[focusedRadio](FALSE);
+      return; 
     }
   }
   
@@ -185,7 +188,6 @@ implementation {
   command void Wor.setEvent1[radio_id_t radioId](uint8_t evt1) {
     worSettings[radioId].event1 = evt1;
   }
-  
   
   /***************** RxInterrupt Events ****************/
   async event void RxInterrupt.fired[radio_id_t radioId]() {

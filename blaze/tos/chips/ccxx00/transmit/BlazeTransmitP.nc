@@ -113,10 +113,12 @@ implementation {
   
   /***************** AsyncSend Commands ****************/  
   async command error_t AsyncSend.send[ radio_id_t id ](void *msg, bool forcePkt, uint16_t preambleDurationMs) {
-    
+
     if(call State.requestState(S_TX_PACKET) != SUCCESS) {
       return FAIL;
     }
+    
+    ///call Leds.led1On();
     
     atomic m_id = id;
     atomic myMsg = msg;
@@ -132,6 +134,8 @@ implementation {
     if(call State.requestState(S_TX_ACK) != SUCCESS) {
       return FAIL;
     }
+    
+    ///call Leds.led0On();
     
     atomic m_id = id;
     atomic myMsg = msg;
@@ -187,9 +191,11 @@ implementation {
       call State.toIdle();
       
       if(myState == S_TX_PACKET) {
+        ///call Leds.led1Off();
         signal AsyncSend.sendDone[ id ](error);
         
       } else {
+        ///call Leds.led0Off();
         signal AckSend.sendDone[ id ](error);
       }
     }
@@ -264,7 +270,7 @@ implementation {
      */
     
     if(forcing) {
-      for(forceAttempts = 0; call RadioStatus.getRadioStatus() != BLAZE_S_TX
+      for(forceAttempts = 0; (status = call RadioStatus.getRadioStatus()) != BLAZE_S_TX
           && forceAttempts < MAX_FORCE_ATTEMPTS; forceAttempts++) {
         call STX.strobe();
       }
@@ -272,19 +278,28 @@ implementation {
     } else {
       
       ////call Leds.set(3);
+      /*
+       * The end result is always TX or RX, not some in-between state.
+       * That's why we have this in a do-while().
+       */
       do {
         call STX.strobe();
         status = call RadioStatus.getRadioStatus();
       } while((status != BLAZE_S_RX) && (status != BLAZE_S_TX));
       ////call Leds.set(0);
       
-      if(status != BLAZE_S_TX) {
-        // CCA failed
-        call Csn.set[ id ]();
-        call State.toIdle();
-        return EBUSY;
-      }
     }
+    
+    
+    if(status != BLAZE_S_TX) {
+      // CCA failed
+      ///call Leds.led1Off();
+      ///call Leds.led0Off();
+      call Csn.set[ id ]();
+      call State.toIdle();
+      return EBUSY;
+    }
+    
     
     // CCA Passed
     if(transmitDelay > 0) {

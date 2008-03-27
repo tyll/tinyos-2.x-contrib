@@ -82,7 +82,7 @@ enum {
   MAC_HEADER_SIZE = sizeof( blaze_header_t ) - 1,
   
   // size of the footer (FCS field)
-  MAC_FOOTER_SIZE = sizeof( uint16_t ),
+  MAC_FOOTER_SIZE = sizeof( blaze_footer_t ),
   
   // size of the acknowledgement frame, not including the length byte
   ACK_FRAME_LENGTH = sizeof( blaze_ack_t ) - 1,

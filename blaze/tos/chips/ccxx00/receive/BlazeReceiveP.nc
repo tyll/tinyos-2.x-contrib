@@ -95,6 +95,9 @@ implementation {
   /** TRUE if SplitControl.stop() was called */
   bool stopping;
   
+  /** Send an ack a few times; its penalty is much less than re-tx'ing a pkt */
+  uint8_t acksSent = 0;
+  
   enum receive_states{
     S_IDLE,
     S_RX_LENGTH,
@@ -169,6 +172,8 @@ implementation {
   /***************** RxInterrupt Events ****************/
   async event void RxInterrupt.fired[ radio_id_t id ]() {
     
+    ///call Leds.led2On();
+    
     if(call State.requestState(S_RX_LENGTH) != SUCCESS) {
       return;
     }
@@ -194,7 +199,19 @@ implementation {
   
   
   /***************** AckSend Events ****************/
+  
   async event void AckSend.sendDone[ radio_id_t id ](error_t error) {
+    acksSent++;
+    if(acksSent < 3) {
+      call Csn.set[id]();
+      call Csn.clr[id]();
+      call SIDLE.strobe();
+      call Csn.set[id]();
+      if(call AckSend.send[ id ](&acknowledgement, TRUE, 0) == SUCCESS) {
+        return;
+      }
+    }
+    
     call Csn.set[ id ]();
     post receiveDone();
   }
@@ -280,6 +297,8 @@ implementation {
                   acknowledgement.src = call ActiveMessageAddress.amAddress();
                 }
             
+                acksSent = 0;
+                
                 call Csn.clr[ id ]();
                 if(call AckSend.send[ id ](&acknowledgement, TRUE, 0) != SUCCESS) {
                   post receiveDone();
@@ -432,6 +451,8 @@ implementation {
       id = m_id;
       stop = stopping;
     }
+    
+    ///call Leds.led2Off();
     
     call Csn.set[ id ]();
     

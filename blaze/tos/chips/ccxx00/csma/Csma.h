@@ -41,7 +41,7 @@
 #endif
 
 #ifndef BLAZE_MIN_BACKOFF
-#define BLAZE_MIN_BACKOFF 10
+#define BLAZE_MIN_BACKOFF 20
 #endif
 
 

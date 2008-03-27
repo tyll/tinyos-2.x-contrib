@@ -57,4 +57,5 @@ typedef nx_struct RssiMsg {
 	nx_uint8_t msgbytes[TOSH_DATA_LENGTH-1];
 } RssiMsg;
 
+
 #endif

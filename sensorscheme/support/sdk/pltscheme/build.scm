@@ -96,8 +96,8 @@
   (let* ([code-module
           (command-line (car cmdline) (cdr cmdline)
                         (once-each 
-                         [("-a" "--appdir") appdir "the directory where the Tinyos application is generated" 
-                                            (set! *appdir* appdir)])
+                         [("-a" "--appdir") dir "the directory where the TinyOS application is generated" 
+                                            (set! *appdir* dir)])
                         (args (filename) ; expects one command-line argument: a filename
                               filename)) ; return a single filename to compile
           ]

@@ -16,7 +16,7 @@
    or cond define-handler case when begin do unless define lambda let define-macro letrec and quasiquote let*
    
    ;primitives
-   defined? car cdr set-car! set-cdr! cons + - * / % 
+   id defined? car cdr set-car! set-cdr! cons + - * / % 
    bitwise-and bitwise-ior bitwise-xor > >= < <= eq? 
    null? pair? symbol? number? boolean? bitwise-not not 
    random now call-at-time sensor blink append list 

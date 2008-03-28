@@ -1,7 +1,7 @@
 (ssmodule primitives
   
 (provide 
-   defined? car cdr set-car! set-cdr! cons + - * / % 
+   id defined? car cdr set-car! set-cdr! cons + - * / % 
    bitwise-and bitwise-ior bitwise-xor > >= < <= eq? 
    null? pair? symbol? number? boolean? bitwise-not not 
    random now call-at-time sensor blink append list 
@@ -9,8 +9,10 @@
    send-local send-serial 
    recv-local recv-serial)
   
+  (define-primitive id (id))
+
   (define-primitive defined? (simple DefinedPrim))
-  
+    
   (define-primitive car (simple CarPrim))
   (define-primitive cdr (simple CdrPrim))
   (define-primitive set-car! (simple SetCarPrim))

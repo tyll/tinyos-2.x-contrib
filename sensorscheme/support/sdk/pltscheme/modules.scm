@@ -191,9 +191,9 @@
               '() 
               ;global var
               (list exp))))
-    ;(printf "find-globals ~s" exps)
+
     (let ((r (apply lset-union (cons eq? (map (lambda (el) (find-in-exp el '())) exps)))))
-      ;(printf ": ~s~n"r)
+      (printf "find-globals ~s: ~s~n" exps r)
       r))
   
   ; recursively checks the globals referred to
@@ -202,12 +202,12 @@
   (define (find-all-globals exps found mdl)
     (if (null? exps) found
         (let ([globals-to-find (lset-difference eq? (find-globals exps) (map car found))])
-          ;(printf "in ~s~nto find: ~s~n" exps globals-to-find)
+          (printf "in ~s~nto find: ~s~n" exps globals-to-find)
           (let ([new-found (lookup-globals mdl globals-to-find)])
             (find-all-globals (filter-map (lambda (el) (case (cadr el) 
                                                          [(define handler) (cddr el)]
                                                          [else #f])) new-found) 
-                              (append-reverse new-found found) mdl)))))
+                              (append new-found found) mdl)))))
   
   (define (lookup-globals mdl globals)
     (map (lambda (name) (let ([val (hash-table-get (ssmodule-defines mdl) name #f)])

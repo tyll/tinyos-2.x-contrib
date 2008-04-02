@@ -18,6 +18,7 @@
 # PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS."
 #
 # @author Kamin Whitehouse 
+# @author Michael Okola (TinyOS 2.x porting)
 #
 
 from nescDecls import *

@@ -21,6 +21,7 @@
 
 # @author Cory Sharp <cssharp@eecs.berkeley.edu>
 # @author Shawn Schaffert <sms@eecs.berkeley.edu>
+# @author Michael Okola (TinyOS 2.x porting)
 
 __all__ = [ "Comm" , "Util" ]
 

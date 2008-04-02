@@ -22,6 +22,7 @@
 # @author Cory Sharp <cssharp@eecs.berkeley.edu>
 # @author Shawn Schaffert <sms@eecs.berkeley.edu>
 # @author Kamin Whitehouse
+# @author Michael Okola (TinyOS 2.x porting)
 
 import sys, os, string, types
 from Queue import Queue

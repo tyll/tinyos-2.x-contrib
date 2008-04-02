@@ -31,6 +31,7 @@
 
 /**
  * @author Kamin Whitehouse
+ * @author Michael Okola (TinyOS 2.x porting)
  */
 
 #ifndef __RPC_H__

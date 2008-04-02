@@ -6,7 +6,7 @@
  */
 
 #include <setjmp.h>
-#include <Message.h>
+#include "message.h"
 #include "SensorScheme.h"
 
 module SensorSchemeC {

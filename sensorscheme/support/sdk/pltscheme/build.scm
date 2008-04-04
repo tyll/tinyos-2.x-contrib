@@ -93,27 +93,25 @@
     (filter-map (lambda (el) 
                   (if (eq? (cadr el) sym)
                       (cons (car el) (cddr el)) #f)) defs))
-  (let* ([code-module
-          (command-line (car cmdline) (cdr cmdline)
-                        (once-each 
-                         [("-a" "--appdir") dir "the directory where the TinyOS application is generated" 
-                                            (set! *appdir* dir)])
-                        (args (filename) ; expects one command-line argument: a filename
-                              filename)) ; return a single filename to compile
-          ]
-         [module-name (string-drop-right 
-                       code-module 
-                       (+ 1 (string-contains (string-reverse code-module) ".")))])
-    (when (not *appdir*)
-      (let ([basedir "../../../apps/SensorScheme/"])
-        (when (not (directory-exists? basedir))
-          (make-directory basedir))
-        (set! *appdir* (string-append "../../../apps/SensorScheme/" module-name))
-        (when (not (directory-exists? *appdir*))
-          (make-directory *appdir*))))
+  
+  (let*-values 
+      ([(code-module)
+        (command-line (car cmdline) (cdr cmdline)
+                      (once-each 
+                       [("-a" "--appdir") dir "the directory where the TinyOS application is generated" 
+                                          (set! *appdir* (string->path dir))])
+                      (args (filename) ; expects one command-line argument: a filename
+                            filename)) ; return a single filename to compile
+        ]
+       [(base name must-be-dir?) (split-path (path->complete-path (string->path code-module)))]
+       [(module-name) (string-drop-right (path->string name) 
+                                         (+ 1 (string-contains (string-reverse code-module) ".")))])
+    (if (not *appdir*) (set! *appdir* (build-path base module-name)))
+    (when (not (directory-exists? *appdir*))
+      (make-directory *appdir*))
     
-    (printf "code-module: ~a~nappdir: ~a~n" 
-            code-module *appdir*)
+    (printf "Generating application for module ~s ...~n" code-module)
+    (printf "Application dir is ~a~n" *appdir*)
     
     (let*-values ([(symmap) (new-symmap)]
                   [(mdls inits defs) (compile-module code-module)]
@@ -121,33 +119,33 @@
                   [(primitives) (filter-defs defs 'primitive)]
                   [(receivers) (filter-defs defs 'receiver)]
                   [(code) `((%define% ,@(apply append defines)) ,@inits)])
-      (printf " defs: ~s~n inits: ~s~n code: ~s~n" defs inits code)
+      ;(printf " defs: ~s~n inits: ~s~n" defs inits)
       
-      (with-output-to-file (string-append *appdir* "/Primitives.h")
+      (with-output-to-file (build-path *appdir* "Primitives.h")
         ; code to compile into binary image
         (lambda () 
           (display c-autogen-msg)
           (display (make-primitives-h symmap primitives receivers))) 'replace)
       
-      (with-output-to-file (string-append *appdir* "/InitMessage.h")
+      (with-output-to-file (build-path *appdir* "InitMessage.h")
         ; code to compile into binary image
         (lambda () 
           (display c-autogen-msg)
           (display (make-initmessage-h (net-encode code symmap)))) 'replace)
       
-      (with-output-to-file (string-append *appdir* "/InitMessage.scm")
+      (with-output-to-file (build-path *appdir* "InitMessage.scm")
         ; simulation version
         (lambda () 
           (display scheme-autogen-msg)
           (pretty-print code)) 'replace)
-
-      (with-output-to-file (string-append *appdir* "/config.ncf") 
+      
+      (with-output-to-file (build-path *appdir* "config.ncf") 
         ; build message with injector and code
         (lambda () 
           (display scheme-autogen-msg)
           (pretty-print (build-node-conf mdls inits defs symmap))) 'replace)
       
-      (with-output-to-file (string-append *appdir* "/"  module-name "C.nc") 
+      (with-output-to-file (build-path *appdir* (string-append module-name "C.nc")) 
         ; build message with injector and code
         (lambda () 
           (display c-autogen-msg)
@@ -160,10 +158,11 @@ configuration ~aC {}
 #include \"implementation.h\"
 " module-name)) 'replace)
       
-            (with-output-to-file (string-append *appdir* "/Makefile") 
-        ; build message with injector and code
-        (lambda () 
-          (printf "COMPONENT=~aC
+      (unless (file-exists? (build-path *appdir* "Makefile"))
+        (with-output-to-file (build-path *appdir* "Makefile") 
+          ; build message with injector and code
+          (lambda () 
+            (printf "COMPONENT=~aC
 
 CFLAGS += -I$(SENSORSCHEME)/tos/lib/SensorScheme \\
           -I$(SENSORSCHEME)/tos/lib/SensorScheme/Interfaces \\
@@ -173,6 +172,8 @@ CFLAGS += -I$(SENSORSCHEME)/tos/lib/SensorScheme \\
           -I$(TOSDIR)/lib/net/ctp
 
 include $(MAKERULES)
-" module-name)) 'replace))))
+" module-name)) 'replace))
+      (unless (file-exists? (build-path *appdir* "sim.py"))
+        (copy-file (build-path (getenv "SENSORSCHEME") "support" "sdk" "pltscheme" "sim.py") (build-path *appdir* "sim.py"))))))
 
 #;(main (cons (path->string program) (current-command-line-arguments)))

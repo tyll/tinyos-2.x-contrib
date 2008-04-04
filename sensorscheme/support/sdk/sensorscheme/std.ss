@@ -1,6 +1,6 @@
 (ssmodule std
   
-  (require "macros.scm" "primitives.scm")
+  (require (lib macros) (lib primitives))
   
   (provide 
    caar cadr cdar cddr 

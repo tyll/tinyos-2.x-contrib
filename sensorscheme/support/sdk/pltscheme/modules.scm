@@ -23,16 +23,21 @@
     (let ([val (hash-table-get (ssmodule-defines mdl) name #f)])
       (if (and val (eq? (car val) kind)) val #f)))
   
-  (define mdl-path-list '("../sensorscheme" "."))
+  (define mdl-path-list '("."))
+  (define lib-path-list (list (build-path (getenv "SENSORSCHEME") "support" "sdk" "sensorscheme")))
   (define (find-module file)
-    (let/cc break
-      (for-each 
-       (lambda (p) 
-         (let ((fp (path->complete-path (build-path p file))))
-           (if (file-exists? fp)
-               (break fp))))
-       mdl-path-list)
-      (error 'find-module "module ~s not found~n" file)))
+    (let-values ([(file path-list) (if (and (list? file) (eq? (car file) 'lib))
+                                       (values (if (symbol? (cadr file)) (string-append (symbol->string (cadr file)) ".ss") 
+                                                   (cadr file)) lib-path-list)
+                                       (values file mdl-path-list))])
+      (let/cc break
+        (for-each 
+         (lambda (p) 
+           (let ((fp (path->complete-path (build-path p file))))
+             (if (file-exists? fp)
+                 (break fp))))
+         path-list)
+        (error 'find-module "module ~s not found~n" file))))
   
   ; gets all code needed for given module 
   ; 
@@ -45,7 +50,7 @@
                  [includes (ssmodule-includes (car todo-mdls))]
                  [new-defs (find-all-globals (append includes new-inits) '() (car todo-mdls))])
             #;(printf "module ~s defs: ~s~n       inits:~s~n" 
-                    (ssmodule-name (car todo-mdls)) new-defs new-inits)
+                      (ssmodule-name (car todo-mdls)) new-defs new-inits)
             (let-values ([(mdls2 inits2 defs2) (select-module (cdr todo-mdls) (cons (car todo-mdls) done-mdls))])
               (values (append (list (car todo-mdls)) mdls1 mdls2) 
                       (append new-inits inits1 inits2) (append new-defs defs1 defs2)))))))
@@ -191,9 +196,9 @@
               '() 
               ;global var
               (list exp))))
-
+    
     (let ((r (apply lset-union (cons eq? (map (lambda (el) (find-in-exp el '())) exps)))))
-      (printf "find-globals ~s: ~s~n" exps r)
+      ;(printf "find-globals ~s: ~s~n" exps r)
       r))
   
   ; recursively checks the globals referred to
@@ -202,7 +207,7 @@
   (define (find-all-globals exps found mdl)
     (if (null? exps) found
         (let ([globals-to-find (lset-difference eq? (find-globals exps) (map car found))])
-          (printf "in ~s~nto find: ~s~n" exps globals-to-find)
+          ;(printf "in ~s~nto find: ~s~n" exps globals-to-find)
           (let ([new-found (lookup-globals mdl globals-to-find)])
             (find-all-globals (filter-map (lambda (el) (case (cadr el) 
                                                          [(define handler) (cddr el)]

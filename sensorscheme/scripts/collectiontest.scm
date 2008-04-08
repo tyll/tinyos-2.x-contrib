@@ -1,6 +1,6 @@
 (ssmodule collection-test
   
-  (require "std.scm" "collection.scm" "network.scm")
+  (require (lib std) (lib collection) (lib network))
   
   (define (time-loop) 
     (call-at-time (+ (now) 256) time-loop)

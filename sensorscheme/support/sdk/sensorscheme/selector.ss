@@ -37,7 +37,7 @@
 ;  (require (lib "optional.ss" "srfi"))
 ;  (require (lib "receive.ss" "srfi" "8"))
 
-  (require "std.scm")
+  (require (lib std))
   
   (define first  car)
   (define second cadr)

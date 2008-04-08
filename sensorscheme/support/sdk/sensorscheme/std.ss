@@ -23,6 +23,9 @@
    eval eval-handler apply call/cc 
    send-local send-serial 
    recv-local recv-serial
+   
+   ;comm
+   handle msg
    )
   
   
@@ -222,5 +225,18 @@
   (define-macro (!= exp1 exp2)
     `(not (= ,exp1 ,exp2)))
   
+  
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ; communication-related functions and acros, independent of 
+  ; transmssion method (radio / serial)
+  
+  ; procedure to handle forwarding messages through protocol layers
+  (define (handle src msg) 
+    (apply (eval (car msg)) (cons src (cdr msg))))    
+  
+    (define-macro (msg tag . body)
+    `(list ',tag ,@body))  
+   
+
   
   ) ; end of service definition  

@@ -1,0 +1,10 @@
+doc
+apps
+tools
+release-notes.txt
+tinyos.sh
+overall-todo.txt
+README
+.settings
+.project
+.pydevproject

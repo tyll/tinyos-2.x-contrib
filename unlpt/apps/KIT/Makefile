@@ -1,0 +1,3 @@
+COMPONENT=KITAppC
+include $(MAKERULES)
+

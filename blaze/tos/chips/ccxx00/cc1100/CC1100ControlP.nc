@@ -124,10 +124,8 @@ implementation {
 #endif
 
 #if defined(NO_ADDRESS_RECOGNITION)
-    regValues[CC1100_CONFIG_PKTCTRL1] &= 0xFC;
     addressRecognition = FALSE;
 #else
-    regValues[CC1100_CONFIG_PKTCTRL1] |= 0x3;
     addressRecognition = TRUE;
 #endif
 
@@ -315,8 +313,7 @@ implementation {
   task void commit() {
     if(call SplitControlManager.isOn[CC1100_RADIO_ID]()) {
       call BlazeCommit.commit();
-    }
-  }
+    }  }
   
   /***************** Defaults ****************/
   default event void BlazeConfig.commitDone() {}

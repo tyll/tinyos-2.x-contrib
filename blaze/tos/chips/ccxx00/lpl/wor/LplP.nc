@@ -86,7 +86,7 @@ implementation {
   
   enum {
     /** The amount of extra time to send a wake-up transmission, in bms */
-    EXTRA_TRANSMIT_TIME = 5,
+    EXTRA_TRANSMIT_TIME = 3,
   };
   
     

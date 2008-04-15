@@ -55,19 +55,10 @@ module CsmaP {
     interface BlazePacket;
     interface BlazePacketBody;
     interface BlazeRegister as PaReg;
-    interface BlazeRegister as IOCFG2;
     interface BlazeRegSettings[radio_id_t radioId];
     interface Random;
     interface State;
     interface Leds;
-    interface GeneralIO as Csn[radio_id_t radioId];
-    interface GeneralIO as Gdo2_io[radio_id_t radioId];
-    interface RadioStatus;
-    
-    interface BlazeStrobe as SFTX;
-    interface BlazeStrobe as SFRX;
-    interface BlazeStrobe as SIDLE;
-    interface BlazeStrobe as SRX;
   }
 }
 
@@ -92,8 +83,13 @@ implementation {
   /** Error to pass back in sendDone */
   error_t myError;
   
-  /** Total number of congestion backoffs */
-  uint8_t totalCongestionBackoffs;
+  /** Total number of congestion backoffs for this transmission */
+  uint16_t totalCongestionBackoffs;
+  
+  enum { 
+    MAXIMUM_PROGRESSIVE_BACKOFF = 0x400,
+  };
+  
   
   enum {
     S_IDLE,
@@ -103,7 +99,6 @@ implementation {
     S_CANCEL,
     S_STOPPING,
   };
-  
   
   /***************** Tasks ****************/
   task void forceSend();
@@ -121,7 +116,7 @@ implementation {
     signal SplitControl.startDone[radioId](SUCCESS);
     return SUCCESS;
   }
-  
+ 
   /**
    * If we're busy, stop being busy so we can shut off this radio.
    * Assume that if we're sending, we're trying to shut off the radio that
@@ -132,7 +127,7 @@ implementation {
   command error_t SplitControl.stop[radio_id_t radioId]() {
     if(!call State.isIdle()) {
       call State.forceState(S_STOPPING);
-    
+
     } else {
       signal SplitControl.stopDone[radioId](SUCCESS);
     }
@@ -157,8 +152,9 @@ implementation {
       myMsg = msg;
       myRadio = id;
     }
-    
+
     requestCca();
+    
     
     if(!useCca) {
       call State.forceState(S_FORCING);
@@ -183,11 +179,11 @@ implementation {
    
     return FAIL;
   }
-  
+
   command uint8_t Send.maxPayloadLength[radio_id_t id]() { 
     return TOSH_DATA_LENGTH;
   }
-  
+
   command void *Send.getPayload[radio_id_t id](message_t* msg, uint8_t len) {
     if(len <= TOSH_DATA_LENGTH) {
       return msg->data;
@@ -199,20 +195,15 @@ implementation {
   /***************** Resource Events ****************/
   event void Resource.granted() {
     if(call State.isState(S_BACKOFF)) {
-      
       if(call BlazePacket.getPower(myMsg) > 0) {
         // This packet has custom PA settings
-        call Csn.clr[myRadio]();
         call PaReg.write(call BlazePacket.getPower(myMsg));
-        call Csn.set[myRadio]();
       }
       
       if(call AsyncSend.send[myRadio](myMsg, FALSE, (call BlazePacketBody.getMetadata(myMsg))->rxInterval) != SUCCESS) {
         if(call BlazePacket.getPower(myMsg) > 0) {
           // Set the PA back to default for whatever ack's are taking place
-          call Csn.clr[myRadio]();
           call PaReg.write(call BlazeRegSettings.getPa[myRadio]());
-          call Csn.set[myRadio]();
         }
         
         call Resource.release();
@@ -222,9 +213,7 @@ implementation {
     } else if(call State.isState(S_FORCING)) {
       if(call BlazePacket.getPower(myMsg) > 0) {
         // This packet has custom PA settings
-        call Csn.clr[myRadio]();
         call PaReg.write(call BlazePacket.getPower(myMsg));
-        call Csn.set[myRadio]();
       }
       post forceSend();
       
@@ -238,7 +227,6 @@ implementation {
 
   async event void AsyncSend.sendDone[radio_id_t id](error_t error) {
     atomic myError = error;
-    totalCongestionBackoffs = 0;
     post sendDone();
   }
   
@@ -313,9 +301,7 @@ implementation {
     
     if(call BlazePacket.getPower(myMsg) > 0) {
       // Set the radio back to default PA settings
-      call Csn.clr[myRadio]();
       call PaReg.write(call BlazeRegSettings.getPa[myRadio]());
-      call Csn.set[myRadio]();
     }
     
     call Resource.release();
@@ -355,22 +341,16 @@ implementation {
    * Obtain a congestion backoff amount
    * When complete, the variable myCongestionBackoff will be filled with the
    * correct amount of congestion backoff time to use.
-   *
-   * For the default value, we add on the totalCongestionBackoffs to make
-   * the backoff progressively longer.  If another transmitter is doing
-   * a WoR long-preamble broadcast, we don't want this transmitter to start
-   * transmitting during the acknowledgment gap.  Plus, this keeps the 
-   * congestion down in dense networks, at the expense of throughput.
    */
   void requestCongestionBackoff() {
-    uint16_t extraCongestionBackoff = totalCongestionBackoffs * 8;
-    if(extraCongestionBackoff > 0xFF) {
-      extraCongestionBackoff = 0xFF;
+    uint32_t extraBackoff = totalCongestionBackoffs * 20;
+    if(extraBackoff > MAXIMUM_PROGRESSIVE_BACKOFF) {
+      extraBackoff = MAXIMUM_PROGRESSIVE_BACKOFF;
     }
     
     atomic myCongestionBackoff = ( call Random.rand16() % 
-        (0x7 * BLAZE_BACKOFF_PERIOD) + BLAZE_MIN_BACKOFF) 
-            + extraCongestionBackoff;
+        (0x7 * BLAZE_BACKOFF_PERIOD) + BLAZE_MIN_BACKOFF)
+            + extraBackoff;
     
     signal Csma.requestCongestionBackoff[(call BlazePacketBody.getHeader(myMsg))->type](myMsg);
   }
@@ -381,8 +361,8 @@ implementation {
    */
   void initialBackoff() {
     uint16_t atomicBackoff;
-    totalCongestionBackoffs = 0;
     requestInitialBackoff();
+    totalCongestionBackoffs = 0;
     atomic atomicBackoff = myInitialBackoff;
     call BackoffTimer.start( atomicBackoff );
   }
@@ -392,14 +372,16 @@ implementation {
    */
   void congestionBackoff() {
     uint16_t atomicBackoff;
-    if(totalCongestionBackoffs < 0xFF) {
-      totalCongestionBackoffs++;
+    totalCongestionBackoffs++;
+    if(totalCongestionBackoffs > 1024) {
+      totalCongestionBackoffs = 1024;
     }
     
     requestCongestionBackoff();
     atomic atomicBackoff = myCongestionBackoff;
     call BackoffTimer.start( atomicBackoff );
   }
+  
   
   /***************** Defaults ****************/
   default event void Send.sendDone[radio_id_t id](message_t* msg, error_t error) { }
@@ -416,24 +398,6 @@ implementation {
   default command blaze_init_t *BlazeRegSettings.getDefaultRegisters[ radio_id_t id ]() { return NULL; }
   default command uint8_t BlazeRegSettings.getPa[ radio_id_t id ]() { return 0xC0; }
   
-  default async command void Csn.set[ radio_id_t id ](){}
-  default async command void Csn.clr[ radio_id_t id ](){}
-  default async command void Csn.toggle[ radio_id_t id ](){}
-  default async command bool Csn.get[ radio_id_t id ](){return FALSE;}
-  default async command void Csn.makeInput[ radio_id_t id ](){}
-  default async command bool Csn.isInput[ radio_id_t id ](){return FALSE;}
-  default async command void Csn.makeOutput[ radio_id_t id ](){}
-  default async command bool Csn.isOutput[ radio_id_t id ](){return FALSE;}
-
-  default async command void Gdo2_io.set[ radio_id_t id ](){}
-  default async command void Gdo2_io.clr[ radio_id_t id ](){}
-  default async command void Gdo2_io.toggle[ radio_id_t id ](){}
-  default async command bool Gdo2_io.get[ radio_id_t id ](){return FALSE;}
-  default async command void Gdo2_io.makeInput[ radio_id_t id ](){}
-  default async command bool Gdo2_io.isInput[ radio_id_t id ](){return FALSE;}
-  default async command void Gdo2_io.makeOutput[ radio_id_t id ](){}
-  default async command bool Gdo2_io.isOutput[ radio_id_t id ](){return FALSE;}
-    
 }
 
 

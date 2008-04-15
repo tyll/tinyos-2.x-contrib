@@ -32,6 +32,18 @@
 #ifndef __BLAZE_H__
 #define __BLAZE_H__
 
+#ifndef BLAZE_ENABLE_WHILE_LOOP_LEDS
+#define BLAZE_ENABLE_WHILE_LOOP_LEDS 0
+#endif
+
+#ifndef BLAZE_ENABLE_TIMING_LEDS
+#define BLAZE_ENABLE_TIMING_LEDS 0
+#endif
+
+#ifndef BLAZE_ENABLE_SPI_WOR_RX_LEDS
+#define BLAZE_ENABLE_SPI_WOR_RX_LEDS 0
+#endif
+
 #include "IEEE802154.h"
 
 typedef uint8_t blaze_status_t;
@@ -82,7 +94,7 @@ enum {
   MAC_HEADER_SIZE = sizeof( blaze_header_t ) - 1,
   
   // size of the footer (FCS field)
-  MAC_FOOTER_SIZE = sizeof( blaze_footer_t ),
+  MAC_FOOTER_SIZE = 0,
   
   // size of the acknowledgement frame, not including the length byte
   ACK_FRAME_LENGTH = sizeof( blaze_ack_t ) - 1,

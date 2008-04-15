@@ -76,6 +76,7 @@ implementation {
   components BlazeCentralWiringC;  
   BlazeTransmitP.Csn -> BlazeCentralWiringC.Csn;
   BlazeTransmitP.ChipRdy -> BlazeCentralWiringC.Gdo2_io;
+  BlazeTransmitP.RxIo -> BlazeCentralWiringC.Gdo0_io;
   
   components BlazeSpiC as Spi;
   BlazeTransmitP.RadioStatus -> Spi.RadioStatus;
@@ -88,6 +89,7 @@ implementation {
   BlazeTransmitP.SIDLE -> Spi.SIDLE;
   BlazeTransmitP.SRX -> Spi.SRX;
   BlazeTransmitP.TxReg -> Spi.TXREG;
+  BlazeTransmitP.WORCTRL -> Spi.WORCTRL;
     
   components new TimerMilliC();
   BlazeTransmitP.Timer -> TimerMilliC;

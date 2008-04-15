@@ -1,6 +1,25 @@
 
 /**
  * This is sort of the hardware presentation layer of Wake-on-Radio
+ *
+ * The KickTimer was integrated due to WoR issues:
+ * The microcontroller tells the radio to go into WoR mode. The radio
+ * says its in WoR mode, and then never signals the microcontroller
+ * that a new packet has been received. This may be due to the WoR timer
+ * not turning on properly in the radio (I could have sworn I stopped seeing
+ * receive check signatures in the energy consumption of the radio). Without
+ * the radio doing its job, there is no way for the microcontroller to know
+ * something is wrong.  We could possibly turn GDO2 into an Event0 or Event1
+ * signal and verify that WoR is running on the radio, but a simpler solution
+ * that shouldn't require widespread code changes is to set a periodic timer
+ * that kicks WoR every so often.  That's what the KickTimer is doing,
+ * and if we could reliably get the radio to do its job, we'd be able to 
+ * remove the kick timer that makes sure the radio is in WoR mode.
+ *
+ * The KickTimer should not fire if we recently received a packet, or
+ * are transmitting a packet which naturally disables WoR.  The only
+ * time it should fire is every WOR_KICK_TIMER seconds of inactivity.
+ * 
  * @author David Moss
  */
 
@@ -31,6 +50,8 @@ module WorP {
     interface GeneralIO as Csn[radio_id_t radioId];
     interface GpioInterrupt as RxInterrupt[radio_id_t radioId];
     
+    interface Timer<TMilli> as KickTimer;
+    
     interface Leds;
   }
 }
@@ -56,7 +77,6 @@ implementation {
   /***************** Prototypes ****************/
   void setupWor();
   void verifyRxMode();
-  
   
   /***************** Init Commands ****************/
   /**
@@ -89,11 +109,17 @@ implementation {
       return;
     }
     
-    focusedRadio = radioId;
+#if BLAZE_ENABLE_SPI_WOR_RX_LEDS
+      // Flicker to notify a change event was requested
+      call Leds.led2Toggle();
+      call Leds.led2Toggle();
+#endif
     
     state = S_TOGGLING;
+    
+    focusedRadio = radioId;
     enabling = on;
-      
+    
     if(call Resource.isOwner()) {
       setupWor();
       
@@ -101,10 +127,14 @@ implementation {
       setupWor();
       
     } else {
-      // Why are we trying to enable WoR when the radio is using the SPI bus?
+    
+#if BLAZE_ENABLE_SPI_WOR_RX_LEDS
+      call Leds.led2Off();
+#endif
+
+      call Resource.release();
       state = S_IDLE;
       signal Wor.stateChange[focusedRadio](FALSE);
-      return; 
     }
   }
   
@@ -189,8 +219,10 @@ implementation {
     worSettings[radioId].event1 = evt1;
   }
   
+  
   /***************** RxInterrupt Events ****************/
   async event void RxInterrupt.fired[radio_id_t radioId]() {
+    call KickTimer.stop();
     //atomic worSettings[radioId].worEnabled = FALSE;
   }
   
@@ -199,45 +231,72 @@ implementation {
     setupWor();
   }
   
+  /***************** KickTimer Events ****************/
+  event void KickTimer.fired() {
+    // Don't do anything if any other part of the radio stack is in use.
+    if(call Resource.immediateRequest() == SUCCESS) {
+      // Focused radio is still the last radio we enabled
+      enabling = TRUE;
+      setupWor();      
+    }
+  }
   
   /***************** Functions ****************/
   void setupWor() {
+
+#if BLAZE_ENABLE_SPI_WOR_RX_LEDS
+      // Flicker to notify the resource was granted
+      call Leds.led2Toggle();
+      call Leds.led2Toggle();
+#endif
+    
     call Csn.set[focusedRadio]();
     call Csn.clr[focusedRadio]();
     
     while(call ChipRdy.get[focusedRadio]());
     
     if(enabling) {
+    
+#if BLAZE_ENABLE_SPI_WOR_RX_LEDS
+      call Leds.led2On();
+#endif
+
       // Enable WoR
       call SIDLE.strobe();
+      call SFRX.strobe();
+      call SFTX.strobe();
       
-      if(worSettings[focusedRadio].worEnabled) {
-        // WoR was previously setup. Give it a kick.
-        call SWOR.strobe();
-        
-      } else {
-        // Setup RX_TIME_RSSI, RX_TIME_QUAL, and RX_TIME        
-        call MCSM2.write(worSettings[focusedRadio].mcsm2);
-        
-        // Setup EVENT0, the time between receive checks.
-        call WOREVT1.write(worSettings[focusedRadio].event0 >> 8);
-        call WOREVT0.write(worSettings[focusedRadio].event0);
-        
-        // Power up the RC Oscillator
-        call WORCTRL.write(
-            (0 << CCXX00_WORCTRL_RC_PD) |
-            (worSettings[focusedRadio].event1 << CCXX00_WORCTRL_EVENT1) |
-            (1 << CCXX00_WORCTRL_RC_CAL) |
-            (0 << CCXX00_WORCTRL_WOR_RES));
-         
-        worSettings[focusedRadio].worEnabled = TRUE;
-        call SWOR.strobe();
-      }
+      call KickTimer.startPeriodic(WOR_KICK_TIMER);
+      
+      // Setup RX_TIME_RSSI, RX_TIME_QUAL, and RX_TIME        
+      call MCSM2.write(worSettings[focusedRadio].mcsm2);
+      
+      // Setup EVENT0, the time between receive checks.
+      call WOREVT1.write(worSettings[focusedRadio].event0 >> 8);
+      call WOREVT0.write(worSettings[focusedRadio].event0);
+      
+      // Power up the RC Oscillator
+      call WORCTRL.write(
+          (0 << CCXX00_WORCTRL_RC_PD) |
+          (worSettings[focusedRadio].event1 << CCXX00_WORCTRL_EVENT1) |
+          (1 << CCXX00_WORCTRL_RC_CAL) |
+          (0 << CCXX00_WORCTRL_WOR_RES));
+       
+      worSettings[focusedRadio].worEnabled = TRUE;
+      call SWOR.strobe();
       
     } else {
       
+#if BLAZE_ENABLE_SPI_WOR_RX_LEDS
+      call Leds.led2Off();
+#endif
+      
       // Disable WoR
       call SIDLE.strobe();
+      call SFRX.strobe();
+      call SFTX.strobe();
+      
+      call KickTimer.stop();
 
       // Disable RX_TIME_RSSI
       call MCSM2.write(0x0E);
@@ -265,8 +324,38 @@ implementation {
   void verifyRxMode() {
     uint8_t status;
     
-    ////call Leds.set(5);
+    /**
+     * TODO
+     * I had the CC2500 set as the default radio, with WoR interval set to
+     * 1000 ms.  Everything was fine, until I tried to disable WoR on 
+     * the CC2500 radio, which occurs naturally when the radio is turned off.
+     * In this while() loop, the radio responds with a bunch of 4F's, which
+     * means "CALIBRATING".  It does this over and over again, and then
+     * goes into IDLE mode mysteriously (when it's calibrating, we don't
+     * send it any commands to go into IDLE mode).  Once in IDLE mode, the
+     * loop would tell the radio SIDLE, SRX.. and we'd get the same result.
+     *
+     * In other words, the radio calibrates indefinitely and then gives up
+     * by going into IDLE mode.  Obviously if we were disabling WoR to send a
+     * packet, we wouldn't be able to send that packet due to some other lock
+     * up issue.
+     *
+     * Not sure if this has ever occured on the CC1100 radio.
+     */
+
+#warning "Using the CC2500 give-up method for WoR"
+
+    uint16_t giveUp = 0;
+    
+#if BLAZE_ENABLE_WHILE_LOOP_LEDS
+    call Leds.set(5);
+#endif
     while((status = call RadioStatus.getRadioStatus()) != BLAZE_S_RX) {
+      giveUp++;
+      if(giveUp > 1024) {
+        break;
+      }
+      
       call Csn.set[focusedRadio]();
       call Csn.clr[focusedRadio]();
       
@@ -285,13 +374,29 @@ implementation {
         
       } else if (status == BLAZE_S_SETTLING) {
         // do nothing but don't quit the loop
-        
+      
       } else {
+        // Disable WoR
         call SIDLE.strobe();
+        
+        // Disable RX_TIME_RSSI
+        call MCSM2.write(0x0E);
+        
+        // Power down the RC oscillator
+        call WORCTRL.write(
+              (1 << CCXX00_WORCTRL_RC_PD) |
+              (worSettings[focusedRadio].event1 << CCXX00_WORCTRL_EVENT1) |
+              (1 << CCXX00_WORCTRL_RC_CAL) |
+              (0 << CCXX00_WORCTRL_WOR_RES));
+        
         call SRX.strobe();
       }
     }
-    ////call Leds.set(0);
+
+#if BLAZE_ENABLE_WHILE_LOOP_LEDS
+    call Leds.set(0);
+#endif
+
     
     call Csn.set[focusedRadio]();
   }

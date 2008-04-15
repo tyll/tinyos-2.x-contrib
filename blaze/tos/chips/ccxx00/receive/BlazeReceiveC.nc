@@ -96,6 +96,12 @@ implementation {
   components ActiveMessageAddressC;
   BlazeReceiveP.ActiveMessageAddress -> ActiveMessageAddressC;
   
+  components new AlarmMultiplexC();
+  BlazeReceiveP.AckGap -> AlarmMultiplexC;
+  
+  components RandomC;
+  BlazeReceiveP.Random -> RandomC;
+  
   components LedsC;
   BlazeReceiveP.Leds -> LedsC;
   

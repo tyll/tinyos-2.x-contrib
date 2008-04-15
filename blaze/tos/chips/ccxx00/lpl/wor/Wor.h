@@ -46,6 +46,11 @@
 #define CCXX00_CRYSTAL_KHZ 26000
 #endif
 
+#ifndef WOR_KICK_TIMER
+#define WOR_KICK_TIMER 15360
+#endif
+
+
 /**
  * WORCTRL register bitfields
  */

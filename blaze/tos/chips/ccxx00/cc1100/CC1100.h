@@ -285,8 +285,8 @@ enum CC1100_config_reg_state_enums {
   /** Maximum variable packet length is 61 per Errata */
   CC1100_CONFIG_PKTLEN = 0x3D,
   
-  /** 0x0 and 0xFF are broadcasts, append 2 status bytes */
-  CC1100_CONFIG_PKTCTRL1 = 0x27,
+  /** No hw address recognition for better ack rate, append 2 status bytes */
+  CC1100_CONFIG_PKTCTRL1 = 0x24,
   
   /** CRC appending, variable length packets */
   CC1100_CONFIG_PKTCTRL0 = 0x45,

@@ -45,7 +45,7 @@
 enum {
   CC2500_RADIO_ID = unique( UQ_BLAZE_RADIO ),
 };
-  
+
 /**
  * All default channels and FREQx registers obtained from SmartRF studio. We
  * are not trying to define channel frequencies to match up with any sort of
@@ -138,15 +138,15 @@ enum cc2500_config_reg_state_enums {
   /** GDO0 asserts when there is data in the RX FIFO */
   CC2500_CONFIG_IOCFG0 = 0x01, 
   
-  CC2500_CONFIG_FIFOTHR = 0x01,
+  CC2500_CONFIG_FIFOTHR = 0x0E,
   CC2500_CONFIG_SYNC1 = 0xD3,
   CC2500_CONFIG_SYNC0 = 0x91,
   
   /** Maximum variable packet length is 61 per Errata */
   CC2500_CONFIG_PKTLEN = 0x3D,
   
-  /** 0x0 and 0xFF are broadcasts, append 2 status bytes */
-  CC2500_CONFIG_PKTCTRL1 = 0x27,
+  /** No hw address recognition for better ack rate, append 2 status bytes */
+  CC2500_CONFIG_PKTCTRL1 = 0x24,
   
   /** CRC appending, variable length packets */
   CC2500_CONFIG_PKTCTRL0 = 0x45,
@@ -171,8 +171,8 @@ enum cc2500_config_reg_state_enums {
   CC2500_CONFIG_MCSM2 = 0x07,
   
   /** TX on CCA; Stay in Rx after Rx and Tx */
-  CC2500_CONFIG_MCSM1 = 0x3F,  
-  CC2500_CONFIG_MCSM0 = 0x1C, 
+  CC2500_CONFIG_MCSM1 = 0x3F,
+  CC2500_CONFIG_MCSM0 = 0x1C,
   CC2500_CONFIG_FOCCFG = 0x1D,
   CC2500_CONFIG_BSCFG = 0x1C,
   CC2500_CONFIG_AGCTRL2 = 0xC7, 

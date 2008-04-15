@@ -42,5 +42,8 @@ implementation {
   components LedsC;
   WorP.Leds -> LedsC;
   
+  components new TimerMilliC() as KickTimerC;
+  WorP.KickTimer -> KickTimerC;
+  
 }
 

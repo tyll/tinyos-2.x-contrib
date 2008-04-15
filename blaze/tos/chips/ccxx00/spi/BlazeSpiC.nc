@@ -32,7 +32,6 @@
 
 #include "Blaze.h"
 
-
 /**
  * CCxx00 SPI bus wiring
  * @author Jared Hill

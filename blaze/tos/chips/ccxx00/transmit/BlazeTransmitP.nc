@@ -68,6 +68,7 @@ module BlazeTransmitP {
   uses {
     interface GeneralIO as Csn[ radio_id_t id ];
     interface GeneralIO as ChipRdy[radio_id_t radioId];
+    interface GeneralIO as RxIo[radio_id_t radioId];
     interface BlazePacketBody;
     interface BlazeRegSettings;
     
@@ -82,6 +83,7 @@ module BlazeTransmitP {
     
     interface BlazeRegister as PaReg;
     interface BlazeRegister as TxReg;
+    interface BlazeRegister as WORCTRL;
     
     interface Timer<TMilli>;
     interface RadioStatus;
@@ -109,16 +111,19 @@ implementation {
   
   /***************** Prototypes ****************/
   error_t transmit();
+  void disableWor();
   task void startTimer();
   
   /***************** AsyncSend Commands ****************/  
   async command error_t AsyncSend.send[ radio_id_t id ](void *msg, bool forcePkt, uint16_t preambleDurationMs) {
-
+    
     if(call State.requestState(S_TX_PACKET) != SUCCESS) {
       return FAIL;
     }
     
-    ///call Leds.led1On();
+#if BLAZE_ENABLE_TIMING_LEDS
+    call Leds.led2On();
+#endif
     
     atomic m_id = id;
     atomic myMsg = msg;
@@ -135,7 +140,9 @@ implementation {
       return FAIL;
     }
     
-    ///call Leds.led0On();
+#if BLAZE_ENABLE_TIMING_LEDS
+    call Leds.led1On();
+#endif
     
     atomic m_id = id;
     atomic myMsg = msg;
@@ -159,8 +166,11 @@ implementation {
     
       call Csn.set[id]();
       call Csn.clr[id]();
-      
-      ////call Leds.set(1);
+
+#if BLAZE_ENABLE_WHILE_LOOP_LEDS
+      call Leds.set(1);
+#endif
+
       while((status = call RadioStatus.getRadioStatus()) != BLAZE_S_RX) {
         call Csn.set[id]();
         call Csn.clr[id]();
@@ -178,12 +188,18 @@ implementation {
         } else if (status == BLAZE_S_CALIBRATE) {
           // do nothing but don't quit the loop
           
+        } else if (status == BLAZE_S_SETTLING) {
+          // do nothing but don't quit the loop
+          
         } else if (status != BLAZE_S_TX) {
           error = FAIL;
           call SRX.strobe();
         }
       }
-      ////call Leds.set(0);
+      
+#if BLAZE_ENABLE_WHILE_LOOP_LEDS
+      call Leds.set(0);
+#endif
       
       call Csn.set[ id ]();
       
@@ -191,11 +207,15 @@ implementation {
       call State.toIdle();
       
       if(myState == S_TX_PACKET) {
-        ///call Leds.led1Off();
+#if BLAZE_ENABLE_TIMING_LEDS
+        call Leds.led2Off();
+#endif
         signal AsyncSend.sendDone[ id ](error);
         
       } else {
-        ///call Leds.led0Off();
+#if BLAZE_ENABLE_TIMING_LEDS
+        call Leds.led1Off();
+#endif
         signal AckSend.sendDone[ id ](error);
       }
     }
@@ -227,15 +247,34 @@ implementation {
       transmitDelay = duration;
     }
     
+    // Receives take priority; don't drop acknowledgments.
+    if(call State.isState(S_TX_PACKET) && call RxIo.get[id]()) {
+#if BLAZE_ENABLE_TIMING_LEDS
+    call Leds.led2Off();
+#endif
+      call State.toIdle();
+      return FAIL;
+    }
+    
     call Csn.clr[ id ]();
     
     while(call ChipRdy.get[id]());
+    
+    /** Ensure WoR is disabled before attempting any transmission */
+    disableWor();
+    
+    call Csn.set[id]();
+    call Csn.clr[id]();
     
     /*
      * Put the radio in RX mode if it's not already. This covers the
      * frequency / synthesizer startup and calibration
      */
-    ////call Leds.set(2);
+
+#if BLAZE_ENABLE_WHILE_LOOP_LEDS
+    call Leds.set(2);
+#endif
+
     while((status = call RadioStatus.getRadioStatus()) != BLAZE_S_RX) {
       call Csn.set[id]();
       call Csn.clr[id]();
@@ -256,12 +295,28 @@ implementation {
       } else if (status == BLAZE_S_SETTLING) {
         // do nothing but don't quit the loop
         
+      } else if (status == BLAZE_S_IDLE) {
+        call SRX.strobe();
+        
       } else {
         call SIDLE.strobe();
         call SRX.strobe();
       }
     }
-    ////call Leds.set(0);
+#if BLAZE_ENABLE_WHILE_LOOP_LEDS
+    call Leds.set(0);
+#endif
+    
+    // Receives take priority; don't drop acknowledgments.
+    // This is the last chance to abort a transmit for a receive.
+    if(call State.isState(S_TX_PACKET) && call RxIo.get[id]()) {
+#if BLAZE_ENABLE_TIMING_LEDS
+    call Leds.led2Off();
+#endif
+      call Csn.set[id]();
+      call State.toIdle();
+      return FAIL;
+    }
     
     /*
      * Attempt to transmit.  If the radio goes into TX mode, then our transmit
@@ -276,31 +331,31 @@ implementation {
       }
       
     } else {
-      
-      ////call Leds.set(3);
-      /*
-       * The end result is always TX or RX, not some in-between state.
-       * That's why we have this in a do-while().
-       */
+
+#if BLAZE_ENABLE_WHILE_LOOP_LEDS
+      call Leds.set(3);
+#endif
       do {
         call STX.strobe();
         status = call RadioStatus.getRadioStatus();
       } while((status != BLAZE_S_RX) && (status != BLAZE_S_TX));
-      ////call Leds.set(0);
-      
+#if BLAZE_ENABLE_WHILE_LOOP_LEDS
+      call Leds.set(0);
+#endif
     }
-    
     
     if(status != BLAZE_S_TX) {
       // CCA failed
-      ///call Leds.led1Off();
-      ///call Leds.led0Off();
       call Csn.set[ id ]();
       call State.toIdle();
+
+#if BLAZE_ENABLE_TIMING_LEDS
+      call Leds.led2Off();
+      call Leds.led1Off();
+#endif
       return EBUSY;
     }
-    
-    
+      
     // CCA Passed
     if(transmitDelay > 0) {
       post startTimer();
@@ -309,6 +364,18 @@ implementation {
       call TXFIFO.write(msg, (call BlazePacketBody.getHeader(msg))->length + 1);
     }
     return SUCCESS;
+  }
+  
+  
+  /**
+   * Disable WoR locally. 
+   */
+  void disableWor() {
+      call WORCTRL.write(
+            (1 << CCXX00_WORCTRL_RC_PD) |
+            (0x7 << CCXX00_WORCTRL_EVENT1) |
+            (1 << CCXX00_WORCTRL_RC_CAL) |
+            (0 << CCXX00_WORCTRL_WOR_RES));
   }
   
   /***************** Timer Events ****************/
@@ -344,6 +411,15 @@ implementation {
   default async command bool ChipRdy.isInput[ radio_id_t id ](){return FALSE;}
   default async command void ChipRdy.makeOutput[ radio_id_t id ](){}
   default async command bool ChipRdy.isOutput[ radio_id_t id ](){return FALSE;}
+  
+  default async command void RxIo.set[ radio_id_t id ](){}
+  default async command void RxIo.clr[ radio_id_t id ](){}
+  default async command void RxIo.toggle[ radio_id_t id ](){}
+  default async command bool RxIo.get[ radio_id_t id ](){ return 0; }
+  default async command void RxIo.makeInput[ radio_id_t id ](){}
+  default async command bool RxIo.isInput[ radio_id_t id ](){ return 0; }
+  default async command void RxIo.makeOutput[ radio_id_t id ](){}
+  default async command bool RxIo.isOutput[ radio_id_t id ](){ return 0; }
   
   default async event void AsyncSend.sendDone[ radio_id_t id ](error_t error) {}
   

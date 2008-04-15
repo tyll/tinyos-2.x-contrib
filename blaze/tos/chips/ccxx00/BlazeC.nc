@@ -85,6 +85,9 @@ configuration BlazeC {
     
     /** Configure low power listening for any blaze radio */
     interface LowPowerListening as BlazeLowPowerListening[ radio_id_t radioId ];
+    
+    /** CTP Required Interface */
+    interface LinkPacketMetadata;
   }
 }
 
@@ -97,6 +100,7 @@ implementation {
   AMPacket = BlazeActiveMessageC;
   Packet = BlazeActiveMessageC;
   SendNotifier = BlazeActiveMessageC;
+  LinkPacketMetadata = BlazeActiveMessageC;
   
   components RadioSelectC;
   RadioSelect = RadioSelectC;

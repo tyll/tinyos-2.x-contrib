@@ -38,6 +38,8 @@
  */
  
 #include "Blaze.h"
+#include "Acknowledgements.h"
+#include "Csma.h"
 
 module BlazeReceiveP {
 
@@ -68,11 +70,14 @@ module BlazeReceiveP {
     
     interface BlazeRegister as RXREG;
   
+    interface Alarm<T32khz,uint32_t> as AckGap;
+    
     interface BlazePacket;
     interface BlazePacketBody;
     interface RadioStatus;
     interface ActiveMessageAddress;
     interface State;
+    interface Random;
     interface Leds;
   }
 
@@ -94,9 +99,6 @@ implementation {
   
   /** TRUE if SplitControl.stop() was called */
   bool stopping;
-  
-  /** Send an ack a few times; its penalty is much less than re-tx'ing a pkt */
-  uint8_t acksSent = 0;
   
   enum receive_states{
     S_IDLE,
@@ -171,8 +173,15 @@ implementation {
   
   /***************** RxInterrupt Events ****************/
   async event void RxInterrupt.fired[ radio_id_t id ]() {
+
     
-    ///call Leds.led2On();
+#if BLAZE_ENABLE_SPI_WOR_RX_LEDS
+      call Leds.led0On();
+#endif
+
+#if BLAZE_ENABLE_TIMING_LEDS
+    call Leds.led0On();
+#endif
     
     if(call State.requestState(S_RX_LENGTH) != SUCCESS) {
       return;
@@ -199,20 +208,21 @@ implementation {
   
   
   /***************** AckSend Events ****************/
+  uint8_t totalAcks;
   
   async event void AckSend.sendDone[ radio_id_t id ](error_t error) {
-    acksSent++;
-    if(acksSent < 3) {
-      call Csn.set[id]();
-      call Csn.clr[id]();
-      call SIDLE.strobe();
-      call Csn.set[id]();
+    totalAcks++;
+    
+    if(totalAcks < 3) {
+      call Csn.set[ id ]();
+      call Csn.clr[ id ]();
       if(call AckSend.send[ id ](&acknowledgement, TRUE, 0) == SUCCESS) {
         return;
       }
     }
     
     call Csn.set[ id ]();
+    
     post receiveDone();
   }
   
@@ -287,7 +297,7 @@ implementation {
       } else if(rxFrameLength >= sizeof(blaze_header_t) - 1) {
         // The amount of data in this packet is at least a valid header size
         if(isDataPacket(header, id)) {
-          if(passesAddressFilter(header, id)) {        
+          if(passesAddressFilter(header, id)) {
             if(passesPanFilter(header, id)) {
               if(shouldAck(header, id)) {
                 // Send an ack and then receive the packet in AckSend.sendDone()
@@ -297,9 +307,10 @@ implementation {
                   acknowledgement.src = call ActiveMessageAddress.amAddress();
                 }
             
-                acksSent = 0;
+                totalAcks = 0;
                 
                 call Csn.clr[ id ]();
+                
                 if(call AckSend.send[ id ](&acknowledgement, TRUE, 0) != SUCCESS) {
                   post receiveDone();
                 }
@@ -314,6 +325,13 @@ implementation {
               }
             }
           }
+          
+          // This is a data packet that is not for me.
+          // Allow the real destination node time to acknowledge the packet 
+          // without interruption from this node's transmit branch.
+          call AckGap.start(call Random.rand16() % (0x7 * BLAZE_BACKOFF_PERIOD) 
+              + BLAZE_ACK_WAIT);
+          return;
         }
       }
       
@@ -330,6 +348,12 @@ implementation {
   }  
   
 
+  /***************** AckGap Alarm Events ****************/
+  async event void AckGap.fired() {
+    cleanUp();
+  }
+  
+  
   /***************** ActiveMessageAddress Events ****************/
   async event void ActiveMessageAddress.changed() {
   }
@@ -398,7 +422,7 @@ implementation {
     atomic id = m_id;
     
     call Csn.clr[ id ]();
- 
+    
     // Read in the length byte
     call RXFIFO.beginRead(msg, 1);
   }
@@ -410,7 +434,10 @@ implementation {
     
     call SRX.strobe();
     
-    ////call Leds.set(4);
+#if BLAZE_ENABLE_WHILE_LOOP_LEDS
+    call Leds.set(4);
+#endif
+
     while((status = call RadioStatus.getRadioStatus()) != BLAZE_S_RX) {
       call Csn.set[id]();
       call Csn.clr[id]();
@@ -431,12 +458,18 @@ implementation {
       } else if (status == BLAZE_S_SETTLING) {
         // do nothing but don't quit the loop
         
+      } else if (status == BLAZE_S_IDLE) {
+        call SRX.strobe();
+        
       } else {
         call SIDLE.strobe();
         call SRX.strobe();
       }
     }
-    ////call Leds.set(0);
+
+#if BLAZE_ENABLE_WHILE_LOOP_LEDS
+    call Leds.set(0);
+#endif
     
     cleanUp();
   }
@@ -451,8 +484,6 @@ implementation {
       id = m_id;
       stop = stopping;
     }
-    
-    ///call Leds.led2Off();
     
     call Csn.set[ id ]();
     
@@ -477,6 +508,14 @@ implementation {
         }
       }
       
+#if BLAZE_ENABLE_TIMING_LEDS    
+      call Leds.led0Off();
+#endif
+
+#if BLAZE_ENABLE_SPI_WOR_RX_LEDS
+      call Leds.led0Off();
+#endif
+
       post notifyRxDone();
     }
   }

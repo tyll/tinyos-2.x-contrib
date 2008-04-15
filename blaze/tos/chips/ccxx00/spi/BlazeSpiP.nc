@@ -167,7 +167,13 @@ implementation {
         call SpiResourceState.toIdle();
       }
     }
-    
+
+#if BLAZE_ENABLE_SPI_WOR_RX_LEDS
+    if(!error) {
+      call Leds.led3On();
+    }
+#endif
+
     return error;
   }
 
@@ -304,6 +310,11 @@ implementation {
     atomic { 
       holder = m_holder;
     }
+
+#if BLAZE_ENABLE_SPI_WOR_RX_LEDS
+    call Leds.led3On();
+#endif
+
     signal Resource.granted[ holder ]();
   }
 
@@ -334,6 +345,11 @@ implementation {
     signal ChipSpiResource.releasing();
     atomic {
       if(release) {
+
+#if BLAZE_ENABLE_SPI_WOR_RX_LEDS
+        call Leds.led3Off();
+#endif
+
         call SpiResource.release();
         return SUCCESS;
       }

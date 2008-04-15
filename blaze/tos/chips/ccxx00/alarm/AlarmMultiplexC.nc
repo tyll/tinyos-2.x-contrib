@@ -38,9 +38,9 @@
  * @author David Moss
  */
 
-#include <Timer.h>
+#include "Timer.h"
 
-configuration AlarmMultiplexC {
+generic configuration AlarmMultiplexC() {
 
   provides interface Alarm<T32khz,uint32_t> as Alarm32khz32;
 

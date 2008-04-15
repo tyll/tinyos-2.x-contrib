@@ -70,7 +70,7 @@ implementation {
   components BlazePacketC;
   AcknowledgementsP.BlazePacketBody -> BlazePacketC;
   
-  components AlarmMultiplexC;
+  components new AlarmMultiplexC();
   AcknowledgementsP.AckWaitTimer -> AlarmMultiplexC;
   
   components BlazeReceiveC;

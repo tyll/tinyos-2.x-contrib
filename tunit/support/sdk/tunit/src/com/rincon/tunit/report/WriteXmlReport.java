@@ -143,7 +143,7 @@ public class WriteXmlReport {
     String xml = "";
     xml += "  <testcase classname=\"";
     xml += report.getPackage() + "\" "; // doesn't matter
-    xml += "name=\"" + result.getTestName() + "\n" + result.getSourceCodeLineNumber() + "\" ";
+    xml += "name=\"" + makeXmlFriendly(result.getTestName()) + "\n" + result.getSourceCodeLineNumber() + "\" ";
     xml += "time=\"" + result.getDuration() + "\"";
     
     if(!result.isError() && !result.isFailure()) {
@@ -162,8 +162,8 @@ public class WriteXmlReport {
       xml += "failure";
     }
     
-    xml += " type=\"" + result.getProblemType() + "\">";  // doesn't matter
-    xml += result.getFailMsg() + "</";
+    xml += " type=\"" + makeXmlFriendly(result.getProblemType()) + "\">";  // doesn't matter
+    xml += makeXmlFriendly(result.getFailMsg()) + "</";
     
     if(result.isError()) {
       xml += "error";
@@ -176,5 +176,17 @@ public class WriteXmlReport {
     xml += "\n\n";
     return xml;
     
+  }
+  
+  /**
+   * XML hates things like quotes and < >'s embedded in tags.
+   * @param xml
+   * @return
+   */
+  private String makeXmlFriendly(String xml) {
+    xml = xml.replaceAll("\"","&quot;");
+    xml = xml.replaceAll("<", "&lt;");
+    xml = xml.replaceAll(">", "&gt;");
+    return xml;
   }
 }

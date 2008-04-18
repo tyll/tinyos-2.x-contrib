@@ -8,3 +8,5 @@ CFLAGS += -I$(TOSCONTRIB)/tunit/tos/system/
 CFLAGS += -I$(TOSCONTRIB)/tunit/tos/interfaces
 CFLAGS += -I$(TOSCONTRIB)/tunit/tos/lib/directserial
 CFLAGS += -I$(TOSCONTRIB)/tunit/tos/lib/fifoqueue
+
+CFLAGS += $(TUNITCFLAGS)

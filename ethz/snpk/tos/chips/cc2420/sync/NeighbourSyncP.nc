@@ -44,6 +44,7 @@ module NeighbourSyncP {
     interface NeighbourSyncInfo;
     interface NeighbourSyncPacket;
     interface NeighbourSyncFlowPacket;
+    interface PacketLogger;
   }
   uses {
     interface Send as SubSend;
@@ -339,6 +340,7 @@ implementation {
     	retries=0;
     	(call CC2420PacketBody.getHeader(msg))->length = m_len;	// set the right length
     	(call CC2420PacketBody.getMetadata( msg ))->rxInterval = m_rxInterval;
+    	signal PacketLogger.sendDone(msg, error);
     	signal Send.sendDone(msg, error);
     }
   }
@@ -400,6 +402,7 @@ implementation {
     */
 #endif
     (call CC2420PacketBody.getHeader(msg))->length = len - SYNC_HEADER_SIZE;
+    signal PacketLogger.received(msg);
     return signal Receive.receive(msg, payload, len - SYNC_HEADER_SIZE);
   }
   
@@ -542,6 +545,13 @@ implementation {
 	  call LowPowerListening.setRxSleepInterval(&resync_msg, lplPeriod);
 	  call AMSend.send(address, &resync_msg, 0);
   }
+  
+  /***************** PacketLogger events ***************/
+   default event void PacketLogger.received(message_t* msg) {
+   }
+   
+   default event void PacketLogger.sendDone(message_t* msg, error_t error) {
+   }
   
   /***************** AMSend events *************/
   event void AMSend.sendDone(message_t* msg, error_t error) {

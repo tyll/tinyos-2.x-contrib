@@ -38,6 +38,7 @@ configuration NeighbourSyncC {
     interface NeighbourSyncRequest;
     interface NeighbourSyncPacket;
     interface NeighbourSyncFlowPacket;
+    interface PacketLogger;
   }
   uses {
     interface Send as SubSend;
@@ -74,6 +75,7 @@ implementation {
   NeighbourSyncRequest = NeighbourSyncP.NeighbourSyncRequest;
   NeighbourSyncPacket = NeighbourSyncP;
   NeighbourSyncFlowPacket = NeighbourSyncP;
+  PacketLogger = NeighbourSyncP;
   
   MainC.SoftwareInit -> Alarm32khz32C;
 

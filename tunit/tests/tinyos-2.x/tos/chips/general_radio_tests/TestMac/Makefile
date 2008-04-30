@@ -1,2 +1,0 @@
-COMPONENT=TestMacC
-include $(MAKERULES)

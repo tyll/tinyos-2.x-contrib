@@ -33,19 +33,6 @@ implementation
 	TestMacP.TestCase -> TestCaseC.TestCase;
 	TestMacP.TearDownOneTime -> TestCaseC.TearDownOneTime;
 
-	components new StatisticsC() as RxThroughputC;
-	TestMacP.RxThroughput -> RxThroughputC;
-	components new StatisticsC() as RxMissingC;
-	TestMacP.RxMissing -> RxMissingC;
-	components new StatisticsC() as RxDuplicatesC;
-	TestMacP.RxDuplicates -> RxDuplicatesC;
-	components new StatisticsC() as TxThroughputC;
-	TestMacP.TxThroughput -> TxThroughputC;
-	components new StatisticsC() as TxNotAckedC;
-	TestMacP.TxNotAcked -> TxNotAckedC;
-	components new StatisticsC() as TxFailedC;
-	TestMacP.TxFailed -> TxFailedC;
-
 	TestMacP.RadioControl -> ActiveMessageC;
 	TestMacP.AMSend -> ActiveMessageC.AMSend[0x17];
 	TestMacP.Receive -> ActiveMessageC.Receive[0x17];

@@ -32,13 +32,6 @@ module TestMacP
 		interface TestCase;
 		interface TestControl as TearDownOneTime;
 
-		interface Statistics as RxThroughput;
-		interface Statistics as RxMissing;
-		interface Statistics as RxDuplicates;
-		interface Statistics as TxThroughput;
-		interface Statistics as TxNotAcked;
-		interface Statistics as TxFailed;
-
 		interface SplitControl as RadioControl;
 		interface AMSend;
 		interface Receive;

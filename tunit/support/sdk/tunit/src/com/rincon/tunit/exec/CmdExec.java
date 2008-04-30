@@ -31,55 +31,78 @@ package com.rincon.tunit.exec;
  * OF THE POSSIBILITY OF SUCH DAMAGE
  */
 
+
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
 
-
 /**
- * Execute commands outside of Java.  Execute the commmand and it returns the
- * output.  Access 'lastExitVal' to determine what the exit status was.
+ * Execute commands outside of Java. Execute the commmand and it returns the
+ * output. Access 'lastExitVal' to determine what the exit status was.
+ * 
  * @author David Moss
- *
+ * @author Miklos Maroti
  */
 public class CmdExec {
-	
+
   /** Logging */
   private static Logger log = Logger.getLogger(CmdExec.class);
-  
+
   /** The exit value from the last command executed */
   public static int lastExitVal = 0;
-  
+
   /** Capture the output stream from the running process */
   private static StreamCapture outputCapture = null;
-  
+
   /** Capture the error stream from the running process */
   private static StreamCapture errorCapture = null;
-  
-  
-	/**
-	 * Run a command on the command line
-	 * @param cmd
-	 * @return
-	 * @throws IOException
-	 */
-	@SuppressWarnings("unchecked")
+
+  /**
+   * Run a command on the command line
+   * 
+   * @param cmd
+   * @return
+   * @throws IOException
+   */
+  @SuppressWarnings("unchecked")
   static public String[] runCommand(String cmd) throws IOException {
     log.info(cmd);
-    
-		Process proc = Runtime.getRuntime().exec(cmd);
+
+    java.util.List tokenList = new java.util.ArrayList();
+    String token = "";
+    boolean inQuote = false;
+
+    for (int i = 0; i <= cmd.length(); ++i) {
+      if (token.length() > 0
+          && (i == cmd.length() || (cmd.charAt(i) == ' ' && !inQuote))) {
+        tokenList.add(token);
+        token = "";
+      } else {
+        if (token.length() != 0 || cmd.charAt(i) != ' ')
+          token += cmd.charAt(i);
+
+        if (cmd.charAt(i) == '"')
+          inQuote = !inQuote;
+      }
+    }
+
+    String[] tokens = (String[]) tokenList.toArray(new String[0]);
+
+    Process proc = Runtime.getRuntime().exec(tokens);
+
     outputCapture = new StreamCapture(proc.getInputStream(), "Output");
     errorCapture = new StreamCapture(proc.getErrorStream(), "Error");
 
-		try {
-			// Wait for process to terminate and catch any Exceptions.
-			lastExitVal = proc.waitFor();
+    try {
+      // Wait for process to terminate and catch any Exceptions.
+      lastExitVal = proc.waitFor();
       log.debug("Exit Value: " + lastExitVal);
-		} catch (InterruptedException e) {
-			log.error("Command was interrupted");
-		}
-		
+    } catch (InterruptedException e) {
+      log.error("Command was interrupted");
+    }
+
     log.debug("Done executing " + cmd);
-		return (outputCapture.getCaptured() + errorCapture.getCaptured()).split("\n");
-	}
+    return (outputCapture.getCaptured() + errorCapture.getCaptured())
+        .split("\n");
+  }
 }

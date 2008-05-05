@@ -93,7 +93,7 @@
  *  @see Net2-WG
  */
 
-generic module CtpRoutingEngineP(uint8_t routingTableSize, uint16_t minInterval, uint16_t maxInterval) {
+generic module CtpRoutingEngineP(uint8_t routingTableSize, uint32_t minInterval, uint32_t maxInterval) {
     provides {
         interface UnicastNameFreeRouting as Routing;
         interface RootControl;
@@ -171,7 +171,7 @@ implementation {
     error_t routingTableUpdateEntry(am_addr_t, am_addr_t , uint16_t);
     error_t routingTableEvict(am_addr_t neighbor);
 
-    uint16_t currentInterval = minInterval;
+    uint32_t currentInterval = minInterval;
     uint32_t t; 
     bool tHasPassed;
 
@@ -179,7 +179,7 @@ implementation {
     
     void chooseAdvertiseTime() {
        t = currentInterval;
-       t *= 512; // * 1024 / 2
+       t /= 2;
        t += call Random.rand32() % t;
        tHasPassed = FALSE;
        call BeaconTimer.stop();
@@ -192,21 +192,18 @@ implementation {
     }
 
     void decayInterval() {
-      if (!state_is_root) {
-        currentInterval *= 2;
-        if (currentInterval > maxInterval) {
-          currentInterval = maxInterval;
-        }
+      currentInterval *= 2;
+      if (currentInterval > maxInterval) {
+         currentInterval = maxInterval;
       }
       chooseAdvertiseTime();
     }
 
     void remainingInterval() {
        uint32_t remaining = currentInterval;
-       remaining *= 1024;
        remaining -= t;
        tHasPassed = TRUE;
-       call BeaconTimer.startPeriodic(t);
+       call BeaconTimer.startOneShot(t);
     }
 
     command error_t Init.init() {
@@ -398,9 +395,8 @@ implementation {
                 // we need it: i. when choosing a parent (here); 
                 //            ii. when choosing a next hop
                 parentChanges++;
-                resetInterval();
                 dbg("TreeRouting","Changed parent. from %d to %d\n", routeInfo.parent, best->neighbor);
-                call CollectionDebug.logEventRoute(NET_C_TREE_NEW_PARENT, best->neighbor, 0, best->info.etx); 
+                call CollectionDebug.logEventDbg(NET_C_TREE_NEW_PARENT, best->neighbor, best->info.etx, minEtx);
                 call LinkEstimator.unpinNeighbor(routeInfo.parent);
                 call LinkEstimator.pinNeighbor(best->neighbor);
                 call LinkEstimator.clearDLQ(best->neighbor);
@@ -509,7 +505,7 @@ implementation {
 
     event void RouteTimer.fired() {
       if (radioOn && running) {
-	post updateRouteTask();
+    	  post updateRouteTask();
       }
     }
       
@@ -594,7 +590,6 @@ implementation {
         if (call CtpRoutingPacket.getOption(msg, CTP_OPT_PULL)) {
               resetInterval();
         }
-        //post updateRouteTask();
         return msg;
     }
 
@@ -649,24 +644,11 @@ implementation {
     }
 
     command void CtpInfo.triggerRouteUpdate() {
-      // Random time in interval 64-127ms
-      uint16_t beaconDelay = call Random.rand16();
-      beaconDelay &= 0x3f; 
-      beaconDelay += 64;
-      if (call BeaconTimer.gett0() + call BeaconTimer.getdt() -
-                                     call BeaconTimer.getNow() >= beaconDelay) {
-         call BeaconTimer.stop();
-         call BeaconTimer.startOneShot(beaconDelay);
-        }
+    	resetInterval();
      }
 
     command void CtpInfo.triggerImmediateRouteUpdate() {
-      // Random time in interval 4-11ms
-      uint16_t beaconDelay = call Random.rand16();
-      beaconDelay &= 0x7; 
-      beaconDelay += 4;
-      call BeaconTimer.stop();
-      call BeaconTimer.startOneShot(beaconDelay);
+    	resetInterval();
     }
 
     command void CtpInfo.setNeighborCongested(am_addr_t n, bool congested) {

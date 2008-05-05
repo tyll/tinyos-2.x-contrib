@@ -843,10 +843,9 @@ implementation {
     }
 
     // NB: at this point, we have a resource acquistion problem.
-    // Trigger an immediate route update, log the event, and drop the
+    // Log the event, and drop the
     // packet on the floor.
     droppedPackets++;
-    call CtpInfo.triggerImmediateRouteUpdate();
     call CollectionDebug.logEvent(NET_C_FE_SEND_QUEUE_FULL);
     return m;
   }

@@ -1,15 +1,52 @@
 <html>
 <head>
-   <title>Index Placeholder</title>
+   <title>Marionette</title>
 </head>
 <body TEXT="#000000" BGCOLOR="#FFFFFF" LINK="#0000EF" VLINK="#55188A" ALINK="#FF0000">
 
-<img src="http://www.tinyos.net/scoop/images/tos-jwall.jpg"></img>
-
-<h1>Index Placeholder</h1>
+<h1>Overview of the Marionette for TinyOS 2.x Project</h1>
 
 <p>
-This file is a placeholder for your personal index file.  It is linked to from your entry in the main index file found in <i>tinyos-2.x-contrib/index.html</i>.  It should be used to document any projects contained in this directory.  Please update it as appropriate. 
+Marionette is a tool suite which utilizes RPC to allow functions to be called and variables to be read and modified on an embedded wireless node from a PC.  This specific project serves two purposes: to port the functionality of Marionette from TinyOS 1.x to 2.x, and to add new capabilities to the tool suite.
+</p>
+
+<h1>Project Information</h1>
+
+<h2>Completed Functionality</h2>
+
+<p>
+This project has nearly reached the full functionality of the TinyOS 1.x version.  It only lacks the ability to communicate with nodes using multi-hop routing.  In addition, an XML-RPC server has been included in Marionette to allow programs to utilize it in a variety of different programming languages and from separate PCs.
+</p>
+
+<h2>Current Development Efforts</h2>
+
+<p>
+A unit testing tool is currently under development for Marionette.  It will enable programmers to test a given NesC interface and its associated functions, while only requiring the user to give the location of the .nc file and of the node.  All of the NesC code will be generated automatically and installed on the node, then the programmer may treat the returned object as a normal Marionette NescApp.
+</p>
+
+<h2>Future Work</h2>
+
+<p>
+Some areas which we are considering exploring in the future are:<br/>
+
+<ul>
+<li>Porting multi-hop routing</li>
+<li>Marionette as a macroprogramming development tool</li>
+<li>Determining how to allow full or expanded access to NesC Python objects through the XML-RPC interface</li>
+</ul>
+</p>
+
+<h1>Links</h1>
+
+<ul>
+<li><a href=http://www.cs.virginia.edu/~whitehouse/research/marionette/whitehouse06marionette.pdf>Marionette: Using RPC for Interactive Development and Debugging of Wireless Embedded Networks (IPSN/SPOTS '06)</a></li>
+<li><a href="doc/Pytos Development Environment.html">Marionette Documentation</a></li>
+</ul>
+
+<h1>Contact Information</h1>
+
+<p>
+<a href=http://www.cs.virginia.edu/~whitehouse>Kamin Whitehouse</a>
 </p>
 
 </body>

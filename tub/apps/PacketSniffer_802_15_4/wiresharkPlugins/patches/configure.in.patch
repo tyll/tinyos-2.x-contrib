@@ -1,0 +1,24 @@
+--- wireshark-1.0.0/configure.in	2008-03-29 18:27:02.000000000 +0100
++++ wireshark-1.0.0-sniff/configure.in	2008-05-11 04:31:04.000000000 +0200
+@@ -1696,10 +1696,12 @@
+   packaging/svr4/checkinstall
+   packaging/svr4/pkginfo
+   plugins/Makefile
++  plugins/802_15_4/Makefile
+   plugins/agentx/Makefile
+   plugins/artnet/Makefile
+   plugins/asn1/Makefile
+   plugins/ciscosm/Makefile
++  plugins/cc2420/Makefile
+   plugins/docsis/Makefile
+   plugins/enttec/Makefile
+   plugins/ethercat/Makefile
+@@ -1719,6 +1721,8 @@
+   plugins/rudp/Makefile
+   plugins/sbus/Makefile
+   plugins/stats_tree/Makefile
++  plugins/t2am/Makefile
++  plugins/t2sf/Makefile
+   plugins/unistim/Makefile
+   plugins/v5ua/Makefile
+   plugins/wimax/Makefile

@@ -3,6 +3,7 @@
 #include "AM.h"
 #include "Serial.h"
 #include "sniff802154.h"
+#include "IEEE802154.h"
 
 module Sniff802154P {
   uses {
@@ -13,25 +14,39 @@ module Sniff802154P {
     interface AMSend as UartSend[am_id_t id];
     interface Receive as UartReceive[am_id_t id];
     interface Packet as UartPacket;
-    interface AMPacket as UartAMPacket;
+    interface Send as TransparentUartSend;
+    //    interface Receive as TransparentReceive;
     
     // radio stuff
-    interface SplitControl as RadioSniffControl;
-    command error_t setChannel(uint8_t channel);
+    interface StdControl as RadioReceiveControl;
+    interface CC2420Receive as RadioReceive;
+    interface Receive as RadioDataReceive;
+    interface CC2420Config as RadioConfig;
+    interface CC2420Power as RadioPower;
+    interface CC2420PacketBody as RadioPacketBody;
+    interface Resource as RadioControlResource;
 
+    interface GpioCapture as CaptureSFD;
     interface Leds;
   }
-  provides {
- 		async command void* rawReceive(void*);
-  }
+
 }
 
 implementation
 {
+
+  typedef enum {
+    S_PRE_INIT,
+    S_SET_CHANNEL,
+    S_SNIFF_RECEIVE,
+  } sniff_state_t;
+
   enum {
     UART_QUEUE_LEN = 50,
   };
 
+  sniff_state_t m_sniff_state;
+  
   message_t uartAckControl;
   message_t* uartAckControlPtr = &uartAckControl;
   
@@ -40,6 +55,7 @@ implementation
   norace uint8_t    uartIn, uartOut;
   norace bool       uartBusy, uartFull;
   
+  task void start_done_task();
   task void uartRawSendTask();
  
 
@@ -56,38 +72,56 @@ implementation
     uartBusy = FALSE;
     uartFull = TRUE;
 
-    call RadioSniffControl.start();
-    call SerialControl.start();
+    atomic m_sniff_state = S_PRE_INIT;
+
+    call RadioPower.startVReg();
   }
 
-  event void RadioSniffControl.startDone(error_t error) {
-    if (error == SUCCESS) {
-    }
+  
+  async event void RadioPower.startVRegDone() {
+    call RadioControlResource.request();
+  }
+  
+  event void RadioControlResource.granted() {
+    if (m_sniff_state == S_PRE_INIT)
+      call RadioPower.startOscillator();
+  }
+
+  async event void RadioPower.startOscillatorDone() {
+    post start_done_task();
+  }
+
+  task void start_done_task() {
+    call RadioReceiveControl.start();
+    call RadioPower.rxOn();
+    call RadioControlResource.release();
+    call SerialControl.start(); 
   }
 
   event void SerialControl.startDone(error_t error) {
     if (error == SUCCESS) {
       uartFull = FALSE;
+      atomic m_sniff_state = S_SNIFF_RECEIVE;
     }
   }
 
   event void SerialControl.stopDone(error_t error) {}
-  event void RadioSniffControl.stopDone(error_t error) {}
 
-  async command void* rawReceive(void* buffer) {
-    message_t *ret = buffer;
+
+  message_t* sniffReceive(message_t* msg) {
+
+    message_t *ret = msg;
     atomic {
       if (!uartFull)
       {
-        // not so fast...
-        // memcpy((void*)&uartQueue[uartIn]->data, buffer, (*((uint8_t*)buffer)+1));
 	      
         ret = uartQueue[uartIn];
-	  		uartQueue[uartIn] = (message_t*)buffer;
-                
-        uartIn = (uartIn + 1) % UART_QUEUE_LEN;
+	uartQueue[uartIn] = msg;
         
-        if (uartIn == uartOut)
+	if (++uartIn >= UART_QUEUE_LEN)
+	  uartIn = 0;
+        
+	if (uartIn == uartOut)
           uartFull = TRUE;
 
         if (!uartBusy)
@@ -102,13 +136,21 @@ implementation
   	return ret;
   }
 
+
+  async event void RadioReceive.receive( uint8_t type, message_t* msg ) {
+    uint8_t state;
+    atomic state=m_sniff_state;
+    if (state == S_SNIFF_RECEIVE)
+      sniffReceive(msg);
+  }
+
+
   // sends the raw captured packet via serial
   task void uartRawSendTask() {
     uint8_t len;
-    am_id_t id;
-    am_addr_t addr;
     message_t* msg;
-    
+    cc2420_header_t* header;
+
     atomic if (uartIn == uartOut && !uartFull)
     {
       uartBusy = FALSE;
@@ -116,20 +158,38 @@ implementation
     }
 
     msg = uartQueue[uartOut];
-        
-    len = *((uint8_t*)msg->data)+1;
-    id = AM_RAW_PKT_T;
-    addr = AM_BROADCAST_ADDR;
-
-    if (call UartSend.send[id](addr, uartQueue[uartOut], len) == SUCCESS)
-      call Leds.led1Toggle();
-    else
-    {
-      post uartRawSendTask();
+    
+    header = call RadioPacketBody.getHeader(msg);
+    len = header->length+1-sizeof(cc2420_header_t);
+    if (uartAckControlPtr != msg) { 
+      if (call TransparentUartSend.send(msg, len) == SUCCESS)
+	call Leds.led1Toggle();
+      else
+	{
+	  call Leds.led0Toggle();
+	  post uartRawSendTask();
+	}
     }
   }
-  
-  
+   
+ event void TransparentUartSend.sendDone(message_t* msg, error_t error) {
+    if (error != SUCCESS)
+      dropBlink();
+    else {
+      atomic if (msg == uartQueue[uartOut])
+      {
+        if (++uartOut >= UART_QUEUE_LEN)
+          uartOut = 0;
+        if (uartFull)
+          uartFull = FALSE;
+      }
+      else {
+        uartAckControlPtr = msg;
+      }
+    }
+    post uartRawSendTask();
+  }
+ 
   event void UartSend.sendDone[am_id_t id](message_t* msg, error_t error) {
     if (error != SUCCESS)
       dropBlink();
@@ -148,29 +208,31 @@ implementation
     post uartRawSendTask();
   }
 
-  event message_t *UartReceive.receive[am_id_t id](message_t *msg,
-      void *payload,
-      uint8_t len) 
-  {
+  event message_t *UartReceive.receive[am_id_t id](message_t *msg, void *payload, uint8_t len) {
     message_t *ret = msg;
 
     // control packet
     if (id == AM_CONTROL_PKT_T) {
-      if ((call setChannel(((control_pkt_t*)payload)->channel) == SUCCESS) 
-           && (uartAckControlPtr != ret))
-      {
-        // send ack in form of the same control packet
+      if (uartAckControlPtr != ret) {
+        atomic m_sniff_state=S_SET_CHANNEL;
+        call RadioConfig.setChannel((((control_pkt_t*)payload)->channel));
+        call RadioConfig.sync(); 
+	call UartSend.send[AM_CONTROL_PKT_T](AM_BROADCAST_ADDR, msg, len);
         ret = uartAckControlPtr;
-        call UartSend.send[AM_CONTROL_PKT_T](AM_BROADCAST_ADDR, msg, len);
       }
-    } 
-    // packet injection not supported yet!
-    else if (id == AM_RAW_PKT_T) {  
-			;
     }
-     
     return ret;
   }
+
+  event void RadioConfig.syncDone( error_t error ) {
+    atomic {
+      if (m_sniff_state == S_SET_CHANNEL)
+	m_sniff_state = S_SNIFF_RECEIVE;
+    }
+  }
+
+  event message_t* RadioDataReceive.receive(message_t* msg, void* payload, uint8_t len) { return msg; }
+  async event void CaptureSFD.captured( uint16_t time ) {}
 
 }  
 

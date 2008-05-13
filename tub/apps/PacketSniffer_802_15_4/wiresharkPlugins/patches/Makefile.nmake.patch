@@ -1,0 +1,24 @@
+--- wireshark-1.0.0/Makefile.nmake	2008-03-29 18:27:02.000000000 +0100
++++ wireshark-1.0.0-sniff/Makefile.nmake	2008-05-13 01:37:12.000000000 +0200
+@@ -953,9 +953,11 @@
+ 	xcopy ".\wimaxasncp\*.*" $(INSTALL_DIR)\wimaxasncp /d
+ 	if not exist $(INSTALL_DIR)\plugins mkdir $(INSTALL_DIR)\plugins
+ 	if not exist $(INSTALL_DIR)\plugins\$(VERSION) mkdir $(INSTALL_DIR)\plugins\$(VERSION)
+-	xcopy ".\plugins\agentx\agentx.dll" $(INSTALL_DIR)\plugins\$(VERSION) /d
++	xcopy ".\plugins\802_15_4\802_15_4.dll" $(INSTALL_DIR)\plugins\$(VERSION) /d
++        xcopy ".\plugins\agentx\agentx.dll" $(INSTALL_DIR)\plugins\$(VERSION) /d
+ 	xcopy ".\plugins\artnet\artnet.dll" $(INSTALL_DIR)\plugins\$(VERSION) /d
+ 	xcopy ".\plugins\asn1\asn1.dll" $(INSTALL_DIR)\plugins\$(VERSION) /d
++        xcopy ".\plugins\cc2420\cc2420.dll" $(INSTALL_DIR)\plugins\$(VERSION) /d
+ 	xcopy ".\plugins\ciscosm\ciscosm.dll" $(INSTALL_DIR)\plugins\$(VERSION) /d
+ 	xcopy ".\plugins\docsis\docsis.dll" $(INSTALL_DIR)\plugins\$(VERSION) /d
+ 	xcopy ".\plugins\enttec\enttec.dll" $(INSTALL_DIR)\plugins\$(VERSION) /d
+@@ -979,6 +981,8 @@
+ 	xcopy ".\plugins\rudp\rudp.dll" $(INSTALL_DIR)\plugins\$(VERSION) /d
+ 	xcopy ".\plugins\sbus\sbus.dll" $(INSTALL_DIR)\plugins\$(VERSION) /d
+ 	xcopy ".\plugins\stats_tree\stats_tree.dll" $(INSTALL_DIR)\plugins\$(VERSION) /d
++        xcopy ".\plugins\t2sf\t2sf.dll" $(INSTALL_DIR)\plugins\$(VERSION) /d
++        xcopy ".\plugins\t2am\t2am.dll" $(INSTALL_DIR)\plugins\$(VERSION) /d
+ 	xcopy ".\plugins\unistim\unistim.dll" $(INSTALL_DIR)\plugins\$(VERSION) /d
+ 	xcopy ".\plugins\v5ua\v5ua.dll" $(INSTALL_DIR)\plugins\$(VERSION) /d
+ 	xcopy ".\plugins\wimax\wimax.dll" $(INSTALL_DIR)\plugins\$(VERSION) /d

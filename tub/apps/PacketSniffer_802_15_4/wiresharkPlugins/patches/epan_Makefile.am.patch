@@ -1,0 +1,22 @@
+--- wireshark-1.0.0/epan/Makefile.am	2008-03-29 18:26:39.000000000 +0100
++++ wireshark-1.0.0-sniff/epan/Makefile.am	2008-05-11 04:33:39.000000000 +0200
+@@ -181,8 +181,10 @@
+ if ENABLE_STATIC
+ 
+ plugin_src = \
++	../plugins/802_15_4/packet-802_15_4.c \
+ 	../plugins/artnet/packet-artnet.c \
+ 	../plugins/asn1/packet-asn1.c \
++	../plugins/cc2420/packet-2420.c \
+ 	../plugins/docsis/packet-bpkmattr.c \
+ 	../plugins/docsis/packet-bpkmreq.c \
+ 	../plugins/docsis/packet-bpkmrsp.c \
+@@ -221,6 +223,8 @@
+ 	../plugins/pcli/packet-pcli.c \
+ 	../plugins/rdm/packet-rdm.c \
+ 	../plugins/rtnet/packet-rtnet.c \
++	../plugins/t2am/packet-t2am.c \
++	../plugins/t2sf/packet-t2sf.c \
+ 	../plugins/v5ua/packet-v5ua.c \
+         ../plugins/wimax/crc.c \
+         ../plugins/wimax/crc_data.c \

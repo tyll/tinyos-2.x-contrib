@@ -1,0 +1,24 @@
+--- wireshark-1.0.0/plugins/Makefile.am	2008-03-29 18:23:45.000000000 +0100
++++ wireshark-1.0.0-sniff/plugins/Makefile.am	2008-05-11 04:25:15.000000000 +0200
+@@ -22,10 +22,12 @@
+ # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ 
+ SUBDIRS = \
++        802_15_4 \
+ 	agentx \
+ 	artnet \
+ 	asn1 \
+ 	ciscosm \
++	cc2420 \
+ 	docsis \
+ 	enttec \
+ 	ethercat \
+@@ -45,6 +47,8 @@
+ 	rudp \
+ 	sbus \
+ 	stats_tree \
++        t2am \
++        t2sf \
+ 	unistim \
+ 	v5ua \
+ 	wimax \

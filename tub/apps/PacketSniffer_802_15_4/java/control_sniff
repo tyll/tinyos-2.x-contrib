@@ -1,0 +1,8 @@
+#! /bin/bash
+
+mkfifo sniffControlPipeIn
+#java net.tinyos.sf.SerialForwarder -comm serial@/dev/ttyUSB0:telosb & 
+#sleep 5
+java Sniff802154Control 
+rm -f sniffControlPipeIn
+

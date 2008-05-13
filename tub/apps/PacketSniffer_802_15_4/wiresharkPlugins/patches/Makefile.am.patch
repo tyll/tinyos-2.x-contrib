@@ -1,0 +1,24 @@
+--- wireshark-1.0.0/Makefile.am	2008-03-29 18:27:02.000000000 +0100
++++ wireshark-1.0.0-sniff/Makefile.am	2008-05-11 04:29:40.000000000 +0200
+@@ -236,10 +236,12 @@
+ if HAVE_PLUGINS
+ 
+ plugin_ldadd = \
++	-dlopen plugins/802_15_4/802_15_4.la \
+ 	-dlopen plugins/agentx/agentx.la \
+ 	-dlopen plugins/artnet/artnet.la \
+ 	-dlopen plugins/asn1/asn1.la \
+ 	-dlopen plugins/ciscosm/ciscosm.la \
++	-dlopen plugins/cc2420/cc2420.la \
+ 	-dlopen plugins/docsis/docsis.la \
+ 	-dlopen plugins/enttec/enttec.la \
+ 	-dlopen plugins/ethercat/ethercat.la \
+@@ -260,6 +262,8 @@
+ 	-dlopen plugins/rudp/rudp.la \
+ 	-dlopen plugins/sbus/sbus.la \
+ 	-dlopen plugins/stats_tree/stats_tree.la \
++	-dlopen plugins/t2am/t2am.la \
++	-dlopen plugins/t2sf/t2sf.la \
+ 	-dlopen plugins/unistim/unistim.la \
+ 	-dlopen plugins/v5ua/v5ua.la \
+ 	-dlopen plugins/wimax/wimax.la

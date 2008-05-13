@@ -1,0 +1,57 @@
+--- wireshark-1.0.0/plugins/Makefile.nmake	2008-03-29 18:23:45.000000000 +0100
++++ wireshark-1.0.0-sniff/plugins/Makefile.nmake	2008-05-11 04:27:53.000000000 +0200
+@@ -29,6 +29,9 @@
+ maintainer-clean-local: distclean-local
+ 
+ process-plugins:
++	cd 802.15.4
++	$(MAKE) /$(MAKEFLAGS) -f Makefile.nmake $(PLUGIN_TARGET)
++	cd ..
+ 	cd agentx
+ 	$(MAKE) /$(MAKEFLAGS) -f Makefile.nmake $(PLUGIN_TARGET)
+ 	cd ..
+@@ -41,6 +44,9 @@
+ 	cd ciscosm
+ 	$(MAKE) /$(MAKEFLAGS) -f Makefile.nmake $(PLUGIN_TARGET)
+ 	cd ..
++	cd cc2420
++	$(MAKE) /$(MAKEFLAGS) -f Makefile.nmake $(PLUGIN_TARGET)
++	cd ..
+ 	cd docsis
+ 	$(MAKE) /$(MAKEFLAGS) -f Makefile.nmake $(PLUGIN_TARGET)
+ 	cd ..
+@@ -98,6 +104,12 @@
+ 	cd stats_tree
+ 	$(MAKE) /$(MAKEFLAGS) -f Makefile.nmake $(PLUGIN_TARGET)
+ 	cd ..
++	cd t2am
++	$(MAKE) /$(MAKEFLAGS) -f Makefile.nmake $(PLUGIN_TARGET)
++	cd ..
++	cd t2sf
++	$(MAKE) /$(MAKEFLAGS) -f Makefile.nmake $(PLUGIN_TARGET)
++	cd ..
+ 	cd unistim
+ 	$(MAKE) /$(MAKEFLAGS) -f Makefile.nmake $(PLUGIN_TARGET)
+ 	cd ..
+@@ -121,10 +133,12 @@
+ !IFDEF ENABLE_LIBWIRESHARK
+ 	rm -rf $(VERSION)
+ 	mkdir $(VERSION)
++	xcopy 802_15_4\*.dll $(VERSION) /d
+ 	xcopy agentx\*.dll $(VERSION) /d
+ 	xcopy artnet\*.dll $(VERSION) /d
+ 	xcopy asn1\*.dll $(VERSION) /d
+ 	xcopy ciscosm\*.dll $(VERSION) /d
++	xcopy cc2420\*.dll $(VERSION) /d
+ 	xcopy docsis\*.dll $(VERSION) /d
+ 	xcopy enttec\*.dll $(VERSION) /d
+ 	xcopy ethercat\*.dll $(VERSION) /d
+@@ -144,6 +158,8 @@
+ 	xcopy rudp\*.dll $(VERSION) /d
+ 	xcopy sbus\*.dll $(VERSION) /d
+ 	xcopy stats_tree\*.dll $(VERSION) /d
++	xcopy t2am\*.dll $(VERSION) /d
++	xcopy t2sf\*.dll $(VERSION) /d
+ 	xcopy unistim\*.dll $(VERSION) /d
+ 	xcopy v5ua\*.dll $(VERSION) /d
+ 	xcopy wimax\*.dll $(VERSION) /d

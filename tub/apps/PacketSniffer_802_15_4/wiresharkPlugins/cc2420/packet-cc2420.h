@@ -31,8 +31,8 @@
 /* offset off length field */
 #define CC2420_HEADER_LENGTH_OFFSET 1
 
-/* describes the standard serial AM type to registrate with */
-#define CC2420_STANDARD_AM_TYPE 0xD7
+/* describes the standard serial type to registrate with */
+#define T2_802154_SERIAL_TYPE 2
 
 /* standard channel of cc2420 radio */
 #define CC2420_CHANNEL 26

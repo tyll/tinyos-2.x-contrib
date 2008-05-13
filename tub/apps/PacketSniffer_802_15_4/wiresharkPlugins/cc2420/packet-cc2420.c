@@ -53,8 +53,8 @@ static int hf_cc2420_rssi = -1;
 	
 /* Global preferences */
 /* pref for AM type to registrate with  */
-static guint global_am_type_cc2420 = CC2420_STANDARD_AM_TYPE;
-static guint am_type_cc2420 = CC2420_STANDARD_AM_TYPE;
+static guint global_serial_type_cc2420 = T2_802154_SERIAL_TYPE;
+static guint serial_type_cc2420 = T2_802154_SERIAL_TYPE;
 static guint global_channel_cc2420 = CC2420_CHANNEL;
 static guint channel_cc2420 = CC2420_CHANNEL;
 
@@ -65,11 +65,10 @@ static gint ett_cc2420 = -1;
 /* for sub dissectors */
 static dissector_handle_t data_handle;
 static heur_dissector_list_t heur_subdissector_list;
-
 /* description for packet dispatch type */
 static const true_false_string cc2420_crc_string = {
-	"16 bit crc correct",
-	"16 bit crc failed"
+  "16 bit crc correct",
+  "16 bit crc failed"
 };
 
 /* writes the channel given by the pref to a file, hoping that it's the
@@ -84,36 +83,36 @@ static void setChannel_cc2420() {
 /* Code to actually dissect general frame fields */
 static void dissect_cc2420(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 {  
-	/* Set up structures needed to add the protocol subtree and manage it */
- 	proto_item* ti;
+  /* Set up structures needed to add the protocol subtree and manage it */
+  proto_item* ti;
   proto_item *fc;
- 	proto_tree* tree_cc2420;
+  proto_tree* tree_cc2420;
   proto_tree* fc_tree;
   unsigned int cc2420_length, available_length;
   tvbuff_t* next_tvb;
 
-	tree_cc2420 = NULL;
+  tree_cc2420 = NULL;
  
   cc2420_length = tvb_get_guint8(tvb, 0);
     
   /* check if this cc2420 packet is really sane. If length is incorrect this might be another packet */
   if (cc2420_length+1 != tvb_length(tvb)) {
-   	call_dissector(data_handle, tvb, pinfo, tree);
-		return;
+    call_dissector(data_handle, tvb, pinfo, tree);
+    return;
   }
   
-	/* Make entries in Protocol column and Info column on summary display */
-	if (check_col(pinfo->cinfo, COL_PROTOCOL)) 
-		col_set_str(pinfo->cinfo, COL_PROTOCOL, "CC2420");
+  /* Make entries in Protocol column and Info column on summary display */
+  if (check_col(pinfo->cinfo, COL_PROTOCOL)) 
+    col_set_str(pinfo->cinfo, COL_PROTOCOL, "CC2420");
 
-	if (check_col(pinfo->cinfo, COL_INFO)) {
-		col_set_str(pinfo->cinfo, COL_INFO, "CC2420 Phy Frame");
+  if (check_col(pinfo->cinfo, COL_INFO)) {
+    col_set_str(pinfo->cinfo, COL_INFO, "CC2420 Phy Frame");
   }
 
-	if (tree) {
-		/* create display subtree for the protocol */
- 		ti = proto_tree_add_item(tree, proto_cc2420, tvb, 0, -1, FALSE);
- 		tree_cc2420 = proto_item_add_subtree(ti, ett_cc2420);
+  if (tree) {
+    /* create display subtree for the protocol */
+    ti = proto_tree_add_item(tree, proto_cc2420, tvb, 0, -1, FALSE);
+    tree_cc2420 = proto_item_add_subtree(ti, ett_cc2420);
     /* print cc2420 phy header */
     proto_tree_add_item(tree_cc2420, hf_cc2420_length, tvb, 0, 1, FALSE);
     /* tree for cc2420 phy footer / fcs */
@@ -122,13 +121,13 @@ static void dissect_cc2420(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
     proto_tree_add_item(fc_tree, hf_cc2420_rssi, tvb, tvb_length(tvb)-2, 2, FALSE);
     proto_tree_add_item(fc_tree, hf_cc2420_crc, tvb, tvb_length(tvb)-2, 2, FALSE);
     proto_tree_add_item(fc_tree, hf_cc2420_lqi, tvb, tvb_length(tvb)-2, 2, FALSE);
-	}
+  }
   
   /* Calculate the available data in the packet, 
      set this to -1 to use all the data in the tv_buffer (FCS field is passed to next dissector too)*/
   available_length = tvb_length(tvb) - CC2420_HEADER_LEN + 2;
 
-	/* Create the tvbuffer for the next dissector, this also passes the last two bytes to subdissector */
+  /* Create the tvbuffer for the next dissector, this also passes the last two bytes to subdissector */
   next_tvb = tvb_new_subset(tvb, CC2420_HEADER_LENGTH_OFFSET, MIN(cc2420_length, available_length), cc2420_length);
   
   /* try "heuristics */
@@ -136,8 +135,8 @@ static void dissect_cc2420(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
     return;
   }
   
-	/* call the next dissector */
-	call_dissector(data_handle, next_tvb, pinfo, tree);
+  /* call the next dissector */
+  call_dissector(data_handle, next_tvb, pinfo, tree);
   return;
 }
 
@@ -145,10 +144,10 @@ static void dissect_cc2420(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 /* Register the protocol with Wireshark */
 void proto_register_cc2420(void)
 {                 
-	module_t *module_cc2420;
+  module_t *module_cc2420;
 
-	/* 802.15.4 Header */
-	static hf_register_info hf[] = {
+  /* 802.15.4 Header */
+  static hf_register_info hf[] = {
     /* cc2420 specific phy header */
     { &hf_cc2420_length,	{ "Length", "cc2420.length", FT_UINT8, BASE_DEC, NULL, 0x0, "", HFILL } },
     /* cc2420 specific FCS */
@@ -157,33 +156,33 @@ void proto_register_cc2420(void)
     /* cc2420 specific FCS fields containing rssi & lqi & crc_pass*/
     { &hf_cc2420_lqi,	{ "Lqi", "cc2420.lqi", FT_UINT16, BASE_HEX, NULL, 0x7f, "", HFILL } },
     { &hf_cc2420_rssi,	{ "Rssi", "cc2420.rssi", FT_UINT16, BASE_HEX, NULL, 0xff00, "", HFILL } }
-	};
+  };
   
-	/* Setup protocol subtree array */
-	static gint *ett[] = {
-		&ett_cc2420
-	};
+  /* Setup protocol subtree array */
+  static gint *ett[] = {
+    &ett_cc2420
+  };
 
-	/* Register the protocol name and description */
-	proto_cc2420 = proto_register_protocol("CC2420 Frame Format", "CC2420", "cc2420");
+  /* Register the protocol name and description */
+  proto_cc2420 = proto_register_protocol("CC2420 Frame Format", "CC2420", "cc2420");
 
-	/* Required function calls to register the header fields and subtrees used */
-	proto_register_field_array(proto_cc2420, hf, array_length(hf));
-	proto_register_subtree_array(ett, array_length(ett));
+  /* Required function calls to register the header fields and subtrees used */
+  proto_register_field_array(proto_cc2420, hf, array_length(hf));
+  proto_register_subtree_array(ett, array_length(ett));
         
-	/* Register preferences module (See Section 2.6 for more on preferences) */
-	module_cc2420 = prefs_register_protocol(proto_cc2420, proto_reg_handoff_cc2420);
+  /* Register preferences module (See Section 2.6 for more on preferences) */
+  module_cc2420 = prefs_register_protocol(proto_cc2420, proto_reg_handoff_cc2420);
      
   /* subdissector code */
-	register_heur_dissector_list("cc2420", &heur_subdissector_list);
+  register_heur_dissector_list("cc2420", &heur_subdissector_list);
   
-	/* Register prefs */
-	prefs_register_uint_preference(module_cc2420, "am_type",
-				 "AM type ",
-				 "The AM type of AM messgaes which "
+  /* Register prefs */
+  prefs_register_uint_preference(module_cc2420, "am_type",
+				 "Serial type ",
+				 "The type of Serial T2  messgaes which "
 				 "contain CC2420 "
 				 "packets as payload",
-				 10, &global_am_type_cc2420);
+				 10, &global_serial_type_cc2420);
   
   prefs_register_uint_preference(module_cc2420, "channel",
 				 "Standard Channel ",
@@ -204,22 +203,19 @@ void proto_register_cc2420(void)
 */
 void proto_reg_handoff_cc2420(void)
 {
-	static dissector_handle_t handle_cc2420;
-	static gboolean inited = FALSE;
-        
-	if (!inited) {
-	    handle_cc2420 = create_dissector_handle(dissect_cc2420, proto_cc2420);
-	    dissector_add("t2am.type", am_type_cc2420, handle_cc2420);
-	    inited = TRUE;
-	} else {
-    	dissector_delete("t2am.type", am_type_cc2420, handle_cc2420);
+  static dissector_handle_t cc2420_handle;
+  static gboolean inited = FALSE;
+ 
+  if (!inited) {
+    cc2420_handle = create_dissector_handle(dissect_cc2420, proto_cc2420);
+    dissector_add("t2sf.type", serial_type_cc2420, cc2420_handle);
+    inited = TRUE;
+  } else {
+    dissector_delete("t2sf.type", serial_type_cc2420, cc2420_handle);
   }
-
-  am_type_cc2420 = global_am_type_cc2420;
-  channel_cc2420 = global_channel_cc2420;
   
   setChannel_cc2420();
-  dissector_add("t2am.type", global_am_type_cc2420, handle_cc2420);
- 	data_handle = find_dissector("data");
+  dissector_add("t2sf.type", global_serial_type_cc2420, cc2420_handle);
+  data_handle = find_dissector("data");
 }
 

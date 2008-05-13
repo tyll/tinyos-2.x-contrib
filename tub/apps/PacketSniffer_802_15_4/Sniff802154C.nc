@@ -1,23 +1,36 @@
 configuration Sniff802154C {
 }
 implementation {
-  components MainC, Sniff802154P, LedsC;
-  components CC2420SniffC as RadioSniff;
+  components MainC;
+  components CC2420ReceiveC as RadioReceive; 
+  components CC2420ControlC as RadioControl;
+  components CC2420PacketC as RadioPacket; 
+  components Sniff802154P as Sniffer;
   components SerialActiveMessageC as Serial;
+  components Serial802_15_4C as TransparentSerial;
+  components LedsC;
+  components HplCC2420InterruptsC as Interrupts;
+
+  
+  MainC.Boot <- Sniffer;  
+  
+  Sniffer.SerialControl -> Serial;
+  
+  Sniffer.UartSend -> Serial;
+  Sniffer.UartReceive -> Serial;
+  Sniffer.UartPacket -> Serial;
+  //Sniffer.UartAMPacket -> Serial;
+  Sniffer.TransparentUartSend -> TransparentSerial.Send;
+  //Sniffer.TransparentReceive -> TransparentSerial.Receive;
   
   
-  MainC.Boot <- Sniff802154P;  
-  
-  Sniff802154P.SerialControl -> Serial;
-  
-  Sniff802154P.UartSend -> Serial;
-  Sniff802154P.UartReceive -> Serial;
-  Sniff802154P.UartPacket -> Serial;
-  Sniff802154P.UartAMPacket -> Serial;
-  
-	Sniff802154P.RadioSniffControl -> RadioSniff;
-  Sniff802154P.rawReceive <- RadioSniff.rawReceive;
-  Sniff802154P.setChannel -> RadioSniff;
-  
-  Sniff802154P.Leds -> LedsC;
+  Sniffer.RadioReceiveControl -> RadioReceive.StdControl;
+  Sniffer.RadioReceive -> RadioReceive.CC2420Receive;
+  Sniffer.RadioDataReceive -> RadioReceive.Receive;
+  Sniffer.RadioControlResource -> RadioControl.Resource;
+  Sniffer.RadioConfig -> RadioControl.CC2420Config;
+  Sniffer.RadioPower -> RadioControl.CC2420Power;
+  Sniffer.RadioPacketBody -> RadioPacket.CC2420PacketBody;
+  Sniffer.CaptureSFD -> Interrupts.CaptureSFD;
+  Sniffer.Leds -> LedsC;
 }

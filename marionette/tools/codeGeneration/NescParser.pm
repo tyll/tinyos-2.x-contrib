@@ -147,7 +147,7 @@ sub getInterfaces {
 	my $fileLocation = $interfaceHash->{'loc'};
 	$fileLocation =~ s/^.*?://;
 	my $text = &SlurpFile::scrub_c_comments( &SlurpFile::slurp_file( $fileLocation ) );
-	if ( $text !~ m/interface $interface{'interfaceName'}(<.*?>)?\s*{[^}]/ ){ 
+	if ( $text !~ m/interface $interface{'interfaceName'}(\s)*(<.*?>)?\s*{[^}]/ ){ 
             #the last [^}] is there for emacs tabbing purposes
 	    print $text;
 	    die "ERROR: NescParser.pm found interface $interface{'interfaceName'} in xml file with no .nc file.";

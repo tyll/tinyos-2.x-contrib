@@ -248,7 +248,9 @@ implementation {
     // 208MHz hangs with 1.0 V (B2R1_TRIM_1_V)
     // 208MHz hangs with 1.125 V B2R1_TRIM_1_125_V
 #if defined(PXA27X_FREQ) && (PXA27X_FREQ==13)
-    call PMIC.setCoreVoltage(B2R1_TRIM_P85_V);
+    call PMIC.setCoreVoltage(B2R1_TRIM_P95_V);
+#else
+    call PMIC.setCoreVoltage(B2R1_TRIM_1_25_V);
 #endif
     startLDOs();
     return SUCCESS;

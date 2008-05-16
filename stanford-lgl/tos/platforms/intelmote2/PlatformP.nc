@@ -69,7 +69,7 @@ implementation {
     asm volatile ("mcr p15,0,%0,c15,c1,0\n\t": : "r" (0x43));
 
 #ifndef PXA27X_FREQ
-  #define PXA27X_FREQ=13
+  #define PXA27X_FREQ 208
 #endif
 
 #if defined(PXA27X_FREQ) && PXA27X_FREQ!=13 && PXA27X_FREQ!=104 && PXA27X_FREQ!=208

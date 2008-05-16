@@ -11,7 +11,7 @@ int main(int argc, char **argv)
   if (argc != 3 && argc != 4)
   {
       fprintf(stderr,
-	      "Usage: %s <ip_port> <mote_id> [<img_type>]\n\t where img_type: 0=bw_jpg(default) 1=col_jpg 2=pgm 3=ppm",
+	      "Usage: %s <ip_port> <mote_id> [<img_type>]\n\t where img_type: 2=bw_jpg(default) 3=col_jpg 0=bw_raw 1=col_raw",
 	      argv[0]);
       exit(2);
     } 
@@ -20,7 +20,7 @@ int main(int argc, char **argv)
   printf("connecting to serialforwarder: localhost:%d\n",port);
   comm_init("localhost", port);
   int node_id = atoi(argv[2]);
-  int img_type = 0;
+  int img_type = 2;
   
   if (argc==4)
     img_type=atoi(argv[3]);

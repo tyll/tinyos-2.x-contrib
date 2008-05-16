@@ -5,15 +5,11 @@ $LGLDIR should be defined as per README in our main directory
 1.upload base station node with 'rootNode' application
 2.upload a number of nodes with 'camNode' application (use different IDs)
 3.run serialforwarder on your PC (e.g. on COM1: '$TOSROOT/support/sdk/c/sf/sf 9002 /dev/ttyS0 115200')
-4.in the 'c' directory, run 'get_jpg 9002 1' to get bw jpg image from mote #1
+4.in 'c/' directory, run 'get_jpg 9002 1' to get bw jpg image from mote #1
 
 =======================
 buidling get_jpg.c file
 =======================
-1.make sure that libmote.a is available in one of the standard directories
-(/usr/lib or /usr/local/lib), if not, copy $LGLDIR/support/sdk/c/sf/Makefile.am
-to /opt/tinyos-2.x/support/sdk/c/sf and rebuild the mote library (starting with
-'./bootstrap', make sure to do 'make install')
-2.also need jpeg-6b library
-3.build $LGLDIR/support/sdk/c/camera_cmd and 'make install' it
-4.finally build get_jpg.c file
+1.make sure that you built /opt/tinyos-2.x/support/sdk/c/sf (libmote.a file)
+2.we also need jpeg-6b library installed (libjpeg.a file)
+3.build get_jpg.c file by typing 'make' in c/ directory

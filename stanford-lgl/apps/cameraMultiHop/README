@@ -11,5 +11,7 @@ $LGLDIR should be defined as per README in our main directory
 buidling get_jpg.c file
 =======================
 1.make sure that you built /opt/tinyos-2.x/support/sdk/c/sf (libmote.a file)
+  note: copy Makefile.am from $LGLDIR/support/sdk/c/sf to $TOSROOT/support/sdk/s/sf
+        and enter './configure' and 'make install' to build and install libmote.a
 2.we also need jpeg-6b library installed (libjpeg.a file)
 3.build get_jpg.c file by typing 'make' in c/ directory

@@ -27,15 +27,16 @@
 * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 * OF THE POSSIBILITY OF SUCH DAMAGE.
-*/ 
+*/
 
 /**
  * @author Brano Kusy (branislav.kusy@gmail.com)
- */ 
- 
+ */
+
 #include <math.h>
 #include <limits.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include "tinyos_macros.h"
 #include "jpeghdr.h"
@@ -48,9 +49,42 @@
   int BANDWIDTH=225000;
   int IS_COLOR=1;
 
-int main()
+int main(int argc, char **argv)
 {
-  //*
+  printf("usage: dctApp.exe [.pgm|.ppm file] [max filesize]\n");
+  char filename[1024];
+  if (argc >= 2)
+    sprintf(filename,argv[1]);
+  else
+    sprintf(filename,"data//test.pgm");
+
+  char* ext=filename, *tmp;
+  while ( (tmp=strstr(ext,".")) != NULL )
+  {
+    ext=&tmp[1];
+  }
+  printf("input file:%s ext:%s\n",filename,ext);
+
+  int max_filesize=INT_MAX;
+  if (argc == 3)
+    max_filesize = atoi(argv[2]);
+
+  int bufShift;
+  if (strcmp(ext,"pgm")==0)
+  {
+    IS_COLOR=0;
+    bufShift=1;
+  }
+  else
+  {
+    IS_COLOR=1;
+    bufShift=3;
+  }
+  char filenameIn[1024];
+  sprintf(filenameIn, "data//testIn.%s",ext);
+  char filenameOut[1024];
+  sprintf(filenameOut, "data//testOut.%s",ext);
+  /*
   char *filename = "data//test.pgm";
   char *filenameIn = "data//testIn.pgm";
   char *filenameOut = "data//testOut.pgm";
@@ -67,11 +101,12 @@ int main()
     printf("Can't open data: %s\n", filename);
     return 1;
   }
+  
   if (    !(fdIn = fopen(filenameIn, "w")) 
-	   || !(fdOut = fopen(filenameOut, "w"))
-	 ) {
+	   || !(fdOut = fopen(filenameOut, "w")))
+  {
     printf("Can't open data for writing\n");
-	fclose(fd);
+    fclose(fd);
     return 1;
   }
 
@@ -98,15 +133,18 @@ int main()
 
   uint32_t idx;
   if (IS_COLOR)
-  	idx = encodeColJpeg(input,dct_code,BANDWIDTH,ROW,COL,QUALITY,bufShift);
+    idx = encodeColJpeg(input,dct_code,BANDWIDTH,ROW,COL,QUALITY,bufShift);
 	else
-		idx = encodeJpeg(input,dct_code,BANDWIDTH,ROW,COL,QUALITY,bufShift,0);
+    idx = encodeJpeg(input,dct_code,BANDWIDTH,ROW,COL,QUALITY,bufShift,0);
 
   FILE *fd_tmp1=0;
   if (!(fd_tmp1 = fopen("data//coded.huf", "w")) ){
     printf("Can't open %s file for writing\n",filename);
     return 1;
   }
+  
+  if (idx > max_filesize)
+    idx = max_filesize;
   fwrite(dct_code,1,idx,fd_tmp1);
   fclose(fd_tmp1);
   printf("CODE length: %d b (%d msgs)\n", (int)idx,(int)idx/64+1);

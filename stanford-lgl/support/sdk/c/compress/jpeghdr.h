@@ -44,7 +44,7 @@
     nx_uint8_t is_color;
     nx_uint16_t sizeRLE;
     nx_uint16_t sizeHUF;
-    nx_uint16_t padding;
+    nx_uint16_t totalSize;
   } code_header_t;
 
   enum{

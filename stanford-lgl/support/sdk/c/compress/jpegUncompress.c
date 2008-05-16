@@ -43,7 +43,6 @@
 #include "idctfstBlk.h"
 #include "quanttables_odrb.h"
 #include "huffmanUncompress.h"
-//#include "rleUncompress.h"
 #include "decodeZeros.h"
 
 //#define RLE_ONLY
@@ -175,6 +174,7 @@ void decodeJpegBytes(uint8_t *dataIn, uint32_t dataSize, uint8_t *recovered, cod
   decodeBytes(dataIn, dct_decoded, header);
   if (header->is_color)
   {
+    uint16_t dataSize=header->totalSize;
     idct(header, dct_decoded, recovered, 3, QUANT_TABLE);
 
     uint32_t idx=header->sizeHUF+CODE_HEADER_SIZE;
@@ -198,6 +198,7 @@ void decodeJpegBytes(uint8_t *dataIn, uint32_t dataSize, uint8_t *recovered, cod
         recovered[i]=recovered[i*3];
       header->is_color=0;
     }
+    header->totalSize=dataSize;
   }
   else
     idct(header, dct_decoded, recovered, 1, QUANT_TABLE);

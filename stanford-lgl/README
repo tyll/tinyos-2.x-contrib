@@ -10,6 +10,6 @@ automatically include our specific tos/* directories.
 
 !!! IMPORTANT !!!! 
 
-LGL_DIR env variable pointing to our stanford-lgl dir is *required*. In most 
+LGLDIR env variable pointing to our stanford-lgl dir is *required*. In most
 cases, type at the bash shell:
     export LGLDIR=/opt/tinyos-2.x-contrib/stanford-lgl      

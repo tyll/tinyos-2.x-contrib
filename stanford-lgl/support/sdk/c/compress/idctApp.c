@@ -46,7 +46,7 @@ int getBytes(char* filename, uint8_t *dataIn)
 {
   FILE *fdIn;
   if (!(fdIn = fopen(filename, "r")) ){
-    printf("Can't open file for reading\n");
+    printf("Can't open %s for reading\n", filename);
     return 0;
   }
 
@@ -63,9 +63,14 @@ int getBytes(char* filename, uint8_t *dataIn)
   return dataSize;
 }
 
-int main()
+int main(int argc, char **argv)
 {
-
+  char filename[1024];
+  if (argc == 2)
+    sprintf(filename,argv[1]);
+  else
+    sprintf(filename,"coded.huf");
+    
   uint8_t recovered[320*240*3];
   memset(recovered,0,sizeof(recovered));
 	code_header_t header;
@@ -73,8 +78,10 @@ int main()
   //decodeJpegFile("coded.huf", recovered, &header);
       
   uint8_t in[320*240*3];
-  uint32_t size=getBytes("coded.huf",in);
+  uint32_t size=getBytes(filename,in);
   decodeJpegBytes(in, size, recovered, &header);
+  printf("decoded header: W=%d H=%d qual=%d COL=%d size2=%d\n",
+            header.width, header.height, header.quality, header.is_color, header.totalSize);
   
 	if (header.is_color)
 	{

@@ -109,7 +109,8 @@ uint32_t encodeJpeg(uint8_t *dataIn, uint8_t *dataOut, uint32_t bandwidthLimit,
 #endif
 	header->sizeHUF = (uint16_t)idx;
   printf("HUF code: %d\n",header->sizeHUF);
-  
+	header->totalSize = idx;
+
 	return idx+CODE_HEADER_SIZE;
 }
 
@@ -121,6 +122,7 @@ uint32_t encodeColJpeg(uint8_t *dataIn, uint8_t *dataOut, uint32_t bandwidthLimi
 	uint32_t idx=encodeJpeg(dataIn, dataOut, bandwidthLimit, width, height, qual, bufFix,1);
 	idx+=encodeJpeg(&dataIn[1], &dataOut[idx], bandwidthLimit, width, height, qual, bufFix,1);
 	idx+=encodeJpeg(&dataIn[2], &dataOut[idx], bandwidthLimit, width, height, qual, bufFix,1);
+	((code_header_t *)dataOut)->totalSize = idx;
 	return idx;
 }
 

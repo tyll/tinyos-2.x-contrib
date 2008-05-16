@@ -1,0 +1,15 @@
+TinyOS CVS repository of the Stanford/LGL (Leo Guibas Lab).
+
+Contact: branislav.kusy@gmail.com
+
+To run our tinyos applications properly, we suggest to check out our whole CVS 
+contrib directory and compile them in place. This is because we set a number of 
+extra compilation params in suport/make/lgl.extra and modify apps/Makerules to
+automatically include our specific tos/* directories. 
+
+
+!!! IMPORTANT !!!! 
+
+LGLDIR env variable pointing to our stanford-lgl dir is *required*. In most
+cases, type at the bash shell:
+    export LGLDIR=/opt/tinyos-2.x-contrib/stanford-lgl      

@@ -1,0 +1,6 @@
+#Use the "new" Make structure
+TOSMAKE_PATH += $(LGLDIR)/support/make
+include $(MAKERULES)
+
+#Include LGL Libs and platforms
+$(call TOSMake_include,lgl.extra)

@@ -1,0 +1,7 @@
+#!/bin/sh
+if cygpath -w / >/dev/null 2>/dev/null; then
+  CLASSPATH="camera.jar;$CLASSPATH"
+else
+  CLASSPATH="camera.jar:$CLASSPATH"
+fi
+java CameraGUI

@@ -1,6 +1,6 @@
-==================================
-Serial Communication in TinyOS 2.x
-==================================
+===============================================
+Serial Communication in TinyOS 2.x using tos.py
+===============================================
 
 Intro
 ====================================================================
@@ -102,15 +102,16 @@ NoAck Data Frame
 Python tools
 ====================================================================
 
-The ``tinyos.py`` Python library provides two main things: a simple
-way to send and receive Active Messages on the serial port and a
-versatile way to encode/decode arbitrary packets. For byte-level serial
-communication the PySerial Python library is used.
+The ``tos.py`` Python library provides two things: a simple way to
+send and receive Active Messages on the serial port and a versatile
+way to encode/decode arbitrary packets. For byte-level serial
+communication the [PySerial]_ Python library is used.
 
-The classes provided by ``tinyos.py`` are:
+The classes provided by ``tos.py`` are:
 
 - Serial
-- GenericPacket
+- AM
+- Packet
 - RawPacket
 - AckFrame
 - DataFrame
@@ -124,27 +125,18 @@ The constructor requires two parameters: the port and the baudrate.
 
 The most important methods provided are:
 
-- sniff(skip_queue = False): it returns None if no packet was received
-  for the timeout period (right now it's set to 0.5 seconds) or a
-  RawPacket. The Active Messages send by TinyOS 2.x are always
-  NoAckDataFrame. The skip_queue parameter is used to ignore the
-  content of the queue of packets received between a send of a packet
-  and the arrival of the ack.
+- read(timeout=None): it returns None if no packet was received for
+  the timeout period or a RawPacket otherwise. The Active Messages
+  send by TinyOS 2.x are always NoAckDataFrame.
 
-- sniff_am(skip_queue = False, timeout=0): this is similar with sniff
-  but returns an ActiveMessage.
+- write(payload): it sends a packet (usually an Active Message) on the
+  serial port. If payload parameter is a list then it's assume to be
+  exactly the payload. Otherwise the payload is assume to be a Packet
+  and the real payload is obtain by calling the payload() method. The
+  TinyOS 2.x only accepts packets that required acknowledge. If the
+  ack is not received during the timeout period the packet is resent.
 
-- write(payload, num_tries=3): it sends a packet (usually an Active
-  Message) on the serial port. If payload parameter is a list then it's
-  assume to be exactly the payload. Otherwise the payload is assume to
-  be a GenericPacket and the real payload is obtain by calling the
-  payload() method. The TinyOS 2.x only accepts packets that required
-  acknowledge. If the ack is not received during the timeout period
-  the packet is resent up to num_tried times. If some new packets
-  arrived during this period they will be queued and delivered to the
-  next sniff/sniff_am calls.
-
-GenericPacket
+Packet
 --------------------------------------------------------------------
 
 This class is responsible for making easy the work with arbitrary
@@ -154,11 +146,11 @@ packet.
 
 The schema is a list of 3-tuples formed by (*name*, *format*,
 *size*). *name* is the name of the field, *format* can be 'int' for
-integers, 'bint' for integers with lengths shorter than a byte, or
-'blob' which indicate an opaque field. The size represents the number
-of bytes for 'int' and 'blob' fields and number of bits for
-'bint'. Size can also set to None in which case the size will be
-dynamically adjusted.
+integers, 'bint' for integers with lengths shorter than a byte,
+'string' for strings or 'blob' which indicate an opaque field. The
+size represents the number of bytes for 'int', 'string' and 'blob'
+fields and number of bits for 'bint'. Size can also set to None in
+which case the size will be dynamically adjusted.
 
 The packet parameter is used to initialize the content of the fields
 described by the schema. It can be a tuple with the desired values of
@@ -166,9 +158,9 @@ the fields (so it needs to have the same size as the schema) or it can
 be a list of bytes in which case it will be interpreted based on the
 schema.
 
-After init, the fields appear as variables inside the GenericPacket
-object (*e.g.* gp.source). Beside this a GenericPacket also implements
-the behavior of a map (*e.g.* gp['source'], gp.keys()).
+After init, the fields appear as variables inside the Packet object
+(e.g., gp.source). Beside this a Packet also implements the behavior
+of a map (e.g., gp['source'], gp.keys()).
 
 Other methods are:
 
@@ -180,7 +172,7 @@ Other methods are:
 ActiveMessage
 --------------------------------------------------------------------
 
-This is a GenericPacket offering the following fields:
+This is a Packet offering the following fields:
 - destination
 - source
 - length
@@ -188,7 +180,7 @@ This is a GenericPacket offering the following fields:
 - type
 - data
 
-The constructor has three optional parameters: packet = None, am_id =
+The constructor has three optional parameters: packet = None, amid =
 0x00, dest = 0xFFFF.
 
 Citations
@@ -196,3 +188,4 @@ Citations
 
 .. [TEP113] Serial Communication. ``tinyos-2.x/doc/tep113.txt``
 .. [RFC1662] PPP in HDLC-like Framing.
+.. [PySerial] http://pyserial.sourceforge.net/

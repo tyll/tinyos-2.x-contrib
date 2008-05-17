@@ -4,7 +4,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="Docutils 0.4.1: http://docutils.sourceforge.net/" />
-<title>Serial Communication in TinyOS 2.x</title>
+<title>Serial Communication in TinyOS 2.x using tos.py</title>
 <style type="text/css">
 
 /*
@@ -290,8 +290,8 @@ ul.auto-toc {
 </style>
 </head>
 <body>
-<div class="document" id="serial-communication-in-tinyos-2-x">
-<h1 class="title">Serial Communication in TinyOS 2.x</h1>
+<div class="document" id="serial-communication-in-tinyos-2-x-using-tos-py">
+<h1 class="title">Serial Communication in TinyOS 2.x using tos.py</h1>
 <div class="section">
 <h1><a id="intro" name="intro">Intro</a></h1>
 <p>The official documentation of the serial communication in TinyOS 2.x
@@ -378,14 +378,15 @@ F       = Framing byte denoting end of packet (0x7e): HdlcTranslateC
 </div>
 <div class="section">
 <h1><a id="python-tools" name="python-tools">Python tools</a></h1>
-<p>The <tt class="docutils literal"><span class="pre">tinyos.py</span></tt> Python library provides two main things: a simple
-way to send and receive Active Messages on the serial port and a
-versatile way to encode/decode arbitrary packets. For byte-level serial
-communication the PySerial Python library is used.</p>
-<p>The classes provided by <tt class="docutils literal"><span class="pre">tinyos.py</span></tt> are:</p>
+<p>The <tt class="docutils literal"><span class="pre">tos.py</span></tt> Python library provides two things: a simple way to
+send and receive Active Messages on the serial port and a versatile
+way to encode/decode arbitrary packets. For byte-level serial
+communication the <a class="citation-reference" href="#pyserial" id="id3" name="id3">[PySerial]</a> Python library is used.</p>
+<p>The classes provided by <tt class="docutils literal"><span class="pre">tos.py</span></tt> are:</p>
 <ul class="simple">
 <li>Serial</li>
-<li>GenericPacket</li>
+<li>AM</li>
+<li>Packet</li>
 <li>RawPacket</li>
 <li>AckFrame</li>
 <li>DataFrame</li>
@@ -397,46 +398,38 @@ communication the PySerial Python library is used.</p>
 <p>The constructor requires two parameters: the port and the baudrate.</p>
 <p>The most important methods provided are:</p>
 <ul class="simple">
-<li>sniff(skip_queue = False): it returns None if no packet was received
-for the timeout period (right now it's set to 0.5 seconds) or a
-RawPacket. The Active Messages send by TinyOS 2.x are always
-NoAckDataFrame. The skip_queue parameter is used to ignore the
-content of the queue of packets received between a send of a packet
-and the arrival of the ack.</li>
-<li>sniff_am(skip_queue = False, timeout=0): this is similar with sniff
-but returns an ActiveMessage.</li>
-<li>write(payload, num_tries=3): it sends a packet (usually an Active
-Message) on the serial port. If payload parameter is a list then it's
-assume to be exactly the payload. Otherwise the payload is assume to
-be a GenericPacket and the real payload is obtain by calling the
-payload() method. The TinyOS 2.x only accepts packets that required
-acknowledge. If the ack is not received during the timeout period
-the packet is resent up to num_tried times. If some new packets
-arrived during this period they will be queued and delivered to the
-next sniff/sniff_am calls.</li>
+<li>read(timeout=None): it returns None if no packet was received for
+the timeout period or a RawPacket otherwise. The Active Messages
+send by TinyOS 2.x are always NoAckDataFrame.</li>
+<li>write(payload): it sends a packet (usually an Active Message) on the
+serial port. If payload parameter is a list then it's assume to be
+exactly the payload. Otherwise the payload is assume to be a Packet
+and the real payload is obtain by calling the payload() method. The
+TinyOS 2.x only accepts packets that required acknowledge. If the
+ack is not received during the timeout period the packet is resent.</li>
 </ul>
 </div>
 <div class="section">
-<h2><a id="genericpacket" name="genericpacket">GenericPacket</a></h2>
+<h2><a id="packet" name="packet">Packet</a></h2>
 <p>This class is responsible for making easy the work with arbitrary
 packets. The constructor of the class has two parameters: a
 description of the packet (we'll call this schema) and optionally, a
 packet.</p>
 <p>The schema is a list of 3-tuples formed by (<em>name</em>, <em>format</em>,
 <em>size</em>). <em>name</em> is the name of the field, <em>format</em> can be 'int' for
-integers, 'bint' for integers with lengths shorter than a byte, or
-'blob' which indicate an opaque field. The size represents the number
-of bytes for 'int' and 'blob' fields and number of bits for
-'bint'. Size can also set to None in which case the size will be
-dynamically adjusted.</p>
+integers, 'bint' for integers with lengths shorter than a byte,
+'string' for strings or 'blob' which indicate an opaque field. The
+size represents the number of bytes for 'int', 'string' and 'blob'
+fields and number of bits for 'bint'. Size can also set to None in
+which case the size will be dynamically adjusted.</p>
 <p>The packet parameter is used to initialize the content of the fields
 described by the schema. It can be a tuple with the desired values of
 the fields (so it needs to have the same size as the schema) or it can
 be a list of bytes in which case it will be interpreted based on the
 schema.</p>
-<p>After init, the fields appear as variables inside the GenericPacket
-object (<em>e.g.</em> gp.source). Beside this a GenericPacket also implements
-the behavior of a map (<em>e.g.</em> gp['source'], gp.keys()).</p>
+<p>After init, the fields appear as variables inside the Packet object
+(e.g., gp.source). Beside this a Packet also implements the behavior
+of a map (e.g., gp['source'], gp.keys()).</p>
 <p>Other methods are:</p>
 <ul class="simple">
 <li>names(): it returns a list with all the names of the fields</li>
@@ -447,14 +440,14 @@ the fields. Multi-byte integers are in big-ending.</li>
 </div>
 <div class="section">
 <h2><a id="activemessage" name="activemessage">ActiveMessage</a></h2>
-<p>This is a GenericPacket offering the following fields:
+<p>This is a Packet offering the following fields:
 - destination
 - source
 - length
 - group
 - type
 - data</p>
-<p>The constructor has three optional parameters: packet = None, am_id =
+<p>The constructor has three optional parameters: packet = None, amid =
 0x00, dest = 0xFFFF.</p>
 </div>
 </div>
@@ -470,6 +463,12 @@ the fields. Multi-byte integers are in big-ending.</li>
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
 <tr><td class="label"><a class="fn-backref" href="#id2" name="rfc1662">[RFC1662]</a></td><td>PPP in HDLC-like Framing.</td></tr>
+</tbody>
+</table>
+<table class="docutils citation" frame="void" id="pyserial" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id3" name="pyserial">[PySerial]</a></td><td><a class="reference" href="http://pyserial.sourceforge.net/">http://pyserial.sourceforge.net/</a></td></tr>
 </tbody>
 </table>
 </div>

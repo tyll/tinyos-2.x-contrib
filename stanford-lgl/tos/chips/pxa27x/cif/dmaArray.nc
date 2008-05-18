@@ -44,7 +44,7 @@
  * @author Brano Kusy (branislav.kusy@gmail.com)
  * @version October 25, 2007
  */
-#include "dma.h"
+#include "DMA.h"
 
 interface dmaArray{
 	async command uint32_t array_getBaseIndex(DescArray *DAPtr);

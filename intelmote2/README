@@ -1,0 +1,16 @@
+TinyOS CVS repository of intelmote2 contrib code.
+
+What is Required:
+=================
+- download this contrib directory to /opt/
+- set environment variable INTELMOTE2_CONTRIB_DIR as follows
+  export INTELMOTE2_CONTRIB_DIR=/opt/tinyos-2.x-contrib/intelmote2
+
+Suggestions:
+============
+To make sure that your application includes all source files properly, we
+suggest to compile applications from $INTELMOTE2_CONTRIB_DIR/apps directory.
+This is because we set a number of extra compilation parameters in
+$INTELMOTE2_CONTRIB_DIR/suport/make/intelmote2.extra and modify
+$INTELMOTE2_CONTRIB_DIR/apps/Makerules to automatically include required files.
+(see the modified Makefile in $INTELMOTE2_CONTRIB_DIR/apps/Blink)

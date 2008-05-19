@@ -1,0 +1,18 @@
+#-*-Makefile-*- vim:syntax=make
+#$Id$
+
+PROGRAM = xflash
+
+PROGRAMMER ?= xflash.exe
+PROGRAMMER_FLAGS = -p imote2
+
+PXA27X_JTAG_DEV ?= "INTEL(R) JTAG CABLE"
+#PXA27X_JTAG_DEV ?= "JTAG CPU"
+
+program: FORCE
+	@echo "    installing $(PLATFORM) binary using $(PROGRAM) with the $(PXA27X_JTAG_DEV)"
+	$(PROGRAMMER) $(PROGRAMMER_FLAGS) -tt $(PXA27X_JTAG_DEV) $(INSTALL_BIN)
+
+program_input: bin
+	@:
+

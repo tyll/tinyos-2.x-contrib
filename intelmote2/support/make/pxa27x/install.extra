@@ -1,0 +1,6 @@
+#-*-Makefile-*- vim:syntax=make
+#$Id$
+
+NODEID = $(INSTALL)
+BUILD_DEPS = bin bytes setid program
+

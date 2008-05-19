@@ -1,0 +1,19 @@
+#-*-Makefile-*- vim:syntax=make
+#$Id$
+
+PROGRAM = jflashmm
+
+PROGRAMMER ?= JFlashmm.exe
+PROGRAMMER_FLAGS = bulbcx16
+PXA27X_JTAG_DEV ?= "INTEL(R) JTAG CABLE"
+#PXA27X_JTAG_DEV ?= "JTAG CPU"
+JFLASHMM_DIR ?= /opt/jflashmm
+
+program: FORCE
+	@echo "    installing $(PLATFORM) binary using $(PROGRAM) and $(JFLASHMM_DIR)"
+	cp $(JFLASHMM_DIR)/bulbcx16.dat $(BUILDDIR)
+	$(PROGRAMMER) $(BUILDDIR)/$(PROGRAMMER_FLAGS) $(INSTALL_BIN) P 0x0
+
+program_input: bin
+	@:
+

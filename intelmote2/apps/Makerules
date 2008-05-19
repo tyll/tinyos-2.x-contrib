@@ -1,0 +1,7 @@
+#Use the "new" Make structure
+INTELMOTE2_CONTRIB_DIR ?= /opt/tinyos-2.x-contrib/intelmote2
+TOSMAKE_PATH += $(INTELMOTE2_CONTRIB_DIR)/support/make
+include $(MAKERULES)
+
+#Include intelmote2 Libs and platforms
+$(call TOSMake_include,intelmote2.extra)

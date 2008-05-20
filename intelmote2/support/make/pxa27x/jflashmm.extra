@@ -3,15 +3,16 @@
 
 PROGRAM = jflashmm
 
-PROGRAMMER ?= jflashmm.exe
+PROGRAMMER ?= JFlashmm.exe
 PROGRAMMER_FLAGS = bulbcx16
-POST_INSTALL_BIN_FLAGS = P 0x0
-PXA27X_JTAG_DEV ?= "JTAG CPU"
+PXA27X_JTAG_DEV ?= "INTEL(R) JTAG CABLE"
+#PXA27X_JTAG_DEV ?= "JTAG CPU"
+JFLASHMM_DIR ?= /opt/jflashmm
 
 program: FORCE
 	@echo "    installing $(PLATFORM) binary using $(PROGRAM)"
-	$(PROGRAMMER) $(PROGRAMMER_FLAGS) $(INSTALL_BIN) $(POST_INTSALL_BIN_FLAGS)
-
+	cp $(JFLASHMM_DIR)/bulbcx16.dat $(BUILDDIR)
+	$(PROGRAMMER) $(BUILDDIR)/$(PROGRAMMER_FLAGS) $(INSTALL_BIN) P 0x0
 
 program_input: bin
 	@:

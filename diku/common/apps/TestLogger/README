@@ -1,0 +1,5 @@
+A simple test application for the log recording layer. Install this
+application on the mote beeing monitored and active state transitions
+manually.
+
+For more see diku/common/lib/logger/README

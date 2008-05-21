@@ -1,0 +1,75 @@
+#-*-Makefile-*- vim:syntax=make
+#$Id$
+
+# This file originally by Cory Sharp, adapted to evb13192 by Mads
+# Bondo Dydensborg, <madsdyd@diku.dk>
+
+# Setup the help, I guess.
+define HCS08_HELP
+
+ HCS08 extras:
+
+   none yet
+
+ Programmer options:
+
+   pemicro : use pemicro programmer
+   an2295  : (default) use an2295 programmer
+
+endef
+HELP += $(HCS08_HELP)
+
+SET_ID = set-mote-id
+
+# We need this dir, because we need to call the makeEvb13192 script.
+THISDIR_PATH := $(dir $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST)))
+
+# Main and app - is only used with set-mote-id I think, which we do
+# not support. (MAIN_EXE used to be main.exe).
+BUILDDIR = build/$(PLATFORM)
+APP_S19 = $(BUILDDIR)/app.s19
+MAIN_S19 = $(BUILDDIR)/main.s19
+
+ifndef DEFAULT_PROGRAM
+DEFAULT_PROGRAM = an2295
+endif
+
+BUILDLESS_DEPS += bytes
+
+# Use the 'if' function instead of the 'ifdef' construct because ifdef freaks
+# out with call in there.  I don't know why.
+$(if $(PROGRAM),,$(call TOSMake_include,CodeWarrior/$(DEFAULT_PROGRAM).extra))
+
+ifndef BUILD_DEPS
+  ifeq ($(filter $(BUILDLESS_DEPS),$(GOALS)),)
+    BUILD_DEPS = exe0
+  endif
+endif
+
+
+export PFLAGS CFLAGS NESC_FLAGS DEFAULT_LOCAL_GROUP TOSDIR
+export CWPATH FORCE_HCS08 CHC08_OPTS
+export TINYOS_EVB13192DIR
+export ENVIRONMENT FREESCALE_LIBDIR
+export PLATFORM
+
+setid: FORCE
+	@cmd () { echo "$$@"; $$@; }; if [ x = x$(NODEID) ]; then cmd cp $(APP_S19) $(MAIN_S19); else cmd $(SET_ID) --exe $(APP_S19) $(MAIN_S19) $(NODEID); fi
+
+srec: exe FORCE
+	@:
+
+exe: exe0 FORCE
+	@:
+
+exe0: FORCE
+	@echo "    compiling $(COMPONENT) to a $(PLATFORM) binary"
+	@if $(THISDIR_PATH)/makeEvb13192.sh $(COMPONENT).nc ; then \
+		echo "    compiled $(COMPONENT) to $(APP_S19)"; \
+	else \
+		echo "    error during compilation"; \
+	fi
+
+builddir: FORCE
+	mkdir -p $(BUILDDIR)
+

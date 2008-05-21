@@ -1,0 +1,3 @@
+COMPONENT=Null2SerAppC
+include $(MAKERULES)
+

@@ -1,0 +1,3 @@
+COMPONENT=ActiveMessageTestAppC
+include $(MAKERULES)
+

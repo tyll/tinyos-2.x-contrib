@@ -41,6 +41,7 @@ module CompressionTestM {
     interface Init;
   }
   uses {
+    interface GeneralIO as Starter;
     interface SerialByteComm as UART;
     interface CRC16;
     interface Compressor;
@@ -121,6 +122,8 @@ implementation {
 
 
   event void Boot.booted() {
+    call Starter.clr();
+    call Starter.makeOutput();
     memset(tmp_buffer, 0, sizeof(tmp_buffer));
   }
 
@@ -155,6 +158,7 @@ implementation {
 
     /* Compression done */
     if (!halt_compression) {
+      call Starter.clr();
       print("f\n");
       state = ST_Ready;
     }
@@ -299,6 +303,7 @@ implementation {
     do_compress_pos = 0;
      
     post do_compress();
+    call Starter.set();
   }
 
   task void start_recv()

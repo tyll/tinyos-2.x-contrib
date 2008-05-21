@@ -1,0 +1,13 @@
+#-*-Makefile-*- vim:syntax=make
+#$Id$
+
+#ifeq ($(PEMICRO),)
+#$(error PEMICRO must be defined, try "make $(TARGETS) help")
+#endif
+
+PROGRAM = pemicro
+
+program: FORCE
+	@echo "    installing $(PLATFORM) binary using pemicro"
+	cd $(BUILDDIR) && make -f $(TINYOS_EVB13192DIR)/tools/make/hcs08/MakeHCS08 main.install
+

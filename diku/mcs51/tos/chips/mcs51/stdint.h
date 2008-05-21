@@ -20,6 +20,11 @@
  *	ISO C99: 7.18 Integer types <stdint.h>
  */
 
+/*
+ * Modified from GCC version to remove 64 bit integer
+ * Martin Leopold 2008
+ */
+
 #ifndef _STDINT_H
 #define _STDINT_H	1
 
@@ -31,64 +36,65 @@
 
 /* Exact integral types.  */
 
-
-
 /* Small types.  */
 
 /* Signed.  */
 typedef signed char		int_least8_t;
 typedef short int		int_least16_t;
 typedef long			int_least32_t;
-#if __WORDSIZE == 64
-typedef long int		int_least64_t;
-#else
-__extension__
-typedef long long int		int_least64_t;
-#endif
+/* 64 bit integers are not supported */
+/* #if WORDSIZE == 64 */
+/* typedef long int		int_least64_t; */
+/* #else */
+/* __extension__ */
+/* typedef long long int		int_least64_t; */
+/* #endif */
 
 /* Unsigned.  */
 typedef unsigned char		uint_least8_t;
 typedef unsigned short	        uint_least16_t;
 typedef unsigned long 	        uint_least32_t;
-#if __WORDSIZE == 64
-typedef unsigned long int	uint_least64_t;
-#else
-__extension__
-typedef unsigned long long int	uint_least64_t;
-#endif
+
+/* 64 bit integers are not supported */
+/* #if WORDSIZE == 64 */
+/* typedef unsigned long int	uint_least64_t; */
+/* #else */
+/* __extension__ */
+/* typedef unsigned long long int	uint_least64_t; */
+/* #endif */
 
 
 /* Fast types.  */
 
 /* Signed.  */
 typedef signed char		int_fast8_t;
-#if __WORDSIZE == 64
+#if WORDSIZE == 64
 typedef long int		int_fast16_t;
 typedef long int		int_fast32_t;
-typedef long int		int_fast64_t;
+/* typedef long int		int_fast64_t; */
 #else
 typedef int			int_fast16_t;
 typedef int			int_fast32_t;
-__extension__
-typedef long long int		int_fast64_t;
+/* __extension__ */
+/* typedef long long int		int_fast64_t; */
 #endif
 
 /* Unsigned.  */
 typedef unsigned char		uint_fast8_t;
-#if __WORDSIZE == 64
+#if WORDSIZE == 64
 typedef unsigned long int	uint_fast16_t;
 typedef unsigned long int	uint_fast32_t;
-typedef unsigned long int	uint_fast64_t;
+/* typedef unsigned long int	uint_fast64_t; */
 #else
 typedef unsigned int		uint_fast16_t;
 typedef unsigned int		uint_fast32_t;
-__extension__
-typedef unsigned long long int	uint_fast64_t;
+/* __extension__ */
+/* typedef unsigned long long int	uint_fast64_t; */
 #endif
 
 
 /* Types for `void *' pointers.  */
-#if __WORDSIZE == 64
+#if WORDSIZE == 64
 # ifndef __intptr_t_defined
 typedef long int		intptr_t;
 #  define __intptr_t_defined
@@ -104,7 +110,7 @@ typedef unsigned int		uintptr_t;
 
 
 /* Largest integral types.  */
-#if __WORDSIZE == 64
+#if WORDSIZE == 64
 typedef long int		intmax_t;
 typedef unsigned long int	uintmax_t;
 #else
@@ -119,7 +125,7 @@ typedef unsigned long long int	uintmax_t;
    macros should only be defined if explicitly requested.  */
 #if !defined __cplusplus || defined __STDC_LIMIT_MACROS
 
-# if __WORDSIZE == 64
+# if WORDSIZE == 64
 #  define __INT64_C(c)	c ## L
 #  define __UINT64_C(c)	c ## UL
 # else
@@ -167,7 +173,7 @@ typedef unsigned long long int	uintmax_t;
 
 /* Minimum of fast signed integral types having a minimum size.  */
 # define INT_FAST8_MIN		(-128)
-# if __WORDSIZE == 64
+# if WORDSIZE == 64
 #  define INT_FAST16_MIN	(-9223372036854775807L-1)
 #  define INT_FAST32_MIN	(-9223372036854775807L-1)
 # else
@@ -177,7 +183,7 @@ typedef unsigned long long int	uintmax_t;
 # define INT_FAST64_MIN		(-__INT64_C(9223372036854775807)-1)
 /* Maximum of fast signed integral types having a minimum size.  */
 # define INT_FAST8_MAX		(127)
-# if __WORDSIZE == 64
+# if WORDSIZE == 64
 #  define INT_FAST16_MAX	(9223372036854775807L)
 #  define INT_FAST32_MAX	(9223372036854775807L)
 # else
@@ -188,7 +194,7 @@ typedef unsigned long long int	uintmax_t;
 
 /* Maximum of fast unsigned integral types having a minimum size.  */
 # define UINT_FAST8_MAX		(255)
-# if __WORDSIZE == 64
+# if WORDSIZE == 64
 #  define UINT_FAST16_MAX	(18446744073709551615UL)
 #  define UINT_FAST32_MAX	(18446744073709551615UL)
 # else
@@ -199,7 +205,7 @@ typedef unsigned long long int	uintmax_t;
 
 
 /* Values to test for integral types holding `void *' pointer.  */
-# if __WORDSIZE == 64
+# if WORDSIZE == 64
 #  define INTPTR_MIN		(-9223372036854775807L-1)
 #  define INTPTR_MAX		(9223372036854775807L)
 #  define UINTPTR_MAX		(18446744073709551615UL)
@@ -222,7 +228,7 @@ typedef unsigned long long int	uintmax_t;
 /* Limits of other integer types.  */
 
 /* Limits of `ptrdiff_t' type.  */
-# if __WORDSIZE == 64
+# if WORDSIZE == 64
 #  define PTRDIFF_MIN		(-9223372036854775807L-1)
 #  define PTRDIFF_MAX		(9223372036854775807L)
 # else
@@ -235,7 +241,7 @@ typedef unsigned long long int	uintmax_t;
 # define SIG_ATOMIC_MAX		(2147483647)
 
 /* Limit of `size_t' type.  */
-# if __WORDSIZE == 64
+# if WORDSIZE == 64
 #  define SIZE_MAX		(18446744073709551615UL)
 # else
 #  define SIZE_MAX		(4294967295U)
@@ -263,7 +269,7 @@ typedef unsigned long long int	uintmax_t;
 # define INT8_C(c)	c
 # define INT16_C(c)	c
 # define INT32_C(c)	c
-# if __WORDSIZE == 64
+# if WORDSIZE == 64
 #  define INT64_C(c)	c ## L
 # else
 #  define INT64_C(c)	c ## LL
@@ -273,14 +279,14 @@ typedef unsigned long long int	uintmax_t;
 # define UINT8_C(c)	c ## U
 # define UINT16_C(c)	c ## U
 # define UINT32_C(c)	c ## U
-# if __WORDSIZE == 64
+# if WORDSIZE == 64
 #  define UINT64_C(c)	c ## UL
 # else
 #  define UINT64_C(c)	c ## ULL
 # endif
 
 /* Maximal type.  */
-# if __WORDSIZE == 64
+# if WORDSIZE == 64
 #  define INTMAX_C(c)	c ## L
 #  define UINTMAX_C(c)	c ## UL
 # else

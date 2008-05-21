@@ -50,12 +50,12 @@
         <option>
           <name>Data Memory Model</name>
           <version>0</version>
-          <state>1</state>
+          <state>2</state>
         </option>
         <option>
           <name>Data Memory Model slave</name>
           <version>0</version>
-          <state>1</state>
+          <state>2</state>
         </option>
         <option>
           <name>Use extended stack</name>
@@ -72,7 +72,7 @@
         <option>
           <name>Calling convention</name>
           <version>0</version>
-          <state>2</state>
+          <state>4</state>
         </option>
         <option>
           <name>Workseg Size</name>

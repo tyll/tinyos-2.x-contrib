@@ -1,0 +1,3 @@
+COMPONENT=RtiTestAppC
+include $(MAKERULES)
+

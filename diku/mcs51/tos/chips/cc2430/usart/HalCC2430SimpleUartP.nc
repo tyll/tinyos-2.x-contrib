@@ -88,6 +88,7 @@ implementation {
     // PERCFG selects beween alternative pin mappings for the
     // peripherals PERCFG.U0CFG == PERCFG.U0CFG select Uart0 as part
     // of port0 (U0CFG=0) or port1 (U0CFG=1)
+    // P0.2 = rx P0.3 = tx
     PERCFG &= ~0x1u;
 
     /* HUH!?

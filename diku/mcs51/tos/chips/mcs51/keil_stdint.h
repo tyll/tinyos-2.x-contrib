@@ -60,8 +60,8 @@ typedef long long int		int64_t;
 typedef unsigned char		uint8_t;
 typedef unsigned short	        uint16_t; 
 
-// In Keil both are 16 bit, but not to Nesc!
-//typedef unsigned int	        uint16_t; 
+// In Keil in is 16 bit
+//typedef unsigned int	        uint16_t;
 typedef unsigned long		uint32_t;
 
 /* This will be removed later Keil does not support 64 bit types*/

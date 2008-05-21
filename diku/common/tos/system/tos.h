@@ -1,3 +1,7 @@
+
+// This file is a copy of the tinyos tos.h header. It adds a
+// combine function for booleans
+
 #if !defined(__CYGWIN__)
 #if defined(__MSP430__)
 #include <sys/inttypes.h>

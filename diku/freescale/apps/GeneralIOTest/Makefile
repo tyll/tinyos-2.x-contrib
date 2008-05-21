@@ -1,0 +1,3 @@
+COMPONENT=GeneralIOTestAppC
+include $(MAKERULES)
+

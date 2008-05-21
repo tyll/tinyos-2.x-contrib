@@ -1,0 +1,2 @@
+COMPONENT=KbiTestAppC
+include $(MAKERULES)

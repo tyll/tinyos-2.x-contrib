@@ -1,0 +1,159 @@
+Benchmark:
+OS - compiler - platform uafhængig
+
+Areal: 
+- strømforbrug x performance
+- skaleringsfaktor mellem de to enheder
+
+Metrik:
+- kode størrelse
+- ram forbrug
+- tid
+- strømforbrug
+
+Eksterne komponenter:
+- kombination af bus og komponent
+
+/********************************************************************
+* kompiler
+********************************************************************/
+kompiler:
+- kode størrelse
+- ram forbrug
+- stack size
+- libraries (floating point)
+- function call overhead:
+                - activation record
+
+/********************************************************************
+* OS
+********************************************************************/
+OS:
+- thread latency
+- memory handling / allocation
+- concurrency    
+
+/********************************************************************
+* komponenter
+********************************************************************/
+ADC (intern/ekstern):
+ved 8, 10, 12 bit
+a. max. single channel sampling rate
+b. max. multiple channel sampling rate
+
+Bus:
+a. tiden det tager at skifte mellem komponenter
+b. antal komponenter pr. bus
+c. latency - hvor længe skal man vente på at få bussen
+d. overførselshastighed?
+
+a. 
+    1. init bus
+    2. marker tid_start
+    3. deselect gammel komponent
+    4. setup bus
+    5. vælg ny komponent
+    6. marker tid_slut
+    
+b.
+    tæl
+    
+/* TODO: Hvad mener vi egentlig med en bus? */
+
+
+CPU:
+a. aritmetik (cisc / risc)
+
+    a. integer add/sub (fibonacci)
+    b. integer mul/div
+    c. float add/sub
+    d. float mul/div (sqrt)
+    e. 8/16/32 bit
+
+    1. start tid
+    2. udfør function
+    3. stop tid
+
+b. power modes
+    a. sleep/wakeup 
+    
+    1. transition tid
+    2. strømforbrug
+    
+    b. strømforbrug i de forskellige modes:
+        a. laveste sleep mode med intern interrupt
+        b. laveste sleep mode med ekstern interrupt
+        c. execute mode
+        d. idle mode?
+    
+        sleepmode: laveste tilstand hvorfra man stadig kan genoptage program direkte
+    
+
+c. jump / function call
+    a. hvor lang tid tager et funktionskald?
+
+/* */
+
+Flash (intern/ekstern)
+a. læs
+b. skriv
+c. slet 
+
+    find tid pr. byte minus overhead
+    problem: hvordan finder vi det?
+
+/* */
+
+Mem. acc (intern/ekstern)
+- stigende størrelser 64, 128, 256...
+
+a. DMA
+    a. one shot 
+    b. repeat
+
+b. CPU
+    a. memcopy
+    
+c. parallel (samme størrelse)
+    1. start_tid
+    2. start dma
+    3. mem copy
+    4. stop_tid
+
+/* */
+
+Radio:
+a. strøm i de forskellige modes: sleep-rx-tx-idle
+b. transition tid:
+         boot-idle, idle-rx, rx-tx etc.
+
+c. hastighed: throughput
+             delay/latency: modtag - tænk - send
+                            send - boot - sendDone
+                            rx....rxdone
+                        
+    
+/********************************************************************
+** Metodik
+********************************************************************/
+
+Platform:
+- MCU
+- eksterne komponenter forbundet til MCU gennem en bus
+- én PSU leverer strøm til alle dele på platformen
+
+Strømforbrug:
+- Måles for hele platformen (PSU): 
+    Mellem onboard voltage regulator og batteri/strøm
+- Triggeren til at udføre målingen med er valgfri  
+
+Kode størrelse:
+- hvor stor er koden?
+
+Timing:
+- Timing: Den tid det tager CPU'en at få udført et given sæt handlinger
+- Måles enten med et trigger ben fra MCU til stopur
+- Eller måles med interne timere som er kalibreret
+- Timingen af eksterne komponenter vil inkludere bus overhead, 
+    hvilket vil give et mere reelt billede af platformen og dens defekter
+

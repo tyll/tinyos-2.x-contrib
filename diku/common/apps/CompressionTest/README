@@ -8,7 +8,8 @@ compression library. It has a node side (CompressionTest) and PC side
 (node-comm). The PC side reads data from a text file, transmits it to
 the mote using a UART. The mote stores it in a buffer, compressed it
 and sends it back. The default chunk size that CompressionTest reads
-is 256 bytes.
+is 256 bytes, and the mote as default stores and compresses 16 chunks
+(4096~bytes).
 
 The data read by node-comm must be stored in a simple but specific
 file format (see below).

@@ -1,0 +1,32 @@
+$CR = $ENV{"CONTRIBROOT"} if defined($ENV{"CONTRIBROOT"});
+
+#qw doesn't replace variable so build list manually
+@LIST=(
+  "$CR/diku/freescale/tos/platforms/dig528",
+  "$CR/diku/freescale/tos/platforms/dig528/include",
+  "$CR/diku/freescale/tos/platforms/dig528/chips/mc13192",
+  "$CR/diku/freescale/tos/chips/hcs08",
+  "$CR/diku/freescale/tos/chips/hcs08/adc",
+  "$CR/diku/freescale/tos/chips/hcs08/interrupts",
+  "$CR/diku/freescale/tos/chips/hcs08/kbi",
+  "$CR/diku/freescale/tos/chips/hcs08/pin",
+  "$CR/diku/freescale/tos/chips/hcs08/spi",
+  "$CR/diku/freescale/tos/chips/hcs08/timer",
+  "$CR/diku/freescale/tos/chips/hcs08/uart",
+  "$CR/diku/freescale/tos/chips/mc13192",
+  "$CR/diku/freescale/tos/chips/mc13192/interfaces",
+  "$CR/diku/freescale/tos/lib",
+  "$CR/diku/freescale/tos/interfaces",
+  "%T/lib/adc",
+  "%T/lib/power",
+  "%T/lib/serial",
+  "%T/lib/timer"
+);
+
+push( @includes, @LIST);
+
+@opts = qw(
+  -fnesc-scheduler=TinySchedulerC,TinySchedulerC.TaskBasic,TaskBasic,TaskBasic,runTask,postTask
+);
+@commonplatforms = ("hcs08");
+

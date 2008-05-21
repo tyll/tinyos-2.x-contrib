@@ -1,0 +1,6 @@
+
+cp: cp_target
+
+cp_target: tosimage FORCE
+	@echo "    Copy $(MAIN_IHEX) to ~/"
+	cp $(MAIN_IHEX) ~/

@@ -1,7 +1,5 @@
 PLATFORM = nRF24E1_EVBOARD
-#SENSORBOARD ?= micasb
-#PROGRAMMER_PART ?= -dpart=ATmega128 --wr_fuse_e=ff
-#PFLAGS += -finline-limit=100000
+MCS51_KEIL_SCRIPT=nRF24E1.bat
 
 $(call TOSMake_include_platform,mcs51)
 

@@ -1,0 +1,12 @@
+#-*-Makefile-*- vim:syntax=make
+#$Id$
+
+# File to program and debug using the CW/Hiwave engine
+# based on install.extra file
+
+hwdebug:	FORCE
+	@echo "    installing $(PLATFORM) binary using hiwave"
+	cd $(BUILDDIR) && make -f $(TINYOS_EVB13192DIR)/tools/make/hcs08/MakeHCS08 main.debug
+
+NODEID = $(INSTALL)
+BUILD_DEPS = srec setid hwdebug

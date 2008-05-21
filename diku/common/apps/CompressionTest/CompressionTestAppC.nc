@@ -45,6 +45,9 @@ implementation
     CompressorM, PlatformStdOutC;
   MainC.SoftwareInit -> CompressionTestM.Init;
 
+  components new StarterPinC();
+  CompressionTestM.Starter -> StarterPinC.GeneralIO;
+
   CompressionTestM.UART -> PlatformStdOutC.SerialByteComm;
   CompressionTestM.CRC16 -> CRC16M;
   CompressionTestM.Compressor -> CompressorM;

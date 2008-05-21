@@ -96,14 +96,14 @@ EOF
   }
 
 #
-# Skip lines that start with // and that are within a comment
+# Skip lines that start with // and lines that are within a comment
 #
 
   if ($_ =~ /^\/\//) { print $_; next;}
 
+  if ($_ =~ /\*\//) { $comment_level--; }
   if ($comment_level > 0) { print $_; next; }
   if ($_ =~ /\/\*/) { $comment_level++; }
-  if ($_ =~ /\*\//) { $comment_level--; }
 
 #
 #  replace $ in symbols with __ (dollar in identifiers)
@@ -144,9 +144,15 @@ if(m{uint(\d+)_t\s+volatile\s+(.*)\s+__attribute(?:__)?\(\((?:__)?(sfr|sbit|sfr1
      # sfr16: __sfr __no_init volatile unsigned int  name @ addr
      # sfr32: __sfr __no_init volatile unsigned long name @ addr
      if ( $IAR )  {
-	 if ($type eq "sfr")   { $_ = "__sfr __no_init volatile unsigned char $ident @ $addr;\n"; }
-	 if ($type eq "sfr16") { $_ = "__sfr __no_init volatile unsigned int $ident @ $addr;\n"; }
-	 if ($type eq "sbit")  { $_ = "__bit  __no_init bool $ident @ $addr;\n"; }
+	 if ($type eq "sfr")   {
+             $_ = "__sfr __no_init volatile unsigned char $ident @ $addr;\n";
+         }
+	 if ($type eq "sfr16") {
+             $_ = "__sfr __no_init volatile unsigned int $ident @ $addr;\n";
+         }
+	 if ($type eq "sbit")  {
+             $_ = "__bit  __no_init bool $ident @ $addr;\n";
+         }
      }
 
  }
@@ -194,9 +200,21 @@ if(m{uint(\d+)_t\s+volatile\s+(.*)\s+__attribute(?:__)?\(\((?:__)?(sfr|sbit|sfr1
 #   For Keil the small memory model puts all variables in data
 #   the large model all goes in xdata
 #
-# Replace uint8_t j __attribute((xdata)); with uint8_t xdata j;
+# Replace uint8_t j __attribute((xdata)); with
+#   Keil, SDCC: uint8_t xdata j;
+#   IAR       : uint8_t __xdata j;
+
   $memory_att_match = 0;
-  if(s{\s+(.*)\s+__attribute(?:__)?\(\((?:__)?((?:x|p)?data)(?:__)?\)\)}{ $2 $1}) {
+  if( ($KEIL ) &&
+      s{\s+(.*)\s+__attribute(?:__)?\(\((?:__)?((?:x|p)?data)(?:__)?\)\)}
+      { $2 $1} ) {
+      $memory_att_match = 1;  # Dont replace with _data later on
+  }
+
+  if( ( $IAR || $SDCC) &&
+      s{\s+(.*)\s+__attribute(?:__)?\(\((?:__)?((?:x|p)?data)(?:__)?\)\)}
+      { $1} ) { # Drop types and rely on default for now..
+#      { __$2 $1} ) {
       $memory_att_match = 1;  # Dont replace with _data later on
   }
 
@@ -274,18 +292,14 @@ if(m{uint(\d+)_t\s+volatile\s+(.*)\s+__attribute(?:__)?\(\((?:__)?(sfr|sbit|sfr1
 
   #
   # Array definitions without length are not allowed within typedef
-  # struct
+  # struct (C99 automatic array length)
   # 
 
-  #
-  # Replace varname[] with * varname;
-  #
   if( ($KEIL || $IAR) && $typedef_struct_lines ) {
 
      # [] and * are _NOT_ the same inside a struct definition!!
      # [] means an array with a length that is up to the compiler to calculate
      #    != * which is a regular pointer!
-     # s{(\w+)\[\];}{\* $1; // Coverted from [] to * by mangleAppC.pl}
       my $quit = 0;
       if (m/\[\].*;/) {
 	  print STDERR "Structs with non-fixed length is not allowed in Keil\n";
@@ -326,7 +340,7 @@ if ( $KEIL ) {
 }
 
 #
-# Replace keyword "data"
+# Replace keyword "data" with "_data"
 #
   # replace keyword data with something else
   # Don't match xdata and __attribute((xdata))
@@ -353,54 +367,46 @@ if ( $KEIL ) {
       #s{^(.*\b__inline\b.*)}{ (my $t=$1) =~ s/\b(__inline)\b/\/*$1*\//; "$t" }e;
 
   # Keil does not support inline
-  # SDCC from version 2.7.0 should but it does not seem to work for me!
-  if ( $KEIL || $SDCC) {
+  # SDCC > 2.7.0 w. --std-sdcc99 should but it does not seem to work for me!
+  if ( $KEIL || $SDCC || $IAR) {
       s{\b((?:__)?inline)\b}{ /*$1*/ }
   }
-
-  # map gcc noinline attribute to hcs08 noinline pragma
-  # Noinline does not exist in Keil/sdcc
-  #s{^(.*)(__attribute\(\(noinline\)\))(.*)}{#pragma NO_INLINE\n$1/*$2*/$3};
 
     
 ########################################################################
 # Convert datatypes                                                    #
 ########################################################################
 
-  # /usr/include/stdint.h also contains a uint64_t definition. Lets kill it.
-  # (if it is changed to int32_t we'll have a double definition)
-  s{(__extension__)}{/*$1*/};
-  s/^typedef long long int int64_t;.*$//;
-  s/^typedef unsigned long long int uint64_t;.*//;
-    
 #
-# 64 bit integers are not implemented in sdcc so we kill them!!
-#
-  # We assume the 32 bit version is already declared
-  s/^\s*typedef\s*long\s*long\s*__nesc_nw_int64_t;\s*\n//;
-  s/^\s*typedef\s*unsigned\s*long\s*long\s*__nesc_nw_uint64_t;\s*\n//;
-  s/^\s*typedef\s*struct\s*nw_int64_t.*nw_int64_t;\s*\n//;
-  s/^\s*typedef\s*struct\s*nw_uint64_t.*nw_uint64_t;\s*\n//;
-
-#    
-# Remove implementation of __nesc_nw_uint64_t
-#
-  $multi_match = 1 if /^.*static.*inline.*__nesc_nw_u{0,1}int64_t/;
-  if ( $multi_match && /\}/ ) {
-    $multi_match = 0;
-    next;
-  }
-  next if $multi_match;
-  
-  s/^\s*typedef\s*long\s*long\s*int64_t;\s*\n//;
-  s/^\s*typedef\s*unsigned\s*long\s*long\s*uint64_t;\s*\n//;
-
+# 64 bit integers are not implemented, so we remove them.
+# Any program requiring them will fail
 #  
-# Replace all uses of uint64_t
+
+  s{(__extension__)}{/*$1*/};
+
+  # Remove typedefs ralating to 64 bit integers, e.g.
+  #    typedef unsigned long long uint64_t
+  #
+  # Replace the type of any long long variables to something that will
+  # hopefully lead to a bizzare type error - if they are ever used
+  # (the cant be removed entierly, since this seems to lead to empty
+  # structures - which again is a nono in Keil). eg.
+  #    unsigned long long myvar;
+
+  s{(typedef u?int64_t __nesc_nxbase_nx(?:le)?_u?int64_t\s*;)}{/*$1*/};
+  if (!s{(typedef\s*(?:unsigned)?\s*long\s*long\s*(?:int)?\s*\w+;)}{/*$1*/}) {
+      s{((?:unsigned)?\s*long\s*long\s*(?:int)?\s*)(\w+;)}{
+         float* $2
+      };
+  }
+
 #
-  s/\suint64_t/ uint32_t/g;
-  s/\sint64_t/ int32_t/g;  
-  s/long\s*long/long /g;
+# Double is not supported, abort if a variable is declared double
+#
+  if (/^\s+double\s+\w+;/) {
+      print STDERR "Detected the use of a variable of type \"double\" in $file line $line_no\nThis is not supported in SDCC or Keil. Aborting.\n";
+      exit -1;
+  }
 
 #
 # Drop empty structures (Keil doesn't seem to like that)

@@ -1,0 +1,25 @@
+At the moment the timers are access using one of 3 interfaces (for
+experimentation). The CC2430Timer1AlarmCounterC has been superseeded
+by HplCC2430Timer1AlarmCounterC which has lower stack depth.
+HalCC2430SimpleTimerC is a simple setup for testing the timers.
+
+1. 
+====
+ Alarm32khz16C  Counter32khz16C                              
+        |             | 
+  HplCC2430Timer1AlarmCounterC
+              |
+   HplCC2430Timer1AlarmCounterP
+
+2.
+====
+               CC2430Timer1AlarmCounterC
+                    |             |
+ CC2430Timer1AlarmCounterP    HplCC2430Timer1P
+
+
+3.
+====
+  HalCC2430SimpleTimerC
+           |
+  HalCC2430SimpleTimerP

@@ -1,0 +1,178 @@
+#-*-Makefile-*- vim:syntax=make
+# $Id$
+# @author Cory Sharp <cssharp@eecs.berkeley.edu>
+# Adapted by Mads Bondo Dydensborg <madsdyd@diku.dk>
+
+# The purpose of this Makefile is to compile the app.c file (which
+# must be in CW format) into the binary file that can be uploaded to a
+# node. Additionally, map files are generated, and various targets for
+# programming/uploading are supported.
+
+# INTERFACE/EXTERNAL ENVIRONMENT VARIABLES USED:
+
+# CYGWIN             : REQUIRED : This makefile must run under Cygwin
+# CWPATH             : REQUIRED : The base path for CodeWarrior
+# TINYOS_EVB13192DIR : REQUIRED : The path to the diku/contrib/evb13192 dir 
+# ENVIROMENT         : REQUIRED : Defines which environment (SimpleMac, FFD, etc) to link with
+# FREESCALE_LIBDIR   : REQUIRED : The path to the libraries from Freescale
+
+# The reason this Makefile needs to know where the tinyos stuff is, is
+# because of the linker scripts, and interrupt include file.
+
+################################################################################
+#
+# Sanity and parameter checking
+
+# Check that we are running under Cygwin - nothing else makes sense currently
+ifndef CYGWIN
+$(error This makefile will only work under Cygwin)
+endif
+
+# Check that required variables are set
+ifndef CWPATH
+$(error Toolchain error: CWPATH is not set)
+endif
+
+ifndef TINYOS_EVB13192DIR
+$(error Toolchain error: TINYOS_EVB13192DIR is not set)
+endif
+
+ifndef FREESCALE_LIBDIR
+$(error Toolchain error: FREESCALE_LIBDIR is not set)
+endif
+
+################################################################################
+#
+# Setting up paths, etc.
+
+# Eliminated " " in name... sigh
+CWPATH:="$(CWPATH)"
+
+# Progs used for compilation.
+CHC08   = $(CWPATH)/prog/chc08.exe
+# FIXME: If chc08 is not present, bail out, or something.
+LINKER  = $(CWPATH)/prog/Linker.exe
+BURNER  = $(CWPATH)/prog/Burner.exe
+HIWAVE  = $(CWPATH)/prog/hiwave.exe
+
+# Objects needed to start and during runtime.
+# Note that these objects are for hcs08!
+# Also note, that conversion to dos names is needed for CW, it seems.
+START_OBJ        = $(CWPATH)/lib/hc08c/lib/start08s.o
+START_OBJ       := $(shell cygpath -m -s $(START_OBJ))
+START_OBJ_SRCDIR:= $(shell cygpath -m -s $(CWPATH)/lib/hc08c/src)
+ANSI_LIB         = $(CWPATH)/lib/hc08c/lib/ansiis.lib
+ANSI_LIB        := $(shell cygpath -m -s $(ANSI_LIB))
+
+# Linker and burner program files.
+# Note, that this must be mixed mode?
+LINKER_PRM = $(TINYOS_EVB13192DIR)/lib/general_customstartupcode.prm
+LINKER_PRM:= $(shell cygpath -m -s $(LINKER_PRM))
+BURNER_BBL = $(TINYOS_EVB13192DIR)/lib/generic_s19.bbl
+BURNER_BBL:= $(shell cygpath -m -s $(BURNER_BBL))
+
+# Only include smac lib, if defined
+# Also, possible override LINKER_PRM
+ifndef ENVIRONMENT
+$(error ENVIRONMENT UNDEFINED)
+endif
+ifeq "$(ENVIRONMENT)" "SimpleMac"
+$(warning Linking with support for SimpleMac)
+ENVIRONMENT_LIBS :=-Add$(shell cygpath -m -s $(FREESCALE_LIBDIR))/SMAC_13192evb_3_0.lib
+endif
+ifeq "$(ENVIRONMENT)" "FFD"
+$(warning Linking with support for FFD)
+ENVIRONMENT_LIBS :=-Add$(shell cygpath -m -s $(FREESCALE_LIBDIR))/802.15.4_MAC_FFD_V1.05.Lib -Add$(shell cygpath -m -s $(FREESCALE_LIBDIR))/802.15.4_PHY_RD01_V1.05.Lib
+LINKER_PRM = $(TINYOS_EVB13192DIR)/lib/802.15.4.prm
+LINKER_PRM:= $(shell cygpath -m -s $(LINKER_PRM))
+endif
+ifeq "$(ENVIRONMENT)" "RFD"
+$(warning Linking with support for RFD)
+ENVIRONMENT_LIBS :=-Add$(shell cygpath -m -s $(FREESCALE_LIBDIR))/802.15.4_MAC_RFD_V1.05.Lib -Add$(shell cygpath -m -s $(FREESCALE_LIBDIR))/802.15.4_PHY_RD01_V1.05.Lib
+LINKER_PRM = $(TINYOS_EVB13192DIR)/lib/802.15.4.prm
+LINKER_PRM:= $(shell cygpath -m -s $(LINKER_PRM))
+endif
+
+
+# Setup options for compilation.
+# Some of these are from Corys work, others from the standard compilation options
+# of CW/Freescale 802.15.4 projects:
+
+# Options to compiler:
+# -Os : optimize for size (removed for debug reasons)
+# -Oi=c65536 : inline, using up to 64kb ram
+# -F2 : Object file format, 2=ELF/Dwarf 2.0 object file format
+# My options:
+# -Lp : Generate/leave preprocessor output file (%.pre)
+# -Cs08 : Generate Code for HCS08
+# -CswMaxLF0 -CswMinLF0 -CswMinSLB9999 : Options related to tables...
+# -DType_FFDDP : <<<< Whenever we start using the 802.15.4 lib.
+# -Lasm=%n.lst -Lasmc=h : Produce assembler code for viewing. Can not be compiled
+# -Ot <<< Optimize for time - what MW does..
+# -Ou : About dead code. Can be unsafe. We use the safe version. 
+# -Onf : identify common code - follows -Ot or -Os 
+# -OnB=alr : disable branch optmizer
+# -OnCstVar : Do not optimize const vars.
+# -OnPMNC : Usefull when we do not use c++
+# -Or : Allocate local variables into registers (may increase code size)
+# -TE1uE : Set enums to use 8 bit unsigned. (ups)
+# -WStdoutOn : Write error and warning to stdout
+# -WOutFileOff : Do not write an error file
+# -WErrFileOff : No error is written (do not use) .log file (dos thing).
+
+# Fixme: check the <<<< above.
+CHCS08_OPTS := -Oi=c65536 -TE4uE -F2 -Lp -Cs08 -CswMaxLF0 -CswMinLF0 -CswMinSLB9999 \
+             -Lasm=%n.lst -Lasmc=h -Onu -OnB=alr -OnPMNC -Or \
+	     -WStdoutOn -WOutFileOff \
+             $(CHCS08_OPTS) 
+
+# The PFLAGS is only used to let the compiler locate the interrupts file
+PFLAGS = $(TINYOS_EVB13192DIR)/tos/platform/hcs08/
+PFLAGS:= -I$(shell cygpath -m -s $(PFLAGS))
+
+################################################################################
+#
+# Actual targets
+
+# Should use the bootloader to install here
+%.install: %.exe %.s19 FORCE
+	@echo Install does not currently work, use debug instead.
+
+# Debug only works if you actually have 
+%.debug: %.exe FORCE
+	@if [ ! -f flash.ini ] ; then \
+		echo No flash.ini files, creating default files ; \
+		cp $(TINYOS_EVB13192DIR)/lib/flash.* . ; \
+	fi
+	@if  [ "x$$TERM" = "xcygwin" ] ; then \
+		echo "Starting hiwave engine" ; \
+		GENPATH=$(START_OBJ_SRCDIR) $(HIWAVE) $< -W -Prod=flash.ini ; \
+	else \
+		echo "TERM!=cygwin, will not run W32 GUI program!" ; \
+		/usr/bin/false ; \
+	fi
+
+
+%.s19: %.exe
+	BurnIn=$< BurnOut=$@ $(BURNER) -WStdoutOn -WOutFileOff -f $(BURNER_BBL)
+
+%.exe: %.o 
+	DEFAULTDIR=. TEXTPATH=. $(LINKER) -WStdoutOn -WOutFileOff \
+        -O./$@ -Add$+ -Add$(START_OBJ) -Add$(ANSI_LIB) $(ENVIRONMENT_LIBS) $(LINKER_PRM)
+
+# map=$(TINYOS_EVB13192DIR)/lib/$(basename $@).map && [ -f $$map ] && mv $$map ./
+
+# FIXME Problsm with the map stuff - do not want the map file in lib
+
+%.o: %.c
+	$(CHC08) $(CHCS08_OPTS) $(PFLAGS) $(CFLAGS) $<
+
+clean: FORCE
+	rm -f EDOUT err.log
+	@a=`for a in *.c; do b=$${a%.c}; for c in $$b.o $$b.map $$b.exe $$b.s19 $$b.lst $$b.pre $$b.bpt $$b.mrk; do [ -f $$c ] && echo -n "$$c "; done; done`; [ -n "$$a" ] && echo "rm -f $$a" && rm -f $$a; true
+
+extra_clean: FORCE
+
+.PRECIOUS: %.o %.exe %.s19
+.PHONY: FORCE
+

@@ -1,0 +1,32 @@
+Transparent log recording layer.
+
+The log recording layer is used to record the accumulated time used in
+different mote states, such as on, transmitting, receiving, etc. The
+states are numbered by connecting I/O pins from one pin two an other
+and recording the time spent in each state on the second mote.
+
+The recording layer has two parts:
+ 1. The library in this directory that is to be linked with a target
+    application and used on a target mote
+ 2. The LogRecorder application in the apps directory. This application
+    records the state transitions on the target mote via the I/O pins.
+
+
+To use this on a target application:
+
+ * Change the top level wiring file to point to the log-component
+   instead of the real components. For example to record the use of
+   the Msp430 internal temperature sensor:
+
+  components new Msp430InternalTemperatureC();
+  components new ReadLoggerC(uint16_t);
+  DataAcquisitionP.Read -> ReadLoggerC;
+  ReadLoggerC.ReadIn -> Msp430InternalTemperatureC;
+
+ * Link log.extra to support/make/<your platform>/
+
+ * make <your platform> log
+
+Which output pins are bound to which states is configured in the component
+"LoggerPinsC" found in the platform directory.
+

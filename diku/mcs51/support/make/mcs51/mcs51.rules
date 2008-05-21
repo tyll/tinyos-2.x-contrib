@@ -11,6 +11,11 @@ HELP += $(MCS51_HELP)
 
 NCC = ncc
 
+SDCC = sdcc
+# hmm.. should be --model-large, but that seems to fail
+# --std-sdcc99 allows inline
+SDCC_CFLAGS = -mmcs51 --model-large --no-c-code-in-asm --std-sdcc99
+
 BUILDDIR = build/$(PLATFORM)
 MAIN_EXE = $(BUILDDIR)/APP
 MAIN_SREC = $(BUILDDIR)/main.srec
@@ -44,12 +49,12 @@ ifndef MCS51_COMPILER
 endif
 
 ifndef MCS51_IAR_PATH
-	MCS51_IAR_PATH=Program\ Files/IAR\ Systems/Embedded\ Workbench\ 4.0\ Evaluation\ version/common/bin/
+	MCS51_IAR_PATH=Program\ Files/IAR\ Systems/Embedded\ Workbench\ 4.0\ Evaluation\ version/common/bin
 endif
 
 OSNAME = $(shell uname)
 ifeq ($(findstring CYGWIN,$(OSNAME)),CYGWIN)
-	MCS51_IAR_PATH=/cygdrive/c/$(MCS51_IAR_PATH)
+	MCS51_IAR_PATH:=/cygdrive/c/$(MCS51_IAR_PATH)
 else
 	MCS51_IAR_PATH:=C:$(MCS51_IAR_PATH)
 	ifndef MCS51_WINE_IAR_PATH
@@ -59,7 +64,7 @@ else
 	       MCS51_WINE_KEIL_PATH := $(HOME)/.wine.keil
 	endif
         MCS51_WINE_IAR=env WINEPREFIX=$(MCS51_WINE_IAR_PATH) LC_ALL=en_US wine
-        MCS51_WINE_KEIL=env WINEPREFIX=$(MCS51_WINE_KEIL_PATH) LC_ALL=en_US wine wcmd /c
+        MCS51_WINE_KEIL=env WINEPREFIX=$(MCS51_WINE_KEIL_PATH) LC_ALL=en_US wine cmd /c
 endif
 
 
@@ -99,16 +104,18 @@ mangle: ncc
 
 iar: mangle builddir
 	cp $(MCS51_MAKE_PATH)/mcs51/iar* $(BUILDDIR)
-	cd $(BUILDDIR) && $(MCS51_WINE_IAR) $(MCS51_IAR_PATH)/iarbuild.exe iar-app-project.ewp -build Debug
+	cd $(BUILDDIR) && $(MCS51_WINE_IAR) "$(MCS51_IAR_PATH)/iarbuild.exe" iar-app-project.ewp -build Debug
 	@grep "SEGMENTS IN ADDRESS ORDER" -B 3 -A 20 $(BUILDDIR)/Debug/List/iar-app-project.map
 	@grep "END OF CROSS REFERENCE" -A 8 $(BUILDDIR)/Debug/List/iar-app-project.map | grep memory 
+	cp $(BUILDDIR)/Debug/Exe/iar-app-project.a51 $(BUILDDIR)/app.hex
 
 #######
 # SDCC rules
 
 .PHONY: sdcc
 sdcc: mangle
-	sdcc -mmcs51 $(APP_C) -o$(BUILDDIR)/app
+	$(SDCC) $(SDCC_CFLAGS) $(APP_C) -o$(BUILDDIR)/app  
+	packihx $(BUILDDIR)/app > $(BUILDDIR)/app.hex
 	@echo "Segment sizes"
 	@grep -A 1 "OSEG" $(BUILDDIR)/app.sym
 	@grep -A 1 "SSEG" $(BUILDDIR)/app.sym
@@ -126,7 +133,6 @@ sdcc: mangle
 # Keil rules
 # Build to .hex using $(MCS51_KEIL_SCRIPT) from
 
-# env WINEPREFIX=$(HOME)/.wine.keil LC_ALL=en_US wine wcmd /c
 keil: mangle $(BUILDDIR)/startup.OBJ $(BUILDDIR)/$(KEIL_BAT_SCRIPT)
 	cd $(BUILDDIR) $(OSTYPE) &&   $(MCS51_WINE_KEIL) ./$(MCS51_KEIL_SCRIPT)
 	@bash -c "if [ -f $(COMPONENT).s ]; then mv $(COMPONENT).s build/$(PLATFORM)/; fi"

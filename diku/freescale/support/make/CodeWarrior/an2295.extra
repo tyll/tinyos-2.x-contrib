@@ -1,0 +1,15 @@
+#-*-Makefile-*- vim:syntax=make
+#$Id$
+
+#ifeq ($(PEMICRO),)
+#$(error PEMICRO must be defined, try "make $(TARGETS) help")
+#endif
+
+PROGRAM = an2295
+
+program: FORCE
+	@echo "    installing $(PLATFORM) binary using an2296"
+	@echo
+	@echo "You can install the binary using the following command:"	
+	@echo hc08sprg /dev/ttyUSB0 $(BUILDDIR)/main.s19
+

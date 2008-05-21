@@ -1,0 +1,46 @@
+$Id$
+
+Note: although this dir is called hcs08, it really currently only
+      supports the evb13192.
+
+Second note: The system works (kindof) but if you were to argue that
+             it is a mess, I would not contradict you... The system
+             makes heavy use of environment variables, that in many
+             instances seems redundant. A total rewrite would be great.
+
+The role of the files in this directory is as follows.
+
+hcs08.rules: Basic rules used by TinyOS build system to provide a
+             target for hcs08. Used by ../evb13192.target, potentially 
+             by others. This file more or less only sets up the TinyOS
+             make system to call the file makeEvb13192.sh script upon
+             compilation. 
+
+*.extra: Files that define extras to the main target. 
+         debug: On windows, starts the hiwave engine, _but_ uses a
+         pemicro burner, not recommended currently.
+         install: broken, but does build a .s19 file. Use this
+
+makeEvb13192.sh: This script uses ncc to create an app.c file for the
+                 MetroWerks CW compiler to compile. This involves
+                 calling the ncc compiler, with the right set of
+                 include files and paramters, and "demangle" the app.c
+                 file: The app.c file created by ncc includes a lot of
+                 gcc specific code, which is converted into code that
+                 the CodeWarrior compiler can understand.  The last
+                 step of this script is to call make, using the
+                 MakeHSC08 makefile as input, if the CW compiler is
+                 present, otherwise it will use the COMPILEHOST
+                 environment variable to contact a compilehost for
+                 compilation.
+
+hcs08MangleAppC.pl: This script converts the app.c files created by
+                    nesc into an app.c file that can be used by the
+                    MetroWerks CodeWarrior compiler. It currently also
+		    adds some stuff that is needed for SMAC support. (TODO).
+          
+MakeHSC08: This Makefile does the actual compilation from app.c file
+           into the binary files that can be uploaded to the nodes.
+
+
+

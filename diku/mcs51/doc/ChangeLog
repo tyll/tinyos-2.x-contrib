@@ -1,3 +1,14 @@
+
+0.1 pre3
+ * Fixed typo in mcs51.rules (IAR compile)
+ * Fixed typo in env
+ * Added hex convertion for sdcc
+ * Fix stdint.h!!
+ * mangleApp.pl now aborts when a double variable is detected.
+ * mangleApp.pl now handles 64 bit integers elegant
+ * Added dummy includes to prevent inclution of system includes
+   (math.h, unistd.h)
+
 0.1 pre2
  * Cygwin support
  * SDCC support
@@ -11,14 +22,18 @@ RoadMap
 =======
 0.1
  Cleanup clock control + PlatformC
+ HalPlatformLedsC for nano (Blink* depends on it)
+ Add nRF24E1
+ Fix BlinkNoTimer + BlinkNoTimerTask
+
+0.2
  Sleep modes
  SimpleMac idle-power-consumption problem
- PlatformSerial? UartC - UartStream
+ Serial Stack: PlatformSerial, UartC
 
 Later
- Cygwin support
+ Separate CC2430 code into a common ChipCon-8051 ancester
+ Regression testing
  nRF24E1
- Serial Stack
  AM Stack
  Acurate timers (pending final silicon rev.)
- 

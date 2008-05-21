@@ -1,0 +1,7 @@
+#-*-Makefile-*- vim:syntax=make
+#$Id$
+
+# This file work by requiring a set of extra targets.
+NODEID = $(INSTALL)
+BUILD_DEPS = srec setid program
+

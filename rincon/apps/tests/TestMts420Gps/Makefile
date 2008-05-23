@@ -1,0 +1,4 @@
+SENSORBOARD=mts420
+COMPONENT=TestNmeaParseC
+
+include $(MAKERULES)

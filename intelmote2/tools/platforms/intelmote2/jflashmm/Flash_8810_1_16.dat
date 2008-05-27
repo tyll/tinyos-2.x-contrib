@@ -1,0 +1,85 @@
+/* Flash_8810_1_16.dat
+   Called from Jflash with Device ID = 0x8810
+***************************************************************************** 
+    This is a flash data file required by JFlash. This file contains memory 
+    map information and other particulars required to program the device. 
+    This data file is a text file with specific format requirements.
+
+    The filename is constructed by the JFlash engine by the following 
+    algorithm. This is so that the JFlash engine does not have to be 
+    updated with new flash information. If the file was not found, then
+    the flash is either not supported or not released to the customer.
+
+    The algorithm is:
+
+    Flash_ + numeric ID + number of devices in parallel + bus width +.dat
+
+
+    Comment blocks can be defined using the old-style C comment blocks. 
+    The difference is that the delimiter characters must have whitespace 
+    on both sides. 
+
+    Data may be string data, or numeric. String data is only allowed 
+    at specific positions within this file. Numeric data can be decimal, 
+    hexadecimal, or octal. 
+    Decimal data is assumed, and HEX data may be denoted by a 
+    preceding 'X' character.
+
+    Valid HEX data:
+        xA0000000
+        XA4090000
+        Xff
+
+    Valid OCTAL data:
+        o765
+        O123545
+
+***************************************************************************** 
+*/
+    28F256L18B  /* Designation for this memory type */
+    1.0         /* Version number of this data file */
+    VLF0000001  /* Version lock code for compatibility to JTAG engine */
+/*
+***************************************************************************** 
+*/
+    5       /* Max Erase Time in seconds */
+    16      /* Max Write Buffer */
+/*
+***************************************************************************** 
+The flash blocks may be of different sizes throughout the flash device or 
+may be all one size. The description of the flash for our purposes must 
+identify where the erase and program regions are in the device. The simplest 
+method would be to limit the description to allow up to 10 unique regions of 
+similiar characteristics. In most cases, 10 regions will be too many, and 
+these extra definition locations can be stubbed out by setting the region 
+identifier as disabled. Regions are expected to be described in order so that
+the start address of the first region and the end address of the last region 
+can be used to compute the total memory size.  
+
+***************************************************************************** 
+*/
+/* 
+   reg # | enabled  |# of   | Block  | Start    | End      |
+         | or       |erase  | size   | Addr of  | Addr of  |
+         | disabled |blocks |        | region   | region   |
+         |	    |       |(words) | (bytes)	| (bytes)  |
+*/
+/*	0 */   enabled   4       X4000	  X00000000  X1FFFF
+/*	1 */   enabled	 255     X10000   X20000     X1FFFFFF
+/*	2 */   disabled	 0       X0       X0         X0
+/*	3 */   disabled	 0       X0       X0         X0
+/*	4 */   disabled	 0       X0       X0         X0
+/*	5 */   disabled	 0       X0       X0         X0
+/*	6 */   disabled	 0       X0       X0         X0
+/*	7 */   disabled	 0       X0       X0         X0
+/*	8 */   disabled	 0       X0       X0         X0
+/*	9 */   disabled	 0       X0       X0         X0
+
+/*
+*********************************************************
+Alignment checkpoint - do not edit this value
+*********************************************************
+*/
+	1111
+
+/* End of data */

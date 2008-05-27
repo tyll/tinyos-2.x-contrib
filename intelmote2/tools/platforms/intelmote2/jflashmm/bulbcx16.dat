@@ -1,0 +1,1031 @@
+/* BulvBCx_16.dat version 1.00.001
+****************************************************************************
+
+    This data file contains the JTAG and board configuration data required 
+    for multi-mode JFlash. This data file is a text file with specific 
+    format requirements.
+
+    Comment blocks can be defined using the old-style C comment blocks. 
+    The difference is that the delimiter characters must have whitespace 
+    on both sides. 
+
+    Data may be string data, or numeric. String data is only allowed 
+    at specific positions within this file. Numeric data can be decimal, 
+    hexadecimal, or octal. 
+    Decimal data is assumed, and HEX data may be denoted by a 
+    preceding 'X' character.
+
+    Valid HEX data:
+        xA0000000
+        XA4090000
+        Xff
+
+    Valid OCTAL data:
+        o765
+        O123545
+
+    The data required to fill in this table comes from knowledge of the 
+    BSDL file for the processor, the development board user's guide, 
+    and specifications for the flash components. 
+
+    Data is position dependent in terms of order. Whitespace is the 
+    delimiter for the data and may be used as necessary to keep the 
+    data in reasonably readable format. 
+
+    There are checkpoints within this file that are used as validation 
+    that the data alignment is correct. DO NOT MODIFY THE CHECKPOINT DATA. 
+
+    The filename of this file is used as the parameter for JFlash.
+*/ 
+
+/*
+****************************************************************************
+Release Information  
+**************************************************************************** 
+
+	1. This data file will identify the A0 and A1 silicon, but the scan data is not
+	   compatible with these older revisions.
+	
+	2. 2.0 release: adds identification for the C2 silicon. 
+
+	END RELEASE INFORMATION
+*/
+	
+
+/*
+****************************************************************************
+File Identification strings to display from JFlash  
+**************************************************************************** 
+*/
+    PXA27x       /* Position 0 - Supported Processor Code Name or Number */
+    Mainstone    /* Supported Development platform name or number */
+    1.00.001     /* Version number of this data file */
+    VL00000001   /* Version lock code for compatibility to JTAG engine */
+
+/*
+****************************************************************************
+Basic JTAG setup required by JFlash
+**************************************************************************** 
+*/
+    504     /* The number of bits in the Boundary Scan chain */
+    7       /* The number of bits in the instruction register */
+    X0      /* EXTEST instruction in HEX */
+    X7E     /* IDCODE instruction in HEX */
+    X7F     /* BYPASS instruction */
+/*
+****************************************************************************
+Chip select offsets: 6 total, beginning with chip select 0 and in order.
+**************************************************************************** 
+*/
+    61  303 240 239 238 285
+/*
+****************************************************************************
+Control Bits required for bus transactions
+**************************************************************************** 
+*/
+    60      /* Output enable: nOE_OUT */
+    59      /* Write Enable: nWE_OUT */
+    72      /* Memory data upper bit control: mdupper_ctrl */
+    71      /* Memory data lower bit control: mdlower_ctrl */
+    68      /* Read/Write direction: RD_nWR_OUT */
+/*
+****************************************************************************
+ALIGNMENT CHECKPOINT # 1 - DO NOT MODIFY THIS DATA
+**************************************************************************** 
+*/
+    1111    /* position 20 */
+/*
+****************************************************************************
+Address bit offsets beginning with A0
+**************************************************************************** 
+*/
+    25  24  23  22  21  20  19  18      /* A0 - A7 */   
+    17  16  15  14  13  12  11  10      /* A8 - A15 */
+    9   8   7   6   5   4   3   2       /* A16 - A23 */
+    1   0                               /* A24, A25 */
+/*
+****************************************************************************
+Input data bit offsets beginning with D0
+**************************************************************************** 
+*/
+    491 490 489 488 487 486 485 484     /* D0 -  D7  */
+    483 482 481 480 479 478 477 476     /* D8 -  D15 */
+    475 474 473 472 471 470 469 468     /* D16 - D23 */
+    467 466 465 464 463 462 461 460     /* D24 - D31 */
+/*
+****************************************************************************
+Output data bit offsets beginning with D0
+**************************************************************************** 
+*/
+    57  56  55  54  53  52  51  50      /* D0 -  D7  */
+    49  48  47  46  45  44  43  42      /* D8 -  D15 */
+    41  40  39  38  37  36  35  34      /* D16 - D23 */
+    33  32  31  30  29  28  27  26      /* D24 - D31 */
+/*
+****************************************************************************
+ALIGNMENT CHECKPOINT # 2 - DO NOT MODIFY THIS DATA
+**************************************************************************** 
+*/
+    2222    /* position 111 */
+/*
+****************************************************************************
+Width of data bus. Only 16 or 32 are allowed as values 
+**************************************************************************** 
+*/
+    16
+/*
+****************************************************************************
+Memory Space Definition for chip selects. The memory addresses are defined 
+by a lower and upper limit and the chip select that is used to access this
+address. The chip selects are identified by an integer.
+Only 6 regions are allowed. If there are fewer regions on the platform, 
+then specify the unused regions with XFFFFFFFF as the lower and upper 
+region limits and specify the highest chip select for these regions.  
+**************************************************************************** 
+*/
+/*  Lower Address       Upper Address       Chip Select */
+    X00000000           X04000000           0
+    X04000000           X08000000           1
+    X08000000           X0C000000           2
+    X0C000000           X10000000           3
+    X10000000           X14000000           4
+    X14000000           X18000000           5
+/*
+****************************************************************************
+Processor JTAG ID string. The upper 4 bits that define the stepping are not
+required here, but must be defined afterward to equate the value to the 
+named stepping. 
+**************************************************************************** 
+*/
+    1001001001100101    /* Processor ID */ 
+    00000001001         /* Intel Manufacturer Code */
+    1                   /* required by JTAG Standards */
+/*
+****************************************************************************
+Stepping labels relative to the top 4 bits of the chip ID. 
+16 values required. 
+**************************************************************************** 
+*/
+    A0       /* id = 0 , data position 131 */
+    A1       /* id = 1 */
+    B0       /* id = 2 */
+    B1       /* id = 3 */
+    C0       /* id = 4 */
+    C2       /* id = 5 */
+    ??       /* id = 6 */
+    C5       /* id = 7 */
+    ??       /* id = 8 */
+    ??       /* id = 9 */
+    ??       /* id = 10 */
+    ??       /* id = 11 */
+    ??       /* id = 12 */
+    ??       /* id = 13 */
+    ??       /* id = 14 */
+    ??       /* id = 15 */
+/*
+****************************************************************************
+Default High bits. These are pins on the chain that are required to be set 
+high by default. This list contains some usual pins, and allows for 20 
+arbitrary additional pins to be set. This list as with all lists is required 
+to have a fixed number of entries. All entries that are not used should be 
+set to 9999 
+**************************************************************************** 
+*/
+    /* Normally high */
+
+    61      /* nCS0_OUT */
+    303     /* nCS1_OUT */      182     /* nCS1 control pin */
+    240     /* nCS2_OUT */      119     /* nCS2 control pin */
+    239     /* nCS3_OUT */      118     /* nCS3 control pin */
+    238     /* nCS4_OUT */      117     /* nCS4 control pin */
+    285     /* nCS5_OUT */      164     /* nCS5 control pin */
+    9999    /* additional */
+    59      /* nWE_OUT */
+    60      /* nOE_OUT */
+    69      /* ma_ctrl - address lines enable */
+    70      /* dqm_ctrl - DQM Control */
+    71      /* mdlower_ctrl - memory data lower 16 bits */
+    72      /* mdupper_ctrl - memory data upper 16 bits */
+    73      /* nwe_ctrl */
+    74      /* noe_ctrl */
+    75      /* sdclk_ctrl */
+    319     /* nsdcs_0 */
+    318     /* nsdcs_1 */
+    321     /* nsdras */
+    325     /* clk_req_ctrl */
+    492     /* nbatt_fault */
+    494     /* nvdd_fault */
+
+    /* Arbitrary Additional Pins */
+
+    316    /* GPIO 2 required for sys enable */
+    195    /* GPIO 2 Control */
+    269    /* GPIO 49 nPWE */
+    148    /* GPIO 49 control */
+    228    /* GPIO 90 nURST */
+    107    /* GPIO 90 control */
+    313    /* additional */
+    192    /* additional */
+    312    /* additional */
+    191    /* additional */
+    311    /* additional */
+    190    /* additional */
+    310    /* additional */
+    189    /* additional */
+    9999    /* additional */
+    9999    /* additional */
+    9999    /* additional */
+    9999    /* additional */
+    9999    /* additional */
+    9999    /* additional */
+/*
+****************************************************************************
+JTAG Chain description: This section defines the position of components 
+on the chain so that these components can be accounted for and bypassed
+during the programming operation. There are up to 5 devices that can be 
+handled, and at least one must be the main processor. Specify that a 
+device is present with the string 'Enabled' or not present with the string 
+'Disabled'. Each device that is enabled requires a specification for the 
+number of bits in the JTAG instruction register.  The controlling entity,
+usually the main processor is identified by the string 'Controller'.
+The order of the components is from TDI to TDO. The procedure needs to 
+know if the device is the last 
+**************************************************************************** 
+*/
+/* TDI --------> */  Enabled    7   Controller  Last
+                     Disabled   0   Other       More
+                     Disabled   0   Other       More
+                     Disabled   0   Other       More
+                     Disabled   0   Other       More    /* TDO ---------> */
+/*
+****************************************************************************
+Additional flash component UNLOCK controls: 4 addition pins can be defined 
+that would be controlled to UNLOCK a flash memory device that has external 
+locking pins. Any unused pins should be set to 9999. Specify the signal level
+required to UNLOCK the flash. These signals will be reversed to re-lock the 
+flash after programming. 
+**************************************************************************** 
+*/
+    9999     1   /* gpio22_ctrl */
+    9999    1   /* gpio12_ctrl */
+    9999    1   /* gpio22_out */
+    9999    1   /* gpio12_out */
+/*
+****************************************************************************
+ALIGNMENT CHECKPOINT # 3 - DO NOT MODIFY THIS DATA
+**************************************************************************** 
+*/
+    3333
+
+/*
+****************************************************************************
+number of flash devices in parallel on the bus
+**************************************************************************** 
+*/
+	1  
+/*
+****************************************************************************
+position of nsdcas signal - toggled in parallel with any chip select
+**************************************************************************** 
+*/
+	58		/* nsdcas */
+/*
+****************************************************************************
+Flash programming Mode: WORD or BUFFER
+WORD programming is useful for doing things like smoothly crossing device 
+boundaries but is a little slower. 
+**************************************************************************** 
+*/
+	BUFFER		/* WORD or BUFFER is the allowed entry */
+/*
+****************************************************************************
+E N D   O F   D A T A 
+**************************************************************************** 
+*/
+
+/* 
+BSDL File Used
+
+--------------------------------------------------------------------------
+-- File Type      :  BSDL Description Bulverde B0 v1_0 13x13 VFBGA
+-- Author         :  jboyer
+--------------------------------------------------------------------------
+
+entity bulverde_b0_13x13 is 
+
+generic(PHYSICAL_PIN_MAP : string := "VFBGA"); 
+
+port(
+    boot_sel_0           : in           bit;
+    rdnwr                : out          bit;
+    clk_req              : inout        bit;
+    gpio                 : inout        bit_vector(118 downto 0);
+    dqm_0                : out          bit;
+    dqm_1                : out          bit;
+    dqm_2                : out          bit;
+    dqm_3                : out          bit;
+    ma                   : out          bit_vector(25 downto 0);
+    md                   : inout        bit_vector(31 downto 0);
+    ncs_0                : out          bit;
+    noe                  : out          bit;
+    nsdcas               : out          bit;
+    nsdcs_0              : out          bit;
+    nsdcs_1              : out          bit;
+    nsdras               : out          bit;
+    nwe                  : out          bit;
+    sdcke_1              : out          bit;
+    sdclk_0              : out          bit;
+    sdclk_1              : out          bit;
+    sdclk_2              : out          bit;
+    nbatt_fault          : in           bit;
+    nreset               : in           bit;
+    nreset_out           : linkage      bit;
+    nvdd_fault           : in           bit;
+    pwr_en               : linkage      bit;
+    pxtal_in             : linkage      bit;
+    pxtal_out            : linkage      bit;
+    test                 : in           bit;
+    testclk              : in           bit;
+    txtal_in             : linkage      bit;
+    txtal_out            : linkage      bit;
+    uio                  : inout        bit;
+    usbc_n               : inout        bit;
+    usbc_p               : inout        bit;
+    usbh_n_0             : inout        bit;
+    usbh_p_0             : inout        bit;
+    vcc_batt             : linkage      bit;
+    vcc_bb               : linkage      bit;
+    vcc_core             : linkage      bit_vector(13 downto 0);
+    vcc_io               : linkage      bit_vector(2 downto 0);
+    vcc_usb              : linkage      bit_vector(3 downto 0);
+    vcc_lcd              : linkage      bit_vector(1 downto 0);
+    vcc_mem              : linkage      bit_vector(18 downto 0);
+    pwr_out              : linkage      bit;
+    vcc_pll              : linkage      bit;
+    vcc_ram              : linkage      bit_vector(3 downto 0);
+    vcc_usim             : linkage      bit;
+    vss_bb               : linkage      bit;
+    vss_core             : linkage      bit_vector(19 downto 0);
+    vss_io               : linkage      bit_vector(7 downto 0);
+    vss_mem              : linkage      bit_vector(16 downto 0);
+    vss_pad              : linkage      bit_vector(5 downto 0);
+    vss_pll              : linkage      bit;
+    tdi                  : in           bit;
+    tms                  : in           bit;
+    tck                  : in           bit;
+    tdo                  : out          bit;
+    ntrst                : in           bit
+    );
+
+use STD_1149_1_1994.all;
+
+attribute COMPONENT_CONFORMANCE of bulverde_b0_13x13 : entity is "STD_1149_1_1993";
+
+attribute PIN_MAP of bulverde_b0_13x13 : entity is PHYSICAL_PIN_MAP; 
+
+constant VFBGA : PIN_MAP_STRING := 
+   "boot_sel_0:  ab23," &
+   "rdnwr:       c9," &
+   "clk_req:     w24," &
+   "gpio:        (a22,d20,c24,e21,d24,a13,b18,c17,b17," &
+                  "d17,ad14,ac15,ab15,ab16,ad15,ac16,ab17,ac17,ac18," &
+                  "ab18,ad18,aa17,ac19,aa18,ad19,ab19,a19,f23,f22," &
+                  "d22,c23,n23,n22,ac12,aa11,ad10,ad9,ab12,c7," &
+                  "c8,b7,r21,p22,p23,r23,m22,n24,l22,m24," &
+                  "l23,l21,k23,k22,k24,j22,h23,h22,h24,g23," &
+                  "g22,g24,ac11,ab11,aa10,aa14,ab14,ac14,ad13,ab13," &
+                  "a10,ac13,a11,b11,c19,b20,c22,c21,c18,d14," &
+                  "d19,b14,a15,c14,b19,a21,b6,a20,c12,c13," &
+                  "b13,a14,c15,b15,d16,a17,b16,d13,ad5,ab6," &
+                  "r22,b9,c16,a18,a3,t24,c10,b10,c11,v23," &
+                  "u22,aa20,ac22,ad22,ab21,w23,w21,aa24,y24,v22)," &
+   "dqm_0:       ab9," &
+   "dqm_1:       ab10," &
+   "dqm_2:       ac9," &
+   "dqm_3:       ac10," &
+   "ma:          (d6,c4,d4,c2,d2,e4,e3,c1,d1,f3," &
+                  "g4,f2,e1,g3,g2,h3,h2,g1,j3,j2,k3,k2,j1,k4,a6,c6)," &
+   "md:          (l2,m2,m3,n2,n1,p3,r3,r1,t1,v2,v1,w1,y1,aa1,ab3,aa4," &
+                  "k1,l1,m4,n3,p2,p4,r4,t3,u1,v3,u4,y2,y3,aa3,ab1,ab4)," &
+   "ncs_0:       b3," &
+   "noe:         ac5," &
+   "nsdcas:      aa6," &
+   "nsdcs_0:     ab7," &
+   "nsdcs_1:     ab8," &
+   "nsdras:      ac7," &
+   "nwe:         ab5," &
+   "sdcke_1:     ad6," &
+   "sdclk_0:     ac4," &
+   "sdclk_1:     ad7," &
+   "sdclk_2:     ad3," &
+   "nbatt_fault: ab24," &
+   "nreset:      y22," &
+   "nreset_out:  y21," &
+   "nvdd_fault:  w22," &
+   "pwr_en:      y23," &
+   "pxtal_in:    ac21," &
+   "pxtal_out:   ad21," &
+   "test:        u24," &
+   "testclk:     t23," &
+   "txtal_in:    aa22," &
+   "txtal_out:   aa23," &
+   "uio:         e23," &
+   "usbc_n:      c20," &
+   "usbc_p:      b22," &
+   "usbh_n_0:    d23," &
+   "usbh_p_0:    e22," &
+   "vcc_batt:    ab20," &
+   "vcc_bb:      ad12," &
+   "vcc_core:    (ad11,t2,ad4,w3,b21,m23,r24,ad16,f24,l24,j23,d3," &
+                  "a7,b12)," &
+   "vcc_io:      (ad17,a12,a16)," &
+   "vcc_usb:     (a23,a24,b23,b24)," &
+   "vcc_lcd:     (j24,p24)," &
+   "vcc_mem:     (w2,ac6,a4,b8,ac8,aa2,u2,ad8,f1,h1,m1,ad1,ac1," &
+                  "ac2,ad2,l3,e2,c3,p1)," &
+   "pwr_out:     ab22," &
+   "vcc_pll:     ac20," &
+   "vcc_ram:     (b4,a5,a8,a9)," &
+   "vcc_usim:    e24," &
+   "vss_bb:      aa13," &
+   "vss_core:    (aa12,w4,d8,d12,d21,g21,k21,p21,aa7,u3,m21,aa15," &
+                 "d10,j21,a1,b1,a2,b2,d7,b5)," &
+   "vss_io:      (d11,d15,d18,f21,h21,n21,aa19,aa16)," &                      
+   "vss_mem:     (y4,c5,r2,n4,d9,aa9,aa8,aa5,v4,t4,l4,ab2,ac3,j4," &
+                  "h4,f4,d5)," &
+   "vss_pad:     (v21,ad23,ac23,ad24,ac24,aa21)," &
+   "vss_pll:     ad20," &
+   "tdi:         u23," &
+   "tms:         t21," &
+   "tck:         t22," &
+   "tdo:         v24," &
+   "ntrst:       u21";
+
+
+attribute TAP_SCAN_IN of TDI : signal is true; 
+attribute TAP_SCAN_MODE of TMS : signal is true; 
+attribute TAP_SCAN_OUT of TDO : signal is true; 
+attribute TAP_SCAN_CLOCK of TCK : signal is (20.0e6, BOTH); 
+attribute TAP_SCAN_RESET of NTRST : signal is true; 
+
+attribute INSTRUCTION_LENGTH of bulverde_b0_13x13 : entity is 7;
+attribute INSTRUCTION_OPCODE of bulverde_b0_13x13 : entity is 
+    "extest (0000000)," &
+    "bypass (1111111)," &
+    "sample (0000001)," &
+    "clamp (0000100)," &
+    "highz (0001000)," &
+    "flashload (0110110)," &
+    "flashprgm (0110111)," &
+    "idcode (1111110)"; 
+
+attribute INSTRUCTION_CAPTURE of bulverde_b0_13x13 : entity is "0000001";
+attribute IDCODE_REGISTER of bulverde_b0_13x13 : entity is 
+    "0010" &               -- Version Number 
+    "1001001001100101" &   -- Part Number 
+    "00000001001" &        -- Manufacturer ID 
+    "1";                   -- Required by IEEE Std. 1149.1-1990 
+
+attribute REGISTER_ACCESS of bulverde_b0_13x13 : entity is 
+    "BOUNDARY (extest, sample)," &
+    "DEVICE_ID (idcode)," &
+    "BYPASS (bypass, clamp, highz)," &
+    "flash_reg[76] (flashload, flashprgm)";
+
+attribute BOUNDARY_LENGTH of bulverde_b0_13x13 : entity is 504;
+attribute BOUNDARY_REGISTER of bulverde_b0_13x13 : entity is 
+    -- num  cell           port      function   safe  [ccell  disval  rslt]
+    "0    ( bc_1,        ma(25),      output3,  X,     69,      0,    Z)," &
+    "1    ( bc_1,        ma(24),      output3,  X,     69,      0,    Z)," &
+    "2    ( bc_1,        ma(23),      output3,  X,     69,      0,    Z)," &
+    "3    ( bc_1,        ma(22),      output3,  X,     69,      0,    Z)," &
+    "4    ( bc_1,        ma(21),      output3,  X,     69,      0,    Z)," &
+    "5    ( bc_1,        ma(20),      output3,  X,     69,      0,    Z)," &
+    "6    ( bc_1,        ma(19),      output3,  X,     69,      0,    Z)," &
+    "7    ( bc_1,        ma(18),      output3,  X,     69,      0,    Z)," &
+    "8    ( bc_1,        ma(17),      output3,  X,     69,      0,    Z)," &
+    "9    ( bc_1,        ma(16),      output3,  X,     69,      0,    Z)," &
+    "10   ( bc_1,        ma(15),      output3,  X,     69,      0,    Z)," &
+    "11   ( bc_1,        ma(14),      output3,  X,     69,      0,    Z)," &
+    "12   ( bc_1,        ma(13),      output3,  X,     69,      0,    Z)," &
+    "13   ( bc_1,        ma(12),      output3,  X,     69,      0,    Z)," &
+    "14   ( bc_1,        ma(11),      output3,  X,     69,      0,    Z)," &
+    "15   ( bc_1,        ma(10),      output3,  X,     69,      0,    Z)," &
+    "16   ( bc_1,         ma(9),      output3,  X,     69,      0,    Z)," &
+    "17   ( bc_1,         ma(8),      output3,  X,     69,      0,    Z)," &
+    "18   ( bc_1,         ma(7),      output3,  X,     69,      0,    Z)," &
+    "19   ( bc_1,         ma(6),      output3,  X,     69,      0,    Z)," &
+    "20   ( bc_1,         ma(5),      output3,  X,     69,      0,    Z)," &
+    "21   ( bc_1,         ma(4),      output3,  X,     69,      0,    Z)," &
+    "22   ( bc_1,         ma(3),      output3,  X,     69,      0,    Z)," &
+    "23   ( bc_1,         ma(2),      output3,  X,     69,      0,    Z)," &
+    "24   ( bc_1,         ma(1),      output3,  X,     69,      0,    Z)," &
+    "25   ( bc_1,         ma(0),      output3,  X,     69,      0,    Z)," &
+    "26   ( bc_1,        md(31),      output3,  X,     72,      0,    Z)," &
+    "27   ( bc_1,        md(30),      output3,  X,     72,      0,    Z)," &
+    "28   ( bc_1,        md(29),      output3,  X,     72,      0,    Z)," &
+    "29   ( bc_1,        md(28),      output3,  X,     72,      0,    Z)," &
+    "30   ( bc_1,        md(27),      output3,  X,     72,      0,    Z)," &
+    "31   ( bc_1,        md(26),      output3,  X,     72,      0,    Z)," &
+    "32   ( bc_1,        md(25),      output3,  X,     72,      0,    Z)," &
+    "33   ( bc_1,        md(24),      output3,  X,     72,      0,    Z)," &
+    "34   ( bc_1,        md(23),      output3,  X,     72,      0,    Z)," &
+    "35   ( bc_1,        md(22),      output3,  X,     72,      0,    Z)," &
+    "36   ( bc_1,        md(21),      output3,  X,     72,      0,    Z)," &
+    "37   ( bc_1,        md(20),      output3,  X,     72,      0,    Z)," &
+    "38   ( bc_1,        md(19),      output3,  X,     72,      0,    Z)," &
+    "39   ( bc_1,        md(18),      output3,  X,     72,      0,    Z)," &
+    "40   ( bc_1,        md(17),      output3,  X,     72,      0,    Z)," &
+    "41   ( bc_1,        md(16),      output3,  X,     72,      0,    Z)," &
+    "42   ( bc_1,        md(15),      output3,  X,     71,      0,    Z)," &
+    "43   ( bc_1,        md(14),      output3,  X,     71,      0,    Z)," &
+    "44   ( bc_1,        md(13),      output3,  X,     71,      0,    Z)," &
+    "45   ( bc_1,        md(12),      output3,  X,     71,      0,    Z)," &
+    "46   ( bc_1,        md(11),      output3,  X,     71,      0,    Z)," &
+    "47   ( bc_1,        md(10),      output3,  X,     71,      0,    Z)," &
+    "48   ( bc_1,         md(9),      output3,  X,     71,      0,    Z)," &
+    "49   ( bc_1,         md(8),      output3,  X,     71,      0,    Z)," &
+    "50   ( bc_1,         md(7),      output3,  X,     71,      0,    Z)," &
+    "51   ( bc_1,         md(6),      output3,  X,     71,      0,    Z)," &
+    "52   ( bc_1,         md(5),      output3,  X,     71,      0,    Z)," &
+    "53   ( bc_1,         md(4),      output3,  X,     71,      0,    Z)," &
+    "54   ( bc_1,         md(3),      output3,  X,     71,      0,    Z)," &
+    "55   ( bc_1,         md(2),      output3,  X,     71,      0,    Z)," &
+    "56   ( bc_1,         md(1),      output3,  X,     71,      0,    Z)," &
+    "57   ( bc_1,         md(0),      output3,  X,     71,      0,    Z)," &
+    "58   ( bc_1,        nsdcas,      output3,  X,     69,      0,    Z)," &
+    "59   ( bc_1,           nwe,      output3,  X,     73,      0,    Z)," &
+    "60   ( bc_1,           noe,      output3,  X,     74,      0,    Z)," &
+    "61   ( bc_1,         ncs_0,      output3,  X,     74,      0,    Z)," &
+    "62   ( bc_1,       sdclk_0,      output3,  X,     75,      0,    Z)," &
+    "63   ( bc_1,             *,     internal,  0)," &
+    "64   ( bc_1,         dqm_3,      output3,  X,     70,      0,    Z)," &
+    "65   ( bc_1,         dqm_2,      output3,  X,     70,      0,    Z)," &
+    "66   ( bc_1,         dqm_1,      output3,  X,     69,      0,    Z)," &
+    "67   ( bc_1,         dqm_0,      output3,  X,     69,      0,    Z)," &
+    "68   ( bc_1,         rdnwr,      output3,  X,     69,      0,    Z)," &
+    "69   ( bc_1,             *,      control,  0)," &
+    "70   ( bc_1,             *,      control,  0)," &
+    "71   ( bc_1,             *,      control,  0)," &
+    "72   ( bc_1,             *,      control,  0)," &
+    "73   ( bc_1,             *,      control,  0)," &
+    "74   ( bc_1,             *,      control,  0)," &
+    "75   ( bc_1,             *,      control,  0)," &
+    "76   ( bc_1,       clk_req,      output3,  X,    325,      0,    Z)," &
+    "77   ( bc_1,             *,     internal,  0)," &
+    "78   ( bc_1,             *,     internal,  0)," &
+    "79   ( bc_1,             *,      control,  0)," &
+    "80   ( bc_1,             *,      control,  0)," &
+    "81   ( bc_1,             *,      control,  0)," &
+    "82   ( bc_1,             *,      control,  0)," &
+    "83   ( bc_1,             *,      control,  0)," &
+    "84   ( bc_1,             *,      control,  0)," &
+    "85   ( bc_1,             *,      control,  0)," &
+    "86   ( bc_1,             *,      control,  0)," &
+    "87   ( bc_1,             *,      control,  0)," &
+    "88   ( bc_1,             *,      control,  0)," &
+    "89   ( bc_1,             *,      control,  0)," &
+    "90   ( bc_1,             *,      control,  0)," &
+    "91   ( bc_1,             *,      control,  0)," &
+    "92   ( bc_1,             *,      control,  0)," &
+    "93   ( bc_1,             *,      control,  0)," &
+    "94   ( bc_1,             *,      control,  0)," &
+    "95   ( bc_1,             *,      control,  0)," &
+    "96   ( bc_1,             *,      control,  0)," &
+    "97   ( bc_1,             *,      control,  0)," &
+    "98   ( bc_1,             *,      control,  0)," &
+    "99   ( bc_1,             *,      control,  0)," &
+    "100  ( bc_1,             *,      control,  0)," &
+    "101  ( bc_1,             *,      control,  0)," &
+    "102  ( bc_1,             *,      control,  0)," &
+    "103  ( bc_1,             *,      control,  0)," &
+    "104  ( bc_1,             *,      control,  0)," &
+    "105  ( bc_1,             *,      control,  0)," &
+    "106  ( bc_1,             *,      control,  0)," &
+    "107  ( bc_1,             *,      control,  0)," &
+    "108  ( bc_1,             *,      control,  0)," &
+    "109  ( bc_1,             *,      control,  0)," &
+    "110  ( bc_1,             *,      control,  0)," &
+    "111  ( bc_1,             *,      control,  0)," &
+    "112  ( bc_1,             *,      control,  0)," &
+    "113  ( bc_1,             *,      control,  0)," &
+    "114  ( bc_1,             *,      control,  0)," &
+    "115  ( bc_1,             *,      control,  0)," &
+    "116  ( bc_1,             *,      control,  0)," &
+    "117  ( bc_1,             *,      control,  0)," &
+    "118  ( bc_1,             *,      control,  0)," &
+    "119  ( bc_1,             *,      control,  0)," &
+    "120  ( bc_1,             *,      control,  0)," &
+    "121  ( bc_1,             *,      control,  0)," &
+    "122  ( bc_1,             *,      control,  0)," &
+    "123  ( bc_1,             *,      control,  0)," &
+    "124  ( bc_1,             *,      control,  0)," &
+    "125  ( bc_1,             *,      control,  0)," &
+    "126  ( bc_1,             *,      control,  0)," &
+    "127  ( bc_1,             *,      control,  0)," &
+    "128  ( bc_1,             *,      control,  0)," &
+    "129  ( bc_1,             *,      control,  0)," &
+    "130  ( bc_1,             *,      control,  0)," &
+    "131  ( bc_1,             *,      control,  0)," &
+    "132  ( bc_1,             *,      control,  0)," &
+    "133  ( bc_1,             *,      control,  0)," &
+    "134  ( bc_1,             *,      control,  0)," &
+    "135  ( bc_1,             *,      control,  0)," &
+    "136  ( bc_1,             *,      control,  0)," &
+    "137  ( bc_1,             *,      control,  0)," &
+    "138  ( bc_1,             *,      control,  0)," &
+    "139  ( bc_1,             *,      control,  0)," &
+    "140  ( bc_1,             *,      control,  0)," &
+    "141  ( bc_1,             *,      control,  0)," &
+    "142  ( bc_1,             *,      control,  0)," &
+    "143  ( bc_1,             *,      control,  0)," &
+    "144  ( bc_1,             *,      control,  0)," &
+    "145  ( bc_1,             *,      control,  0)," &
+    "146  ( bc_1,             *,      control,  0)," &
+    "147  ( bc_1,             *,      control,  0)," &
+    "148  ( bc_1,             *,      control,  0)," &
+    "149  ( bc_1,             *,      control,  0)," &
+    "150  ( bc_1,             *,      control,  0)," &
+    "151  ( bc_1,             *,      control,  0)," &
+    "152  ( bc_1,             *,      control,  0)," &
+    "153  ( bc_1,             *,      control,  0)," &
+    "154  ( bc_1,             *,      control,  0)," &
+    "155  ( bc_1,             *,      control,  0)," &
+    "156  ( bc_1,             *,      control,  0)," &
+    "157  ( bc_1,             *,      control,  0)," &
+    "158  ( bc_1,             *,      control,  0)," &
+    "159  ( bc_1,             *,      control,  0)," &
+    "160  ( bc_1,             *,      control,  0)," &
+    "161  ( bc_1,             *,      control,  0)," &
+    "162  ( bc_1,             *,      control,  0)," &
+    "163  ( bc_1,             *,      control,  0)," &
+    "164  ( bc_1,             *,      control,  0)," &
+    "165  ( bc_1,             *,      control,  0)," &
+    "166  ( bc_1,             *,      control,  0)," &
+    "167  ( bc_1,             *,      control,  0)," &
+    "168  ( bc_1,             *,      control,  0)," &
+    "169  ( bc_1,             *,      control,  0)," &
+    "170  ( bc_1,             *,      control,  0)," &
+    "171  ( bc_1,             *,      control,  0)," &
+    "172  ( bc_1,             *,      control,  0)," &
+    "173  ( bc_1,             *,      control,  0)," &
+    "174  ( bc_1,             *,      control,  0)," &
+    "175  ( bc_1,             *,      control,  0)," &
+    "176  ( bc_1,             *,      control,  0)," &
+    "177  ( bc_1,             *,      control,  0)," &
+    "178  ( bc_1,             *,      control,  0)," &
+    "179  ( bc_1,             *,      control,  0)," &
+    "180  ( bc_1,             *,      control,  0)," &
+    "181  ( bc_1,             *,      control,  0)," &
+    "182  ( bc_1,             *,      control,  0)," &
+    "183  ( bc_1,             *,      control,  0)," &
+    "184  ( bc_1,             *,      control,  0)," &
+    "185  ( bc_1,             *,      control,  0)," &
+    "186  ( bc_1,             *,      control,  0)," &
+    "187  ( bc_1,             *,      control,  0)," &
+    "188  ( bc_1,             *,      control,  0)," &
+    "189  ( bc_1,             *,      control,  0)," &
+    "190  ( bc_1,             *,      control,  0)," &
+    "191  ( bc_1,             *,      control,  0)," &
+    "192  ( bc_1,             *,      control,  0)," &
+    "193  ( bc_1,             *,      control,  0)," &
+    "194  ( bc_1,             *,      control,  0)," &
+    "195  ( bc_1,             *,      control,  0)," &
+    "196  ( bc_1,             *,      control,  0)," &
+    "197  ( bc_1,             *,      control,  0)," &
+    "198  ( bc_1,             *,     internal,  0)," &
+    "199  ( bc_1,             *,     internal,  0)," &
+    "200  ( bc_1,     gpio(118),      output3,  X,     79,      0,    Z)," &
+    "201  ( bc_1,     gpio(117),      output3,  X,     80,      0,    Z)," &
+    "202  ( bc_1,     gpio(116),      output3,  X,     81,      0,    Z)," &
+    "203  ( bc_1,     gpio(115),      output3,  X,     82,      0,    Z)," &
+    "204  ( bc_1,     gpio(114),      output3,  X,     83,      0,    Z)," &
+    "205  ( bc_1,     gpio(113),      output3,  X,     84,      0,    Z)," &
+    "206  ( bc_1,     gpio(112),      output3,  X,     85,      0,    Z)," &
+    "207  ( bc_1,     gpio(111),      output3,  X,     86,      0,    Z)," &
+    "208  ( bc_1,     gpio(110),      output3,  X,     87,      0,    Z)," &
+    "209  ( bc_1,     gpio(109),      output3,  X,     88,      0,    Z)," &
+    "210  ( bc_1,     gpio(108),      output3,  X,     89,      0,    Z)," &
+    "211  ( bc_1,     gpio(107),      output3,  X,     90,      0,    Z)," &
+    "212  ( bc_1,     gpio(106),      output3,  X,     91,      0,    Z)," &
+    "213  ( bc_1,     gpio(105),      output3,  X,     92,      0,    Z)," &
+    "214  ( bc_1,     gpio(104),      output3,  X,     93,      0,    Z)," &
+    "215  ( bc_1,     gpio(103),      output3,  X,     94,      0,    Z)," &
+    "216  ( bc_1,     gpio(102),      output3,  X,     95,      0,    Z)," &
+    "217  ( bc_1,     gpio(101),      output3,  X,     96,      0,    Z)," &
+    "218  ( bc_1,     gpio(100),      output3,  X,     97,      0,    Z)," &
+    "219  ( bc_1,      gpio(99),      output3,  X,     98,      0,    Z)," &
+    "220  ( bc_1,      gpio(98),      output3,  X,     99,      0,    Z)," &
+    "221  ( bc_1,      gpio(97),      output3,  X,    100,      0,    Z)," &
+    "222  ( bc_1,      gpio(96),      output3,  X,    101,      0,    Z)," &
+    "223  ( bc_1,      gpio(95),      output3,  X,    102,      0,    Z)," &
+    "224  ( bc_1,      gpio(94),      output3,  X,    103,      0,    Z)," &
+    "225  ( bc_1,      gpio(93),      output3,  X,    104,      0,    Z)," &
+    "226  ( bc_1,      gpio(92),      output3,  X,    105,      0,    Z)," &
+    "227  ( bc_1,      gpio(91),      output3,  X,    106,      0,    Z)," &
+    "228  ( bc_1,      gpio(90),      output3,  X,    107,      0,    Z)," &
+    "229  ( bc_1,      gpio(89),      output3,  X,    108,      0,    Z)," &
+    "230  ( bc_1,      gpio(88),      output3,  X,    109,      0,    Z)," &
+    "231  ( bc_1,      gpio(87),      output3,  X,    110,      0,    Z)," &
+    "232  ( bc_1,      gpio(86),      output3,  X,    111,      0,    Z)," &
+    "233  ( bc_1,      gpio(85),      output3,  X,    112,      0,    Z)," &
+    "234  ( bc_1,      gpio(84),      output3,  X,    113,      0,    Z)," &
+    "235  ( bc_1,      gpio(83),      output3,  X,    114,      0,    Z)," &
+    "236  ( bc_1,      gpio(82),      output3,  X,    115,      0,    Z)," &
+    "237  ( bc_1,      gpio(81),      output3,  X,    116,      0,    Z)," &
+    "238  ( bc_1,      gpio(80),      output3,  X,    117,      0,    Z)," &
+    "239  ( bc_1,      gpio(79),      output3,  X,    118,      0,    Z)," &
+    "240  ( bc_1,      gpio(78),      output3,  X,    119,      0,    Z)," &
+    "241  ( bc_1,      gpio(77),      output3,  X,    120,      0,    Z)," &
+    "242  ( bc_1,      gpio(76),      output3,  X,    121,      0,    Z)," &
+    "243  ( bc_1,      gpio(75),      output3,  X,    122,      0,    Z)," &
+    "244  ( bc_1,      gpio(74),      output3,  X,    123,      0,    Z)," &
+    "245  ( bc_1,      gpio(73),      output3,  X,    124,      0,    Z)," &
+    "246  ( bc_1,      gpio(72),      output3,  X,    125,      0,    Z)," &
+    "247  ( bc_1,      gpio(71),      output3,  X,    126,      0,    Z)," &
+    "248  ( bc_1,      gpio(70),      output3,  X,    127,      0,    Z)," &
+    "249  ( bc_1,      gpio(69),      output3,  X,    128,      0,    Z)," &
+    "250  ( bc_1,      gpio(68),      output3,  X,    129,      0,    Z)," &
+    "251  ( bc_1,      gpio(67),      output3,  X,    130,      0,    Z)," &
+    "252  ( bc_1,      gpio(66),      output3,  X,    131,      0,    Z)," &
+    "253  ( bc_1,      gpio(65),      output3,  X,    132,      0,    Z)," &
+    "254  ( bc_1,      gpio(64),      output3,  X,    133,      0,    Z)," &
+    "255  ( bc_1,      gpio(63),      output3,  X,    134,      0,    Z)," &
+    "256  ( bc_1,      gpio(62),      output3,  X,    135,      0,    Z)," &
+    "257  ( bc_1,      gpio(61),      output3,  X,    136,      0,    Z)," &
+    "258  ( bc_1,      gpio(60),      output3,  X,    137,      0,    Z)," &
+    "259  ( bc_1,      gpio(59),      output3,  X,    138,      0,    Z)," &
+    "260  ( bc_1,      gpio(58),      output3,  X,    139,      0,    Z)," &
+    "261  ( bc_1,      gpio(57),      output3,  X,    140,      0,    Z)," &
+    "262  ( bc_1,      gpio(56),      output3,  X,    141,      0,    Z)," &
+    "263  ( bc_1,      gpio(55),      output3,  X,    142,      0,    Z)," &
+    "264  ( bc_1,      gpio(54),      output3,  X,    143,      0,    Z)," &
+    "265  ( bc_1,      gpio(53),      output3,  X,    144,      0,    Z)," &
+    "266  ( bc_1,      gpio(52),      output3,  X,    145,      0,    Z)," &
+    "267  ( bc_1,      gpio(51),      output3,  X,    146,      0,    Z)," &
+    "268  ( bc_1,      gpio(50),      output3,  X,    147,      0,    Z)," &
+    "269  ( bc_1,      gpio(49),      output3,  X,    148,      0,    Z)," &
+    "270  ( bc_1,      gpio(48),      output3,  X,    149,      0,    Z)," &
+    "271  ( bc_1,      gpio(47),      output3,  X,    150,      0,    Z)," &
+    "272  ( bc_1,      gpio(46),      output3,  X,    151,      0,    Z)," &
+    "273  ( bc_1,      gpio(45),      output3,  X,    152,      0,    Z)," &
+    "274  ( bc_1,      gpio(44),      output3,  X,    153,      0,    Z)," &
+    "275  ( bc_1,      gpio(43),      output3,  X,    154,      0,    Z)," &
+    "276  ( bc_1,      gpio(42),      output3,  X,    155,      0,    Z)," &
+    "277  ( bc_1,      gpio(41),      output3,  X,    156,      0,    Z)," &
+    "278  ( bc_1,      gpio(40),      output3,  X,    157,      0,    Z)," &
+    "279  ( bc_1,      gpio(39),      output3,  X,    158,      0,    Z)," &
+    "280  ( bc_1,      gpio(38),      output3,  X,    159,      0,    Z)," &
+    "281  ( bc_1,      gpio(37),      output3,  X,    160,      0,    Z)," &
+    "282  ( bc_1,      gpio(36),      output3,  X,    161,      0,    Z)," &
+    "283  ( bc_1,      gpio(35),      output3,  X,    162,      0,    Z)," &
+    "284  ( bc_1,      gpio(34),      output3,  X,    163,      0,    Z)," &
+    "285  ( bc_1,      gpio(33),      output3,  X,    164,      0,    Z)," &
+    "286  ( bc_1,      gpio(32),      output3,  X,    165,      0,    Z)," &
+    "287  ( bc_1,      gpio(31),      output3,  X,    166,      0,    Z)," &
+    "288  ( bc_1,      gpio(30),      output3,  X,    167,      0,    Z)," &
+    "289  ( bc_1,      gpio(29),      output3,  X,    168,      0,    Z)," &
+    "290  ( bc_1,      gpio(28),      output3,  X,    169,      0,    Z)," &
+    "291  ( bc_1,      gpio(27),      output3,  X,    170,      0,    Z)," &
+    "292  ( bc_1,      gpio(26),      output3,  X,    171,      0,    Z)," &
+    "293  ( bc_1,      gpio(25),      output3,  X,    172,      0,    Z)," &
+    "294  ( bc_1,      gpio(24),      output3,  X,    173,      0,    Z)," &
+    "295  ( bc_1,      gpio(23),      output3,  X,    174,      0,    Z)," &
+    "296  ( bc_1,      gpio(22),      output3,  X,    175,      0,    Z)," &
+    "297  ( bc_1,      gpio(21),      output3,  X,    176,      0,    Z)," &
+    "298  ( bc_1,      gpio(20),      output3,  X,    177,      0,    Z)," &
+    "299  ( bc_1,      gpio(19),      output3,  X,    178,      0,    Z)," &
+    "300  ( bc_1,      gpio(18),      output3,  X,    179,      0,    Z)," &
+    "301  ( bc_1,      gpio(17),      output3,  X,    180,      0,    Z)," &
+    "302  ( bc_1,      gpio(16),      output3,  X,    181,      0,    Z)," &
+    "303  ( bc_1,      gpio(15),      output3,  X,    182,      0,    Z)," &
+    "304  ( bc_1,      gpio(14),      output3,  X,    183,      0,    Z)," &
+    "305  ( bc_1,      gpio(13),      output3,  X,    184,      0,    Z)," &
+    "306  ( bc_1,      gpio(12),      output3,  X,    185,      0,    Z)," &
+    "307  ( bc_1,      gpio(11),      output3,  X,    186,      0,    Z)," &
+    "308  ( bc_1,      gpio(10),      output3,  X,    187,      0,    Z)," &
+    "309  ( bc_1,       gpio(9),      output3,  X,    188,      0,    Z)," &
+    "310  ( bc_1,       gpio(8),      output3,  X,    189,      0,    Z)," &
+    "311  ( bc_1,       gpio(7),      output3,  X,    190,      0,    Z)," &
+    "312  ( bc_1,       gpio(6),      output3,  X,    191,      0,    Z)," &
+    "313  ( bc_1,       gpio(5),      output3,  X,    192,      0,    Z)," &
+    "314  ( bc_1,       gpio(4),      output3,  X,    193,      0,    Z)," &
+    "315  ( bc_1,       gpio(3),      output3,  X,    194,      0,    Z)," &
+    "316  ( bc_1,       gpio(2),      output3,  X,    195,      0,    Z)," &
+    "317  ( bc_1,       gpio(1),      output3,  X,    196,      0,    Z)," &
+    "318  ( bc_1,       gpio(0),      output3,  X,    197,      0,    Z)," &
+    "319  ( bc_1,       nsdcs_0,      output3,  X,     69,      0,    Z)," &
+    "320  ( bc_1,       nsdcs_1,      output3,  X,     75,      0,    Z)," &
+    "321  ( bc_1,        nsdras,      output3,  X,     69,      0,    Z)," &
+    "322  ( bc_1,       sdcke_1,      output3,  X,     75,      0,    Z)," &
+    "323  ( bc_1,       sdclk_1,      output3,  X,     69,      0,    Z)," &
+    "324  ( bc_1,       sdclk_2,      output3,  X,     75,      0,    Z)," &
+    "325  ( bc_1,             *,      control,  0)," &
+    "326  ( bc_1,           uio,      output3,  X,    327,      0,    Z)," &
+    "327  ( bc_1,             *,      control,  0)," &
+    "328  ( bc_1,             *,      control,  0)," &
+    "329  ( bc_1,        usbc_n,      output3,  X,    328,      0,    Z)," &
+    "330  ( bc_1,        usbc_p,      output3,  X,    328,      0,    Z)," &
+    "331  ( bc_1,             *,      control,  1)," &
+    "332  ( bc_1,             *,     internal,  1)," &
+    "333  ( bc_1,      usbh_n_0,      output3,  X,    331,      1,    Z)," &
+    "334  ( bc_1,             *,     internal,  0)," &
+    "335  ( bc_1,      usbh_p_0,      output3,  X,    331,      1,    Z)," &
+    "336  ( bc_1,             *,     internal,  0)," &
+    "337  ( bc_1,    boot_sel_0,        input,  X)," &
+    "338  ( bc_1,       clk_req,        input,  X)," &
+    "339  ( bc_1,             *,     internal,  0)," &
+    "340  ( bc_1,             *,     internal,  0)," &
+    "341  ( bc_1,     gpio(118),        input,  X)," &
+    "342  ( bc_1,     gpio(117),        input,  X)," &
+    "343  ( bc_1,     gpio(116),        input,  X)," &
+    "344  ( bc_1,     gpio(115),        input,  X)," &
+    "345  ( bc_1,     gpio(114),        input,  X)," &
+    "346  ( bc_1,     gpio(113),        input,  X)," &
+    "347  ( bc_1,     gpio(112),        input,  X)," &
+    "348  ( bc_1,     gpio(111),        input,  X)," &
+    "349  ( bc_1,     gpio(110),        input,  X)," &
+    "350  ( bc_1,     gpio(109),        input,  X)," &
+    "351  ( bc_1,     gpio(108),        input,  X)," &
+    "352  ( bc_1,     gpio(107),        input,  X)," &
+    "353  ( bc_1,     gpio(106),        input,  X)," &
+    "354  ( bc_1,     gpio(105),        input,  X)," &
+    "355  ( bc_1,     gpio(104),        input,  X)," &
+    "356  ( bc_1,     gpio(103),        input,  X)," &
+    "357  ( bc_1,     gpio(102),        input,  X)," &
+    "358  ( bc_1,     gpio(101),        input,  X)," &
+    "359  ( bc_1,     gpio(100),        input,  X)," &
+    "360  ( bc_1,      gpio(99),        input,  X)," &
+    "361  ( bc_1,      gpio(98),        input,  X)," &
+    "362  ( bc_1,      gpio(97),        input,  X)," &
+    "363  ( bc_1,      gpio(96),        input,  X)," &
+    "364  ( bc_1,      gpio(95),        input,  X)," &
+    "365  ( bc_1,      gpio(94),        input,  X)," &
+    "366  ( bc_1,      gpio(93),        input,  X)," &
+    "367  ( bc_1,      gpio(92),        input,  X)," &
+    "368  ( bc_1,      gpio(91),        input,  X)," &
+    "369  ( bc_1,      gpio(90),        input,  X)," &
+    "370  ( bc_1,      gpio(89),        input,  X)," &
+    "371  ( bc_1,      gpio(88),        input,  X)," &
+    "372  ( bc_1,      gpio(87),        input,  X)," &
+    "373  ( bc_1,      gpio(86),        input,  X)," &
+    "374  ( bc_1,      gpio(85),        input,  X)," &
+    "375  ( bc_1,      gpio(84),        input,  X)," &
+    "376  ( bc_1,      gpio(83),        input,  X)," &
+    "377  ( bc_1,      gpio(82),        input,  X)," &
+    "378  ( bc_1,      gpio(81),        input,  X)," &
+    "379  ( bc_1,      gpio(80),        input,  X)," &
+    "380  ( bc_1,      gpio(79),        input,  X)," &
+    "381  ( bc_1,      gpio(78),        input,  X)," &
+    "382  ( bc_1,      gpio(77),        input,  X)," &
+    "383  ( bc_1,      gpio(76),        input,  X)," &
+    "384  ( bc_1,      gpio(75),        input,  X)," &
+    "385  ( bc_1,      gpio(74),        input,  X)," &
+    "386  ( bc_1,      gpio(73),        input,  X)," &
+    "387  ( bc_1,      gpio(72),        input,  X)," &
+    "388  ( bc_1,      gpio(71),        input,  X)," &
+    "389  ( bc_1,      gpio(70),        input,  X)," &
+    "390  ( bc_1,      gpio(69),        input,  X)," &
+    "391  ( bc_1,      gpio(68),        input,  X)," &
+    "392  ( bc_1,      gpio(67),        input,  X)," &
+    "393  ( bc_1,      gpio(66),        input,  X)," &
+    "394  ( bc_1,      gpio(65),        input,  X)," &
+    "395  ( bc_1,      gpio(64),        input,  X)," &
+    "396  ( bc_1,      gpio(63),        input,  X)," &
+    "397  ( bc_1,      gpio(62),        input,  X)," &
+    "398  ( bc_1,      gpio(61),        input,  X)," &
+    "399  ( bc_1,      gpio(60),        input,  X)," &
+    "400  ( bc_1,      gpio(59),        input,  X)," &
+    "401  ( bc_1,      gpio(58),        input,  X)," &
+    "402  ( bc_1,      gpio(57),        input,  X)," &
+    "403  ( bc_1,      gpio(56),        input,  X)," &
+    "404  ( bc_1,      gpio(55),        input,  X)," &
+    "405  ( bc_1,      gpio(54),        input,  X)," &
+    "406  ( bc_1,      gpio(53),        input,  X)," &
+    "407  ( bc_1,      gpio(52),        input,  X)," &
+    "408  ( bc_1,      gpio(51),        input,  X)," &
+    "409  ( bc_1,      gpio(50),        input,  X)," &
+    "410  ( bc_1,      gpio(49),        input,  X)," &
+    "411  ( bc_1,      gpio(48),        input,  X)," &
+    "412  ( bc_1,      gpio(47),        input,  X)," &
+    "413  ( bc_1,      gpio(46),        input,  X)," &
+    "414  ( bc_1,      gpio(45),        input,  X)," &
+    "415  ( bc_1,      gpio(44),        input,  X)," &
+    "416  ( bc_1,      gpio(43),        input,  X)," &
+    "417  ( bc_1,      gpio(42),        input,  X)," &
+    "418  ( bc_1,      gpio(41),        input,  X)," &
+    "419  ( bc_1,      gpio(40),        input,  X)," &
+    "420  ( bc_1,      gpio(39),        input,  X)," &
+    "421  ( bc_1,      gpio(38),        input,  X)," &
+    "422  ( bc_1,      gpio(37),        input,  X)," &
+    "423  ( bc_1,      gpio(36),        input,  X)," &
+    "424  ( bc_1,      gpio(35),        input,  X)," &
+    "425  ( bc_1,      gpio(34),        input,  X)," &
+    "426  ( bc_1,      gpio(33),        input,  X)," &
+    "427  ( bc_1,      gpio(32),        input,  X)," &
+    "428  ( bc_1,      gpio(31),        input,  X)," &
+    "429  ( bc_1,      gpio(30),        input,  X)," &
+    "430  ( bc_1,      gpio(29),        input,  X)," &
+    "431  ( bc_1,      gpio(28),        input,  X)," &
+    "432  ( bc_1,      gpio(27),        input,  X)," &
+    "433  ( bc_1,      gpio(26),        input,  X)," &
+    "434  ( bc_1,      gpio(25),        input,  X)," &
+    "435  ( bc_1,      gpio(24),        input,  X)," &
+    "436  ( bc_1,      gpio(23),        input,  X)," &
+    "437  ( bc_1,      gpio(22),        input,  X)," &
+    "438  ( bc_1,      gpio(21),        input,  X)," &
+    "439  ( bc_1,      gpio(20),        input,  X)," &
+    "440  ( bc_1,      gpio(19),        input,  X)," &
+    "441  ( bc_1,      gpio(18),        input,  X)," &
+    "442  ( bc_1,      gpio(17),        input,  X)," &
+    "443  ( bc_1,      gpio(16),        input,  X)," &
+    "444  ( bc_1,      gpio(15),        input,  X)," &
+    "445  ( bc_1,      gpio(14),        input,  X)," &
+    "446  ( bc_1,      gpio(13),        input,  X)," &
+    "447  ( bc_1,      gpio(12),        input,  X)," &
+    "448  ( bc_1,      gpio(11),        input,  X)," &
+    "449  ( bc_1,      gpio(10),        input,  X)," &
+    "450  ( bc_1,       gpio(9),        input,  X)," &
+    "451  ( bc_1,       gpio(8),        input,  X)," &
+    "452  ( bc_1,       gpio(7),        input,  X)," &
+    "453  ( bc_1,       gpio(6),        input,  X)," &
+    "454  ( bc_1,       gpio(5),        input,  X)," &
+    "455  ( bc_1,       gpio(4),        input,  X)," &
+    "456  ( bc_1,       gpio(3),        input,  X)," &
+    "457  ( bc_1,       gpio(2),        input,  X)," &
+    "458  ( bc_1,       gpio(1),        input,  X)," &
+    "459  ( bc_1,       gpio(0),        input,  X)," &
+    "460  ( bc_1,        md(31),        input,  X)," &
+    "461  ( bc_1,        md(30),        input,  X)," &
+    "462  ( bc_1,        md(29),        input,  X)," &
+    "463  ( bc_1,        md(28),        input,  X)," &
+    "464  ( bc_1,        md(27),        input,  X)," &
+    "465  ( bc_1,        md(26),        input,  X)," &
+    "466  ( bc_1,        md(25),        input,  X)," &
+    "467  ( bc_1,        md(24),        input,  X)," &
+    "468  ( bc_1,        md(23),        input,  X)," &
+    "469  ( bc_1,        md(22),        input,  X)," &
+    "470  ( bc_1,        md(21),        input,  X)," &
+    "471  ( bc_1,        md(20),        input,  X)," &
+    "472  ( bc_1,        md(19),        input,  X)," &
+    "473  ( bc_1,        md(18),        input,  X)," &
+    "474  ( bc_1,        md(17),        input,  X)," &
+    "475  ( bc_1,        md(16),        input,  X)," &
+    "476  ( bc_1,        md(15),        input,  X)," &
+    "477  ( bc_1,        md(14),        input,  X)," &
+    "478  ( bc_1,        md(13),        input,  X)," &
+    "479  ( bc_1,        md(12),        input,  X)," &
+    "480  ( bc_1,        md(11),        input,  X)," &
+    "481  ( bc_1,        md(10),        input,  X)," &
+    "482  ( bc_1,         md(9),        input,  X)," &
+    "483  ( bc_1,         md(8),        input,  X)," &
+    "484  ( bc_1,         md(7),        input,  X)," &
+    "485  ( bc_1,         md(6),        input,  X)," &
+    "486  ( bc_1,         md(5),        input,  X)," &
+    "487  ( bc_1,         md(4),        input,  X)," &
+    "488  ( bc_1,         md(3),        input,  X)," &
+    "489  ( bc_1,         md(2),        input,  X)," &
+    "490  ( bc_1,         md(1),        input,  X)," &
+    "491  ( bc_1,         md(0),        input,  X)," &
+    "492  ( bc_1,   nbatt_fault,        input,  1)," &
+    "493  ( bc_1,        nreset,        input,  1)," &
+    "494  ( bc_1,    nvdd_fault,        input,  1)," &
+    "495  ( bc_1,          test,        input,  X)," &
+    "496  ( bc_1,       testclk,        input,  X)," &
+    "497  ( bc_1,           uio,        input,  X)," &
+    "498  ( bc_1,        usbc_n,        input,  X)," &
+    "499  ( bc_1,        usbc_p,        input,  X)," &
+    "500  ( bc_1,      usbh_n_0,        input,  X)," &
+    "501  ( bc_1,             *,     internal,  0)," &
+    "502  ( bc_1,      usbh_p_0,        input,  X)," &
+    "503  ( bc_1,             *,     internal,  0)";
+ 
+attribute DESIGN_WARNING of bulverde_b0_13x13 : entity is
+    " 1. The following ports are not part of the boundary scan register: " &
+    "    pxtal_in, txtal_in, pextal_out, textal_out, tdi, tms, ntrst,    " &
+    "    tck, tdo                                                        " &
+    "                                                                    " &
+    " 2. ntrst must be driven from low to high either before or at the   " &
+    "    same time as nreset at power-up.  Only after nreset_out has     " &
+    "    been deasserted is power applied to the BSR logic.              " &
+    "                                                                    " &
+    " 3. The nbatt_fault, nvdd_fault, and nreset input ports must be     " &
+    "    driven to a logic 1 at all times.  Not doing so puts the part   " &
+    "    into sleep which disables power to all BSR logic.               " &
+    "                                                                    " &
+    " 4. gpio[2]=sys_en, gpio[20]=nsdcs2, gpio[21]=nsdcs3                " &
+    "                                                                    " &
+    " 5. The following BSR cells are internal, i.e. not bounded out:     " &
+    "    63,77,78,198,199,332,334,336,339,340,501,503                    " &
+    "    As such they will capture indeterminate values.                 ";
+
+end bulverde_b0_13x13;
+
+*/
+
+/* End of reference information */       
+
+
+
+
+

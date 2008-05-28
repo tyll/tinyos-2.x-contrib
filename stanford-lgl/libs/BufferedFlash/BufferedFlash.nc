@@ -35,11 +35,12 @@
  
 interface BufferedFlash
 {
-	command error_t write(uint8_t *buf, uint16_t length);
+	command error_t write(uint8_t *buf, uint8_t num, uint8_t size);
 	command error_t erase();
 	command error_t flush();
 	command error_t read(uint8_t *buf, uint16_t length);
 	command error_t readNext(uint8_t *buf, uint16_t length);
+	event void writeDone(error_t err);
 	event void flushDone(error_t err);
 	event void readDone(error_t err);
 }

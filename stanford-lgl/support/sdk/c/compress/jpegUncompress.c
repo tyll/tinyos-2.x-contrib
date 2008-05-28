@@ -68,9 +68,9 @@ void decode(code_header_t *header, unsigned char *dataIn, int8_t* decoded)
 void decodeBytes(unsigned char *dataBuffer, int8_t* decoded, code_header_t *header)
 {
   memcpy(header,dataBuffer,CODE_HEADER_SIZE);
-  //  printf("DECODE hdr (%dx%d, qual=%d, col=%d, sizeRLE=%d, sizeHUF=%d)\n",
-  //			 header->width,header->height,header->quality,
-  //			 header->is_color,header->sizeRLE,header->sizeHUF);
+//    printf("DECODE hdr (%dx%d, qual=%d, col=%d, sizeRLE=%d, sizeHUF=%d, totSize=%d)\n",
+//  			 header->width,header->height,header->quality,
+//  			 header->is_color,header->sizeRLE,header->sizeHUF,header->totalSize);
 
   unsigned char *dataIn=&dataBuffer[CODE_HEADER_SIZE];
   decode(header, dataIn, decoded);
@@ -174,7 +174,7 @@ void decodeJpegBytes(uint8_t *dataIn, uint32_t dataSize, uint8_t *recovered, cod
   decodeBytes(dataIn, dct_decoded, header);
   if (header->is_color)
   {
-    uint16_t dataSize=header->totalSize;
+    //uint16_t dataSize=header->totalSize;
     idct(header, dct_decoded, recovered, 3, QUANT_TABLE);
 
     uint32_t idx=header->sizeHUF+CODE_HEADER_SIZE;

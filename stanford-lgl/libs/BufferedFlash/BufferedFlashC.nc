@@ -53,12 +53,6 @@ implementation
 	BufferedFlashM.BlockRead->BlockStorageC;
 	BufferedFlashM.BlockWrite->BlockStorageC;
 
-#ifdef DBG
-	components SerialActiveMessageC as ActiveMessageC;
- 	BufferedFlashM.DbgSend->ActiveMessageC.AMSend[254];
-	components LedsC;
-	BufferedFlashM.Leds->LedsC;
-#endif
 }
 
 

@@ -32,8 +32,8 @@ void comm_init(char* host, int port);
 int send_img_cmd(int node_id, int type);
 int receive_img(int session_id, bool progressive, char *filename, void (*_callback)(int, char *, bool));
 int save_img_jpg(char *filebase, unsigned char *img_buffer, int width, int height, int is_color);
-//int receive_ctp_info_pckts();
-//int send_CTP_info_cmd(int node_id);
+int receive_ctp_info_pckts();
+int send_CTP_info_cmd(int node_id);
 bool is_parent_process();
 bool do_fork();
 

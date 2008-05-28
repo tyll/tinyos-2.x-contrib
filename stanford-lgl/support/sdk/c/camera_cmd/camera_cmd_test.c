@@ -28,11 +28,11 @@ int main(int argc, char **argv)
   sprintf(filename,"/var/www/sensornet/stargate/tmp/test%d",(int)time(NULL));
 
   if (cmd_id==2)
-    printf("sending bw_jpg request to node %d: ",node_id);
+    printf("sending bw_jpg request to node %d: \n",node_id);
   else if (cmd_id==3)
-    printf("sending col_jpg request to node %d: ",node_id);
+    printf("sending col_jpg request to node %d: \n",node_id);
 
-  printf("%d\n",send_img_cmd(node_id, cmd_id));
+  send_img_cmd(node_id, cmd_id);
 
   printf("jpg:     0%%");
   ret = receive_img(node_id, is_progressive, filename, &callback);

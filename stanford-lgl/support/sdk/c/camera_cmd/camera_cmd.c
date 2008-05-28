@@ -33,12 +33,6 @@ long tv_udiff(struct timeval *start, struct timeval *end)
 void comm_init(char* host, int port)
 {
   sf_fd = open_sf_source(host, port);
-  int val = fcntl(sf_fd, F_GETFL, 0);
-  if (fcntl(sf_fd, F_SETFL, val | O_NONBLOCK) < 0)
-  {
-    close(sf_fd);
-    sf_fd=-1;
-  }
 
   if (sf_fd==-1){
     fprintf(stderr, "Couldn't open serial forwarder at %s:%d\n", host, port);
@@ -53,27 +47,20 @@ int send_packet(unsigned char *packet, int count)
 
 void* read_packet(int *len)
 {
-  void* packet = NULL;
-  struct timeval start;
-  gettimeofday(&start,0);
+  struct timeval deadline;
+  deadline.tv_sec = 3;
+  deadline.tv_usec = 0;
 
-  while (true)
-  {
-    packet = read_sf_packet(sf_fd, len);
-    if (packet == NULL)
-    {
-      struct timeval now;
-      gettimeofday(&now,0);
-      if (tv_udiff(&start,&now)>5000000L) // 5 sec
-        return NULL;
+  fd_set fds;
+  FD_ZERO(&fds);
+  FD_SET(sf_fd, &fds);
+  int cnt = select(sf_fd+1, &fds, NULL, NULL, &deadline);
 
-      usleep(10000); //10ms
-    }
-    else
-      return packet;
-  }
+  if (cnt <= 0)
+    return NULL;
 
-  return packet;
+  return read_sf_packet(sf_fd, len);
+
 }
 
 unsigned char cmd_packet[8+CMD_MSG_SIZE];
@@ -149,7 +136,7 @@ const unsigned char *receive_ctp_info_packet()
 }
 
 //Debugging,, no data returned, just displayed on the standard output.  
-/*int receive_ctp_info_pckts()
+int receive_ctp_info_pckts()
 {
   time_t t;
   int node_id, seqNo, parent, ETX;
@@ -170,23 +157,26 @@ const unsigned char *receive_ctp_info_packet()
     printf("Routing info for node: %d, parent: %d, ETX: %d.\n", node_id, parent, ETX);
   }
   return 0;
-}*/
+}
 
 void (*callback_function)(int, char *, bool) = NULL;
 
 int receive_img_stat_packet(int session_id, img_stat_t *is)
 {
+  //i do it with time  deadline here  - want to wait for the right img_stat, 
+  //even if there is other traffic in the air
   struct timeval start;
   gettimeofday(&start,0);
 
   const unsigned char *packet = NULL;
   int len;
-  while(true) // 1 sec
+  while(1) // 1 sec
   {
     packet = read_packet(&len);
-    //if am check fails, try to receive next packet
+
     if (packet)
-    {  
+    { 
+      //      printf("am type: %d, looking for: %d\n",packet[7],IMG_STAT_AM_TYPE);
       if (len<9 || packet[7]!=IMG_STAT_AM_TYPE)
         free((void *)packet);
       else
@@ -230,6 +220,7 @@ const unsigned char *receive_img_packet()
     //if am check fails, try to receive next packet
     if (packet)
     {
+      //printf("am type: %d, looking for: %d\n",packet[7],BIGMSG_FRAME_PART_AM_TYPE);
       if( (len<9) || (packet[7]!=BIGMSG_FRAME_PART_AM_TYPE))
         free((void *)packet);
       else
@@ -238,7 +229,7 @@ const unsigned char *receive_img_packet()
     
     struct timeval now;
     gettimeofday(&now,0);
-    if (tv_udiff(&start,&now)>5000000L) // 5 sec
+    if (tv_udiff(&start,&now)>1000000L) // 1 sec
       return NULL;
   }
 }
@@ -261,6 +252,7 @@ int receive_img_packets(img_stat_t *is, packet_buffer_t *pkt_buf, char *filename
     }
     
     tmsg_t *bigmsg = new_tmsg((void *)&packet[8], BIGMSG_FRAME_PART_SIZE);
+    //printf("session id: %d, looking for: %d\n",bigmsg_frame_part_node_id_get(bigmsg),session_id );
     if (bigmsg_frame_part_node_id_get(bigmsg) != session_id) // ignore messages not meant for us
     {
       free_tmsg(bigmsg);
@@ -271,6 +263,7 @@ int receive_img_packets(img_stat_t *is, packet_buffer_t *pkt_buf, char *filename
     part_id = bigmsg_frame_part_part_id_get(bigmsg);
     const unsigned char *buf = &packet[8+bigmsg_frame_part_buf_offset(0)];
 
+    //printf("part id: %d, max: %d\n", part_id, pkt_buf->num_packets);
     if (part_id>=pkt_buf->num_packets)
     {
       free_tmsg(bigmsg);
@@ -281,29 +274,39 @@ int receive_img_packets(img_stat_t *is, packet_buffer_t *pkt_buf, char *filename
     memcpy(&pkt_buf->data[part_id*pkt_buf->packet_size], buf, pkt_buf->packet_size);
     pkt_buf->is_received[part_id] = 1;
     
-    if (callback_function!=NULL) {
+    if (callback_function!=NULL)
+    {
       int percentage = (part_id*100)/(pkt_buf->num_packets);
       
-      if(is->is_progressive && part_id >= iter*inc_amt){
+      if(is->is_progressive && part_id >= iter*inc_amt)
+      {
         iter++;
+        is->data_size=part_id*64;
         write_img_file(is, pkt_buf, filename);
+        //printf("receive: callback(1)(pid %d)\n",getpid());
         callback_function(percentage, filename, true);
         
-        if (!has_forked) {
-          has_forked = do_fork(); 
+        if (!has_forked)
+        {
+          //printf("receive: forking (pid %d)\n",getpid());
+          has_forked = do_fork();
           
-          if (!is_parent_process())
-        	break;
+          if (is_parent_process())
+          	break;
         }
       }
       else
+      {
+        //printf("receive: callback(2)(pid %d)\n",getpid());
         callback_function(percentage, filename, false);
+      }
     }
-    
+
     free_tmsg(bigmsg);
     free((void *)packet);
   }
-  
+  //printf("receive: done(pid %d)\n",getpid());
+
   return 0;
 }
 
@@ -327,7 +330,8 @@ int reliable_receive_img_packets(img_stat_t *is, char *filename, void (*_callbac
   receive_img_packets(is, &pkt_buf, filename, pkt_buf.num_packets-1);
   --retries;
 
-  while (retries>0 && part_idx<pkt_buf.num_packets-1 && is_parent_process()){
+  while (retries>0 && part_idx<pkt_buf.num_packets
+  && (!is_parent_process()||!is->is_progressive)){
     if (!pkt_buf.is_received[part_idx]){
       send_img_part_cmd(is->node_id, part_idx, 10);
       receive_img_packets(is, &pkt_buf, filename,part_idx+9);
@@ -336,13 +340,20 @@ int reliable_receive_img_packets(img_stat_t *is, char *filename, void (*_callbac
     else
       ++part_idx;
   }
-  write_img_file(is, &pkt_buf, filename);
-  callback_function(100, filename, true);
+
   if (is->is_progressive && is_parent_process()) {
+    //printf("reliable_receive: exiting parent process!(pid %d)\n",getpid());
     free(p_buffer);
     exit(0);
   }
-  
+  else
+  {
+    //printf("reliable_receive: callback!(pid %d)\n",getpid());
+    is->data_size=part_idx*64;
+    write_img_file(is, &pkt_buf, filename);
+    callback_function(100, filename, true);
+  }
+
   free(p_buffer);
 
   return part_idx;
@@ -454,8 +465,9 @@ void write_img_file(img_stat_t *is, packet_buffer_t *pkt_buf, char *filename){
   if (is->type&IMG_TYPE_JPG)
   {
     code_header_t header;
+//    printf("decoding data size %d\n",is->data_size);
     decodeJpegBytes(pkt_buf->data, is->data_size, img_buffer, &header);
-    //printf("jpg decoded header: W=%d H=%d qual=%d COL=%d size=%d\n",header.width, header.height, header.quality, header.is_color, header.totalSize);
+//    printf("jpg decoded header: W=%d H=%d qual=%d COL=%d size=%d\n",header.width, header.height, header.quality, header.is_color, header.totalSize);
 
     #ifndef NO_JPEG
       save_img_jpg(filename, img_buffer, header.width, header.height, header.is_color);
@@ -480,7 +492,6 @@ void write_img_file(img_stat_t *is, packet_buffer_t *pkt_buf, char *filename){
   }
 
   free(img_buffer);
-
 }
 
 

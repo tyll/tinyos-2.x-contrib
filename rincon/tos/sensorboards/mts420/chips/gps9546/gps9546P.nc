@@ -35,24 +35,17 @@
  * turn on/off the power as well as connecting/disconnecting the UART pins
  * and start the UART.
  * 
- * Start Order:
+ * Start/Stop Order:
  *   1. UART control
- *   2. GPS Power
- *   3. GPS UART Pins
- * 
- * Stop Order:
- *   1. UART Control
  *   2. GPS UART Pins
- *   3. GPS Power
  * 
  * @author Danny Park
  */
 
 module gps9546P {
   uses {
-    interface Channel as GpsPowerChannel;//This may actually be the enable channel (the power may always be connected)
-    interface Channel as GpsUartTxChannel;
     interface Channel as GpsUartRxChannel;
+    interface Channel as GpsUartTxChannel;
     interface StdControl as UartControl;
   }
   provides {
@@ -62,40 +55,19 @@ module gps9546P {
 implementation {
   command error_t GpsControl.start() {
     call UartControl.start();
-    call GpsPowerChannel.open();
+    call GpsUartRxChannel.open();
     
     return SUCCESS;
   }
   
   /*
-    Power off the GPS, disconnect and stop the UART
+    Disconnect and stop the UART
   */
   command error_t GpsControl.stop() {
     call UartControl.stop();
-    call GpsPowerChannel.close();
+    call GpsUartRxChannel.close();
+    
     return SUCCESS;
-  }
-  
-  event void GpsPowerChannel.openDone(error_t error) {
-    if(call GpsUartRxChannel.open() != SUCCESS) {
-      //error
-      
-    }
-  }
-  
-  event void GpsPowerChannel.closeDone(error_t error) {
-    if(call GpsUartRxChannel.close() != SUCCESS) {
-      //error
-      
-    }
-  }
-  
-  event void GpsUartTxChannel.openDone(error_t error) {
-    signal GpsControl.startDone(SUCCESS);
-  }
-  
-  event void GpsUartTxChannel.closeDone(error_t error) {
-    signal GpsControl.stopDone(SUCCESS);
   }
   
   event void GpsUartRxChannel.openDone(error_t error) {
@@ -110,5 +82,13 @@ implementation {
       //error
       
     }
+  }
+  
+  event void GpsUartTxChannel.openDone(error_t error) {
+    signal GpsControl.startDone(SUCCESS);
+  }
+  
+  event void GpsUartTxChannel.closeDone(error_t error) {
+    signal GpsControl.stopDone(SUCCESS);
   }
 }

@@ -50,7 +50,6 @@ implementation {
   SyncUartStream = HplGps9546C;
   
   app.UartControl -> HplGps9546C;
-  app.GpsPowerChannel -> adg715PowerC.ChannelGpsEnable;
   app.GpsUartTxChannel -> adg715CommC.ChannelGpsTx;
   app.GpsUartRxChannel -> adg715CommC.ChannelGpsRx;
 }

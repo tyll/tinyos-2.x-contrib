@@ -59,7 +59,8 @@ implementation {
   nmea_gga_msg_t* gpsInfo;
   
   event void Boot.booted() {
-    gpsInfo = (nmea_gga_msg_t*)call Packet.getPayload(&myMsg, sizeof(nmea_gga_msg_t));
+    gpsInfo = (nmea_gga_msg_t*)call Packet.getPayload(&myMsg,
+        sizeof(nmea_gga_msg_t));
     call GPSControl.start();
   }
   

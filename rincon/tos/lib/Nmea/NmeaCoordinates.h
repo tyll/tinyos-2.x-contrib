@@ -46,18 +46,27 @@ enum {
   WEST = 0x57,//hex ASCII for 'W'
 };
 
-typedef struct nmea_latitude {
-  uint8_t degree; // 0-90
-  uint8_t minute; // 0-60
-  uint8_t remainder; // 2 decimal places as an integer (i.e. divide by 100 to get the actual remainder)
-  nmea_cardinal_t direction; // NORTH or SOUTH ONLY
-} nmea_latitude_t;
+typedef struct nmea_coordinate {
 
-typedef struct nmea_longitude {
-  uint8_t degree; // 0-180
-  uint8_t minute; // 0-60
-  uint8_t remainder; // 2 decimal places as an integer (i.e. divide by 100 to get the actual remainder)
-  nmea_cardinal_t direction; // EAST or WEST ONLY
-} nmea_longitude_t;
+  /** Stored as an integer value */
+  uint8_t degree;
+  
+  /**
+   * Measured from 0-60* minutes with 3 decimal places of accuracy
+   * stored as an integer (divide by 1000 to get actual value)
+   * *Actual values will range from 0 to 59999.
+   */
+  uint16_t minute;
+  
+  /** NORTH, SOUTH, EAST, or WEST (from the above enums) */
+  nmea_cardinal_t direction;
+
+} nmea_coordinate_t;
+
+/** degree should be from 0-90, direction should only be NORTH or SOUTH */
+typedef nmea_coordinate_t nmea_latitude_t;
+
+/** degree should be from 0-180, direction should only be EAST or WEST */
+typedef nmea_coordinate_t nmea_longitude_t;
 
 #endif

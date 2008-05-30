@@ -52,9 +52,13 @@ enum {
   NMEA_END = 0x0A,//LF -- NMEA 'sentence' terminator
   NMEA_DELIMETER = 0x2C,//','
   NMEA_CHECKSUM_DELIM = 0x2A,//'*'
+  ASCII_PERIOD = 0x2E,//ASCII period '.'
   ASCII_ZERO = 0x30,//ASCII zero '0'
+  ASCII_FIVE = 0x35,//ASCII five '5'
+  ASCII_NINE = 0x39,//ASCII nine '9'
   ASCII_A = 0x41,//ASCII 'A'
   ASCII_G = 0x47,//ASCII 'G'
+  ASCII_M = 0x4D,//ASCII 'M'
   ASCII_P = 0x50,//ASCII 'P'
 };
 

@@ -61,7 +61,7 @@ enum nmea_gga_fields_enum {
   GGA_NUM_SATELLITES = 6,
   GGA_HORZ_DIL = 7,//Horizontal dilution of position
   GGA_ALTITUDE = 8,
-  GGA_GEIOD_HEIGHT = 10,
+  GGA_GEOID_HEIGHT = 10,
   GGA_DGPS_LAST_UPDATE = 12,//time in seconds since last DGPS udpate
   GGA_DGPS_ID = 13,//DGPS station ID number
   GGA_FIELD_COUNT = 14
@@ -74,7 +74,7 @@ enum nmea_gga_min_field_len_enum {//minumum length required for current processi
   GGA_FQ_ML = 1,//Fix Quality
   GGA_SAT_ML = 2,//Number of sattelites
   GGA_HD_ML = 7,//Horizontal dilution of position
-  GGA_ALT_ML = 8,//Altitude
+  GGA_ALT_ML = 1,//Altitude
   GGA_GH_ML = 10,//Geiod Height
   GGA_DGPSLU_ML = 12,//time in seconds since last DGPS udpate
   GGA_DGPSID_ML = 13,//DGPS station ID number 
@@ -88,7 +88,7 @@ typedef struct nmea_gga_msg {
   uint8_t numSatellites;//0-12 for the current gps chip
   //horizontal dilution of position
   uint16_t altitude;//in meters to one decimal place (divide by 10 to get actual value)
-  uint16_t geiodHeight;//Height of geoid (mean sea level) above WGS84 ellipsoid
+  uint16_t geoidHeight;//Height of geoid (mean sea level) above WGS84 ellipsoid
   //time in seconds since last DGPS update
   //DGPS station ID number
   //checksum

@@ -10,8 +10,12 @@ $LGLDIR should be defined as per README in our main directory
 =======================
 buidling get_jpg.c file
 =======================
-1.make sure that you built /opt/tinyos-2.x/support/sdk/c/sf (libmote.a file)
-  note: copy Makefile.am from $LGLDIR/support/sdk/c/sf to $TOSROOT/support/sdk/s/sf
-        and enter './configure' and 'make install' to build and install libmote.a
-2.we also need jpeg-6b library installed (libjpeg.a file)
+1. make serialforwarder c library:
+   cp $LGLDIR/support/sdk/c/sf/Makefile.am $TOSROOT/support/sdk/c/sf
+   cd $TOSROOT/support/sdk/c/sf
+   ./bootstrap
+   ./configure
+   sudo make install
+2. install jpeg-6b dev library 
+   sudo aptitude install libjpeg-dev
 3.build get_jpg.c file by typing 'make' in c/ directory

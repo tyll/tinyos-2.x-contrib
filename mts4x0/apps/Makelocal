@@ -1,0 +1,27 @@
+# those includes should be hanled automatically by nesc but this
+# doesn't work from a conrib dir ...
+
+
+TOSCONTRIB?=../../../
+
+
+ifeq ($(SENSORBOARD),mts400)
+	CFLAGS+=-I$(TOSCONTRIB)/mts4x0/tos/chips/leadtekgps9546
+	CFLAGS+=-I$(TOSCONTRIB)/mts4x0/tos/lib/gps/
+endif
+
+ifeq ($(SENSORBOARD),mts420ca)
+	CFLAGS+=-I$(TOSCONTRIB)/mts4x0/tos/sensorboards/mts420ca/
+	CFLAGS+=-I$(TOSCONTRIB)/mts4x0/tos/sensorboards/mts400/
+	CFLAGS+=-I$(TOSCONTRIB)/mts4x0/tos/chips/leadtekgps9546
+	CFLAGS+=-I$(TOSCONTRIB)/mts4x0/tos/chips/adg715/
+	CFLAGS+=-I$(TOSCONTRIB)/mts4x0/tos/lib/gps/
+endif 
+
+ifeq ($(SENSORBOARD),mts420cc)
+	CFLAGS+=-I$(TOSCONTRIB)/mts4x0/tos/sensorboards/mts420ca/
+	CFLAGS+=-I$(TOSCONTRIB)/mts4x0/tos/sensorboards/mts400/
+	CFLAGS+=-I$(TOSCONTRIB)/mts4x0/tos/lib/gps/
+#TODO :
+	CFLAGS+=-I$(TOSCONTRIB)/mts4x0/tos/chips/ublox
+endif 

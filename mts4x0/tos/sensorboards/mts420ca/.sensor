@@ -1,0 +1,8 @@
+
+push( @includes, qw(
+  %T/sensorboards/mts400
+  %T/chips/adg715
+  %T/lib/gps
+  %T/chips/leadtekgps9546
+) );
+

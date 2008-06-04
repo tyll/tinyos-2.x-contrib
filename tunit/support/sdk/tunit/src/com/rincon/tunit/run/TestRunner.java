@@ -249,6 +249,7 @@ public class TestRunner {
           extras += focusedNode.getInstallExtras() + " ";
           extras += suiteProperties.getExtras() + " ";
           extras += "tunit ";
+          extras += focusedNode.getBuildExtras() + " ";
           
           extras += "TUNITCFLAGS=\""
         	  + "-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/lib/tunit "
@@ -272,9 +273,13 @@ public class TestRunner {
       } else {
         log.debug("Build properties are identical for nodes using target "
             + focusedTarget.getTargetName());
+        
+        focusedNode = focusedTarget.getNode(0);
+        
         extras = suiteProperties.getExtras() + " ";
         extras += "tunit ";
-
+        extras += focusedNode.getBuildExtras() + " ";
+        
         extras += "TUNITCFLAGS=\""
       	  + "-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/lib/tunit "
       	  + "-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/lib/tunitstats "

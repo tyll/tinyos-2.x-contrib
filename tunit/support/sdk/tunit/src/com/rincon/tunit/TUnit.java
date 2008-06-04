@@ -221,7 +221,8 @@ public class TUnit {
   private void syntax() {
     System.out.println("TUnit Syntax: java com.rincon.tunit.TUnit (options)");
     System.out.println("\nOptions are:");
-    System.out.println("\t-tunitbase [absolute path to tinyos-2.x-contrib/tunit]");
+    System.out.println("\t-tunitbase [absolute path to the equivalent of");
+    System.out.println("\t\ttinyos-2.x-contrib/tunit]");
     System.out.println("\t\tThe tinyos-2.x-contrib/tunit directory contains");
     System.out.println("\t\tTUnit's embedded libraries");
     System.out.println();
@@ -232,8 +233,9 @@ public class TUnit {
     System.out.println("\t\tThis directory is where your reports will be stored.");
     System.out.println();
     System.out.println("\t-packagedir [absolute package directory]");
-    System.out.println("\t\tThis directory is where your tests will be reference from in reports");
-    System.out.println("\t\tBy default, this is the parent directory containing a build.xml");
+    System.out.println("\t\tThis directory is where your tests will be reference from in");
+    System.out.println("\t\treports. By default, this is the parent directory containing");
+    System.out.println("\t\ta build.xml");
     System.out.println();
     System.out.println("\t-debug");
     System.out.println("\t\tDisplay all TUnit Java framework debug statements");
@@ -336,13 +338,7 @@ public class TUnit {
     if (tunitBase == null) {
       // We're flexible. Pick one. Or don't, we're still flexible.
 
-      if((String) System.getenv().get("TOSCONTRIB") != null) {
-        log.info("Found a TOSCONTRIB environment variable");
-        tunitBase = ((String) System.getenv().get("TOSCONTRIB")).replace('\\',
-            File.separatorChar).replace('/', File.separatorChar)
-                + File.separatorChar + "tunit";
-        
-      } else if((String) System.getenv().get("TUNIT_BASE") != null) {
+      if(((String) System.getenv().get("TUNIT_BASE") != null)) {
           log.info("Found a TUNIT_BASE environment variable");
           tunitBase = ((String) System.getenv().get("TUNIT_BASE")).replace('\\',
               File.separatorChar).replace('/', File.separatorChar);
@@ -351,7 +347,14 @@ public class TUnit {
         log.info("Found a TUNIT_HOME environment variable");
         ((String) System.getenv().get("TUNIT_HOME")).replace('\\',
             File.separatorChar).replace('/', File.separatorChar);
+        
+      } else if((String) System.getenv().get("TOSCONTRIB") != null) {
+        log.info("Found a TOSCONTRIB environment variable");
+        tunitBase = ((String) System.getenv().get("TOSCONTRIB")).replace('\\',
+            File.separatorChar).replace('/', File.separatorChar)
+                + File.separatorChar + "tunit";
       }
+        
     }
 
     if (tunitBase == null) {
@@ -490,9 +493,11 @@ public class TUnit {
    * 
    */
   private void processTunitXml() {
+    // TODO check for a manually set tunit.xml file.
     File tunitPropertiesFile = new File(tunitDirectory, "tunit.xml");
     if (!tunitPropertiesFile.exists()) {
       log.fatal("Cannot locate " + tunitPropertiesFile.getAbsolutePath());
+      // TODO edit this comment
       log.fatal("Does tinyos-2.x-contrib/tunit/tunit.xml exist?");
       System.exit(4);
     }

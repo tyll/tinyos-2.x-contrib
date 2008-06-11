@@ -37,6 +37,8 @@
  */
 
 #include "IEEE802154.h"
+#include "message.h"
+#include "AM.h"
 
 module CC2420ReceiveP {
 
@@ -96,7 +98,7 @@ implementation {
   
   norace uint8_t m_bytes_left;
   
-  norace message_t* m_p_rx_buf;
+  norace message_t* ONE_NOK m_p_rx_buf;
 
   message_t m_rx_buf;
   
@@ -108,7 +110,8 @@ implementation {
   void receive();
   void waitForNextPacket();
   void flush();
-  
+  bool passesAddressCheck(message_t * ONE msg);
+
   task void receiveDone_task();
   
   /***************** Init Commands ****************/
@@ -196,7 +199,8 @@ implementation {
                                     error_t error ) {
     cc2420_header_t* header = call CC2420PacketBody.getHeader( m_p_rx_buf );
     //cc2420_metadata_t* metadata = call CC2420PacketBody.getMetadata( m_p_rx_buf );
-    uint8_t* buf = (uint8_t*) header;
+    uint8_t tmpLen __DEPUTY_UNUSED__ = sizeof(message_t) - (offsetof(message_t, data) - sizeof(cc2420_header_t));
+    uint8_t* COUNT(tmpLen) buf = TCAST(uint8_t* COUNT(tmpLen), header);
     rxFrameLength = buf[ 0 ];
 
     switch( m_state ) {
@@ -325,13 +329,18 @@ implementation {
    */
   task void receiveDone_task() {
     cc2420_metadata_t* metadata = call CC2420PacketBody.getMetadata( m_p_rx_buf );
-    uint8_t* buf = (uint8_t*) call CC2420PacketBody.getHeader( m_p_rx_buf );;
-    
+    cc2420_header_t* header = call CC2420PacketBody.getHeader( m_p_rx_buf);
+    uint8_t tmpLen __DEPUTY_UNUSED__ = sizeof(message_t) - (offsetof(message_t, data) - sizeof(cc2420_header_t));
+    uint8_t* COUNT(tmpLen) buf = TCAST(uint8_t* COUNT(tmpLen), header);
+
     metadata->crc = buf[ rxFrameLength ] >> 7;
     metadata->lqi = buf[ rxFrameLength ] & 0x7f;
     metadata->rssi = buf[ rxFrameLength - 1 ];
-    m_p_rx_buf = signal Receive.receive( m_p_rx_buf, m_p_rx_buf->data, 
-                                         rxFrameLength );
+
+    if(passesAddressCheck(m_p_rx_buf)) {
+      m_p_rx_buf = signal Receive.receive( m_p_rx_buf, m_p_rx_buf->data,
+          rxFrameLength );
+    }
 
     atomic receivingPacket = FALSE;
     waitForNextPacket();
@@ -436,4 +445,17 @@ implementation {
     m_missed_packets = 0;
   }
 
+  /**
+   * @return TRUE if the given message passes address recognition
+   */
+  bool passesAddressCheck(message_t *msg) {
+    cc2420_header_t *header = call CC2420PacketBody.getHeader( msg );
+
+    if(!(call CC2420Config.isAddressRecognitionEnabled())) {
+      return TRUE;
+    }
+
+    return (header->dest == call CC2420Config.getShortAddr()
+        || header->dest == AM_BROADCAST_ADDR);
+  }
 }

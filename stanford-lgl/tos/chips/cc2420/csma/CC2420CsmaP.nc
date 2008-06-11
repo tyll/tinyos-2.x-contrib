@@ -38,7 +38,7 @@ module CC2420CsmaP {
 
   provides interface SplitControl;
   provides interface Send;
-  provides interface RadioBackoff[am_id_t amId];
+  provides interface RadioBackoff;
 
   uses interface Resource;
   uses interface CC2420Power;

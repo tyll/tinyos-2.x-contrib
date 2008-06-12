@@ -181,12 +181,13 @@ void check_new_client(void)
     new_client(clientfd);
 }
 
+int nodeID = 1;
 void big_msg_hdr_p(char *packet, int *len, int idx)
 {
   char tmp_packet[] = {
     0x00, 0x07, 0xba, 0x00, 0x02, 0x1b, 0x00, 0x6e,
     idx>>8,idx&0xFF, //part id
-    0x00, 0x00        //node id
+    0, nodeID        //node id
   };
   *len=sizeof(tmp_packet);
   memcpy(packet, tmp_packet, *len);
@@ -196,7 +197,7 @@ void img_stat_p(code_header_t *header, char *packet, int *len)
 {
   char tmp_packet[] = {
     0x00, 0x07, 0xba, 0x00, 0x02, 0x1b, 0x00, 0x05,
-    0x00, 0x00, 0x02+header->is_color, //node id(2), type(1)
+    0x00, nodeID, 0x02+header->is_color, //node id(2), type(1)
     header->width>>8, header->width&0xFF, header->height>>8, header->height&0xFF,//width, height
     0x00, 0x00, header->totalSize>>8, header->totalSize&0xFF,//data size
     0x00, 0x00, 0x00, 0x00,
@@ -205,6 +206,11 @@ void img_stat_p(code_header_t *header, char *packet, int *len)
   };
   *len=sizeof(tmp_packet);
   memcpy(packet, tmp_packet, *len);
+}
+
+int max_data_idx(int img_size)
+{
+  return img_size/BIGMSG_DATA_LENGTH+(img_size%BIGMSG_DATA_LENGTH==0?0:1);
 }
 
 unsigned char* last_img=bw_img;
@@ -223,26 +229,34 @@ void forward_packet(const unsigned char *packet, int len)
 
   int l;
   char p[100];
+
   if (packet[10]==0x02)
   {
+    img_size=bw_header.totalSize;
+    max_idx=max_data_idx(img_size);
     h = &bw_header;
     i=0;
-    img_size=bw_header.totalSize;
-    max_idx=img_size/BIGMSG_DATA_LENGTH+(img_size%BIGMSG_DATA_LENGTH==0?0:1);
     last_img=bw_img;
   }
   else if (packet[10]==0x03)
   {
+    img_size=col_header.totalSize;
+    max_idx=max_data_idx(img_size);
     h = &col_header;
     i=0;
-    img_size=col_header.totalSize;
-    max_idx=img_size/BIGMSG_DATA_LENGTH+(img_size%BIGMSG_DATA_LENGTH==0?0:1);
     last_img=col_img;
   }
   else if (packet[10]==0x05)
   {
+    if (last_img==bw_img)
+      img_size=bw_header.totalSize;
+    else
+      img_size=col_header.totalSize;
+    max_idx=max_data_idx(img_size);
+
     i=packet[12]+(packet[11]<<8);
-    max_idx=i+packet[14]+(packet[13]<<8);
+    int tmp_max_idx=i+packet[14]+(packet[13]<<8);
+    max_idx = (tmp_max_idx<max_idx)?tmp_max_idx:max_idx;
     img_size = (last_img==bw_img)?bw_header.totalSize:col_header.totalSize;
     printf("requesting lost packets: %d - %d \n",i, max_idx);
   }
@@ -277,11 +291,12 @@ void forward_packet(const unsigned char *packet, int len)
         printf("big_msg #%d packet len %d written(part_size %d, l %d,)!\n",i,l+part_size, part_size, l);
     }
     else
-      printf("dropping packet\n");
+      printf("dropping packet (i %d, max_idx %d)\n", i, max_idx);
     ++i;
   }
   packets_written++;
   printf("written packets done (%d retries)!\n",packets_written);
+  fflush(stdout);
 }
 
 void parseFile(char* filename, code_header_t *header, unsigned char *data)
@@ -334,7 +349,9 @@ int main(int argc, char **argv)
 
   parseFile("coded_bw.huf" ,&bw_header ,bw_img);
   parseFile("coded_col.huf",&col_header,col_img);
-
+  printf("simulating mote: %d\n",nodeID);
+  fflush(stdout);
+  
   for (;;)
     {
       fd_set rfds;

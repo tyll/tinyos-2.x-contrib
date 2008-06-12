@@ -3,7 +3,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
 #include <libmote/sfsource.h>
 
 int sf_fd;
@@ -15,7 +14,7 @@ enum {
 typedef struct{
   int node_id;
   int type;
-  bool is_progressive;
+  int is_progressive;
   int data_size;
   int width;
   int height;
@@ -30,11 +29,11 @@ typedef struct {
 
 void comm_init(char* host, int port);
 int send_img_cmd(int node_id, int type);
-int receive_img(int session_id, bool progressive, char *filename, void (*_callback)(int, char *, bool));
+int receive_img(int session_id, int progressive, char *filename, void (*_callback)(int, char *));
 int save_img_jpg(char *filebase, unsigned char *img_buffer, int width, int height, int is_color);
 int receive_ctp_info_pckts();
 int send_CTP_info_cmd(int node_id);
-bool is_parent_process();
-bool do_fork();
+int is_parent_process();
+const unsigned char *receive_ctp_info_packet();
 
 #endif //CAMERA_CMD_H

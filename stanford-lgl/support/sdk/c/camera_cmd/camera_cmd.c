@@ -20,14 +20,31 @@
 #include "jpegTOS.h"
 #include "jpegUncompress.h"
 #include "quanttables.h"
+//#include <syslog.h>
 
-bool is_parent_proc = true; // used to track whether this is the parent of child thread
-							// when forking during progressive jpg downloads
+int has_forked = 0;
+int is_parent_proc = 1; // used to track whether this is the parent of child thread
+              // when forking during progressive jpg downloads
 
+unsigned char first_packets_mask=255;
 void write_img_file(img_stat_t *is, packet_buffer_t *pkt_buf, char *filename);
 long tv_udiff(struct timeval *start, struct timeval *end)
 {
   return (end->tv_sec - start->tv_sec)*1000000L + (end->tv_usec - start->tv_usec);
+}
+
+int do_fork() {
+  //printf("do_fork (pid %d, has_forked %d, is_parent_proc %d)\n",getpid(), has_forked, is_parent_proc);
+  int pID = fork();
+  
+  if (pID == 0)
+    is_parent_proc = 0;
+  else
+    nice(10); // give child process enough cycles to render the page
+
+  //printf("do_forked (pid %d, has_forked %d, is_parent_proc %d)\n",getpid(), has_forked, is_parent_proc);
+
+  return 1;
 }
 
 void comm_init(char* host, int port)
@@ -101,10 +118,10 @@ int send_img_part_cmd(int node_id, int idx, int num_parts)
 }
 
 
-//Sends a request to camera nodes to return their parent and ETX in the CTP collection tree. 
+//Sends a request to camera nodes to return its parent and ETX in the CTP collection tree. 
 int send_CTP_info_cmd(int node_id){
-	init_cmd_packet(0xFFFF, 8, 5, 0); 
-	return send_packet( cmd_packet, sizeof(cmd_packet));
+  init_cmd_packet(node_id, 8, 5, 0); 
+  return send_packet( cmd_packet, sizeof(cmd_packet));
 }
 
 //Listens for a single command packet with CTP routing information
@@ -121,13 +138,14 @@ const unsigned char *receive_ctp_info_packet()
     //if am check fails, try to receive next packet
     if (packet)
     {
+      
       if( (len<9) || (packet[7]!=STATUS_AM_TYPE))
       {
-		free((void *)packet);
+        free((void *)packet);
       }
       else
       {
-	return packet;
+        return packet;
       }
     }
   }
@@ -147,19 +165,19 @@ int receive_ctp_info_pckts()
     if (!packet)
       break;
 
-	//Extract sender, parent, and ETX from the packet and display
+    //Extract sender, parent, and ETX from the packet and display
     tmsg_t *ctp_info = new_tmsg((void *)&packet[8], STATUS_SIZE);
-	node_id=status_node_id_get(ctp_info);
-	seqNo=status_seqNo_get(ctp_info);
-	parent=status_parent_get(ctp_info);
-	ETX=status_ETX_get(ctp_info);
+    node_id=status_node_id_get(ctp_info);
+    seqNo=status_seqNo_get(ctp_info);
+    parent=status_parent_get(ctp_info);
+    ETX=status_ETX_get(ctp_info);
     free_tmsg(ctp_info);
     printf("Routing info for node: %d, parent: %d, ETX: %d.\n", node_id, parent, ETX);
   }
   return 0;
 }
 
-void (*callback_function)(int, char *, bool) = NULL;
+void (*callback_function)(int, char *) = NULL;
 
 int receive_img_stat_packet(int session_id, img_stat_t *is)
 {
@@ -181,20 +199,20 @@ int receive_img_stat_packet(int session_id, img_stat_t *is)
         free((void *)packet);
       else
       {
-      	tmsg_t *img_stat_msg = new_tmsg((void *)&packet[8], len);
-      	if (img_stat_node_id_get(img_stat_msg) == session_id)
-      	{
-      	  is->node_id = img_stat_node_id_get(img_stat_msg);
-      	  is->type = img_stat_type_get(img_stat_msg);
-      	  is->data_size = img_stat_data_size_get(img_stat_msg);
-      	  is->width = img_stat_width_get(img_stat_msg);
-      	  is->height = img_stat_height_get(img_stat_msg);
-      	  free_tmsg(img_stat_msg);
+        tmsg_t *img_stat_msg = new_tmsg((void *)&packet[8], len);
+        if (img_stat_node_id_get(img_stat_msg) == session_id)
+        {
+          is->node_id = img_stat_node_id_get(img_stat_msg);
+          is->type = img_stat_type_get(img_stat_msg);
+          is->data_size = img_stat_data_size_get(img_stat_msg);
+          is->width = img_stat_width_get(img_stat_msg);
+          is->height = img_stat_height_get(img_stat_msg);
+          free_tmsg(img_stat_msg);
           free((void *)packet);
-      	  return 0;
-      	}
+          return 0;
+        }
         free_tmsg(img_stat_msg);
-      	free((void *)packet);
+        free((void *)packet);
       }
     }
     struct timeval now;
@@ -213,7 +231,7 @@ const unsigned char *receive_img_packet()
   struct timeval start;
   gettimeofday(&start,0);
 
-  while( true ){
+  while(1){
     int len;
     const unsigned char *packet = read_packet(&len);
 
@@ -232,6 +250,7 @@ const unsigned char *receive_img_packet()
     if (tv_udiff(&start,&now)>1000000L) // 1 sec
       return NULL;
   }
+  return NULL;
 }
 
 int receive_img_packets(img_stat_t *is, packet_buffer_t *pkt_buf, char *filename, int max_part_id)
@@ -241,7 +260,6 @@ int receive_img_packets(img_stat_t *is, packet_buffer_t *pkt_buf, char *filename
   
   int iter = 1;
   int inc_amt = (pkt_buf->num_packets / 5);
-  bool has_forked = false;
 
   while (part_id<max_part_id){
     const unsigned char *packet = receive_img_packet();
@@ -261,6 +279,9 @@ int receive_img_packets(img_stat_t *is, packet_buffer_t *pkt_buf, char *filename
     }
 
     part_id = bigmsg_frame_part_part_id_get(bigmsg);
+    if (part_id<8)
+      first_packets_mask &= ~(1<<part_id);
+
     const unsigned char *buf = &packet[8+bigmsg_frame_part_buf_offset(0)];
 
     //printf("part id: %d, max: %d\n", part_id, pkt_buf->num_packets);
@@ -277,28 +298,34 @@ int receive_img_packets(img_stat_t *is, packet_buffer_t *pkt_buf, char *filename
     if (callback_function!=NULL)
     {
       int percentage = (part_id*100)/(pkt_buf->num_packets);
-      
+      percentage = (percentage>=100)?99:percentage;
       if(is->is_progressive && part_id >= iter*inc_amt)
       {
         iter++;
         is->data_size=part_id*64;
-        write_img_file(is, pkt_buf, filename);
-        //printf("receive: callback(1)(pid %d)\n",getpid());
-        callback_function(percentage, filename, true);
+        if (!first_packets_mask)
+          write_img_file(is, pkt_buf, filename);
+        //syslog(0,"receive: callback(1)(pid %d)\n",getpid());
+
+        callback_function(percentage, filename);
         
         if (!has_forked)
         {
-          //printf("receive: forking (pid %d)\n",getpid());
           has_forked = do_fork();
           
-          if (is_parent_process())
-          	break;
+          if (is_parent_proc)
+          {
+            //syslog(0,"stopping parent process(pid %d)\n",getpid());
+            free_tmsg(bigmsg);
+            free((void *)packet);
+            return 0;
+          }
         }
       }
-      else
+      else if (!is->is_progressive)
       {
         //printf("receive: callback(2)(pid %d)\n",getpid());
-        callback_function(percentage, filename, false);
+        callback_function(percentage, filename);
       }
     }
 
@@ -310,12 +337,12 @@ int receive_img_packets(img_stat_t *is, packet_buffer_t *pkt_buf, char *filename
   return 0;
 }
 
-int reliable_receive_img_packets(img_stat_t *is, char *filename, void (*_callback)(int, char *, bool))
+int reliable_receive_img_packets(img_stat_t *is, char *filename, void (*_callback)(int, char *))
 {
   packet_buffer_t pkt_buf;
   pkt_buf.packet_size = 64;
   pkt_buf.num_packets = is->data_size/64+((is->data_size%64==0)?0:1);
-    
+
   int pkt_buf_size=(pkt_buf.packet_size+1)*pkt_buf.num_packets;
   unsigned char *p_buffer = (unsigned char*)calloc(pkt_buf_size, sizeof(char));
   memset(p_buffer, 0, pkt_buf_size);
@@ -326,32 +353,42 @@ int reliable_receive_img_packets(img_stat_t *is, char *filename, void (*_callbac
 
   int retries = 10;
   int part_idx = 0;
+  first_packets_mask = 255;
 
+  //syslog(0,"receive_img_packets attmpt 1");
   receive_img_packets(is, &pkt_buf, filename, pkt_buf.num_packets-1);
+  //syslog(0,"receive_img_packets attmpt 1 done");
   --retries;
 
   while (retries>0 && part_idx<pkt_buf.num_packets
-  && (!is_parent_process()||!is->is_progressive)){
+  && (!is_parent_proc||!is->is_progressive)){
     if (!pkt_buf.is_received[part_idx]){
+      //syslog(0,"query missing packets");
       send_img_part_cmd(is->node_id, part_idx, 10);
+      //syslog(0, "receive_img_packets, attempt %d",11-retries);
       receive_img_packets(is, &pkt_buf, filename,part_idx+9);
+      //syslog(0, "receive_img_packets, attempt %d done",11-retries);
       --retries;
     }
     else
       ++part_idx;
   }
 
-  if (is->is_progressive && is_parent_process()) {
-    //printf("reliable_receive: exiting parent process!(pid %d)\n",getpid());
+  if (is->is_progressive && is_parent_proc) {
+    //syslog(0,"reliable_receive: exiting parent process!(pid %d)\n",getpid());
     free(p_buffer);
-    exit(0);
+    //exit(0);
+    return 0;
   }
   else
   {
-    //printf("reliable_receive: callback!(pid %d)\n",getpid());
+    //syslog(0, "reliable_receive: callback!(pid %d)\n",getpid());
     is->data_size=part_idx*64;
-    write_img_file(is, &pkt_buf, filename);
-    callback_function(100, filename, true);
+    if (!first_packets_mask)
+      write_img_file(is, &pkt_buf, filename);
+    callback_function(100, filename);
+    if (!is_parent_proc)
+      exit(0);
   }
 
   free(p_buffer);
@@ -361,7 +398,7 @@ int reliable_receive_img_packets(img_stat_t *is, char *filename, void (*_callbac
 
 
 int packets2col_img(packet_buffer_t *pkt_buf, 
-		unsigned char *img_buffer, int width, int height){
+    unsigned char *img_buffer, int width, int height){
   int idx;
   int packet_buf_size = pkt_buf->packet_size*pkt_buf->num_packets;
 
@@ -404,8 +441,8 @@ int save_img_pnm(char *filebase, unsigned char *img_buffer, int width, int heigh
   for (i=0; i<height; i++){
     for (j=0; j<width; j++)
       for (k=0; k<pixels_width; k++){
-	unsigned char byte = img_buffer[i*width*pixels_width+j*pixels_width+k];
-	fprintf(fd, "%d ", byte);
+  unsigned char byte = img_buffer[i*width*pixels_width+j*pixels_width+k];
+  fprintf(fd, "%d ", byte);
       }
     fprintf(fd,"\r\n");
   }
@@ -465,9 +502,9 @@ void write_img_file(img_stat_t *is, packet_buffer_t *pkt_buf, char *filename){
   if (is->type&IMG_TYPE_JPG)
   {
     code_header_t header;
-//    printf("decoding data size %d\n",is->data_size);
+    //printf("decoding data size %d\n",is->data_size);
     decodeJpegBytes(pkt_buf->data, is->data_size, img_buffer, &header);
-//    printf("jpg decoded header: W=%d H=%d qual=%d COL=%d size=%d\n",header.width, header.height, header.quality, header.is_color, header.totalSize);
+    //printf("jpg decoded header: W=%d H=%d qual=%d COL=%d size=%d\n",header.width, header.height, header.quality, header.is_color, header.totalSize);
 
     #ifndef NO_JPEG
       save_img_jpg(filename, img_buffer, header.width, header.height, header.is_color);
@@ -495,34 +532,22 @@ void write_img_file(img_stat_t *is, packet_buffer_t *pkt_buf, char *filename){
 }
 
 
-int receive_img(int session_id, bool progressive, char * filename, void (*_callback)(int, char *, bool))
+int receive_img(int session_id, int progressive, char * filename, void (*_callback)(int, char *))
 {
   img_stat_t is;
 
+  //syslog(0,"receving image");
   if (receive_img_stat_packet(session_id, &is)!=0)
     return -1;
   is.is_progressive=progressive;
   
   //printf("img stat: id: %d, type: %d, progress: %d, size: %d\n", is.node_id, is.type, is.is_progressive, is.data_size);
   
+  //syslog(0,"img from node: %d, progressive: %d", is.node_id, is.is_progressive);
   reliable_receive_img_packets(&is, filename, _callback);
+  //syslog(0,"reliable_receive done!");
 
   return 0;
-}
-
-bool is_parent_process() {
-  return is_parent_proc;
-}
-
-bool do_fork() {
-  int pID = fork();
-  
-  if (pID == 0)
-    is_parent_proc = false;
-  else
-	nice(10); // give child process enough cycles to render the page
-  
-  return true;
 }
 
 

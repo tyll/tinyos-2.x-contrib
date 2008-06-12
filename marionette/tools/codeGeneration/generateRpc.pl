@@ -163,13 +163,14 @@ for my $taggedInterface (@$taggedInterfaces){
     }
 }
     
+
 #The following variable is set in the checkRpcFunction subroutine.
 #We wait until after all functions are checked before dieing so that
 #we can get all error messages at once
 if ($shouldDie == 1) { die "Too many errors.";}
     
 
-
+my %allFunctions = (%requiredFunctions, %rpcFunctions);
 
 
 ##############################
@@ -294,8 +295,8 @@ my $interfaceName="";
 my $gparams = "";
 
 # generate the "provides" declarations of rpc-able events
-for $fullName (sort keys %rpcFunctions ) {
-    $rpc = $rpcFunctions{$fullName};
+for $fullName (sort keys %allFunctions ) {
+    $rpc = $allFunctions{$fullName};
     if ($rpc->{'provided'} == 1){
 	next;
     }
@@ -312,6 +313,9 @@ for $fullName (sort keys %rpcFunctions ) {
 		    $gparams .= $gparam;
 		}		
 		$gparams .= ">";
+		if ($gparams eq "<>") {
+		    $gparams = ""
+		}
 	    }
 	    $s = sprintf "%s    interface $rpc->{'interfaceType'}$gparams as $componentName\_$interfaceName;\n", $s;
 	}
@@ -356,8 +360,8 @@ $s = sprintf "%s  }
 ", $s;
 
 # generate the "uses" declarations of rpc-able commands
-for $fullName (sort keys %rpcFunctions ) {
-    $rpc = $rpcFunctions{$fullName};
+for $fullName (sort keys %allFunctions ) {
+    $rpc = $allFunctions{$fullName};
     if ($rpc->{'provided'} == 0){
 	next;
     }
@@ -799,8 +803,9 @@ for $fullName (sort keys %rpcFunctions ) {
 }
 
 my %componentInterfaces;
-for $fullName (sort keys %rpcFunctions ) {
-    my $rpc = $rpcFunctions{$fullName};
+my %allFunctions = (%rpcFunctions, %requiredFunctions);
+for $fullName (sort keys %allFunctions ) {
+    my $rpc = $allFunctions{$fullName};
     if ( $rpc->{'interfaceName'} ){
 	if (! $componentInterfaces{$rpc->{'componentName'}.$rpc->{'interfaceName'}}){
 	    $componentInterfaces{$rpc->{'componentName'}.$rpc->{'interfaceName'}} = 1;

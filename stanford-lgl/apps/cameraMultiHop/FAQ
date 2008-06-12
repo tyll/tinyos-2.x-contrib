@@ -1,0 +1,14 @@
+> Are the applications, cameraMultiHop and cameraTestJpegSerial, used
+> for video streaming over sensor network? What are the differents between
+> them? Do you have any detailed documentation on the source codes?
+no, this is for transmitting a single image at a time. JpegSerial app sends
+images over the serial port, which is much faster (about a second for jpeg imgs).
+MultiHop app sends images over the radio, using CTP. we have no documentation...
+
+> In the video, what's the number of frame per second? What's the size
+> of the image in each frame? In order to use the code, do I need to
+> download any JPEG codec?
+images are 320x240, but the imager chip is capable of taking 640x480 images. you
+do need to get jpeg-6b open source jpeg implementation to be able to compile our
+c application (get_jpg.c) that converts mote data to jpg file. you can find more
+info in README file.

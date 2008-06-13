@@ -293,6 +293,7 @@ module RpcM {
 my $componentName="";
 my $interfaceName="";
 my $gparams = "";
+my $gparamsLength;
 
 # generate the "provides" declarations of rpc-able events
 for $fullName (sort keys %allFunctions ) {
@@ -307,15 +308,15 @@ for $fullName (sort keys %allFunctions ) {
 	    $componentName = $rpc->{'componentName'};
 	    $interfaceName = $rpc->{'interfaceName'};
 	    $gparams = "";
-	    if ($rpc->{'gparams'}){
+	    $gparamsLength = @{$rpc->{'gparams'}};
+	    if ($gparamsLength > 0){
 		$gparams = "<";
 		for my $gparam (@{$rpc->{'gparams'}}) {
 		    $gparams .= $gparam;
-		}		
-		$gparams .= ">";
-		if ($gparams eq "<>") {
-		    $gparams = ""
+		    $gparams .= ', ';
 		}
+		$gparams = substr($gparams, 0, length($gparams) - 2);
+		$gparams .= ">";
 	    }
 	    $s = sprintf "%s    interface $rpc->{'interfaceType'}$gparams as $componentName\_$interfaceName;\n", $s;
 	}
@@ -370,11 +371,14 @@ for $fullName (sort keys %allFunctions ) {
 	if ( $componentName ne $rpc->{'componentName'} ||
 	     $interfaceName ne $rpc->{'interfaceName'} ) {
 	    $gparams = "";
-	    if ($rpc->{'gparams'}){
+	    $gparamsLength = @{$rpc->{'gparams'}};
+	    if ($gparamsLength > 0){
 		$gparams = "<";
 		for my $gparam (@{$rpc->{'gparams'}}) {
 		    $gparams .= $gparam;
+		    $gparams .= ", ";
 		}		
+		$gparams = substr($gparams, 0, length($gparams) - 2);
 		$gparams .= ">";
 	    }
 	    $componentName = $rpc->{'componentName'};

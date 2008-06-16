@@ -1,7 +1,0 @@
-#!/bin/sh
-if cygpath -w / >/dev/null 2>/dev/null; then
-  CLASSPATH="app.jar;$CLASSPATH"
-else
-  CLASSPATH="app.jar:$CLASSPATH"
-fi
-java DataLogger

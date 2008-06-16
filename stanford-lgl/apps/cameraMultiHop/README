@@ -1,7 +1,7 @@
 ===================
 Running Application
 ===================
-$LGLDIR should be defined as per README in our main directory
+$LGL_CONTRIB should be defined as per README in our main directory
 1.upload base station node with 'rootNode' application
 2.upload a number of nodes with 'camNode' application (use different IDs)
 3.run serialforwarder on your PC (e.g. on COM1: '$TOSROOT/support/sdk/c/sf/sf 9002 /dev/ttyS0 115200')
@@ -11,7 +11,7 @@ $LGLDIR should be defined as per README in our main directory
 buidling get_jpg.c file
 =======================
 1. make serialforwarder c library:
-   cp $LGLDIR/support/sdk/c/sf/Makefile.am $TOSROOT/support/sdk/c/sf
+   cp $LGL_CONTRIB/support/sdk/c/sf/Makefile.am $TOSROOT/support/sdk/c/sf
    cd $TOSROOT/support/sdk/c/sf
    ./bootstrap
    ./configure

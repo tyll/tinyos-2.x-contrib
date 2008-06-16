@@ -1,8 +1,8 @@
 TOSDIR = /opt/tinyos-2.x/tos
 SFDIR = $(TOSDIR)/../support/sdk/c/sf
-APPDIR = $(LGLDIR)/apps/cameraMultiHop/camNode
-JPGDIR = $(LGLDIR)/support/sdk/c/compress
-CAMCMDDIR = $(LGLDIR)/support/sdk/c/camera_cmd
+APPDIR = $(LGL_CONTRIB)/apps/cameraMultiHop/camNode
+JPGDIR = $(LGL_CONTRIB)/support/sdk/c/compress
+CAMCMDDIR = $(LGL_CONTRIB)/support/sdk/c/camera_cmd
 
 EXE = get_jpg
 SRC = get_jpg.c

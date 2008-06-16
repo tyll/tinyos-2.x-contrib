@@ -81,7 +81,7 @@ implementation {
     SACK_HEADER_LENGTH = 7,
   };
 
-  uint16_t m_timestamp_queue[ TIMESTAMP_QUEUE_SIZE ];
+  uint32_t m_timestamp_queue[ TIMESTAMP_QUEUE_SIZE ];
   
   uint8_t m_timestamp_head;
   
@@ -111,7 +111,7 @@ implementation {
   void waitForNextPacket();
   void flush();
   bool passesAddressCheck(message_t * ONE msg);
-
+  
   task void receiveDone_task();
   
   /***************** Init Commands ****************/
@@ -146,16 +146,13 @@ implementation {
    * Start frame delimiter signifies the beginning/end of a packet
    * See the CC2420 datasheet for details.
    */
-  async command void CC2420Receive.sfd( uint16_t time ) {
+  async command void CC2420Receive.sfd( uint32_t time ) {
     if ( m_timestamp_size < TIMESTAMP_QUEUE_SIZE ) {
       uint8_t tail =  ( ( m_timestamp_head + m_timestamp_size ) % 
                         TIMESTAMP_QUEUE_SIZE );
       m_timestamp_queue[ tail ] = time;
       m_timestamp_size++;
     }
-  }
-  async command void CC2420Receive.sfd32( uint32_t time ) {
-    call PacketTimeStamp.set(m_p_rx_buf,time);
   }
 
   async command void CC2420Receive.sfd_dropped() {
@@ -198,7 +195,6 @@ implementation {
   async event void RXFIFO.readDone( uint8_t* rx_buf, uint8_t rx_len,
                                     error_t error ) {
     cc2420_header_t* header = call CC2420PacketBody.getHeader( m_p_rx_buf );
-    //cc2420_metadata_t* metadata = call CC2420PacketBody.getMetadata( m_p_rx_buf );
     uint8_t tmpLen __DEPUTY_UNUSED__ = sizeof(message_t) - (offsetof(message_t, data) - sizeof(cc2420_header_t));
     uint8_t* COUNT(tmpLen) buf = TCAST(uint8_t* COUNT(tmpLen), header);
     rxFrameLength = buf[ 0 ];
@@ -287,12 +283,12 @@ implementation {
       
       if ( m_timestamp_size ) {
         if ( rxFrameLength > 10 ) {
-          //metadata->time = m_timestamp_queue[ m_timestamp_head ];
+          call PacketTimeStamp.set(m_p_rx_buf, m_timestamp_queue[ m_timestamp_head ]);
           m_timestamp_head = ( m_timestamp_head + 1 ) % TIMESTAMP_QUEUE_SIZE;
           m_timestamp_size--;
         }
       } else {
-        //metadata->timestamp = 0x80000000L;
+        call PacketTimeStamp.clear(m_p_rx_buf);
       }
       
       // We may have received an ack that should be processed by Transmit
@@ -332,16 +328,16 @@ implementation {
     cc2420_header_t* header = call CC2420PacketBody.getHeader( m_p_rx_buf);
     uint8_t tmpLen __DEPUTY_UNUSED__ = sizeof(message_t) - (offsetof(message_t, data) - sizeof(cc2420_header_t));
     uint8_t* COUNT(tmpLen) buf = TCAST(uint8_t* COUNT(tmpLen), header);
-
+    
     metadata->crc = buf[ rxFrameLength ] >> 7;
     metadata->lqi = buf[ rxFrameLength ] & 0x7f;
     metadata->rssi = buf[ rxFrameLength - 1 ];
-
+    
     if(passesAddressCheck(m_p_rx_buf)) {
-      m_p_rx_buf = signal Receive.receive( m_p_rx_buf, m_p_rx_buf->data,
+      m_p_rx_buf = signal Receive.receive( m_p_rx_buf, m_p_rx_buf->data, 
           rxFrameLength );
     }
-
+    
     atomic receivingPacket = FALSE;
     waitForNextPacket();
   }
@@ -450,11 +446,11 @@ implementation {
    */
   bool passesAddressCheck(message_t *msg) {
     cc2420_header_t *header = call CC2420PacketBody.getHeader( msg );
-
+    
     if(!(call CC2420Config.isAddressRecognitionEnabled())) {
       return TRUE;
     }
-
+    
     return (header->dest == call CC2420Config.getShortAddr()
         || header->dest == AM_BROADCAST_ADDR);
   }

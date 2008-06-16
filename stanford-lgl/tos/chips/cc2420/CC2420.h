@@ -77,7 +77,7 @@ typedef nx_struct cc2420_metadata_t {
   nx_uint8_t tx_power;
   nx_bool crc;
   nx_bool ack;
-  nx_bool touch;
+  nx_bool timesync;
   nx_uint32_t timestamp;
   nx_uint16_t rxInterval;
 
@@ -362,5 +362,11 @@ enum cc2420_sfdmux_enums {
   CC2420_SFDMUX_SFD = 0,
   CC2420_SFDMUX_XOSC16M_STABLE = 24,
 };
+
+enum
+{
+  CC2420_INVALID_TIMESTAMP  = 0x80000000L,
+};
+
 
 #endif

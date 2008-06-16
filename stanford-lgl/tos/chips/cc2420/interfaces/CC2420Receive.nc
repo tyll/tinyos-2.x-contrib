@@ -46,8 +46,7 @@ interface CC2420Receive {
    *
    * @param time at which the capture happened.
    */
-  async command void sfd( uint16_t time );
-  async command void sfd32( uint32_t time );
+  async command void sfd( uint32_t time );
 
   /**
    * Notification that the packet has been dropped by the radio

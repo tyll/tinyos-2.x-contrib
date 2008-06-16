@@ -64,7 +64,7 @@ implementation {
   };
 
   message_t* ONE_NOK m_msg;
-
+  
   error_t sendErr = SUCCESS;
   
   /** TRUE if we are to use CCA when sending the current packet */
@@ -137,15 +137,16 @@ implementation {
     header->length = len;
     header->fcf &= 1 << IEEE154_FCF_ACK_REQ;
     header->fcf |= ( ( IEEE154_TYPE_DATA << IEEE154_FCF_FRAME_TYPE ) |
-		     ( 1 << IEEE154_FCF_INTRAPAN ) |
-		     ( IEEE154_ADDR_SHORT << IEEE154_FCF_DEST_ADDR_MODE ) |
-		     ( IEEE154_ADDR_SHORT << IEEE154_FCF_SRC_ADDR_MODE ) );
+             ( 1 << IEEE154_FCF_INTRAPAN ) |
+             ( IEEE154_ADDR_SHORT << IEEE154_FCF_DEST_ADDR_MODE ) |
+             ( IEEE154_ADDR_SHORT << IEEE154_FCF_SRC_ADDR_MODE ) );
 
     metadata->ack = FALSE;
     metadata->rssi = 0;
     metadata->lqi = 0;
-    metadata->timestamp = 0x80000000L;
-    
+    metadata->timesync = FALSE;
+    metadata->timestamp = CC2420_INVALID_TIMESTAMP;
+
     ccaOn = TRUE;
     signal RadioBackoff.requestCca(m_msg);
 
@@ -283,10 +284,10 @@ implementation {
 
   default async event void RadioBackoff.requestCongestionBackoff(message_t *msg) {
   }
-
+  
   default async event void RadioBackoff.requestCca(message_t *msg) {
   }
-
-
+  
+  
 }
 

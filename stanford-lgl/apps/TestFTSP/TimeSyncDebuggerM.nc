@@ -34,17 +34,13 @@ module TimeSyncDebuggerM
     }
     uses
     {
-        interface GlobalTime;
+        interface GlobalTime<TMilli>;
         interface TimeSyncInfo;
         interface Receive;
         interface AMSend;
         interface Timer<TMilli>;
         interface Leds;
-#ifdef TS_MICRO
-        interface PacketTimeStamp<TMicro,uint32_t>;
-#else
-        interface PacketTimeStamp<T32khz,uint32_t>;
-#endif
+        interface PacketTimeStamp<TMilli,uint32_t>;
         interface Boot;
         interface SplitControl as RadioControl;
     }
@@ -103,9 +99,9 @@ implementation
     {
         uint32_t localTime;
         TimeSyncPollReply* pPollReply = (TimeSyncPollReply*)(msg.data);
-        if( !reporting && call PacketTimeStamp.isSet(p))
+        if( !reporting && call PacketTimeStamp.isValid(p))
         {
-            localTime = call PacketTimeStamp.get(p);
+            localTime = call PacketTimeStamp.timestamp(p);
 
             pPollReply->nodeID = TOS_NODE_ID;
             pPollReply->msgID = ((TimeSyncPoll*)(p->data))->msgID;

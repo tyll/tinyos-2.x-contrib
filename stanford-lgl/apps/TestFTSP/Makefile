@@ -16,7 +16,8 @@ CFLAGS += -DTIMESYNC_RATE=10 -DTIMESYNC_POLLER_RATE=3
 #CFLAGS += -DTIMESYNC_DEBUG
 
 #path to the vanderbilt TimeSync component
-CFLAGS += -I$(LGLDIR)/libs/FTSP
+#CFLAGS += -I$(LGL_CONTRIB)/libs/FTSP
+PFLAGS += -I$(TOSDIR)/lib/ftsp
 
 include ../Makerules
 

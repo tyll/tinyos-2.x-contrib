@@ -33,12 +33,9 @@ configuration TimeSyncDebuggerC
 implementation
 {
     components TimeSyncDebuggerM,
-        NoLedsC as LedsC,
-#ifdef TS_MICRO
-        TimeSyncMicroC as TimeSyncC;
-#else
-        TimeSyncC;
-#endif
+                NoLedsC as LedsC,
+                TimeSyncC;
+
     Init = TimeSyncDebuggerM;
     Boot = TimeSyncDebuggerM;
 

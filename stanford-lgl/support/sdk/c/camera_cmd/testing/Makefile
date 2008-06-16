@@ -1,7 +1,7 @@
 SFDIR = $(TOSDIR)/../support/sdk/c/sf
-JPGDIR = $(LGLDIR)/support/sdk/c/compress
-APPDIR = $(LGLDIR)/apps/cameraMultiHop/camNode
-BIGMSGDIR = $(LGLDIR)/libs/BigMsgCTP
+JPGDIR = $(LGL_CONTRIB)/support/sdk/c/compress
+APPDIR = $(LGL_CONTRIB)/apps/cameraMultiHop/camNode
+BIGMSGDIR = $(LGL_CONTRIB)/libs/BigMsgCTP
 EXE = fake_mote.exe
 
 SRC = fake_mote.c
@@ -21,7 +21,7 @@ cmd_msg.h:
 	mig -target=null c $(APPDIR)/cameraJpegTest.h cmd_msg -o $@
 	
 bigmsg_frame_part.h:
-	mig -DTOSH_DATA_LENGTH=100 -target=null c $(LGLDIR)/libs/BigMsgCTP/BigMsg.h bigmsg_frame_part -o $@
+	mig -DTOSH_DATA_LENGTH=100 -target=null c $(LGL_CONTRIB)/libs/BigMsgCTP/BigMsg.h bigmsg_frame_part -o $@
 
 $(EXE): fake_mote.c
 	$(CC) $(CFLAGS) $(INCLS) -o $(EXE) $(SRC) $(LIBS)

@@ -1,7 +1,7 @@
 #TOSDIR = /opt/tinyos-2.x/tos
 SFDIR = $(TOSDIR)/../support/sdk/c/sf
-APPDIR = $(LGLDIR)/apps/cameraMultiHop/camNode
-JPGDIR = $(LGLDIR)/support/sdk/c/compress
+APPDIR = $(LGL_CONTRIB)/apps/cameraMultiHop/camNode
+JPGDIR = $(LGL_CONTRIB)/support/sdk/c/compress
 EXE = camera_cmd_test
 LIB = libcamera_cmd.a
 
@@ -30,7 +30,7 @@ status.h:
 	mig -target=null c $(APPDIR)/cameraJpegTest.h status -o $@
 
 bigmsg_frame_part.h:
-	mig -DTOSH_DATA_LENGTH=100 -target=null c $(LGLDIR)/libs/BigMsgCTP/BigMsg.h bigmsg_frame_part -o $@
+	mig -DTOSH_DATA_LENGTH=100 -target=null c $(LGL_CONTRIB)/libs/BigMsgCTP/BigMsg.h bigmsg_frame_part -o $@
 
 camera_cmd.o: camera_cmd.c
 	$(CC) -c $(CFLAGS) $(LIBSRC) $(INCLS)

@@ -157,14 +157,14 @@ implementation
 
         /*----------------- TimeSyncPacket32khz -----------------*/
 
-    async command bool TimeSyncPacket32khz.isValid(message_t* msg)
+    command bool TimeSyncPacket32khz.isValid(message_t* msg)
     {
         timesync_radio_t* timesync = getFooter(msg);
 
         return call PacketTimeStamp32khz.isValid(msg) && *timesync != CC2420_INVALID_TIMESTAMP;
     }
 
-    async command uint32_t TimeSyncPacket32khz.eventTime(message_t* msg)
+    command uint32_t TimeSyncPacket32khz.eventTime(message_t* msg)
     {
         timesync_radio_t* timesync = getFooter(msg);
 
@@ -173,14 +173,14 @@ implementation
 
     /*----------------- TimeSyncPacketMilli -----------------*/
 
-    async command bool TimeSyncPacketMilli.isValid(message_t* msg)
+    command bool TimeSyncPacketMilli.isValid(message_t* msg)
     {
         timesync_radio_t* timesync = getFooter(msg);
 
         return call PacketTimeStampMilli.isValid(msg) && *timesync != CC2420_INVALID_TIMESTAMP;
     }
 
-    async command uint32_t TimeSyncPacketMilli.eventTime(message_t* msg)
+    command uint32_t TimeSyncPacketMilli.eventTime(message_t* msg)
     {
         timesync_radio_t* timesync = getFooter(msg);
 

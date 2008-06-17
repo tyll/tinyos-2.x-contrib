@@ -269,6 +269,7 @@ implementation {
         call PacketTimeStamp.set(m_msg, time32);
         if (call PacketTimeSyncOffset.isSet(m_msg)) {
            timesync_radio_t *timesync = (timesync_radio_t*)((void*)m_msg + call PacketTimeSyncOffset.get(m_msg));
+           // set timesync event time as the offset between the event time and the SFD interrupt time (TEP  133)
            *timesync  -= time32;
            call CSN.clr();
            call TXFIFO_RAM.write( call PacketTimeSyncOffset.get(m_msg), (void*)timesync, sizeof(timesync_radio_t) );

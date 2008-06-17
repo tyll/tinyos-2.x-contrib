@@ -138,7 +138,6 @@ implementation {
 
   async command uint32_t PacketTimeStampMilli.timestamp(message_t* msg)
   {
-    //return call PacketTimeStamp32khz.timestamp(msg);
     int32_t offset = call PacketTimeStamp32khz.timestamp(msg) - call LocalTime32khz.get();
     return (offset >> 5) + call LocalTimeMilli.get();
   }
@@ -150,7 +149,6 @@ implementation {
 
   async command void PacketTimeStampMilli.set(message_t* msg, uint32_t value)
   {
-    //(call CC2420PacketBody.getMetadata( msg ))->timestamp = value;
     int32_t offset = (value - call LocalTimeMilli.get()) << 5;
     call PacketTimeStamp32khz.set(msg, offset + call LocalTime32khz.get());
   }
@@ -162,7 +160,7 @@ implementation {
 
   async command uint8_t PacketTimeSyncOffset.get(message_t* msg)
   {
-    return sizeof(cc2420_header_t) + call Packet.payloadLength(msg) - sizeof(uint32_t);
+    return (call CC2420PacketBody.getHeader(msg))->length - 1 - sizeof(uint32_t); // minus 1 because of the length byte
   }
 
   async command void PacketTimeSyncOffset.set(message_t* msg)

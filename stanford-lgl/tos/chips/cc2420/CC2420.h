@@ -38,6 +38,10 @@
 
 typedef uint8_t cc2420_status_t;
 
+#ifndef TFRAMES_ENABLED
+#define CC2420_IFRAME_TYPE
+#endif
+
 /**
  * CC2420 header.  An I-frame (interoperability frame) header has an 
  * extra network byte specified by 6LowPAN
@@ -55,7 +59,10 @@ typedef nx_struct cc2420_header_t {
   nxle_uint8_t network;
 #endif
 
+#ifndef TINYOS_IP
   nxle_uint8_t type;
+#endif
+
 } cc2420_header_t;
   
 /**
@@ -117,10 +124,10 @@ typedef nx_struct cc2420_packet_t {
 #endif
 
 /** 
- * The 6LowPAN ID has yet to be defined for a TinyOS network.
+ * The 6LowPAN NALP ID for a TinyOS network is 63 (TEP 125).
  */
 #ifndef TINYOS_6LOWPAN_NETWORK_ID
-#define TINYOS_6LOWPAN_NETWORK_ID 0x0
+#define TINYOS_6LOWPAN_NETWORK_ID 0x3f
 #endif
 
 

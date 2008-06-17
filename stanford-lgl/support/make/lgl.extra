@@ -7,39 +7,3 @@ ifeq ($(PLATFORM),intelmote2)
 	PFLAGS := -I$(LGL_CONTRIB)/tos/sensorboards/im2cb $(PFLAGS)
   SENSORBOARD ?= im2cb
 endif
-
-ifeq ($(PLATFORM),micaz)
-#	PFLAGS := -I$(LGL_CONTRIB)/tos/interfaces $(PFLAGS)
-#	PFLAGS := -I$(LGL_CONTRIB)/tos/chips/cc2420/timestamping $(PFLAGS)
-	PFLAGS := -I$(LGL_CONTRIB)/tos/chips/cc2420/ $(PFLAGS)
-	PFLAGS := -I$(LGL_CONTRIB)/tos/chips/cc2420/csma $(PFLAGS)
-	PFLAGS := -I$(LGL_CONTRIB)/tos/chips/cc2420/interfaces $(PFLAGS)
-	PFLAGS := -I$(LGL_CONTRIB)/tos/chips/cc2420/packet $(PFLAGS)
-	PFLAGS := -I$(LGL_CONTRIB)/tos/chips/cc2420/receive $(PFLAGS)
-	PFLAGS := -I$(LGL_CONTRIB)/tos/chips/cc2420/transmit $(PFLAGS)
-	PFLAGS := -I$(LGL_CONTRIB)/tos/platforms/micaz $(PFLAGS)
-endif
-
-ifeq ($(PLATFORM),telosa)
-#	PFLAGS := -I$(LGL_CONTRIB)/tos/interfaces $(PFLAGS)
-#	PFLAGS := -I$(LGL_CONTRIB)/tos/chips/cc2420/timestamping $(PFLAGS)
-	PFLAGS := -I$(LGL_CONTRIB)/tos/chips/cc2420/ $(PFLAGS)
-	PFLAGS := -I$(LGL_CONTRIB)/tos/chips/cc2420/csma $(PFLAGS)
-	PFLAGS := -I$(LGL_CONTRIB)/tos/chips/cc2420/interfaces $(PFLAGS)
-	PFLAGS := -I$(LGL_CONTRIB)/tos/chips/cc2420/packet $(PFLAGS)
-	PFLAGS := -I$(LGL_CONTRIB)/tos/chips/cc2420/receive $(PFLAGS)
-	PFLAGS := -I$(LGL_CONTRIB)/tos/chips/cc2420/transmit $(PFLAGS)
-	PFLAGS := -I$(LGL_CONTRIB)/tos/platforms/telosa $(PFLAGS)
-endif
-
-ifeq ($(PLATFORM),telosb)
-#	PFLAGS := -I$(LGL_CONTRIB)/tos/interfaces $(PFLAGS)
-#	PFLAGS := -I$(LGL_CONTRIB)/tos/chips/cc2420/timestamping $(PFLAGS)
-	PFLAGS := -I$(LGL_CONTRIB)/tos/chips/cc2420/ $(PFLAGS)
-	PFLAGS := -I$(LGL_CONTRIB)/tos/chips/cc2420/csma $(PFLAGS)
-	PFLAGS := -I$(LGL_CONTRIB)/tos/chips/cc2420/interfaces $(PFLAGS)
-	PFLAGS := -I$(LGL_CONTRIB)/tos/chips/cc2420/packet $(PFLAGS)
-	PFLAGS := -I$(LGL_CONTRIB)/tos/chips/cc2420/receive $(PFLAGS)
-	PFLAGS := -I$(LGL_CONTRIB)/tos/chips/cc2420/transmit $(PFLAGS)
-	PFLAGS := -I$(LGL_CONTRIB)/tos/platforms/telosa $(PFLAGS)
-endif

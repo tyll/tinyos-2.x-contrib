@@ -4,7 +4,7 @@
 # @author Michael Okola
 #
 
-import sys, re, os
+from pytos.util.NescApp import *
 import pytos.util.NescApp as NescApp
 
 class UnitTest(NescApp.NescApp):
@@ -21,12 +21,17 @@ class UnitTest(NescApp.NescApp):
     gen = re.compile('\s*generic\s+configuration\s+', re.MULTILINE)
     result = gen.search(interfaceStr)
     if result != None: #generic
-      #interfaceName = interfaceStr[result.end():].split()[0]
-      #index = interfaceName.find("(")
+      componentName = (interfaceStr[result.end():].split()[0])[:interfaceStr.find("(", result.end())].strip('()')
       gen = re.compile('(.|\s)*provides(.|\s)+interface\s+')
-      end = gen.search(interfaceStr[result.end():]).end() + result.end()
-      interfaceName = interfaceStr[end:interfaceStr.find(";", end)]
-      #interfaceName = interfaceName[:index]
+      result = gen.search(interfaceStr[result.end():]).end() + result.end()
+      interfaceNames = []
+      while result != None:
+        interfaceNames.append(interfaceStr[result:interfaceStr.find(";", result)])
+        inter = gen.search(interfaceStr[interfaceStr.find(";", result):])
+        if inter != None:
+          result = inter + result.end()
+        else:
+          result = inter
       generic = True
       
     else:
@@ -34,21 +39,24 @@ class UnitTest(NescApp.NescApp):
       result = gen.search(interfaceStr)
       
       if result != None: #not generic
-        interfaceName = interfaceStr[result.end():].split()[0]
+        interfaceNames.put(interfaceStr[result.end():].split()[0])
         generic = False
         
       else: #invalid file
         raise Exception("Configuration information could not be found in file")
       
     #create NesC files
-    os.system("rm -rf " + interfaceName + "UnitTest")
-    os.mkdir(interfaceName + "UnitTest")
-    os.chdir(interfaceName + "UnitTest")
-    pFile = open("Test" + interfaceName + "C.nc", "w")
-    pFile.write("module Test" + interfaceName + '''P {
-  uses {
-    interface ''' + interfaceName + ''';
-    interface Boot;
+    os.system("rm -rf " + componentName + "UnitTest")
+    os.mkdir(componentName + "UnitTest")
+    os.chdir(componentName + "UnitTest")
+    cFile = open("Test" + componentName + ".nc", "w")
+    cOutput = '''includes Rpc;
+
+module Test''' + componentName + ''' {
+  uses {\n'''
+    for name in interfaceNames:
+      cOutput += "    interface " + name + " @rpc();\n";
+    cOutput += '''    interface Boot;
     interface SplitControl;
   }
 }
@@ -65,37 +73,37 @@ implementation {
 
   event void SplitControl.stopDone(error_t error) {
   }
-''')
-    pFile.close()
-    cFile = open("Test" + interfaceName + "AppC.nc", "w")
-    cOutput = "configuration Test" + interfaceName + '''C {
+}
+'''
+    cFile.write(cOutput)
+    cFile.close()
+    appFile = open("Test" + componentName + "AppC.nc", "w")
+    appOutput = '''configuration Test''' + componentName + '''AppC {
 }
 
 implementation {
   
-  components Test''' + interfaceName + '''C,
+  components Test''' + componentName + ''',
     MainC,
     RamSymbolsM,
     RpcC,
     '''
     if generic:
-      cOutput += "new " + interfaceName + "() @rpc();"
+      appOutput += "new " + componentName + "();"
     else:
-      cOutput += interfaceName + "@rpc();"
-    cOutput += '''
-      
-  Test''' + interfaceName + "C." + interfaceName + " -> " + interfaceName + ''';
-  
-  Test''' + interfaceName + '''C.Boot -> MainC.Boot;
-  Test''' + interfaceName + '''C.SplitControl -> RpcC;
-}
-'''
-    cFile.write(cOutput)
-    cFile.close()
+      appOutput += componentName + ";\n"
+#    for name in interfaceNames:
+#      appOutput += '\n  Test' + componentName + "." + name + " -> " + componentName + ";\n"
+
+    appOutput += "  Test" + componentName + '''.Boot -> MainC.Boot;
+  Test''' + componentName + '''.SplitControl -> RpcC;
+}\n'''
+    appFile.write(appOutput)
+    appFile.close()
       
     #create Makefile
     mFile = open("Makefile", "w")
-    mFile.write("COMPONENT=Test" + interfaceName + '''AppC
+    mFile.write("COMPONENT=Test" + componentName + '''AppC
 
 GOALS += marionette
 
@@ -119,7 +127,7 @@ include $(MAKERULES)''')
 
     #now run the regular NescApp initialization
     #first, import all enums, types, msgs, rpc functions, and ram symbols
-    self.applicationName = interfaceName
+    self.applicationName = componentName
     self.buildDir = buildDir
     self.motecom=motecom
     self.tosbase=tosbase

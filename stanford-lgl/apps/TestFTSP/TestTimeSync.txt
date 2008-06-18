@@ -68,8 +68,8 @@ REPORTED DATA:
  - the skew (the speed ratio between the clocks of the root of the network  and
    the receiving node). Note, this value is normalized to 0, so 0 means  that
    the two clocks run with the same speed. (float)
- - the boolean value saying whether the node is synchronized or not. If a node
-   is not synchronized, the global time is not valid (uint8_t)
+ - the error_t value saying whether the node is synchronized or not. If a node
+   is not synchronized, the global time is not valid (uint8_t, SUCCESS = 0)
  - the id of the root of the time sync multi-hop algorithm. (uint16_t)
  - the sequence number of the last time synchronizataion msg received from the
    current root (uint8_t)

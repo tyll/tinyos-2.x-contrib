@@ -1,0 +1,42 @@
+================================
+Grant-to-Send README 06/18/2008
+
+== General Notes
+ * Compatible with TinyOS 2.0.1 CC2420 and TOSSIM
+
+== Usage instruction
+ 1. In Makefile, include the following line:
+    CFLAGS += -D(gts directory) -DCC2420_NO_ADDRESS_RECOGNITION
+ 
+ 2. Use GTSAMSenderC component and GTSAMSend interface instead of AMSenderC and
+    AMSend in your application. send() in GTSAMSend interface has one more 
+    argument, grant duration(in ms).
+    
+ ** When used for TOSSIM, follow the above instructions except 
+    CC2420_NO_ADDRESS_RECOGNITION. 
+
+== Grant-to-send description
+
+Grant-to-send(GTS) is a collision avoidance mechanism with no control packets
+which can be used for protocol isolation mechanism. By using GTS, each protocol
+can prevent not only intra-protocol collisions but also inter-protocol collisions.
+With this collision avoidance, each protocol can improve performance and also 
+debugging becomes easier due to less interactions between protocols.
+
+Grant-to-send adds grant duration field (one byte) to each packet. Transmitter
+and overhearer of this packet are suppressed during this grant, and receiver
+becomes the only sender around the previous transmitter. 
+
+The grant duration must be set to be the time by which the receiver finishes
+its transmissions. For simple forwarding (as in collection protocols) the grant
+should be one packet time (~10ms depending on the length of the packet). When
+GTS is used for Deluge, request packets can set its grant duration to be the
+duration of data burst they are requesting (number of pkts * one packet time). 
+When the grant duration is zero, it reverts to regular CSMA network.
+
+For inter-operability, CC2420 packet header has one more field, GTS-packet
+indication field (one byte). CC2420ReceiveP for GTS checks for this field
+and filters out non-GTS packets.
+
+A more detailed description can be found here: 
+http://sing.stanford.edu/pubs/sing-06-01.pdf

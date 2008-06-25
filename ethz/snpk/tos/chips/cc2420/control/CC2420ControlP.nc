@@ -65,7 +65,6 @@ module CC2420ControlP {
   uses interface CC2420Strobe as SRFOFF;
   uses interface CC2420Strobe as SXOSCOFF;
   uses interface CC2420Strobe as SXOSCON;
-  uses interface AMPacket;
   
   uses interface Resource as SpiResource;
   uses interface Resource as RssiResource;

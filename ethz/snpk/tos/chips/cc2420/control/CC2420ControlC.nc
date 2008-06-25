@@ -59,9 +59,6 @@ implementation {
   components MainC;
   MainC.SoftwareInit -> CC2420ControlP;
   
-  components CC2420ActiveMessageC;
-  CC2420ControlP.AMPacket -> CC2420ActiveMessageC;
-  
   components AlarmMultiplexC as Alarm;
   CC2420ControlP.StartupTimer -> Alarm;
 

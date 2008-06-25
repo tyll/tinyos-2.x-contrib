@@ -36,6 +36,7 @@
  * @author Jonathan Hui <jhui@archrock.com>
  * @version $Revision$ $Date$
  */
+#include "message.h"
 
 interface CC2420Receive {
 

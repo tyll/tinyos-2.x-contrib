@@ -1,5 +1,5 @@
 /*
- * "Copyright (c) 2007 Washington University in St. Louis.
+ * "Copyright (c) 2007-2008 Washington University in St. Louis.
  * All rights reserved.
  *
  * Permission to use, copy, modify, and distribute this software and its
@@ -52,8 +52,7 @@
  */
 
 /**
- * Low-level abstraction for the transmit path implementaiton of the
- * ChipCon CC2420 radio.
+ * Implementation of the transmit path for the ChipCon CC2420 radio.
  *
  * @author Jonathan Hui <jhui@archrock.com>
  * @author Greg Hackmann
@@ -62,42 +61,68 @@
  * @version $Revision$ $Date$
  */
 
-interface CC2420Transmit {
+#include "IEEE802154.h"
 
-  /**
-   * Send a message
-   *
-   * @param p_msg message to send.
-   * @param useCca TRUE if this Tx should use clear channel assessments
-   * @return SUCCESS if the request was accepted, FAIL otherwise.
-   */
-  async command error_t send( message_t* p_msg );
+configuration CC2420TransmitC {
 
-  /**
-   * Cancel sending of the message.
-   *
-   * @return SUCCESS if the request was accepted, FAIL otherwise.
-   */
-  async command error_t cancel();
-
-  /**
-   * Signal that a message has been sent
-   *
-   * @param p_msg message to send.
-   * @param error notifaction of how the operation went.
-   */
-  async event void sendDone( message_t* p_msg, error_t error );
-
-  /**
-   * Modify the contents of a packet. This command can only be used
-   * when an SFD capture event for the sending packet is signalled.
-   *
-   * @param offset in the message to start modifying.
-   * @param buf to data to write
-   * @param len of bytes to write
-   * @return SUCCESS if the request was accepted, FAIL otherwise.
-   */
-  async command error_t modify( uint8_t offset, uint8_t* buf, uint8_t len );
-
+  provides {
+    interface AsyncStdControl;
+    interface CC2420Transmit;
+    interface Resend;
+    interface CcaControl[am_id_t amId];
+    interface RadioTimeStamping;
+    interface ReceiveIndicator as EnergyIndicator;
+    interface ReceiveIndicator as ByteIndicator;
+  }
 }
 
+implementation {
+
+  components CC2420TransmitP;
+  AsyncStdControl = CC2420TransmitP;
+  CC2420Transmit = CC2420TransmitP;
+  Resend = CC2420TransmitP;
+  CcaControl = CC2420TransmitP;
+  RadioTimeStamping = CC2420TransmitP;
+  EnergyIndicator = CC2420TransmitP.EnergyIndicator;
+  ByteIndicator = CC2420TransmitP.ByteIndicator;
+
+  components MainC;
+  MainC.SoftwareInit -> CC2420TransmitP;
+  MainC.SoftwareInit -> Alarm;
+  
+  components AlarmMultiplexC as Alarm;
+  CC2420TransmitP.BackoffTimer -> Alarm;
+
+  components HplCC2420PinsC as Pins;
+  CC2420TransmitP.CCA -> Pins.CCA;
+  CC2420TransmitP.CSN -> Pins.CSN;
+  CC2420TransmitP.SFD -> Pins.SFD;
+
+  components HplCC2420InterruptsC as Interrupts;
+  CC2420TransmitP.CaptureSFD -> Interrupts.CaptureSFD;
+
+  components new CC2420SpiC() as Spi;
+  CC2420TransmitP.SpiResource -> Spi;
+  CC2420TransmitP.ChipSpiResource -> Spi;
+  CC2420TransmitP.SNOP        -> Spi.SNOP;
+  CC2420TransmitP.STXON       -> Spi.STXON;
+  CC2420TransmitP.STXONCCA    -> Spi.STXONCCA;
+  CC2420TransmitP.SFLUSHTX    -> Spi.SFLUSHTX;
+  CC2420TransmitP.TXCTRL      -> Spi.TXCTRL;
+  CC2420TransmitP.TXFIFO      -> Spi.TXFIFO;
+  CC2420TransmitP.TXFIFO_RAM  -> Spi.TXFIFO_RAM;
+  CC2420TransmitP.MDMCTRL1    -> Spi.MDMCTRL1;
+  
+  components CC2420ReceiveC;
+  CC2420TransmitP.CC2420Receive -> CC2420ReceiveC;
+  
+  components CC2420PacketC;
+  CC2420TransmitP.CC2420PacketBody -> CC2420PacketC;
+  
+  components RandomC;
+  CC2420TransmitP.Random -> RandomC;
+  
+  components LedsC;
+  CC2420TransmitP.Leds -> LedsC;
+}

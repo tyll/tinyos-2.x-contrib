@@ -55,7 +55,6 @@ implementation {
 	components TDMASlotSenderC;
 	components GenericSlotterC;
 	components LedsC;
-	components HplMsp430GeneralIOC;
 	components SenderDispatcherC;
 	components DummyChannelMonitorC;
 	components BeaconSlotC;

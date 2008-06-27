@@ -60,6 +60,7 @@ implementation
 		call AMPacket.setType(&boot, AM_SCPBOOTMSG);
 		call AMPacket.setSource(&boot, TOS_NODE_ID);
 		call AMPacket.setDestination(&boot, AM_BROADCAST_ADDR);
+		call AMPacket.setGroup(&boot, call AMPacket.localGroup());
 
 		call BootAlarm.start(call LowPowerListening.getLocalSleepInterval() * 2);
 		send();

@@ -55,7 +55,6 @@ implementation {
 	components TDMASlotSenderC;
 	components GenericSlotterC;
 	components LedsC;
-	components HplMsp430GeneralIOC;
 	//components new CsmaSlotSenderC(16 + 24, 8);
 	//components new CsmaSlotSenderC(64, 120, 8);
 	components new CsmaSlotSenderC(32, 120, 8);

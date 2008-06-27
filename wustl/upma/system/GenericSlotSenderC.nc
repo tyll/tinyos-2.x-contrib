@@ -39,8 +39,6 @@ generic configuration GenericSlotSenderC(uint16_t offset, uint16_t backoff, bool
 	components new GenericSlotSenderP(offset, backoff, cca);
 	//components new VirtualizedAlarmMilli16C();
 	components new Alarm32khz16C();
-	components HplMsp430GeneralIOC;
-
 	
 	MainC.SoftwareInit -> GenericSlotSenderP.Init;
 	GenericSlotSenderP.Alarm -> Alarm32khz16C;
@@ -51,6 +49,5 @@ generic configuration GenericSlotSenderC(uint16_t offset, uint16_t backoff, bool
 	Send = GenericSlotSenderP;
 	
 	
-	GenericSlotSenderP.Pin -> HplMsp430GeneralIOC.Port26;
 	GenericSlotSenderP.Boot -> MainC.Boot;
 }

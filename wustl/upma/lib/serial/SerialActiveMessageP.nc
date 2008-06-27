@@ -164,18 +164,33 @@ implementation {
     serial_header_t* header = getHeader(amsg);
     header->type = type;
   }
-
-  async command uint8_t AMPacket.headerSize() {
-    return 0;
-  }
   
+  async command uint8_t AMPacket.headerSize() {
+    return sizeof(serial_header_t);
+  }
+
   async command error_t PacketAcknowledgements.requestAck( message_t* msg ) {
     return FAIL;
   }
   async command error_t PacketAcknowledgements.noAck( message_t* msg ) {
     return SUCCESS;
   }
-   
+  
+  async command void AMPacket.setGroup(message_t* msg, am_group_t group) {
+    serial_header_t* header = getHeader(msg);
+    header->group = group;
+  }
+
+  async command am_group_t AMPacket.group(message_t* msg) {
+    serial_header_t* header = getHeader(msg);
+    return header->group;
+  }
+
+  async command am_group_t AMPacket.localGroup() {
+    return TOS_AM_GROUP;
+  }
+
+ 
   async command bool PacketAcknowledgements.wasAcked(message_t* msg) {
     return FALSE;
   }

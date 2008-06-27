@@ -38,7 +38,7 @@ module GenericSlotterP {
 	uses {
 		interface Alarm<T32khz, uint32_t>;
 		interface Leds;
-		interface HplMsp430GeneralIO as Pin;
+//		interface HplMsp430GeneralIO as Pin;
 		interface Boot;
 	}
 }

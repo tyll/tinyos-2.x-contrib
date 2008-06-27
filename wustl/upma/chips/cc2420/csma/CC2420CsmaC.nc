@@ -1,5 +1,5 @@
 /*
- * "Copyright (c) 2007 Washington University in St. Louis.
+ * "Copyright (c) 2007-2008 Washington University in St. Louis.
  * All rights reserved.
  *
  * Permission to use, copy, modify, and distribute this software and its
@@ -52,7 +52,7 @@
  */
 
 /**
- * Implementation of the receive path for the ChipCon CC2420 radio.
+ * Basic implementation of a CSMA MAC for the ChipCon CC2420 radio.
  *
  * @author Jonathan Hui <jhui@archrock.com>
  * @author Greg Hackmann
@@ -61,39 +61,56 @@
  * @version $Revision$ $Date$
  */
 
-configuration CC2420ReceiveC {
+#include "CC2420.h"
+#include "IEEE802154.h"
 
-  provides interface StdControl;
-  provides interface CC2420Receive;
+configuration CC2420CsmaC {
+
+  provides interface RadioPowerControl;
+  provides interface AsyncSend as Send;
+  provides interface Resend;
   provides interface AsyncReceive as Receive;
+  provides interface CcaControl[am_id_t amId];
 
 }
 
 implementation {
-  components MainC;
-  components CC2420ReceiveP;
-  components CC2420PacketC;
-  components ActiveMessageAddressC;
-  components new CC2420SpiC() as Spi;
 
-  components HplCC2420PinsC as Pins;
-  components HplCC2420InterruptsC as InterruptsC;
-
-  StdControl = CC2420ReceiveP;
-  CC2420Receive = CC2420ReceiveP;
-  Receive = CC2420ReceiveP;
-
-  MainC.SoftwareInit -> CC2420ReceiveP;
+  components CC2420CsmaP as CsmaP;
+  RadioPowerControl = CsmaP;
+  Send = CsmaP;
   
-  CC2420ReceiveP.CSN -> Pins.CSN;
-  CC2420ReceiveP.FIFO -> Pins.FIFO;
-  CC2420ReceiveP.FIFOP -> Pins.FIFOP;
-  CC2420ReceiveP.InterruptFIFOP -> InterruptsC.InterruptFIFOP;
-  CC2420ReceiveP.SpiResource -> Spi;
-  CC2420ReceiveP.RXFIFO -> Spi.RXFIFO;
-  CC2420ReceiveP.SFLUSHRX -> Spi.SFLUSHRX;
-  CC2420ReceiveP.SACK -> Spi.SACK;
-  CC2420ReceiveP.CC2420Packet -> CC2420PacketC;
-  CC2420ReceiveP.amAddress -> ActiveMessageAddressC;
+  components CC2420ActiveMessageC;
+  CsmaP.AMPacket -> CC2420ActiveMessageC;
+  
+  components CC2420ControlC;
+  CsmaP.Resource -> CC2420ControlC;
+  CsmaP.CC2420Power -> CC2420ControlC;
 
+  components CC2420TransmitC;
+  Resend = CC2420TransmitC;
+  CcaControl = CC2420TransmitC;
+  CsmaP.SubControl -> CC2420TransmitC;
+  CsmaP.CC2420Transmit -> CC2420TransmitC;
+
+  components CC2420ReceiveC;
+  Receive = CC2420ReceiveC;
+  CsmaP.SubControl -> CC2420ReceiveC;
+
+  components CC2420PacketC;
+  CsmaP.CC2420PacketBody -> CC2420PacketC;
+  
+  components RandomC;
+  CsmaP.Random -> RandomC;
+
+  components new StateC();
+  CsmaP.SplitControlState -> StateC;
+  
+  components LedsC as Leds;
+  CsmaP.Leds -> Leds;
+  
+#ifdef DUTY_CYCLE_BENCHMARK
+  components Counter32khz32C as Counter;
+  CsmaP.Counter -> Counter;
+#endif
 }

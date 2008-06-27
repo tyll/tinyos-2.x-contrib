@@ -112,6 +112,7 @@ implementation
 		call AMPacket.setType(&sync, AM_SCPSYNCMSG);
 		call AMPacket.setSource(&sync, TOS_NODE_ID);
 		call AMPacket.setDestination(&sync, AM_BROADCAST_ADDR);
+		call AMPacket.setGroup(&sync, call AMPacket.localGroup());
 		call Send.send(&sync, call AMPacket.headerSize());
 		// Create an explicit sync message with no payload, and pass
 		// it through our normal sending routines

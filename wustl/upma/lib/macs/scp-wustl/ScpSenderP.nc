@@ -126,6 +126,7 @@ implementation
 			call AMPacket.setType(&preamble, AM_PREAMBLEPACKET);
 			call AMPacket.setSource(&preamble, TOS_NODE_ID);
 			call AMPacket.setDestination(&preamble, call AMPacket.destination(msg));
+			call AMPacket.setGroup(&preamble, call AMPacket.localGroup());
 			preambleLen = call AMPacket.headerSize();
 			// Construct a preamble packet containing just the header
 

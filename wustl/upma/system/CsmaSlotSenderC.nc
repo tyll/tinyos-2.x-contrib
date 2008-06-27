@@ -40,8 +40,6 @@ generic configuration CsmaSlotSenderC(uint16_t offset, uint16_t backoff, uint16_
 	components MainC;
 	components LedsC;
 	components new CsmaSlotSenderP(offset, backoff, checkLength);
-	//components new VirtualizedAlarmMilli16C();
-	components HplMsp430GeneralIOC;
 	components new Alarm32khz32C();
 
 	MainC.SoftwareInit -> CsmaSlotSenderP.Init;
@@ -57,5 +55,4 @@ generic configuration CsmaSlotSenderC(uint16_t offset, uint16_t backoff, uint16_
   	CsmaSlotSenderP.Random -> RandomC;
 	
 	
-	CsmaSlotSenderP.Pin -> HplMsp430GeneralIOC.Port26;
 }

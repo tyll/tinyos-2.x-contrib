@@ -38,11 +38,7 @@ configuration GenericSlotterC {
 implementation {
 	components MainC, LedsC;
 	components GenericSlotterP;
-	//components new VirtualizedAlarmMilli16C();
 	components new Alarm32khz32C();
-	//components Alarm32Khz16VirtualizerC;
-	components HplMsp430GeneralIOC;
-	//components LocalTime32khz16C;
 	
 	
 	GenericSlotterP.Boot -> MainC;
@@ -56,5 +52,4 @@ implementation {
 	//GenericSlotterP.Alarm -> Alarm32Khz16VirtualizerC;
 	GenericSlotterP.SlotterControl = SlotterControl;
 	GenericSlotterP.Leds -> LedsC;
-	GenericSlotterP.Pin -> HplMsp430GeneralIOC.Port27;
 }

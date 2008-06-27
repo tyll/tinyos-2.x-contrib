@@ -1,5 +1,5 @@
 /*
- * "Copyright (c) 2007 Washington University in St. Louis.
+ * "Copyright (c) 2007-2008 Washington University in St. Louis.
  * All rights reserved.
  *
  * Permission to use, copy, modify, and distribute this software and its
@@ -71,8 +71,9 @@ module CC2420ActiveMessageP {
     interface Send as SubSend;
     interface Receive as SubReceive;
     interface CC2420Packet;
-    interface Leds;
-    async command am_addr_t amAddress();
+    interface CC2420PacketBody;
+    interface CC2420Config;
+    interface ActiveMessageAddress;
   }
 }
 implementation {
@@ -81,15 +82,15 @@ implementation {
     CC2420_SIZE = MAC_HEADER_SIZE + MAC_FOOTER_SIZE,
   };
   
-  
+  /***************** AMSend Commands ****************/
   command error_t AMSend.send[am_id_t id](am_addr_t addr,
 					  message_t* msg,
 					  uint8_t len) {
-    cc2420_header_t* header = call CC2420Packet.getHeader( msg );
+    cc2420_header_t* header = call CC2420PacketBody.getHeader( msg );
     header->type = id;
     header->dest = addr;
-    header->destpan = TOS_AM_GROUP;
-
+    header->destpan = call CC2420Config.getPanAddr();
+    
     return call SubSend.send( msg, len + CC2420_SIZE );
   }
 
@@ -105,6 +106,7 @@ implementation {
     return call Packet.getPayload(m, NULL);
   }
 
+  /***************** Receive Commands ****************/
   command void* Receive.getPayload[am_id_t id](message_t* m, uint8_t* len) {
     return call Packet.getPayload(m, len);
   }
@@ -113,6 +115,7 @@ implementation {
     return call Packet.payloadLength(m);
   }
   
+  /***************** Snoop Commands ****************/
   command void* Snoop.getPayload[am_id_t id](message_t* m, uint8_t* len) {
     return call Packet.getPayload(m, len);
   }
@@ -120,44 +123,29 @@ implementation {
   command uint8_t Snoop.payloadLength[am_id_t id](message_t* m) {
     return call Packet.payloadLength(m);
   }
-  
-  event void SubSend.sendDone(message_t* msg, error_t result) {
-    signal AMSend.sendDone[call AMPacket.type(msg)](msg, result);
-  }
 
-  /* Receiving a packet */
-
-  event message_t* SubReceive.receive(message_t* msg, void* payload, uint8_t len) {
-    if (call AMPacket.isForMe(msg)) {
-      return signal Receive.receive[call AMPacket.type(msg)](msg, payload, len - CC2420_SIZE);
-    }
-    else {
-      return signal Snoop.receive[call AMPacket.type(msg)](msg, payload, len - CC2420_SIZE);
-    }
-  }
-  
+  /***************** AMPacket Commands ****************/
   async command am_addr_t AMPacket.address() {
-    return call amAddress();
+    return call ActiveMessageAddress.amAddress();
   }
  
   async command am_addr_t AMPacket.destination(message_t* amsg) {
-    cc2420_header_t* header = call CC2420Packet.getHeader(amsg);
+    cc2420_header_t* header = call CC2420PacketBody.getHeader(amsg);
     return header->dest;
   }
  
   async command am_addr_t AMPacket.source(message_t* amsg) {
-    cc2420_header_t* header = call CC2420Packet.getHeader(amsg);
+    cc2420_header_t* header = call CC2420PacketBody.getHeader(amsg);
     return header->src;
   }
 
   async command void AMPacket.setDestination(message_t* amsg, am_addr_t addr) {
-    cc2420_header_t* header = call CC2420Packet.getHeader(amsg);
-    header->destpan = TOS_AM_GROUP;
+    cc2420_header_t* header = call CC2420PacketBody.getHeader(amsg);
     header->dest = addr;
   }
 
   async command void AMPacket.setSource(message_t* amsg, am_addr_t addr) {
-    cc2420_header_t* header = call CC2420Packet.getHeader(amsg);
+    cc2420_header_t* header = call CC2420PacketBody.getHeader(amsg);
     header->src = addr;
   }
 
@@ -167,19 +155,82 @@ implementation {
   }
 
   async command am_id_t AMPacket.type(message_t* amsg) {
-    cc2420_header_t* header = call CC2420Packet.getHeader(amsg);
+    cc2420_header_t* header = call CC2420PacketBody.getHeader(amsg);
     return header->type;
   }
 
   async command void AMPacket.setType(message_t* amsg, am_id_t type) {
-    cc2420_header_t* header = call CC2420Packet.getHeader(amsg);
+    cc2420_header_t* header = call CC2420PacketBody.getHeader(amsg);
     header->type = type;
   }
   
-  async command uint8_t AMPacket.headerSize() {
-    return CC2420_SIZE;
+  async command am_group_t AMPacket.group(message_t* amsg) {
+    return (call CC2420PacketBody.getHeader(amsg))->destpan;
   }
 
+  async command void AMPacket.setGroup(message_t* amsg, am_group_t grp) {
+    // Overridden intentionally when we send()
+    (call CC2420PacketBody.getHeader(amsg))->destpan = grp;
+  }
+
+  async command am_group_t AMPacket.localGroup() {
+    return call CC2420Config.getPanAddr();
+  }
+  
+  async command uint8_t AMPacket.headerSize() {
+    return sizeof(cc2420_header_t);
+  }
+
+  /***************** Packet Commands ****************/
+  command void Packet.clear(message_t* msg) {
+  }
+  
+  command uint8_t Packet.payloadLength(message_t* msg) {
+    return (call CC2420PacketBody.getHeader(msg))->length - CC2420_SIZE;
+  }
+  
+  command void Packet.setPayloadLength(message_t* msg, uint8_t len) {
+    (call CC2420PacketBody.getHeader(msg))->length  = len + CC2420_SIZE;
+  }
+  
+  command uint8_t Packet.maxPayloadLength() {
+    return TOSH_DATA_LENGTH;
+  }
+  
+  command void* Packet.getPayload(message_t* msg, uint8_t* len) {
+    if (len != NULL) {
+      *len = call Packet.payloadLength(msg);
+    }
+    return msg->data;
+  }
+
+  
+  /***************** SubSend Events ****************/
+  event void SubSend.sendDone(message_t* msg, error_t result) {
+    signal AMSend.sendDone[call AMPacket.type(msg)](msg, result);
+  }
+
+  
+  /***************** SubReceive Events ****************/
+  event message_t* SubReceive.receive(message_t* msg, void* payload, uint8_t len) {
+    if (call AMPacket.isForMe(msg)) {
+      return signal Receive.receive[call AMPacket.type(msg)](msg, payload, len - CC2420_SIZE);
+    }
+    else {
+      return signal Snoop.receive[call AMPacket.type(msg)](msg, payload, len - CC2420_SIZE);
+    }
+  }
+  
+
+  /***************** ActiveMessageAddress Events ****************/
+  async event void ActiveMessageAddress.changed() {
+  }
+  
+  /***************** CC2420Config Events ****************/
+  event void CC2420Config.syncDone( error_t error ) {
+  }
+  
+  /***************** Defaults ****************/
   default event message_t* Receive.receive[am_id_t id](message_t* msg, void* payload, uint8_t len) {
     return msg;
   }
@@ -188,32 +239,8 @@ implementation {
     return msg;
   }
 
- default event void AMSend.sendDone[uint8_t id](message_t* msg, error_t err) {
-   return;
- }
-
- 
- command void Packet.clear(message_t* msg) {}
- 
- command uint8_t Packet.payloadLength(message_t* msg) {
-   return (call CC2420Packet.getHeader(msg))->length - CC2420_SIZE;
- }
-
-
- command void Packet.setPayloadLength(message_t* msg, uint8_t len) {
-   (call CC2420Packet.getHeader(msg))->length  = len + CC2420_SIZE;
- }
-
- command uint8_t Packet.maxPayloadLength() {
-   return TOSH_DATA_LENGTH;
- }
- 
- command void* Packet.getPayload(message_t* msg, uint8_t* len) {
-   if (len != NULL) {
-     *len = call Packet.payloadLength(msg);
-   }
-   return msg->data;
- }
-
+  default event void AMSend.sendDone[uint8_t id](message_t* msg, error_t err) {
+    return;
+  }
 
 }

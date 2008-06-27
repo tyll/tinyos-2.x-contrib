@@ -1,5 +1,5 @@
 /*
- * "Copyright (c) 2007 Washington University in St. Louis.
+ * "Copyright (c) 2007-2008 Washington University in St. Louis.
  * All rights reserved.
  *
  * Permission to use, copy, modify, and distribute this software and its
@@ -52,67 +52,51 @@
  */
 
 /**
- * Basic implementation of a CSMA MAC for the ChipCon CC2420 radio.
+ * Implementation of the receive path for the ChipCon CC2420 radio.
  *
  * @author Jonathan Hui <jhui@archrock.com>
  * @author Greg Hackmann
- * @author Kevin Klues
- * @author Octav Chipara
  * @version $Revision$ $Date$
  */
 
-#include "CC2420.h"
-#include "IEEE802154.h"
+configuration CC2420ReceiveC {
 
-configuration CC2420CsmaC {
-
-  provides interface AsyncSend as Send;
-  provides interface Resend;
+  provides interface AsyncStdControl;
+  provides interface CC2420Receive;
   provides interface AsyncReceive as Receive;
-  provides interface RadioPowerControl;
-  provides interface ChannelMonitor;
-  provides interface CcaControl[am_id_t amId];
+  provides interface ReceiveIndicator as PacketIndicator;
+
 }
 
 implementation {
-
-  components CC2420CsmaP as CsmaP;
-  Send = CsmaP;
-  RadioPowerControl = CsmaP;
-
   components MainC;
-  MainC.SoftwareInit -> CsmaP;
-  
-  components CC2420ActiveMessageC;
-  CsmaP.AMPacket -> CC2420ActiveMessageC;
-  
-  components CC2420ControlC;
-  CsmaP.Resource -> CC2420ControlC;
-  CsmaP.CC2420Power -> CC2420ControlC;
-
-  components CC2420TransmitC;
-  Resend = CC2420TransmitC;
-  CcaControl = CC2420TransmitC;
-  ChannelMonitor = CC2420TransmitC;
-  CC2420TransmitC.RadioPowerControl -> CsmaP;
-  CsmaP.SubControl -> CC2420TransmitC;
-  CsmaP.CC2420Transmit -> CC2420TransmitC;
-  
-  components CC2420ReceiveC;
-  Receive = CC2420ReceiveC;
-  CsmaP.SubControl -> CC2420ReceiveC;
-
+  components CC2420ReceiveP;
   components CC2420PacketC;
-  CsmaP.CC2420Packet -> CC2420PacketC;
+  components new CC2420SpiC() as Spi;
+  components CC2420ControlC;
   
-  components RandomC;
-  CsmaP.Random -> RandomC;
-  
-  components LedsC;
-  CsmaP.Leds -> LedsC;
+  components HplCC2420PinsC as Pins;
+  components HplCC2420InterruptsC as InterruptsC;
 
-#ifdef DUTY_CYCLE
-  components Counter32khz32C as Counter;
-  CsmaP.Counter -> Counter;
-#endif
+  components LedsC as Leds;
+  CC2420ReceiveP.Leds -> Leds;
+
+  AsyncStdControl = CC2420ReceiveP;
+  CC2420Receive = CC2420ReceiveP;
+  Receive = CC2420ReceiveP;
+  PacketIndicator = CC2420ReceiveP.PacketIndicator;
+
+  MainC.SoftwareInit -> CC2420ReceiveP;
+  
+  CC2420ReceiveP.CSN -> Pins.CSN;
+  CC2420ReceiveP.FIFO -> Pins.FIFO;
+  CC2420ReceiveP.FIFOP -> Pins.FIFOP;
+  CC2420ReceiveP.InterruptFIFOP -> InterruptsC.InterruptFIFOP;
+  CC2420ReceiveP.SpiResource -> Spi;
+  CC2420ReceiveP.RXFIFO -> Spi.RXFIFO;
+  CC2420ReceiveP.SFLUSHRX -> Spi.SFLUSHRX;
+  CC2420ReceiveP.SACK -> Spi.SACK;
+  CC2420ReceiveP.CC2420PacketBody -> CC2420PacketC;
+  CC2420ReceiveP.CC2420Config -> CC2420ControlC;
+
 }

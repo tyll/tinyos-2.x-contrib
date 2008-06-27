@@ -28,7 +28,7 @@
  * @date $Date$
  */
 
-#define DUTY_CYCLE
+#define DUTY_CYCLE_BENCHMARK
 
 uint32_t vDutyCycle = 0;
 uint32_t oscDutyCycle = 0;

@@ -177,4 +177,36 @@ interface AMPacket {
    */
   async command uint8_t headerSize();
 
+  /**
+   * Get the AM group of the AM packet. The AM group is a logical
+   * identifier that distinguishes sets of nodes which may share
+   * a physical communication medium but wish to not communicate.
+   * The AM group logically separates the sets of nodes. When
+   * a node sends a packet, it fills in its AM group, and typically
+   * nodes only receive packets whose AM group field matches their
+   * own.
+   *
+   * @param amsg the packet
+   * @return the AM group of this packet
+   */
+  
+  async command am_group_t group(message_t* amsg);
+
+  /**
+   * Set the AM group field of a packet. Note that most data link
+   * stacks will set this field automatically on a send request, which
+   * may overwrite changes made with this command.
+   *
+   * @param amsg the packet
+   * @param group the packet's new AM group value
+   */
+  async command void setGroup(message_t* amsg, am_group_t grp);
+
+  /**
+   * Provides the current AM group of this communication interface.
+   *
+   * @return The AM group.
+   */
+  
+  async command am_group_t localGroup();
 }

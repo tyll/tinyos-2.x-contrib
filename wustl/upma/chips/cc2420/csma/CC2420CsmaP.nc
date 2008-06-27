@@ -1,5 +1,5 @@
 /*
- * "Copyright (c) 2007 Washington University in St. Louis.
+ * "Copyright (c) 2007-2008 Washington University in St. Louis.
  * All rights reserved.
  *
  * Permission to use, copy, modify, and distribute this software and its
@@ -61,114 +61,104 @@
 
 module CC2420CsmaP {
 
-  provides interface Init;
-  provides interface AsyncSend as Send;
   provides interface RadioPowerControl;
+  provides interface AsyncSend as Send;
 
   uses interface Resource;
   uses interface CC2420Power;
-  uses interface StdControl as SubControl;
+  uses interface AsyncStdControl as SubControl;
   uses interface CC2420Transmit;
   uses interface Random;
   uses interface AMPacket;
-  uses interface CC2420Packet;
   uses interface Leds;
+  uses interface CC2420Packet;
+  uses interface CC2420PacketBody;
+  uses interface State as SplitControlState;
   
-#ifdef DUTY_CYCLE
+#ifdef DUTY_CYCLE_BENCHMARK
   uses interface Counter<T32khz, uint32_t>;
 #endif
+
 }
 
 implementation {
 
   enum {
-    S_PREINIT,
     S_STOPPED,
     S_STARTING,
     S_STARTED,
     S_STOPPING,
-    S_TRANSMIT,
+    S_TRANSMITTING,
   };
 
   message_t* m_msg;
   
-  uint8_t m_state = S_PREINIT;
-  
   error_t sendErr = SUCCESS;
-
-#ifdef DUTY_CYCLE
+  
+#ifdef DUTY_CYCLE_BENCHMARK
    norace uint32_t vStartedAt, oscStartedAt, radioStartedAt, radioStoppedAt;
 #endif
-
+  
+  /** TRUE if we are to use CCA when sending the current packet */
+  norace bool ccaOn;
+  
   /****************** Prototypes ****************/
   task void startDone_task();
-  task void startDone_task();
   task void stopDone_task();
-  void sendDone_task();
+  void sendDone();
   
-  error_t startRadio(bool radioPower);
-  error_t stopRadio(bool radioPower);
-
-  /***************** Init Commands ****************/
-  command error_t Init.init() {
-    if ( m_state != S_PREINIT ) {
-      return FAIL;
-    }
-    m_state = S_STOPPED;
-    return SUCCESS;
-  }
+  void shutdown();
 
   /***************** SplitControl Commands ****************/
-  
-  void signalStartDone();
-  task void signalStartDoneTask() {
-    signalStartDone();
+  task void signalStartDone() {
+    signal RadioPowerControl.startDone( SUCCESS );
   }
   
   async command error_t RadioPowerControl.start() {
-    atomic {
-      if ( m_state == S_STARTED ) {
-        post signalStartDoneTask();
-        return SUCCESS;
-      }
-      if ( m_state != S_STOPPED ) {
-        return FAIL;
-      }
-
-      m_state = S_STARTING;
+    if(call SplitControlState.requestState(S_STARTING) == SUCCESS) {
+#ifdef DUTY_CYCLE_BENCHMARK
+      radioStartCount++;
+	  vStartedAt = call Counter.get();
+#endif
+      call CC2420Power.startVReg();
+      return SUCCESS;
+    
+    } else if(call SplitControlState.isState(S_STARTED)) {
+      post signalStartDone();
+      return EALREADY;
+    } else if(call SplitControlState.isState(S_STARTING)) {
+      return SUCCESS;
     }
     
-#ifdef DUTY_CYCLE
-    radioStartCount++;
-	vStartedAt = call Counter.get();
-#endif
-    call CC2420Power.startVReg();
-
-    return SUCCESS;
+    return EBUSY;
   }
-
-  void signalStopDone();
-  task void signalStopDoneTask() {
-    signalStopDone();
+  
+  task void signalStopDone() {
+    signal RadioPowerControl.stopDone( SUCCESS );
   }
 
   async command error_t RadioPowerControl.stop() {
-    atomic {
-      if ( m_state == S_STOPPED ) {
-        post signalStopDoneTask();
-        return SUCCESS;
-      }
-      if ( m_state != S_STARTED ) {
-        return FAIL;
-      }
-
-      m_state = S_STOPPING;
+    if (call SplitControlState.isState(S_STARTED)) {
+      call SplitControlState.forceState(S_STOPPING);
+      shutdown();
+      return SUCCESS;
+      
+    } else if(call SplitControlState.isState(S_STOPPED)) {
+      post signalStopDone();
+      return EALREADY;
+    
+    } else if(call SplitControlState.isState(S_TRANSMITTING)) {
+      call SplitControlState.forceState(S_STOPPING);
+      // At sendDone, the radio will shut down
+      return SUCCESS;
+    
+    } else if(call SplitControlState.isState(S_STOPPING)) {
+      return SUCCESS;
     }
     
-    post stopDone_task();
-    return SUCCESS;
+    return EBUSY;
   }
-  
+
   /***************** Send Commands ****************/
   async command error_t Send.cancel( message_t* p_msg ) {
     return call CC2420Transmit.cancel();
@@ -176,13 +166,15 @@ implementation {
 
   async command error_t Send.send( message_t* p_msg, uint8_t len ) {
     
-    cc2420_header_t* header = call CC2420Packet.getHeader( p_msg );
-    cc2420_metadata_t* metadata = call CC2420Packet.getMetadata( p_msg );
+    cc2420_header_t* header = call CC2420PacketBody.getHeader( p_msg );
+    cc2420_metadata_t* metadata = call CC2420PacketBody.getMetadata( p_msg );
 
     atomic {
-      if ( m_state != S_STARTED )
+      if (!call SplitControlState.isState(S_STARTED)) {
         return FAIL;
-      m_state = S_TRANSMIT;
+      }
+      
+      call SplitControlState.forceState(S_TRANSMITTING);
       m_msg = p_msg;
     }
 
@@ -197,7 +189,7 @@ implementation {
     metadata->rssi = 0;
     metadata->lqi = 0;
     metadata->time = 0;
-
+    
     call CC2420Transmit.send( p_msg );
     return SUCCESS;
 
@@ -214,8 +206,7 @@ implementation {
   /**************** Events ****************/
   async event void CC2420Transmit.sendDone( message_t* p_msg, error_t err ) {
     atomic sendErr = err;
-
-    sendDone_task();
+    sendDone();
   }
 
   async event void CC2420Power.startVRegDone() {
@@ -223,7 +214,7 @@ implementation {
   }
   
   event void Resource.granted() {
-#ifdef DUTY_CYCLE
+#ifdef DUTY_CYCLE_BENCHMARK
     oscStartedAt = call Counter.get();
 #endif
     call CC2420Power.startOscillator();
@@ -232,57 +223,69 @@ implementation {
   async event void CC2420Power.startOscillatorDone() {
     post startDone_task();
   }
-  
+    
+#ifdef DUTY_CYCLE_BENCHMARK
+  async event void Counter.overflow() { }
+#endif
   
   /***************** Tasks ****************/
-  void sendDone_task() {
+  void sendDone() {
     error_t packetErr;
-    message_t * msg;
+    message_t * packet;
     atomic {
       packetErr = sendErr;
-      msg = m_msg;
-      m_state = S_STARTED;
+      packet = m_msg;
     }
-    signal Send.sendDone( m_msg, packetErr );
+    if(call SplitControlState.isState(S_STOPPING)) {
+      shutdown();
+      
+    } else {
+      call SplitControlState.forceState(S_STARTED);
+    }
+    
+    signal Send.sendDone( packet, packetErr );
   }
 
-  task void startDone_task() {  
+  task void startDone_task() {
     call SubControl.start();
-#ifdef DUTY_CYCLE
+#ifdef DUTY_CYCLE_BENCHMARK
     radioStartedAt = call Counter.get();
 #endif
     call CC2420Power.rxOn();
     call Resource.release();
-    signalStartDone();
-  }
-  
-  void signalStartDone() {
-    atomic m_state = S_STARTED;
+    call SplitControlState.forceState(S_STARTED);
     signal RadioPowerControl.startDone( SUCCESS );
   }
   
   task void stopDone_task() {
-    call SubControl.stop();
-    call CC2420Power.stopVReg();
-
-#ifdef DUTY_CYCLE
+#ifdef DUTY_CYCLE_BENCHMARK
     radioStopCount++;
     radioStoppedAt = call Counter.get();
     vDutyCycle += (oscStartedAt - vStartedAt);
     oscDutyCycle += (radioStartedAt - oscStartedAt);
     radioDutyCycle += (radioStoppedAt - radioStartedAt);
 #endif
-
-    signalStopDone();
-  }
-  
-  void signalStopDone() {
-    atomic m_state = S_STOPPED;
+    call SplitControlState.forceState(S_STOPPED);
     signal RadioPowerControl.stopDone( SUCCESS );
   }
   
-#ifdef DUTY_CYCLE
-  async event void Counter.overflow() { }
-#endif
+  
+  /***************** Functions ****************/
+  /**
+   * Shut down all sub-components and turn off the radio
+   */
+  void shutdown() {
+    call SubControl.stop();
+    call CC2420Power.stopVReg();
+    post stopDone_task();
+  }
+
+  /***************** Defaults ***************/
+  default event void RadioPowerControl.startDone(error_t error) {
+  }
+  
+  default event void RadioPowerControl.stopDone(error_t error) {
+  }
+  
 }
 

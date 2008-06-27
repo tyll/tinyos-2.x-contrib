@@ -25,5 +25,6 @@
 
 #define UQ_VIRTUALIZED_ALARM_MILLI_16 "VirtualizedAlarmMilli16P"
 #define UQ_VIRTUALIZED_ALARM_32KHZ_16 "VirtualizedAlarm32Khz16P"
+#define UQ_VIRTUALIZED_ALARM_32KHZ_32 "VirtualizedAlarm32Khz32P"
 
 #endif /* __ALARMCONSTANTS_H */

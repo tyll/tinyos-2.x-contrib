@@ -1,8 +1,8 @@
-COMPONENT = TestApp$(APP)C
+COMPONENT = TestAppC
 
-CFLAGS += -I$(UPMA_DIR)/chips/cc2420 \
-	-I$(UPMA_DIR)/interfaces \
-	-I$(UPMA_DIR)/lib/macs/scp \
+include $(UPMA_DIR)/chips/cc2420/Makefile.cc2420
+CFLAGS += -I$(UPMA_DIR)/interfaces \
+	-I$(UPMA_DIR)/lib/macs/scp-wustl \
 	-I$(UPMA_DIR)/lib/macs/bmac \
 	-I$(UPMA_DIR)/lib/alarm \
 	-I$(UPMA_DIR)/lib/serial \

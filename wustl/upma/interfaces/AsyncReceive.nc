@@ -20,6 +20,8 @@
  * MODIFICATIONS."
  */
 
+#include <AM.h>
+
 /**
  * Provides packet reception events in an asynchronous fashion.
  *

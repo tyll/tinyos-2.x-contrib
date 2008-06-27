@@ -48,7 +48,7 @@ generic module GenericSlotSenderP(uint16_t offset, uint16_t backoff, bool cca)  
 	uses interface Leds;
 	
 	uses interface Boot;
-	uses interface HplMsp430GeneralIO as Pin;
+//	uses interface HplMsp430GeneralIO as Pin;
 		
 } implementation {
 	enum {

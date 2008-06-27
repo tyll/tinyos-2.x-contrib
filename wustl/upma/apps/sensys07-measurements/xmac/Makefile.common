@@ -3,7 +3,7 @@ MAX_LPL_CCA_CHECKS=500
 
 ifeq ($(UPMA),1)
 	CFLAGS += -I$(UPMA_DIR)/lib/macs/xmac \
-                  -I$(UPMA_DIR)/lib/macs/bmac
+		-I$(UPMA_DIR)/lib/macs/bmac
 else
 	CFLAGS += -DACK_LOW_POWER_LISTENING
 endif

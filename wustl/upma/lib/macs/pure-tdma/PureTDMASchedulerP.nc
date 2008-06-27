@@ -51,7 +51,6 @@ module PureTDMASchedulerP {
 		interface PacketAcknowledgements;
 		
 		interface Boot;
-		interface HplMsp430GeneralIO as Pin;
 		interface Leds;
 	}
 }
@@ -74,7 +73,6 @@ implementation {
 
 	event void Boot.booted()
 	{
-		call Pin.makeOutput();
 	}
 	
 	command error_t Init.init() {		

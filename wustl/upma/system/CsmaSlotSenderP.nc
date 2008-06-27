@@ -47,7 +47,6 @@ generic module CsmaSlotSenderP(uint16_t offset, uint16_t backoff, uint16_t check
 	uses interface CcaControl as SubCcaControl;
 	uses interface Leds;
 	
-	uses interface HplMsp430GeneralIO as Pin;		
 	uses interface ChannelMonitor;
 	uses interface Alarm<T32khz, uint32_t>;
 	uses interface Random;
@@ -72,7 +71,6 @@ generic module CsmaSlotSenderP(uint16_t offset, uint16_t backoff, uint16_t check
 		toSend = NULL;
 		toSendLen = 0;
 		state = S_END;
-		call Pin.makeOutput();
 		
 		return SUCCESS;
   	}
@@ -92,7 +90,6 @@ generic module CsmaSlotSenderP(uint16_t offset, uint16_t backoff, uint16_t check
 				toSendLen = len;
 			}
 
-			call Pin.set();
 			call ChannelMonitor.setCheckLength(checkLength);
 			call ChannelMonitor.check();
 		}
@@ -135,14 +132,12 @@ generic module CsmaSlotSenderP(uint16_t offset, uint16_t backoff, uint16_t check
   	
   	async event void ChannelMonitor.busy() {
   		atomic state = S_END;
-  		call Pin.clr();
   		if (toSend != NULL) signal Send.sendDone(toSend, FAIL);
   	}
   	
   	async event void ChannelMonitor.error() {
   		atomic state = S_END;
   		if (toSend != NULL) signal Send.sendDone(toSend, FAIL);
-  		call Pin.clr();
   	}
   	
   	
@@ -150,7 +145,6 @@ generic module CsmaSlotSenderP(uint16_t offset, uint16_t backoff, uint16_t check
 		if (toSend == msg) {
 			atomic state = S_END;
 			atomic toSend = NULL;
-			call Pin.clr();
 			signal Send.sendDone(msg,error);
 		}
 	}

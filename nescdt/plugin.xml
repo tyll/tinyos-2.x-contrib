@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            name="nesC Editor"
+            extensions="nc"
+            icon="icons/tos.gif"
+            contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"
+            class="nescdt.NescEditor"
+            id="nesc.editors.NesCEditor">
+      </editor>
+   </extension>
+   <extension 
+	    point="org.eclipse.ui.decorators">
+     <decorator
+            lightweight="true"
+            label="nesC Decorator"
+            class="nescdt.decorator.NescLightWeightDecorator"
+            state="true"
+            adaptable="true"
+            id="nescdt.decorator">
+         <enablement>
+              <objectClass
+                 name="org.eclipse.core.resources.IResource">
+              </objectClass>
+         </enablement>
+      </decorator>
+	</extension>
+	   <extension
+         point="org.eclipse.ui.newWizards">
+      <wizard
+            category="nescdt.category1"
+            class="nescdt.wizards.NewSiteProjectWizard"
+            icon="icons/tos.gif"
+            id="nescdt.wizard1"
+            name="nesC Project"
+            project="true">
+         <description>
+            Create a nesC project
+         </description>
+      </wizard>
+      <category
+            name="nescdt"
+            id="nescdt.category1"/>
+   </extension>
+    <extension
+          id="nescdtNature"
+          name="nescdt Plugin Nature"
+          point="org.eclipse.core.resources.natures">
+    </extension>
+</plugin>

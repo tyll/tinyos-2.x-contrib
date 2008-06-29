@@ -4,6 +4,7 @@
 # @author Michael Okola
 #
 
+import pdb
 from pytos.util.NescApp import *
 import pytos.util.NescApp as NescApp
 
@@ -13,56 +14,54 @@ class UnitTest(NescApp.NescApp):
     if applicationName == "Unknown App":
       raise Exception("Module name must be specified")
     
-    #check to see if interface at file applicationName is generic
-    interfaceFile = open(applicationName, "r")
-    interfaceStr = interfaceFile.read()
-    if not interfaceFile:
-      raise Exception("Specified file does not exist")
-    gen = re.compile('\s*generic\s+configuration\s+', re.MULTILINE)
-    result = gen.search(interfaceStr)
-    if result != None: #generic
-      componentName = (interfaceStr[result.end():].split()[0])[:interfaceStr.find("(", result.end())].strip('()')
-      gen = re.compile('(.|\s)*provides(.|\s)+interface\s+')
-      result = gen.search(interfaceStr[result.end():]).end() + result.end()
-      interfaceNames = []
-      while result != None:
-        interfaceNames.append(interfaceStr[result:interfaceStr.find(";", result)])
-        inter = gen.search(interfaceStr[interfaceStr.find(";", result):])
-        if inter != None:
-          result = inter + result.end()
-        else:
-          result = inter
-      generic = True
-      
-    else:
-      gen = re.compile('^\s*configuration\s+', re.MULTILINE)
-      result = gen.search(interfaceStr)
-      
-      if result != None: #not generic
-        interfaceNames.put(interfaceStr[result.end():].split()[0])
-        generic = False
-        
-      else: #invalid file
-        raise Exception("Configuration information could not be found in file")
-      
-    #create NesC files
-    os.system("rm -rf " + componentName + "UnitTest")
-    os.mkdir(componentName + "UnitTest")
-    os.chdir(componentName + "UnitTest")
-    cFile = open("Test" + componentName + ".nc", "w")
-    cOutput = '''includes Rpc;
+    #open the files, apply the necessary transformations, and save the new ones
+    appFile = open(applicationName + "AppC.nc", "r")
+    cFile = open(applicationName + "C.nc", "r")
+    if not (appFile or cFile):
+      raise Exception("Given component does not exist")
+    appStr = self.stripComments(appFile.read())
+    cStr = self.stripComments(cFile.read())
+    appFile.close()
+    cFile.close()
 
-module Test''' + componentName + ''' {
-  uses {\n'''
-    for name in interfaceNames:
-      cOutput += "    interface " + name + " @rpc();\n";
-    cOutput += '''    interface Boot;
-    interface SplitControl;
-  }
-}
 
-implementation {
+    #Check to make sure that Boot is not wired to this component
+    if re.compile("interface\s+Boot").search(cStr) != None:
+      raise Exception("Error: Component may not use the Boot interface")
 
+    #Check to see if SplitControl is already wired to the component in some way
+    hasSplitControl = False
+    if re.compile(r'interface\s+SplitControl').search(cStr) != None or re.compile(r'interface/s+SplitControl').search(appStr) != None:
+      hasSplitControl = True
+
+    #Perform necessary transformations
+    providesBegin = re.compile(r'provides\s*\{', re.MULTILINE)
+    usesBegin = re.compile(r'uses\s*\{', re.MULTILINE)
+    pResult = providesBegin.search(cStr)
+
+    if pResult != None:
+      nextSemi = cStr.find(";", pResult.end(), cStr.find("}", pResult.end()))
+      while nextSemi != -1:
+        cStr = cStr[:nextSemi] + " @rpc()" + cStr[nextSemi:]
+        nextSemi = cStr.find(";", nextSemi+8, cStr.find("}", pResult.end()))
+
+    uResult = usesBegin.search(cStr)
+    if uResult != None:
+      nextSemi = cStr.find(";", uResult.end(), cStr.find("}", uResult.end()))
+      while nextSemi != -1:
+        cStr = cStr[:nextSemi] + " @rpc()" + cStr[nextSemi:]
+        nextSemi = cStr.find(";", nextSemi+8, cStr.find("}", uResult.end()))
+      cStr = cStr[:cStr.find("}", uResult.end())-1] + '''   interface Boot;
+    ''' + cStr[cStr.find("}", uResult.end()):]
+
+    if not hasSplitControl:
+      res = re.compile("interface Boot.*?\n").search(cStr)
+      cStr = cStr[:res.end()] + "    interface SplitControl;\n" + cStr[res.end():]
+      
+    impl = re.compile(r'implementation\s*\{').search(cStr)
+    if not hasSplitControl:
+      cStr = cStr[:impl.end()] + '''
+    
   event void Boot.booted()
   {
     call SplitControl.start();
@@ -73,45 +72,51 @@ implementation {
 
   event void SplitControl.stopDone(error_t error) {
   }
-}
-'''
-    cFile.write(cOutput)
-    cFile.close()
-    appFile = open("Test" + componentName + "AppC.nc", "w")
-    appOutput = '''configuration Test''' + componentName + '''AppC {
-}
-
-implementation {
-  
-  components Test''' + componentName + ''',
-    MainC,
-    RamSymbolsM,
-    RpcC,
-    '''
-    if generic:
-      appOutput += "new " + componentName + "();"
+''' + cStr[impl.end():]
     else:
-      appOutput += componentName + ";\n"
-#    for name in interfaceNames:
-#      appOutput += '\n  Test' + componentName + "." + name + " -> " + componentName + ";\n"
+      cStr = cStr[:impl.end()] + '''
+    
+  event void Boot.booted()
+  {
+    call SplitControl.start();
+  }
 
-    appOutput += "  Test" + componentName + '''.Boot -> MainC.Boot;
-  Test''' + componentName + '''.SplitControl -> RpcC;
-}\n'''
-    appFile.write(appOutput)
+''' + cStr[impl.end():]
+
+
+    beginImpl = re.compile("implementation\s*{\s*\n").search(appStr)
+    appStr = appStr[:beginImpl.end()+1] + '''components RpcC,
+RamSymbolsM,
+MainC;
+''' + appStr[beginImpl.end()+1:]
+    endImpl = re.compile("}").search(appStr, beginImpl.end())
+    appStr = appStr[:endImpl.start()-1] + applicationName + "C.SplitControl -> RpcC;\n  " + applicationName + "C.Boot -> MainC.Boot;\n" + appStr[endImpl.start():]
+
+    
+    #Make UnitTest directory and copy all files into it
+    os.system("rm -rf " + applicationName + "UnitTest")
+    os.mkdir(applicationName + "UnitTest")
+    os.chdir(applicationName + "UnitTest")
+    os.system("cp ../* ./")
+
+    #Write the transformed components to disk
+    appFile = open(applicationName + "AppC.nc", "w")
+    cFile = open(applicationName + "C.nc", "w")
+    appFile.write(appStr)
+    cFile.write(cStr)
     appFile.close()
-      
+    cFile.close()
+
     #create Makefile
     mFile = open("Makefile", "w")
-    mFile.write("COMPONENT=Test" + componentName + '''AppC
+    mFile.write("COMPONENT=" + applicationName + '''AppC
 
 GOALS += marionette
 
 PFLAGS += -DTOSH_MAX_TASKS_LOG2=8
 MARIONETTE_ROOT=/opt/tinyos-2.x-contrib/marionette
 
-''' + #CFLAGS += -I''' + applicationName[:applicationName.rfind("/")] + '''
-'''CFLAGS += -I$(MARIONETTE_ROOT)/tos/lib/Rpc
+CFLAGS += -I$(MARIONETTE_ROOT)/tos/lib/Rpc
 CFLAGS += -I$(MARIONETTE_ROOT)/tos/lib/RamSymbols
 
 TOSMAKE_PATH += $(MARIONETTE_ROOT)/support/make
@@ -120,14 +125,14 @@ MAKERULES := $(TOSROOT)/support/make/Makerules
 include $(MAKERULES)''')
 
     mFile.close()
-      
+
     #build and program the mote software
     #os.system("cp " + applicationName + " ./")
     os.system("make " + buildDir + " install")
 
     #now run the regular NescApp initialization
     #first, import all enums, types, msgs, rpc functions, and ram symbols
-    self.applicationName = componentName
+    self.applicationName = applicationName
     self.buildDir = buildDir
     self.motecom=motecom
     self.tosbase=tosbase
@@ -200,3 +205,19 @@ Be sure that you supplied the correct buildDir parameter \"%s\".
                 self.__dict__[name] = Shortcut(name, rpc, ram)
                 self._moduleNames.append(name)
                 self._moduleNames.sort()
+
+  def stripComments(self, s):
+    blockre = re.compile(r'/\*.*?\*/', re.MULTILINE|re.DOTALL)
+    result = blockre.search(s)
+
+    while result != None:
+      s = s[:result.start()] + " " + s[result.end()+1:]
+      result = blockre.search(s)
+
+    linere = re.compile(r'//.*?\n')
+    result = linere.search(s)
+    while result != None:
+      s = s[:result.start()] + " " + s[result.end()+1:]
+      result = linere.search(s)
+    
+    return s

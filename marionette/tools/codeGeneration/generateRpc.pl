@@ -142,6 +142,7 @@ for my $taggedInterface (@$taggedInterfaces){
 	$rpc{'provided'} = $taggedInterface->{'provided'};
 	$rpc{'functionType'} = $function->{'functionType'};
 	$rpc{'returnType'} = $function->{'returnType'};
+	$rpc{'async'} = $function->{'async'};
 	$rpc{'params'} = $function->{'params'};
 	if ($interface->{'abstract'}==1){
 	    $rpc{'gparams'} = $taggedInterface->{'gparams'};
@@ -745,7 +746,14 @@ $s = sprintf "%s
 
 #now, print out all the provided events or uses commands that are required
 for my $requiredFunc (values %requiredFunctions) {
-    $s .= sprintf("  %s %s %s.%s( ", $requiredFunc->{functionType},
+    
+    my $async = "";
+    if ($requiredFunc->{async})
+    {
+	$async = "async";
+    }
+    $s .= sprintf("  %s %s %s %s.%s( ", $async,
+		  $requiredFunc->{functionType},
 		  $requiredFunc->{returnType}->{typeDecl},
 		  $requiredFunc->{componentName}."_".$requiredFunc->{interfaceName},
 		  $requiredFunc->{functionName});
@@ -775,7 +783,17 @@ $s = "includes Rpc;
 
 configuration RpcC {
   provides {
-    interface SplitControl;
+    interface SplitControl;";
+#my %requiredInterfaces;
+#for $fullName (sort keys %requiredFunctions ) {
+#    $rpc = $allFunctions{$fullName};
+#    if (! $requiredInterfaces{$rpc->{'interfaceName'}}){
+#	$requiredInterfaces{$rpc->{'interfaceName'}} = 1;
+#	$s = sprintf "%s\n    interface $rpc->{'interfaceName'};", $s;
+#    }
+#}
+
+$s = sprintf "%s
   }
 }
 implementation {
@@ -794,12 +812,12 @@ implementation {
   components
     DrainC;
 #endif // !RPC_NO_DRAIN*/
-";
+", $s;
 
 # generate the declarations of each rpc interface or function:
 my %components;
-for $fullName (sort keys %rpcFunctions ) {
-    $rpc = $rpcFunctions{$fullName};
+for $fullName (sort keys %allFunctions ) {
+    $rpc = $allFunctions{$fullName};
     if (! $components{$rpc->{'componentName'}}){
 	$components{$rpc->{'componentName'}} = 1;
 	$s = sprintf "%s\n    components $rpc->{'componentName'};", $s;
@@ -807,7 +825,6 @@ for $fullName (sort keys %rpcFunctions ) {
 }
 
 my %componentInterfaces;
-my %allFunctions = (%rpcFunctions, %requiredFunctions);
 for $fullName (sort keys %allFunctions ) {
     my $rpc = $allFunctions{$fullName};
     if ( $rpc->{'interfaceName'} ){

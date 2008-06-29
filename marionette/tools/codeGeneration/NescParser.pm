@@ -102,8 +102,9 @@ sub getInterfaces {
 #                              |->functions--->function1Name--->functionType
 #                                           |                |->returnType
 #                                           |                |->functionName
+#                                           |                |->async
 #                                           |                |->%paramNum
-#                                                                    |->name
+#                                           |                        |->name
 #                                           |                        |->type
 #                                           |                        |->size
 #                                           |                
@@ -170,6 +171,16 @@ sub getInterfaces {
 	}
 	my %functions;
 	while ( my ($functionName, $functionXML) = each (%{$interfaceHash->{'function'}})){
+	    my %function;
+	    if ($text =~ /\s*async\s+/ )
+	    {
+		$function{'async'} = 1;
+	    }
+	    else
+	    {
+		$function{'async'} = 0;
+	    }
+
 	    if ($text =~ m/(command|event)\s+([^();,]+\s+\*?)$functionName\s*(\(.*?\));/s ) {
 		$functionText = $&;
 	    }
@@ -178,7 +189,6 @@ sub getInterfaces {
 		die "ERROR: found function $interface{'interfaceName'}.$functionName in .nc file that is not in xml file.";
 	    }
 	    
-	    my %function;
 	    $function{'functionName'} = $functionName;
 #	    print "parsing function: $interface{'interfaceName'}.$functionName\n";
 

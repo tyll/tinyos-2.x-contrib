@@ -1,9 +1,13 @@
 #include "DSN.h"
-generic module DsnPlatformTelosbP(bool useHandshake) {
+#if USART == 0
+#define DSN_HANDSHAKE
+#endif
+module DsnPlatformTelosbP {
 	provides {
 		interface DsnPlatform;
 		interface Msp430UartConfigure;
-		interface Resource as DummyResource; // this resource is once granted, never released
+		interface Resource as DsnResource; // no handshake:this resource is once granted, never released
+											 // handshake: wire through to uart
 	}
 	uses {
 		interface HplMsp430Usart;
@@ -15,17 +19,19 @@ generic module DsnPlatformTelosbP(bool useHandshake) {
 		interface Packet;
 		interface SplitControl as RadioControl;
 		interface Resource;
+		interface Boot;
+		interface Timer<TMilli> as TimeoutTimer;
 	}
 }
 implementation {
 	
 	bool dummyResourceGranted=FALSE;
-	
+
 	msp430_uart_union_config_t dsn_config = {
   		{
   		ubr: UBR_32KHZ_9600,			//UBR_1MHZ_9600
   		umctl: UMCTL_32KHZ_9600, 			//UMCTL_1MHZ_9600
-  		ssel: 0x01,		//Clock source (00=UCLKI; 01=ACLK; 10=SMCLK; 11=SMCLK)
+  		ssel: 0x02, //0x01,		//Clock source (00=UCLKI; 01=ACLK; 10=SMCLK; 11=SMCLK)
 		pena: 0,
 		pev: 0,
 		spb: 0,
@@ -46,12 +52,22 @@ implementation {
 		// a low pin would cause framing errors in the dsn uart
 		call TxPin.set();
 		call TxPin.makeOutput();
+#ifdef DSN_HANDSHAKE
 		// setup pin for rx RTS interrupt
 		call RxRTSPin.makeInput();
-		call RxRTSInt.enableRisingEdge();
 		// setup CTS pin
 		call RxCTSPin.set();		// default hi = not ready to receive
 		call RxCTSPin.makeOutput();
+#endif		
+	}
+	
+	event void Boot.booted(){
+#ifdef DSN_HANDSHAKE		
+		call RxRTSInt.disable(); // this clears pending interrupt flags
+		call RxRTSInt.enableRisingEdge();
+#else
+		call DsnResource.immediateRequest();
+#endif
 	}
 	
 	async command void DsnPlatform.flushUart(){
@@ -93,7 +109,11 @@ implementation {
 	}
 	
 	async command bool DsnPlatform.isHandshake() {
-		return useHandshake;
+#ifdef DSN_HANDSHAKE		
+		return TRUE;
+#else
+		return FALSE;
+#endif		
 	}
 	  	
 	event void RadioControl.startDone(error_t error) {}
@@ -102,40 +122,87 @@ implementation {
   	async command msp430_uart_union_config_t* Msp430UartConfigure.getConfig() {
 	    return &dsn_config;
   	}
- /********* DummyResource ****************************/
+ /********* DsnResource ****************************/
  	task void grantedTask() {
- 		signal DummyResource.granted();
+ 		signal DsnResource.granted();
  	}
  	
-	async command error_t DummyResource.request() {
+	async command error_t DsnResource.request() {
+#ifdef DSN_HANDSHAKE
+		return call Resource.request();
+#else
 		if (!dummyResourceGranted)
 			call Resource.request();
 		else
 			post grantedTask();
 		return SUCCESS;
+#endif		
 	}
 	
-	async command error_t DummyResource.immediateRequest() {
-		if (!dummyResourceGranted)
-			if (call Resource.immediateRequest()==SUCCESS) {
-				dummyResourceGranted=TRUE;
-				return SUCCESS;
-			}
-		else
-			return SUCCESS;
+	async command error_t DsnResource.immediateRequest() {
+#ifdef DSN_HANDSHAKE
+		return call Resource.immediateRequest();
+#else		
+		atomic {
+			if (!dummyResourceGranted)
+				if (call Resource.immediateRequest()==SUCCESS)
+					dummyResourceGranted=TRUE;
+		}
+		return SUCCESS;
+#endif		
 	}
 	
-	async command error_t DummyResource.release() {return FAIL;}
-	async command bool DummyResource.isOwner() {return dummyResourceGranted; }
+	async command error_t DsnResource.release() {
+#ifdef DSN_HANDSHAKE
+		return call Resource.release();
+#else
+		return FAIL;
+#endif
+	}
+	async command bool DsnResource.isOwner() {
+#ifdef DSN_HANDSHAKE
+		return call Resource.isOwner();
+#else		
+		return dummyResourceGranted;
+#endif		
+	}
+	
 	event void Resource.granted() {
+#ifndef DSN_HANDSHAKE
 		atomic dummyResourceGranted=TRUE;
-		signal DummyResource.granted();
+#endif
+		signal DsnResource.granted();
 	} 
 
+	// ************* Timeout monitor for rx line ***********
+	
+	bool rxhandled;
+	
+	command void DsnPlatform.startTimeoutMonitor(uint8_t timeout) {
+		atomic rxhandled=FALSE;
+		call TimeoutTimer.startPeriodic(timeout);
+	}
+	command void DsnPlatform.stopTimeoutMonitor() {
+		call TimeoutTimer.stop();
+	}
+	
+	async command void DsnPlatform.updateTimeoutMonitor() {
+		rxhandled=TRUE;
+	}
+	
+	event void TimeoutTimer.fired() {
+		atomic if (!rxhandled) {
+			call TimeoutTimer.stop();
+			signal DsnPlatform.timeoutMonitorFired();
+		}
+	}
+	
+	// ************* default stuff
+	
   	default async command void RxCTSPin.set() {}
   	default async command void RxCTSPin.clr() {}
   	default async command void RxCTSPin.makeOutput() {}
   	default async command void RxRTSPin.makeInput() {}
   	default async command error_t RxRTSInt.enableRisingEdge() {return SUCCESS;}
-  	default event void DummyResource.granted() {}
+  	default event void DsnResource.granted() {}
 }

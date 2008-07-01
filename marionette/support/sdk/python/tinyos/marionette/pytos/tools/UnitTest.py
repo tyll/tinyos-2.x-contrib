@@ -172,14 +172,14 @@ Be sure that you supplied the correct buildDir parameter \"%s\".
         return # (if there are no rpc commands, we have nothing left to do)
       else :
         raise
-      try:
-        self.ramSymbols = RamSymbols.RamSymbols(self, xmlFileDOM=xmlFileDOM)
-      except Exception, e:
-        if re.search("The RamSymbolsM module was not compiled in", e.args[0]) > 0 :
-          print e.args[0]
-        else :
-          raise
-        pass 
+    try:
+      self.ramSymbols = RamSymbols.RamSymbols(self, xmlFileDOM=xmlFileDOM)
+    except Exception, e:
+      if re.search("The RamSymbolsM module was not compiled in", e.args[0]) > 0 :
+        print e.args[0]
+      else :
+        raise
+      pass 
 
     # Create shortcuts to all the application modules
     moduleNames = {}

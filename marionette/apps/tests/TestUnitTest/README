@@ -1,0 +1,10 @@
+#
+# Unit Tester example
+#
+# @author Michael Okola
+#
+#
+
+This example is a modified version of TestMarionette, with all of the RPC functionality stripped out of it.  In order to use it, you will need to change the parameters in TestUnitTest.py so they correspond to your type of mode and its address.  Assuming your paths are set up correctly, you can reach an interactive prompt with the programmed node and RPC interface ready to go by typing in the following:
+
+python -i TestUnitTest.py

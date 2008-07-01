@@ -1,0 +1,69 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+
+  
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+
+  
+  <title>Unit Testing</title>
+</head>
+
+
+<body>
+
+<h2> Overview </h2>
+
+
+<p>The Marionette unit testing tool allows a user to easily add RPC functionality to a nesc component and then run Marionette without having to modify existing component code. This enables Marionette to be used as a tool to quickly test code as it progresses through various iterations without requiring a complex infrastructure.
+</p>
+
+<div class="editsection" style="float: right; margin-left: 5px;"><br>
+</div>
+
+<a name="API"></a>
+<h2> Capabilities and Usage </h2>
+
+
+<p>The unit tester adds <a href="Rpc.html">RPC</a> functionality to all the provided commands and used events in a given component and deploys the result without requiring any additional user input during the process.
+</p>
+
+<p>The current version of the unit tester does not support generic components.  Therefore, in order to work around this limitation, a "wrapper" component should be written. Components that wire into Boot will also not function correctly.
+</p>
+
+<p>The unit tester is essentially just a Python object that extends NescApp, the standard Marionette class that is initially created, but the following steps may make its usage clearer.
+</p>
+
+<ol style="list-style-type: decimal;">
+
+<li>After <a href="Pytos Development Environment.html">setting up the environment</a> and navigating to a directory where a nesc component is located and ready to compile and deploy, the user may run the unit tester.
+</li>
+<li> All of the work is done in <b>UnitTest.py</b>. A Python script must be written that instantiates the UnitTest class in this file. It takes the same constructor arguments as a NescApp, except that the "name" argument of the constructor must be the name of the component to be tested, with any necessary path information included.  For example, if the component to be tested had the file names "TestAppC.nc" and "TestC.nc", the argument should be "Test".
+</li>
+<li>The new UnitTest object that is returned functions in the same manner as a normal NescApp. The user may decide to execute their script in an interactive Python session (with the -i tag) or run a set of static calls on it.
+</li>
+<li>If desired, it is possible to create new UnitTests as often as the user would like in the same script.  Obviously, in order for a given UnitTest to function, it must not have been overwritten by a newer instance.
+</li>
+</ol>
+
+<p>For an example, see the TestUnitTest app.
+</p>
+
+<a name="Implementation"/>
+<h2> Implementation </h2>
+
+
+<p>The UnitTest constructor first makes sure that its specific arguments are valid. It then reads in the AppC.nc and C.nc files and inserts the code needed for Marionette to function. Using regular expressions, it tags all interfaces and functions that are provided or used with the @rpc() tag. The resulting component is written to a clean directory and compiled/installed using the normal make system. Marionette inserts the code, as it would if the tags had been inserted manually. After the node is programmed, a new NescApp instance is created and returned that points to this node, which is the same result as if all of the steps had been taken manually.
+</p>
+
+<div class="editsection" style="float: right; margin-left: 5px;"><br>
+</div>
+
+<a name="Notes"></a>
+<h2> Notes </h2>
+
+<p>This tool has not been thoroughly tested and undoubtedly contains bugs. Any bug reports may be sent to michael_okola AT brown DOT edu. I'll try to fix any problems you may encounter as soon as possible.
+</p>
+
+</body>
+</html>

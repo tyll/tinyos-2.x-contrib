@@ -42,9 +42,12 @@ nesC code. Check out the <a href="Pytos%20Screenshots.html" title="Pytos Screens
 </p>
 
 
+<p><a href="UnitTest.html">Unit Testing Tool</a>
+</p>
 
 
-For the TinyOS 1.x version of this set of pages, please visit <a href="http://nest.cs.berkeley.edu/nestfe/index.php/Pytos_Development_Environment">here</a>.<br>
+<p>For the TinyOS 1.x version of this set of pages, please visit <a href="http://nest.cs.berkeley.edu/nestfe/index.php/Pytos_Development_Environment">here</a>.
+</p>
 
 
 <br>
@@ -67,12 +70,7 @@ For the TinyOS 1.x version of this set of pages, please visit <a href="http://ne
 <p>1. First, install the python environment for your&nbsp;<a href="Pytos%20Installation%20Instructions.html" class="external text" title="http://today.cs.berkeley.edu/nestfe/index.php/Pytos_Installation_Instructions" rel="nofollow">platform</a>.</p>
 
 
-
-<p>2. Second, install jpype (soon to become unnecessary).</p>
-
-
-
-<p>3. Next, add the following line to your .bashrc or other script in order to properly set up paths for pytos:</p>
+<p>2. Next, add the following line to your .bashrc or other script in order to properly set up paths for pytos:</p>
 
 
 
@@ -80,7 +78,7 @@ For the TinyOS 1.x version of this set of pages, please visit <a href="http://ne
 
 
 
-<p>4.  Then, you must edit the compiler include path and invoke the <span style="font-weight: bold;">marionette.extra</span>
+<p>3.  Then, you must edit the compiler include path and invoke the <span style="font-weight: bold;">marionette.extra</span>
 makefile during compilation by adding the following lines to your
 ~/tinyos-2.x/support/make/Makelocal (alternatively, you could add them to
 each application's Makefile individually).
@@ -94,7 +92,7 @@ each application's Makefile individually).
 
 
 
-<p>5.  Finally, each application must also include the <b>RpcM.nc</b> and <b>RamSymbolsM.nc</b> nesc libraries in your nesc application by adding the following line to a top-level configuration file:
+<p>4.  Finally, each application must also include the <b>RpcM.nc</b> and <b>RamSymbolsM.nc</b> nesc libraries in your nesc application by adding the following line to a top-level configuration file:
 </p>
 
 
@@ -113,7 +111,7 @@ instructions at&nbsp;<a href="Nesc%20Declarations.html" class="external text" ti
 
 
 
-<p>6. Once you have completed this setup, you can simply run a command similar to the one below: 
+<p>5. Once you have completed this setup, you can simply run a command similar to the one below: 
 </p>
 
 

@@ -18,10 +18,13 @@ Marionette is a tool suite which utilizes RPC to allow functions to be called an
 This project has nearly reached the full functionality of the TinyOS 1.x version.  It only lacks the ability to communicate with nodes using multi-hop routing.  In addition, an XML-RPC server has been included in Marionette to allow programs to utilize it in a variety of different programming languages and from separate PCs.
 </p>
 
+<p>
+A unit testing tool has also been developed for Marionette.  It enables programmers to test a given NesC interface and its associated functions, while only requiring the user to give the location of the .nc files and of the node.  All of the NesC code will be generated automatically and installed on the node, then the programmer may treat the returned object as a normal Marionette NescApp.
+</p>
+
 <h2>Current Development Efforts</h2>
 
-<p>
-A unit testing tool is currently under development for Marionette.  It will enable programmers to test a given NesC interface and its associated functions, while only requiring the user to give the location of the .nc file and of the node.  All of the NesC code will be generated automatically and installed on the node, then the programmer may treat the returned object as a normal Marionette NescApp.
+<p>Callback functionality is currently being developed for Marionette in order to allow listeners to be registered for provided events in a given component. This will greatly expand the number of functions that Marionette is able to interact with.
 </p>
 
 <h2>Future Work</h2>

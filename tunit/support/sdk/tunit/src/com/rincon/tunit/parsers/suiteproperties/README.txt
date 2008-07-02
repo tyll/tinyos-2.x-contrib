@@ -81,6 +81,13 @@ Each keyword must be located at the beginning of the line in the file.
 
 @skip
  - Skip this entire suite
+ 
+@compile <option>
+ - always : Default usage. Always compiles the test at least once per test run.
+ - once : If a build already exists, use it. Otherwise, compile one time.
+ - never : Never let TUnit compile the test. This requires you to compile
+       manually.
+ 
 
 EXAMPLES
 -------------------------------------------------------

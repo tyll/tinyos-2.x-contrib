@@ -96,8 +96,24 @@ public class TUnitSuiteProperties {
   /** @skip */
   private boolean skip;
   
+  /** @compile [always|once|never] */
+  private Integer compileOption;
+  
   /** Default amount of minutes before the current test times out */
   public static final int DEFAULT_TIMEOUT_MINUTES = 1;
+  
+  /** Default compile option. This differentiates from user defined settings */
+  public static final int COMPILE_DEFAULT_ALWAYS = 0;
+  
+  /** Compile the test always on each test run */
+  public static final int COMPILE_ALWAYS = 1;
+  
+  /** Compile the test once.  Don't compile if a build already exists */
+  public static final int COMPILE_ONCE = 2;
+  
+  /** Never compile the test. Always compile it manually */
+  public static final int COMPILE_NEVER = 3;
+  
   
   /**
    * Constructor
@@ -117,6 +133,7 @@ public class TUnitSuiteProperties {
     minTargetCount = null;
     timeout = null;
     skip = false;
+    compileOption = COMPILE_DEFAULT_ALWAYS;
     log = Logger.getLogger(getClass());
   }
 
@@ -256,7 +273,36 @@ public class TUnitSuiteProperties {
   public void setSkip(boolean skip) {
     this.skip = skip;
   }
+
   
+  public void setCompileOption(String string) {
+    if(string.equalsIgnoreCase("always")) {
+      compileOption = COMPILE_ALWAYS;
+    } else if(string.equalsIgnoreCase("once")) {
+      compileOption = COMPILE_ONCE;
+    } else if(string.equalsIgnoreCase("never")) {
+      compileOption = COMPILE_NEVER;
+    } else {
+      log.error("Invalid @compile option: " + string);
+    }
+  }
+  
+  public void setCompileOption(int option) {
+    if(option > COMPILE_NEVER || option < 0) {
+      log.error("Attempting to set an invalid compile option: " + option);
+      
+    } else {
+      compileOption = option;
+    }
+  }
+  
+  /**
+   * @return an integer of a static id defined in TUnitSuiteProperties that
+   *     translates to always, once, and never.
+   */
+  public int getCompileOption() {
+    return compileOption;
+  }
   
   /**
    * 
@@ -396,6 +442,10 @@ public class TUnitSuiteProperties {
     
     aggregate.ignore.addAll(subset.ignore);
     
+    if(subset.getCompileOption() > COMPILE_DEFAULT_ALWAYS) {
+      aggregate.setCompileOption(subset.getCompileOption());
+    }
+    
     // If the subset defines less @only's than the aggregate, only include
     // the subset's @only's.
     if(subset.only.size() > 0) {
@@ -438,11 +488,13 @@ public class TUnitSuiteProperties {
     if(timeout != null) {
       clone.setTimeout(timeout);
     }
-
+    
+    clone.setCompileOption(compileOption);
     clone.ignore.addAll(ignore);
     clone.only.addAll(only);
     
     return clone;
   }
+
 
 }

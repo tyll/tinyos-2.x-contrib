@@ -158,17 +158,12 @@ public class TestRunner {
   public void runTest() {
     log.trace("TestRunner.runTest()");
 
-    // 1. Clean the existing compiled projects
-    if (!clean()) {
-      return;
-    }
-
-    // 2. Build and install the project on all test run nodes
+    // 1. Build and install the project on all test run nodes
     if (!install()) {
       return;
     }
 
-    // 3. Connect serial forwarders, run the test, disconnect sf's.
+    // 2. Connect serial forwarders, run the test, disconnect sf's.
     log.debug("Connecting serial forwarders");
     if (!testManager.connectAll()) {
       TestResult result = new TestResult("__ConnectSerialForwarders");
@@ -203,22 +198,7 @@ public class TestRunner {
       log.error(e.getMessage());
     }
   }
-
-  /**
-   * Clean the build directory
-   * 
-   * @return true if the clean was successful
-   */
-  private boolean clean() {
-    log.trace("TestRunner.clean()");
-    log.debug("Clean");
-    TestResult focusedResult = make.clean(buildDirectory);
-    if (!focusedResult.isSuccess()) {
-      report.addResult(focusedResult);
-    }
-    return focusedResult.isSuccess();
-  }
-
+  
   /**
    * Build and install all targets. We evaluate all the build extras for each
    * target to determine if that target only has to be created once. If not, we
@@ -244,6 +224,13 @@ public class TestRunner {
         log.debug("Build properties differ for nodes using target "
             + focusedTarget.getTargetName());
         for (int nodeIndex = 0; nodeIndex < focusedTarget.totalNodes(); nodeIndex++) {
+          log.debug("Cleaning");
+          focusedResult = make.clean(buildDirectory);
+          if (!focusedResult.isSuccess()) {
+            report.addResult(focusedResult);
+            return false;
+          }
+          
           focusedNode = focusedTarget.getNode(nodeIndex);
           extras = "install." + focusedNode.getId() + " ";
           extras += focusedNode.getInstallExtras() + " ";
@@ -261,6 +248,7 @@ public class TestRunner {
         	  + "-DTUNIT_TOTAL_NODES=" + runProperties.totalNodes() + " "
           	  + suiteProperties.getCFlags() + "\"";
           
+          log.debug("Compiling and installing");
           focusedResult = make.build(buildDirectory, focusedTarget
               .getTargetName(), extras);
           
@@ -274,30 +262,50 @@ public class TestRunner {
         log.debug("Build properties are identical for nodes using target "
             + focusedTarget.getTargetName());
         
-        focusedNode = focusedTarget.getNode(0);
+        if(needsCompile(focusedTarget.getTargetName())) {
+          log.debug("Cleaning");
+          focusedResult = make.clean(buildDirectory);
+          if (!focusedResult.isSuccess()) {
+            report.addResult(focusedResult);
+            return false;
+          }
+          
+          log.debug("Compiling");
+          
+          focusedNode = focusedTarget.getNode(0);
+          
+          extras = suiteProperties.getExtras() + " ";
+          extras += "tunit ";
+          extras += focusedNode.getBuildExtras() + " ";
+          
+          extras += "TUNITCFLAGS=\""
+            + "-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/lib/tunit "
+            + "-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/lib/tunitstats "
+            + "-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/system "
+            + "-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/interfaces "
+            + "-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/lib/directserial "
+            + "-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/lib/fifoqueue "
+            + "-DTUNIT_TOTAL_NODES=" + runProperties.totalNodes() + " "
+            + suiteProperties.getCFlags() + "\"";
+          
+          focusedResult = make.build(buildDirectory, focusedTarget
+              .getTargetName(), extras);
+          
+          report.addResult(focusedResult);
+          if (!focusedResult.isSuccess()) {
+            return false;
+          }
+        }
         
-        extras = suiteProperties.getExtras() + " ";
-        extras += "tunit ";
-        extras += focusedNode.getBuildExtras() + " ";
-        
-        extras += "TUNITCFLAGS=\""
-      	  + "-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/lib/tunit "
-      	  + "-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/lib/tunitstats "
-      	  + "-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/system "
-      	  + "-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/interfaces "
-      	  + "-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/lib/directserial "
-      	  + "-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/lib/fifoqueue "
-      	  + "-DTUNIT_TOTAL_NODES=" + runProperties.totalNodes() + " "
-          + suiteProperties.getCFlags() + "\"";
-        
-        focusedResult = make.build(buildDirectory, focusedTarget
-            .getTargetName(), extras);
-        
-        report.addResult(focusedResult);
-        if (!focusedResult.isSuccess()) {
+        if(!doesBuildExist(focusedTarget.getTargetName())) {
+          log.error("Cannot install or run test! Build doesn't exist.");
+          TestResult logResult = new TestResult("__Build");
+          logResult.error("No test to install!", "Build doesn't exist, and we can't compile.\n" +
+              "Compile manually, or change the @compile option in suite.properties.");
+          report.addResult(logResult);
           return false;
         }
-
+        
         log.debug("Total nodes to install: " + focusedTarget.totalNodes());
         String reinstallExtras;
         for (int nodeIndex = 0; nodeIndex < focusedTarget.totalNodes(); nodeIndex++) {
@@ -338,7 +346,7 @@ public class TestRunner {
       return false;
     }
     
-    File appcFile = new File(buildDirectory, "/" + make.getAppcLocation());
+    File appcFile = new File(buildDirectory, "build/" + focusedTarget.getTargetName() + "/app.c");
     log.info("Parsing app.c file " + appcFile.getAbsolutePath());
     
     // Attempt to find and parse the app.c file
@@ -364,4 +372,48 @@ public class TestRunner {
     return true;
   }
 
+  
+  /**
+   * If the compile option for this test suite says we should only compile once,
+   * then we check to see if a build directory exists with the app.c file 
+   * inside.  If this is found, then we don't need to compile.
+   * 
+   * If the compile option is "never", we don't need to compile.
+   * 
+   * If the compile option is "always" or "default" then we need to compile.
+   * 
+   * @param focusedTarget
+   * @return true if we need to compile.
+   */
+  private boolean needsCompile(String focusedTargetName) {
+    if(suiteProperties.getCompileOption() == TUnitSuiteProperties.COMPILE_ALWAYS
+        || suiteProperties.getCompileOption() == TUnitSuiteProperties.COMPILE_DEFAULT_ALWAYS) {
+      log.debug("Compile recommended");
+      return true;
+    
+    } else if(suiteProperties.getCompileOption() == TUnitSuiteProperties.COMPILE_ONCE) {
+      if(doesBuildExist(focusedTargetName)) {
+        log.debug("Recommend no compile since build already exists.");
+        return false;
+        
+      } else {
+        log.debug("Compile recommended");
+        return true;
+      }
+    } 
+    
+    log.debug("This test must be compiled manually");
+    return false;
+  }
+  
+  /**
+   * 
+   * @param focusedTargetName
+   * @return true if the test firmware image exists. We look for the app.c file.
+   */
+  private boolean doesBuildExist(String focusedTargetName) {
+    log.debug("Checking " + new File(buildDirectory, "build/" + focusedTargetName + "/app.c").getAbsolutePath());
+    
+    return new File(buildDirectory, "build/" + focusedTargetName + "/app.c").exists();
+  }
 }

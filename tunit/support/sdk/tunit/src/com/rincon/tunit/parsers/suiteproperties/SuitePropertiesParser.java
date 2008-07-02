@@ -40,7 +40,6 @@ import org.apache.log4j.Logger;
 
 import com.rincon.tunit.properties.TUnitSuiteProperties;
 import com.rincon.tunit.report.TestResult;
-import com.rincon.util.Util;
 
 /**
  * Parse test suite configuration files. These files can be located
@@ -182,6 +181,9 @@ public class SuitePropertiesParser {
           } catch(NumberFormatException e) {
             log.error("Unable to decode " + line);
           }
+          
+        } else if(line.toLowerCase().startsWith("@compile")) {
+          suiteProperties.setCompileOption(line.replace("@compile","").trim());
           
         } else if(parsingDescription) {
           suiteProperties.addDescription(line.replace("@description","").trim());

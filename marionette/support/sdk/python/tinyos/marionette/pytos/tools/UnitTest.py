@@ -4,7 +4,6 @@
 # @author Michael Okola
 #
 
-import pdb
 from pytos.util.NescApp import *
 import pytos.util.NescApp as NescApp
 
@@ -130,6 +129,10 @@ include $(MAKERULES)''')
     #os.system("cp " + applicationName + " ./")
     os.system("make " + buildDir + " install")
 
+    #wait for the user to start up any needed serial forwarders, etc
+    print "\nPlease set up any connections needed, such as a serial forwarder."
+    raw_input("Press enter when ready to connect.")
+
     #now run the regular NescApp initialization
     #first, import all enums, types, msgs, rpc functions, and ram symbols
     self.applicationName = applicationName
@@ -188,23 +191,23 @@ Be sure that you supplied the correct buildDir parameter \"%s\".
     names = self.rpc._messages.keys()
     if self.__dict__.has_key("ramSymbols"):
       names.extend(self.ramSymbols._messages.keys())
-      names.sort()
-      for name in names :
-        match = moduleName.match(name)
-        if match != None :
-          moduleNames[match.groups(0)[0]] = True
-          for name in moduleNames.keys() :
-            try :
-              rpc = self.rpc.__getattr__(name)
-            except:
-              rpc = None
-              try :
-                ram = self.ramSymbols.__getattr__(name)
-              except:
-                ram = None
-                self.__dict__[name] = Shortcut(name, rpc, ram)
-                self._moduleNames.append(name)
-                self._moduleNames.sort()
+    names.sort()
+    for name in names :
+      match = moduleName.match(name)
+      if match != None :
+        moduleNames[match.groups(0)[0]] = True
+    for name in moduleNames.keys() :
+      try :
+        rpc = self.rpc.__getattr__(name)
+      except:
+        rpc = None
+      try :
+        ram = self.ramSymbols.__getattr__(name)
+      except:
+        ram = None
+      self.__dict__[name] = Shortcut(name, rpc, ram)
+      self._moduleNames.append(name)
+    self._moduleNames.sort()
 
   def stripComments(self, s):
     blockre = re.compile(r'/\*.*?\*/', re.MULTILINE|re.DOTALL)
@@ -221,3 +224,6 @@ Be sure that you supplied the correct buildDir parameter \"%s\".
       result = linere.search(s)
     
     return s
+
+  def getValue(result):
+    return result[0].value.values()[0].value

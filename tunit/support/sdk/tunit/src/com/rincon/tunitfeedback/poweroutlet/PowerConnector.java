@@ -191,10 +191,10 @@ public class PowerConnector implements Messenger, PhoenixError {
           .getAbsolutePath()
           + " does not exist");
       focusedResult = make.build(buildDirectory, "telosb", " install "
-          + connectedNode.getInstallExtras());
+          + connectedNode.getInstallExtras(), null);
     } else {
       focusedResult = make.build(buildDirectory, "telosb", " reinstall "
-          + connectedNode.getInstallExtras());
+          + connectedNode.getInstallExtras(), null);
     }
 
     return focusedResult.isSuccess();

@@ -54,7 +54,7 @@ public interface BuildInterface {
    * @param extras Arguments to pass into the build process
    * @return true if the project compiled correctly
    */
-  public TestResult build(File buildDir, String target, String extras);
+  public TestResult build(File buildDir, String target, String extras, String env);
   
   /**
    * 

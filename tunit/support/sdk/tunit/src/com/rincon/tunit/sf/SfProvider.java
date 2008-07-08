@@ -173,7 +173,9 @@ public class SfProvider extends Thread implements PacketListenerIF,
 
       try {
         for (;;) {
+          log.debug("Accepting socket");
           Socket currentSocket = serverSocket.accept();
+          log.debug("Socket accepted, creating new SFClient");
           SfClient newServicer = new SfClient(currentSocket, serialForwarder,
               this, commentListener);
           clients.add(newServicer);

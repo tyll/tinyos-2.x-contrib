@@ -61,7 +61,7 @@ public class Make implements BuildInterface {
 
   /** Text that was printed to the screen on make */
   private String appcLocation;
-  
+
   /**
    * Constructor
    * 
@@ -80,18 +80,24 @@ public class Make implements BuildInterface {
    *          Arguments to pass into the build process
    * @return true if the project compiled correctly
    */
-  public TestResult build(File buildDir, String target, String extras) {
+  public TestResult build(File buildDir, String target, String extras,
+      String env) {
     log.trace("Entering make build");
     log.info("Building platform " + target + " in "
         + buildDir.getAbsolutePath());
     TestResult result;
+    
+    if(env == null) {
+      env = "";
+    }
 
     String buildArgs = target + " " + extras;
     String largeOutput;
+    
     try {
-      String[] display = CmdExec.runCommand("make -C "
+      String[] display = CmdExec.runBlockingCommand(" make -C "
           + buildDir.getAbsolutePath().replace(File.separatorChar, '/') + " "
-          + buildArgs);
+          + buildArgs, env);
 
       largeOutput = "";
       // int exitVal = CmdExec.lastExitVal;
@@ -105,7 +111,7 @@ public class Make implements BuildInterface {
         for (int i = 0; i < display.length; i++) {
           largeOutput += display[i] + "\n";
         }
-        
+
       } else {
         for (int i = 0; i < display.length; i++) {
           largeOutput += display[i] + "\n";
@@ -119,23 +125,22 @@ public class Make implements BuildInterface {
             ramBytes = parseBytes(display[i]);
           }
         }
-        
-        result = new TestResult("__Build " + target + " " + extras + " (ROM="
+
+        result = new TestResult("__Build " + target + " " + extras + " " + env + " (ROM="
             + romBytes + "; RAM=" + ramBytes + ")");
       }
-      
+
       log.info(largeOutput);
-      
-      
-      String[] word = largeOutput.replace("="," ").split(" ");
-      for(int i = 0; i < word.length; i++) {
-        if(word[i].contains("app.c")) {
+
+      String[] word = largeOutput.replace("=", " ").split(" ");
+      for (int i = 0; i < word.length; i++) {
+        if (word[i].contains("app.c")) {
           log.info("Found app.c in " + word[i]);
           appcLocation = word[i];
           break;
         }
       }
-      
+
       if (!compileSuccessful) {
         result.error("Compile Error", largeOutput);
       }
@@ -177,7 +182,7 @@ public class Make implements BuildInterface {
     TestResult result = new TestResult("__Clean");
 
     try {
-      String[] display = CmdExec.runCommand("make -C "
+      String[] display = CmdExec.runBlockingCommand("make -C "
           + buildDir.getAbsolutePath().replace(File.separatorChar, '/')
           + " clean");
 
@@ -207,7 +212,7 @@ public class Make implements BuildInterface {
     return Long.decode(new StringTokenizer(compileLine).nextToken())
         .longValue();
   }
-  
+
   /**
    * 
    * @return "build/telosb/app.c" so you can tack it onto your build directory

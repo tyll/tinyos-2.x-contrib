@@ -80,7 +80,13 @@ public class TUnit {
 
   /** The directory we're running our tests from */
   private static File rootDirectory;
+  
+  /** The tunit.xml file location */
+  private static File tunitXmlFile; 
 
+  /** True if we want to enable the @cmd flags in suite.properties files */
+  private static boolean cmdFlagEnabled = false;
+  
   /**
    * The directory from which all other packages are relative Also the directory
    * where build.xml is located, or the root of the file system
@@ -115,6 +121,13 @@ public class TUnit {
     for (int i = 0; i < args.length; i++) {
       if (args[i].equalsIgnoreCase("-tunitbase") && args.length > i + 1) {
         i++;
+        
+        if(i > args.length) {
+          log.error("Not enough arguments");
+          syntax();
+          System.exit(1);
+        }
+        
         tunitBase = args[i];
 
         File tunitBaseAttempt = new File(tunitBase);
@@ -129,6 +142,13 @@ public class TUnit {
 
       } else if (args[i].equalsIgnoreCase("-testdir") && args.length > i + 1) {
         i++;
+        
+        if(i > args.length) {
+          log.error("Not enough arguments");
+          syntax();
+          System.exit(1);
+        }
+        
         File rootDirectoryAttempt = new File(args[i]);
 
         if (!rootDirectoryAttempt.exists()) {
@@ -144,10 +164,24 @@ public class TUnit {
 
       } else if (args[i].equalsIgnoreCase("-packagedir") && args.length > i + 1) {
         i++;
+        
+        if(i > args.length) {
+          log.error("Not enough arguments");
+          syntax();
+          System.exit(1);
+        }
+        
         packageDirectoryAttempt = new File(args[i]);
 
       } else if (args[i].equalsIgnoreCase("-reportdir") && args.length > i + 1) {
         i++;
+        
+        if(i > args.length) {
+          log.error("Not enough arguments");
+          syntax();
+          System.exit(1);
+        }
+        
         baseReportDirectory = new File(args[i]);
 
         // We'll create the report directory if it doesn't exist.
@@ -160,6 +194,29 @@ public class TUnit {
         log.info("Running TUnit in debug mode");
         Logger.getRootLogger().setLevel((Level) Level.TRACE);
 
+      } else if (args[i].equalsIgnoreCase("-tunitxml")) {
+        i++;
+        
+        if(i > args.length) {
+          log.error("Not enough arguments");
+          syntax();
+          System.exit(1);
+        }
+        
+        tunitXmlFile = new File(args[i]);
+        if(!tunitXmlFile.exists()) {
+          log.error("The given tunit.xml file does not exist:");
+          log.error(tunitXmlFile.getAbsoluteFile());
+          tunitXmlFile = null;
+          
+        } else {
+          log.info("Using tunit.xml file located at " + tunitXmlFile.getAbsolutePath());
+        }
+        
+        
+      } else if (args[i].equalsIgnoreCase("-enablecmd")) {
+        cmdFlagEnabled = true;
+        
       } else if (args[i].contains("?")) {
         syntax();
         System.exit(1);
@@ -216,30 +273,6 @@ public class TUnit {
 
     establishTunitDir();
     establishReportDir();
-  }
-
-  private void syntax() {
-    System.out.println("TUnit Syntax: java com.rincon.tunit.TUnit (options)");
-    System.out.println("\nOptions are:");
-    System.out.println("\t-tunitbase [absolute path to the equivalent of");
-    System.out.println("\t\ttinyos-2.x-contrib/tunit]");
-    System.out.println("\t\tThe tinyos-2.x-contrib/tunit directory contains");
-    System.out.println("\t\tTUnit's embedded libraries");
-    System.out.println();
-    System.out.println("\t-testdir [absolute test directory]");
-    System.out.println("\t\tThis lets you start testing in a specific directory");
-    System.out.println();
-    System.out.println("\t-reportdir [absolute report directory]");
-    System.out.println("\t\tThis directory is where your reports will be stored.");
-    System.out.println();
-    System.out.println("\t-packagedir [absolute package directory]");
-    System.out.println("\t\tThis directory is where your tests will be reference from in");
-    System.out.println("\t\treports. By default, this is the parent directory containing");
-    System.out.println("\t\ta build.xml");
-    System.out.println();
-    System.out.println("\t-debug");
-    System.out.println("\t\tDisplay all TUnit Java framework debug statements");
-    System.out.println("\n\t-? for help");
   }
 
   /**
@@ -493,26 +526,28 @@ public class TUnit {
    * 
    */
   private void processTunitXml() {
-    // TODO check for a manually set tunit.xml file.
-    File tunitPropertiesFile = new File(tunitDirectory, "tunit.xml");
-    if (!tunitPropertiesFile.exists()) {
-      log.fatal("Cannot locate " + tunitPropertiesFile.getAbsolutePath());
-      // TODO edit this comment
-      log.fatal("Does tinyos-2.x-contrib/tunit/tunit.xml exist?");
+    if(tunitXmlFile == null) {
+      tunitXmlFile = new File(tunitDirectory, "tunit.xml");
+    }
+    
+    if (!tunitXmlFile.exists()) {
+      log.fatal("Cannot locate " + tunitXmlFile.getAbsolutePath());
+      log.fatal("Does " + tunitXmlFile.getAbsolutePath() + " exist?");
       System.exit(4);
     }
 
     // 5. Process the tunit.xml file
-    log.debug("Processing " + tunitPropertiesFile);
+    log.debug("Processing " + tunitXmlFile);
     TUnitPropertiesParser tunitParser = new TUnitPropertiesParser(
-        tunitPropertiesFile);
+        tunitXmlFile);
     TestResult parseResult = tunitParser.parse();
     if (parseResult.isSuccess()) {
-      log.debug("tunit.xml processed successfully");
+      log.debug(tunitXmlFile.getAbsoluteFile() + " processed successfully");
     } else {
       log.fatal(parseResult.getFailMsg());
       System.exit(5);
     }
+    
     testRuns = tunitParser.getAllTestRuns();
     tunitParser = null;
   }
@@ -612,5 +647,45 @@ public class TUnit {
     } catch (ParseException e) {
       log.error(e.getMessage());
     }
+  }
+
+
+  private void syntax() {
+    System.out.println("TUnit Syntax: java com.rincon.tunit.TUnit (options)");
+    System.out.println("\nOptions are:");
+    System.out.println("\t-tunitbase [absolute path to the equivalent of");
+    System.out.println("\t\ttinyos-2.x-contrib/tunit]");
+    System.out.println("\t\tThe tinyos-2.x-contrib/tunit directory contains");
+    System.out.println("\t\tTUnit's embedded libraries");
+    System.out.println();
+    System.out.println("\t-testdir [absolute test directory]");
+    System.out.println("\t\tThis lets you start testing in a specific directory");
+    System.out.println();
+    System.out.println("\t-reportdir [absolute report directory]");
+    System.out.println("\t\tThis directory is where your reports will be stored.");
+    System.out.println();
+    System.out.println("\t-packagedir [absolute package directory]");
+    System.out.println("\t\tThis directory is where your tests will be reference from in");
+    System.out.println("\t\treports. By default, this is the parent directory containing");
+    System.out.println("\t\ta build.xml");
+    System.out.println();
+    System.out.println("\t-tunitxml [absolute path to tunit.xml]");
+    System.out.println("\t\tThis lets you specify a tunit.xml file outside of your");
+    System.out.println("\t\ttinyos-2.x-contrib/tunit directory.");
+    System.out.println();
+    System.out.println("\t-enablecmd");
+    System.out.println("\t\tEnables the @cmd suite.properties command.");
+    System.out.println("\t\tThis will allow command line arguments to run during");
+    System.out.println("\t\ta test, providing a hook to run external scripts and");
+    System.out.println("\t\tapplications that may be useful to the test, such as");
+    System.out.println("\t\taccessing external test and measurement equipment.");
+    System.out.println();
+    System.out.println("\t-debug");
+    System.out.println("\t\tDisplay all TUnit Java framework debug statements");
+    System.out.println("\n\t-? for help");
+  }
+
+  public static boolean isCmdFlagEnabled() {
+    return cmdFlagEnabled;
   }
 }

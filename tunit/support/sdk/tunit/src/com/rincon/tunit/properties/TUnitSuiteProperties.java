@@ -96,6 +96,15 @@ public class TUnitSuiteProperties {
   /** @skip */
   private boolean skip;
   
+  /** @cmd start <blah> */
+  private String startCmd;
+  
+  /** @cmd run <blah> */
+  private String runCmd;
+  
+  /** @cmd stop <blah> */
+  private String stopCmd;
+  
   /** @compile [always|once|never] */
   private Integer compileOption;
   
@@ -133,6 +142,9 @@ public class TUnitSuiteProperties {
     minTargetCount = null;
     timeout = null;
     skip = false;
+    startCmd = "";
+    runCmd = "";
+    stopCmd = "";
     compileOption = COMPILE_DEFAULT_ALWAYS;
     log = Logger.getLogger(getClass());
   }
@@ -304,6 +316,32 @@ public class TUnitSuiteProperties {
     return compileOption;
   }
   
+  public void setStartCmd(String command) {
+    startCmd = command;
+  }
+
+  public void setRunCmd(String command) {
+    runCmd = command;
+  }
+
+  public void setStopCommand(String command) {
+    stopCmd = command;
+  }
+
+  public String getStartCmd() {
+    return startCmd;
+  }
+  
+  public String getRunCmd() {
+    return runCmd;
+  }
+  
+  public String getStopCmd() {
+    return stopCmd;
+  }
+
+  
+  
   /**
    * 
    * @param testRun the test run to evaluate if this test is applicable for
@@ -440,6 +478,18 @@ public class TUnitSuiteProperties {
       aggregate.setSkip(true);
     }
     
+    if(!subset.getStartCmd().matches("")) {
+      aggregate.setStartCmd(subset.getStartCmd());
+    }
+    
+    if(!subset.getRunCmd().matches("")) {
+      aggregate.setRunCmd(subset.getRunCmd());
+    }
+    
+    if(!subset.getStopCmd().matches("")) {
+      aggregate.setStopCommand(subset.getStopCmd());
+    }
+    
     aggregate.ignore.addAll(subset.ignore);
     
     if(subset.getCompileOption() > COMPILE_DEFAULT_ALWAYS) {
@@ -490,6 +540,9 @@ public class TUnitSuiteProperties {
     }
     
     clone.setCompileOption(compileOption);
+    clone.setStartCmd(startCmd);
+    clone.setRunCmd(runCmd);
+    clone.setStopCommand(stopCmd);
     clone.ignore.addAll(ignore);
     clone.only.addAll(only);
     

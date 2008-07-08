@@ -43,6 +43,7 @@ import org.apache.log4j.Logger;
 import com.rincon.tunit.TUnit;
 import com.rincon.tunit.build.BuildInterface;
 import com.rincon.tunit.build.Make;
+import com.rincon.tunit.exec.CmdExec;
 import com.rincon.tunit.parsers.appc.AppCParser;
 import com.rincon.tunit.properties.TUnitNodeProperties;
 import com.rincon.tunit.properties.TUnitSuiteProperties;
@@ -171,10 +172,37 @@ public class TestRunner {
       report.addResult(result);
       return;
     }
-
+    
+    if(TUnit.isCmdFlagEnabled() && !suiteProperties.getStartCmd().matches("")) {
+      log.info("Running start cmd: " + suiteProperties.getStartCmd());
+      try {
+        log.info(CmdExec.outputToString(CmdExec.runBlockingCommand(suiteProperties.getStartCmd())));
+      } catch (IOException e) {
+        log.fatal("Fatal error running start cmd " + suiteProperties.getStartCmd()
+            + "\n" + e.getMessage() + "\n" + e.getStackTrace());
+        TestResult result = new TestResult("@cmd start " + suiteProperties.getStartCmd());
+        result.error("@cmd execution error", "Fatal error running @cmd start: " + suiteProperties.getStartCmd());
+        report.addResult(result);
+      }
+    }
+    
     log.debug("Running test");
     new ResultCollector(report, runProperties, suiteProperties, testMap,
         statsMap, assertionMap);
+    
+    if(TUnit.isCmdFlagEnabled() && !suiteProperties.getStopCmd().matches("")) {
+      log.info("Running stop cmd: " + suiteProperties.getStartCmd());
+      try {
+        log.info(CmdExec.outputToString(CmdExec.runBlockingCommand(suiteProperties.getStartCmd())));
+      } catch (IOException e) {
+        log.fatal("Fatal error running stop cmd " + suiteProperties.getStartCmd()
+            + "\n" + e.getMessage() + "\n" + e.getStackTrace());
+        TestResult result = new TestResult("@cmd stop " + suiteProperties.getStartCmd());
+        result.error("@cmd execution error", "Fatal error running @cmd stop: " + suiteProperties.getStartCmd());
+        report.addResult(result);
+      }
+    }
+    
     log.debug("Disconnecting serial forwarders");
     testManager.disconnectAll();
   }
@@ -217,6 +245,7 @@ public class TestRunner {
     TUnitTargetProperties focusedTarget = null;
     TUnitNodeProperties focusedNode;
     String extras;
+    String env;
     
     for (int i = 0; i < runProperties.totalTargets(); i++) {
       focusedTarget = runProperties.getTarget(i);
@@ -238,19 +267,13 @@ public class TestRunner {
           extras += "tunit ";
           extras += focusedNode.getBuildExtras() + " ";
           
-          extras += "TUNITCFLAGS=\""
-        	  + "-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/lib/tunit "
-        	  + "-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/lib/tunitstats "
-        	  + "-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/system "
-        	  + "-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/interfaces "
-        	  + "-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/lib/directserial "
-        	  + "-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/lib/fifoqueue "
+          env = "TUNITCFLAGS=\""
         	  + "-DTUNIT_TOTAL_NODES=" + runProperties.totalNodes() + " "
           	  + suiteProperties.getCFlags() + "\"";
           
           log.debug("Compiling and installing");
           focusedResult = make.build(buildDirectory, focusedTarget
-              .getTargetName(), extras);
+              .getTargetName(), extras, env);
           
           if (!focusedResult.isSuccess()) {
             report.addResult(focusedResult);
@@ -278,18 +301,12 @@ public class TestRunner {
           extras += "tunit ";
           extras += focusedNode.getBuildExtras() + " ";
           
-          extras += "TUNITCFLAGS=\""
-            + "-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/lib/tunit "
-            + "-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/lib/tunitstats "
-            + "-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/system "
-            + "-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/interfaces "
-            + "-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/lib/directserial "
-            + "-I" + TUnit.getTunitBase().replace("\\","/") + "/tos/lib/fifoqueue "
+          env = "TUNITCFLAGS=\""
             + "-DTUNIT_TOTAL_NODES=" + runProperties.totalNodes() + " "
             + suiteProperties.getCFlags() + "\"";
           
           focusedResult = make.build(buildDirectory, focusedTarget
-              .getTargetName(), extras);
+              .getTargetName(), extras, env);
           
           report.addResult(focusedResult);
           if (!focusedResult.isSuccess()) {
@@ -314,7 +331,7 @@ public class TestRunner {
           reinstallExtras += focusedNode.getInstallExtras();
 
           focusedResult = make.build(buildDirectory, focusedTarget
-              .getTargetName(), reinstallExtras);
+              .getTargetName(), reinstallExtras, null);
 
           if (!focusedResult.isSuccess()) {
             report.addResult(focusedResult);

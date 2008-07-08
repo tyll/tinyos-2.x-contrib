@@ -143,6 +143,11 @@ public class Sf implements SerialForwarder, Messenger, PhoenixError {
         // I commented out the while loop here because sometimes a missing
         // mote wouldn't produce any feedback indicating that it did or didn't
         // connect.  This should be investigated further.
+        
+        if(motecom.contains("sf")) {
+          serverRunning = true;
+        }
+        
         while (!serverRunning && !error) {
           try {
             wait(2000);

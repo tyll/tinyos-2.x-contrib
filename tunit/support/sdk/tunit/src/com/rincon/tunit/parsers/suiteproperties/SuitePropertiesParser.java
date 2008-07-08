@@ -35,6 +35,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
 
@@ -184,6 +185,31 @@ public class SuitePropertiesParser {
           
         } else if(line.toLowerCase().startsWith("@compile")) {
           suiteProperties.setCompileOption(line.replace("@compile","").trim());
+          
+        } else if(line.toLowerCase().startsWith("@cmd")) {
+          StringTokenizer tokens = new StringTokenizer(line.replace("@cmd",""));
+          
+          if(tokens.countTokens() < 2) {
+            log.error("Too few arguments to suite.properties flag: " + line);
+            continue;
+          }
+          
+          String type = tokens.nextToken();
+          String command = "";
+          
+          while(tokens.hasMoreTokens()) {
+            command += tokens.nextToken() + " ";
+          }
+          
+          if(type.equalsIgnoreCase("start")) {
+            suiteProperties.setStartCmd(command);
+          } else if(type.equalsIgnoreCase("run")) {
+            suiteProperties.setRunCmd(command);
+          } else if(type.equalsIgnoreCase("stop")) {
+            suiteProperties.setStopCommand(command);
+          } else {
+            log.error("Illegal @cmd type: " + line);
+          }
           
         } else if(parsingDescription) {
           suiteProperties.addDescription(line.replace("@description","").trim());

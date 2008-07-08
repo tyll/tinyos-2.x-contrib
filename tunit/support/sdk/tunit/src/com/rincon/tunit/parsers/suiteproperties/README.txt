@@ -87,7 +87,15 @@ Each keyword must be located at the beginning of the line in the file.
  - once : If a build already exists, use it. Otherwise, compile one time.
  - never : Never let TUnit compile the test. This requires you to compile
        manually.
- 
+
+@cmd [start|run|finish] [commandline]
+  - start : runs the given command line argument before the test begins. Blocks.
+  - run : runs the given command line argument during the test. This gets 
+        destroyed when the test completes if not before. Does not block.
+  - finish : runs the given command line argument after the test ends. Blocks.
+  You must run TUnit with the -enablecmd option to allow command line arguments
+  to execute.
+
 
 EXAMPLES
 -------------------------------------------------------

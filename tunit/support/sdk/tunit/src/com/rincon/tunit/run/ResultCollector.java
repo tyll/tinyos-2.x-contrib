@@ -144,7 +144,6 @@ public class ResultCollector extends Thread implements Messenger,
     MoteIF focusedMoteIf;
     PhoenixSource focusedSource;
     for (int i = 0; i < runProperties.totalNodes(); i++) {
-
       String source = "sf@localhost:" + (TestRunManager.BASE_PORT + i);
       focusedSource = BuildSource.makePhoenix(source, this);
       focusedSource.setPacketErrorHandler(this);
@@ -169,6 +168,9 @@ public class ResultCollector extends Thread implements Messenger,
 
     // 4. Begin the test, wait for it to complete
     this.start();
+    
+    // TODO execute the @cmd run here
+    
     synchronized (this) {
       while (!allDone) {
         try {

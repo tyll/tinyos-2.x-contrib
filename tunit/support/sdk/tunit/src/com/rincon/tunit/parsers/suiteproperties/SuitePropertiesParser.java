@@ -203,10 +203,13 @@ public class SuitePropertiesParser {
           
           if(type.equalsIgnoreCase("start")) {
             suiteProperties.setStartCmd(command);
+            
           } else if(type.equalsIgnoreCase("run")) {
             suiteProperties.setRunCmd(command);
+            
           } else if(type.equalsIgnoreCase("stop")) {
             suiteProperties.setStopCommand(command);
+            
           } else {
             log.error("Illegal @cmd type: " + line);
           }

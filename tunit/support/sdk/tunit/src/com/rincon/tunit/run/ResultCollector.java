@@ -169,8 +169,6 @@ public class ResultCollector extends Thread implements Messenger,
     // 4. Begin the test, wait for it to complete
     this.start();
     
-    // TODO execute the @cmd run here
-    
     synchronized (this) {
       while (!allDone) {
         try {
@@ -253,6 +251,8 @@ public class ResultCollector extends Thread implements Messenger,
     log.debug("Calling link.runTest()");
     link.runTest();
 
+    CmdFlagExecutor.executeCmdFlag("run", suiteProperties.getRunCmd(), report);
+    
     log.trace("ResultCollector.run()::runtest");
     while (!allDone) {
       try {

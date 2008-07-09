@@ -215,6 +215,7 @@ public class TUnit {
         
         
       } else if (args[i].equalsIgnoreCase("-enablecmd")) {
+        log.info("External @cmd flags enabled");
         cmdFlagEnabled = true;
         
       } else if (args[i].contains("?")) {

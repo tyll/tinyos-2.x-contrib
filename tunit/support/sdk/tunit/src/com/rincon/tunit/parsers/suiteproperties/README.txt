@@ -92,10 +92,10 @@ Each keyword must be located at the beginning of the line in the file.
   - start : runs the given command line argument before the test begins. Blocks.
   - run : runs the given command line argument during the test. This gets 
         destroyed when the test completes if not before. Does not block.
-  - finish : runs the given command line argument after the test ends. Blocks.
+  - stop : runs the given command line argument after the test ends. Blocks.
   You must run TUnit with the -enablecmd option to allow command line arguments
   to execute.
-
+  
 
 EXAMPLES
 -------------------------------------------------------

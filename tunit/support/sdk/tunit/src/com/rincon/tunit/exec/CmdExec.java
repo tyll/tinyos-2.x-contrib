@@ -160,7 +160,7 @@ public class CmdExec {
   static public String outputToString(String[] output) {
     String str = "";
     for (int i = 0; i < output.length; i++) {
-      str = output[i] + "\n";
+      str += output[i] + "\n";
     }
 
     return str;

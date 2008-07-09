@@ -31,8 +31,6 @@ package com.rincon.tunit.run;
  * OF THE POSSIBILITY OF SUCH DAMAGE
  */
 
-import java.io.FileWriter;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
@@ -173,35 +171,13 @@ public class TestRunner {
       return;
     }
     
-    if(TUnit.isCmdFlagEnabled() && !suiteProperties.getStartCmd().matches("")) {
-      log.info("Running start cmd: " + suiteProperties.getStartCmd());
-      try {
-        log.info(CmdExec.outputToString(CmdExec.runBlockingCommand(suiteProperties.getStartCmd())));
-      } catch (IOException e) {
-        log.fatal("Fatal error running start cmd " + suiteProperties.getStartCmd()
-            + "\n" + e.getMessage() + "\n" + e.getStackTrace());
-        TestResult result = new TestResult("@cmd start " + suiteProperties.getStartCmd());
-        result.error("@cmd execution error", "Fatal error running @cmd start: " + suiteProperties.getStartCmd());
-        report.addResult(result);
-      }
-    }
+    CmdFlagExecutor.executeCmdFlag("start", suiteProperties.getStartCmd(), report);
     
     log.debug("Running test");
     new ResultCollector(report, runProperties, suiteProperties, testMap,
         statsMap, assertionMap);
     
-    if(TUnit.isCmdFlagEnabled() && !suiteProperties.getStopCmd().matches("")) {
-      log.info("Running stop cmd: " + suiteProperties.getStartCmd());
-      try {
-        log.info(CmdExec.outputToString(CmdExec.runBlockingCommand(suiteProperties.getStartCmd())));
-      } catch (IOException e) {
-        log.fatal("Fatal error running stop cmd " + suiteProperties.getStartCmd()
-            + "\n" + e.getMessage() + "\n" + e.getStackTrace());
-        TestResult result = new TestResult("@cmd stop " + suiteProperties.getStartCmd());
-        result.error("@cmd execution error", "Fatal error running @cmd stop: " + suiteProperties.getStartCmd());
-        report.addResult(result);
-      }
-    }
+    CmdFlagExecutor.executeCmdFlag("stop", suiteProperties.getStopCmd(), report);
     
     log.debug("Disconnecting serial forwarders");
     testManager.disconnectAll();

@@ -365,6 +365,9 @@ implementation
 
 	void stop() {
 		call DsnPlatform.flushUart();
+	}
+	
+	async event void DsnPlatform.flushUartDone() {
 		atomic {
 			if (m_state==S_SENDING) {
 				call Resource.release();

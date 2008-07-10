@@ -72,6 +72,7 @@ implementation {
 	
 	async command void DsnPlatform.flushUart(){
 		while (!call HplMsp430Usart.isTxEmpty());
+		signal DsnPlatform.flushUartDone();
 	}
 	
 	async event void RxRTSInt.fired() {

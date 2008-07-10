@@ -6,6 +6,7 @@
 interface DsnPlatform {
 	command void init();
 	async command void flushUart();
+	async event void flushUartDone();
 	async event void rxRequest();
 	async command void rxGrant();
 	async command void rxRelease();

@@ -90,6 +90,7 @@ implementation
   }
   event void DsnPlatform.timeoutMonitorFired() {}
   async event void  DsnPlatform.rxRequest() {}
+  async event void DsnPlatform.flushUartDone() {}
 
 /****************** DsnSend commands *******************/
 	command error_t DsnSend.log(void * msg) {return call DSN.log(msg); }

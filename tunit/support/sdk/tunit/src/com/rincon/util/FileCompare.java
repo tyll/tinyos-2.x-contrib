@@ -28,85 +28,83 @@ import java.io.*;
  */
 
 /**
- * Compares two files, byte by byte to determine if they are 
- * identical or not.
+ * Compares two files, byte by byte to determine if they are identical or not.
  * 
  * @author Jon Wyant (jrwy@rincon.com)
- *
+ * 
  */
 
-public class FileCompare
-{
-	/**
-	 * Compares two files, byte by byte to see if they are identical.
-	 * 
-	 * @param file1 - first file to compare
-	 * @param file2 - second file to compare
-	 *
-	 * @return true if files are equal, false if not
-	 */
-	public boolean compare(String file1, String file2)
-	{
-		int tmp1, tmp2;
-		InputStream input1 = null;
-		InputStream input2 = null;
+public class FileCompare {
+  /**
+   * Compares two files, byte by byte to see if they are identical.
+   * 
+   * @param file1 -
+   *          first file to compare
+   * @param file2 -
+   *          second file to compare
+   * 
+   * @return true if files are equal, false if not
+   */
+  public boolean compare(String file1, String file2) {
+    int tmp1, tmp2;
+    InputStream input1 = null;
+    InputStream input2 = null;
 
-		// check if files exist
-		if(!new File(file1).exists() || !new File(file2).exists()) {
-			return false;
-		}
-		
-		try	{
+    // check if files exist
+    if (!new File(file1).exists() || !new File(file2).exists()) {
+      return false;
+    }
 
-			// if comparing same files, return true
-			if(file1 == file2) {
-				return true;
-			}
+    try {
 
-			// try to open files
-			input1 = new FileInputStream(file1);
-			input2 = new FileInputStream(file2);
+      // if comparing same files, return true
+      if (file1 == file2) {
+        return true;
+      }
 
-			// neither input has any content to compare
-			if(input1 == null && input2 == null) {
-				return true;
-			}
-			
-			// only one input has contents, so nothing to compare
-			if(input1 == null || input2 == null) {
-				return false;
-			}
+      // try to open files
+      input1 = new FileInputStream(file1);
+      input2 = new FileInputStream(file2);
 
-			// read in a byte at a time and compare from each input
-			while(true) {
-				tmp1 = input1.read();
-				tmp2 = input2.read();
-				
-				// current bytes are not identical, so inputs are not equal
-				if(tmp1 != tmp2) {
-					break;
-				}
+      // neither input has any content to compare
+      if (input1 == null && input2 == null) {
+        return true;
+      }
 
-				// at end of both inputs and everything identical to this
-				// point, so inputs are equal
-				if(tmp1 == -1 && tmp2 == -1) {
-					return true;
-				}
-			}
-		} catch(IOException ioe) {
-		} finally {
-			try {
-				if(input1 != null) {
-					input1.close();
-				}
-				
-				if(input2 != null) {
-					input2.close();
-				}
-			} catch(IOException ioe) {
-			}
-		}
-		return false;
-	}
+      // only one input has contents, so nothing to compare
+      if (input1 == null || input2 == null) {
+        return false;
+      }
+
+      // read in a byte at a time and compare from each input
+      while (true) {
+        tmp1 = input1.read();
+        tmp2 = input2.read();
+
+        // current bytes are not identical, so inputs are not equal
+        if (tmp1 != tmp2) {
+          break;
+        }
+
+        // at end of both inputs and everything identical to this
+        // point, so inputs are equal
+        if (tmp1 == -1 && tmp2 == -1) {
+          return true;
+        }
+      }
+    } catch (IOException ioe) {
+    } finally {
+      try {
+        if (input1 != null) {
+          input1.close();
+        }
+
+        if (input2 != null) {
+          input2.close();
+        }
+      } catch (IOException ioe) {
+      }
+    }
+    return false;
+  }
 }
-

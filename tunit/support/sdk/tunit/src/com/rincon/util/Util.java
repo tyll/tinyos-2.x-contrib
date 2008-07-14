@@ -33,169 +33,171 @@ package com.rincon.util;
 
 public class Util {
 
-	
-	/**
-	 * Turn an array of short[]'s to a String
-	 * 
-	 * @param data
-	 * @return
-	 */
-	public static String dataToString(short[] data) {
-		String returnString = "";
+  /**
+   * Turn an array of short[]'s to a String
+   * 
+   * @param data
+   * @return
+   */
+  public static String dataToString(short[] data) {
+    String returnString = "";
 
-		for (int i = 0; i < data.length; i++) {
-			returnString += (char) data[i];
-		}
-		return returnString;
-	}
+    for (int i = 0; i < data.length; i++) {
+      returnString += (char) data[i];
+    }
+    return returnString;
+  }
 
-	/**
-	 * Turn a string into a short[] array of data
-	 * @param string
-	 * @return
-	 */
-	public static short[] stringToData(String string) {
-		char[] charData = string.toCharArray();
-		short[] returnData = new short[charData.length];
-		
-		
-		for(int i = 0; i < charData.length; i++) {
-			returnData[i] = (short) charData[i];
-		}
-		
-		return returnData;
-	}
-	
-	/**
-	 * Attempt to decode the int value, and deal with any illegible remarks.
-	 * 
-	 * @param intString
-	 * @return
-	 */
-	public static int parseInt(String intString) {
-		try {
-			return Integer.decode(intString).intValue();
-		} catch (NumberFormatException e) {
-			e.printStackTrace();
-		}
-		return 0;
-	}
+  /**
+   * Turn a string into a short[] array of data
+   * 
+   * @param string
+   * @return
+   */
+  public static short[] stringToData(String string) {
+    char[] charData = string.toCharArray();
+    short[] returnData = new short[charData.length];
 
-	/**
-	 * Attempt to decode the long value, and deal with any illegible remarks.
-	 * 
-	 * @param longString
-	 * @return
-	 */
-	public static long parseLong(String longString) {
-		try {			
-			return Long.decode(longString).longValue();
-		} catch (NumberFormatException e) {
-			e.printStackTrace();
-		}
+    for (int i = 0; i < charData.length; i++) {
+      returnData[i] = (short) charData[i];
+    }
 
-		return 0;
-	}
+    return returnData;
+  }
 
-	/**
-	 * Attempt to decode the short value, and deal with any illegible remarks.
-	 * 
-	 * @param shortString
-	 * @return
-	 */
-	public static short parseShort(String shortString) {
-		try {
-			return Short.decode(shortString).shortValue();
-		} catch (NumberFormatException e) {
-			e.printStackTrace();
-		}
+  /**
+   * Attempt to decode the int value, and deal with any illegible remarks.
+   * 
+   * @param intString
+   * @return
+   */
+  public static int parseInt(String intString) {
+    try {
+      return Integer.decode(intString).intValue();
+    } catch (NumberFormatException e) {
+      e.printStackTrace();
+    }
+    return 0;
+  }
 
-		return 0;
-	}
-	
-	/**
-	 * Convert some data to a filename
-	 * @param data
-	 * @return
-	 */
-	public static String dataToFilename(short[] data) {
-		String returnString = "";
-		
-		for(int i = 0; i < data.length; i++) {
-			if(data[i] != 0) {
-				returnString += (char) data[i];
-			}
-		}
-		return returnString;
-	}
+  /**
+   * Attempt to decode the long value, and deal with any illegible remarks.
+   * 
+   * @param longString
+   * @return
+   */
+  public static long parseLong(String longString) {
+    try {
+      return Long.decode(longString).longValue();
+    } catch (NumberFormatException e) {
+      e.printStackTrace();
+    }
 
-	/**
-	 * Takes a filename string and converts it to a 14 element
-	 * filename short array
-	 * @param s
-	 * @return
-	 */
-	public static short[] filenameToData(String filename, int maxLength) {
-		short[] returnData = new short[maxLength];
-		char[] charData = filename.toCharArray();
-		
-		for(int i = 0; i < charData.length && i < maxLength; i++) {
-			returnData[i] = (short) charData[i];
-		}
-		
-		for(int i = charData.length; i < maxLength; i++) {
-			returnData[i] = 0;
-		}
-		
-		return returnData;
-	}
+    return 0;
+  }
 
-	
-	/**
-	 * Turn an array of shorts into an array of bytes
-	 * @param shortData
-	 * @return
-	 */
-	public static byte[] shortsToBytes(short[] shortData, int length) {
-		byte[] byteData = new byte[length];
-		for(int i = 0; i < length; i++) {
-			byteData[i] = (byte) shortData[i];
-		}
-		
-		return byteData;
-	}
-	
+  /**
+   * Attempt to decode the short value, and deal with any illegible remarks.
+   * 
+   * @param shortString
+   * @return
+   */
+  public static short parseShort(String shortString) {
+    try {
+      return Short.decode(shortString).shortValue();
+    } catch (NumberFormatException e) {
+      e.printStackTrace();
+    }
 
-	/**
-	 * Convert a byte array to short array.
-	 * @param byteData
-	 * @return
-	 */
-	public static short[] bytesToShorts(byte[] byteData) {
-		short[] shortData = new short[byteData.length];
-		for(int i = 0; i < byteData.length; i++) {
-			shortData[i] = (short) byteData[i];
-		}
-		
-		return shortData;
-	}
+    return 0;
+  }
 
-	/**
-	 * Truncate an array of shorts to a specified size
-	 * @param value
-	 * @param size
-	 * @return the truncated array of shorts
-	 */
-	public static short[] truncate(short[] value, int maxSize) {
-		int actualSize = maxSize;
-		if(actualSize > value.length) {
-			actualSize = value.length;
-		}
-		short[] returnValue = new short[actualSize];
-		for(int i = 0; i < actualSize; i++) {
-			returnValue[i] = value[i];
-		}
-		return returnValue;
-	}
+  /**
+   * Convert some data to a filename
+   * 
+   * @param data
+   * @return
+   */
+  public static String dataToFilename(short[] data) {
+    String returnString = "";
+
+    for (int i = 0; i < data.length; i++) {
+      if (data[i] != 0) {
+        returnString += (char) data[i];
+      }
+    }
+    return returnString;
+  }
+
+  /**
+   * Takes a filename string and converts it to a 14 element filename short
+   * array
+   * 
+   * @param s
+   * @return
+   */
+  public static short[] filenameToData(String filename, int maxLength) {
+    short[] returnData = new short[maxLength];
+    char[] charData = filename.toCharArray();
+
+    for (int i = 0; i < charData.length && i < maxLength; i++) {
+      returnData[i] = (short) charData[i];
+    }
+
+    for (int i = charData.length; i < maxLength; i++) {
+      returnData[i] = 0;
+    }
+
+    return returnData;
+  }
+
+  /**
+   * Turn an array of shorts into an array of bytes
+   * 
+   * @param shortData
+   * @return
+   */
+  public static byte[] shortsToBytes(short[] shortData, int length) {
+    byte[] byteData = new byte[length];
+    for (int i = 0; i < length; i++) {
+      byteData[i] = (byte) shortData[i];
+    }
+
+    return byteData;
+  }
+
+  /**
+   * Convert a byte array to short array.
+   * 
+   * @param byteData
+   * @return
+   */
+  public static short[] bytesToShorts(byte[] byteData) {
+    short[] shortData = new short[byteData.length];
+    for (int i = 0; i < byteData.length; i++) {
+      shortData[i] = (short) byteData[i];
+    }
+
+    return shortData;
+  }
+
+  /**
+   * Truncate an array of shorts to a specified size
+   * 
+   * @param value
+   * @param size
+   * @return the truncated array of shorts
+   */
+  public static short[] truncate(short[] value, int maxSize) {
+    int actualSize = maxSize;
+    if (actualSize > value.length) {
+      actualSize = value.length;
+    }
+    short[] returnValue = new short[actualSize];
+    for (int i = 0; i < actualSize; i++) {
+      returnValue[i] = value[i];
+    }
+    return returnValue;
+  }
 
 }

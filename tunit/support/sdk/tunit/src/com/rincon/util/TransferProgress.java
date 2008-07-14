@@ -34,63 +34,63 @@ package com.rincon.util;
  */
 public class TransferProgress {
 
-	/** The total number of characters written last time */
-	private int lastCharsWritten;
+  /** The total number of characters written last time */
+  private int lastCharsWritten;
 
-	/** The total amount to do */
-	private long totalAmount;
+  /** The total amount to do */
+  private long totalAmount;
 
-	/**
-	 * Constructor
-	 * 
-	 * @param total
-	 */
-	public TransferProgress(long total) {
-		lastCharsWritten = 0;
-		totalAmount = total;
-	}
+  /**
+   * Constructor
+   * 
+   * @param total
+   */
+  public TransferProgress(long total) {
+    lastCharsWritten = 0;
+    totalAmount = total;
+  }
 
-	public void update(long currentAmount) {
-		// Erase the last stuff.
-		if (currentAmount == 0) {
-			return;
-		}
+  public void update(long currentAmount) {
+    // Erase the last stuff.
+    if (currentAmount == 0) {
+      return;
+    }
 
-		for (int i = 0; i < lastCharsWritten; i++) {
-			System.out.print('\b');
-		}
+    for (int i = 0; i < lastCharsWritten; i++) {
+      System.out.print('\b');
+    }
 
-		String output = "  [";
+    String output = "  [";
 
-		int progressPercentage = ((int) (((float) currentAmount)
-				/ ((float) totalAmount) * 100));
+    int progressPercentage = ((int) (((float) currentAmount)
+        / ((float) totalAmount) * 100));
 
-		// Check bounds
-		if (progressPercentage < 0) {
-			progressPercentage = 0;
-		}
+    // Check bounds
+    if (progressPercentage < 0) {
+      progressPercentage = 0;
+    }
 
-		if (progressPercentage > 100) {
-			progressPercentage = 100;
-		}
+    if (progressPercentage > 100) {
+      progressPercentage = 100;
+    }
 
-		for (int i = 0; i < 100; i++) {
-			if (i % 2 == 0) {
-				if (i <= progressPercentage) {
-					output += '#';
-				} else {
-					output += ' ';
-				}
-			}
-		}
+    for (int i = 0; i < 100; i++) {
+      if (i % 2 == 0) {
+        if (i <= progressPercentage) {
+          output += '#';
+        } else {
+          output += ' ';
+        }
+      }
+    }
 
-		output += "] ";
-		output += progressPercentage + "%";
-		lastCharsWritten = output.length();
-		System.out.print(output);
+    output += "] ";
+    output += progressPercentage + "%";
+    lastCharsWritten = output.length();
+    System.out.print(output);
 
-		if (progressPercentage == 100) {
-			System.out.println('\n');
-		}
-	}
+    if (progressPercentage == 100) {
+      System.out.println('\n');
+    }
+  }
 }

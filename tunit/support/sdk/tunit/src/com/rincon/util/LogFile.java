@@ -1,7 +1,7 @@
 package com.rincon.util;
 
 import java.io.IOException;
-import java.io.FileWriter; 
+import java.io.FileWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -31,232 +31,242 @@ import java.util.Date;
  */
 
 /**
- * Provides the ability to easily create an output log file
- * for an application.
+ * Provides the ability to easily create an output log file for an application.
  * 
  * @author Jon Wyant (jrwy@rincon.com)
- *
+ * 
  */
 
 public class LogFile {
 
-	/** File Writer */
-	private FileWriter log;
-	
-	/** log file name */
-	private String fileName;
-	
-	/** current indent level */
-	private int numIndent;
-	
-	/** number of spaces to use for an indent */
-	private int spaces;
-	
-	/** flag specifying whether to have debug messages on or not */
-	private boolean debug;
+  /** File Writer */
+  private FileWriter log;
 
-	/** flag specifying whether to flush output after each write or not */
-	private boolean flush;
+  /** log file name */
+  private String fileName;
 
-	/**
-	 * Constructor
-	 * 
-	 * @param String - log file name to open/create
-	 * @param boolean - false to overwrite/create file, true to append
-	 */
-	public LogFile(String file, boolean mode) {
-		fileName = file;
-		numIndent = 0;
-		spaces = 2; // default number of spaces to use for an indent
-		debug = false; // default debug messages off
-		try {
-			log = new FileWriter(fileName, mode);
-		} catch(IOException ioe) {
-		}
-	}
-	
-	/**
-	 * Write string message to the log file
-	 * 
-	 * @param String - string to write to the log file
-	 */
-	public void write(String msg) {
-		try {
-			// if no new line added then add one
-			if(!msg.endsWith("\n")) {
-				msg += "\n";
-			}
-			
-			// write message to file and flush instantly
-			log.write(msg);
-			
-			// only flush each write if flag is set
-			if(flush) {
-				log.flush();
-			}
-			
-			// display message to standard out if debug is on
-			if(debug) {
-				System.out.print(msg);
-			}
-				
-		} catch(IOException ioe) {
-		}	
-	}
+  /** current indent level */
+  private int numIndent;
 
-	/**
-	 * Write string message to the log file using indents
-	 * 
-	 * @param String - string to write to the log file
-	 */
-	public void iWrite(String msg) {
-		String indentMsg = "";
-		int i;
-		
-		// first print out the indents using spaces
-		try {
-			for(i = 0; i < numIndent * spaces; i++) {
-				indentMsg += " ";
-			}
-			log.write(indentMsg);
-		} catch(IOException ioe) {
-		}
-		
-		// now print out the actual message
-		write(msg);
-	}
-	
-	/**
-	 * Write string message to the log file using indents
-	 * 
-	 * @param String - string to write to the log file
-	 * @param int - number of indents to print
-	 */
-	public void iWrite(String msg, int indents) {
-		String indentMsg = "";
-		int i;
-		
-		// first print out the indents using spaces
-		try {
-			for(i = 0; i < indents * spaces; i++) {
-				indentMsg += " ";
-			}
-			log.write(indentMsg);
-		} catch(IOException ioe) {
-		}
-		
-		// now print out the actual message
-		write(msg);
-	}
+  /** number of spaces to use for an indent */
+  private int spaces;
 
-	/**
-	 * Get the current indent level being used
-	 * 
-	 * @return current indent level
-	 */
-	public int getIndent() {
-		return numIndent;
-	}
+  /** flag specifying whether to have debug messages on or not */
+  private boolean debug;
 
-	/**
-	 * Set the current indent level to use
-	 * 
-	 * @param int - indent level
-	 */
-	public void setIndent(int indent) {
-		numIndent = indent;
-		if(numIndent < 0) {
-			numIndent = 0;
-		}
-	}
+  /** flag specifying whether to flush output after each write or not */
+  private boolean flush;
 
-	/**
-	 * Set the number of spaces to use for an indent
-	 * 
-	 * @param int - number of spaces to use for indents
-	 */
-	public void setSpaces(int numSpaces) {
-		spaces = numSpaces;
-		if(spaces < 1) {
-			spaces = 2;
-		}
-	}
+  /**
+   * Constructor
+   * 
+   * @param String -
+   *          log file name to open/create
+   * @param boolean -
+   *          false to overwrite/create file, true to append
+   */
+  public LogFile(String file, boolean mode) {
+    fileName = file;
+    numIndent = 0;
+    spaces = 2; // default number of spaces to use for an indent
+    debug = false; // default debug messages off
+    try {
+      log = new FileWriter(fileName, mode);
+    } catch (IOException ioe) {
+    }
+  }
 
-	/**
-	 * Increments the current indent level by 1
-	 */
-	public void incIndent() {
-		numIndent++;
-	}
+  /**
+   * Write string message to the log file
+   * 
+   * @param String -
+   *          string to write to the log file
+   */
+  public void write(String msg) {
+    try {
+      // if no new line added then add one
+      if (!msg.endsWith("\n")) {
+        msg += "\n";
+      }
 
-	/**
-	 * Decrements the current indent level by 1
-	 */
-	public void decIndent() {
-		numIndent--;
-		if(numIndent < 0) {
-			numIndent = 0;
-		}
-	}
+      // write message to file and flush instantly
+      log.write(msg);
 
-	/**
-	 * Returns a string containing the date and time in default format
-	 * 
-	 * @return a formated date/time String
-	 */
-	public String DateTime() {
-		return DateTime("MMM dd, yyyy, hh:mm:ss a");
-	}
+      // only flush each write if flag is set
+      if (flush) {
+        log.flush();
+      }
 
-	/**
-	 * Returns a string containing the date and time using specified format
-	 * 
-	 * @param String - format string to use for date/time string
-	 */
-	public String DateTime(String format) {
-		SimpleDateFormat sdf = new SimpleDateFormat(format);
-		return sdf.format(new Date());
-	}
-	
-	/**
-	 * Close the log file
-	 */
-	public void close() {
-		try {
-			log.close();
-		} catch(IOException ioe) {
-		}
-	}
+      // display message to standard out if debug is on
+      if (debug) {
+        System.out.print(msg);
+      }
 
-	/**
-	 * Sets debug mode on or off
-	 * 
-	 * @param boolean - true for debug on, false for debug off
-	 */
-	public void debug(boolean mode) {
-		debug = mode;
-	}
+    } catch (IOException ioe) {
+    }
+  }
 
-	/**
-	 * Sets flush mode on or off
-	 * 
-	 * @param boolean - true for flush instantly, false for no flush
-	 */
-	public void flush(boolean f) {
-		flush = f;
-	}
+  /**
+   * Write string message to the log file using indents
+   * 
+   * @param String -
+   *          string to write to the log file
+   */
+  public void iWrite(String msg) {
+    String indentMsg = "";
+    int i;
 
-	/**
-	 * Clears the log file of all existing data
-	 */
-	public void clearLog() {
-		try {
-			// close log file
-			log.close();
-			
-			// re-open file
-			log = new FileWriter(fileName, false);
-		} catch(IOException ioe) {
-		}
-	}
+    // first print out the indents using spaces
+    try {
+      for (i = 0; i < numIndent * spaces; i++) {
+        indentMsg += " ";
+      }
+      log.write(indentMsg);
+    } catch (IOException ioe) {
+    }
+
+    // now print out the actual message
+    write(msg);
+  }
+
+  /**
+   * Write string message to the log file using indents
+   * 
+   * @param String -
+   *          string to write to the log file
+   * @param int -
+   *          number of indents to print
+   */
+  public void iWrite(String msg, int indents) {
+    String indentMsg = "";
+    int i;
+
+    // first print out the indents using spaces
+    try {
+      for (i = 0; i < indents * spaces; i++) {
+        indentMsg += " ";
+      }
+      log.write(indentMsg);
+    } catch (IOException ioe) {
+    }
+
+    // now print out the actual message
+    write(msg);
+  }
+
+  /**
+   * Get the current indent level being used
+   * 
+   * @return current indent level
+   */
+  public int getIndent() {
+    return numIndent;
+  }
+
+  /**
+   * Set the current indent level to use
+   * 
+   * @param int -
+   *          indent level
+   */
+  public void setIndent(int indent) {
+    numIndent = indent;
+    if (numIndent < 0) {
+      numIndent = 0;
+    }
+  }
+
+  /**
+   * Set the number of spaces to use for an indent
+   * 
+   * @param int -
+   *          number of spaces to use for indents
+   */
+  public void setSpaces(int numSpaces) {
+    spaces = numSpaces;
+    if (spaces < 1) {
+      spaces = 2;
+    }
+  }
+
+  /**
+   * Increments the current indent level by 1
+   */
+  public void incIndent() {
+    numIndent++;
+  }
+
+  /**
+   * Decrements the current indent level by 1
+   */
+  public void decIndent() {
+    numIndent--;
+    if (numIndent < 0) {
+      numIndent = 0;
+    }
+  }
+
+  /**
+   * Returns a string containing the date and time in default format
+   * 
+   * @return a formated date/time String
+   */
+  public String DateTime() {
+    return DateTime("MMM dd, yyyy, hh:mm:ss a");
+  }
+
+  /**
+   * Returns a string containing the date and time using specified format
+   * 
+   * @param String -
+   *          format string to use for date/time string
+   */
+  public String DateTime(String format) {
+    SimpleDateFormat sdf = new SimpleDateFormat(format);
+    return sdf.format(new Date());
+  }
+
+  /**
+   * Close the log file
+   */
+  public void close() {
+    try {
+      log.close();
+    } catch (IOException ioe) {
+    }
+  }
+
+  /**
+   * Sets debug mode on or off
+   * 
+   * @param boolean -
+   *          true for debug on, false for debug off
+   */
+  public void debug(boolean mode) {
+    debug = mode;
+  }
+
+  /**
+   * Sets flush mode on or off
+   * 
+   * @param boolean -
+   *          true for flush instantly, false for no flush
+   */
+  public void flush(boolean f) {
+    flush = f;
+  }
+
+  /**
+   * Clears the log file of all existing data
+   */
+  public void clearLog() {
+    try {
+      // close log file
+      log.close();
+
+      // re-open file
+      log = new FileWriter(fileName, false);
+    } catch (IOException ioe) {
+    }
+  }
 }

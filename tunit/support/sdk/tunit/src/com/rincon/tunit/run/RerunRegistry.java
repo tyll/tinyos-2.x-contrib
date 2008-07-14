@@ -79,6 +79,21 @@ public class RerunRegistry {
   public RerunRegistry(File baseDirectory) {
     rerunFile = new File(baseDirectory, "tests-failed.log");
   }
+  
+  /**
+   * Alternative Constructor
+   *
+   */
+  public RerunRegistry() {
+  }
+  
+  /**
+   * Set the base TUnit directory
+   * @param baseDirectory
+   */
+  public void setBaseDirectory(File baseDirectory) {
+    rerunFile = new File(baseDirectory, "tests-failed.log");
+  }
 
   /**
    * Enable running only tests that failed by passing in the base directory. The

@@ -2,14 +2,14 @@
 <project name="TUnit" basedir="." default="tunit">
 
 
-      <!---------------------------------------------------------
+      <!--
            This build.xml assumes you have sourced .tunitclasspath. 
            Specifically, you need your $CLASSPATH pointing to all .jar 
            files, and your TUNIT_BASE (or TUNIT_HOME, or TOSCONTRIB)
            environment variables pointing to the tunit directory,
            and your REPORTDIR defined so it knows where to store
            test reports.
-        --------------------------------------------------------->
+        -->
 
       <property environment="env"/>
 

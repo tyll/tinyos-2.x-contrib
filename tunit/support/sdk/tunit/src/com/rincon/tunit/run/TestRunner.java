@@ -41,7 +41,6 @@ import org.apache.log4j.Logger;
 import com.rincon.tunit.TUnit;
 import com.rincon.tunit.build.BuildInterface;
 import com.rincon.tunit.build.Make;
-import com.rincon.tunit.exec.CmdExec;
 import com.rincon.tunit.parsers.appc.AppCParser;
 import com.rincon.tunit.properties.TUnitNodeProperties;
 import com.rincon.tunit.properties.TUnitSuiteProperties;
@@ -93,7 +92,7 @@ public class TestRunner {
 
   /** App.c statistics parse results */
   private Map statsMap;
-  
+
   /** App.c assertion ID numbers to source code line numbers map */
   private Map assertionMap;
 
@@ -128,11 +127,7 @@ public class TestRunner {
      * directory, relative to the tunit base directory. Being a package, all /'s
      * are replaced with .'s.
      */
-    packageId = testRunProperties.getName()
-        + "."
-        + myBuildDirectory.getAbsolutePath().substring(
-            TUnit.getBasePackageDirectory().getAbsolutePath().length()).replace(
-            File.separatorChar, '.').replaceFirst(".", "");
+    packageId = createPackageIdentification();
 
     log.info("PACKAGE " + packageId);
 
@@ -158,29 +153,31 @@ public class TestRunner {
     log.trace("TestRunner.runTest()");
 
     // 1. Build and install the project on all test run nodes
-    if (!install()) {
+    if (!install()) { 
       return;
     }
-
+    
     // 2. Connect serial forwarders, run the test, disconnect sf's.
-    log.debug("Connecting serial forwarders");
-    if (!testManager.connectAll()) {
-      TestResult result = new TestResult("__ConnectSerialForwarders");
-      result.error("SFError", "Could not connect all serial forwarders!");
-      report.addResult(result);
-      return;
-    }
+    log.debug("Connecting serial forwarders"); if (!testManager.connectAll()) {
+    TestResult result = new TestResult("__ConnectSerialForwarders");
+    result.error("SFError", "Could not connect all serial forwarders!");
+    report.addResult(result); return; }
+
+    CmdFlagExecutor.executeCmdFlag("start", suiteProperties.getStartCmd(),
+        report);
+
     
-    CmdFlagExecutor.executeCmdFlag("start", suiteProperties.getStartCmd(), report);
+    log.debug("Running test"); new ResultCollector(report, runProperties,
+    suiteProperties, testMap, statsMap, assertionMap);
     
-    log.debug("Running test");
-    new ResultCollector(report, runProperties, suiteProperties, testMap,
-        statsMap, assertionMap);
-    
-    CmdFlagExecutor.executeCmdFlag("stop", suiteProperties.getStopCmd(), report);
+
+    CmdFlagExecutor
+        .executeCmdFlag("stop", suiteProperties.getStopCmd(), report);
+
     
     log.debug("Disconnecting serial forwarders");
     testManager.disconnectAll();
+    
   }
 
   /**
@@ -192,8 +189,8 @@ public class TestRunner {
         .getXmlReportDirectory());
     try {
       xmlWrite.write();
-      StatisticsChart.write(StatisticsReport.log(packageId,
-          "TestingProgress", "[Total Problems]", report.getTotalErrors()
+      StatisticsChart.write(StatisticsReport.log(runProperties.getName(), buildDirectory, "TestingProgress",
+          "[Total Problems]", report.getTotalErrors()
               + report.getTotalFailures(), "[Total Tests]", report
               .getTotalTests()), 500, 325);
     } catch (IOException e) {
@@ -202,7 +199,7 @@ public class TestRunner {
       log.error(e.getMessage());
     }
   }
-  
+
   /**
    * Build and install all targets. We evaluate all the build extras for each
    * target to determine if that target only has to be created once. If not, we
@@ -222,7 +219,7 @@ public class TestRunner {
     TUnitNodeProperties focusedNode;
     String extras;
     String env;
-    
+
     for (int i = 0; i < runProperties.totalTargets(); i++) {
       focusedTarget = runProperties.getTarget(i);
       if (runProperties.getTarget(i).requiresMultipleBuilds()) {
@@ -235,22 +232,22 @@ public class TestRunner {
             report.addResult(focusedResult);
             return false;
           }
-          
+
           focusedNode = focusedTarget.getNode(nodeIndex);
           extras = "install." + focusedNode.getId() + " ";
           extras += focusedNode.getInstallExtras() + " ";
           extras += suiteProperties.getExtras() + " ";
           extras += "tunit ";
           extras += focusedNode.getBuildExtras() + " ";
-          
-          env = "TUNITCFLAGS=\""
-        	  + "-DTUNIT_TOTAL_NODES=" + runProperties.totalNodes() + " "
-          	  + suiteProperties.getCFlags() + "\"";
-          
+
+          env = "TUNITCFLAGS=\"" + "-DTUNIT_TOTAL_NODES="
+              + runProperties.totalNodes() + " " + suiteProperties.getCFlags()
+              + "\"";
+
           log.debug("Compiling and installing");
           focusedResult = make.build(buildDirectory, focusedTarget
               .getTargetName(), extras, env);
-          
+
           if (!focusedResult.isSuccess()) {
             report.addResult(focusedResult);
             return false;
@@ -260,45 +257,48 @@ public class TestRunner {
       } else {
         log.debug("Build properties are identical for nodes using target "
             + focusedTarget.getTargetName());
-        
-        if(needsCompile(focusedTarget.getTargetName())) {
+
+        if (needsCompile(focusedTarget.getTargetName())) {
           log.debug("Cleaning");
           focusedResult = make.clean(buildDirectory);
           if (!focusedResult.isSuccess()) {
             report.addResult(focusedResult);
             return false;
           }
-          
+
           log.debug("Compiling");
-          
+
           focusedNode = focusedTarget.getNode(0);
-          
+
           extras = suiteProperties.getExtras() + " ";
           extras += "tunit ";
           extras += focusedNode.getBuildExtras() + " ";
-          
-          env = "TUNITCFLAGS=\""
-            + "-DTUNIT_TOTAL_NODES=" + runProperties.totalNodes() + " "
-            + suiteProperties.getCFlags() + "\"";
-          
+
+          env = "TUNITCFLAGS=\"" + "-DTUNIT_TOTAL_NODES="
+              + runProperties.totalNodes() + " " + suiteProperties.getCFlags()
+              + "\"";
+
           focusedResult = make.build(buildDirectory, focusedTarget
               .getTargetName(), extras, env);
-          
+
           report.addResult(focusedResult);
           if (!focusedResult.isSuccess()) {
             return false;
           }
         }
-        
-        if(!doesBuildExist(focusedTarget.getTargetName())) {
+
+        if (!doesBuildExist(focusedTarget.getTargetName())) {
           log.error("Cannot install or run test! Build doesn't exist.");
           TestResult logResult = new TestResult("__Build");
-          logResult.error("No test to install!", "Build doesn't exist, and we can't compile.\n" +
-              "Compile manually, or change the @compile option in suite.properties.");
+          logResult
+              .error(
+                  "No test to install!",
+                  "Build doesn't exist, and we can't compile.\n"
+                      + "Compile manually, or change the @compile option in suite.properties.");
           report.addResult(logResult);
           return false;
         }
-        
+
         log.debug("Total nodes to install: " + focusedTarget.totalNodes());
         String reinstallExtras;
         for (int nodeIndex = 0; nodeIndex < focusedTarget.totalNodes(); nodeIndex++) {
@@ -318,10 +318,12 @@ public class TestRunner {
     }
 
     try {
-      StatisticsChart.write(StatisticsReport.log(packageId, "Footprint",
-          "[RAM Bytes]", make.getRamSize(), "[ROM Bytes]", make.getRomSize()), 
-           500, 325);
-      
+      if(make.getRomSize() > 0) {
+        StatisticsChart.write(StatisticsReport.log(runProperties.getName(), buildDirectory, "Footprint",
+            "[RAM Bytes]", make.getRamSize(), "[ROM Bytes]", make.getRomSize()),
+            500, 325);
+      }
+
     } catch (IOException e) {
       TestResult logResult = new TestResult("__LogFootprintStats");
       logResult.error("IOException", e.getMessage());
@@ -338,10 +340,11 @@ public class TestRunner {
     if (focusedTarget == null) {
       return false;
     }
-    
-    File appcFile = new File(buildDirectory, "build/" + focusedTarget.getTargetName() + "/app.c");
+
+    File appcFile = new File(buildDirectory, "build/"
+        + focusedTarget.getTargetName() + "/app.c");
     log.info("Parsing app.c file " + appcFile.getAbsolutePath());
-    
+
     // Attempt to find and parse the app.c file
     AppCParser appcParser = new AppCParser(appcFile);
     if (appcFile.exists()) {
@@ -350,11 +353,12 @@ public class TestRunner {
         report.addResult(focusedResult);
         return false;
       }
-      
+
     } else {
       log.warn("Cannot find app.c file " + appcFile.getAbsolutePath());
       focusedResult = new TestResult("__ParseAppC");
-      focusedResult.error("App.c Parser", "app.c file not found in " + appcFile.getAbsolutePath());
+      focusedResult.error("App.c Parser", "app.c file not found in "
+          + appcFile.getAbsolutePath());
       report.addResult(focusedResult);
     }
 
@@ -365,11 +369,10 @@ public class TestRunner {
     return true;
   }
 
-  
   /**
    * If the compile option for this test suite says we should only compile once,
-   * then we check to see if a build directory exists with the app.c file 
-   * inside.  If this is found, then we don't need to compile.
+   * then we check to see if a build directory exists with the app.c file
+   * inside. If this is found, then we don't need to compile.
    * 
    * If the compile option is "never", we don't need to compile.
    * 
@@ -379,34 +382,59 @@ public class TestRunner {
    * @return true if we need to compile.
    */
   private boolean needsCompile(String focusedTargetName) {
-    if(suiteProperties.getCompileOption() == TUnitSuiteProperties.COMPILE_ALWAYS
+    if (suiteProperties.getCompileOption() == TUnitSuiteProperties.COMPILE_ALWAYS
         || suiteProperties.getCompileOption() == TUnitSuiteProperties.COMPILE_DEFAULT_ALWAYS) {
       log.debug("Compile recommended");
       return true;
-    
-    } else if(suiteProperties.getCompileOption() == TUnitSuiteProperties.COMPILE_ONCE) {
-      if(doesBuildExist(focusedTargetName)) {
+
+    } else if (suiteProperties.getCompileOption() == TUnitSuiteProperties.COMPILE_ONCE) {
+      if (doesBuildExist(focusedTargetName)) {
         log.debug("Recommend no compile since build already exists.");
         return false;
-        
+
       } else {
         log.debug("Compile recommended");
         return true;
       }
-    } 
-    
+    }
+
     log.debug("This test must be compiled manually");
     return false;
   }
-  
+
   /**
    * 
    * @param focusedTargetName
    * @return true if the test firmware image exists. We look for the app.c file.
    */
   private boolean doesBuildExist(String focusedTargetName) {
-    log.debug("Checking " + new File(buildDirectory, "build/" + focusedTargetName + "/app.c").getAbsolutePath());
+    log.debug("Checking "
+        + new File(buildDirectory, "build/" + focusedTargetName + "/app.c")
+            .getAbsolutePath());
+
+    return new File(buildDirectory, "build/" + focusedTargetName + "/app.c")
+        .exists();
+  }
+
+  /**
+   * This is responsible for creating the package ID that helps us uniquely 
+   * locate the code for the test and the settings under which it ran.
+   * 
+   * @return
+   */
+  private String createPackageIdentification() {
+    String returnString = runProperties.getName()
+      + ".";
     
-    return new File(buildDirectory, "build/" + focusedTargetName + "/app.c").exists();
+    String packageDir = 
+           buildDirectory.getAbsolutePath().substring(
+            TUnit.getBasePackageDirectory().getAbsolutePath().length())
+            .replace(File.separatorChar, '.');
+    
+    if(packageDir.startsWith(".")) {
+      packageDir = packageDir.replaceFirst("\\.", "");
+    }
+    
+    return returnString + packageDir;
   }
 }

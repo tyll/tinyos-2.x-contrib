@@ -26,11 +26,12 @@ public class CmdFlagExecutor {
       log.info("Running " + type + " cmd: " + command);
       try {
         String output = CmdExec.outputToString(CmdExec.runBlockingCommand(command));
-        TestResult result = new TestResult("@cmd " + type + " " + command);
+        
+        TestResult result = new TestResult("@cmd " + type + " " + command + " " + output);
         
         if(CmdExec.lastExitVal > 0) {
           log.error(output);
-          result.error("Exit value was not 0 when executing: @cmd " + type + " " + command, output);
+          result.error("@cmd " + type + " error", "Exit value was " + CmdExec.lastExitVal + " when executing: @cmd " + type + " " + command + "\n\n" + output);
           
         } else {
           log.info(output);

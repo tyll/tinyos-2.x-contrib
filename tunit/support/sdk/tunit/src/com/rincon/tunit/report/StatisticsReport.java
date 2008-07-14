@@ -73,9 +73,9 @@ public class StatisticsReport {
    * @throws IOException 
    * @throws ParseException 
    */
-  public static StatisticsLogData log(String packageId, String name, String units1,
+  public static StatisticsLogData log(String testRunName, File buildDirectory, String name, String units1,
       long value1, String units2, long value2) throws IOException, ParseException {
-    return log(packageId, name, units1, new Long(value1), units2, new Long(value2));
+    return log(testRunName, buildDirectory, name, units1, new Long(value1), units2, new Long(value2));
   }
   
   /**
@@ -88,8 +88,8 @@ public class StatisticsReport {
    * @throws IOException 
    * @throws ParseException 
    */
-  public static StatisticsLogData log(String packageId, String name, String units, long value1) throws IOException, ParseException {
-    return log(packageId, name, units, new Long(value1), null, null);
+  public static StatisticsLogData log(String testRunName, File buildDirectory, String name, String units, long value1) throws IOException, ParseException {
+    return log(testRunName, buildDirectory, name, units, new Long(value1), null, null);
   }
 
   
@@ -104,15 +104,12 @@ public class StatisticsReport {
    * @throws IOException 
    * @throws ParseException 
    */
-  private static StatisticsLogData log(String packageId, String name, String units1, Long value1,
+  private static StatisticsLogData log(String testRunName, File buildDirectory, String name, String units1, Long value1,
       String units2, Long value2) throws IOException, ParseException {
-   
     
     boolean newFile = false;
-
-    // TODO this replaces tinyos-2.x with tinyos-2/x!
-    File reportDir = new File(TUnit.getStatsReportDirectory(), packageId
-        .replace('.', File.separatorChar));
+    
+    File reportDir = new File(TUnit.getStatsReportDirectory(), generateStatsSubDirectory(testRunName, buildDirectory));
     reportDir.mkdirs();
     
     File reportFile = new File(reportDir, name + ".csv");
@@ -139,7 +136,7 @@ public class StatisticsReport {
 
     log.info("LOGGING STATISTICS: ");
     log.info("Name = " + name); 
-    log.info("Package = " + packageId);
+    log.info("Location = " + reportDir.getAbsolutePath());
     if(value1 != null) {
       log.info(units1 + " = " + value1.longValue());
     }
@@ -216,6 +213,39 @@ public class StatisticsReport {
     
     return data;
   }
+
+  /**
+   * Create a string containing the name of the statistics sub-directory
+   * where statistics information will be stored.  
+   * 
+   * This method keeps the tinyos-2/x/ structure but is compatible with our
+   * external post TUnit HTML processing based on package name.
+   * 
+   * @param packageId
+   * @return
+   */
+  private static String generateStatsSubDirectory(String testRunName, File buildDirectory) {
+    String directory = "";
+    
+    if(testRunName == null) {
+      testRunName = "";
+    }
+    
+    if(buildDirectory == null) {
+      return testRunName;
+    }
+    
+    for(File currentDirectory = buildDirectory; currentDirectory.compareTo(TUnit.getBasePackageDirectory()) != 0; currentDirectory = currentDirectory.getParentFile()) {
+      directory = currentDirectory.getName() + File.separatorChar + directory;
+    }
+    
+    // The replaceAll here will turn tinyos-2.x into tinyos-2/x, but is
+    // compatible with the post HTML editing performed externally that only
+    // relies on a package name and doesn't understand the directory structure
+    // it came from.
+    return (testRunName + File.separatorChar + directory).replace('.', File.separatorChar);
+  }
+  
 
   /**
    * Parse a line from a .csv file into a StatsEntry object

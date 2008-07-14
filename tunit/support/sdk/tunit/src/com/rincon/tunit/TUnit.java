@@ -107,7 +107,7 @@ public class TUnit {
   public static void main(String[] args) {
     org.apache.log4j.BasicConfigurator.configure();
     Logger.getRootLogger().setLevel((Level) Level.DEBUG);
-    new TUnit(args).runTunit(args);
+    new TUnit(args).runTunit();
   }
 
   /**
@@ -117,7 +117,9 @@ public class TUnit {
   public TUnit(String[] args) {
     rootDirectory = new File(System.getProperty("user.dir"));
     File packageDirectoryAttempt = null;
-
+    
+    rerunRegistry = new RerunRegistry();
+    
     for (int i = 0; i < args.length; i++) {
       if (args[i].equalsIgnoreCase("-tunitbase") && args.length > i + 1) {
         i++;
@@ -217,6 +219,9 @@ public class TUnit {
       } else if (args[i].equalsIgnoreCase("-enablecmd")) {
         log.info("External @cmd flags enabled");
         cmdFlagEnabled = true;
+      
+      } else if (args[i].equalsIgnoreCase("-rerun")) {
+          rerunRegistry.enableRerun();
         
       } else if (args[i].contains("?")) {
         syntax();
@@ -232,14 +237,20 @@ public class TUnit {
         syntax();
         System.exit(1);
 
-      } else if (!rootDirectory.getAbsolutePath().startsWith(
-          packageDirectoryAttempt.getAbsolutePath())) {
+      } else if (!rootDirectory.getAbsolutePath().toLowerCase().startsWith(
+          packageDirectoryAttempt.getAbsolutePath().toLowerCase())) {
+        
+        
         /*
          * The package identifier is outside of our root directory. This causes
          * problems because when we move into our root directory's tree, we
          * cannot remove the base package directory identifier from the current
          * test directory's absolute path
          */
+        System.err.println("\n" + packageDirectoryAttempt.getAbsolutePath().toLowerCase());
+        System.err.println("    is not inside of ");
+        System.err.println(rootDirectory.getAbsolutePath().toLowerCase() + "\n\n");
+        
         System.err
             .println("Package directory mismatch! The base package directory MUST be");
         System.err
@@ -281,16 +292,16 @@ public class TUnit {
    * 
    * @param args
    */
-  public void runTunit(String[] args) {
+  public void runTunit() {
     System.out.println("Running TUnit from " + rootDirectory.getAbsolutePath());
 
+    // 0. You should have already instantiated TUnit and passed in arguments.
+    
     // 1. Locate the tunit.xml file from the TUNIT_BASE directory
     processTunitXml();
 
-    // 2. Now that everything is established, parse arguments and configure
-    // rerun settings
-    rerunRegistry = new RerunRegistry(tunitDirectory);
-    parseArgs(args);
+    // 2. Now that everything is established, configure rerun settings
+    rerunRegistry.setBaseDirectory(tunitDirectory);
     rerunRegistry.clean();
 
     // 3. Initialize and run each test run that can be initialized.
@@ -471,7 +482,7 @@ public class TUnit {
     if (basePackageDirectory != null) {
       return basePackageDirectory;
     }
-
+    
     File currentDirectory;
     
     for(currentDirectory = rootDirectory; currentDirectory.list(
@@ -493,20 +504,6 @@ public class TUnit {
     
     log.info("Base package directory located: " + basePackageDirectory.getAbsolutePath());
     return basePackageDirectory;
-  }
-
-  /**
-   * Parse arguments
-   * 
-   * @param args
-   *          command line arguments
-   */
-  private void parseArgs(String[] args) {
-    for (int i = 0; i < args.length; i++) {
-      if (args[i].equalsIgnoreCase("-rerun")) {
-        rerunRegistry.enableRerun();
-      }
-    }
   }
 
   /**
@@ -580,8 +577,7 @@ public class TUnit {
     System.out.println("Total runtime: "
         + ((float) (System.currentTimeMillis() - startTime) / (float) 1000)
         + " [s]");
-    System.out.println("Total tests recorded: "
-        + TestReport.getTotalTunitTests());
+    System.out.println("Total tests recorded: " + TestReport.getTotalTunitTests());
     System.out.println("Total errors: " + TestReport.getTotalTunitErrors());
     System.out.println("Total failures: " + TestReport.getTotalTunitFailures()
         + "\n");
@@ -609,7 +605,7 @@ public class TUnit {
   private void logResults() {
     try {
       // Write out all our results for our test reports.
-      StatisticsLogData dataSet = StatisticsReport.log("", "TotalProgress",
+      StatisticsLogData dataSet = StatisticsReport.log("", null, "TotalProgress",
           "[Total Problems]", TestReport.getTotalTunitErrors()
               + TestReport.getTotalTunitFailures(), "[Total Tests]", TestReport
               .getTotalTunitTests());

@@ -7,4 +7,5 @@ interface TestInterface1
   command RpcCommandMsg* testCommand6(RpcCommandMsg* data);
   command void testCommand7(RpcCommandMsg data);
   command RpcCommandMsg testCommand8();
+  event error_t testEvent1(RpcCommandMsg data);
 }

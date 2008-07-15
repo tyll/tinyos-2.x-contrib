@@ -112,6 +112,9 @@ my $interfaces = NescParser::getInterfaces($nescXml);
 
 my %rpcFunctions;
 my %requiredFunctions;
+my %requiredEventFunctions;
+my %requiredCommandFunctions;
+my %allFunctions;
 my $fullName;
 my $shouldDie=0;
 
@@ -156,7 +159,12 @@ for my $taggedInterface (@$taggedInterfaces){
 	$rpc{'numParams'} = $function->{'numParams'};
 	$fullName = $rpc{'componentName'}.".".$rpc{'interfaceName'}.".".$rpc{'functionName'};
 	if (checkRpcFunction(\%rpc, $fullName)){
-	    $requiredFunctions{$fullName} = \%rpc;
+	    if ($rpc{'functionType'} eq "event") {
+		$requiredEventFunctions{$fullName} = \%rpc;
+	    }
+	    else {
+		$requiredCommandFunctions{$fullName} = \%rpc;
+	    }
 	}
 	else{
 	    $rpcFunctions{$fullName} = \%rpc;
@@ -171,8 +179,9 @@ for my $taggedInterface (@$taggedInterfaces){
 if ($shouldDie == 1) { die "Too many errors.";}
     
 
-my %allFunctions = (%requiredFunctions, %rpcFunctions);
-
+%requiredFunctions = (%requiredEventFunctions, %requiredCommandFunctions);
+%allFunctions = (%requiredFunctions, %rpcFunctions);
+my $numCallbackFunctions = scalar(keys %requiredEventFunctions);
 
 ##############################
 # Number the rpc functions alphabetically
@@ -185,7 +194,15 @@ for $fullName (sort keys %rpcFunctions ) {
     $rpc->{'commandID'} = $count++;
 }
 
+##############################
+# Add callback variable to appropriate functions
+##############################
 
+$count = 0;
+for $fullName (sort keys %requiredEventFunctions ) {
+    $rpc = $requiredFunctions{$fullName};
+    $rpc->{'callbackID'} = $count++;
+}
 
 ##############################
 # print out the parsed info for debugging/user knowledge.
@@ -235,6 +252,7 @@ my $xs1 = XML::Simple->new();
 
 my %xmlOutHash = ();
 $xmlOutHash{'rpcFunctions'} = \%rpcFunctions;
+$xmlOutHash{'callbackFunctions'} = \%requiredEventFunctions;
 my %tmpHash = ();
 #$tmpHash{'struct'} = $structs;
 #$xmlOutHash{'structs'} = \%tmpHash;
@@ -432,6 +450,7 @@ implementation {
   uint16_t returnAddress;
   bool processingCommand;
   bool sendingResponse;
+  bool callbackEnabled[$numCallbackFunctions];
 
   static const uint8_t args_sizes[$num_rpcs] = {
 $rpc_args_elems
@@ -445,6 +464,7 @@ $rpc_return_elems
     responseMsgPtr = &responseMsgBuf;
     processingCommand=FALSE;
     sendingResponse=FALSE;
+    memset((void*)&callbackEnabled, 0, sizeof(bool)*$numCallbackFunctions);
 /*#ifndef RPC_NO_DRIP
     call CommandDrip.init();
 #endif // !RPC_NO_DRIP*/
@@ -760,7 +780,61 @@ for my $requiredFunc (values %requiredFunctions) {
     for my $param (values %{$requiredFunc->{params}}) {
 	$s .= " $param->{type}->{typeDecl} $param->{name},";
     }
-    $s .= "\b) { }\n";
+    $s .= "\b) {\n";
+
+    if ($requiredFunc->{functionType} eq 'event') {
+	$s .= "    RpcCommandMsg* msg = (RpcCommandMsg*)cmdStore.data;
+    uint8_t* byteSrc = (uint8_t*)msg->data;
+    uint16_t maxLength;
+    uint16_t id = msg->commandID;
+    RpcResponseMsg *responseMsg = (RpcResponseMsg*)(responseMsgPtr->data);
+    maxLength = TOSH_DATA_LENGTH;
+
+    /*** now send the response message off if necessary ***/
+    if(callbackEnabled[$requiredFunc->{'callbackID'}]) {
+    //dbg(DBG_USR2, \"errorCode=%s,dataLength=%s\\n\",responseMsg->errorCode, responseMsg->dataLength);
+    //dbg(DBG_USR2, \"sizeof( RpcResponseMsg ) = %s, data-transactionID= %s\\n\",sizeof (RpcResponseMsg),((uint32_t)&(responseMsg->data[0]) - (uint32_t)&(responseMsg->transactionID)));
+ /*   if (responseMsg->errorCode == RPC_SUCCESS && responseMsg->dataLength==0){
+      //dbg(DBG_USR2, \"done processing, no return args\\n\");
+      processingCommand=FALSE;
+    }
+    else if (responseMsg->errorCode == RPC_SUCCESS){
+      //calculate the size to be the size of the data I just added 
+      //plus the size of the responseMsg less the data array (the data array 
+      //can sometimes take space due to compiler packing)
+      if (call ResponseSendMsgDrain.send(msg->returnAddress,
+				    responseMsg->dataLength + ( (uint32_t)&(responseMsg->data[0]) - (uint32_t)&(responseMsg->transactionID)),
+				    responseMsgPtr) ){
+        //dbg(DBG_USR2, \"sending response\\n\");
+        sendingResponse=TRUE;
+      }
+      else{
+        //dbg(DBG_USR2, \"sending response failed\\n\");
+        processingCommand=FALSE;
+      }
+    }
+    else{*/
+      if (msg->responseDesired == 0){
+        //dbg(DBG_USR2, \"no response desired; not sending response message\");
+        processingCommand=FALSE;
+      }
+      else if (call AMSend.send(msg->returnAddress, responseMsgPtr, responseMsg->dataLength + sizeof(RpcResponseMsg)) ){
+        //dbg(DBG_USR2, \"sending response\\n\");
+        sendingResponse=TRUE;
+        $led2Toggle
+      }
+      else{
+        //dbg(DBG_USR2, \"sending response failed\\n\");
+        processingCommand=FALSE;
+        $led0Toggle
+      }
+//    }
+    //dbg(DBG_USR2, \"done processing.\\n\");
+    }
+  ";
+    }
+    
+    $s .= "}\n";
 }
 
 $s .= "\n}

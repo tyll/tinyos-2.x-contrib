@@ -501,6 +501,10 @@ module IPDispatchP {
       // the "prev" hop will be set by the receiver.
       len += sizeof(struct source_header) + sh->nentries * sizeof(hw_addr_t);
     }
+
+    ip_memclr(msg->hdr.vlfc, 4);
+    msg->hdr.vlfc[0] = IPV6_VERSION << 4;
+    
     msg->metadata.sender = TOS_NODE_ID;
     msg->hdr.plen = hton16(len);
 

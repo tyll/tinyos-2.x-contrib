@@ -111,7 +111,10 @@ router_t *get_insert_router(node_id_t rid) {
     ret->id = rid;
     ret->links = NULL;
     ret->next = router_list;
+
+    ret->sp.dist = FLT_MAX;
     ret->sp.prev = NULL;
+
     router_list = ret;
 
     *key = rid;
@@ -213,7 +216,7 @@ void update_neighbors(router_t *cur) {
 
 router_t *extract_min(router_t **list) {
   router_t *r, *prev = NULL, *min = NULL, *prev_min = NULL;
-  float min_dist = 1e11;
+  float min_dist = FLT_MAX;
   for (r = *list; r != NULL; r = r->sp.setptr) {
     if (r->sp.dist < min_dist) {
       min_dist = r->sp.dist;
@@ -222,13 +225,19 @@ router_t *extract_min(router_t **list) {
     }
     prev = r;
   }
-  // the first element was the best, set list is pointed at the second element
-  if (prev_min == NULL) {
+
+  if (min == NULL) {
+    // it might be the case that not everyone is reachable.  In that
+    // case, we'll just leave them unconnected.
+    *list = NULL;
+  } else if (prev_min == NULL) {
+    // the first element was the best, set list is pointed at the second element
     *list = (*list)->sp.setptr;
   } else {
     // otherwise just remove the min element from the list
     prev_min->sp.setptr = min->sp.setptr;
   }
+
   return min;
 }
 

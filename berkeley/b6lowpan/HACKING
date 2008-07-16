@@ -1,0 +1,53 @@
+
+This file is to describe the directory structure and software
+architecture.  The implementation is split into two major parts.  In
+ANSI-c, lib6lowpan provides generic functionality necessary for
+unpacking 6lowpan packets and dealing with fragmentation.  In nesC,
+there is mote code which interacts with the radio on the motes, and
+presents an IP interface to other applications running there.
+
+
+support/sdk/c/lib6lowpan
+  - implementation of 6lowpan header parser, fragmentation and
+        reassembly helper functions.
+support/sdk/c/lib6lowpan/tunnel
+  - a c driver and router for adding an IPv6 over 802.15.4 interface to a linux
+        machine, using the /dev/net/tun device.  The driver maintains
+        topology within the PAN based on reports from motes, and uses
+        this to provide source routes to motes more then one hop from
+        the router station.
+
+tos/lib/net/b6lowpan
+  - home for the mote-side code
+ IPDispatchC
+     - root IP component, providing (level 2.5) fragmentation and
+        reassembly, forwarding engine, and bare IP send and receive
+        interfaces.
+ IPRoutingP
+     - Routing component maintains default root to a base router.
+ ICMPResponderP
+     - Provides ICMP functionality: router solicitations and
+        advertisements, and replying to ECHO requests.
+ UDPC
+     - A UDP wrapper on top of the bare IP functionality provided by
+        IPDispatchC.  This is the component applications should
+        include to send UDP packets.
+
+tos/chips/cc2420/
+  - provides a radio components which no active message dispatch field.
+
+apps/IPBaseStation
+  - A simple serial-to-radio bridge based on T2's BaseStation.  Add
+        ack's and retries, and new radio component eliminating the
+        active message field.  Also transmits the 802.15.4 headers
+        over UART instead of the old version which switches to a
+        different header format over serial.
+
+apps/UDPEcho/
+  - Provides a UDP echo service on port 7 and will respond to pings.
+
+
+To see how to send a packet, or re-use one on a receive, look at
+UDPEchoP, which does both.
+
+

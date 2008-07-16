@@ -1,0 +1,17 @@
+
+PFLAGS+=-DTINYOS_IP -DPACKET_LINK -DTFRAMES_ENABLED
+
+PFLAGS+=-I$(LOWPAN_ROOT)/support/sdk/c/lib6lowpan/ 
+PFLAGS+=-I$(LOWPAN_ROOT)/tos/lib/net/b6lowpan/
+PFLAGS+=-I$(LOWPAN_ROOT)/tos/lib/net/b6lowpan/interfaces/ 
+PFLAGS+=-I$(LOWPAN_ROOT)/tos/lib/serial/
+PFLAGS+=-I$(LOWPAN_ROOT)/tos/chips/cc2420/
+PFLAGS+=-I$(LOWPAN_ROOT)/tos/chips/cc2420/interfaces/
+PFLAGS+=-I$(LOWPAN_ROOT)/tos/chips/cc2420/packet/
+PFLAGS+=-I$(LOWPAN_ROOT)/tos/chips/cc2420/link/
+
+PFLAGS+=$(LOWPAN_ROOT)/support/sdk/c/lib6lowpan/lib6lowpan.c 
+PFLAGS+=$(LOWPAN_ROOT)/support/sdk/c/lib6lowpan/lib6lowpanIP.c
+PFLAGS+=$(LOWPAN_ROOT)/support/sdk/c/lib6lowpan/lib6lowpanFrag.c
+PFLAGS+=$(LOWPAN_ROOT)/support/sdk/c/lib6lowpan/in_cksum.c
+

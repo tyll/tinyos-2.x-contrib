@@ -68,7 +68,7 @@
 		</java>
 
 		<tstamp>
-			<format property="TIMESTAMP" pattern="d-MMMM-yyyy_hh-mm-aa" />
+			<format property="TIMESTAMP" pattern="yyyy-MM-dd-_hh-mm-aa" />
 		</tstamp>
 
 		<property name="archive.prefix" value="htmlreport_${TIMESTAMP}" />

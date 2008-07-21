@@ -46,6 +46,7 @@ import net.tinyos.util.Messenger;
 
 import org.apache.log4j.Logger;
 
+import com.rincon.tunit.TUnit;
 import com.rincon.tunit.link.TUnitProcessing;
 import com.rincon.tunit.link.TUnitProcessing_Events;
 import com.rincon.tunit.properties.TUnitSuiteProperties;
@@ -441,7 +442,7 @@ public class ResultCollector extends Thread implements Messenger,
         + value);
 
     try {
-      StatisticsChart.write(StatisticsReport.log(report.getPackage(),
+      StatisticsChart.write(StatisticsReport.log(report.getPackage(), TUnit.getBasePackageDirectory(),
           (String) statsMap.get(new Integer(id)), units, value), 500, 325);
 
     } catch (IOException e) {

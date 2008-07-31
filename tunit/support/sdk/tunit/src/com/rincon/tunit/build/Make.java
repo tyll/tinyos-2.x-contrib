@@ -34,6 +34,9 @@ package com.rincon.tunit.build;
 import java.io.File;
 import java.io.IOException;
 import java.util.StringTokenizer;
+import java.util.Map;
+import java.util.Collection;
+import java.lang.System;
 
 import org.apache.log4j.Logger;
 
@@ -82,22 +85,30 @@ public class Make implements BuildInterface {
    */
   public TestResult build(File buildDir, String target, String extras,
       String env) {
+    Map environment;    
+    String complete_env = env;
     log.trace("Entering make build");
     log.info("Building platform " + target + " in "
         + buildDir.getAbsolutePath());
     TestResult result;
-    
-    if(env == null) {
-      env = "";
-    }
+
+     environment = System.getenv();
+
+    for (String key: (Collection<String>) environment.keySet()){
+       complete_env += key;
+       complete_env += "=";
+       complete_env += environment.get(key);
+       complete_env += " ";
+      } 
+
 
     String buildArgs = target + " " + extras;
     String largeOutput;
-    
+
     try {
       String[] display = CmdExec.runBlockingCommand(" make -C "
           + buildDir.getAbsolutePath().replace(File.separatorChar, '/') + " "
-          + buildArgs, env);
+          + buildArgs, complete_env);
 
       largeOutput = "";
       // int exitVal = CmdExec.lastExitVal;

@@ -34,9 +34,6 @@ package com.rincon.tunit.build;
 import java.io.File;
 import java.io.IOException;
 import java.util.StringTokenizer;
-import java.util.Map;
-import java.util.Collection;
-import java.lang.System;
 
 import org.apache.log4j.Logger;
 
@@ -47,9 +44,9 @@ import com.rincon.tunit.report.TestResult;
  * Make implements the BuildInterface to compile a project using the make
  * system. The compile is successful if we can locate the phrase "bytes in ROM"
  * within the output. All output is included in the TUnitResult passed back.
- * 
+ *
  * @author David Moss
- * 
+ *
  */
 public class Make implements BuildInterface {
 
@@ -67,7 +64,7 @@ public class Make implements BuildInterface {
 
   /**
    * Constructor
-   * 
+   *
    */
   public Make() {
     log = Logger.getLogger(getClass());
@@ -76,7 +73,7 @@ public class Make implements BuildInterface {
   /**
    * Compile the project for the given target with the given arguments from the
    * current working directory
-   * 
+   *
    * @param target
    *          The target to compile for
    * @param extras
@@ -85,22 +82,14 @@ public class Make implements BuildInterface {
    */
   public TestResult build(File buildDir, String target, String extras,
       String env) {
-    Map environment;    
-    String complete_env = env;
     log.trace("Entering make build");
     log.info("Building platform " + target + " in "
         + buildDir.getAbsolutePath());
     TestResult result;
 
-     environment = System.getenv();
-
-    for (String key: (Collection<String>) environment.keySet()){
-       complete_env += key;
-       complete_env += "=";
-       complete_env += environment.get(key);
-       complete_env += " ";
-      } 
-
+    if(env == null) {
+      env = "";
+    }
 
     String buildArgs = target + " " + extras;
     String largeOutput;
@@ -108,7 +97,7 @@ public class Make implements BuildInterface {
     try {
       String[] display = CmdExec.runBlockingCommand(" make -C "
           + buildDir.getAbsolutePath().replace(File.separatorChar, '/') + " "
-          + buildArgs, complete_env);
+          + buildArgs, env);
 
       largeOutput = "";
       // int exitVal = CmdExec.lastExitVal;
@@ -167,7 +156,7 @@ public class Make implements BuildInterface {
   }
 
   /**
-   * 
+   *
    * @return the approximate size of the compiled ROM
    */
   public long getRomSize() {
@@ -175,7 +164,7 @@ public class Make implements BuildInterface {
   }
 
   /**
-   * 
+   *
    * @return the approximate size of the compiled RAM
    */
   public long getRamSize() {
@@ -184,7 +173,7 @@ public class Make implements BuildInterface {
 
   /**
    * Erase and clean up any previous builds
-   * 
+   *
    */
   public TestResult clean(File buildDir) {
     log.trace("Entering make clean");
@@ -215,7 +204,7 @@ public class Make implements BuildInterface {
   /**
    * Parse the bytes out of a string coming from the compile command line. The
    * first token of the line happens to be the byte value we want
-   * 
+   *
    * @param compileLine
    * @return bytes first number found on the line
    */
@@ -225,7 +214,7 @@ public class Make implements BuildInterface {
   }
 
   /**
-   * 
+   *
    * @return "build/telosb/app.c" so you can tack it onto your build directory
    */
   public String getAppcLocation() {

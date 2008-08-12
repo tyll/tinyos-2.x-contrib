@@ -36,7 +36,6 @@ import java.io.BufferedReader;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.PrintStream;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
@@ -85,11 +84,13 @@ public class DataLogger implements MessageListener {
     final int RX_ERROR=5;
     class NodeTimes {
     	TreeMap<Integer, Long> time = new TreeMap<Integer, Long>();//indexed by msg_id
-        int numSmallErrors=0, numBigErrors=0;
-        double sumSmallErrors=0d;
+        int numSmallErrors=0, numBigErrors=0,numSmallErrors2=0, numBigErrors2=0;
+        double sumSmallErrors=0d,sumSmallErrors2=0d;
     	public String toString() {
-    		return new String(""+numBigErrors+"\t"+numSmallErrors+"\t"
-    							+((int)(sumSmallErrors*1000/numSmallErrors))/1000f);
+    		return new String(numBigErrors+"\t"+numSmallErrors+"\t"
+    							+((int)(sumSmallErrors*1000/numSmallErrors))/1000f+"\t \t"
+    							+numBigErrors2+"\t"+numSmallErrors2+"\t"
+    							+((int)(sumSmallErrors2*1000/numSmallErrors2))/1000f);
     	}
     }
     
@@ -135,21 +136,49 @@ public class DataLogger implements MessageListener {
 		Long rxTime = rxTimes.time.get(msgId);
 		Long txTimePrev = txTimes.time.get(prevMsgId);
 		Long txTime = txTimes.time.get(msgId);
-		if (rxTimePrev!=null&&rxTime!=null&&txTimePrev!=null&&txTime!=null)
+		if (rxTimePrev!=null&&rxTime!=null&&txTimePrev!=null&&txTime!=null)// && rxId==2)
 		{
 		    double exp_rx_time = rxTimePrev+txTime-txTimePrev;
 		    double rx_error = exp_rx_time-rxTime;
 		    if (Math.abs(rx_error)>RX_ERROR){
 		    	++rxTimes.numBigErrors;
-		    	System.out.println("RX error: rxId,txId ["+rxId+","+txId+"], msg "+msgId+", exp_time "+exp_rx_time+", time "+rxTime+" (error "+rx_error+")");
+		    	System.out.println("RXTX err: ids ["+txId+"->"+rxId+"  ], msg "+msgId+", exp_time "+exp_rx_time+", time "+rxTime+" (error "+rx_error+")");
 		    }
 		    else {
 		    	++rxTimes.numSmallErrors;
 		    	rxTimes.sumSmallErrors+=rx_error;
-		    	if (rxTimes.numSmallErrors%100==0)
-		    		System.out.println("Node "+txId+": "+rxTimes.numSmallErrors+" RX timestamps without error (avg "+(rxTimes.sumSmallErrors/rxTimes.numSmallErrors)+")");
+			    	System.out.println("RXTX  ok: ids ["+txId+"->"+rxId+"  ], msg "+msgId+", exp_time "+exp_rx_time+", time "+rxTime+" (error "+rx_error+")");
+			    	//if (rxTimes.numSmallErrors%1000==0)
+		    		//System.out.println("Node "+txId+": "+rxTimes.numSmallErrors+" RX timestamps without error (avg "+(rxTimes.sumSmallErrors/rxTimes.numSmallErrors)+")");
 		    }		
 		}
+		for (TxRx txRxId:rx_node_times.keySet())
+			if (txId==txRxId.tx && txRxId.rx>rxId)// && (rxId==2||txRxId.rx==2))
+			{
+				NodeTimes nt = rx_node_times.get(txRxId);
+				if (nt!=null && nt.time.containsKey(prevMsgId)&& nt.time.containsKey(msgId)) 
+				{
+					Long rx2TimePrev = nt.time.get(prevMsgId);
+					Long rx2Time = nt.time.get(msgId);
+					long offset1=rxTime-rxTimePrev;
+					long offset2=rx2Time-rx2TimePrev;
+					
+				    double exp_rx_time = rxTimePrev+rx2Time-rx2TimePrev;
+				    double rx_error = Math.abs(exp_rx_time-rxTime);
+				    if (rx_error>RX_ERROR){
+				    	++rxTimes.numBigErrors2;
+				    	System.out.println("RXRX err: ids ["+txRxId.tx+"->"+rxId+","+txRxId.rx+"], msg "+msgId+", exp_time "+exp_rx_time+", time "+rxTime+" (error "+rx_error+")");
+				    }
+				    else {
+				    	++rxTimes.numSmallErrors2;
+				    	rxTimes.sumSmallErrors2+=rx_error;
+					    	System.out.println("RXRX  ok: ids ["+txRxId.tx+"->"+rxId+","+txRxId.rx+"], msg "+msgId+", exp_time "+exp_rx_time+", time "+rxTime+" (error "+rx_error+")");
+					    	//if (rxTimes.numSmallErrors2%1000==0)
+				    		//System.out.println("Node "+rxId+": "+rxTimes.numSmallErrors2+" RX/RX timestamps without error (avg "+(rxTimes.sumSmallErrors2/rxTimes.numSmallErrors2)+")");
+				    }		
+				}
+			}
+
 	}
 	
 	public void analyzeReprot(int txId, int rxId, int msgId, long tx_prev_time, long rx_time)

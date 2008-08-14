@@ -1,0 +1,77 @@
+-------------------------------------------------------------------------------
+Author/Contact:
+---------------
+ Brano Kusy: branislav.kusy@gmail.com
+ Miklos Maroti: mmaroti@gmail.com
+
+-------------------------------------------------------------------------------
+Conventions:
+------------
+ TINYOS - the tinyos-2.x distro directory , i.e. /opt/tinyos-2.x
+ CONTRIB - stanford-lgl contrib dir, i.e. /opt/tinyos-2.x-contrib/stanoford-lgl
+
+-------------------------------------------------------------------------------
+DESCRIPTION:
+------------
+ TestTimeSyncC component verifies the precision of FTSP timesync (CONTRIB/lib/
+ FTSP). TestTimeSyncPollerC is a beacon (reference broadcaster). Each client
+ (TestTimeSyncC app) responds to the beacon's radio msgs by sending data to base
+ station (BaseStation).
+
+-------------------------------------------------------------------------------
+TUNABLE PARAMETERS:
+-------------------
+ TIMESYNC_RATE (seconds) - how often will each node transmit the time sync msg
+ TS_MICRO - if defined, the faster CPU (7MHz) clock is used, rather than 32kHz
+            external crystal
+ TIMESYNC_DEBUG - if defined, the multi-hop network is enforced by software,
+                  requires special TOS_NODE_IDs
+ TIMESYNC_POLLER_RATE - how often will the poller send the beacon message
+
+-------------------------------------------------------------------------------
+STEP BY STEP GUIDE TO RUN OUR TEST SCENARIO:
+--------------------------------------------
+ We propose the following test scenario:
+
+ - one base station connected to a PC. On the PC side you should run an
+   application that parses FTSP report messages (see data/readme),
+ - one dedicated beacon (TestTimeSyncPollerC) broadcasts TimeSyncPoll msgs
+ - several clients (TestTimeSyncC) that wire 1) TimeSyncC component providing
+   timesync, and 2) TimeSyncDebuggerC compoenent reporting performance data back
+   to the base station.
+
+ See data/readme for more info
+
+ Additional comment on addressing scheme:
+      upload motes with 'make micaz install.addr'
+
+   addr should be unique address, if using TIMESYNC_DEBUG option, the network is
+   connected based on 2D grid connectivity defined by addr using hexadec format:
+   e.g. in one of our tests we programmed 64 motes with these addrs: 0x5ij;
+   i,j={0,1,...,7} and used 0x444 instead of 0x544; this creates an 8x8 grid
+   with the max hop distance 7 - the root 0x444 is in the middle, see our
+   SenSys'04 paper for more information
+
+-------------------------------------------------------------------------------
+REPORTED DATA:
+--------------
+ The most important reported data is the global time of arrival of the beacons.
+ The beacon msg arrives to all clients at the same time instant, thus reported
+ global times should be the same for all clients, if FTSP works properly.
+
+ Each message contains:
+ - the node ID of the mote that is sending this report (uint16_t)
+ - the  sequence number of the polling message that is increased by the poller
+   for each new polling msg (uint16_t)
+ - the global time when the polling message arrived (uint32_t)
+ - the local time when the  polling message arrived (uint32_t)
+ - the skew (the speed ratio between the clocks of the root of the network  and
+   the receiving node). Note, this value is normalized to 0, so 0 means  that
+   the two clocks run with the same speed. (float)
+ - the boolean value saying whether the node is synchronized or not. If a node
+   is not synchronized, the global time is not valid (uint8_t)
+ - the id of the root of the time sync multi-hop algorithm. (uint16_t)
+ - the sequence number of the last time synchronizataion msg received from the
+   current root (uint8_t)
+ - the number of entries currently stored in the linear regression table
+   (uint8_t)

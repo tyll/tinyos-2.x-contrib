@@ -81,7 +81,7 @@ public class DataLogger implements MessageListener {
     PrintStream outPoll = null;
     PrintStream outReport = null;
     
-    final int RX_ERROR=5;
+    final int RX_ERROR=10;
     class NodeTimes {
     	TreeMap<Integer, Long> time = new TreeMap<Integer, Long>();//indexed by msg_id
         int numSmallErrors=0, numBigErrors=0,numSmallErrors2=0, numBigErrors2=0;
@@ -136,32 +136,33 @@ public class DataLogger implements MessageListener {
 		Long rxTime = rxTimes.time.get(msgId);
 		Long txTimePrev = txTimes.time.get(prevMsgId);
 		Long txTime = txTimes.time.get(msgId);
-		if (rxTimePrev!=null&&rxTime!=null&&txTimePrev!=null&&txTime!=null)// && rxId==2)
+		
+		int FILTER_RX_ID=9;
+		
+		if (rxTimePrev!=null&&rxTime!=null&&txTimePrev!=null&&txTime!=null)// && rxId==FILTER_RX_ID)
 		{
 		    double exp_rx_time = rxTimePrev+txTime-txTimePrev;
 		    double rx_error = exp_rx_time-rxTime;
 		    if (Math.abs(rx_error)>RX_ERROR){
 		    	++rxTimes.numBigErrors;
-		    	System.out.println("RXTX err: ids ["+txId+"->"+rxId+"  ], msg "+msgId+", exp_time "+exp_rx_time+", time "+rxTime+" (error "+rx_error+")");
+		    	System.out.println("RXTX err: ids ["+txId+"->"+rxId+"  ], msg(prev) "+msgId+"("+prevMsgId+"), exp_time "+exp_rx_time+", time "+rxTime+" (error "+rx_error+")");
 		    }
 		    else {
 		    	++rxTimes.numSmallErrors;
 		    	rxTimes.sumSmallErrors+=rx_error;
-			    	System.out.println("RXTX  ok: ids ["+txId+"->"+rxId+"  ], msg "+msgId+", exp_time "+exp_rx_time+", time "+rxTime+" (error "+rx_error+")");
+			    System.out.println("RXTX  ok: ids ["+txId+"->"+rxId+"  ], msg "+msgId+", exp_time "+exp_rx_time+", time "+rxTime+" (error "+rx_error+")");
 			    	//if (rxTimes.numSmallErrors%1000==0)
 		    		//System.out.println("Node "+txId+": "+rxTimes.numSmallErrors+" RX timestamps without error (avg "+(rxTimes.sumSmallErrors/rxTimes.numSmallErrors)+")");
 		    }		
 		}
 		for (TxRx txRxId:rx_node_times.keySet())
-			if (txId==txRxId.tx && txRxId.rx>rxId)// && (rxId==2||txRxId.rx==2))
+			if (txId==txRxId.tx && txRxId.rx>rxId)// && (rxId==FILTER_RX_ID||txRxId.rx==FILTER_RX_ID))
 			{
 				NodeTimes nt = rx_node_times.get(txRxId);
 				if (nt!=null && nt.time.containsKey(prevMsgId)&& nt.time.containsKey(msgId)) 
 				{
 					Long rx2TimePrev = nt.time.get(prevMsgId);
 					Long rx2Time = nt.time.get(msgId);
-					long offset1=rxTime-rxTimePrev;
-					long offset2=rx2Time-rx2TimePrev;
 					
 				    double exp_rx_time = rxTimePrev+rx2Time-rx2TimePrev;
 				    double rx_error = Math.abs(exp_rx_time-rxTime);
@@ -172,7 +173,7 @@ public class DataLogger implements MessageListener {
 				    else {
 				    	++rxTimes.numSmallErrors2;
 				    	rxTimes.sumSmallErrors2+=rx_error;
-					    	System.out.println("RXRX  ok: ids ["+txRxId.tx+"->"+rxId+","+txRxId.rx+"], msg "+msgId+", exp_time "+exp_rx_time+", time "+rxTime+" (error "+rx_error+")");
+					    System.out.println("RXRX  ok: ids ["+txRxId.tx+"->"+rxId+","+txRxId.rx+"], msg "+msgId+", exp_time "+exp_rx_time+", time "+rxTime+" (error "+rx_error+")");
 					    	//if (rxTimes.numSmallErrors2%1000==0)
 				    		//System.out.println("Node "+rxId+": "+rxTimes.numSmallErrors2+" RX/RX timestamps without error (avg "+(rxTimes.sumSmallErrors2/rxTimes.numSmallErrors2)+")");
 				    }		

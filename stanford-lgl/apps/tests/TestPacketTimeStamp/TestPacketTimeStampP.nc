@@ -91,7 +91,7 @@ implementation
 
     task void foo(){
         uint32_t time = call BusyTimer.getNow();
-        while ((call BusyTimer.getNow() - time) < 2);//keep CPU busy for up to 2ms
+        while ((call BusyTimer.getNow() - time) < 5);//keep CPU busy
     }
 
     event void BusyTimer.fired(){
@@ -108,8 +108,11 @@ implementation
         tspr->msgID = tsp->msgID;
         tspr->previousSendTime = tsp->previousSendTime;
 
-        tspr->receiveTime = call PacketTimeStamp.timestamp(p);
-        call ReportSend.send(AM_BROADCAST_ADDR, &msgReport, sizeof(TimeStampPollReport));
+        if (tsp->previousSendTime!=0 && call PacketTimeStamp.isValid(p))
+        {
+            tspr->receiveTime = call PacketTimeStamp.timestamp(p);
+            call ReportSend.send(AM_BROADCAST_ADDR, &msgReport, sizeof(TimeStampPollReport));
+        }
 
         return p;
     }
@@ -118,7 +121,10 @@ implementation
     event void RadioControl.stopDone(error_t error){};
     event void PollSend.sendDone(message_t* p, error_t success){
         TimeStampPoll *tsp = call PollSend.getPayload(p, sizeof(TimeStampPoll));
-        tsp->previousSendTime = call PacketTimeStamp.timestamp(p);
+        if (call PacketTimeStamp.isValid(p))
+            tsp->previousSendTime = call PacketTimeStamp.timestamp(p);
+        else
+            tsp->previousSendTime = 0;
     };
     event void ReportSend.sendDone(message_t* p, error_t success){};
 

@@ -236,12 +236,10 @@ implementation {
   }
   
   
-  inline uint32_t time16to32(uint16_t time, uint32_t recent_time)
+  inline uint32_t getTime32(uint16_t time)
   {
-    if ((recent_time&0xFFFF)<time)
-      return ((recent_time-0x10000UL)&0xFFFF0000UL)|time;
-    else
-      return (recent_time&0xFFFF0000UL)|time;
+    uint32_t recent_time=call BackoffTimer.getNow();
+    return recent_time + (int16_t)(time - recent_time);
   }
 
   /**
@@ -258,8 +256,9 @@ implementation {
    * would have picked up and executed had our microcontroller been fast enough.
    */
   async event void CaptureSFD.captured( uint16_t time ) {
-    uint32_t time32 = time16to32(time, call BackoffTimer.getNow());
+    uint32_t time32;
     atomic {
+      time32 = getTime32(time);
       switch( m_state ) {
         
       case S_SFD:

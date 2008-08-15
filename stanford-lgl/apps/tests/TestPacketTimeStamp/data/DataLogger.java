@@ -44,12 +44,47 @@ import net.tinyos.message.*;
 import net.tinyos.util.*;
 
 public class DataLogger implements MessageListener {
-	public class RunWhenShuttingDown extends Thread { 
+
+    final int RX_ERROR=20;
+
+	public class RunWhenShuttingDown extends Thread {
+		TreeMap<Integer, NodeTimes> rx_nodes = new TreeMap<Integer, NodeTimes>();
+		TreeMap<Integer, NodeTimes> tx_nodes = new TreeMap<Integer, NodeTimes>();
 		public void run() 
 		{ 
-			System.out.println("TX/RX:\tErrB\tErrS\tAvgErrS\t \tErrB2\tErrS2\tAvgErrS2");
+			System.out.println("\nError summary:\nTX/RX:\tErrB\tErrS\tAvgErrS\t \tErrB2\tErrS2\tAvgErrS2");
 			for (TxRx id:rx_node_times.keySet())
-				System.out.println(id+"\t "+rx_node_times.get(id));
+			{
+				NodeTimes rxval = rx_nodes.get(id.rx);
+				NodeTimes txval = tx_nodes.get(id.tx);
+				NodeTimes rxnew = rx_node_times.get(id);
+				if (rxval==null)
+				{
+					rxval = new NodeTimes();
+					rx_nodes.put(id.rx, rxval);
+				}
+				rxval.numBigErrors+=rxnew.numBigErrors;
+				rxval.numSmallErrors+=rxnew.numSmallErrors;
+				rxval.sumSmallErrors+=Math.abs(rxnew.sumSmallErrors);
+					
+				if (txval==null)
+				{
+					txval = new NodeTimes();
+					tx_nodes.put(id.tx, txval);
+				}
+				txval.numBigErrors+=rxnew.numBigErrors;
+				txval.numSmallErrors+=rxnew.numSmallErrors;
+				txval.sumSmallErrors+=Math.abs(rxnew.sumSmallErrors);
+					
+				System.out.println(id+"\t "+rx_node_times.get(id));				
+			}
+			System.out.println("Summary of receivers (abs txrx errors):");
+			for (Integer id:rx_nodes.keySet())
+				System.out.println(id+"\t "+rx_nodes.get(id));				
+			System.out.println("Summary of transmitters (abs txrx errors):");
+			for (Integer id:tx_nodes.keySet())
+				System.out.println(id+"\t "+tx_nodes.get(id));				
+
 			if (outPoll!=null)
 				outPoll.close();
 			if (outReport!=null)
@@ -81,7 +116,6 @@ public class DataLogger implements MessageListener {
     PrintStream outPoll = null;
     PrintStream outReport = null;
     
-    final int RX_ERROR=10;
     class NodeTimes {
     	TreeMap<Integer, Long> time = new TreeMap<Integer, Long>();//indexed by msg_id
         int numSmallErrors=0, numBigErrors=0,numSmallErrors2=0, numBigErrors2=0;
@@ -150,7 +184,7 @@ public class DataLogger implements MessageListener {
 		    else {
 		    	++rxTimes.numSmallErrors;
 		    	rxTimes.sumSmallErrors+=rx_error;
-			    System.out.println("RXTX  ok: ids ["+txId+"->"+rxId+"  ], msg "+msgId+", exp_time "+exp_rx_time+", time "+rxTime+" (error "+rx_error+")");
+			    //System.out.println("RXTX  ok: ids ["+txId+"->"+rxId+"  ], msg "+msgId+", exp_time "+exp_rx_time+", time "+rxTime+" (error "+rx_error+")");
 			    	//if (rxTimes.numSmallErrors%1000==0)
 		    		//System.out.println("Node "+txId+": "+rxTimes.numSmallErrors+" RX timestamps without error (avg "+(rxTimes.sumSmallErrors/rxTimes.numSmallErrors)+")");
 		    }		
@@ -166,14 +200,14 @@ public class DataLogger implements MessageListener {
 					
 				    double exp_rx_time = rxTimePrev+rx2Time-rx2TimePrev;
 				    double rx_error = Math.abs(exp_rx_time-rxTime);
-				    if (rx_error>RX_ERROR){
+				    if (rx_error>RX_ERROR-5){
 				    	++rxTimes.numBigErrors2;
 				    	System.out.println("RXRX err: ids ["+txRxId.tx+"->"+rxId+","+txRxId.rx+"], msg "+msgId+", exp_time "+exp_rx_time+", time "+rxTime+" (error "+rx_error+")");
 				    }
 				    else {
 				    	++rxTimes.numSmallErrors2;
 				    	rxTimes.sumSmallErrors2+=rx_error;
-					    System.out.println("RXRX  ok: ids ["+txRxId.tx+"->"+rxId+","+txRxId.rx+"], msg "+msgId+", exp_time "+exp_rx_time+", time "+rxTime+" (error "+rx_error+")");
+					    //System.out.println("RXRX  ok: ids ["+txRxId.tx+"->"+rxId+","+txRxId.rx+"], msg "+msgId+", exp_time "+exp_rx_time+", time "+rxTime+" (error "+rx_error+")");
 					    	//if (rxTimes.numSmallErrors2%1000==0)
 				    		//System.out.println("Node "+rxId+": "+rxTimes.numSmallErrors2+" RX/RX timestamps without error (avg "+(rxTimes.sumSmallErrors2/rxTimes.numSmallErrors2)+")");
 				    }		

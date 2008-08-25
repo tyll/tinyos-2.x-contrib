@@ -26,22 +26,16 @@ configuration ACMeterAppC {
 
 } implementation {
   components MainC, LedsC;
-  components UDPC, ACMeterAppP;
+  components IPDispatchC, ACMeterAppP;
 
   ACMeterAppP.Boot -> MainC;
   ACMeterAppP.Leds -> LedsC;
 
-  ACMeterAppP.RadioControl -> UDPC;
-  ACMeterAppP.UDPReceive -> UDPC.UDPReceive[7];
-  ACMeterAppP.UDPSend -> UDPC.UDPSend[7];
-
-  ACMeterAppP.BufferPool -> UDPC;
-
-  components IPDispatchC;
-
-  ACMeterAppP.ReportSend  -> UDPC.UDPSend[7001];
-  ACMeterAppP.IPPacket   -> IPDispatchC;
-  ACMeterAppP.UdpPacket  -> UDPC;
+  ACMeterAppP.RadioControl -> IPDispatchC;
+  components UDPShellC;
+  UDPShellC.UDP -> IPDispatchC.UDP[0xF0B0];
+  ACMeterAppP.Shell       -> IPDispatchC.UDP[0xf0b1];
+  ACMeterAppP.ReportSend  -> IPDispatchC.UDP[0xf0b2];
 
   components ACMeterC;
 

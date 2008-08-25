@@ -8,12 +8,12 @@ $testbuf = "";
 while (length($testbuf) < 1280 - 40 - 8) {
     $testbuf .= $alpha;
 }
-$pid = open2(*reader, *writer, "nc6 -u 2001:470:1f04:56d::16 7");
+$pid = open2(*reader, *writer, "nc6 -u 2001:470:1f04:56d::66 7");
 
 
 my $trials = 0;
 while (1) {
-    $len = int(rand(1280 - 40 - 8 ));
+    $len = int(rand(850));
     print $len . "\n";
     print writer substr($testbuf, 0, $len) . "\n";
 

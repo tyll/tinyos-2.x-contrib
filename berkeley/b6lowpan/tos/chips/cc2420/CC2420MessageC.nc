@@ -85,7 +85,6 @@ implementation {
   components CC2420ControlC;
   
 #if defined(LOW_POWER_LISTENING) || defined(ACK_LOW_POWER_LISTENING)
-#error "Using LPL!"
   components DefaultLplC as LplC;
 #else
   components DummyLplC as LplC;

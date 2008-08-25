@@ -58,7 +58,6 @@
 #include <unistd.h>
 #include <string.h>
 #include <time.h>
-#include <arpa/inet.h>
 #include <stdarg.h>
 #include <termios.h>
 #include <errno.h>
@@ -69,11 +68,9 @@
 #include "serialprotocol.h"
 
 #include "6lowpan.h"
+#include "ip.h"
 #include "lib6lowpan.h"
-#include "lib6lowpanIP.h"
-#include "lib6lowpanFrag.h"
 #include "router_address.h"
-#include "IP.h"
 #include "IEEE154.h"
 #include "routing.h"
 #include "configure.h"
@@ -123,22 +120,6 @@ static char* ifconfig_fmt_llocal = "ifconfig tun0 inet6 add fe80::%x%02x/64";
 #endif
 
 /* ------------------------------------------------------------------------- */
-/* function pre-declarations */
-int serial_output_am_payload(uint8_t * buf, int len,
-			     const hw_addr_t * hw_src_addr,
-			     const hw_addr_t * hw_dst_addr);
-
-int serial_input_layer3(uint8_t * buf, int len,
-			const hw_addr_t * hw_src_addr,
-			const hw_addr_t * hw_dst_addr);
-
-int serial_input_ipv6_uncompressed(uint8_t * buf, int len,
-				   const hw_addr_t * hw_src_addr,
-				   const hw_addr_t * hw_dst_addr);
-
-int serial_input_ipv6_compressed(uint8_t * buf, int len,
-				 const hw_addr_t * hw_src_addr,
-				 const hw_addr_t * hw_dst_addr);
 
 void stderr_msg(serial_source_msg problem)
 {
@@ -171,9 +152,9 @@ int ssystem(const char *fmt, ...)
 #ifdef DEBUG
 #define dump_serial_packet(X,Y)  __dump_serial_packet((X),(Y))
 
-void print_ip_packet(ip_msg_t *msg) {
-  struct source_header *sh = (struct source_header *)msg->data;
+void print_ip_packet(struct split_ip_msg *msg) {
   int i;
+  struct generic_header *g_hdr;
   printf("  nxthdr: 0x%x hlim: 0x%x\n", msg->hdr.nxt_hdr, msg->hdr.hlim);
   printf("  src: ");
   for (i = 0; i < 16; i++) printf("0x%x ", msg->hdr.src_addr[i]);
@@ -182,40 +163,58 @@ void print_ip_packet(ip_msg_t *msg) {
   for (i = 0; i < 16; i++) printf("0x%x ", msg->hdr.dst_addr[i]);
   printf("\n");
 
-  if (msg->hdr.nxt_hdr == NXTHDR_SOURCE) {
-    printf("  source nxthdr: 0x%x nentries: 0x%x current: 0x%x\n", sh->nxt_hdr, sh->nentries, sh->current);
-    printf("    route: ");
-    for (i = 0; i < sh->nentries; i++) printf ("0x%x ", ntoh16(sh->hops[i]));
+  g_hdr = msg->headers;
+  while (g_hdr != NULL) {
+    printf("header [%i]: ", g_hdr->len);
+    for (i = 0; i < g_hdr->len; i++)
+      printf("0x%x ", g_hdr->hdr.data[i]);
     printf("\n");
+    g_hdr = g_hdr->next;
   }
+
+  printf("data [%i]:\n\t", msg->data_len);
+  for (i = 0; i < msg->data_len; i++) {
+    if (i == 0x40) {
+      printf (" ...\n");
+      break;
+    }
+    printf("0x%x ", msg->data[i]);
+    if (i % 16 == 15) printf("\n\t");
+    if (i % 16 == 7) printf ("  ");
+  }
+  printf("\n");
 }
-
-
 #else
 #define dump_serial_packet(X,Y)  ;
 #define print_ip_packet(X)
 #endif
 
+/*
+ * frees the linked list structs, and their payloads if we have
+ * malloc'ed them at some other point.
+ *
+ * does not free the payload buffer or the actual split_ip_msg struct,
+ * since those are malloc'ed seperatly in this implementation.
+ */
+void free_split_msg(struct split_ip_msg *msg) {
+  struct generic_header *cur, *next;
+  cur = msg->headers;
+  while (cur != NULL) {
+    next = cur->next;
+    if (cur->payload_malloced)
+      free(cur->hdr.data);
+    free(cur);
+    cur = next;
+  }
+}
 
 
 /* ------------------------------------------------------------------------- */
-/* ip6_addr_t and hw_addr_t utility functions */
-int ipv6_addr_is_zero(const ip6_addr_t * addr)
-{
-/*     int i; */
-/*     for (i=0;i<16;i++) { */
-/* 	if (addr->addr[i]) { */
-/* 	    return 0; */
-/* 	} */
-/*     } */
-    return 1;
-}
-
-int cmp_ipv6_addr(const ip6_addr_t * addr1, const ip6_addr_t * addr2)
-{
-    return memcmp(addr1, addr2, sizeof(ip6_addr_t));
-}
-
+/*
+ * the first byte the TOS serial stack sends is a dispatch byte.  One
+ * dispatch value is for forwarded 802;.15.4 packets; we use a few
+ * others to talk directly to the attached IPBaseStation.
+ */
 void handle_other_pkt(uint8_t *data, int len) {
   config_reply_t *rep;
   switch (data[0]) {
@@ -244,12 +243,11 @@ void send_configure() {
 
 /* ------------------------------------------------------------------------- */
 /* handling of data arriving on the tun interface */
-
 void write_radio_header(uint8_t *serial, hw_addr_t dest, uint16_t payload_len) {
   IEEE154_header_t *radioPacket = (IEEE154_header_t *)(serial + 1);
   radioPacket->length = payload_len + MAC_HEADER_SIZE + MAC_FOOTER_SIZE;
   // don't include the length byte
-  radioPacket->fcf = htons(0x4188);
+  radioPacket->fcf = hton16(0x4188);
   // dsn will get set on mote
   radioPacket->destpan = 0;
   radioPacket->dest = htole16(dest);
@@ -258,7 +256,7 @@ void write_radio_header(uint8_t *serial, hw_addr_t dest, uint16_t payload_len) {
   serial[0] = SERIAL_TOS_SERIAL_802_15_4_ID;
 }
 
-void send_fragments (ip_msg_t *msg, hw_addr_t dest) {
+void send_fragments (struct split_ip_msg *msg, hw_addr_t dest) {
   int result;
   uint16_t frag_len;
   fragment_t progress;
@@ -277,7 +275,6 @@ void send_fragments (ip_msg_t *msg, hw_addr_t dest) {
   // the dispatch byte: they are not included in the radio packet
   // header's length However, no crc bytes are appended.
   debug("send_fragments: about to send\n");
-  dump_serial_packet(serial, radioPacket->length + 2);
 
   result = write_serial_packet(ser_src, serial, radioPacket->length + 2);
   if (result != 0)
@@ -310,7 +307,7 @@ void send_fragments (ip_msg_t *msg, hw_addr_t dest) {
   }
 }
 
-void icmp_unreachable(ip_msg_t *msg) {
+void icmp_unreachable(struct split_ip_msg *msg) {
   
 }
 
@@ -320,19 +317,16 @@ void icmp_unreachable(ip_msg_t *msg) {
  * recompute L4 checksums as necessary.
  *
  */ 
-uint8_t ip_to_pan(ip_msg_t *msg) {
+uint8_t ip_to_pan(struct split_ip_msg *msg) {
   uint16_t dest;
-  uint8_t buf [sizeof(ip_msg_t *) + INET_MTU];
-  ip_msg_t *newMsg = (ip_msg_t *)buf;
-  newMsg->b_len = INET_MTU;
 
+  debug("ip_to_pan\n");
   print_ip_packet(msg);
 
   // source route as necessary
   switch (routing_is_onehop(msg)) {
   case ROUTE_MHOP:
-    if (routing_insert_route(msg, newMsg)) goto fail;
-    msg = newMsg;
+    if (routing_insert_route(msg)) goto fail;
     break;
     
   case ROUTE_NO_ROUTE:
@@ -350,32 +344,41 @@ uint8_t ip_to_pan(ip_msg_t *msg) {
   return 1;
 }
 
-void proc_sourceroute(ip_msg_t *msg) {
-  struct source_header *sh = (struct source_header *)msg->data;
-  uint16_t sh_len, new_plen;
-  if (msg->hdr.nxt_hdr == NXTHDR_SOURCE) {
-    //sh_len = sizeof(struct source_header) + (sh->nentries * sizeof(hw_addr_t));
-    sh_len = 4 + (sh->nentries * 2);
-    new_plen = ntoh16(msg->hdr.plen) - sh_len;
+void upd_source_route(struct source_header *sh, hw_addr_t addr) {
+  if (sh->current < SH_NENTRIES(sh)) {
+    sh->hops[sh->current] = leton16(addr);
+    sh->current++;
+  }
+}
 
+void remove_sourceroute(struct split_ip_msg *msg) {
+  struct source_header *sh;
+  struct generic_header *g_hdr;
+  if (msg->hdr.nxt_hdr == NXTHDR_SOURCE) {
+    sh = msg->headers->hdr.sh;
+
+    upd_source_route(sh, msg->metadata.sender);
     routing_add_source_header(sh);
 
     msg->hdr.nxt_hdr = sh->nxt_hdr;
-    ip_memcpy(msg->data, msg->data + sh_len, new_plen);
-    msg->hdr.plen = hton16(new_plen);
+    msg->hdr.plen = hton16(ntoh16(msg->hdr.plen) - sh->len);
+
+    g_hdr = msg->headers;
+    msg->headers = msg->headers->next;
+    free(g_hdr);
   }
 }
 
 
-void handle_ip_packet(ip_msg_t *msg) {
+void handle_serial_packet(struct split_ip_msg *msg) {
 
   if (ntoh16(msg->hdr.plen) > INET_MTU - sizeof(struct ip6_hdr)) {
     warn("handle_ip_packet: too long: 0x%x\n", ntoh16(msg->hdr.plen));
     return;
   }
 
-  //updateFromSourceRoute(msg);
   print_ip_packet(msg);
+  remove_sourceroute(msg);
 
   if (cmpPfx(msg->hdr.dst_addr, my_address) && 
       ((msg->hdr.dst_addr[14] != my_address[14] ||
@@ -385,24 +388,47 @@ void handle_ip_packet(ip_msg_t *msg) {
   } else {
     // give it to linux
     // need to remove route info here.
-    proc_sourceroute(msg);
-    tun_write(tun_fd, (void *)(&msg->pi), sizeof(struct ip6_hdr) + ntohs(msg->hdr.plen));
-    debug("tun_write: wrote 0x%x bytes\n", sizeof(struct ip6_hdr) + ntohs(msg->hdr.plen));
+    tun_write(tun_fd, msg);
+    debug("tun_write: wrote 0x%x bytes\n", sizeof(struct ip6_hdr) + ntoh16(msg->hdr.plen));
   }
 }
 
-void upd_source_route(ip_msg_t *msg, hw_addr_t addr) {
-  struct source_header *sh = (struct source_header *)msg->data;
-  if (msg->hdr.nxt_hdr == NXTHDR_SOURCE) {
-    if (sh->current < sh->nentries) {
-      sh->hops[sh->current] = leton16(addr);
-      sh->current++;
+void add_header_list(struct split_ip_msg *msg) {
+  uint8_t nxt_hdr;
+  struct generic_header *g_hdr, **g_list;
+  struct ip6_ext *ext = (struct ip6_ext *)msg->next;
+  uint16_t hdr_len = 0;
+  nxt_hdr = msg->hdr.nxt_hdr;
+  msg->headers = NULL;
+  g_list = &(msg->headers);
+  while (KNOWN_HEADER(nxt_hdr)) {
+    g_hdr = (struct generic_header *)malloc(sizeof(struct generic_header));
+    g_hdr->payload_malloced = 0;
+    g_hdr->hdr.ext = ext;
+    g_hdr->next = NULL;
+    *g_list = g_hdr;
+    g_list = &g_hdr->next;
+
+    switch(nxt_hdr) {
+    case NXTHDR_SOURCE:
+      g_hdr->len = ext->len;
+      
+      nxt_hdr = ext->nxt_hdr;
+      ext = (struct ip6_ext *)(((uint8_t *)ext) + ext->len);
+      break;
+    case IANA_UDP:
+      // a UDP header terminates a chain of headers we can compress...
+      g_hdr->len = sizeof(struct udp_hdr);
+      ext = (struct ip6_ext *)(((uint8_t *)ext) + sizeof(struct udp_hdr));
+      nxt_hdr = NXTHDR_UNKNOWN;
+      break;
     }
+    hdr_len += g_hdr->len;
   }
+  msg->data = (uint8_t *)ext;
+  msg->data_len = ntoh16(msg->hdr.plen) - hdr_len;
 }
 
-
-uint16_t last_tag = 0;
 
 /*
  * read data from the tun device and send it to the serial port
@@ -410,12 +436,12 @@ uint16_t last_tag = 0;
  */
 int tun_input()
 {
-  uint8_t buf[sizeof(ip_msg_t) + INET_MTU];
-  ip_msg_t *msg = (ip_msg_t *)buf;
-  msg->b_len = INET_MTU;
+  uint8_t buf[sizeof(struct split_ip_msg) + INET_MTU];
+  struct split_ip_msg *msg = (struct split_ip_msg *)buf;
   int len;
 
-  len = tun_read(tun_fd, (void *)(&msg->pi), INET_MTU);
+  len = tun_read(tun_fd, (void *)(&msg->pi), INET_MTU + sizeof(struct ip6_hdr));
+
   if (len <= 0) {
     return 0;
   }
@@ -429,8 +455,16 @@ int tun_input()
     warn("tun_input: dropping packet due to length: 0x%x\n", ntoh16(msg->hdr.plen));
     goto fail;
   }
+  if (msg->hdr.nxt_hdr == 0) {
+    warn("tun_input: dropping packet with IPv6 options\n");
+    goto fail;
+  }
+  
+  add_header_list(msg);
 
   ip_to_pan(msg);
+
+  free_split_msg(msg);
   
   return 1;
  fail:
@@ -479,7 +513,7 @@ reconstruct_t *getReassembly(packed_lowmsg_t *lowmsg) {
     reconstructions[free_spot].tag = mytag;
 
     reconstructions[free_spot].size = size;
-    reconstructions[free_spot].buf = malloc(size + offsetof(ip_msg_t, hdr));
+    reconstructions[free_spot].buf = malloc(size + offsetof(struct split_ip_msg, hdr));
     reconstructions[free_spot].bytes_rcvd = 0;
     reconstructions[free_spot].timeout = T_ACTIVE;
 
@@ -497,16 +531,17 @@ reconstruct_t *getReassembly(packed_lowmsg_t *lowmsg) {
  * read data on serial port and send it to the tun interface
  * does fragment reassembly
  */
-int serial_input()
-{
+int serial_input() {
     packed_lowmsg_t pkt;
     IEEE154_header_t *mac_hdr;
-    ip_msg_t *ipmsg;
     reconstruct_t *recon;
+    struct split_ip_msg *msg;
 
     uint8_t *ser_data = NULL;	        /* data read from serial port */
     int ser_len = 0;                    /* length of data read from serial port */
     uint8_t shortMsg[INET_MTU];
+    uint8_t *payload;
+    
 
     int rv = 1;
 
@@ -521,7 +556,6 @@ int serial_input()
       }
       
       debug("serial_input: read 0x%x bytes\n", ser_len);
-      dump_serial_packet(ser_data, ser_len);
 
       mac_hdr = (IEEE154_header_t *)(ser_data + 1);
 
@@ -537,33 +571,64 @@ int serial_input()
       if (pkt.headers == LOWPAN_NALP_PATTERN) goto discard_packet;
 
       if (hasFrag1Header(&pkt) || hasFragNHeader(&pkt)) {
+        unpack_info_t u_info;
+        uint8_t amount_here;
+
         recon = getReassembly(&pkt);
+        
+        msg = (struct split_ip_msg *)recon->buf;
         // printf ("recon is 0x%p\n", recon);
-        if (recon == NULL) goto discard_packet;
+        if (recon == NULL || recon->buf == NULL) goto discard_packet;
 
-        // mark that we've used this fragment recently
-        recon->timeout = T_ACTIVE;
+        if (hasFrag1Header(&pkt)) {
+          if (unpackHeaders(&pkt, &u_info,
+                            (uint8_t *)&msg->hdr, recon->size) == NULL) goto discard_packet;
+          amount_here = pkt.len - (u_info.payload_start - pkt.data);
+          ip_memcpy(u_info.header_end, u_info.payload_start, amount_here);
+          recon->bytes_rcvd = sizeof(struct ip6_hdr) + u_info.payload_offset + amount_here;
+        } else {
+          uint8_t offset_cmpr;
+          uint16_t offset;
+          if (getFragDgramOffset(&pkt, &offset_cmpr)) goto discard_packet;
+          offset = offset_cmpr * 8;
+          payload = getLowpanPayload(&pkt);
+          amount_here = pkt.len - (payload - pkt.data);
 
-        if (addFragment(&pkt, recon)) {
-          debug ("serial: reconstruction finished\n");
-          upd_source_route(recon->buf, pkt.src);
-          handle_ip_packet(recon->buf);
-          recon->timeout = T_UNUSED;
-          free(recon->buf);
+          if (offset + amount_here > recon->size) goto discard_packet;
+          ip_memcpy(((uint8_t *)&msg->hdr) + offset, payload, amount_here);
+          recon->bytes_rcvd += amount_here;
+          
+          if (recon->size == recon->bytes_rcvd) {
+            // got all the fragments...
+            debug ("serial: reconstruction finished\n");
+            add_header_list(msg);
+
+            msg->metadata.sender = pkt.src;
+
+            handle_serial_packet(msg);
+
+            recon->timeout = T_UNUSED;
+            free_split_msg(msg);
+            free(recon->buf);
+          }
         }
-      } else {
-        uint8_t *payload;
-        ipmsg = (ip_msg_t *)shortMsg;
-        payload = unpackHeaders(&pkt, (uint8_t *)&ipmsg->hdr, INET_MTU);
-        if (ntoh16(ipmsg->hdr.plen) > INET_MTU - sizeof(struct ip6_hdr)) goto discard_packet;
-        if (payload == NULL) goto discard_packet;
 
-        ip_memcpy(ipmsg->data + packs_header(ipmsg), payload, ntoh16(ipmsg->hdr.plen));
-        upd_source_route(ipmsg, pkt.src);
-        handle_ip_packet(ipmsg);
+      } else {
+        unpack_info_t u_info;
+        msg = (struct split_ip_msg *)shortMsg;
+        if (unpackHeaders(&pkt, &u_info,
+                          (uint8_t *)&msg->hdr, INET_MTU) == NULL) goto discard_packet;
+        if (ntoh16(msg->hdr.plen) > INET_MTU - sizeof(struct ip6_hdr)) goto discard_packet;
+
+        msg->metadata.sender = pkt.src;
+
+        ip_memcpy(u_info.header_end, u_info.payload_start, ntoh16(msg->hdr.plen));
+
+        add_header_list(msg);
+        
+        handle_serial_packet(msg);
+        free_split_msg(msg);
       }
-/*       printf("<"); */
-/*       fflush(stdout); */
     } else {
       //printf("no data on serial port, but FD triggered select\n");
       rv = 0;

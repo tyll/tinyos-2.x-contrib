@@ -31,13 +31,7 @@
 #ifndef __6LOWPAN_H__
 #define __6LOWPAN_H__
 
-enum {
-  HW_BROADCAST_ADDR = 0xffff,
-};
-
-
-void ip_memclr(uint8_t *buf, uint16_t len);
-void *ip_memcpy(void *dst0, const void *src0, size_t len);  
+#include <stdint.h>
 
 /*
  * Typedefs and static library data.
@@ -45,6 +39,26 @@ void *ip_memcpy(void *dst0, const void *src0, size_t len);
 typedef uint16_t hw_addr_t;
 typedef uint16_t hw_pan_t;
 typedef uint8_t ip6_addr_t [16];
+typedef uint16_t cmpr_ip6_addr_t;
+
+/*
+ * shared variables which contain addressing information for 6lowpan
+ * devices
+ */
+extern uint8_t globalPrefix;
+extern ip6_addr_t my_address;
+extern uint8_t multicast_prefix[8];
+extern uint8_t linklocal_prefix[8];
+
+uint8_t cmpPfx(ip6_addr_t a, uint8_t *pfx);
+
+enum {
+  HW_BROADCAST_ADDR = 0xffff,
+};
+
+
+void ip_memclr(uint8_t *buf, uint16_t len);
+void *ip_memcpy(void *dst0, const void *src0, uint16_t len);  
 
 /*
  * A packed 6lowpan packet. 
@@ -63,7 +77,6 @@ typedef struct packed_lowmsg {
   uint8_t *data;
 } packed_lowmsg_t;
 
-
 /*
  * bit fields we use to keep track of which optional header fields are
  * present in a message
@@ -74,6 +87,7 @@ enum {
   LOWMSG_FRAG1_HDR = (1 << 2),
   LOWMSG_FRAGN_HDR = (1 << 3),
   LOWMSG_NALP      = (1 << 4),
+  LOWMSG_IPNH_HDR  = (1 << 5),
 };
 
 /*
@@ -89,6 +103,7 @@ enum {
 enum {
   LOWPAN_LINK_MTU = 100,
   INET_MTU = 1280,
+  LIB6LOWPAN_MAX_LEN = LOWPAN_LINK_MTU,
 };
 
 /*
@@ -120,8 +135,11 @@ enum {
   IANA_TCP = 6,
 
   NXTHDR_SOURCE = 0,
+  NXTHDR_DEST   = 60,
+  NXTHDR_UNKNOWN = 0xff,
 };
 
+#define KNOWN_HEADER(X)  ((X) == NXTHDR_SOURCE || (X) == IANA_UDP || (X) == NXTHDR_DEST)
 
 /*
  * constants to unpack HC-packed headers
@@ -161,26 +179,6 @@ enum {
   LOWPAN_UDP_C_MASK          = 0x10,
 };
 
-/*
- * Definition for internet protocol version 6.
- * RFC 2460
- */
-struct ip6_hdr {
-  uint8_t   vlfc[4];
-  uint16_t  plen;      /* payload length */
-  uint8_t   nxt_hdr;       /* next header */
-  uint8_t   hlim;      /* hop limit */
-  ip6_addr_t src_addr; /* source address */
-  ip6_addr_t dst_addr; /* destination address */
-} __attribute__((packed));
-
-#define IPV6_VERSION            0x6
-#define IPV6_VERSION_MASK       0xf0
-
-
-/*
- * Extension Headers
- */
 
 /*
  * nonstandard source routing header fields
@@ -188,54 +186,41 @@ struct ip6_hdr {
 enum {
   IP_EXT_SOURCE_DISPATCH    = 0x40,
   IP_EXT_SOURCE_MASK        = 0xc0,
+
+  // dispatch values
   IP_EXT_SOURCE_RECORD      = 0x01,
   IP_EXT_SOURCE_RECORD_MASK = 0x01,
   IP_EXT_SOURCE_INVAL       = 0x02,
   IP_EXT_SOURCE_INVAL_MASK  = 0x02,
+
+  // dispatch values for route installation if this flag is set, the
+  // source_header must be immediately followed by a
+  // source_install_opt struct.
+  IP_EXT_SOURCE_INSTALL     = 0x10,
+  IP_EXT_SOURCE_INSTALL_MASK= 0x10,
+
+  // indicates weather the forward and reverse paths should be
+  // installed.  Are these needed?  the only case when we don't want
+  // to install the reverse path is when the destination is a
+  // multicast?
+  IP_EXT_SOURCE_INST_SRC    = 0x20,
+  IP_EXT_SOURCE_INST_DST    = 0x40,
 };
 
+#define SH_NENTRIES(SH)   ((sh->len - (sizeof(struct source_header))) / (sizeof(uint16_t)))
+
 struct source_header {
-  uint8_t dispatch;
   uint8_t nxt_hdr;
-  uint8_t nentries;
+  uint8_t len;
+  // the equalivent of the "routing type" field
+  uint8_t dispatch;
   uint8_t current;
   uint16_t hops[0];
 };
 
-/*
- * icmp
- */
-struct  icmp6_hdr {
-  uint8_t        type;     /* type field */
-  uint8_t        code;     /* code field */
-  uint16_t       cksum;    /* checksum field */
-};
 
 enum {
-    ICMP_TYPE_ECHO_DEST_UNREACH     = 1,
-    ICMP_TYPE_ECHO_PKT_TOO_BIG      = 2, 
-    ICMP_TYPE_ECHO_TIME_EXCEEDED    = 3,
-    ICMP_TYPE_ECHO_PARAM_PROBLEM    = 4,
-    ICMP_TYPE_ECHO_REQUEST          = 128,
-    ICMP_TYPE_ECHO_REPLY            = 129,
-    ICMP_TYPE_ROUTER_SOL            = 133,
-    ICMP_TYPE_ROUTER_ADV            = 134,
-    ICMP_TYPE_NEIGHBOR_SOL          = 135,
-    ICMP_TYPE_NEIGHBOR_ADV          = 136,
-    ICMP_NEIGHBOR_HOPLIMIT          = 255,
-
-    ICMP_CODE_HOPLIMIT_EXCEEDED     = 0,
-    ICMP_CODE_ASSEMBLY_EXCEEDED     = 1,
-};
-
-/*
- * Udp protocol header.
- */
-struct udp_hdr {
-    uint16_t srcport;               /* source port */
-    uint16_t dstport;               /* destination port */
-    uint16_t len;                   /* udp length */
-    uint16_t chksum;                /* udp checksum */
+  IP_NUMBER_FRAGMENTS = 10,
 };
 
 #endif

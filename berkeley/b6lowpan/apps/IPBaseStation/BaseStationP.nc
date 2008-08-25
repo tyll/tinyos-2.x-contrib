@@ -89,6 +89,7 @@ module BaseStationP {
     interface IEEE154Packet as RadioIEEEPacket;
 
     interface PacketLink;
+    interface LowPowerListening;
 
     interface Leds;
   }
@@ -161,6 +162,9 @@ implementation
   event void RadioControl.startDone(error_t error) {
     if (error == SUCCESS) {
       radioFull = FALSE;
+#ifdef LPL_SLEEP_INTERVAL
+      call LowPowerListening.setLocalSleepInterval(LPL_SLEEP_INTERVAL);
+#endif
     }
   }
 
@@ -305,7 +309,9 @@ implementation
     } else {
       call PacketLink.setRetries(msg, 0);
     }
-    
+#ifdef LPL_SLEEP_INTERVAL
+    call LowPowerListening.setRxSleepInterval(msg, LPL_SLEEP_INTERVAL);
+#endif
     if (call RadioSend.send(addr, msg, len) == SUCCESS)
       call Leds.led0Toggle();
     else

@@ -63,8 +63,7 @@ void log_log  (loglevel_t level, const char *fmt, ...) {
 }
 
 /* print char* in hex format */
-void __dump_serial_packet(const unsigned char *packet, const int len)
-{
+void __dump_serial_packet(unsigned char *packet, const int len) {
     int i;
     printf("len: %d\n", len);
     if (!packet)

@@ -34,7 +34,6 @@ configuration UDPC {
     interface SplitControl;
     interface UDPReceive[uint16_t port];
     interface UDPSend[uint16_t port];
-    interface BufferPool;
     interface BasicPacket;
     interface UDPPacket;
   }
@@ -46,7 +45,6 @@ configuration UDPC {
   SplitControl = IPDispatchC;
   UDPReceive   = UDPP;
   UDPSend      = UDPP;
-  BufferPool   = UDPP;
   BasicPacket  = UDPP;
   UDPPacket    = UDPP;
 

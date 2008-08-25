@@ -28,102 +28,128 @@
 #include "lib6lowpanFrag.h"
 
 int main(char **argv, int argc) {
-  uint8_t buf1[2000];
-  ip_msg_t *msg = (ip_msg_t *)buf1;
   uint8_t buf[2000];
   uint8_t *payload, *i;
-  ip_memclr((uint8_t *)&msg->hdr, sizeof(struct ip6_hdr));
-  ip_memclr(buf, 100);
 
-  globalPrefix = 0;
+  struct split_ip_msg msg;
+  uint8_t data[200];
 
-  uint16_t plen = 64;
+  globalPrefix = 1;
 
-  ip_memcpy(&msg->hdr.src_addr, my_address, 16);
-  ip_memcpy(&msg->hdr.dst_addr, my_address, 16);
+  uint16_t plen = 200;
+
+  ip_memclr((uint8_t *)&msg.hdr, 40);
+
+  ip_memcpy(msg.hdr.src_addr, my_address, 16);
+  ip_memcpy(msg.hdr.dst_addr, my_address, 16);
 
 
-  msg->hdr.vlfc[0] = 6 << 4;
-  msg->hdr.nxt_hdr = IANA_ICMP;
-  msg->hdr.hlim = 0x64;
-  msg->hdr.plen = hton16(plen);
+  msg.hdr.vlfc[0] = 6 << 4;
+  msg.hdr.nxt_hdr = NXTHDR_SOURCE;
+  msg.hdr.hlim = 0x64;
+  msg.hdr.plen = hton16(plen);
 
-  msg->hdr.dst_addr[0] = 0xff;
-  msg->hdr.dst_addr[1] = 0xfe;
-  msg->hdr.dst_addr[14]= 0x12;
-  msg->hdr.dst_addr[15] = 0xfe;
+  msg.hdr.dst_addr[0] = 0xff;
+  msg.hdr.dst_addr[1] = 0xfe;
+  msg.hdr.dst_addr[14]= 0x12;
+  msg.hdr.dst_addr[15] = 0xfe;
+  msg.headers = NULL;
+  msg.data = data;
+  msg.data_len = plen - 12;
 
-  struct udp_hdr *udp = (struct udp_hdr *)msg->data;
-  udp->srcport = hton16(0xf0d1);
-  udp->dstport = hton16(0xf0e0);
-  udp->len = hton16(plen - 8);
-  udp->chksum = hton16(0x9abc);
 
-  uint8_t *data = msg->data + 8;
+  struct udp_hdr udp;
+  udp.srcport = hton16(0xf0d1);
+  udp.dstport = hton16(0xf0e0);
+  udp.len = hton16(plen - 4);
+  udp.chksum = hton16(0x9abc);
+
+  printBuf(&udp, 8);
+
+  struct generic_header u_p;
+  u_p.len = sizeof(struct udp_hdr);
+  u_p.hdr.udp = &udp;
+  u_p.next = NULL;
+
+  struct source_header source;
+  source.nxt_hdr = IANA_UDP;
+  source.len = sizeof(struct source_header);
+  source.current = 0;
+
+  struct generic_header s_h;
+  s_h.len = sizeof(struct source_header);
+  s_h.hdr.ext = &source;
+  s_h.next = &u_p;
+  msg.headers = &s_h;
+
   int j;
-  for (j = 0; j < 800; j++)
+  for (j = 0; j < 200; j++)
     data[j] = j;
 
   fragment_t prog;
 
-  uint8_t r_buf[2000];
+/*   uint8_t r_buf[2000]; */
   int rc;
-  ip_memclr(r_buf, 1000);
+/*   ip_memclr(r_buf, 1000); */
 
-  packed_lowmsg_t pkt;
-  pkt.headers = 0;
-  pkt.data = buf;
+/*   packed_lowmsg_t pkt; */
+/*   pkt.headers = 0; */
+/*   pkt.data = buf; */
 
 
-  reconstruct_t recon;
+/*   reconstruct_t recon; */
   
-  printBuf(&msg->hdr, 40 + plen);
+  printBuf(&msg.hdr, 40 );
   
-  rc = getNextFrag(msg, &prog, buf, 100);
-  printBuf(buf, rc);
-  printf ("rc: %i\n", rc);
-  pkt.len = rc;
-
-  pkt.headers = getHeaderBitmap(&pkt);
-
-  printf("cmprlen: 0x%x\n", getCompressedLen(&pkt));
-
-  printBuf(buf, getCompressedLen(&pkt));
-
-  return;
-
-  uint16_t mytag, size;
-  pkt.headers = getHeaderBitmap(&pkt);
-  printf("headers: 0x%x\n", pkt.headers);
-  if (getFragDgramTag(&pkt, &mytag));
-  if (getFragDgramSize(&pkt, &size));
-  recon.tag = mytag;
-  recon.size = size;
-  recon.buf = r_buf;
-  recon.bytes_rcvd = 0;
-
-
-  addFragment(&pkt, &recon);
   
-  printf ("adding fragment len: %i\n", rc);
-
-  while (rc > 0) {
-    ip_memclr(buf, 100);
-    rc = getNextFrag(msg, &prog, buf, 100);
-    pkt.len = rc;
-    
-    pkt.headers = getHeaderBitmap(&pkt);
-    addFragment(&pkt, &recon);
-    
-    ip_memclr(buf, 100);
-    printf ("adding fragment len: %i\n", rc);
+  while ((rc =getNextFrag(&msg, &prog, buf, 100)) > 0) {
+    printf("n_frags: %i\n", prog.n_frags);
+    printBuf(buf, rc);
   }
+/*   printf ("rc: %i\n", rc); */
+/*   pkt.len = rc; */
 
-  printf("Reconstructed buffer [%i]:\n", size);
-  printBuf(&r_buf[10], size);
+/*   pkt.headers = getHeaderBitmap(&pkt); */
 
-  for (j = 10; j < size; j++)
-    if (r_buf[j] != buf1[j])
-      printf("differ in byte %i (0x%x, 0x%x)\n", j - 10, buf1[j], r_buf[j]);
+/*   printf("cmprlen: 0x%x\n", getCompressedLen(&pkt)); */
+
+/*   printBuf(buf, getCompressedLen(&pkt)); */
+
+/*   return; */
+
+/*   uint16_t mytag, size; */
+/*   pkt.headers = getHeaderBitmap(&pkt); */
+/*   printf("headers: 0x%x\n", pkt.headers); */
+/*   if (getFragDgramTag(&pkt, &mytag)); */
+/*   if (getFragDgramSize(&pkt, &size)); */
+/*   recon.tag = mytag; */
+/*   recon.size = size; */
+/*   recon.buf = r_buf; */
+/*   recon.bytes_rcvd = 0; */
+
+
+/*   addFragment(&pkt, &recon); */
   
+/*   printf ("adding fragment len: %i\n", rc); */
+
+/*   while (rc > 0) { */
+/*     ip_memclr(buf, 100); */
+/*     rc = getNextFrag(msg, &prog, buf, 100); */
+/*     pkt.len = rc; */
+    
+/*     pkt.headers = getHeaderBitmap(&pkt); */
+/*     addFragment(&pkt, &recon); */
+    
+/*     ip_memclr(buf, 100); */
+/*     printf ("adding fragment len: %i\n", rc); */
+/*   } */
+
+/*   printf("Reconstructed buffer [%i]:\n", size); */
+/*   printBuf(&r_buf[10], size); */
+
+/*   for (j = 10; j < size; j++) */
+/*     if (r_buf[j] != buf1[j]) */
+/*       printf("differ in byte %i (0x%x, 0x%x)\n", j - 10, buf1[j], r_buf[j]); */
+
+  return 0;
 }

@@ -37,7 +37,7 @@ interface IPRouting {
    * to a given address.  Interprets link-local and global addresses,
    * and manages multicast group membership.
    */
-  command bool isForMe(ip_msg_t *a);
+  command bool isForMe(struct ip6_hdr *a);
 
   /*
    * returns a policy for sending this message to someone else.
@@ -45,7 +45,8 @@ interface IPRouting {
    *     and spacing between them.
    *
    */ 
-  command error_t getNextHop(ip_msg_t *a, uint8_t attempt, send_policy_t *ret);
+  command error_t getNextHop(struct ip6_hdr *hdr, struct source_header *sh,
+                             send_policy_t *ret);
 
 
   /*
@@ -73,16 +74,13 @@ interface IPRouting {
   /*
    * the result of sending to a neighbor.
    */
-  command void reportTransmission(send_policy_t *send, bool wasDelivered);
-
-  command void reportAbandonment();
-
-  command bool wasAbandoned();
+  command void reportTransmission(send_policy_t *send);
 
   /*
    * @returns TRUE if the routing engine has established a default route.
    */
   command bool hasRoute();
 
+  command void insertRoutingHeaders(struct split_ip_msg *msg);
 
 }

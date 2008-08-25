@@ -22,10 +22,7 @@
 #ifndef _UDPREPORT_H
 #define _UDPREPORT_H
 
-#include <6lowpan.h>
-#include <IP.h>
 #include <IPDispatch.h>
-
 
 struct udp_report {
   ip_statistics_t    ip;

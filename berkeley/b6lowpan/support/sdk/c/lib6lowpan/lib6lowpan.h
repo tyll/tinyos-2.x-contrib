@@ -25,6 +25,9 @@
 #include <stdint.h>
 #include <stddef.h>
 
+#include "6lowpan.h"
+#include "ip.h"
+
 /* #if __BYTE_ORDER == __BIG_ENDIAN */
 /* #define ntoh16(X)   (X) */
 /* #define hton16(X)   (X) */
@@ -58,43 +61,10 @@
  * available, and the interface is presented in lib6lowpanIP.h.
  *
  */
-#include "6lowpan.h"
-#include "lib6lowpanIP.h"
 
 // only 16-bit address handling modes
 #define __6LOWPAN_16BIT_ADDRESS
 
-
-/*
- * Some disgusting macros for reading unaligned values.  We only use
- * these where it's a lot easier; things are mostly byte-aligned.
- *
- */
-
-// read a 16 bit value from an arbitrary offset.  If your compiler is
-// working, this should produce a HOST value since it assumes
-// canonical byte order on the part of the buffer.
-#define READ16(buf, bits)  ((uint16_t)(buf[((bits) / 8)])     << (((bits) % 8) + 8)  | \
-                            (uint16_t)((buf[((bits) / 8) + 1]) << ((bits) % 8))  | \
-                            (uint16_t)(buf[((bits) / 8) + 2]) >> (8 - ((bits) % 8))  )  
-
-#define READ4(buf, bits)    ((buf[(bits) / 8] >> (4 - ((bits) % 8))) & 0x0f)
-
-#define WRITE16(buf, bits, val) (buf[(bits) / 8]     &= 0xff << (8 - ((bits) % 8))); \
-                                (buf[(bits) / 8 + 2] &= 0xff >> ((bits) % 8));  \
-                                (buf[(bits) / 8]     |= (val) >> (8 + ((bits) % 8))); \
-                                (buf[(bits) / 8 + 1]  = ((val) >> ((bits) % 8)) & 0xff); \
-                                (buf[(bits) / 8 + 2] |= ((val) << (8 - ((bits) % 8))) & 0xff);
-
-
-#define WRITE8(buf, bits, val)  (buf[(bits) / 8] &= 0xff << ((bits) % 8)); \
-                                (buf[(bits) / 8] |= (val) >> ((bits) % 8)); \
-                                (buf[(bits) / 8 + 1] &= 0xff >> (8 - ((bits) % 8))); \
-                                (buf[(bits) / 8 + 1] |= (val) << (8 - ((bits) % 8)));
-// write a half-byte aligned value
-#define WRITE4(buf, bits, val)  (buf[(bits) / 8] &= 0xff << (8 - (bits) % 8));   \
-                                (buf[(bits) / 8] &= 0xff >> (4 - ((bits) % 8))); \
-                                (buf[(bits) / 8] |= (val)  << (4 - ((bits) % 8))); 
 /*
  *  Library implementation of packing of 6lowpan packets.  
  *
@@ -103,6 +73,9 @@
  *  unfortunately.
  */
 
+/*
+ * 6lowpan header functions
+ */
 
 uint16_t getHeaderBitmap(packed_lowmsg_t *lowmsg);
 /*
@@ -158,5 +131,110 @@ uint8_t getFragDgramOffset(packed_lowmsg_t *msg, uint8_t *size);
 uint8_t setFragDgramSize(packed_lowmsg_t *msg, uint16_t size);
 uint8_t setFragDgramTag(packed_lowmsg_t *msg, uint16_t tag);
 uint8_t setFragDgramOffset(packed_lowmsg_t *msg, uint8_t size);
+
+
+
+/*
+ * IP header compression functions
+ *
+ */
+int getCompressedLen(packed_lowmsg_t *pkt);
+
+/*
+ * Pack the header fields of msg into buffer 'buf'.
+ *  it returns the number of bytes written to 'buf', or zero if it encountered a problem.
+ *
+ * it will pack the IP header and all headers in the header chain of
+ * msg into the buffer; the only thing it will not pack is the
+ * payload.
+ */
+uint8_t packHeaders(struct split_ip_msg *msg,
+                    uint8_t *buf, uint8_t len);
+/*
+ * Unpack the packed data from pkt into dest.
+ *
+ * It turns out that we need to keep track of a lot of different
+ * locations in order to be able to unpack and forward efficiently.
+ * If we don't save these during the unpack, we end up reconstructing
+ * them in various places so it's less error-prone to compute them
+ * while we're parsing the packed fields.
+ */
+typedef struct {
+  // the final header in the header chain; should be the transport header
+  uint8_t nxt_hdr;
+  // a pointer to the point in the source where we stopped unpacking
+  uint8_t *payload_start;
+  // a pointer to the point in the destination right after all headers
+  uint8_t *header_end;
+  // the total, uncompressed length of the headers which were unpacked
+  uint8_t payload_offset;
+  // points to the hop limit field of the packet message
+  uint8_t *hlim;
+  // points to the UDP header of the unpacked data, IF nxt_hdr is IANA_UDP
+  union {
+    struct udp_hdr *udp;
+  } nxt_hdr_ptr;
+  // points to the source header within the packed fields, IF it contains one.
+  struct source_header *sh;
+} unpack_info_t;
+
+uint8_t *unpackHeaders(packed_lowmsg_t *pkt, unpack_info_t *u_info,
+                       uint8_t *dest, uint16_t len);
+
+/*
+ * Fragmentation routines.
+ */
+
+extern uint16_t lib6lowpan_frag_tag;
+
+typedef struct {
+  uint16_t hw_addr;
+  uint16_t tag;            /* datagram label */
+  uint16_t size;           /* the size of the packet we are reconstructing */
+  void    *buf;            /* the reconstruction location */
+  uint16_t recon_offset;
+  uint16_t bytes_rcvd;     /* how many bytes from the packet we have
+                              received so far */
+  uint8_t timeout;
+  uint8_t nxt_hdr;
+  union {
+    uint16_t udp_port;
+  } dispatch;
+  struct ip_metadata metadata;
+  union {
+    struct sockaddr_in6 sock;
+    ip6_addr_t src;
+  } address;
+} reconstruct_t;
+
+typedef struct {
+  uint16_t tag;    /* the label of the datagram */
+  uint16_t offset; /* how far into the packet we have sent, in bytes */
+  uint16_t n_frags;
+} fragment_t;
+
+
+/*
+ *  this function writes the next fragment which needs to be sent into
+ *  the buffer passed in.  It updates the structures in process to
+ *  reflect how much of the packet has been sent so far.
+ *
+ *  if the packet does not require fragmentation, this function will
+ *  not insert a fragmentation header and will merely compress the
+ *  headers into the packet.
+ *
+ */
+uint8_t getNextFrag(struct split_ip_msg *msg, fragment_t *progress,
+                    uint8_t *buf, uint16_t len);
+
+
+enum {
+  T_FAILED1 = 0,
+  T_FAILED2 = 1,
+  T_UNUSED =  2,
+  T_ACTIVE =  3,
+  T_ZOMBIE =  4,
+};
+
 
 #endif

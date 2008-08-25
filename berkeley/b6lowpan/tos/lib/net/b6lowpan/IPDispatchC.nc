@@ -28,26 +28,25 @@
 
 configuration IPDispatchC {
   provides {
+    interface StdControl as RoutingControl;
     interface SplitControl;
-    interface IPSend[uint8_t nxt];
-    interface IPReceive[uint8_t nxt];
-    interface BufferPool[uint8_t nxt];
-    interface BasicPacket;
-    interface IPPacket;
+    interface IP[uint8_t nxt_hdr];
+    interface UDP[uint16_t local_port];
 
     interface Statistics<ip_statistics_t> as IPStats;
     interface Statistics<route_statistics_t> as RouteStats;
     interface Statistics<icmp_statistics_t> as ICMPStats;
+
   }
 } implementation {
-  components MainC, CC2420MessageC, IPDispatchP;
+  components MainC, CC2420MessageC, CC2420ControlC, IPDispatchP;
+  components IPRoutingP;
   components LedsC;
-
+  
+  RoutingControl = IPRoutingP;
   SplitControl = CC2420MessageC;
-  IPSend = IPDispatchP;
-  IPReceive = IPDispatchP;
-  IPPacket = IPDispatchP;
-  BasicPacket = IPDispatchP;
+  IP = IPDispatchP;
+  UDP = IPDispatchP;
 
   IPDispatchP.Boot -> MainC;
 
@@ -56,29 +55,32 @@ configuration IPDispatchC {
   IPDispatchP.IEEE154Packet -> CC2420MessageC;
   IPDispatchP.PacketLink -> CC2420MessageC;
   IPDispatchP.Packet -> CC2420MessageC;
-  IPDispatchP.CC2420Config -> CC2420MessageC;
   IPDispatchP.CC2420Packet -> CC2420MessageC;
+  IPDispatchP.CC2420Config -> CC2420ControlC;
+  IPDispatchP.LowPowerListening -> CC2420MessageC;
 
   IPDispatchP.Leds -> LedsC;
 
   components new TimerMilliC();
   IPDispatchP.ExpireTimer -> TimerMilliC;
 
-  components new PoolC(send_entry_t, 5), new QueueC(send_entry_t *, 5);
-  IPDispatchP.Pool -> PoolC;
-  IPDispatchP.Queue -> QueueC;
+  components new PoolC(message_t, IP_NUMBER_FRAGMENTS) as FragPool;
 
-  components new BufferPoolC(0,5,1);
-  BufferPool = BufferPoolC;
-  IPDispatchP.BufferPool -> BufferPoolC.BufferPool[0];
+  components new PoolC(send_entry_t, IP_NUMBER_FRAGMENTS) as SendEntryPool;
+  components new QueueC(send_entry_t *, IP_NUMBER_FRAGMENTS);
+
+  components new PoolC(send_info_t, N_FORWARD_ENT) as SendInfoPool;
+
+  IPDispatchP.FragPool -> FragPool;
+  IPDispatchP.SendEntryPool -> SendEntryPool;
+  IPDispatchP.SendInfoPool  -> SendInfoPool;
+  IPDispatchP.SendQueue -> QueueC;
 
   components ICMPResponderC;
-  ICMPResponderC.BufferPool -> BufferPoolC.BufferPool[IANA_ICMP];
   IPDispatchP.ICMP -> ICMPResponderC;
   IPRoutingP.ICMP  -> ICMPResponderC;
   IPDispatchP.RadioControl -> CC2420MessageC;
 
-  components IPRoutingP;
   IPDispatchP.IPRouting -> IPRoutingP;
   IPRoutingP.Boot -> MainC;
   IPRoutingP.Leds -> LedsC;
@@ -89,5 +91,9 @@ configuration IPDispatchC {
 
   components new TimerMilliC() as RouteTimer;
   IPRoutingP.SortTimer -> RouteTimer;
+
+#ifdef DELUGE
+  components NWProgC;
+#endif
 
 }

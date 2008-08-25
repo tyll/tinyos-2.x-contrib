@@ -22,7 +22,6 @@
 
 #include <string.h>
 #include "lib6lowpan.h"
-#include "lib6lowpanFrag.h"
 /*
  * This file presents an interface for parsing IP and UDP headers in a
  * 6loWPAN packet.  
@@ -34,7 +33,7 @@ uint8_t linklocal_prefix [] = {0xfe, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 uint8_t multicast_prefix [] = {0xff, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
 ip6_addr_t my_address       = {0xfe, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                               0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x64};
+                               0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x65};
 uint8_t globalPrefix = 0;
 
 uint8_t cmpPfx(ip6_addr_t a, uint8_t *pfx) {
@@ -195,13 +194,16 @@ int decompressAddress(uint8_t dispatch, uint16_t src, uint8_t addr_flags,
  * @return the number of bytes written to dest, or zero if decompression failed.
  *         should be >= sizeof(struct ip6_hdr)
  */
-uint8_t *unpackHeaders(packed_lowmsg_t *pkt, uint8_t *dest, uint16_t len) {
+uint8_t *unpackHeaders(packed_lowmsg_t *pkt, unpack_info_t *u_info,
+                       uint8_t *dest, uint16_t len) {
   uint8_t dispatch, encoding;
   uint16_t size, extra_header_length = 0;
   uint8_t *buf = (uint8_t *)getLowpanPayload(pkt);
 
   // pointers to fields  we may come back to fill in later
   uint8_t *plen, *prot_len, *nxt_hdr;
+
+  u_info->payload_offset = 0;
 
   // a buffer we can write addresses prefixes and suffexes into.
   // now we don't need to check sizes until we get to next headers
@@ -210,6 +212,9 @@ uint8_t *unpackHeaders(packed_lowmsg_t *pkt, uint8_t *dest, uint16_t len) {
 
   dispatch = *buf; buf++;
   encoding = *buf; buf++;
+
+  if (dispatch != LOWPAN_HC_LOCAL_PATTERN && dispatch != LOWPAN_HC_CRP_PATTERN)
+    return NULL;
 
   if ((encoding & LOWPAN_IPHC_VTF_MASK) == LOWPAN_IPHC_VTF_INLINE) {
     // copy the inline 4 bytes of fields.
@@ -237,8 +242,10 @@ uint8_t *unpackHeaders(packed_lowmsg_t *pkt, uint8_t *dest, uint16_t len) {
   // otherwise, decompress IPNH compression once we reach the end of
   // the packed data.
 
+  u_info->hlim = NULL;
   if ((encoding & LOWPAN_IPHC_HLIM_MASK) == LOWPAN_IPHC_HLIM_INLINE) {
     *dest = *buf;
+    u_info->hlim = buf;
     buf++;
   }
   dest += 1;
@@ -266,6 +273,7 @@ uint8_t *unpackHeaders(packed_lowmsg_t *pkt, uint8_t *dest, uint16_t len) {
     // time to decode some next header fields
     // we ought to be pointing at the HCNH encoding byte now.
     if ((*buf & LOWPAN_UDP_DISPATCH) == LOWPAN_UDP_DISPATCH) {
+      pkt->headers |= LOWMSG_IPNH_HDR;
       if (len < sizeof(struct udp_hdr)) return NULL;
       len -= sizeof(struct udp_hdr);
       struct udp_hdr *udp = (struct udp_hdr *)dest;
@@ -294,7 +302,6 @@ uint8_t *unpackHeaders(packed_lowmsg_t *pkt, uint8_t *dest, uint16_t len) {
         buf += 2;
       }
 
-
       if (udp_enc & LOWPAN_UDP_C_MASK) {
         // we elided the checksum and so are supposed to recompute it here.
         // however, we won't do this.
@@ -309,6 +316,9 @@ uint8_t *unpackHeaders(packed_lowmsg_t *pkt, uint8_t *dest, uint16_t len) {
       prot_len = (uint8_t *)&udp->len;
       dest += sizeof(struct udp_hdr);
 
+      u_info->nxt_hdr = IANA_UDP;
+      u_info->payload_offset += sizeof(struct udp_hdr);
+      u_info->nxt_hdr_ptr.udp = udp;
 
     } else {
       // otherwise who knows what's here... it's an error because the
@@ -316,8 +326,45 @@ uint8_t *unpackHeaders(packed_lowmsg_t *pkt, uint8_t *dest, uint16_t len) {
       // recognize the NH encoding.
       return NULL;
     }
+  } else {
+    // there was no IPNH field, but there might be uncompressed fields
+    // we want to copy out for consistency (since we always unpack all
+    // headers not part of the payload).
+    uint8_t nhdr = *nxt_hdr;
+    uint8_t nhdr_len = 0;
+    struct ip6_ext *hdr;
+    u_info->nxt_hdr = nhdr;
+    while (KNOWN_HEADER(nhdr)) {
+      hdr = (struct ip6_ext *)buf;
+      u_info->nxt_hdr = nhdr;
+      switch (nhdr) {
+      case IANA_UDP:
+        nhdr = NXTHDR_UNKNOWN;
+        nhdr_len = sizeof(struct udp_hdr);
+        u_info->nxt_hdr_ptr.udp = (struct udp_hdr *)dest;
+        break;
+      case NXTHDR_SOURCE:
+        u_info->sh = (struct source_header *)buf;
+      case NXTHDR_DEST:
+        // this is how to handle all ipv6 options headers: should we
+        // use "default" here?
+        nhdr = hdr->nxt_hdr;
+        nhdr_len = hdr->len;
+        u_info->nxt_hdr = nhdr;
+        break;
+      }
+      if (len < nhdr_len) return NULL;
+      ip_memcpy(dest, buf, nhdr_len);
+      dest += nhdr_len;
+      buf += nhdr_len;
+
+      u_info->payload_offset += nhdr_len;
+      extra_header_length += nhdr_len;
+    }
   }
 
+  u_info->payload_start = buf;
+  u_info->header_end = dest;
 
   // we can go back and figure out the payload length now that we know
   // how long the compressed headers were
@@ -350,6 +397,7 @@ uint8_t *unpackHeaders(packed_lowmsg_t *pkt, uint8_t *dest, uint16_t len) {
  * @returns the bit flags indicating which length was used
  */
 uint8_t packAddress(uint8_t dispatch, uint8_t **buf, ip6_addr_t addr) {
+
   if ((dispatch == LOWPAN_HC_CRP_PATTERN && globalPrefix &&
       cmpPfx(addr, my_address)) ||
       (dispatch == LOWPAN_HC_LOCAL_PATTERN &&
@@ -391,121 +439,139 @@ uint8_t packAddress(uint8_t dispatch, uint8_t **buf, ip6_addr_t addr) {
  * 
  * @returns a pointer to where we stopped writing
  */
-uint8_t *packHeaders(ip_msg_t *msg, uint8_t *buf, uint8_t len) {
-  uint8_t *dispatch, *encoding, addr_enc;
-
+uint8_t packHeaders(struct split_ip_msg *msg,
+                    uint8_t *buf, uint8_t len) {
+  uint8_t *dispatch, *encoding, addr_enc, nxt_hdr;
+  struct ip6_hdr *hdr = &msg->hdr;
   dispatch = buf;
   buf += 1;
   encoding = buf;
   buf += 1;
   *encoding = 0;
 
-  if (!(msg->hdr.vlfc[0] == (IPV6_VERSION << 4) && 
-        msg->hdr.vlfc[1] == 0 &&
-        msg->hdr.vlfc[2] == 0 &&
-        msg->hdr.vlfc[3] == 0)) {
-    ip_memcpy(buf, &msg->hdr.vlfc, 4);
+  if (!(hdr->vlfc[0] == (IPV6_VERSION << 4) && 
+        hdr->vlfc[1] == 0 &&
+        hdr->vlfc[2] == 0 &&
+        hdr->vlfc[3] == 0)) {
+    ip_memcpy(buf, &hdr->vlfc, 4);
     buf += 4;
   } else {
     *encoding |= LOWPAN_IPHC_VTF_MASK;
   }
 
-  if (msg->hdr.nxt_hdr == IANA_UDP /* or other compressed values... */) {
+  nxt_hdr = hdr->nxt_hdr;
+  if (hdr->nxt_hdr == IANA_UDP /* or other compressed values... */) {
     // we will add the HCNH encoding at the end of the header
     *encoding |= LOWPAN_IPHC_NH_MASK;
   } else {
-    *buf = msg->hdr.nxt_hdr;
+    *buf = hdr->nxt_hdr;
     buf += 1;
   }
 
   // always carry hop limit
-  *buf = msg->hdr.hlim;
+  *buf = hdr->hlim;
   buf += 1;
 
-  if (globalPrefix && cmpPfx(msg->hdr.src_addr, my_address)) {
+  if (globalPrefix && cmpPfx(hdr->src_addr, my_address)) {
     *dispatch = LOWPAN_HC_CRP_PATTERN;
-  } else if (globalPrefix && cmpPfx(msg->hdr.dst_addr, my_address)) {
+  } else if (globalPrefix && cmpPfx(hdr->dst_addr, my_address)) {
     *dispatch = LOWPAN_HC_CRP_PATTERN;
-  } else if (cmpPfx(msg->hdr.src_addr, linklocal_prefix)) {
+  } else if (cmpPfx(hdr->src_addr, linklocal_prefix)) {
     *dispatch = LOWPAN_HC_LOCAL_PATTERN;
   } else {
     *dispatch = LOWPAN_HC_LOCAL_PATTERN;
   }
 
-  addr_enc = packAddress(*dispatch, &buf, msg->hdr.src_addr);
+  addr_enc = packAddress(*dispatch, &buf, hdr->src_addr);
   *encoding |= addr_enc << LOWPAN_IPHC_SC_OFFSET;
 
-  addr_enc = packAddress(*dispatch, &buf, msg->hdr.dst_addr);
+  addr_enc = packAddress(*dispatch, &buf, hdr->dst_addr);
   *encoding |= addr_enc << LOWPAN_IPHC_DST_OFFSET;
 
-
+  len -= (buf - dispatch);
   // now come the compressions for special next header values.
-
-  if (msg->hdr.nxt_hdr == IANA_UDP) {
-    struct udp_hdr *udp = (struct udp_hdr *)msg->data;
+  // we pack all the headers in the split message into this fragment, and fail if we cannot;
+  {
+    int i = 0;
+    struct generic_header *cur = msg->headers;
+    while (cur != NULL) {
+      if (nxt_hdr == IANA_UDP && i == 0) {
+        struct udp_hdr *udp = cur->hdr.udp;
   
-    uint8_t *udp_enc = buf;
-    uint8_t *cmpr_port = NULL;
-    // do the LOWPAN_UDP coding
-    *udp_enc = LOWPAN_UDP_DISPATCH;;
-    buf += 1;
-
-
-    if ((ntoh16(udp->srcport) & LOWPAN_UDP_PORT_BASE_MASK) == 
-        LOWPAN_UDP_PORT_BASE) {
-      //printf("compr to 4b\n");
-      cmpr_port = buf;
-      *cmpr_port = (ntoh16(udp->srcport) & ~LOWPAN_UDP_PORT_BASE_MASK) << 4;
-      *udp_enc |= LOWPAN_UDP_S_MASK;
-      buf += 1;
-    } else {
-      ip_memcpy(buf, (uint8_t *)&udp->srcport, 2);
-      buf += 2;
-    }
-
-    if ((ntoh16(udp->dstport) & LOWPAN_UDP_PORT_BASE_MASK) == 
-        LOWPAN_UDP_PORT_BASE) {
-      if (cmpr_port == NULL) {
-        // the source port must not have been compressed, so 
-        // allocate a new byte for this guy
-        *buf = ((ntoh16(udp->dstport) & ~LOWPAN_UDP_PORT_BASE_MASK) << 4);
-        buf += 1;
-      } else {
-        // already in the middle of a byte for the port compression,
-        // so fill in the rest of the byte
-        *cmpr_port = *cmpr_port | ((ntoh16(udp->dstport) & ~LOWPAN_UDP_PORT_BASE_MASK));
-      }
-      *udp_enc |= LOWPAN_UDP_D_MASK;
-    } else {
-      ip_memcpy(buf, (uint8_t *)&udp->dstport, 2);
-      buf += 2;
-    }
+        uint8_t *udp_enc = buf;
+        uint8_t *cmpr_port = NULL;
+        // do the LOWPAN_UDP coding
         
-    // we never elide the checksum
-    ip_memcpy(buf, (uint8_t *)&udp->chksum, 2);
-    buf += 2;
+        if (len < sizeof(struct udp_hdr)) return (buf - dispatch);
+        
+        *udp_enc = LOWPAN_UDP_DISPATCH;;
+        buf += 1;
 
+
+        if ((ntoh16(udp->srcport) & LOWPAN_UDP_PORT_BASE_MASK) == 
+            LOWPAN_UDP_PORT_BASE) {
+          //printf("compr to 4b\n");
+          cmpr_port = buf;
+          *cmpr_port = (ntoh16(udp->srcport) & ~LOWPAN_UDP_PORT_BASE_MASK) << 4;
+          *udp_enc |= LOWPAN_UDP_S_MASK;
+          buf += 1;
+        } else {
+          ip_memcpy(buf, (uint8_t *)&udp->srcport, 2);
+          buf += 2;
+        }
+        
+        if ((ntoh16(udp->dstport) & LOWPAN_UDP_PORT_BASE_MASK) == 
+            LOWPAN_UDP_PORT_BASE) {
+          if (cmpr_port == NULL) {
+            // the source port must not have been compressed, so 
+            // allocate a new byte for this guy
+            *buf = ((ntoh16(udp->dstport) & ~LOWPAN_UDP_PORT_BASE_MASK) << 4);
+            buf += 1;
+          } else {
+            // already in the middle of a byte for the port compression,
+            // so fill in the rest of the byte
+            *cmpr_port = *cmpr_port | ((ntoh16(udp->dstport) & ~LOWPAN_UDP_PORT_BASE_MASK));
+          }
+          *udp_enc |= LOWPAN_UDP_D_MASK;
+        } else {
+          ip_memcpy(buf, (uint8_t *)&udp->dstport, 2);
+          buf += 2;
+        }
+        
+        // we never elide the checksum
+        ip_memcpy(buf, (uint8_t *)&udp->chksum, 2);
+        buf += 2;
+      } else {
+        // otherwise we just need to copy the extension header
+        if (len < cur->len) return 0;
+        ip_memcpy(buf, (uint8_t *)cur->hdr.ext, cur->len);
+        len -= cur->len;
+        buf += cur->len;
+      }
+      cur = cur->next;
+      i++;
+    }
   }
-
   // I think we're done here...
-  return buf;
+  return buf - dispatch;
 }
 
 /*
  * indicates how much of the packet after the IP header we will pack
  *
  */
-int packs_header(ip_msg_t *msg) {
-  switch (msg->hdr.nxt_hdr) {
-  case IANA_UDP:
-    return sizeof(struct udp_hdr);
-  default:
-    return 0;
-  }
-}
+/* int packs_header(struct split_ip_msg *msg) { */
+/*   switch (hdr->nxt_hdr) { */
+/*   case IANA_UDP: */
+/*     return sizeof(struct udp_hdr); */
+/*   default: */
+/*     return 0; */
+/*   } */
+/* } */
 
 
-#define CHAR_VAL(X)  (((X) >= '0' && (X) <= '9') ? ((X) - '0') : ((X) - 'A'))
+#define CHAR_VAL(X)  (((X) >= '0' && (X) <= '9') ? ((X) - '0') : \
+                      (((X) >= 'A' && (X) <= 'F') ? ((X) - 'A' + 10) : ((X) - 'a' + 10)))
 
 
 void inet6_aton(char *addr, ip6_addr_t dest) {
@@ -514,14 +580,6 @@ void inet6_aton(char *addr, ip6_addr_t dest) {
   uint8_t block = 0, shift = 0;
   if (addr == NULL || dest == NULL) return;
   ip_memclr(dest, 16);
-
-  // go to upper case
-  while (*p != '\0') {
-    if (*p >= 'a' && *p <= 'z')
-      *p -= 'a' - 'A' - 10;
-    p ++;
-  }
-  p = addr;
 
   // first fill in from the front
   while (*p != '\0') {

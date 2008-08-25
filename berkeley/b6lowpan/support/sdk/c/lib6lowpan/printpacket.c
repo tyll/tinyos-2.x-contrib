@@ -22,7 +22,7 @@
 
 #include <stdint.h>
 #include <stdio.h>
-#include <arpa/inet.h>
+// #include <arpa/inet.h>
 #include "6lowpan.h"
 #include "lib6lowpan.h"
 #include "lib6lowpanIP.h"

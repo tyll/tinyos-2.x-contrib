@@ -24,26 +24,21 @@
 
 configuration ICMPResponderC {
   provides interface ICMP;
+  provides interface ICMPPing[uint16_t client];
   provides interface Statistics<icmp_statistics_t>;
-  uses interface BufferPool;
 } implementation {
   components LedsC;
   components IPDispatchC, IPRoutingP, ICMPResponderP, IPAddressC;
 
   ICMP = ICMPResponderP;
+  ICMPPing = ICMPResponderP;
   Statistics = ICMPResponderP;
 
   ICMPResponderP.Leds -> LedsC;
 
-  ICMPResponderP.IPReceive -> IPDispatchC.IPReceive[IANA_ICMP];
-  ICMPResponderP.IPSend -> IPDispatchC.IPSend[IANA_ICMP];
-  ICMPResponderP.IPPacket -> IPDispatchC;
-  ICMPResponderP.Packet ->  IPDispatchC;;
-  
+  ICMPResponderP.IP -> IPDispatchC.IP[IANA_ICMP];
 
   ICMPResponderP.IPAddress -> IPAddressC;
-
-  ICMPResponderP.BufferPool = BufferPool;
 
   ICMPResponderP.IPRouting -> IPRoutingP;
 
@@ -51,7 +46,12 @@ configuration ICMPResponderC {
   ICMPResponderP.Random -> RandomC;
 
   components new TimerMilliC() as STimer,
-    new TimerMilliC() as ATimer;
+    new TimerMilliC() as ATimer,
+    new TimerMilliC() as PTimer;
   ICMPResponderP.Solicitation -> STimer;
   ICMPResponderP.Advertisement -> ATimer;
+  ICMPResponderP.PingTimer -> PTimer;
+
+  components HilTimerMilliC;
+  ICMPResponderP.LocalTime -> HilTimerMilliC;
 }

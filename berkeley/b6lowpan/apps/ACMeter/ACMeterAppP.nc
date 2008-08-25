@@ -21,7 +21,7 @@
  */
 
 #include <IPDispatch.h>
-#include <IP.h>
+#include <ip.h>
 #include <router_address.h>
 
 #include "ACReport.h"
@@ -31,17 +31,11 @@ module ACMeterAppP {
   uses {
     interface Boot;
     interface SplitControl as RadioControl;
-    interface UDPSend;
-    interface UDPReceive;
+    interface UDP as Shell;
+    interface UDP as ReportSend;
 
     interface Leds;
     
-    interface BufferPool;
-    
-    interface UDPSend as ReportSend;
-    interface IPPacket;
-    interface BasicPacket as UdpPacket;
-   
     interface SplitControl as MeterControl;
     interface ACMeter;
   }
@@ -49,9 +43,8 @@ module ACMeterAppP {
 } implementation {
 
   bool timerStarted;
-  ip_msg_t *currentMsg = NULL;
-  uint32_t lastReading;
-  struct sockaddr report_dest;
+  nx_struct ac_report report;
+  struct sockaddr_in6 report_dest;
 
   char *help = "Outlet commands:\n\
   help - print this mesage\n\
@@ -67,7 +60,6 @@ module ACMeterAppP {
 
   event void Boot.booted() {
     call RadioControl.start();
-    call MeterControl.start();
 
     report_dest.sin_port = hton16(7001);
     memcpy(&report_dest.sin_addr, router_address, 16);
@@ -78,7 +70,7 @@ module ACMeterAppP {
   }
 
   event void RadioControl.startDone(error_t e) {
-
+    call MeterControl.start();
   }
 
   event void RadioControl.stopDone(error_t e) {
@@ -95,9 +87,16 @@ module ACMeterAppP {
     
   }
 
+  event void ReportSend.recvfrom(struct sockaddr_in6 *from,
+                                 void *data, uint16_t len,
+                                 struct ip_metadata *meta) {
+
+  }
+
 #define MAX_REPLY_LEN 100
-  event ip_msg_t *UDPReceive.receive(struct sockaddr *from, ip_msg_t *msg,
-                                     void *data, uint16_t len) {
+  event void Shell.recvfrom(struct sockaddr_in6 *from,
+                            void *data, uint16_t len,
+                            struct ip_metadata *meta) {
     char rbuf[MAX_REPLY_LEN];
     char *reply = rbuf;
 
@@ -119,53 +118,13 @@ module ACMeterAppP {
       reply = help;
     }
 
-    snprintf(rbuf, MAX_REPLY_LEN, "OK: switch: %i power: %li watts\n", call ACMeter.getState(),
-             lastReading / 5);
+    snprintf(rbuf, MAX_REPLY_LEN, "OK: switch: %i power: %li watts\n", call ACMeter.getState(), report.data / 5);
 
-    if (reply != NULL) {
-      ip_msg_t *replyMsg = call BufferPool.get(sizeof(ip_msg_t) + sizeof(struct udp_hdr) +
-                                          + strlen(reply));
-      char *payload;
-      
-      if (replyMsg == NULL) return msg;
-      payload = call UdpPacket.getPayload(replyMsg);
-      memcpy(payload, reply, strlen(reply));
-
-
-      if (call UDPSend.send(from, replyMsg, strlen(reply)) 
-          != SUCCESS)
-        call BufferPool.put(replyMsg);
-    }
-
-    return msg;
+    call Shell.sendto(from, reply, strlen(reply));
   }
-
-  event void UDPSend.sendDone(ip_msg_t *msg, error_t error) {
-    printfUART("signal sendDone\n");
-    call BufferPool.put(msg);
-  }
-
 
   event void ACMeter.sampleDone(uint32_t energy) {
-    ip_msg_t *msg = call BufferPool.get(sizeof(ip_msg_t) + sizeof(struct udp_hdr) +
-                                        sizeof(hw_addr_t) * 5 + sizeof(struct source_header) 
-                                        + sizeof(nx_struct ac_report));
-    nx_struct ac_report *payload;
-
-    call Leds.led0Toggle();
-
-    call IPPacket.addSourceHeader(msg, 5, TRUE);
-    payload = (nx_struct ac_report *)call UdpPacket.getPayload(msg);
-    payload->data = energy;
-    lastReading = energy;
-                                       
-    if (call ReportSend.send(&report_dest, msg, sizeof(nx_struct ac_report)) != SUCCESS) {
-      call BufferPool.put(msg);
-    }
-  }
-
-  event void ReportSend.sendDone(ip_msg_t *msg, error_t error) {
-    printfUART("Route sendDone\n");
-    call BufferPool.put(msg);
+    report.data = energy;
+    call ReportSend.sendto(&report_dest, &report, sizeof(nx_struct ac_report));
   }
 }

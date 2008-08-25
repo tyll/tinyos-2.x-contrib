@@ -46,6 +46,6 @@ deps:
 	./deps.awk $(SOURCES) >> Makefile
 
 ########################################################################
-lib6lowpan.o: lib6lowpan.c 6lowpan.h IP.h lib6lowpanIP.h lib6lowpan.h
-lib6lowpanIP.o: lib6lowpanIP.c 6lowpan.h IP.h lib6lowpanIP.h lib6lowpan.h
-lib6lowpanFrag.o: lib6lowpanFrag.c tunnel/IEEE154.h 6lowpan.h IP.h lib6lowpanIP.h lib6lowpan.h
+lib6lowpan.o: lib6lowpan.c 6lowpan.h ip.h lib6lowpan.h
+lib6lowpanIP.o: lib6lowpanIP.c 6lowpan.h ip.h lib6lowpan.h
+lib6lowpanFrag.o: lib6lowpanFrag.c tunnel/IEEE154.h 6lowpan.h ip.h lib6lowpan.h

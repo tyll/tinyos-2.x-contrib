@@ -26,26 +26,19 @@ configuration UDPEchoC {
 
 } implementation {
   components MainC, LedsC;
-  components UDPC, UDPEchoP;
+  components UDPEchoP;
 
   UDPEchoP.Boot -> MainC;
   UDPEchoP.Leds -> LedsC;
 
-  UDPEchoP.RadioControl -> UDPC;
-  UDPEchoP.UDPReceive -> UDPC.UDPReceive[7];
-  UDPEchoP.UDPSend -> UDPC.UDPSend[7];
-
-  UDPEchoP.BufferPool -> UDPC;
-
-
   components new TimerMilliC();
-
   components IPDispatchC;
 
-  UDPEchoP.RouteTimer -> TimerMilliC;
-  UDPEchoP.RouteSend  -> UDPC.UDPSend[7000];
-  UDPEchoP.IPPacket   -> IPDispatchC;
-  UDPEchoP.UdpPacket  -> UDPC;
+  UDPEchoP.RadioControl -> IPDispatchC;
+  UDPEchoP.Echo -> IPDispatchC.UDP[7];
+  UDPEchoP.Status -> IPDispatchC.UDP[7000];
+
+  UDPEchoP.StatusTimer -> TimerMilliC;
 
   UDPEchoP.IPStats -> IPDispatchC.IPStats;
   UDPEchoP.RouteStats -> IPDispatchC.RouteStats;
@@ -53,4 +46,7 @@ configuration UDPEchoC {
 
   components RandomC;
   UDPEchoP.Random -> RandomC;
+
+  components UDPShellC;
+  UDPShellC.UDP -> IPDispatchC.UDP[0xF0B0];
 }

@@ -20,15 +20,14 @@
  *
  */
 
-#include <lib6lowpanFrag.h>
 #include "IPDispatch.h"
 #include "PrintfUART.h"
 
 module IPRoutingP {
+  provides interface StdControl;
   provides interface IPRouting;
   provides interface Statistics<route_statistics_t>;
   uses interface ICMP;
-  uses interface IPPacket;
   uses interface Boot;
 
   uses interface Timer<TMilli> as SortTimer;
@@ -42,8 +41,20 @@ module IPRoutingP {
 
   bool soliciting, wasAbandoned;
 
+  enum {
+    S_RUNNING,
+    S_STOPPED,
+  };
+
+  uint8_t state;
+
   // this is the routing table (k parents);
   struct route_entry table[N_PARENTS];
+
+  struct flow_entry flow_table[N_FLOW_ENT];
+  struct neigh_entry neigh_table[N_NEIGH];
+
+  // struct route_entry route_table[N_ROUTES];
 
   uint16_t adjustLQI(uint8_t val) {
     uint16_t result = (80 - (val - 50));
@@ -65,6 +76,19 @@ module IPRoutingP {
       table[i].flags = 0;
       clearStats(&table[i]);
     }
+
+//     for (i = 0; i < N_ROUTES; i++) {
+//       route_table[i].flags = 0;
+//     }
+
+    for (i = 0; i < N_FLOW_ENT; i++) {
+      flow_table[i].flags = 0;
+    }
+
+    for (i = 0; i < N_NEIGH; i++) {
+      neigh_table[i].neighbor = T_INVAL_NEIGH;
+    }
+
     current_epoch = 0;
     soliciting = FALSE;
     // boot with this true so the router will invalidate any state
@@ -72,11 +96,25 @@ module IPRoutingP {
     wasAbandoned = TRUE;
     call Statistics.clear();
     call SortTimer.startPeriodic(1024L * 30);
+
+    state = S_RUNNING;
+  }
+
+  command error_t StdControl.start() {
+    state = S_RUNNING;
+  }
+
+  command error_t StdControl.stop() {
+    state = S_STOPPED;
   }
   
-  command bool IPRouting.isForMe(ip_msg_t *msg) {
-    return (cmpPfx(my_address, msg->hdr.dst_addr) && cmpPfx(&my_address[8], &msg->hdr.dst_addr[8])) ||
-      cmpPfx(multicast_prefix, msg->hdr.dst_addr);
+  command bool IPRouting.isForMe(struct ip6_hdr *hdr) {
+    // the destination prefix is either link-local or global, or
+    // multicast (we accept all multicast packets), and the suffix is
+    // me.
+    return (((cmpPfx(my_address, hdr->dst_addr) || cmpPfx(linklocal_prefix, hdr->dst_addr)) 
+             && cmpPfx(&my_address[8], &hdr->dst_addr[8])) 
+            || cmpPfx(multicast_prefix, hdr->dst_addr));
   }
 
   struct route_entry *getEntryRank(uint8_t rank) {
@@ -167,47 +205,84 @@ module IPRoutingP {
    *        all-node/all-routers local multicast group.
    *
    */
-  command error_t IPRouting.getNextHop(ip_msg_t *a, uint8_t attempt, send_policy_t *ret) {
-    struct route_entry *r = getEntryRank(attempt);
-    struct source_header *sh = (struct source_header *)a->data;
+  command error_t IPRouting.getNextHop(struct ip6_hdr *hdr, struct source_header *sh,
+                                       send_policy_t *ret) {
+    
+    // AT: Before trying the default route, we need to look for any matching flow table entries.  Code could be similar to this:
+    // int i,c;
+    // for (i = 0; i < N_FLOW_ENT; i++) {
+    //   if (((flow_table[i].src == N_INVAL_ENT) || (flow_table[i].src == a->hdr.src_addr)) && \\
+    //       ((flow_table[i].prev_hop == N_INVAL_ENT) || (flow_table[i].prev_hop == a->metadata.sender))) {
+    //         if (flow_table[i].dest[0] == N_INVAL_ENT) {
+    //           ret->retries = 4;
+    //           ret->delay = 10;
+    //           ret->dest = flow_table[i].next_hop;
+    //           return SUCCESS;
+    //         }
+    //         for (c = 0; c < N_DEST; c++) {
+    //           if (flow_table[i].dest[c] == a->hdr.dest_addr) {
+    //             ret->retries = 4;
+    //             ret->delay = 10;
+    //             ret->dest = flow_table[i].next_hop;
+    //             return SUCCESS;
+    //           }
+    //         }
+    //   }
+    // }
+    //
+    // This code is not the most inefficient.  For one, the source address and dest address compared here are the full 16 byte addresses.  However the flow
+    //  entry table only holds 16-bit addresses, so these will have to be converted.
+    //
+    // Furthermore, this code has two other shortcomings: a) it is not designed to handle cases where multiple flow entries could match.  Also, b) some mechanism
+    //  has to be derived for not using the same flow entry multiple times and resetting the attempt value correctly, otherwise when defaulting to the parent
+    //  oriented route we'll skip over the best parent.  We need to define the semantics of the flags for each entry, and utilize these to solve these two problems.
 
-    printfUART("attempt: 0x%x flags: 0x%x neigh: 0x%x\n", attempt, r->flags, r->neighbor);
 
-    ret->retries = 4;
+
+    ret->retries = 6;
     ret->delay = 10;
+    ret->current = 0;
+    ret->nchoices = 1;
 
     // we only use the address in the source header if the record option is not used
     // otherwise, we use normal routing.
 
-    if (a->hdr.nxt_hdr == NXTHDR_SOURCE && (sh->dispatch & IP_EXT_SOURCE_RECORD_MASK) != IP_EXT_SOURCE_RECORD) {
+    if (hdr->nxt_hdr == NXTHDR_SOURCE && (sh->dispatch & IP_EXT_SOURCE_RECORD_MASK) != IP_EXT_SOURCE_RECORD) {
       // if it's source routed, grab the next address out of the header.
 
-      if (sh->current == sh->nentries) return FAIL;
+      // if (sh->current == sh->nentries) return FAIL;
 
-      ret->dest = ntoh16(sh->hops[sh->current]);
-
-      // try harder for source routed packets, since if this attempt
-      // fails we will drop the packet.
-      ret->retries = 6;
+      ret->dest[0] = ntoh16(sh->hops[sh->current]);
 
       printfUART("using source route\n");
       printfUART("source dispatch: 0x%x\n", sh->dispatch);
 
-
-    } else if (cmpPfx(a->hdr.dst_addr, multicast_prefix)) {
+      
+    } else if (cmpPfx(hdr->dst_addr, multicast_prefix)) {
       // if it's multicast, for now, we send it to the local broadcast
-      ret->dest = 0xffff;
+      ret->dest[0] = 0xffff;
       ret->retries = 0;
       ret->delay = 0;
-
+    } else if (cmpPfx(hdr->dst_addr, linklocal_prefix)) {
+      ret->dest[0] = (hdr->dst_addr[14] << 8) | hdr->dst_addr[15];
     } else {
-
-      // otherwise, it's the default route.
-      if (ret == NULL || r == NULL) return FAIL;
-      //if (r->neighbor == a->metadata.sender) return FAIL;
+      int i;
+      struct route_entry *r;
       
+      printfUART("flags: 0x%x neigh: 0x%x\n", r->flags, r->neighbor);
+      // otherwise, it's the default route.
+      ret->current = 0;
+      ret->nchoices = 0;
 
-      ret->dest = r->neighbor;
+      for (i = 0; i < N_FLOW_CHOICES; i++) {
+        r = getEntryRank(i);
+        if (r == NULL) break;
+        // if (r->neighbor == a->metadata.sender) return FAIL;
+        ret->dest[i] = r->neighbor;
+        ret->nchoices++;
+      }
+      ret->retries = 4;
+      if (ret->nchoices == 0) return FAIL;
     }
     return SUCCESS;
   }
@@ -266,31 +341,12 @@ module IPRoutingP {
       e->linkEstimate = adjustLQI(lqi);
   }
 
-  command void IPRouting.reportTransmission(send_policy_t *policy, bool wasDelivered) {
-    struct route_entry *r;
-    if (policy == NULL) return;
-    r = getEntry(policy->dest);
-    if (r == NULL) return;
-
-
-    r->stats[current_epoch].total++;
-    if (wasDelivered) {
-      r->stats[current_epoch].success++;
-
-      // unset this here; since we successfully sent a packet towards
-      // the default route.
-      wasAbandoned = FALSE;
-    }
-    // TODO : update counters
-
-  }
-
-  command void IPRouting.reportAbandonment() {
+  void reportAbandonment() {
     int i;
 
     printfUART("abandoned-- all parents failed\n");
 
-    if (soliciting) return;
+    if (soliciting || state == S_STOPPED) return;
     call Leds.led1Toggle();
 
     // unmark all the entries
@@ -304,8 +360,30 @@ module IPRoutingP {
     call ICMP.sendSolicitations();
   }
 
-  command bool IPRouting.wasAbandoned() {
-    return wasAbandoned;
+  command void IPRouting.reportTransmission(send_policy_t *policy) {
+    if (policy->dest[0] != HW_BROADCAST_ADDR) {
+      if (policy->nchoices == policy->current) {
+        reportAbandonment();
+      } else {
+        wasAbandoned = FALSE;
+      }
+    }
+//     struct route_entry *r;
+//     if (policy == NULL) return;
+//     r = getEntry(policy->dest);
+//     if (r == NULL) return;
+
+
+//     r->stats[current_epoch].total++;
+//     if (wasDelivered) {
+//       r->stats[current_epoch].success++;
+
+//       // unset this here; since we successfully sent a packet towards
+//       // the default route.
+//       wasAbandoned = FALSE;
+//     }
+//     // TODO : update counters
+
   }
 
   /*
@@ -316,9 +394,35 @@ module IPRoutingP {
     return (re != NULL);
   }
 
+  command void IPRouting.insertRoutingHeaders(struct split_ip_msg *msg) {
+    static uint8_t sh_buf[14];
+    static struct generic_header record_route;
+    struct source_header *sh = (struct source_header *)sh_buf;
+
+    if (msg->hdr.nxt_hdr != IANA_UDP) return;
+
+    // this inserts a source header with the record route option set
+    // on all outgoing packets.  look how easy it is!
+
+    sh->len = 14;
+    sh->current = 0;
+    sh->dispatch = IP_EXT_SOURCE_RECORD;
+    if (wasAbandoned)
+      sh->dispatch |= IP_EXT_SOURCE_INVAL;
+
+    if (msg->hdr.nxt_hdr != NXTHDR_SOURCE) {
+      sh->nxt_hdr = msg->hdr.nxt_hdr;
+      msg->hdr.nxt_hdr = NXTHDR_SOURCE;
+      record_route.hdr.ext = (struct ip6_ext *)sh;
+      record_route.len = 14;
+      record_route.next = msg->headers;
+      msg->headers = &record_route;
+    }
+  }
+
   event void SortTimer.fired() {
     sortTable();
-    if (call IPRouting.getHopLimit() != last_hlim)
+    if (call IPRouting.getHopLimit() != last_hlim && state == S_RUNNING)
       call ICMP.sendAdvertisements();
     last_hlim = call IPRouting.getHopLimit();
   }
@@ -344,7 +448,7 @@ module IPRoutingP {
 
     printTable();
 
-    if (!call IPRouting.hasRoute())
+    if (!call IPRouting.hasRoute() && state == S_RUNNING)
       call ICMP.sendSolicitations();
   }
 
@@ -362,5 +466,3 @@ module IPRoutingP {
     ip_memclr((uint8_t *)&stats, sizeof(route_statistics_t));
   }
 }
-
-//  LocalWords:  sucuseffully

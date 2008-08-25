@@ -22,7 +22,7 @@
 #ifndef __ROUTING_H_
 #define __ROUTING_H_
 
-#include <IP.h>
+#include <ip.h>
 #include <string.h>
 
 enum {
@@ -38,19 +38,19 @@ uint8_t routing_init();
  * @returns: truth value indicating if the destination of the packet
  * is a single hop, and requires no source route.
  */
-uint8_t routing_is_onehop(ip_msg_t *msg);
+uint8_t routing_is_onehop(struct split_ip_msg  *msg);
 
 
 /*
  * Copys the IP message at orig to the empty one at ret, inserting
  * necessary routing information.
  */
-uint8_t routing_insert_route(ip_msg_t *orig, ip_msg_t *ret);
+uint8_t routing_insert_route(struct split_ip_msg *orig);
 
 /*
  * Returns the address of the next router this packet should be send to.
  */
-hw_addr_t routing_get_nexthop(ip_msg_t *msg);
+hw_addr_t routing_get_nexthop(struct split_ip_msg *msg);
 
 
 void routing_add_source_header(struct source_header *sh);

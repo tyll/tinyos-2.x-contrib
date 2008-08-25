@@ -19,6 +19,8 @@
  * PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS."
  *
  */
+#include "6lowpan.h"
+#include "ip.h"
 #include "lib6lowpan.h"
 
 

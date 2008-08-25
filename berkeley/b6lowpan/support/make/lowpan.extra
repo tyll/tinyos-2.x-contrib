@@ -9,9 +9,12 @@ PFLAGS+=-I$(LOWPAN_ROOT)/tos/chips/cc2420/
 PFLAGS+=-I$(LOWPAN_ROOT)/tos/chips/cc2420/interfaces/
 PFLAGS+=-I$(LOWPAN_ROOT)/tos/chips/cc2420/packet/
 PFLAGS+=-I$(LOWPAN_ROOT)/tos/chips/cc2420/link/
+PFLAGS+=-I$(LOWPAN_ROOT)/tos/chips/cc2420/lpl/
+PFLAGS+=-I$(LOWPAN_ROOT)/tos/lib/net/b6lowpan/nwprog/
 
 PFLAGS+=$(LOWPAN_ROOT)/support/sdk/c/lib6lowpan/lib6lowpan.c 
 PFLAGS+=$(LOWPAN_ROOT)/support/sdk/c/lib6lowpan/lib6lowpanIP.c
 PFLAGS+=$(LOWPAN_ROOT)/support/sdk/c/lib6lowpan/lib6lowpanFrag.c
 PFLAGS+=$(LOWPAN_ROOT)/support/sdk/c/lib6lowpan/in_cksum.c
-
+PFLAGS+=$(LOWPAN_ROOT)/support/sdk/c/lib6lowpan/ip_malloc.c
+PFLAGS+=$(LOWPAN_ROOT)/tos/lib/net/b6lowpan/table.c

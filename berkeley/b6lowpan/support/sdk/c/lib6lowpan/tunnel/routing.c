@@ -25,7 +25,6 @@
 #include <stdlib.h>
 #include <6lowpan.h>
 #include <lib6lowpan.h>
-#include <lib6lowpanFrag.h>
 #include "routing.h"
 #include "nwstate.h"
 #include "logging.h"
@@ -50,7 +49,7 @@ uint8_t routing_init() {
  * @returns: truth value indicating if the destination of the packet
  * is a single hop, and requires no source route.
  */
-uint8_t routing_is_onehop(ip_msg_t *msg) {
+uint8_t routing_is_onehop(struct split_ip_msg *msg) {
   path_t *path;
   uint8_t ret = ROUTE_NO_ROUTE;
 
@@ -65,7 +64,7 @@ uint8_t routing_is_onehop(ip_msg_t *msg) {
     else
       ret = ROUTE_MHOP;
   }
-
+  debug("routing_is_onehop: 0x%x\n", ret);
   nw_free_path(path);
   return ret;
 }
@@ -75,59 +74,63 @@ uint8_t routing_is_onehop(ip_msg_t *msg) {
  * Copys the IP message at orig to the empty one at ret, inserting
  * necessary routing information.
  */
-uint8_t routing_insert_route(ip_msg_t *orig, ip_msg_t *ret) {
-  uint16_t hdr_len;
-  struct source_header *sh = (struct source_header *)ret->data;
-
+uint8_t routing_insert_route(struct split_ip_msg *orig) {
   int offset = 0;
   path_t *path = nw_get_route(my_short_addr, l2fromIP(orig->hdr.dst_addr));
   path_t *i;
+  struct generic_header *g_hdr = (struct generic_header *)malloc(sizeof(struct generic_header));
+  struct source_header *sh;
 
-  if (path == NULL)
+  if (path == NULL || path->length == 1) {
+    debug("no path needed\n");
     return 1;
+  }
+  debug("routing_insert_route len: 0x%x\n", path->length);
 
   // if the packet with the source route is longer then the buffer
   // we're putting it into, drop it.
   if (ntoh16(orig->hdr.plen) + sizeof(struct source_header) + 
-      (path->length * sizeof(uint16_t)) > ret->b_len) {
+      (path->length * sizeof(uint16_t)) + sizeof(struct ip6_hdr) > INET_MTU) {
     warn("packet plus source header too long\n");
     return 1;
   }
   
+  sh = (struct source_header *)malloc(sizeof(struct source_header) + path->length * sizeof(uint16_t));
+  if (sh == NULL || g_hdr == NULL) return 1;
 
-  // copy headers
-  ip_memcpy(&ret->hdr, &orig->hdr, sizeof(struct ip6_hdr));
-
-  sh->dispatch = IP_EXT_SOURCE_DISPATCH;
   sh->nxt_hdr = orig->hdr.nxt_hdr;
-  sh->nentries = path->length;
+  sh->len = sizeof(struct source_header) + (path->length * sizeof(uint16_t));
+  sh->dispatch = IP_EXT_SOURCE_DISPATCH;
   sh->current = 0;
   
-  ret->hdr.nxt_hdr = NXTHDR_SOURCE;
+  orig->hdr.nxt_hdr = NXTHDR_SOURCE;
 
-  log_fprintf(stderr, "to 0x%x [%i]: ", l2fromIP(orig->hdr.dst_addr), path->length);
+  fprintf(stderr, "to 0x%x [%i]: ", l2fromIP(orig->hdr.dst_addr), path->length);
   for (i = path; i != NULL; i = i->next) {
-    log_fprintf(stderr, "0x%x ", i->node);
+    fprintf(stderr, "0x%x ", i->node);
     sh->hops[offset++] = hton16(i->node);
     
   }
-  log_fprintf(stderr, "\n");
+  fprintf(stderr, "\n");
 
-  hdr_len = sizeof(struct source_header) + sizeof(hw_addr_t) * path->length;
-  // copy payload
-  ip_memcpy( ((uint8_t *)(ret->data)) + hdr_len,
-             orig->data, ntoh16(orig->hdr.plen));
-  ret->hdr.plen = hton16(ntoh16(orig->hdr.plen) + hdr_len);
+  orig->hdr.plen = hton16(ntoh16(orig->hdr.plen) + sh->len);
+
+  g_hdr->payload_malloced = 1;
+  g_hdr->len = sh->len;
+  g_hdr->hdr.sh = sh;
+  g_hdr->next = orig->headers;
+  orig->headers = g_hdr;
 
   nw_free_path(path);
 
   return 0;
+
 }
 
 /*
  * Returns the address of the next router this packet should be send to.
  */
-hw_addr_t routing_get_nexthop(ip_msg_t *msg) {
+hw_addr_t routing_get_nexthop(struct split_ip_msg *msg) {
   hw_addr_t ret = 0xffff;;
   path_t * path;
   if (cmpPfx(msg->hdr.dst_addr, multicast_prefix))
@@ -157,7 +160,7 @@ void routing_add_source_header(struct source_header *sh) {
   for (i = 0; i < sh->current - 1; i++) {
     nw_add_incr_edge(ntoh16(sh->hops[i]), ntoh16(sh->hops[i+1]));
   }
-  if (sh->current < sh->nentries) {
+  if (sh->current < SH_NENTRIES(sh)) {
     nw_add_incr_edge(ntoh16(sh->hops[sh->current - 1]), 
                      l2fromIP(my_address));
   }

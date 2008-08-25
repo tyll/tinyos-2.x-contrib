@@ -82,4 +82,10 @@ typedef nx_struct {
   nx_uint16_t metric;
 } rqual_t;
 
+struct icmp_stats {
+  uint16_t seq;
+  uint8_t ttl;
+  uint32_t rtt;
+};
+
 #endif

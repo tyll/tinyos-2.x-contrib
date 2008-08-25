@@ -53,9 +53,11 @@
 #ifndef _TUN_DEV_H
 #define _TUN_DEV_H
 
+#include <ip.h>
+
 int tun_open(char *dev);
 int tun_close(int fd, char *dev);
-int tun_write(int fd, char *buf, int len);
+int tun_write(int fd, struct split_ip_msg *msg);
 int tun_read(int fd, char *buf, int len);
 
 #endif

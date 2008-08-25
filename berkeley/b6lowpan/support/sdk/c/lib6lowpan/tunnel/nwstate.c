@@ -269,6 +269,7 @@ void compute_routes(node_id_t v1) {
 path_t *nw_get_route(node_id_t v1, node_id_t v2) {
   router_t *r, *from, *to;
   path_t *ret = NULL, *new;
+
   from = hashtable_search(routers, &v1);
   to   = hashtable_search(routers, &v2);
 

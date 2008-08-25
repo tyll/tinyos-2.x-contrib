@@ -50,7 +50,6 @@ module UDPP {
     interface IPReceive as SubReceive;
     interface IPSend as SubSend;
     interface BasicPacket as SubPacket;
-    interface BufferPool as SubBufPool;
   }
   
 } implementation {
@@ -66,26 +65,45 @@ module UDPP {
                                                                        len - sizeof(struct udp_hdr));
   }
 
-  command error_t UDPSend.send[uint16_t localPort](struct sockaddr *dest,
-                                                   ip_msg_t *msg, uint16_t len) {
-    vec_t cksum_vec[4];
-    uint32_t ck_hdr[2];
-    struct udp_hdr *udp_hdr = call SubPacket.getPayload(msg);
-    int i;
+  /*
+   * we set up any needed addressing information, including leaving
+   * space for a source routing header.  The IP header payload length
+   * my not be the same as the udp header since the IP header may have
+   * extra headers included which will be removed by the adaptation
+   * layer.
+   *
+   */
+  command ip_msg_t *UDPSend.getBuffer[uint16_t localPort](struct sockaddr *dest, uint16_t len) {
+    ip_msg_t *msg;
+    struct udp_hdr *udp_hdr;
 
+    msg = call IPSend.getBuffer(dest->sin_addr, sizeof(struct udp_hdr) + len);
+    if (msg == NULL) return NULL;
+    udp_hdr = call SubPacket.getPayload(msg);
+
+    // fill in header fields here.
     memcpy(msg->hdr.dst_addr, dest->sin_addr, 16);
     memcpy(msg->hdr.src_addr, *(call IPAddress.getIPAddr()), 16);
-
-    printfUART("UDP send from: ");
-    for (i = 0; i < 16; i ++)
-      printfUART("0x%x ", msg->hdr.src_addr[i]);
-    printfUART("\n");
-
 
     udp_hdr->srcport = hton16(localPort);
     udp_hdr->dstport = dest->sin_port;
     udp_hdr->len = hton16(len + sizeof(struct udp_hdr));
     udp_hdr->chksum = 0;
+
+    return msg;
+  }
+
+  /*
+   * on a send, we compute the checksum and submit the packet to the
+   * stack
+   *
+   */
+  command error_t UDPSend.send[uint16_t localPort](ip_msg_t *msg) {
+    vec_t cksum_vec[4];
+    uint32_t ck_hdr[2];
+    struct udp_hdr *udp_hdr = call SubPacket.getPayload(msg);
+
+    uint16_t len = ntoh16(udp_hdr.len);
 
     cksum_vec[0].ptr = (uint8_t *)msg->hdr.src_addr;
     cksum_vec[0].len = 16;
@@ -103,15 +121,7 @@ module UDPP {
     return call SubSend.send((ip_msg_t *)msg, len + sizeof(struct udp_hdr));
                        
   }
-  event void SubSend.sendDone(ip_msg_t *msg, error_t error) {
-    struct udp_hdr *hdr = (struct udp_hdr *)call SubPacket.getPayload(msg);
-    printfUART("udp: sendDone: 0x%x\n", ntoh16(hdr->srcport));
-    signal UDPSend.sendDone[ntoh16(hdr->srcport)](msg, error);
-  }
 
-  default event void UDPSend.sendDone[uint16_t port](ip_msg_t *msg, error_t error) {
-    printfUART("default UDP sendDone\n");
-  }
   default event ip_msg_t *UDPReceive.receive[uint16_t port](struct sockaddr *dest, ip_msg_t *msg,
                                                             void *payload, uint16_t len) {
     return msg;
@@ -136,13 +146,5 @@ module UDPP {
 
   command struct udp_hdr *UDPPacket.getHeader(ip_msg_t *msg) {
     return (struct udp_hdr *)(call SubPacket.getPayload(msg));
-  }
-
-  command ip_msg_t *BufferPool.get(buffer_size_t sz) {
-    return call SubBufPool.get(sz + sizeof(ip_msg_t) + sizeof(struct udp_hdr));
-  }
-
-  command void BufferPool.put(ip_msg_t *buf) {
-    call SubBufPool.put(buf);
   }
 }

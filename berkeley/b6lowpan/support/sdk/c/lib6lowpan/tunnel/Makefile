@@ -1,5 +1,5 @@
 
-SOURCES=serial_tun.c tun_dev.c hashtable.c routing.c nwstate.c ../printpacket.c logging.c
+SOURCES=serial_tun.c tun_dev.c hashtable.c routing.c nwstate.c  logging.c
 LIBS=../lib6lowpan.a ${TOSROOT}/support/sdk/c/sf/libmote.a 
 TARGET=serial_tun
 

@@ -54,4 +54,6 @@ void log_log  (loglevel_t level, const char *fmt, ...);
 
 #define log_fprintf(X, FMT, ...) ;
 
+void __dump_serial_packet(unsigned char *packet, const int len);
+
 #endif

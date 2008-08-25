@@ -21,8 +21,9 @@
  */
 
 #include <IPDispatch.h>
-#include <IP.h>
 #include <router_address.h>
+#include <lib6lowpan.h>
+#include <ip.h>
 
 #include "UDPReport.h"
 #include "PrintfUART.h"
@@ -33,16 +34,13 @@ module UDPEchoP {
   uses {
     interface Boot;
     interface SplitControl as RadioControl;
-    interface UDPSend;
-    interface UDPReceive;
+
+    interface UDP as Echo;
+    interface UDP as Status;
+
     interface Leds;
     
-    interface BufferPool;
-    
-    interface Timer<TMilli> as RouteTimer;
-    interface UDPSend as RouteSend;
-    interface IPPacket;
-    interface BasicPacket as UdpPacket;
+    interface Timer<TMilli> as StatusTimer;
    
     interface Statistics<ip_statistics_t> as IPStats;
     interface Statistics<route_statistics_t> as RouteStats;
@@ -55,11 +53,11 @@ module UDPEchoP {
 
   bool timerStarted;
   udp_statistics_t stats;
-  struct sockaddr route_dest;
+  struct sockaddr_in6 route_dest;
 
   event void Boot.booted() {
     call RadioControl.start();
-    call RouteTimer.startOneShot(call Random.rand16() % (1024 * REPORT_PERIOD));
+    call StatusTimer.startOneShot(call Random.rand16() % (1024 * REPORT_PERIOD));
     timerStarted = FALSE;
 
     call IPStats.clear();
@@ -82,37 +80,36 @@ module UDPEchoP {
 
   }
 
-  event ip_msg_t *UDPReceive.receive(struct sockaddr *from, ip_msg_t *msg,
-                                     void *data, uint16_t len) {
-    if (call UDPSend.send(from, msg, len) != SUCCESS)
-      return msg;
-    return NULL;
+  event void Status.recvfrom(struct sockaddr_in6 *from, void *data, 
+                             uint16_t len, struct ip_metadata *meta) {
+
   }
 
-  event void UDPSend.sendDone(ip_msg_t *msg, error_t error) {
-    printfUART("signal sendDone\n");
-    call BufferPool.put(msg);
-    if (error != SUCCESS)
-      stats.failed++;
+  event void Echo.recvfrom(struct sockaddr_in6 *from, void *data, 
+                           uint16_t len, struct ip_metadata *meta) {
+    call Echo.sendto(from, data, len);
   }
 
-  event void RouteTimer.fired() {
-    uint8_t stats_size = sizeof(ip_statistics_t) + sizeof(route_statistics_t) 
-      + sizeof(icmp_statistics_t) + sizeof(udp_statistics_t);
-    ip_msg_t *msg = call BufferPool.get(sizeof(hw_addr_t) * 5 + sizeof(struct source_header) + stats_size);
+  enum {
+    STATUS_SIZE = sizeof(ip_statistics_t) + sizeof(route_statistics_t) 
+    + sizeof(icmp_statistics_t) + sizeof(udp_statistics_t),
+  };
+
+
+  event void StatusTimer.fired() {
+    uint8_t status[STATUS_SIZE];
     struct udp_report *payload;
+    
+    call Leds.led0Toggle();
 
     stats.total++;
-
+    
     if (!timerStarted) {
-      call RouteTimer.startPeriodic(1024 * REPORT_PERIOD);
+      call StatusTimer.startPeriodic(1024 * REPORT_PERIOD);
       timerStarted = TRUE;
     }
 
-    if (msg == NULL) return;
-    
-    call IPPacket.addSourceHeader(msg, 5, TRUE);
-    payload = (struct udp_report *)call UdpPacket.getPayload(msg);
+    payload = (struct udp_report *)status;
     
     stats.seqno++;
     stats.sender = TOS_NODE_ID;
@@ -122,16 +119,6 @@ module UDPEchoP {
     memcpy(&payload->icmp,  call ICMPStats.get(),  sizeof(icmp_statistics_t));
     memcpy(&payload->udp,   &stats,                sizeof(udp_statistics_t));
 
-    call Leds.led0Toggle();
-
-    if (call RouteSend.send(&route_dest, msg, stats_size) != SUCCESS) {
-      call BufferPool.put(msg);
-      stats.failed++;
-    }
-  }
-
-  event void RouteSend.sendDone(ip_msg_t *msg, error_t error) {
-    printfUART("Route sendDone\n");
-    call BufferPool.put(msg);
+    call Status.sendto(&route_dest, status, STATUS_SIZE);
   }
 }

@@ -22,10 +22,6 @@
 #ifndef _UDPREPORT_H
 #define _UDPREPORT_H
 
-#include <6lowpan.h>
-#include <IP.h>
-#include <IPDispatch.h>
-
 nx_struct ac_report {
   nx_uint32_t data;
 };

@@ -58,13 +58,12 @@
 #include <syslog.h>
 #include <errno.h>
 
-#include <arpa/inet.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
 #include <linux/if.h>
-#include <linux/if_tun.h>
 #include <linux/if_ether.h>
 
+#include "lib6lowpan.h"
 #include "tun_dev.h"
 
 
@@ -104,12 +103,33 @@ int tun_close(int fd, char *dev)
 
 /* Read/write frames from TUN device */
 
-int tun_write(int fd, char *buf, int len)
+int tun_write(int fd, struct split_ip_msg *msg)
 {
+  uint8_t buf[INET_MTU + sizeof(struct tun_pi)], *packet;
   struct tun_pi *pi = (struct tun_pi *)buf;
+  struct generic_header *cur;
+  packet = (uint8_t *)(pi + 1);
+
+
+  if (ntoh16(msg->hdr.plen) + sizeof(struct ip6_hdr) >= INET_MTU)
+    return 1;
+
   pi->flags = 0;
-  pi->proto = htons(ETH_P_IPV6);
-  return write(fd, buf, len + sizeof(struct tun_pi));
+  pi->proto = hton16(ETH_P_IPV6);
+
+  memcpy(packet, &msg->hdr, sizeof(struct ip6_hdr));
+  packet += sizeof(struct ip6_hdr);
+
+  cur = msg->headers;
+  while (cur != NULL) {
+    memcpy(packet, cur->hdr.data, cur->len);
+    packet += cur->len;
+    cur = cur->next;
+  }
+
+  memcpy(packet, msg->data, msg->data_len);
+
+  return write(fd, buf, sizeof(struct tun_pi) + sizeof(struct ip6_hdr) + ntoh16(msg->hdr.plen));
 }
 
 int tun_read(int fd, char *buf, int len)

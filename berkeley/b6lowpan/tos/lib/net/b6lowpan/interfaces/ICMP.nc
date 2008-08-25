@@ -30,5 +30,6 @@ interface ICMP {
 
   command void sendAdvertisements();
 
-  command void sendTimeExceeded(ip_msg_t *msg);
+  command void sendTimeExceeded(struct ip6_hdr *hdr, unpack_info_t *u_info, uint16_t amount_here);
+
 }

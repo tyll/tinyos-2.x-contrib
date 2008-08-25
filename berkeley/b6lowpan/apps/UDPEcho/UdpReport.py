@@ -7,14 +7,14 @@
 import tinyos.message.Message
 
 # The default size of this message type in bytes.
-DEFAULT_MESSAGE_SIZE = 34
+DEFAULT_MESSAGE_SIZE = 41
 
 # The Active Message type associated with this message.
 AM_TYPE = -1
 
 class UdpReport(tinyos.message.Message.Message):
-    # Create a new UdpReport of size 34.
-    def __init__(self, data="", addr=None, gid=None, base_offset=0, data_length=34):
+    # Create a new UdpReport of size 41.
+    def __init__(self, data="", addr=None, gid=None, base_offset=0, data_length=41):
         tinyos.message.Message.Message.__init__(self, data, addr, gid, base_offset, data_length)
         self.amTypeSet(AM_TYPE)
     
@@ -64,6 +64,30 @@ class UdpReport(tinyos.message.Message.Message):
             pass
         try:
             s += "  [ip.senddone_el=0x%x]\n" % (self.get_ip_senddone_el())
+        except:
+            pass
+        try:
+            s += "  [ip.fragpool=0x%x]\n" % (self.get_ip_fragpool())
+        except:
+            pass
+        try:
+            s += "  [ip.sendinfo=0x%x]\n" % (self.get_ip_sendinfo())
+        except:
+            pass
+        try:
+            s += "  [ip.sendentry=0x%x]\n" % (self.get_ip_sendentry())
+        except:
+            pass
+        try:
+            s += "  [ip.sndqueue=0x%x]\n" % (self.get_ip_sndqueue())
+        except:
+            pass
+        try:
+            s += "  [ip.encfail=0x%x]\n" % (self.get_ip_encfail())
+        except:
+            pass
+        try:
+            s += "  [ip.heapfree=0x%x]\n" % (self.get_ip_heapfree())
         except:
             pass
         try:
@@ -628,9 +652,339 @@ class UdpReport(tinyos.message.Message.Message):
         return 8
     
     #
-    # Accessor methods for field: route.hop_limit
+    # Accessor methods for field: ip.fragpool
     #   Field type: short
     #   Offset (bits): 88
+    #   Size (bits): 8
+    #
+
+    #
+    # Return whether the field 'ip.fragpool' is signed (False).
+    #
+    def isSigned_ip_fragpool(self):
+        return False
+    
+    #
+    # Return whether the field 'ip.fragpool' is an array (False).
+    #
+    def isArray_ip_fragpool(self):
+        return False
+    
+    #
+    # Return the offset (in bytes) of the field 'ip.fragpool'
+    #
+    def offset_ip_fragpool(self):
+        return (88 / 8)
+    
+    #
+    # Return the offset (in bits) of the field 'ip.fragpool'
+    #
+    def offsetBits_ip_fragpool(self):
+        return 88
+    
+    #
+    # Return the value (as a short) of the field 'ip.fragpool'
+    #
+    def get_ip_fragpool(self):
+        return self.getUIntElement(self.offsetBits_ip_fragpool(), 8, 1)
+    
+    #
+    # Set the value of the field 'ip.fragpool'
+    #
+    def set_ip_fragpool(self, value):
+        self.setUIntElement(self.offsetBits_ip_fragpool(), 8, value, 1)
+    
+    #
+    # Return the size, in bytes, of the field 'ip.fragpool'
+    #
+    def size_ip_fragpool(self):
+        return (8 / 8)
+    
+    #
+    # Return the size, in bits, of the field 'ip.fragpool'
+    #
+    def sizeBits_ip_fragpool(self):
+        return 8
+    
+    #
+    # Accessor methods for field: ip.sendinfo
+    #   Field type: short
+    #   Offset (bits): 96
+    #   Size (bits): 8
+    #
+
+    #
+    # Return whether the field 'ip.sendinfo' is signed (False).
+    #
+    def isSigned_ip_sendinfo(self):
+        return False
+    
+    #
+    # Return whether the field 'ip.sendinfo' is an array (False).
+    #
+    def isArray_ip_sendinfo(self):
+        return False
+    
+    #
+    # Return the offset (in bytes) of the field 'ip.sendinfo'
+    #
+    def offset_ip_sendinfo(self):
+        return (96 / 8)
+    
+    #
+    # Return the offset (in bits) of the field 'ip.sendinfo'
+    #
+    def offsetBits_ip_sendinfo(self):
+        return 96
+    
+    #
+    # Return the value (as a short) of the field 'ip.sendinfo'
+    #
+    def get_ip_sendinfo(self):
+        return self.getUIntElement(self.offsetBits_ip_sendinfo(), 8, 1)
+    
+    #
+    # Set the value of the field 'ip.sendinfo'
+    #
+    def set_ip_sendinfo(self, value):
+        self.setUIntElement(self.offsetBits_ip_sendinfo(), 8, value, 1)
+    
+    #
+    # Return the size, in bytes, of the field 'ip.sendinfo'
+    #
+    def size_ip_sendinfo(self):
+        return (8 / 8)
+    
+    #
+    # Return the size, in bits, of the field 'ip.sendinfo'
+    #
+    def sizeBits_ip_sendinfo(self):
+        return 8
+    
+    #
+    # Accessor methods for field: ip.sendentry
+    #   Field type: short
+    #   Offset (bits): 104
+    #   Size (bits): 8
+    #
+
+    #
+    # Return whether the field 'ip.sendentry' is signed (False).
+    #
+    def isSigned_ip_sendentry(self):
+        return False
+    
+    #
+    # Return whether the field 'ip.sendentry' is an array (False).
+    #
+    def isArray_ip_sendentry(self):
+        return False
+    
+    #
+    # Return the offset (in bytes) of the field 'ip.sendentry'
+    #
+    def offset_ip_sendentry(self):
+        return (104 / 8)
+    
+    #
+    # Return the offset (in bits) of the field 'ip.sendentry'
+    #
+    def offsetBits_ip_sendentry(self):
+        return 104
+    
+    #
+    # Return the value (as a short) of the field 'ip.sendentry'
+    #
+    def get_ip_sendentry(self):
+        return self.getUIntElement(self.offsetBits_ip_sendentry(), 8, 1)
+    
+    #
+    # Set the value of the field 'ip.sendentry'
+    #
+    def set_ip_sendentry(self, value):
+        self.setUIntElement(self.offsetBits_ip_sendentry(), 8, value, 1)
+    
+    #
+    # Return the size, in bytes, of the field 'ip.sendentry'
+    #
+    def size_ip_sendentry(self):
+        return (8 / 8)
+    
+    #
+    # Return the size, in bits, of the field 'ip.sendentry'
+    #
+    def sizeBits_ip_sendentry(self):
+        return 8
+    
+    #
+    # Accessor methods for field: ip.sndqueue
+    #   Field type: short
+    #   Offset (bits): 112
+    #   Size (bits): 8
+    #
+
+    #
+    # Return whether the field 'ip.sndqueue' is signed (False).
+    #
+    def isSigned_ip_sndqueue(self):
+        return False
+    
+    #
+    # Return whether the field 'ip.sndqueue' is an array (False).
+    #
+    def isArray_ip_sndqueue(self):
+        return False
+    
+    #
+    # Return the offset (in bytes) of the field 'ip.sndqueue'
+    #
+    def offset_ip_sndqueue(self):
+        return (112 / 8)
+    
+    #
+    # Return the offset (in bits) of the field 'ip.sndqueue'
+    #
+    def offsetBits_ip_sndqueue(self):
+        return 112
+    
+    #
+    # Return the value (as a short) of the field 'ip.sndqueue'
+    #
+    def get_ip_sndqueue(self):
+        return self.getUIntElement(self.offsetBits_ip_sndqueue(), 8, 1)
+    
+    #
+    # Set the value of the field 'ip.sndqueue'
+    #
+    def set_ip_sndqueue(self, value):
+        self.setUIntElement(self.offsetBits_ip_sndqueue(), 8, value, 1)
+    
+    #
+    # Return the size, in bytes, of the field 'ip.sndqueue'
+    #
+    def size_ip_sndqueue(self):
+        return (8 / 8)
+    
+    #
+    # Return the size, in bits, of the field 'ip.sndqueue'
+    #
+    def sizeBits_ip_sndqueue(self):
+        return 8
+    
+    #
+    # Accessor methods for field: ip.encfail
+    #   Field type: short
+    #   Offset (bits): 120
+    #   Size (bits): 8
+    #
+
+    #
+    # Return whether the field 'ip.encfail' is signed (False).
+    #
+    def isSigned_ip_encfail(self):
+        return False
+    
+    #
+    # Return whether the field 'ip.encfail' is an array (False).
+    #
+    def isArray_ip_encfail(self):
+        return False
+    
+    #
+    # Return the offset (in bytes) of the field 'ip.encfail'
+    #
+    def offset_ip_encfail(self):
+        return (120 / 8)
+    
+    #
+    # Return the offset (in bits) of the field 'ip.encfail'
+    #
+    def offsetBits_ip_encfail(self):
+        return 120
+    
+    #
+    # Return the value (as a short) of the field 'ip.encfail'
+    #
+    def get_ip_encfail(self):
+        return self.getUIntElement(self.offsetBits_ip_encfail(), 8, 1)
+    
+    #
+    # Set the value of the field 'ip.encfail'
+    #
+    def set_ip_encfail(self, value):
+        self.setUIntElement(self.offsetBits_ip_encfail(), 8, value, 1)
+    
+    #
+    # Return the size, in bytes, of the field 'ip.encfail'
+    #
+    def size_ip_encfail(self):
+        return (8 / 8)
+    
+    #
+    # Return the size, in bits, of the field 'ip.encfail'
+    #
+    def sizeBits_ip_encfail(self):
+        return 8
+    
+    #
+    # Accessor methods for field: ip.heapfree
+    #   Field type: int
+    #   Offset (bits): 128
+    #   Size (bits): 16
+    #
+
+    #
+    # Return whether the field 'ip.heapfree' is signed (False).
+    #
+    def isSigned_ip_heapfree(self):
+        return False
+    
+    #
+    # Return whether the field 'ip.heapfree' is an array (False).
+    #
+    def isArray_ip_heapfree(self):
+        return False
+    
+    #
+    # Return the offset (in bytes) of the field 'ip.heapfree'
+    #
+    def offset_ip_heapfree(self):
+        return (128 / 8)
+    
+    #
+    # Return the offset (in bits) of the field 'ip.heapfree'
+    #
+    def offsetBits_ip_heapfree(self):
+        return 128
+    
+    #
+    # Return the value (as a int) of the field 'ip.heapfree'
+    #
+    def get_ip_heapfree(self):
+        return self.getUIntElement(self.offsetBits_ip_heapfree(), 16, 1)
+    
+    #
+    # Set the value of the field 'ip.heapfree'
+    #
+    def set_ip_heapfree(self, value):
+        self.setUIntElement(self.offsetBits_ip_heapfree(), 16, value, 1)
+    
+    #
+    # Return the size, in bytes, of the field 'ip.heapfree'
+    #
+    def size_ip_heapfree(self):
+        return (16 / 8)
+    
+    #
+    # Return the size, in bits, of the field 'ip.heapfree'
+    #
+    def sizeBits_ip_heapfree(self):
+        return 16
+    
+    #
+    # Accessor methods for field: route.hop_limit
+    #   Field type: short
+    #   Offset (bits): 144
     #   Size (bits): 8
     #
 
@@ -650,13 +1004,13 @@ class UdpReport(tinyos.message.Message.Message):
     # Return the offset (in bytes) of the field 'route.hop_limit'
     #
     def offset_route_hop_limit(self):
-        return (88 / 8)
+        return (144 / 8)
     
     #
     # Return the offset (in bits) of the field 'route.hop_limit'
     #
     def offsetBits_route_hop_limit(self):
-        return 88
+        return 144
     
     #
     # Return the value (as a short) of the field 'route.hop_limit'
@@ -685,7 +1039,7 @@ class UdpReport(tinyos.message.Message.Message):
     #
     # Accessor methods for field: route.parent.flags
     #   Field type: short
-    #   Offset (bits): 96
+    #   Offset (bits): 152
     #   Size (bits): 8
     #
 
@@ -705,13 +1059,13 @@ class UdpReport(tinyos.message.Message.Message):
     # Return the offset (in bytes) of the field 'route.parent.flags'
     #
     def offset_route_parent_flags(self):
-        return (96 / 8)
+        return (152 / 8)
     
     #
     # Return the offset (in bits) of the field 'route.parent.flags'
     #
     def offsetBits_route_parent_flags(self):
-        return 96
+        return 152
     
     #
     # Return the value (as a short) of the field 'route.parent.flags'
@@ -740,7 +1094,7 @@ class UdpReport(tinyos.message.Message.Message):
     #
     # Accessor methods for field: route.parent.neighbor
     #   Field type: int
-    #   Offset (bits): 104
+    #   Offset (bits): 160
     #   Size (bits): 16
     #
 
@@ -760,13 +1114,13 @@ class UdpReport(tinyos.message.Message.Message):
     # Return the offset (in bytes) of the field 'route.parent.neighbor'
     #
     def offset_route_parent_neighbor(self):
-        return (104 / 8)
+        return (160 / 8)
     
     #
     # Return the offset (in bits) of the field 'route.parent.neighbor'
     #
     def offsetBits_route_parent_neighbor(self):
-        return 104
+        return 160
     
     #
     # Return the value (as a int) of the field 'route.parent.neighbor'
@@ -795,7 +1149,7 @@ class UdpReport(tinyos.message.Message.Message):
     #
     # Accessor methods for field: route.parent.hops
     #   Field type: short
-    #   Offset (bits): 120
+    #   Offset (bits): 176
     #   Size (bits): 8
     #
 
@@ -815,13 +1169,13 @@ class UdpReport(tinyos.message.Message.Message):
     # Return the offset (in bytes) of the field 'route.parent.hops'
     #
     def offset_route_parent_hops(self):
-        return (120 / 8)
+        return (176 / 8)
     
     #
     # Return the offset (in bits) of the field 'route.parent.hops'
     #
     def offsetBits_route_parent_hops(self):
-        return 120
+        return 176
     
     #
     # Return the value (as a short) of the field 'route.parent.hops'
@@ -850,7 +1204,7 @@ class UdpReport(tinyos.message.Message.Message):
     #
     # Accessor methods for field: route.parent.costEstimate
     #   Field type: int
-    #   Offset (bits): 128
+    #   Offset (bits): 184
     #   Size (bits): 16
     #
 
@@ -870,13 +1224,13 @@ class UdpReport(tinyos.message.Message.Message):
     # Return the offset (in bytes) of the field 'route.parent.costEstimate'
     #
     def offset_route_parent_costEstimate(self):
-        return (128 / 8)
+        return (184 / 8)
     
     #
     # Return the offset (in bits) of the field 'route.parent.costEstimate'
     #
     def offsetBits_route_parent_costEstimate(self):
-        return 128
+        return 184
     
     #
     # Return the value (as a int) of the field 'route.parent.costEstimate'
@@ -905,7 +1259,7 @@ class UdpReport(tinyos.message.Message.Message):
     #
     # Accessor methods for field: route.parent.linkEstimate
     #   Field type: int
-    #   Offset (bits): 144
+    #   Offset (bits): 200
     #   Size (bits): 16
     #
 
@@ -925,13 +1279,13 @@ class UdpReport(tinyos.message.Message.Message):
     # Return the offset (in bytes) of the field 'route.parent.linkEstimate'
     #
     def offset_route_parent_linkEstimate(self):
-        return (144 / 8)
+        return (200 / 8)
     
     #
     # Return the offset (in bits) of the field 'route.parent.linkEstimate'
     #
     def offsetBits_route_parent_linkEstimate(self):
-        return 144
+        return 200
     
     #
     # Return the value (as a int) of the field 'route.parent.linkEstimate'
@@ -983,7 +1337,7 @@ class UdpReport(tinyos.message.Message.Message):
         offset = 0
         if index1 < 0 or index1 >= 1:
             raise IndexError
-        offset += 160 + index1 * 16
+        offset += 216 + index1 * 16
         return (offset / 8)
     
     #
@@ -993,7 +1347,7 @@ class UdpReport(tinyos.message.Message.Message):
         offset = 0
         if index1 < 0 or index1 >= 1:
             raise IndexError
-        offset += 160 + index1 * 16
+        offset += 216 + index1 * 16
         return offset
     
     #
@@ -1118,7 +1472,7 @@ class UdpReport(tinyos.message.Message.Message):
         offset = 8
         if index1 < 0 or index1 >= 1:
             raise IndexError
-        offset += 160 + index1 * 16
+        offset += 216 + index1 * 16
         return (offset / 8)
     
     #
@@ -1128,7 +1482,7 @@ class UdpReport(tinyos.message.Message.Message):
         offset = 8
         if index1 < 0 or index1 >= 1:
             raise IndexError
-        offset += 160 + index1 * 16
+        offset += 216 + index1 * 16
         return offset
     
     #
@@ -1230,7 +1584,7 @@ class UdpReport(tinyos.message.Message.Message):
     #
     # Accessor methods for field: route.parentmetric
     #   Field type: int
-    #   Offset (bits): 176
+    #   Offset (bits): 232
     #   Size (bits): 16
     #
 
@@ -1250,13 +1604,13 @@ class UdpReport(tinyos.message.Message.Message):
     # Return the offset (in bytes) of the field 'route.parentmetric'
     #
     def offset_route_parentmetric(self):
-        return (176 / 8)
+        return (232 / 8)
     
     #
     # Return the offset (in bits) of the field 'route.parentmetric'
     #
     def offsetBits_route_parentmetric(self):
-        return 176
+        return 232
     
     #
     # Return the value (as a int) of the field 'route.parentmetric'
@@ -1285,7 +1639,7 @@ class UdpReport(tinyos.message.Message.Message):
     #
     # Accessor methods for field: icmp.rx
     #   Field type: int
-    #   Offset (bits): 192
+    #   Offset (bits): 248
     #   Size (bits): 16
     #
 
@@ -1305,13 +1659,13 @@ class UdpReport(tinyos.message.Message.Message):
     # Return the offset (in bytes) of the field 'icmp.rx'
     #
     def offset_icmp_rx(self):
-        return (192 / 8)
+        return (248 / 8)
     
     #
     # Return the offset (in bits) of the field 'icmp.rx'
     #
     def offsetBits_icmp_rx(self):
-        return 192
+        return 248
     
     #
     # Return the value (as a int) of the field 'icmp.rx'
@@ -1340,7 +1694,7 @@ class UdpReport(tinyos.message.Message.Message):
     #
     # Accessor methods for field: udp.total
     #   Field type: int
-    #   Offset (bits): 208
+    #   Offset (bits): 264
     #   Size (bits): 16
     #
 
@@ -1360,13 +1714,13 @@ class UdpReport(tinyos.message.Message.Message):
     # Return the offset (in bytes) of the field 'udp.total'
     #
     def offset_udp_total(self):
-        return (208 / 8)
+        return (264 / 8)
     
     #
     # Return the offset (in bits) of the field 'udp.total'
     #
     def offsetBits_udp_total(self):
-        return 208
+        return 264
     
     #
     # Return the value (as a int) of the field 'udp.total'
@@ -1395,7 +1749,7 @@ class UdpReport(tinyos.message.Message.Message):
     #
     # Accessor methods for field: udp.failed
     #   Field type: int
-    #   Offset (bits): 224
+    #   Offset (bits): 280
     #   Size (bits): 16
     #
 
@@ -1415,13 +1769,13 @@ class UdpReport(tinyos.message.Message.Message):
     # Return the offset (in bytes) of the field 'udp.failed'
     #
     def offset_udp_failed(self):
-        return (224 / 8)
+        return (280 / 8)
     
     #
     # Return the offset (in bits) of the field 'udp.failed'
     #
     def offsetBits_udp_failed(self):
-        return 224
+        return 280
     
     #
     # Return the value (as a int) of the field 'udp.failed'
@@ -1450,7 +1804,7 @@ class UdpReport(tinyos.message.Message.Message):
     #
     # Accessor methods for field: udp.seqno
     #   Field type: int
-    #   Offset (bits): 240
+    #   Offset (bits): 296
     #   Size (bits): 16
     #
 
@@ -1470,13 +1824,13 @@ class UdpReport(tinyos.message.Message.Message):
     # Return the offset (in bytes) of the field 'udp.seqno'
     #
     def offset_udp_seqno(self):
-        return (240 / 8)
+        return (296 / 8)
     
     #
     # Return the offset (in bits) of the field 'udp.seqno'
     #
     def offsetBits_udp_seqno(self):
-        return 240
+        return 296
     
     #
     # Return the value (as a int) of the field 'udp.seqno'
@@ -1505,7 +1859,7 @@ class UdpReport(tinyos.message.Message.Message):
     #
     # Accessor methods for field: udp.sender
     #   Field type: int
-    #   Offset (bits): 256
+    #   Offset (bits): 312
     #   Size (bits): 16
     #
 
@@ -1525,13 +1879,13 @@ class UdpReport(tinyos.message.Message.Message):
     # Return the offset (in bytes) of the field 'udp.sender'
     #
     def offset_udp_sender(self):
-        return (256 / 8)
+        return (312 / 8)
     
     #
     # Return the offset (in bits) of the field 'udp.sender'
     #
     def offsetBits_udp_sender(self):
-        return 256
+        return 312
     
     #
     # Return the value (as a int) of the field 'udp.sender'

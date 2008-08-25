@@ -22,11 +22,14 @@
 #ifndef _IPDISPATCH_H_
 #define _IPDISPATCH_H_
 
-#include <lib6lowpanFrag.h>
+#include <message.h>
+#include <lib6lowpan.h>
 
 enum {
   N_PARENTS = 3,
   N_EPOCHS = 1,
+  N_RECONSTRUCTIONS = 2,
+  N_FORWARD_ENT = 3,
 };
 
 struct epoch_stats {
@@ -58,27 +61,70 @@ struct route_entry {
  ;
 #endif
 
+enum {
+  // store the top-k neighbors.  This could be a poor topology
+  // formation critera is very dense networks.  we may be able to
+  // really use the fact that the "base" has infinite memory.
+  N_NEIGH = 5,
+  N_FLOW_ENT = 6,
+  N_FLOW_CHOICES = 2,
+  T_INVAL_NEIGH = 0xfffe,
+};
+
+typedef struct {
+  hw_addr_t dest[N_FLOW_CHOICES];
+  uint8_t   current:4;
+  uint8_t   nchoices:4;
+  uint8_t   retries;
+  uint8_t   delay;
+} send_policy_t;
+
+typedef struct {
+  send_policy_t policy;
+  uint8_t frags_sent;
+  bool failed;
+  uint8_t refcount;
+} send_info_t;
+
+typedef struct {
+  send_info_t *info;
+  message_t  *msg;
+} send_entry_t;
+
+typedef struct {
+  uint8_t timeout;
+  hw_addr_t l2_src;
+  uint16_t old_tag;
+  uint16_t new_tag;
+  send_info_t *s_info;
+} forward_entry_t;
+
+// Need to add another entry to avoid useless padding
+//  Or can make sure that the flow_table has an even
+//  number of entries.
+struct flow_entry {
+  uint8_t flags;
+  cmpr_ip6_addr_t dest;
+  cmpr_ip6_addr_t next_hops[N_FLOW_CHOICES];
+};
+
+struct neigh_entry {
+  hw_addr_t neighbor;
+  uint16_t linkEstimate;
+};
+
+struct route_table {
+  uint8_t flags;
+  uint8_t path_len;
+  cmpr_ip6_addr_t dest;
+  cmpr_ip6_addr_t hops[5];
+};
 
 typedef enum {
   S_FORWARD,
   S_REQ,
 } send_type_t;
 
-typedef struct {
-  hw_addr_t dest;
-  uint8_t   retries;
-  uint8_t   delay;
-} send_policy_t;
-
-
-typedef struct {
-  ip_msg_t *msg;
-  uint16_t len;
-  fragment_t frag;
-  send_policy_t dest;
-  send_type_t type;
-  uint8_t attempt;
-} send_entry_t;
 
 typedef nx_struct {
   nx_uint16_t sent;
@@ -90,6 +136,12 @@ typedef nx_struct {
   nx_uint8_t real_drop;
   nx_uint8_t hlim_drop;
   nx_uint8_t senddone_el;
+  nx_uint8_t fragpool;
+  nx_uint8_t sendinfo;
+  nx_uint8_t sendentry;
+  nx_uint8_t sndqueue;
+  nx_uint8_t encfail;
+  nx_uint16_t heapfree;
 } ip_statistics_t;
 
 

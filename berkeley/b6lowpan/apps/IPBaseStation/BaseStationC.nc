@@ -108,6 +108,7 @@ implementation {
   BaseStationP.Leds -> LedsC;
 
   BaseStationP.PacketLink -> Radio;
+  BaseStationP.LowPowerListening -> Radio;
 
   components SerialDevConfC as Configure;
   BaseStationP.ConfigureSend -> Configure;

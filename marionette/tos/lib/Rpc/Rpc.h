@@ -45,6 +45,7 @@ enum rpcMsgs {
   AM_RPCCOMMANDMSG         = 211,
   AM_RPCRESPONSEMSG        = 212,
   //  AM_RPCERRORMSG        = 213
+  AM_RPCEVENTMSG           = 219
 };
 
 /*** error codes ***/
@@ -77,5 +78,13 @@ typedef struct RpcResponseMsg {
   nx_uint8_t      data[0];
 } __attribute__ ((packed)) RpcResponseMsg;
 
+typedef struct RpcEventMsg {
+  uint8_t     transactionID;   /*the id of the complete transaction*/
+  uint8_t     eventID;       /*the command that should be run*/
+  uint16_t     destinationAddress;        /*the address that this msg should be received by*/
+  uint16_t     sourceAddress;  /*the address that the return val should be sent to*/
+  uint8_t      dataLength;
+  uint8_t      data[0];
+} __attribute__ ((packed)) RpcEventMsg;
 
 #endif //__RPC_H__

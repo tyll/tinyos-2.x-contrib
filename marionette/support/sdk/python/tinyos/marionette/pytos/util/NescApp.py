@@ -39,6 +39,7 @@ class NescTypes( object ) :
     self.applicationName = applicationName
     self._typeNames = []
     self._types = {}
+    self._callbackTypes = {}
 
     #figure out the sizes of all the basic types for this platform (by scanning the xml file)
     platformTypes = {}

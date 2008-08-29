@@ -168,7 +168,7 @@ Be sure that you supplied the correct buildDir parameter \"%s\".
 
     # Import the rpc commands and ram symbols
     try:
-      self.rpc = Rpc.Rpc(self)
+      self.rpc = Rpc.Rpc(self, comm=self.connections[0])
     except Exception, e:
       if len(e.args)>0 and re.search("WARNING: cannot find file", e.args[0]) > 0 :
         print  e.args[0]

@@ -720,8 +720,6 @@ class Message ( nescStruct ) :
       return self.getBytes()
 
 
-
-
 def getUniqueChild(xmlDefinition) :
   child = None
   for childNode in xmlDefinition.childNodes :

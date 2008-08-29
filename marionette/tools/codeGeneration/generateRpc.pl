@@ -115,6 +115,7 @@ my %requiredFunctions;
 my %requiredEventFunctions;
 my %requiredCommandFunctions;
 my %allFunctions;
+my $registerID;
 my $fullName;
 my $shouldDie=0;
 
@@ -181,7 +182,6 @@ if ($shouldDie == 1) { die "Too many errors.";}
 
 %requiredFunctions = (%requiredEventFunctions, %requiredCommandFunctions);
 %allFunctions = (%requiredFunctions, %rpcFunctions);
-my $numCallbackFunctions = scalar(keys %requiredEventFunctions);
 
 ##############################
 # Number the rpc functions alphabetically
@@ -195,14 +195,16 @@ for $fullName (sort keys %rpcFunctions ) {
 }
 
 ##############################
-# Add callback variable to appropriate functions
+# Do the same as the above except for callback
 ##############################
 
 $count = 0;
-for $fullName (sort keys %requiredEventFunctions ) {
+for $fullName (sort keys %requiredFunctions ) {
     $rpc = $requiredFunctions{$fullName};
     $rpc->{'callbackID'} = $count++;
 }
+
+my $numEventFunctions = $count-1;
 
 ##############################
 # print out the parsed info for debugging/user knowledge.
@@ -283,14 +285,48 @@ if ($useLeds) {
     $led1Toggle = "call Leds.led1Toggle();";
     $led2Toggle = "call Leds.led2Toggle();";
 }
+
+##############################
+# Generate the RpcEventMsgs.h file
+##############################
+
+$s = "enum rpcEventMsgs {\n";
+
+$count = 0;
+for $fullName (sort keys %requiredEventFunctions) {
+    $rpc = $requiredEventFunctions{$fullName};
+    $s .= "  AM_" . uc($rpc->{'functionName'}) . "EVENTMSG = " . $count++ . "\n";
+};
+
+$s .= "};\n\n";
+
+for $fullName (sort keys %requiredEventFunctions) {
+    $rpc = $requiredEventFunctions{$fullName};
+    $s .= "typedef struct $rpc->{'functionName'}EventMsg {\n";
+    $params = $rpc->{"params"};
+    for ($count=0; $count < $rpc->{'numParams'} ; $count++)
+    {
+	$s = sprintf "%s  %s %s;\n", $s, $params->{"param$count"}->{'type'}->{'typeDecl'},  $params->{"param$count"}->{'name'};
+    }
+    $s .= "};\n\n";
+}
+
+#send the generated code out to a file
+my $backsp = sprintf "\b";
+$s =~ s/.$backsp//g;
+open(RPCM, ">${DestDir}RpcEventMsgs.h");
+print RPCM "$G_warning$s";
+close(RPCM);
+
+
 ##############################
 # Generate the RpcM.nc file
 ##############################
 
 $includes->{'/*#ifndef RPC_NO_DRAIN
-includes Drain; 
+includes Drain;
 #endif // !RPC_NO_DRAIN*/'}=1;
-$includes->{'includes Rpc;'}=1;
+$includes->{'includes Rpc;\nincludes RpcEventMsgs;'}=1;
 
 $s = "#ifndef TOSH_DATA_LENGTH
 #define TOSH_DATA_LENGTH 28
@@ -448,9 +484,10 @@ implementation {
   uint16_t cmdStoreLength;
   uint16_t queryID;
   uint16_t returnAddress;
+  uint16_t callbackAddress;
   bool processingCommand;
   bool sendingResponse;
-  bool callbackEnabled[$numCallbackFunctions];
+  bool callbackEnabled[$numEventFunctions];
 
   static const uint8_t args_sizes[$num_rpcs] = {
 $rpc_args_elems
@@ -464,7 +501,7 @@ $rpc_return_elems
     responseMsgPtr = &responseMsgBuf;
     processingCommand=FALSE;
     sendingResponse=FALSE;
-    memset((void*)&callbackEnabled, 0, sizeof(bool)*$numCallbackFunctions);
+    memset((void*)&callbackEnabled, 0, sizeof(bool)*$numEventFunctions);
 /*#ifndef RPC_NO_DRIP
     call CommandDrip.init();
 #endif // !RPC_NO_DRIP*/
@@ -629,6 +666,8 @@ for $fullName (sort keys %rpcFunctions ) {
 }
 #phew!
 
+
+
 $s = sprintf "%s
     default:
         //dbg(DBG_USR2, \"found no rpc function\\n\");
@@ -767,6 +806,7 @@ $s = sprintf "%s
 #now, print out all the provided events or uses commands that are required
 for my $requiredFunc (values %requiredFunctions) {
     
+    $params = $requiredFunc->{'params'};
     my $async = "";
     if ($requiredFunc->{async})
     {
@@ -778,22 +818,41 @@ for my $requiredFunc (values %requiredFunctions) {
 		  $requiredFunc->{componentName}."_".$requiredFunc->{interfaceName},
 		  $requiredFunc->{functionName});
     for my $param (values %{$requiredFunc->{params}}) {
-	$s .= " $param->{type}->{typeDecl} $param->{name},";
+	$s .= sprintf(" %s %s,", $param->{type}->{typeDecl}, $param->{name});
     }
-    $s .= "\b) {\n";
-
+    $s .= sprintf("\b) {\n");
     if ($requiredFunc->{functionType} eq 'event') {
-	$s .= "    RpcCommandMsg* msg = (RpcCommandMsg*)cmdStore.data;
-    uint8_t* byteSrc = (uint8_t*)msg->data;
+	$s .= sprintf("    $requiredFunc->{functionName}EventMsg* responseMsg = ($requiredFunc->{functionName}EventMsg*) malloc(sizeof($requiredFunc->{functionName}EventMsg));
+    uint8_t* byteSrc;
     uint16_t maxLength;
-    uint16_t id = msg->commandID;
-    RpcResponseMsg *responseMsg = (RpcResponseMsg*)(responseMsgPtr->data);
+    uint16_t id = %s;
+    uint8_t msgSize;
+
+    msgSize = 0;
+", $requiredFunc->{callbackID});
+
+    for my $param (values %{$requiredFunc->{params}})
+    {
+        $s .= sprintf("    msgSize += sizeof($param->{name}); \n");
+    }
+
+    $s .= sprintf("    byteSrc = (uint8_t*) responseMsg->data;\n");
+
+    for ( $count=0 ; $count < $requiredFunc->{numParams} ; $count++)
+    {
+        my $name = $params->{"param$count"}{name};
+        my $type = $params->{"param$count"}{type}{typeName};
+        $s .= "    memmove( byteSrc, &$name, sizeof($type) );\n";
+	$s .= "    byteSrc += sizeof($type);\n" if $count != ($rpc->{numParams}-1);
+    }
+
+    $s .= sprintf("
     maxLength = TOSH_DATA_LENGTH;
 
     /*** now send the response message off if necessary ***/
     if(callbackEnabled[$requiredFunc->{'callbackID'}]) {
     //dbg(DBG_USR2, \"errorCode=%s,dataLength=%s\\n\",responseMsg->errorCode, responseMsg->dataLength);
-    //dbg(DBG_USR2, \"sizeof( RpcResponseMsg ) = %s, data-transactionID= %s\\n\",sizeof (RpcResponseMsg),((uint32_t)&(responseMsg->data[0]) - (uint32_t)&(responseMsg->transactionID)));
+    //dbg(DBG_USR2, \"sizeof( $requiredFunc->{functionName}EventMsg ) = %s, data-transactionID= %s\\n\",sizeof ($requiredFunc->{functionName}EventMsg),((uint32_t)&(responseMsg->data[0]) - (uint32_t)&(responseMsg->transactionID)));
  /*   if (responseMsg->errorCode == RPC_SUCCESS && responseMsg->dataLength==0){
       //dbg(DBG_USR2, \"done processing, no return args\\n\");
       processingCommand=FALSE;
@@ -802,7 +861,7 @@ for my $requiredFunc (values %requiredFunctions) {
       //calculate the size to be the size of the data I just added 
       //plus the size of the responseMsg less the data array (the data array 
       //can sometimes take space due to compiler packing)
-      if (call ResponseSendMsgDrain.send(msg->returnAddress,
+      if (call ResponseSendMsgDrain.send(returnAddress,
 				    responseMsg->dataLength + ( (uint32_t)&(responseMsg->data[0]) - (uint32_t)&(responseMsg->transactionID)),
 				    responseMsgPtr) ){
         //dbg(DBG_USR2, \"sending response\\n\");
@@ -814,11 +873,7 @@ for my $requiredFunc (values %requiredFunctions) {
       }
     }
     else{*/
-      if (msg->responseDesired == 0){
-        //dbg(DBG_USR2, \"no response desired; not sending response message\");
-        processingCommand=FALSE;
-      }
-      else if (call AMSend.send(msg->returnAddress, responseMsgPtr, responseMsg->dataLength + sizeof(RpcResponseMsg)) ){
+      if (call AMSend.send(callbackAddress, responseMsgPtr, responseMsg->dataLength + sizeof($requiredFunc->{functionName}EventMsg)) ){
         //dbg(DBG_USR2, \"sending response\\n\");
         sendingResponse=TRUE;
         $led2Toggle
@@ -831,17 +886,17 @@ for my $requiredFunc (values %requiredFunctions) {
 //    }
     //dbg(DBG_USR2, \"done processing.\\n\");
     }
-  ";
+  ");
     }
     
-    $s .= "}\n";
+    $s .= sprintf("}\n");
 }
 
-$s .= "\n}
-";
+$s .= sprintf("\n}
+");
 
 #send the generated code out to a file
-my $backsp = sprintf "\b";
+$backsp = sprintf "\b";
 $s =~ s/.$backsp//g;
 open(RPCM, ">${DestDir}RpcM.nc");
 print RPCM "$G_warning$s";
@@ -854,6 +909,7 @@ close(RPCM);
 ##############################
 
 $s = "includes Rpc;
+includes RpcEventMsgs;
 
 configuration RpcC {
   provides {

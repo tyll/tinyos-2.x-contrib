@@ -38,6 +38,7 @@ f.secondParam = 'abc'
 f()
 """
 
+import pdb
 import sys, string, time, types, os
 from xml.dom import minidom
 import pytos.util.nescDecls as nescDecls
@@ -173,7 +174,87 @@ class RpcFunction( RoutingMessages.RoutingMessage ) :
     self.parent.receiveComm.unregister(self.parent.app.msgs.RpcResponseMsg, RpcResponseListener(self.parent.app, self.responseMsg, listener, self.nescType, self.__call__.__hash__), *comm)
 
 
+class CallbackFunction( RpcFunction ):
 
+  def __init__(self, xmlDefinition=None, parent=None) :
+    if xmlDefinition==None :
+      return
+    self.responseMsg = None
+    #start creating the arguments to the nescStruct constructor.
+    #first, add the command msg name and the rpc headers
+    structArgs = []
+    structArgs.append(xmlDefinition.getAttribute("functionName"))
+    structArgs.append( ("rpcHeader", parent.app.types.RpcCommandMsg) )
+    #then, add each parameter as a new msg field 
+#    for i in range(int(xmlDefinition.getAttribute("numParams"))) :
+#      param = xmlDefinition.getElementsByTagName("param%d" % i)
+#    paramName = param[0].getAttribute("name")
+#      paramType = parent.app.types[
+#        param[0].getElementsByTagName("type")[0].getAttribute("typeName")]
+#      structArgs.append( (paramName, paramType) )
+
+    self.commandID = int(xmlDefinition.getAttribute("callbackID"))
+    self.componentName = xmlDefinition.getAttribute("componentName")
+
+    #turn the response type into a response msg (to be received by the user)
+#    responseType = nescDecls.nescStruct(*structArgs)
+    self.responseMsg = nescDecls.Message(int(self.commandID), parent.app.types[xmlDefinition.getAttribute("functionName") + "EventMsg"])
+
+    #now initialize this command as a Message object (which is really a nescStruct)
+    RoutingMessages.RoutingMessage.__init__(self, parent,
+                                            parent.app.enums.AM_RPCCOMMANDMSG, *structArgs[:1])
+    #fill in the header fields once and for all
+#    self.rpcHeader.commandID = int(xmlDefinition.getAttribute("commandID"))
+#    self.rpcHeader.dataLength = self.size - self.rpcHeader.size
+
+
+  def __call__(self):
+    print "Event Callback function cannot be called\nRegister a listener with this function using .registerCallback(listener)"
+
+  def registerCallback(self, listener):
+#    self.register(listener)
+    self.parent.app.ramSymbols._messages["RpcM.callbackEnabled"].poke(1, arrayIndex=self.commandID-1)
+
+  def unregisterCallback(self, listener):
+#    self.unregister(listener)
+    self.parent.app.ramSymbols._messages["RpcM.callbackEnabled"].poke(0, arrayIndex=self.commandID-1)
+
+class RpcEventDispatcher( ):
+
+  def __init__(self, app, eventMsg, rpcName, comm):
+    pdb.set_trace()
+    self.app = app
+    self.eventMsg = eventMsg
+    self.rpcName = rpcName
+    app.rpc.receiveComm.register(app.msgs.RpcEventMsg, self, *comm)
+    listeners = {}
+    for name in app.enums.rpcEventMsgs._enums:
+      listeners[name] = []
+
+  def registerListener(self, listener, eventMsgNum) :
+    curEventListener = app.enums.rpcEventMsg._enums[eventMsgNum]
+    if listener not in curEventListener:
+      listeners[curEventListener].append(listener)
+
+  def unregisterListener(self, listener, eventMsgNum) :
+    curEventListener = app.enums.rpcEventMsg._enums[eventMsgNum]
+    if listener in curEventListener:
+      listeners[curEventListener].remove(listener)
+
+  def receive(self, address, msg):
+    if msg.commandID == self.Msg.amType :
+      if msg.errorCode == self.app.enums.RPC_SUCCESS :
+        event = deepcopy(self.eventMsg)
+        event.setBytes( msg.data.getBytes() )
+        event.parentMsg = msg
+        event.nescType = "".join( [self.rpcName,
+                                      ",  nodeID=%d"%event.parentMsg.sourceAddress] )
+        for listener in listeners:
+          self.listener.messageReceived( addr, event )
+      else :
+        for listener in listeners:
+          self.listener.messageReceived( addr, msg )
+    
 
 class RpcResponseListener( ):
 
@@ -235,7 +316,10 @@ class Rpc( RoutingMessages.RoutingMessages) :
 
     schema = minidom.parse(nescDecls.findBuildFile(app.buildDir, "rpcSchema.xml"))
     functions, = schema.childNodes[0].getElementsByTagName("rpcFunctions")
+    callbacks, = schema.childNodes[0].getElementsByTagName("callbackFunctions")
     functions = [node for node in functions.childNodes if node.nodeType == 1]
+    callbacks = [node for node in callbacks.childNodes if node.nodeType == 1]
     for funcDef in functions: 
       self._messages[funcDef.tagName] = RpcFunction(funcDef, self)
-
+    for callbackDef in callbacks:
+      self._messages[callbackDef.tagName] = CallbackFunction(callbackDef, self)

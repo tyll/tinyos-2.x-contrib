@@ -254,7 +254,7 @@ my $xs1 = XML::Simple->new();
 
 my %xmlOutHash = ();
 $xmlOutHash{'rpcFunctions'} = \%rpcFunctions;
-$xmlOutHash{'callbackFunctions'} = \%requiredEventFunctions;
+#$xmlOutHash{'callbackFunctions'} = \%requiredEventFunctions;
 my %tmpHash = ();
 #$tmpHash{'struct'} = $structs;
 #$xmlOutHash{'structs'} = \%tmpHash;
@@ -807,7 +807,9 @@ $s = sprintf "%s
 for my $requiredFunc (values %requiredFunctions) {
     
     $params = $requiredFunc->{'params'};
+
     my $async = "";
+
     if ($requiredFunc->{async})
     {
 	$async = "async";
@@ -821,6 +823,7 @@ for my $requiredFunc (values %requiredFunctions) {
 	$s .= sprintf(" %s %s,", $param->{type}->{typeDecl}, $param->{name});
     }
     $s .= sprintf("\b) {\n");
+
     if ($requiredFunc->{functionType} eq 'event') {
 	$s .= sprintf("    $requiredFunc->{functionName}EventMsg* responseMsg = ($requiredFunc->{functionName}EventMsg*) malloc(sizeof($requiredFunc->{functionName}EventMsg));
     uint8_t* byteSrc;

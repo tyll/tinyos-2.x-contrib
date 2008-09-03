@@ -31,8 +31,11 @@ package com.rincon.tunit.run;
  * OF THE POSSIBILITY OF SUCH DAMAGE
  */
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.text.ParseException;
 import java.util.Map;
 
@@ -136,6 +139,8 @@ public class TestRunner {
       return;
     }
 
+    createTunitPathFile();
+    
     report = new TestReport(testRunProperties, aggregatedSuiteProperties,
         packageId);
 
@@ -165,15 +170,12 @@ public class TestRunner {
 
     CmdFlagExecutor.executeCmdFlag("start", suiteProperties.getStartCmd(),
         report);
-
     
-    log.debug("Running test"); new ResultCollector(report, runProperties,
-    suiteProperties, testMap, statsMap, assertionMap);
+    log.debug("Running test"); 
+    new ResultCollector(report, runProperties, suiteProperties, testMap, statsMap, assertionMap);
     
-
     CmdFlagExecutor
         .executeCmdFlag("stop", suiteProperties.getStopCmd(), report);
-
     
     log.debug("Disconnecting serial forwarders");
     testManager.disconnectAll();
@@ -436,5 +438,30 @@ public class TestRunner {
     }
     
     return returnString + packageDir;
+  }
+  
+  /**
+   * Create a file in the local test directory 
+   */
+  private void createTunitPathFile() {
+	  File outFile = new File(buildDirectory, ".tunitPath");
+	  if(outFile.exists()) {
+		  outFile.delete();
+	  }
+    
+	  PrintWriter out;
+    try {
+      out = new PrintWriter(
+              new BufferedWriter(new FileWriter(outFile)));
+
+      
+      String reportDirectory = TUnit.getStatsReportDirectory().getAbsolutePath() + File.separatorChar + StatisticsReport.generateStatsSubDirectory(runProperties.getName(), buildDirectory);
+      
+      out.write(reportDirectory + "\n");
+      out.close();
+      
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
 }

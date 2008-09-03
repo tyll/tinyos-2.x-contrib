@@ -224,7 +224,7 @@ public class StatisticsReport {
    * @param packageId
    * @return
    */
-  private static String generateStatsSubDirectory(String testRunName, File buildDirectory) {
+  public static String generateStatsSubDirectory(String testRunName, File buildDirectory) {
     String directory = "";
     
     if(testRunName == null) {

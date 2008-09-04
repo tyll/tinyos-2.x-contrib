@@ -29,6 +29,7 @@ public class CmdFlagExecutor {
         
         TestResult result = new TestResult("@cmd " + type + " " + command + " " + output);
         
+        
         if(CmdExec.lastExitVal > 0) {
           log.error(output);
           result.error("@cmd " + type + " error", "Exit value was " + CmdExec.lastExitVal + " when executing: @cmd " + type + " " + command + "\n\n" + output);
@@ -38,6 +39,7 @@ public class CmdFlagExecutor {
         }
         
         report.addResult(result);
+        report.addSystemOut("@cmd " + type + " " + command + "\n" + output);
         
       } catch (IOException e) {
         log.fatal("Fatal error running " + type + " cmd " + command

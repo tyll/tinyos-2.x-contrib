@@ -88,6 +88,12 @@ public class TestReport {
   /** True if we've previously logged this suite as needing to rerun */
   private boolean rerunLogged;
   
+  /** System output to be logged in addition to test results */
+  private String systemOut;
+  
+  /** System errors to be logged in addition to test results */
+  private String systemErr;
+  
   /**
    * Constructor
    * 
@@ -106,6 +112,8 @@ public class TestReport {
     totalFailures = 0;
     totalErrors = 0;
     rerunLogged = false;
+    systemOut = "";
+    systemErr = "";
     results = new ArrayList();
     lastTime = System.currentTimeMillis();
   }
@@ -127,6 +135,14 @@ public class TestReport {
     results.add(result);
   }
 
+  public void addSystemOut(String out) {
+    systemOut += out + "\n\n"; 
+  }
+
+  public void addSystemErr(String err) {
+    systemErr += err + "\n\n";
+  }
+  
   public TestResult getTestResult(int i) {
     return (TestResult) results.get(i);
   }
@@ -159,6 +175,14 @@ public class TestReport {
     return results.size();
   }
 
+  public String getSystemOut() {
+    return systemOut;
+  }
+  
+  public String getSystemErr() {
+    return systemErr;
+  }
+  
   /**
    * 
    * @return List of TestResult errors and failures encountered by the entire

@@ -1,16 +1,29 @@
 <html>
 <head>
-   <title>Index Placeholder</title>
+   <title>ECH2O-TE Telos Interface</title>
 </head>
-<body TEXT="#000000" BGCOLOR="#FFFFFF" LINK="#0000EF" VLINK="#55188A" ALINK="#FF0000">
+<body TEXT="#000000" BGCOLOR="#FFFFFF" LINK="#0000EF" VLINK="#55188A" 
+ALINK="#FF0000">
 
-<img src="http://www.tinyos.net/scoop/images/tos-jwall.jpg"></img>
+<h2>ECH<sub>2</sub>O-TE Telos Interface</h2>
+<a href="http://impact.asu.edu">Impact Lab</a><br> 
+<a href="http://www.asu.edu">Arizona State University</a>
 
-<h1>Index Placeholder</h1>
-
-<p>
-This file is a placeholder for your personal index file.  It is linked to from your entry in the main index file found in <i>tinyos-2.x-contrib/index.html</i>.  It should be used to document any projects contained in this directory.  Please update it as appropriate. 
-</p>
+<h3>Overview</h3>
+<p>This contribution is an interface to a Decagon Devices 
+<a href="http://www.decagon.com/ag_research/soil/5te.php">ECH2O-TE</a> soil probe 
+from a TelosB class mote. The contribution includes two parts -- hardware and
+software.
+<ul>
+<li>The hardware contribution is a <a href="http://impact.asu.edu/soil/probe-interface.html">
+detailed description</a> of the circuitry we used to interface the TE stereo plug with the
+TelosB's UART and ADC pins.</li>
+<li>The software portion is the TinyOS module to drive the hardware interface.
+See the module and configuration comments for details.</li>
+</ul>
+The end result is a Read interface that provides 
+the TE's dielectric (moisture), temperature, and conductivity readings.</p>
 
 </body>
 </html>
+

@@ -82,7 +82,9 @@ implementation {
   }
 
   async event void UartStream.sendDone(uint8_t* buf, uint16_t len, error_t e) {
-    atomic m_state = S_FREE;
+    if (buf == m_buf) {
+      atomic m_state = S_FREE;
+    }
   }
 
   async event void UartStream.receivedByte(uint8_t byte) {

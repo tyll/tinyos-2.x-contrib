@@ -328,6 +328,7 @@ implementation {
     assertFalse("", FALSE);
     assertNull(NULL);
     assertNotNull(NULL);
+    setTestName(NULL);
   }
   
   /***************** ActiveMessageAddress Events ****************/

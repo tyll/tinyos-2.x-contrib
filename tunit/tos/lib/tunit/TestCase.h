@@ -52,6 +52,9 @@ static void assertResultIsAboveFailed(char *failMsg, uint32_t lowerbound, uint32
 static void assertTunitSuccess(uint8_t assertionId);
 static void assertTunitFail(char *failMsg, uint8_t assertionId);
 
+/***************** TUnit Private Internal Functions ****************/
+static void setTUnitTestName(char *name);
+#define setTestName(x) setTUnitTestName(x);
 
 /***************** Public Assertion Definitions ***************/
 /**

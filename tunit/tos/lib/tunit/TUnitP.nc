@@ -230,6 +230,12 @@ implementation {
     }
   }
   
+  /**
+   * Compatibility with TUnit UART mode
+   */
+  void setTUnitTestName(char *name) __attribute__((noinline)) @C() @spontaneous() {
+  }
+  
   /***************** Setup and Teardown Commands ****************/
   command void SetUpOneTime.done() {
     setUpOneTimeDone();

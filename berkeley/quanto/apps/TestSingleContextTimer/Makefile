@@ -1,0 +1,3 @@
+COMPONENT=TestSingleContextTimerAppC
+include $(MAKERULES)
+

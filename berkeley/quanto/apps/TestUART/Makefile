@@ -1,0 +1,7 @@
+COMPONENT=TestUARTAppC
+
+
+#CFLAGS += -DNO_TIMER_A1_ACT_CTX
+
+include $(MAKERULES)
+

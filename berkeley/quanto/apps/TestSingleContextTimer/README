@@ -1,0 +1,40 @@
+This test exercises context carrying:
+ - for the CPU, LED0, and LED1
+ - across Tasks, Timers, and from Interrupts
+
+The main app starts up to activities, A and B, which 
+turn on the LED0 and LED2, respectively, at random intervals.
+
+Usage: 
+ - program a TELOS mote (epic should work as well, as we don't use flash)
+ - run Listen, output to a file
+ - run read_log.py on the output
+
+You will see something like the following, indicating the context changes.
+
+           
+log_type 1 296 records
+log_type 2 ctx_change normal t(us): 0 cpu 0:1 -> 0:2 
+log_type 2 ctx_change normal t(us): 213 cpu 0:2 -> 0:49 
+log_type 2 ctx_change normal t(us): 335 cpu 0:49 -> 0:2 
+log_type 2 ctx_change normal t(us): 427 cpu 0:2 -> 0:3 
+...
+
+log_type 2 ctx_change normal t(us): 0 cpu 0:1 -> 0:2 
+
+means that at time 0us (relative to the start of the log),
+           there was a change of context for the resource 'cpu'
+           from 0:1 -> 0:2. <node>:<activity> -> <node>:<activity>
+
+
+
+-------------------- 
+This is probably the first interesting test:
+  - it shows how different resources are used by different contextx over time.
+  - this is the first use of the SingleContext interface, for resources that can only have
+    one Context at a time.
+
+Old info
+  - process.pl produces a graph that shows the resouces' contexts over time. 
+
+

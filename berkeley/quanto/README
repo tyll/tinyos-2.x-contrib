@@ -1,0 +1,179 @@
+Quanto is a framework for activity and resource usage tracking in TinyOS 2.x
+
+THIS IS EXPERIMENTAL CODE. NO WARRANTY IS GIVEN OR IMPLIED THAT IT
+WILL EVEN WORK FOR YOU. See LICENSE for more details.
+
+Authors: Rodrigo Fonseca and Prabal Dutta
+
+
+Using Quanto:
+ * Currently instrumented are TinyOS 2 platforms that use the MSP430
+   and the CC2420 (tested on TelosB and Epic)
+ * Ideally you need a mote that has iCount (some Epic boards do). If
+   you don't have iCount, then you will get no energy readings, just
+   activity and timings
+ * The logging system is quite poor in this version. It logs 700
+   messages to RAM and then dumps it to the UART.
+
+Setup
+  1. Go to the root of the downloaded quanto code (e.g.,
+    contrib/berkeley/quanto), and run 'source quanto_setup.sh'
+  Here's what it does:
+
+export QUANTO_ROOT=`pwd`
+export TOSMAKE_PATH="$QUANTO_ROOT/support/make"
+export PATH=$QUANTO_ROOT/tools/quanto/scripts:$PATH
+ 
+  Quanto currently shadows a large number of files from the
+  tinyos distribution, by using an extra make target.
+  To make a quanto-enabled application you should type, for example
+
+    make telosb quanto
+  
+  2. The other thing you have to do is to build the python auxiliary
+  files. All they do is pull out constants and log entry formats from 
+  the nesc files, so humans can understand what is being spit out.
+  
+  Go to $QUANTO_ROOT/tools/quanto/scripts and run make
+
+  3. You can now compile a sample application and make sure that you
+  can get a simple log.
+  Go to $QUANTO_ROOT/apps/Blink and type
+
+  make telosb quanto
+
+  Install the app. Your mote should blink.
+  Now start the java Listen program. For example (adjust the MOTECOM
+  part for your system/mote. This is how I do it on MacOS X):
+
+  MOTECOM=serial@/dev/tty.usbserial-A9004vNb:telos java net.tinyos.tools.Listen | tee log
+
+  Now press the User Button on the Telos, and wait for 30 seconds.
+  At some point the serial light will stay on for a few seconds, and
+  you should see a log. 
+
+  You can now take a look at the log. Type
+  
+  read_log.py < log > log.parsed
+
+  And then
+  
+  process.pl -f log.parsed 
+
+  Open log.parsed.pdf and behold a timeline of what happened to
+  Blink during those precious seconds.
+
+
+ * System components/abstractions instrumented:
+   Activity:
+   Tasks:
+     Posting a task with an CPU activity A set guarantees that when the
+     task executes the CPUContext will be executing under activity A
+   Timers: (VirtualizedTimer)
+     Timers will correctly carry activities when you set them.
+     Internally, they bind interrupts to a VTimer activity.
+   Arbiters:
+     Arbiters correctly carry the CPU activity, meaning that the
+     activity the CPU will have when the resource is granted is
+     the same as when the request was made.
+     Optionally, you can also "paint" the Resource the arbiter is
+     controlling with the same activity!
+     Examples of Arbiters that are working are the cc2420SPI bus,
+     and the USART buses.
+   Packets:
+     Sending an ActiveMessage packet makes the receive on the other
+     side bind to the activity on the sender when calling send.
+     sendDone returns the CPU context to the activity in effect when
+     send was posted
+   UART:
+     sendDone returns the CPU context to the activity in effect when 
+     send was posted
+   Interrupts:
+     Interrupts on the MSP430 are all instrumented. Each interrupt
+     has a PROXY activity that should be BOUND to a real activity as
+     soon as is appropriate.
+     Examples of binding: receive AM binds to the sending Activity,
+     sendDone binds to the sending activity, the timer interrupt is 
+     bound to VTimer
+   LEDs:
+     LEDs are implement MultiActivity contexts, meaning that they
+     can be shared by more than one activity. The cost should be
+     shared among those.
+   PowerStates
+   MCU:
+     MCU powerstate is currently inferred from the presence/absence
+     of activities in post-processing. We can instrument the lower
+     power states as well, though this is not done.
+   LEDs:
+     The LED components also track power states. Each LED can be on
+     or off.
+   CC2420:
+     The CC2420 has a number of different powerstates. We currently
+     track multiple bits: Starting, Stopping, Rx, Tx, RxFifo,
+     TxFifo, Listen. Tx actually has 8 different power levels for
+     transmission. Listen dominates all other power sinks!
+
+
+Introduction
+
+Quanto's main focus is to establish logical threads of execution
+(activities), and assign time and energy usage to them. These
+activities span different hardware peripherals and even different
+nodes.
+
+An activity corresponds to a logical thread of execution, a set of
+operations that are causally related, and whose resource consumption
+should be grouped together. Activities are the 'resource principals'
+in the core OS. A resources, as used here, is something of which
+there is a limited supply, like CPU time or energy.
+
+TinyOS has no notion of an execution thread or process, and even if
+it did, these are not always the right abstraction to use for
+resource accounting. Even in traditional OSs, where the resource
+principals are the threads or processes, there are  some situations
+in which there is a mismatch in these concepts. For example, in a
+thread pool in which a thread is reused to serve different requests,
+the resources should be really accounted to each request (a logical
+activity), instead of to the threads that change activities over
+time. In other cases, an activity might involve several processes
+and kernel resources, and their usage should be accounted for
+together.
+
+Activities can span several hardware components, and also span
+different nodes.
+
+The main resource we are interested in is energy. We want to know
+where the energy in your system is going, both in terms of hardware
+components and activities.
+
+Quanto tracks power states of each hardware component over time, and
+is able to compute how much time each component was on each power
+state, and on behalf of which activities.
+
+This information is combined with a power draw estimate for
+each powers state, to determine where the energy was spent. These
+estimates can be derived from real-time measurements using the
+iCount metering system, or could be derived from a previously
+measured model. 
+
+iCount allows one to measure the energy consumption of the entire
+mote in a very efficient way, thus making the former approach
+feasible. This is the approach we take in Quanto.
+
+Usage:
+If you are an application writer, you have to create new activity_t's
+for meaningful activities in your application.
+
+You have then to set the CPUContext activity appropriately before starting each one.
+Quanto will propagate the activity automatically  across task invocations,
+arbiters, timers, and network messages. It will also propagate the activities to other
+resources, like the radio, the leds, and the sht11 in the telos/epic platforms.
+
+
+Implementation
+More to come...
+
+
+
+
+

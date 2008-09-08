@@ -1,0 +1,33 @@
+This application measures the time for a CPUContext.set() call
+differently from Burst1, by setting two lines in the processor.
+It requires a high-res scope :)
+
+
+Variations:
+ - no-log: logger not in S_LOG state, checks state and returns.
+   Measures the overhead of calling the function
+ - normal: complete log call, including reading the time and icount
+ - icount only: no call to time, only icount
+ - time only: no call to icount, time only
+ 
+Results:
+ - normal:         102.7us +- 24.6ns
+ - time-only:       78.80us +- 24ns
+ - icount-only:     83.54us +- 23.2ns
+
+Other measurement: ran the IcountReadLatency experiment from the
+icount paper. 
+ - iCount paper test: 16.18us +- 20ns
+
+These measurements do NOT discount the time to set the pin high.
+Prabal eariler found this to be 1us.
+
+This difference is most likely due to the test in the iCount paper
+not assign the value read from icount to a variable. The test in the
+Context code assigns it to a variable in memory.
+Looking at the assembly code shows that the latter case has two add
+instructions (to the base in the icount counter), plus to move
+instructions, plus one more clr instruction.
+
+
+

@@ -1,0 +1,24 @@
+#QUANTO_ROOT is contrib/quanto/
+PFLAGS +=  -I. \
+          -I$(QUANTO_ROOT)/tos/lib/quanto \
+          -I$(QUANTO_ROOT)/tos/lib/quanto/SingleContext\
+          -I$(QUANTO_ROOT)/tos/lib/quanto/MultiContext\
+          -I$(QUANTO_ROOT)/tos/lib/quanto/QuantoLog \
+          -I$(QUANTO_ROOT)/tos/lib/quanto/PowerState\
+          -I$(QUANTO_ROOT)/tos/lib/icount \
+          -I$(QUANTO_ROOT)/tos/lib/timer \
+          -I$(QUANTO_ROOT)/tos/system \
+          -I$(QUANTO_ROOT)/tos/chips/msp430 \
+          -I$(QUANTO_ROOT)/tos/chips/msp430/acd12 \
+          -I$(QUANTO_ROOT)/tos/chips/msp430/timer \
+          -I$(QUANTO_ROOT)/tos/chips/msp430/dma \
+          -I$(QUANTO_ROOT)/tos/chips/msp430/pins \
+          -I$(QUANTO_ROOT)/tos/chips/msp430/usart \
+          -I$(QUANTO_ROOT)/tos/chips/cc2420 \
+          -I$(QUANTO_ROOT)/tos/chips/cc2420/transmit \
+          -I$(QUANTO_ROOT)/tos/chips/cc2420/csma \
+          -I$(QUANTO_ROOT)/tos/chips/cc2420/receive \
+          -I$(QUANTO_ROOT)/tos/chips/cc2420/spi \
+          -I$(QUANTO_ROOT)/tos/chips/sht11 \
+          -I$(QUANTO_ROOT)/tos/platforms/telosa/chips/sht11
+

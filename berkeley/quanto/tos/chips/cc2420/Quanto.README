@@ -1,0 +1,31 @@
+Documentation of the cc2420 instrumentation with powerstates and context
+
+3 Resource Contexts involved:
+ - CPUContext
+ - CC2420Context as RadioContext
+ - CC2420Spi
+
+The Spibus is managed by the CC2420SpiWireC, which is an arbiter, in practice
+
+There is also a RadioPowerState component, with the following states:
+
+  CC2420_PW_STOPPED  = 0x0000, //set by CC2420Csma. override others
+  CC2420_PW_STARTING = 0x0100, //set by CC2420Csma. override others. unused.
+  CC2420_PW_LISTEN   = 0x0200, //set by CC2420Csma. override others
+  CC2420_PW_RX       = 0x0400, //set by CC2420Transmit on SFD & !Tx
+  CC2420_PW_TX       = 0x0800, //set by CC2420Transmit on attemptSend successful
+  CC2420_PW_STOPPING = 0x1000, //set by CC2420Csma. override others. unused
+  CC2420_PW_RXFIFO   = 0x2000, //set by CC2420Receive
+  CC2420_PW_TXFIFO   = 0x4000, //set by CC2420Transmit
+
+RX is set on SFD if not transmitting. We have to add the time spent before SFD to this.
+
+The Activity tracking is as follows:
+The RadioContext is painted:
+ - with the CPU activity right before TXFIFO.write
+
+ - with ACT_PXY_CC2420_RX on receive 
+ - with idle when not in RX, TX, FIFO
+
+ - with Idle after TXFIFO.writedone, unless we are not sampling CCA
+

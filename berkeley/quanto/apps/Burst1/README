@@ -1,0 +1,27 @@
+This application tries to measure the raw costs of changing contexts and recording in memory.
+To do so we repeatedly call change context many times. To avoid even the cost of a compare in a loop, we call the cnanges manually.
+
+Result 1: repeated calls to CPUContext.setContext()
+Delta (in 32KHz tics):
+2 471 0.6643
+3 238 0.3357
+Average: 2.3357
+At 32768 tics per second, this means 71.2 usec
+It also means we can log at most 14044 records per second to RAM, if this is all we do.
+
+147 instructions + 2 = 149 inst. At 1 cycle/instruction, the processor would be running at 2.1MHz
+
+Result 2: epic
+2437/801
+3.0424469413 tics
+2437/801*1000000/32768 = 92.8481122222 usec/log
+
+Result 3: epic without the call to icount
+1797/801*1000000/32768
+68.4645291992
+
+Difference: 24.34us
+
+
+
+

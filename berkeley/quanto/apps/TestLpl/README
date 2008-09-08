@@ -1,0 +1,25 @@
+This is a simple little program to test the behavior of LPL.
+We can use it to log what happens in an LPL reception.
+We can also test the effect of 802.11 beacons on wake-ups.
+
+It just sits there listening for a packet.
+If any packet comes, the green LED goes on and stays on.
+
+The user button controls logging, and resets the led status.
+
+Parameters:
+ set the channel and the LPL_INTERVAL (sleep interval) in the
+makefile.
+ Use BouncePacket on another node with the same channel and interval
+to send messages. In that case, beware that BouncePacket will only
+send to its 'peer'. One configuration that works is:
+   - program id 1 for TestLPL
+   - program id 4 for BouncePacket
+   - press button on TestLPL (to record log)
+   - press button on BouncePacket (sends one packet)
+   - press button on TestLPL (to flush the log)
+
+    Bounce will only send one packet, because they won't bounce
+back.
+
+

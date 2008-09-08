@@ -1,0 +1,7 @@
+export CLASSPATH=/Users/rfonseca/work/context/nprintf/support/sdk/java:$CLASSPATH
+
+# java net.tinyos.sf.SerialForwarder -comm serial@/dev/tty.usbserial-UCC89PXX:telos
+# java net.tinyos.tools.Debug
+# make telosb install bsl,/dev/tty.usbserial-UCC89PXX
+
+

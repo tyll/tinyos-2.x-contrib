@@ -5,29 +5,29 @@
 <body TEXT="#000000" BGCOLOR="#FFFFFF" LINK="#0000EF" VLINK="#55188A" 
 ALINK="#FF0000">
 
-<h2>ECH<sub>2</sub>O-TE Telos Interface</h2>
-<a href="http://impact.asu.edu">Impact Lab</a><br> 
-<a href="http://www.asu.edu">Arizona State University</a>
+   <h2>ECH<sub>2</sub>O-TE Telos Interface</h2>
+   <a href="http://impact.asu.edu">Impact Lab</a><br> 
+   <a href="http://www.asu.edu">Arizona State University</a>
 
-<h3>Overview</h3>
-<p>This contribution is an interface to a Decagon Devices 
-<a href="http://www.decagon.com/ag_research/soil/5te.php">ECH2O-TE</a> soil probe 
-from a TelosB class mote. The contribution includes two parts -- hardware and
-software.
-<ul>
-<li>The hardware contribution is a <a href="http://impact.asu.edu/soil/probe-interface.html">
-detailed description</a> of the circuitry we used to interface the TE stereo plug with the
-TelosB's UART and ADC pins.</li>
-<li>The software portion is the TinyOS module to drive the hardware interface.
-See the <a 
-href="http://tinyos.cvs.sourceforge.net/*checkout*/tinyos/tinyos-2.x-contrib/asu-impact/lib/echote_telos/EchoTETelosP.nc?content-type=text/plain">module</a> 
-and <a 
-href="http://tinyos.cvs.sourceforge.net/*checkout*/tinyos/tinyos-2.x-contrib/asu-impact/lib/echote_telos/EchoTETelosC.nc?content-type=text/plain">configuration</a> 
-comments for 
-details.</li>
-</ul>
+   <h3>Overview</h3>
+   <p>This contribution is an interface to a Decagon Devices 
+<a href="http://www.decagon.com/ag_research/soil/5te.php">ECH2O-TE</a> soil 
+probe from a TelosB class mote. The contribution includes two parts -- 
+hardware and software.
+   <ul>
+   <li>The hardware contribution is a 
+      <a href="http://impact.asu.edu/soil/probe-interface.html"> detailed 
+      description</a> of the circuitry we used to interface the TE stereo plug 
+      with the TelosB's UART and ADC pins.</li>
+   <li>The software portion is the TinyOS module to drive the hardware interface.
+      See the module and configuration comments for details.</li>
+   </ul>
 The end result is a Read interface that provides 
 the TE's dielectric (moisture), temperature, and conductivity readings.</p>
+   <p>As of Sep 2008 the prototype has a 95% reading success rate since
+   installation in Dec 2007. The results are informative as you can see from 
+   the latest
+<a href="http://impact.asu.edu/soil/sensor-current.html">graphs</a>.</p>
 
 </body>
 </html>

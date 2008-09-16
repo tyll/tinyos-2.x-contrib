@@ -457,7 +457,7 @@ public class TestRunner {
       
       String reportDirectory = TUnit.getStatsReportDirectory().getAbsolutePath() + File.separatorChar + StatisticsReport.generateStatsSubDirectory(runProperties.getName(), buildDirectory);
       
-      new File(reportDirectory).createNewFile();
+      new File(reportDirectory).mkdirs();
       out.write(reportDirectory + "\n");
       out.close();
       

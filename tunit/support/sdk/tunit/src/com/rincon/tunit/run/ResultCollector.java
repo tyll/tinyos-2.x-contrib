@@ -210,7 +210,7 @@ public class ResultCollector extends Thread implements Messenger,
     // 1. Ping the node and get a response.
     synchronized (this) {
       log.trace("ResultCollector.run()::initialize");
-      for (int retries = 0; retries < 5 && initializing; retries++) {
+      for (int retries = 0; retries < 20 && initializing; retries++) {
         log.info("Ping...");
         link.ping();
 

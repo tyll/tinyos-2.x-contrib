@@ -1,0 +1,22 @@
+make micaz
+echo "java PreMica2 build/micaz/app.c > build/micaz/appmica2.c" 
+java PreMica2 build/micaz/app.c > build/micaz/appmica2.c
+echo "avr-gcc -o build/micaz/mainmica2.exe -O0 -g -fdollars-in-identifiers -mmcu=atmega128 appmica2.c" 
+avr-gcc -o build/micaz/mainmica2.exe -O0 -g -fdollars-in-identifiers -mmcu=atmega128 build/micaz/appmica2.c
+echo "avr-objdump -dl ./build/micaz/mainmica2.exe > ./build/micaz/asm.txt"
+avr-objdump -dl ./build/micaz/mainmica2.exe > ./build/micaz/asm.txt
+make micaz sim
+echo "java PreTossim build/micaz/app.c > build/micaz/apptossim.c"
+java PreTossim build/micaz/app.c > build/micaz/apptossim.c
+echo "cpp-4.1 ./build/micaz/apptossim.c > build/micaz/preapp.c"
+cpp-4.1 ./build/micaz/apptossim.c > build/micaz/preapp.c
+echo "java Preprocessor build/micaz/preapp.c > build/micaz/extendedapp.c"
+java Preprocessor build/micaz/preapp.c > build/micaz/extendedapp.c
+echo "java TestThrough build/micaz/extendedapp.c > build/micaz/transformedapp.c"
+java TestThrough build/micaz/extendedapp.c > build/micaz/transformedapp.c
+echo "gcc -c -O3 -o ./build/micaz/sim.o build/micaz/transformedapp.c"
+gcc -c -O3 -o ./build/micaz/sim.o build/micaz/transformedapp.c 
+echo "g++ -shared -fPIC  build/micaz/pytossim.o build/micaz/sim.o build/micaz/tossim.o build/micaz/c-support.o -lstdc++  -o _TOSSIMmodule.so"
+g++ -shared -fPIC  build/micaz/pytossim.o build/micaz/sim.o build/micaz/tossim.o build/micaz/c-support.o -lstdc++  -o _TOSSIMmodule.so
+
+

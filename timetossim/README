@@ -1,0 +1,36 @@
+Contribution: TimeTOSSIM
+Authors: Muhammad Hamad Alizai, Olaf Landsiedel
+Email: hamad.alizai@rwth-aachen.de
+
+
+
+
+
+TimeTOSSIM is an extension of TOSSIM that provides nearly time accurate simulation of TinyOS based sensor network applications. In the following we will provide you with the necessarry information about setting the environment and using timeTOSSIM. We assume that tinyos-2.x and tinyos-2.x-contrib lie in your HOME directory, if not, then please replace <HOME> with relevant directory name.
+
+1. Please set up the envirnoment by adding following commands to your .bashrc file
+
+export TIMETOSSIM=$HOME/tinyos-2.x-contrib/timetossim
+export CLASSPATH=$CLASSPATH:.
+export CLASSPATH=$CLASSPATH:$TIMETOSSIM/tinyos-2.x/tools/cgram/examples
+export CLASSPATH=$CLASSPATH:$TIMETOSSIM/tinyos-2.x/tools/cgram/grammars
+export CLASSPATH=$CLASSPATH:$TIMETOSSIM/tinyos-2.x/tools/antlr-2.7.6/antlr.jar
+
+In order to call a bash script directly from your application folder please add the following path. Otherwise you can also copy the script in "tinyos-2.x/timetossim/timetossim" to your application directory
+
+export PATH=$PATH:/home/alizai/tinyos-2.x-contrib/timetossim
+
+2. Please run make command in the following directories
+
+tinyos-2.x-contrib/timetossim/tinyos-2.x/tools/cgram/examples$ make
+tinyos-2.x-contrib/timetossim/tinyos-2.x/tools/cgram/grammars$ make
+
+3. Now you are ready to start using timetossim. As an example go to apps/Blink and just execute the script on your shell as follows.
+
+/tinyos-2.x/apps/Blink$ timetossim
+
+The sim.o file in build/micaz directory is a timeTOSSIM object file which you can link with your simulation driver program just as you do with TOSSIM. For further details you can look into the tinyos-2.x tutorials about TOSSIM.
+
+Note: This distribution of timeTOSSIM only provides code mapping and clock incrementation features as discussed in our IPSN08 paper. Because of rapid development of tinyOS, features like event prioritization and static and manual mapping of code are not supported for the latest revisions of tinyos-2.x. We will provide these features once tinyos-2.x reaches to some stable state. For an earlier revision of tinyos-2.x we have uploaded a complete tinyos-2.x source tree that is the full implementation of our concept. If you are interested you can download it from http://ds.informatik.rwth-aachen.de/research/projects/ttossim/
+
+

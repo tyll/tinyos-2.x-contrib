@@ -1,0 +1,30 @@
+digraph _s {
+StoreData;	 // 1
+Listen[style=filled,fillcolor=lightgray];	 // 2
+GetGPS;	 // 3
+SendData;	 // 4
+ReadData;	 // 5
+GPSTimer[style=filled,fillcolor=lightgray];	 // 6
+ReadRequest;	 // 7
+	 // 8
+
+
+// ENTRY[] -> GPSTimer[] -> ERROR[] -> EXIT:  0
+// ENTRY[] -> GPSTimer[] -> GPS[] -> ERROR[] -> EXIT:  1
+// ENTRY[] -> GPSTimer[] -> GPS[] -> GetGPS[] -> ERROR[] -> EXIT:  2
+// ENTRY[] -> GPSTimer[] -> GPS[] -> GetGPS[] -> StoreData[] -> EXIT:  3
+// ENTRY[] -> GPSTimer[] -> GPS[] -> GetGPS[] -> StoreData[] -> ERROR[] -> EXIT:  4
+// ENTRY[] -> Listen[] -> ERROR[] -> EXIT:  0
+// ENTRY[] -> Listen[] -> DataReq[] -> ERROR[] -> EXIT:  1
+// ENTRY[] -> Listen[] -> DataReq[] -> ReadRequest[] -> ERROR[] -> EXIT:  2
+// ENTRY[] -> Listen[] -> DataReq[] -> ReadRequest[] -> ReadData[] -> ERROR[] -> EXIT:  3
+// ENTRY[] -> Listen[] -> DataReq[] -> ReadRequest[] -> ReadData[] -> SendData[] -> EXIT:  4
+// ENTRY[] -> Listen[] -> DataReq[] -> ReadRequest[] -> ReadData[] -> SendData[] -> ERROR[] -> EXIT:  5
+
+
+GPSTimer -> GetGPS;
+GetGPS -> StoreData;
+Listen -> ReadRequest;
+ReadRequest -> ReadData;
+ReadData -> SendData;
+}

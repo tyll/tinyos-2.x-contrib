@@ -1,0 +1,30 @@
+
+
+platform tinynode_2:
+
+//Node definition	
+//Really fast flow
+	SenseTimer() => ();
+	SenseFlow() => ();
+	Sense() => (eon_message_t msg, uint16_t dest);
+
+
+	
+	
+//Required for compilation	
+	stateorder {High};
+	
+//Sources	
+	source timer SenseTimer[High] => SenseFlow;
+	
+	
+	
+	
+//Flows	
+	
+	
+	SenseFlow = Sense -> EonSend;
+	
+	
+	SenseTimer:[*] = (1000 ms, 3 sec);
+	

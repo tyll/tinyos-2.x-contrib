@@ -1,0 +1,13 @@
+\begin{thebibliography}{1}
+
+\bibitem{flux}
+{\sc Burns, B., Grimaldi, K., Kostadinov, A., Berger, E., and Corner, M.}
+\newblock Flux: A language for programming high-performance servers.
+\newblock In {\em USENIX Technical Conference\/} (2006).
+
+\bibitem{turtlesernst}
+{\sc Ernst, C.~H., Lovich, J.~E., and Barbour, R.~W.}
+\newblock {\em Turtles of the United States and Canada}.
+\newblock Smithsonian Institute Press, 1994.
+
+\end{thebibliography}

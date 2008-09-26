@@ -1,0 +1,37 @@
+
+
+PLATFORM = turtlenet
+
+ifndef TOSDIR
+TOSDIR := $(shell ncc -print-tosdir)
+endif
+
+MSP_BSL ?= tos-bsl
+
+#Flash Config
+VOLUME_FILE = volumes-at45db.xml
+VOLUME_ALLOCATOR = tos-storage-at45db
+
+ifneq (, $(findstring sim-exe,$(BUILD_DEPS)))
+
+
+
+else
+
+
+OPTFLAGS += -Os
+#OPTFLAGS = 
+
+# Disable MSP430 hardware multiply because it makes MSPGCC die
+PFLAGS += -mdisable-hwmul
+PFLAGS += -mstrict-align
+
+endif
+
+
+$(call TOSMake_include_platform,turtlenet)
+$(call TOSMake_include_platform,msp)
+
+turtlenet: $(BUILD_DEPS)
+	@:
+

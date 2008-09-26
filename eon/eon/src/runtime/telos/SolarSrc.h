@@ -1,0 +1,10 @@
+#ifndef SOLARSRC_H_INCLUDED
+#define SOLARSRC_H_INCLUDED
+
+#define _NUMEPOCHS 6
+#define _HISTORYLENGTH 5
+#define _DAYLENGTH (24*60)
+
+#define _EPOCHLENGTH (_DAYLENGTH / _NUMEPOCHS)
+
+#endif

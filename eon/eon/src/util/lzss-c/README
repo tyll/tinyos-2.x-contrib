@@ -1,0 +1,12 @@
+Compress.txt and the associated C source files were uploaded
+to GEnie from Japan by Kenjirou Okubo.  He provided this short
+introduction:
+
+This article by H.Okumura explains various algorithms
+of Data Compression. The article, originally uploaded
+in his workshop, is posted here with his permission.  Also
+includes three C programs illustrating lzari, lzss and
+lzhuf methods uploaded with permission of their authors.
+These are the compression schemes currently being investigated
+by Japanese hobbiest programmers.
+              -Kenjirou Okubo

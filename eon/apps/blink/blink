@@ -1,0 +1,27 @@
+typedef test IsTest;
+
+
+platform tinynode:
+
+
+//Blink Timer flow
+	BlinkTimer() => ();
+	BlinkFlow() => ();
+	SetBlinkVal() => (uint8_t val);
+	DoBlink(uint8_t val) => ();
+	
+//Required for compilation	
+	
+	stateorder {HiState};
+	
+//Sources	
+	source timer BlinkTimer => BlinkFlow;
+	
+	
+//Flows	
+	
+	BlinkFlow = SetBlinkVal -> DoBlink;
+				
+//Timer Values
+	BlinkTimer:[*] = (1 sec, 1 sec);
+	

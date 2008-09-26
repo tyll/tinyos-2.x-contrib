@@ -1,0 +1,258 @@
+package edu.umass.eflux.nesc;
+
+import java.util.Vector;
+import java.io.FileInputStream;
+import java.io.PrintWriter;
+import java.io.OutputStreamWriter;
+import java_cup.runtime.*;
+
+import jdsl.graph.api.*;
+import jdsl.graph.ref.*;
+
+parser code {:
+       	public void syntax_error(Symbol cur) {
+       	      System.err.println("Syntax error at line: "+
+	      				 cur.toString());
+       	      System.err.println("Syntax error at line: "+
+	      				 ((Yylex)getScanner()).getLine());
+	}
+	public static void main(String[] args) {
+	 System.err.println("This is no longer the generating routine.");
+        }
+:}
+
+
+terminal ARROW, STAR, EXCLAMATION;
+
+terminal LEFT_CR_BRACE, RIGHT_CR_BRACE, LESSTHAN, GREATERTHAN;
+terminal PIPE, COLON, COMMA, EQUALS, SEMI, POUND, DOT, QUOTE;
+terminal LEFT_PAREN, RIGHT_PAREN, LEFT_SQ_BRACE, RIGHT_SQ_BRACE;
+terminal CONFIGURATION;
+terminal IMPLEMENTATION;
+terminal COMPONENTS;
+terminal INCLUDE, INCLUDES, UNIQUE;
+terminal PROVIDES, USES, AS;
+terminal INTERFACE, COMMAND, EVENT, MODULE;
+terminal Integer NUMBER;
+terminal String IDENTIFIER;
+
+non terminal Object nesc_object;
+non terminal NESCConfig nesc_config;
+non terminal NESCModule nesc_module;
+non terminal NESCInterface nesc_interface;
+non terminal NESCInterfaceListing iface_list;
+non terminal Vector all_includes; 
+non terminal Vector include_list;
+non terminal String single_include;
+non terminal Vector uses_list;
+non terminal Vector provides_list;
+non terminal NESCImpl nesc_impl;
+non terminal Vector iface_def_list;
+non terminal InterfaceDecl iface_def;
+non terminal Vector iface_decl_list;
+non terminal InterfaceDecl iface_decl;
+non terminal CommandDecl command_decl;
+non terminal EventDecl event_decl;
+non terminal FunctionDecl func_decl;
+non terminal Vector param_decl_list;
+non terminal ParamDecl param_decl;
+non terminal Vector param_list;
+non terminal Vector statement_list;
+non terminal Object statement;
+non terminal WiringStatement wiring_statement;
+non terminal InternalWiringStatement internal_wiring_statement;
+non terminal Vector component_list;
+non terminal NESCComponent component;
+non terminal InterfaceSpec iface_spec;
+non terminal IndexExpr iface_idx;
+non terminal IndexExpr idx_expr;
+non terminal TypeSpec type_spec;
+
+/*------------------------------------------------------------------
+ configuration 
+     
+-------------------------------------------------------------------*/
+
+nesc_object ::= nesc_config:c
+		{: RESULT=c; :}
+		| nesc_module:m
+		{: RESULT=m; :}
+		| nesc_interface:i
+		{: RESULT=i; :}
+		| error
+		;
+
+nesc_config ::= 
+    all_includes:includes CONFIGURATION IDENTIFIER:name iface_list:ifaces nesc_impl:impl
+		{: RESULT = new NESCConfig(includes, name, ifaces, impl); :}
+	;
+	
+nesc_module ::= 
+    all_includes:includes MODULE IDENTIFIER:name iface_list:ifaces IMPLEMENTATION LEFT_CR_BRACE error RIGHT_CR_BRACE
+		{: RESULT = new NESCModule(includes, name, ifaces); :}
+	;
+
+nesc_interface ::= 
+    all_includes:includes INTERFACE IDENTIFIER:name LEFT_CR_BRACE iface_def_list:ifaces RIGHT_CR_BRACE
+		{: RESULT = new NESCInterface(includes, name, ifaces); :}
+	;
+
+
+
+/*-------------------------------------------------------------------#
+# include_list
+#-------------------------------------------------------------------*/
+
+all_includes ::= include_list:l
+		{: RESULT = l; :}
+		| {: RESULT = null; :}
+		;
+
+include_list ::= include_list:l single_include:m
+	     {: l.add(m); RESULT=l; :}
+	     | single_include:m
+	     {: RESULT = new Vector<String>(); if (m != null) { RESULT.add(m);} :}
+	     ;
+
+single_include ::= INCLUDE LESSTHAN IDENTIFIER:i GREATERTHAN 
+		{: RESULT=i; :} 
+	| INCLUDE QUOTE IDENTIFIER:i QUOTE
+		{: RESULT=i; :}
+	| INCLUDES IDENTIFIER:i SEMI
+		{: RESULT=i; :}	
+	;
+
+/*-------------------------------------------------------------------#
+# interface listing
+#-------------------------------------------------------------------*/
+
+iface_list ::= LEFT_CR_BRACE provides_list:pl uses_list:ul RIGHT_CR_BRACE
+	{:  RESULT = new NESCInterfaceListing(pl,ul); :} 
+	;
+
+provides_list ::= PROVIDES LEFT_CR_BRACE iface_decl_list:l RIGHT_CR_BRACE
+	{: RESULT = l; :} 
+    | {: RESULT = null; :}
+	;
+	
+uses_list ::= USES LEFT_CR_BRACE iface_decl_list:l RIGHT_CR_BRACE
+	{: RESULT = l; :} 
+    | {: RESULT = null; :}
+	; 
+
+iface_decl_list ::= iface_decl_list:l iface_decl:m
+	     {: l.add(m); RESULT=l; :}
+	     | iface_decl:m
+	     {: RESULT = new Vector<InterfaceDecl>(); if (m != null) { RESULT.add(m);} :}
+	     ;
+	     
+iface_decl ::= INTERFACE IDENTIFIER:i SEMI 
+		{: RESULT = new InterfaceDecl(i);  :}
+		| INTERFACE IDENTIFIER:i AS IDENTIFIER:alias SEMI
+		{: RESULT = new InterfaceDecl(i, alias);  :}
+		|  COMMAND command_decl:fn SEMI
+		{: RESULT = new InterfaceDecl(fn); :}
+		|  EVENT event_decl:fn SEMI
+		{: RESULT = new InterfaceDecl(fn); :}
+		;
+
+iface_def_list ::= iface_def_list:l iface_def:m
+		{: l.add(m); RESULT=l; :}
+		| iface_def:m
+		{: RESULT = new Vector<InterfaceDecl>(); RESULT.add(m); :}
+		;
+		
+iface_def ::= COMMAND command_decl:fn SEMI
+		{: RESULT = new InterfaceDecl(fn); :}
+		|  EVENT event_decl:fn SEMI
+		{: RESULT = new InterfaceDecl(fn); :}
+		;
+
+command_decl ::= func_decl:fn
+		{: RESULT = new CommandDecl(fn); :}
+	    ;
+	    
+event_decl ::= func_decl:fn
+		{: RESULT = new EventDecl(fn); :}
+	    ;
+	    
+func_decl ::= type_spec:r IDENTIFIER:name LEFT_PAREN param_decl_list:pl RIGHT_PAREN
+		{: RESULT = new FunctionDecl(r, name, pl); :}
+		| type_spec:r IDENTIFIER:name LEFT_PAREN RIGHT_PAREN
+		{: RESULT = new FunctionDecl(r,name,null); :}
+		;
+
+param_decl_list ::= param_decl_list:l COMMA param_decl:m
+		{: l.add(m); RESULT = l; :}
+		| param_decl:m
+		{: RESULT = new Vector<ParamDecl>(); RESULT.add(m);  :}
+		;		
+		
+param_decl ::= type_spec:t IDENTIFIER:n
+		{:  RESULT = new ParamDecl(t,n);  :}
+		; 
+
+type_spec ::= IDENTIFIER:t
+		{: RESULT = new TypeSpec(t, false); :}
+		| IDENTIFIER:t STAR
+		{: RESULT = new TypeSpec(t, true); :}
+		;
+/*-------------------------------------------------------------------#
+# nesc wiring implementation
+#-------------------------------------------------------------------*/
+nesc_impl ::= IMPLEMENTATION LEFT_CR_BRACE statement_list:sl RIGHT_CR_BRACE
+	  {: RESULT= new NESCImpl(sl); :}
+	  ;
+
+statement_list ::= statement_list:l statement:m
+	  {: l.add(m); RESULT = l;  :}
+	  | statement:m
+	  {: RESULT = new Vector(); RESULT.add(m); :}
+	  ;
+
+statement ::= COMPONENTS component_list:cl SEMI
+	  {: RESULT=new ComponentStatement(cl); :}
+	  | wiring_statement:ws
+	  {: RESULT= ws; :}
+	  | internal_wiring_statement:ws
+	  {: RESULT= ws; :}
+	  ;
+
+component_list ::= component_list:l COMMA component:m
+     {: l.add(m); RESULT = l; :}
+     | component:m
+     {: RESULT = new Vector<NESCComponent>(); RESULT.add(m); :}
+	;
+
+component ::= IDENTIFIER:c
+	{: RESULT = new NESCComponent(c); :}
+	| IDENTIFIER:c AS IDENTIFIER:alias
+	{: RESULT = new NESCComponent(c,alias); :}
+	;
+
+internal_wiring_statement ::=  IDENTIFIER:i EQUALS iface_spec:di SEMI
+	{: RESULT = new InternalWiringStatement(i, di);  :}
+	;
+
+wiring_statement ::=  iface_spec:si PIPE iface_spec:di SEMI
+	{: RESULT = new WiringStatement(si, di);  :}
+	;
+	
+iface_spec ::=  IDENTIFIER:c DOT IDENTIFIER:i iface_idx:idx
+	{:  RESULT = new InterfaceSpec(c,i,idx); :}
+	| IDENTIFIER:c iface_idx:idx
+	{:  RESULT = new InterfaceSpec(c,idx); :}
+	;
+
+iface_idx ::=  LEFT_SQ_BRACE idx_expr:e RIGHT_SQ_BRACE
+	{:  RESULT = e;  :}
+	| {: RESULT = null; :}
+	;
+
+idx_expr ::= NUMBER:n
+	{: RESULT = new IndexExpr(n); :}
+	| IDENTIFIER:i
+	{: RESULT = new IndexExpr(i); :}
+	| UNIQUE LEFT_PAREN QUOTE IDENTIFIER:i QUOTE RIGHT_PAREN
+	{: RESULT = new UniqueIndexExpr(i); :}
+	;

@@ -1,0 +1,30 @@
+September 5, 2006
+
+Deployed two devices (Tortue-7 and Zolw-16) on the fort.  Need to overlap a solar panel over the device.  It would be nice to move down to only one panel, especially for a smaller female.
+
+
+September 8, 2006
+
+Inaccuracies in both the DS2770 and DS2751 are causing problems with some devices.  Basically, they are resulting in inaccurate energy accounting and therefore prediction.  Need to look into how to properly callibrate them.  If we have inaccuracies, they should be conservative errors.
+
+September 10, 2006
+
+One of the two devices (not sure yet which) was found with water in it.  Mike is bringing it by when he gets a chance, so that we can try to diagnose the cause of failure.
+
+September 13, 2006
+
+Still no sign of the damaged device.
+
+I seem to have solved the accuracy problem.  Had to calibrate the DS2751 (add a +3 LSB offset).  Also, had a problem in src/runtime/mica2dot/DS2770M.nc with a signed/unsigned cast.
+
+September 14, 2006
+
+Damaged device came in (Tortue).  Appears to be a total loss.  It is badly oxidized.  Once it dries completely, I will see what can be salvaged.
+
+September 15, 2006
+
+Fixed a handful of problems with our hacked up version of TinyAlloc.  Most of the problems occured when the heap was exhausted and it tried to compact the heap.  All seems to be working fine now.
+
+Our plan is to package 6 today, 4 for deployment on Monday, and two for testing around the lab.
+
+Interesting note:  Tortue, who we thought was dead, is now dry and able to be programmed.  Nothing recorded to the flash.  It must have entered the water in the first hour after we released it.

@@ -1,0 +1,28 @@
+
+
+Energy management is a critical problem in designing mobile computing
+systems, especially when those systems depend on harvesting energy
+from environmental sources, such as solar or wind.  Environmental
+sources are highly variable and difficult to predict, which is often
+complicated further when nodes are mobile.  In this demo, we present a
+simple approach for developing energy-aware applications using a
+high-level data flow oriented coordination language.  This language,
+eFlux, is an extension of the Flux~\cite{flux} coordination language,
+which provides a simple interface for specifying an energy adaptation
+policy, which can then be implemented automatically by the underlying
+runtime system.  This approach allows a system designer to change the
+underlying adaptation algorithms (e.g. energy source prediction)
+without modifying the application.  Also, the data flow programming
+style of Flux simplifies program profiling and performance prediction.
+
+In this demo, we will present our experience, to date, using eFlux,
+including both working system and simulation results.  We will
+demonstrate an energy-aware GPS tracking device for tracking
+threatened Wood Turtles in Western Massachusetts.  
+
+The demo will require an easle for a poster and power.  Access to
+sunlight would be beneficial, although it is not required.
+
+
+\bibliographystyle{acm}
+\bibliography{mobisys_2005}

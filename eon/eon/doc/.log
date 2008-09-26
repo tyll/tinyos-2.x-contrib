@@ -1,0 +1,34 @@
+This is pdfTeXk, Version 3.14159-1.10b (Web2C 7.4.5) (format=pdflatex 2004.10.20)  27 MAR 2006 12:57
+ %&-line parsing enabled.
+**nsdi_2006_triage
+(/usr/share/texmf/tex/latex/tools/.tex{/usr/share/texmf/pdftex/config/pdftex.cf
+g}
+! Interruption.
+<to be read again> 
+                   \begingroup 
+l.1 
+    %%
+? q
+OK, entering \batchmode...
+LaTeX2e <2001/06/01>
+Babel <v3.7h> and hyphenation patterns for american, french, german, ngerman, n
+ohyphenation, loaded.
+ File ignored)
+! Emergency stop.
+<*> nsdi_2006_triage
+                    
+*** (job aborted, no legal \end found)
+
+ 
+Here is how much of TeX's memory you used:
+ 6 strings out of 50437
+ 137 string characters out of 690232
+ 44508 words of memory out of 1500001
+ 3103 multiletter control sequences out of 10000+25000
+ 3640 words of font info for 14 fonts, out of 400000 for 1000
+ 14 hyphenation exceptions out of 10000
+ 5i,0n,1p,96b,7s stack positions out of 3000i,500n,3000p,50000b,5000s
+ 0 PDF objects out of 65536
+ 0 named destinations out of 20000
+ 0 words of extra memory for PDF output out of 65536
+No pages of output.

@@ -1,0 +1,88 @@
+typedef text TestText;
+typedef image TestImage;
+typedef audio TestAudio;
+typedef video TestVideo;
+
+typedef stargate_video StargateTestVideo;
+typedef stargate_audio StargateTestAudio;
+typedef stargate_image StargateTestImage;
+
+
+platform TELOS:
+
+	Listen ()
+		=> (uint16_t connid);
+
+	Page (uint16_t connid)
+		=> ();
+
+	ReadRequest (uint16_t connid)
+		=> (uint16_t connid, uint8_t type, request_t request);
+		
+	TelosHandler (uint16_t connid, uint8_t type, request_t request)
+		=> ();
+		
+	Sorry (uint16_t connid, uint8_t type, request_t request)
+		=> (uint16_t connid, uint8_t type, request_t request);
+
+	TelosClose (uint16_t connid, uint8_t type, request_t request)
+		=> ();
+
+	SrvText (uint16_t connid, uint8_t type, request_t request)
+		=> (uint16_t connid, uint8_t type, request_t request);
+
+	ServiceWithStargate (uint16_t connid, uint8_t type, request_t request)
+		=> (uint16_t connid, uint16_t port_num, uint8_t type, request_t request);
+
+platform STARGATE:
+
+	StargateListen (uint16_t connid, uint16_t port_num, uint8_t type, request_t request)
+		=> (uint16_t connid, int socket, uint8_t type, char *filename);
+	
+	StargatePage (uint16_t connid, int socket, uint8_t type, char *filename)
+		=> ();
+
+	StargateHandler (uint16_t connid, int socket, uint8_t type, char *filename)
+		=> (uint16_t connid, int socket, uint8_t type, char *filename);
+	
+	SrvVideo (uint16_t connid, int socket, uint8_t type, char *filename)
+		=> (uint16_t connid, int socket, uint8_t type, char *filename);
+			
+	SrvAudio (uint16_t connid, int socket, uint8_t type, char *filename)
+		=> (uint16_t connid, int socket, uint8_t type, char *filename);
+
+	SrvImage (uint16_t connid, int socket, uint8_t type, char *filename)
+		=> (uint16_t connid, int socket, uint8_t type, char *filename);
+
+	StargateSorry (uint16_t connid, int socket, uint8_t type, char *filename)
+		=> (uint16_t connid, int socket, uint8_t type, char *filename);
+		
+	StargateClose (uint16_t connid, int socket, uint8_t type, char *filename)
+		=> ();
+	
+stateorder  {Video_HiBR,
+			[Video_LoBR, Audio_HiFi],
+			[Audio_LoFi, Image_HiDef],
+			Image_LoDef,
+			Image_Thumb,
+			Text
+			};
+
+source Listen      => Page;
+
+Page = ReadRequest -> TelosHandler;
+
+StargatePage = StargateHandler -> StargateClose;
+
+TelosHandler:[*, video, *][Video_LoBR]  = ServiceWithStargate -> StargateListen -> StargatePage;
+TelosHandler:[*, audio, *][Audio_LoFi]  = ServiceWithStargate -> StargateListen -> StargatePage;
+TelosHandler:[*, image, *][Image_Thumb] = ServiceWithStargate -> StargateListen -> StargatePage;
+TelosHandler:[*, text,  *][Text]        = SrvText --------> TelosClose;
+TelosHandler:[*, *,     *][*]           = Sorry ----------> TelosClose;
+
+StargateHandler:[*, *, stargate_video, *][Video_LoBR]  = SrvVideo;
+StargateHandler:[*, *, stargate_audio, *][Audio_LoFi]  = SrvAudio;
+StargateHandler:[*, *, stargate_image, *][Image_Thumb] = SrvImage;
+StargateHandler:[*, *, *, *][*] = StargateSorry;
+
+handle error SrvText => SorryErr;

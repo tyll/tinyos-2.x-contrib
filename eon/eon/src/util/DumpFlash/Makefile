@@ -1,0 +1,3 @@
+COMPONENT=DumpFlash
+include ${MAKERULES}
+

@@ -1,0 +1,1 @@
+This figure shows solar power coming it at different times for different nodes.  Each node is drawn with a different color.  Note that node #1 (black) seems to have inflated energy measurements.  The maximum power output of the solar panels is roughly 300 mW.  The traces for the other nodes, seem consistent with our predeployment testing.

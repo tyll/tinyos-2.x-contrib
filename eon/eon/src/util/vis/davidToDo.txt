@@ -1,0 +1,20 @@
+David's to do list
+_______________________
+
+X Convert timestamp to local time and create field in database
+_ strip out whitespace from script
+_ add date range feature for both map and dataShow
+X add dilution visualization using 5 meters to google map
+	-values below one -> round up
+_ add feature to gmaps to show a single node from deployment
+_ make gmap script zoom and center based on data being shown.
+X take info from mysql convert into xml
+X xml -> kml script
+X create a convienent way to get a kml file out of google maps and create video in google earth
+X add default values to dataShow
+X remember search criteria in dataShow
+X create basestation table, edit python scripts to insert data
+X add better documentation for the web scripts
+
+note: I haven't been able to access my scratch directory in some time, so there has been nothing checked into the repository
+since last weeek. 7/21

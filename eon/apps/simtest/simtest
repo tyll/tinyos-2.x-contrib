@@ -1,0 +1,33 @@
+
+platform linuxsim:
+
+//Node definition	
+//Really fast flow
+	SampleTimer() => ();
+	SampleFlow() => ();
+	ReadSensor() => (int value);
+	WriteToFlash(int value) => ();
+	
+
+//Medium flow
+	ListenRequest () => (int index);
+	QueryFlow(int index) => ();
+	ReadFlash(int index) => (int value);
+	SendRadio(int value) => ();
+
+	
+//Required for compilation	
+	stateorder {AnswerQueries};
+	
+//Sources	
+	source timer SampleTimer => SampleFlow;
+	source ListenRequest => QueryFlow;
+	
+	
+//Flows	
+	
+	SampleFlow = ReadSensor -> WriteToFlash;
+	QueryFlow:[*][AnswerQueries] = ReadFlash -> SendRadio;
+		
+	SampleTimer:[*] = (30 min, 5 hr);
+	

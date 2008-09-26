@@ -1,0 +1,222 @@
+ \tolerance = 1000
+\documentclass[onecolumn, 10pt]{article}
+\usepackage{epsfig}
+\usepackage{amssymb, amsmath}
+%\usepackage[pdftex]{graphicx}
+\usepackage{graphicx}
+
+
+ \begin{document}
+
+\section{DTN Protocol for TurtleNet}
+
+
+We plan to use a simple routing scheme similar to the one used in
+PROPHET, with a different metric and with adaptation and replication.
+
+
+\subsection{Routing Metric}
+
+The metric used in PROPHET is \emph{delivery predicability}, which is
+essentially a transitive probability of being able to deliver a packet
+from node~A to node~B.  The problem with this metric is that it is not
+a good conceptual fit to the problem, and is therefore difficult to
+work with.  This is clear from their frequent use of scaling factors
+which they use to arbitrarily tune their protocol.  For example, it is
+not clear how to combine local probabilities and transitive
+probabilities, so we add them and dampen the transitive probabilities
+with scaling factor~$\beta$.
+
+
+It seems that what they are ultimately trying to do is to minimize
+routing delay and so we plan to use \emph{estimated delay} as our
+routing metric.  We plan to use an approach similar to Jones, et al's
+MEED (Minimum Estimated Expected Delay) only we only plan to consider
+information about a node's immediate neighbors.  Initially all nodes
+assume that all paths to the basestation have infinite delay.  As
+connection events occur, each node estimates the expected delay
+between meetings with its neighbors including the basestation.  Based
+on these delays, each node estimates the delay between it and the
+basestation.  At each connection event, nodes exchange these estimates
+which they factor into their own estimate as described below.  In the
+equations, $D_{A,B}$ is the estimated delay between meetings of node~A
+and node~B, $D_{A,B,Base}$ is the estimated delay between node~A and
+the base station through node~B.
+
+
+
+\begin{equation}
+D_{A,B,Base} = D_{A,B} + D_{B,Base}
+\end{equation}
+
+
+\begin{equation}
+D_{A,Base} = \min_{X \in Neighbors} D_{A,X,Base}
+\end{equation}
+
+
+The main limitation of this metric as described is that it does not
+take into consideration bandwidth constraints and the resulting
+queueing delays.  For example, a packet sent to node~A might have to
+wait in the queue for three meetings before it is actually sent to
+node~B.  This results in the following:
+
+\begin{equation}
+D_{A,B,Base} = (3 * D_{A,B}) + D_{B,Base}
+\end{equation}
+
+We can deal with this by adding the average time that it takes a
+packet get to the front of the queue, $D_{Q}$.
+
+\begin{equation}
+D_{A,B,Base} =  D_{Q} + D_{A,B} + D_{B,Base}
+\end{equation}
+
+\subsection{eFlux Adaptation}
+
+In order to conserve energy when needed, nodes can degrade service in
+two ways: reduce the number of packets they will accept/transmit, and
+they can vary the amount of replication they will perform.  We plan to
+use the following power states for the turtle application.
+
+\begin{itemize}
+\item {\bf Level 0:} No forwarding.  Just beacons and recording
+connection events.
+
+\item {\bf Level 1:} Low bandwidth (i.e. up to 5 pkts/event) and no
+replication.
+
+\item {\bf Level 2:} Medium bandwidth (i.e. up to 20 pkts/event) and
+replicate each received packet once.
+
+\item {\bf Level 3:} High bandwidth (i.e. up to 50 pkts/event) and
+replicate each received packet twice.
+
+\end{itemize}
+
+The goal of this adaptation scheme is for each node to determine what
+level of activity it can afford (in terms of energy) which will then
+be reflected in its estimated queueing delay.  
+
+\subsection{Packet Forwarding and Replica Management}
+
+Our approach for managing replicas is tailored to the needs of low
+power embedded devices which use Flash memory for storage.  
+
+The main on-flash data structure is a queue.  Data packets can be
+appended at the head and deleted from the tail.  Data can be read in a
+random-access fashion.  The log is circular so data which is not
+deleted will eventually be overwritten when the log fills.  This
+storage structure was chosen because it is simple (small code/memory
+footprint), efficient (all operations are constant time/energy), and
+the memory is worn evenly extending the lifetime of the device.  The
+flash memory can be used as a single queue or partitioned into
+multiple smaller queues.
+
+We plan to divide the storage space into four queues.  The first queue
+will be devoted to local storage of the node's sensor data.  This is a
+fail-safe that ensures that the data can be retrieved even if our DTN
+fails.  Three smaller queues will be used to store packets en-route to
+the basestation.  These queues correspond to the node's three best
+neighbors.  When a connection event occurs, the node determines where
+this neighbor ranks among its other neighbors.  If this is the best
+neighbor, then packets are forwarded from queue~1.  Packets from the
+second and third queues go to the second and third best neighbors
+respectively, that is, of course if the energy state allows.  If the
+node is in Level 2, then only queues 1 and 2 will be serviced.
+Likewise, when a node receives a packet, it replicates it according to
+its current energy state, and appends the replicas to the queues in
+priority order.
+
+
+Using a log-structured storage system has implications on what
+operations can or should be done.  For example, sorting queued packets
+which is performed by MaxProp would be horribly expensive (in time and
+energy)---a fact that would likely negate any of the desired benefits.
+In light of this fact any sorting or prioritization must be performed
+either when the packet is received and appended to the queue or when
+it is popped from the end of queue for transmission.
+
+
+\subsection{Limiting Replication}
+
+One assumption we make in our plan is that the device will run out of
+energy before it runs out of bandwidth or storage space.  That said,
+we want to limit the amount of energy wasted by excessive replication.
+We plan to do this in two ways.  The first is through the use of
+per-packet TTL fields, which represent the maximum number of times it
+will be forwarded.  When a packet is generated by a node, it sets the
+TTL value to a reasonable upper limit, after which other nodes will
+drop the packet.  TTL values can either be set to some static upper
+limit or they can be set with respect to the node's estimated distance
+from the basestation.  The latter is attractive as it would reduce the
+number of replicas in the network for nodes close to the base station;
+however, care would need to be taken so that data is not lost due to
+node mobility.
+
+The second mechanism we can use is to detecting
+duplicates at a single node.  For example, if node~A has a packet in
+its buffer and another node offers it the same packet, it will simply
+drop the second copy since there would likely be no benefit to keeping
+it.  This check would have to be done on a per-queue basis, since
+duplicates in separate queues may benefit the system.
+
+
+\subsection{Acknowledgements}
+
+When a packet is received at the base station, an acknowledment is
+generated and sent back through the network.  In order to reduce the
+overhead of communicating ACKS, we plan to use range ACKS, which
+consist of the owner of the packet and a range of received packet
+ID's.  Range-ACKS will be exchanged at each connection event where
+forwarding will occur and each node will combine all overlapping ACKs.
+When a packet is received or about to be transmitted, the node will
+check to see if that packet has been acknowledged.  If it has, it will
+be dropped.
+
+Also, in order to avoid problems caused by packet IDs wrapping back to
+zero, we plan to limit the size of any single range ack to some fixed
+value (e.g. 20,000).  Any ACK that grows behond that size will be
+adjusted, discarding the older packet IDs.
+
+
+\section{Related Work}
+
+\subsection{DTN Routing}
+
+Epidemic Routing: give a duplicate packet to everyone.
+
+PROPHET: Simple probabilistic routing based on predictive
+deliverability metric.
+
+
+MaxProp and RAPID: Both are too complicated to run on a low-power
+microcontroller, but we could hypothetically compare them in
+simulation.
+
+DTNLite: Not really closely related.  It's a reliable custody transfer
+mechanism designed with DTN-style disconnections in mind.  It does not
+say anything about routing, and in their evaluation they assume that
+routes are statically defined and that there is no mobility.
+
+%Just found this one
+Evan Jones (waterloo), et al: Use Dartmouth WiFi traces to create a
+more realistic DTN in simulation.  They present a routing metric which
+they call MEED(Minimum Estimated Expected Delay) similar to what we
+are proposing except that they flood link-state information about all
+links during a connection event.  They show that MEED is comparable to
+approaches that have the future connection schedule available to them.
+
+I have yet to find anything dealing with energy-constrained DTN routing.
+
+
+\subsection{Energy-Aware Routing}
+
+As a proof of concept, Aman Kansal designed a routing protocol for
+sensor networks in which edge costs were based on the energy
+harvesting capabilities of the nodes.  It assumed static routes and no
+disconnections, and was evaluated purely in simulation.
+
+
+
+\end{document}

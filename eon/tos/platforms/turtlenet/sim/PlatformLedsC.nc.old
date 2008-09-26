@@ -1,0 +1,159 @@
+
+//#include "hardware.h"
+
+module PlatformLedsC {
+  provides interface GeneralIO as Led0; // red
+  provides interface GeneralIO as Led1; // green
+  provides interface GeneralIO as Led2; // yellow
+  uses interface Init;
+}
+implementation
+{
+	bool led1,led2,led3;
+	
+	event void Init.init()
+	{
+		led1 = FALSE;
+		led2 = FALSE;
+		led3 = FALSE;
+	}
+
+  async command void Led0.set()
+  {
+  	led0 = TRUE;
+  	dbg("Led","SET 0");
+  }
+  async command void Led0.clr()
+  {
+  	led0 = FALSE;
+  	dbg("Led","CLR 0");
+  }
+  
+  async command void Led0.toggle()
+  {
+  	led0 = !led0;
+  	dbg("Led","TOGGLE 0");
+  }
+  	
+  async command bool Led0.get()
+  {
+  	dbg("Led","GET 0");
+	return led0;
+  }
+  
+  async command void Led0.makeInput()
+  {
+  	dbg("Led","MAKEINPUT? 0");
+  }
+  
+  async command bool Led0.isInput()
+  {
+  	dbg("Led","ISINPUT?");
+	return FALSE;
+  }
+  
+  async command void Led0.makeOutput()
+  {
+  	dbg("Led","MAKEOUTPUT? 0");
+  }
+  
+  async command bool Led0.isOutput()
+  {
+  	dbg("Led","ISOUTPUT? 0");
+  }
+  
+  //LED1
+  
+  async command void Led1.set()
+  {
+  	led1 = TRUE;
+  	dbg("Led","SET 1");
+  }
+  async command void Led1.clr()
+  {
+  	led1 = FALSE;
+  	dbg("Led","CLR 1");
+  }
+  
+  async command void Led1.toggle()
+  {
+  	led1 = !led1;
+  	dbg("Led","TOGGLE 1");
+  }
+  	
+  async command bool Led1.get()
+  {
+  	dbg("Led","GET 1");
+	return led1;
+  }
+  
+  async command void Led1.makeInput()
+  {
+  	dbg("Led","MAKEINPUT? 1");
+  }
+  
+  async command bool Led1.isInput()
+  {
+  	dbg("Led","ISINPUT? 1");
+	return FALSE;
+  }
+  
+  async command void Led1.makeOutput()
+  {
+  	dbg("Led","MAKEOUTPUT? 1");
+  }
+  
+  async command bool Led1.isOutput()
+  {
+  	dbg("Led","ISOUTPUT? 1");
+  }
+  
+  //LED2
+  
+  async command void Led2.set()
+  {
+  	led2 = TRUE;
+  	dbg("Led","SET 2");
+  }
+  async command void Led2.clr()
+  {
+  	led2 = FALSE;
+  	dbg("Led","CLR 2");
+  }
+  
+  async command void Led2.toggle()
+  {
+  	led2 = !led2;
+  	dbg("Led","TOGGLE 2");
+  }
+  	
+  async command bool Led2.get()
+  {
+  	dbg("Led","GET 2");
+	return led2;
+  }
+  
+  async command void Led2.makeInput()
+  {
+  	dbg("Led","MAKEINPUT? 2");
+  }
+  
+  async command bool Led2.isInput()
+  {
+  	dbg("Led","ISINPUT? 2");
+	return FALSE;
+  }
+  
+  async command void Led2.makeOutput()
+  {
+  	dbg("Led","MAKEOUTPUT? 2");
+  }
+  
+  async command bool Led2.isOutput()
+  {
+  	dbg("Led","ISOUTPUT? 2");
+	return TRUE;
+  }
+  
+}
+

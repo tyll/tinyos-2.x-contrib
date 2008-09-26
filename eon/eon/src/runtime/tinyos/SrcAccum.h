@@ -1,0 +1,11 @@
+#ifndef SRCACCUM_H
+#define SRCACCUM_H
+
+	#define BIN_MS	1024L
+	#define POLL_2770_INTERVAL	(3L * 1024L)
+	#define POLL_2751_INTERVAL	(256L)
+	#define POLL_DIFF_FACTOR (POLL_2770_INTERVAL / POLL_2751_INTERVAL)
+	#define POLL_CYCLES			1
+
+#endif
+

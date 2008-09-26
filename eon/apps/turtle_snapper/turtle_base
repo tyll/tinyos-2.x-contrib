@@ -1,0 +1,56 @@
+typedef filter IsFilter;
+
+
+
+platform tinynode:
+
+//Node definition	
+//Beacon flow	
+	BeaconTimer() => ();
+	BeaconFlow() => ();
+	SetLowRxBW() => (uint8_t bw);
+	Beacon(uint8_t bw) => ();
+
+
+	GPRSTimer() => ();
+	GPRSFlow() => ();
+	GPRSSend() => ();
+	
+//RxDataPacket
+	RxData() => (uint16_t src, chunk_t pkt);
+	RxFlow(uint16_t src, chunk_t pkt) => ();
+	CheckAcks(uint16_t src, chunk_t pkt) => (uint16_t src, chunk_t pkt, bool filter, AckMsg_t ack);
+	StoreDataPacket(uint16_t src, chunk_t pkt, bool filter, AckMsg_t ack) => (uint16_t src, chunk_t pkt, bool filter, AckMsg_t ack); 
+	SendAck(uint16_t src, chunk_t pkt, bool filter, AckMsg_t ack) => ();
+	RxBatch(uint16_t src, chunk_t pkt, bool filter, AckMsg_t ack) => (uint16_t src, chunk_t pkt, bool filter, AckMsg_t ack);
+	RxDropPacket(uint16_t src, chunk_t pkt, bool filter, AckMsg_t ack) => (uint16_t src, chunk_t pkt, bool filter, AckMsg_t ack);
+	
+
+	
+
+//Required for compilation	
+	
+	stateorder {Dummy};
+	
+//Sources	
+	source BeaconTimer => BeaconFlow;
+	source timer GPRSTimer => GPRSFlow;
+	source RxData => RxFlow;
+	
+//Flows	
+	
+	BeaconFlow = SetLowRxBW -> Beacon;
+
+	GPRSFlow = GPRSSend;
+	
+	//ReceiveData
+	RxFlow = CheckAcks -> StoreDataPacket -> SendAck -> SetLowRxBW -> Beacon;
+	StoreDataPacket:[*,*,filter,*][*] = RxDropPacket;
+	StoreDataPacket:[*,*,*,*][*] = RxBatch;
+	
+	
+//Timer Values
+//	BeaconTimer:[*] = (1 min, 1 min);
+//	BeaconTimer:[*] = (5 min, 5 min);
+	GPRSTimer:[*] = (1 hr, 1 hr);
+//	GPRSTimer:[*]= (10 min, 10 min);

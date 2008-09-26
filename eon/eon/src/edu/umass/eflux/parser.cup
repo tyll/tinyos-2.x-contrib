@@ -1,0 +1,346 @@
+package edu.umass.eflux;
+
+import java.util.Vector;
+import java.io.FileInputStream;
+import java.io.PrintWriter;
+import java.io.OutputStreamWriter;
+import java_cup.runtime.*;
+
+import jdsl.graph.api.*;
+import jdsl.graph.ref.*;
+
+parser code {:
+       	public void syntax_error(Symbol cur) {
+       	      System.err.println("Syntax error at line: "+
+	      				 cur.toString());
+       	      System.err.println("Syntax error at line: "+
+	      				 ((Yylex)getScanner()).getLine());
+	}
+	public static void main(String[] args) {
+	 System.err.println("This is no longer the generating routine.");
+        }
+:}
+
+terminal ATOMIC;
+terminal ARROW, STAR, EXCLAMATION;
+terminal LEFT_CR_BRACE, RIGHT_CR_BRACE;
+terminal PIPE, COLON, COMMA, EQUALS, SEMI;
+terminal LEFT_PAREN, RIGHT_PAREN, LEFT_SQ_BRACE, RIGHT_SQ_BRACE;
+terminal TYPEDEF, SOURCEDEF;
+terminal QUESTION;
+/*terminal PLUS, QUESTION;*/
+terminal Integer NUMBER;
+terminal String IDENTIFIER;
+terminal HANDLE, ERROR;
+terminal String PROGRAM;
+terminal String SESSION;
+terminal String CONNECTION;
+terminal String PLATFORM;
+terminal STATEORDER;
+terminal SYNC;
+terminal MAX;
+terminal TIMER;
+terminal OFF;
+terminal String TIME;
+
+non terminal Program program;
+
+non terminal Vector platform_list;
+non terminal Platform platform;
+non terminal String state_id;
+non terminal Source main_fn;
+non terminal Vector main_fn_list;
+
+non terminal Vector type_list;
+non terminal TypeDeclaration type;
+
+
+non terminal Vector decl_list;
+non terminal RunSpec run_spec;
+non terminal TaskDeclaration decl;
+non terminal Vector arg_list;
+non terminal Vector comma_list;
+
+non terminal Vector expr_list;
+non terminal FlowStatement expr_part; 
+non terminal FlowStatement assn;
+non terminal Vector typed_list;
+non terminal Vector ident_list;
+non terminal Object ident;
+
+non terminal Boolean block;
+
+non terminal Vector err_list;
+non terminal ErrorHandler err_def;
+
+non terminal Integer atomic_qualifier;
+non terminal Integer atomic_type;
+non terminal Integer atomic_scope;
+non terminal Vector lock_list;
+non terminal AtomicDeclaration atomic_def;
+non terminal Vector atom_list;
+
+non terminal Vector time_constr_list;
+non terminal TimeConstraint time_constr;
+
+non terminal Vector state_order;
+non terminal Vector state_level_list;
+non terminal Vector state_list;
+non terminal Vector state_level;
+
+
+
+/*------------------------------------------------------------------
+ The main program:
+     Types 
+     States
+     Declarations 
+     Main
+     Expressions
+     Atoms
+     Errors
+-------------------------------------------------------------------*/
+
+program ::= 
+    type_list:types platform_list:pfs state_order:states main_fn_list:ml expr_list:exps time_constr_list:tl atom_list:atoms err_list:errs
+		{: RESULT = new Program(ml, pfs, tl, types, states, exps, atoms, errs); :}
+	| type_list:types platform_list:pfs state_order:states main_fn_list:ml expr_list:exps atom_list:atoms err_list:errs
+		{: RESULT = new Program(ml, pfs, new Vector(), types, states, exps, atoms, errs); :}
+	| error
+	;
+
+/*-------------------------------------------------------------------#
+# listing sources
+#-------------------------------------------------------------------*/
+main_fn_list ::= main_fn_list:l main_fn:m
+	     {: l.add(m); RESULT=l; :}
+	     | main_fn:m
+	     {: RESULT = new Vector<Source>(); RESULT.add(m); :}
+	     ;
+
+state_id ::= LEFT_SQ_BRACE IDENTIFIER:i RIGHT_SQ_BRACE 
+		{: RESULT=i; :} 
+	| {: RESULT=null; :}
+	;
+	
+	
+
+main_fn ::= SOURCEDEF IDENTIFIER:i state_id:s ARROW IDENTIFIER:d SEMI
+	{: RESULT = (s==null)?(new Source(i, d)):(new Source(i,s,d)); :} 
+    | SOURCEDEF TIMER IDENTIFIER:i state_id:s ARROW IDENTIFIER:d SEMI
+    {: RESULT = (s==null)?(new TimerSource(i, d, false)):(new TimerSource(i,s,d, false)); :}
+    | SOURCEDEF TIMER SYNC IDENTIFIER:i state_id:s ARROW IDENTIFIER:d SEMI
+    {: RESULT = (s==null)?(new TimerSource(i, d, true)):(new TimerSource(i,s,d, true)); :}
+	; 
+
+/*-------------------------------------------------------------------#
+# Declarations
+#-------------------------------------------------------------------*/
+platform_list ::= platform_list:l platform:p
+	  {: l.add(p); RESULT=l; :}
+	  | platform:p
+	  {: Vector<Platform> v = new Vector<Platform>(); v.add(p); RESULT=v;  :}
+	  ;
+
+platform ::= PLATFORM IDENTIFIER:p COLON decl_list:fl
+	  {: RESULT = new Platform(p, fl);  :}
+	  ;
+
+decl_list ::= decl_list:l decl:p
+	  {: l.add(p); RESULT=l; :}
+	  | decl:p
+	  {: Vector<TaskDeclaration> v = new Vector<TaskDeclaration>(); v.add(p); RESULT=v; :}
+	  ;
+
+decl ::= IDENTIFIER:i arg_list:in ARROW arg_list:out SEMI
+     {: RESULT = new TaskDeclaration(in, i, out); :}
+     |
+     IDENTIFIER:i LEFT_CR_BRACE run_spec:r RIGHT_CR_BRACE 
+     		  arg_list:in ARROW arg_list:out SEMI
+     {: RESULT = new TaskDeclaration(in, i, out, r); :}
+	;
+
+
+run_spec ::= STAR COMMA STAR block:b 
+	   {: RESULT=new RunSpec(true, true, b.booleanValue()); :}
+	 | NUMBER:n COMMA STAR block:b 
+	   {: RESULT=new RunSpec(false, true, b.booleanValue()); :}
+	 | NUMBER:n COMMA NUMBER:t block:b 
+	   {: RESULT=new RunSpec(false,false,b.booleanValue()); :}
+	 ;
+
+arg_list ::= LEFT_PAREN typed_list:l RIGHT_PAREN {: RESULT=l; :}
+	 | LEFT_PAREN RIGHT_PAREN {: RESULT=new Vector<Argument>(); :}
+	 ;
+
+typed_list ::= typed_list:l COMMA IDENTIFIER:t IDENTIFIER:i 
+	   {: l.add(new Argument(t,i)); RESULT=l; :}
+	 | IDENTIFIER:t IDENTIFIER:i 
+	   {: Vector<Argument> v=new Vector<Argument>(); v.add(new Argument(t,i)); RESULT=v; :}
+	 ;
+
+/*-------------------------------------------------------------------#
+#Types
+#-------------------------------------------------------------------*/
+type_list ::= type_list:tl type:t
+	  {: tl.add(t); RESULT=tl; :}
+	  |
+	  {: Vector<TypeDeclaration> v = new Vector<TypeDeclaration>(); RESULT=v; :}
+	  ;
+
+type ::= TYPEDEF IDENTIFIER:name IDENTIFIER:fn SEMI
+     {: RESULT = new TypeDeclaration(name, fn); :}
+	;
+
+/*-------------------------------------------------------------------#
+#Power States
+#-------------------------------------------------------------------*/
+state_order ::= STATEORDER LEFT_CR_BRACE state_list:sl RIGHT_CR_BRACE SEMI
+	  {: RESULT=sl; :}
+	  ;
+state_list ::= state_list:s COMMA state_level:l
+			  {: s.add(l); RESULT=s; :}
+			  | state_list:s COMMA IDENTIFIER:l
+			  {: Vector<String> v = new Vector<String>(); v.add(l); s.add(v); RESULT=s; :}
+			  | state_level:l
+			  {: Vector<Vector> v = new Vector<Vector>(); v.add(l); RESULT=v; :}
+			  | IDENTIFIER:l
+			  {: Vector<String> v = new Vector<String>(); v.add(l); 
+				 Vector<Vector> s = new Vector<Vector>(); s.add(v); RESULT=s; :}
+			  | 
+			  {: Vector<String> v = new Vector<String>(); RESULT = v; :}
+			  ;
+
+state_level ::= LEFT_SQ_BRACE state_level_list:s RIGHT_SQ_BRACE
+			  {: RESULT=s; :}
+				;
+
+state_level_list ::= state_level_list:l COMMA IDENTIFIER:s
+					{: l.add(s); RESULT=l; :}
+					 | IDENTIFIER:s
+					{: Vector<String> v = new Vector<String>(); v.add(s); RESULT=v; :}
+					;
+
+
+
+/*-------------------------------------------------------------------#
+# Expressions
+#-------------------------------------------------------------------*/
+
+expr_list ::= expr_list:l expr_part:p 
+	  {: l.add(p); RESULT=l; :}
+	  | expr_part:p
+	  {: Vector<FlowStatement> v = new Vector<FlowStatement>(); v.add(p); RESULT=v; :}
+	  ;
+
+expr_part ::= assn:e SEMI 
+			  {: RESULT=e; :};
+
+assn ::= IDENTIFIER:i EQUALS ident_list:l 
+	          {: RESULT=new SimpleFlowStatement(i, l); :}
+
+	// FlowStmt:[*,*,typedef,*,*][] = a -> b;
+  | IDENTIFIER:i COLON LEFT_SQ_BRACE comma_list:t RIGHT_SQ_BRACE LEFT_SQ_BRACE RIGHT_SQ_BRACE EQUALS ident_list:l
+		   	  {: RESULT=new SimpleFlowStatement(i, t, l);:}
+	// FlowStmt:[][state] = a -> b;
+  | IDENTIFIER:i COLON LEFT_SQ_BRACE RIGHT_SQ_BRACE LEFT_SQ_BRACE IDENTIFIER:state RIGHT_SQ_BRACE EQUALS ident_list:l
+		   	  {: RESULT=new SimpleFlowStatement(i, new Vector(), l, state);:}
+
+	// FlowStmt:[][*] = a -> b;
+  | IDENTIFIER:i COLON LEFT_SQ_BRACE RIGHT_SQ_BRACE LEFT_SQ_BRACE STAR RIGHT_SQ_BRACE EQUALS ident_list:l
+		   	  {: RESULT=new SimpleFlowStatement(i, new Vector(), l, "*");:}
+
+			  
+	// FlowStmt:[*,*,typedef,*,*][state] = a -> b;
+  | IDENTIFIER:i COLON LEFT_SQ_BRACE comma_list:t RIGHT_SQ_BRACE LEFT_SQ_BRACE IDENTIFIER:state RIGHT_SQ_BRACE EQUALS ident_list:l
+			  {: RESULT=new SimpleFlowStatement(i, t, l, state);:}
+	// FlowStmt:[*,*,typedef,*,*][*] = a -> b;
+  | IDENTIFIER:i COLON LEFT_SQ_BRACE comma_list:t RIGHT_SQ_BRACE LEFT_SQ_BRACE STAR RIGHT_SQ_BRACE EQUALS ident_list:l
+			  {: RESULT=new SimpleFlowStatement(i, t, l, "*");:}
+	;
+
+ident_list ::= ident_list:l PIPE ident:id {: l.add(id); RESULT=l; :}
+	   | ident:id {: Vector v = new Vector(); v.add(id); RESULT=v; :}
+       | {: Vector v = new Vector(); RESULT=v; :}
+	   ;
+ident ::= IDENTIFIER:i {: RESULT=i; :}
+      | LEFT_PAREN ident_list:l RIGHT_PAREN {: RESULT=l; :}
+      ;
+
+comma_list ::= comma_list:l COMMA IDENTIFIER:i 
+	   {: l.add(i); RESULT=l; :}
+	 | comma_list:l COMMA STAR {: l.add("*"); RESULT=l; :}
+	 | STAR {: RESULT = new Vector(); RESULT.add("*"); :}
+	 | IDENTIFIER:i {: RESULT=new Vector(); RESULT.add(i); :}
+	 ;
+
+
+
+
+time_constr ::= 
+			   /*
+			IDENTIFIER:i COLON LEFT_SQ_BRACE comma_list:s RIGHT_SQ_BRACE EQUALS LEFT_PAREN TIME:l COMMA TIME:h RIGHT_PAREN SEMI
+					{: RESULT=new TimeConstraint(i, s, l, h); :}
+			   */
+			 IDENTIFIER:i COLON LEFT_SQ_BRACE comma_list:s RIGHT_SQ_BRACE EQUALS LEFT_PAREN NUMBER:nl IDENTIFIER:il COMMA NUMBER:nh IDENTIFIER:ih RIGHT_PAREN SEMI
+					{: RESULT=new TimeConstraint(i, s, new String(nl + il), new String(nh + ih)); :}
+             | IDENTIFIER:i COLON LEFT_SQ_BRACE comma_list:s RIGHT_SQ_BRACE EQUALS OFF SEMI
+					{: RESULT=new TimeConstraint(i, s, "-2", "-2"); :}
+             | IDENTIFIER:i COLON LEFT_SQ_BRACE comma_list:s RIGHT_SQ_BRACE EQUALS LEFT_PAREN TIME:l COMMA MAX RIGHT_PAREN SEMI
+					{: RESULT=new TimeConstraint(i, s, l, "-1"); :}
+			 ;
+
+/*
+time_constr_list ::= time_constr_list:l time_constr:c
+						{: l.add(c); RESULT=l; :}
+	               	 |
+				   		{: RESULT=new Vector<TimeConstraint>(); :}
+				   	 ;
+*/
+
+time_constr_list ::= time_constr_list:l time_constr:c
+					 {: l.add(c); RESULT=l; :}
+	               	 | time_constr:c
+					 {: Vector <TimeConstraint> v = new Vector<TimeConstraint>(); v.add(c); RESULT=v; :}
+				   	 ;
+
+
+err_def ::= HANDLE ERROR ident_list:l ARROW IDENTIFIER:i SEMI
+	  {: RESULT = new ErrorHandler(l, i); :}
+	;
+
+err_list ::= 
+		err_list:l err_def:d 
+			{: l.add(d); RESULT=l; :}
+	  	| 
+			{: RESULT = new Vector<ErrorHandler>(); :}
+	  ;
+
+atomic_type ::= QUESTION {: RESULT=new Integer(Lock.READER); :} 
+	| EXCLAMATION {: RESULT=new Integer(Lock.WRITER); :}
+	;
+
+atomic_scope ::=  PROGRAM {: RESULT=new Integer(Lock.PROGRAM); :}
+	| SESSION {: RESULT=new Integer(Lock.SESSION); :}
+	| CONNECTION {: RESULT=new Integer(Lock.CONNECTION); :}
+	;
+
+atomic_qualifier ::= atomic_type:at LEFT_PAREN atomic_scope:as RIGHT_PAREN
+		{: RESULT=new Integer(at.intValue()|as.intValue()); :}
+	| atomic_type:at {: RESULT=at; :}
+	| LEFT_PAREN atomic_scope:as RIGHT_PAREN {: RESULT=as; :}
+	| {: RESULT=new Integer(Lock.WRITER | Lock.PROGRAM); :};
+
+lock_list ::= IDENTIFIER:lock atomic_qualifier:aq 
+	{: RESULT = new Vector<Lock>(); 
+	   ((Vector)RESULT).add(new Lock(lock,aq)); :}
+	| IDENTIFIER:lock atomic_qualifier:aq COMMA lock_list:l
+	{: l.add(new Lock(lock, aq)); RESULT = l; :}	
+	;
+atomic_def ::= 
+	   ATOMIC IDENTIFIER:i COLON LEFT_CR_BRACE lock_list:ll RIGHT_CR_BRACE SEMI
+		{: RESULT = new AtomicDeclaration(i, ll); :}
+	 ;
+atom_list ::= atom_list:l atomic_def:a {: l.add(a); RESULT=l; :}
+	  | {: RESULT = new Vector(); :}
+	  ;

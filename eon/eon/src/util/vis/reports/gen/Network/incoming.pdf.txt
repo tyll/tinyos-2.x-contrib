@@ -1,0 +1,1 @@
+This figure shows packet delivered by the base stations over time.  Total packets are shown in red, and new (previously unseen) packets are shown in blue.  The burst of activity in July was predeployment testing.

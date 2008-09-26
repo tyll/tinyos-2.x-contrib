@@ -1,0 +1,63 @@
+typedef even IsEven;
+typedef odd IsOdd;
+
+
+platform tinynode_2:
+
+//Node definition	
+//Really fast flow
+	FastTimer() => ();
+	FastFlow() => ();
+	FastCheckVal() => (bool valid);
+	FastReact(bool valid) => ();
+
+//Medium flow
+//	MedTimer () => ();
+//	MedFlow() => ();
+//	MedCheckVal() => (bool valid);
+//	MedReact(bool valid) => ();
+
+//Slow flow
+//	SlowTimer() => ();
+//	SlowFlow() => ();
+//	SlowCheckVal() => (bool valid);
+//	SlowReact (bool valid) => ();
+	
+	
+//Random flow	
+//	RandomWait() => (int value);
+//	RandFlow(int value) => ();
+//	EvenCheckVal(int value) => (bool valid);
+//	EvenReact(bool valid) => ();
+//	OddCheckVal(int value) => (bool valid);
+//	OddReact(bool valid) => ();
+
+	
+	
+//Required for compilation	
+	stateorder {HiPower};
+	
+//Sources	
+	source timer FastTimer => FastFlow;
+//	source timer MedTimer => MedFlow;
+//	source timer SlowTimer => SlowFlow;
+//	source RandomWait => RandFlow;
+	
+	
+	
+	
+//Flows	
+	
+	
+	FastFlow = FastCheckVal -> FastReact;
+//	MedFlow = MedCheckVal -> MedReact;
+//	SlowFlow = SlowCheckVal -> SlowReact;
+
+//	RandFlow:[even][*] = EvenCheckVal -> EvenReact;
+//	RandFlow:[odd][*] = OddCheckVal -> OddReact;
+	
+	
+	FastTimer:[*] = (100 ms, 300 ms);
+//	MedTimer:[*] = (1 sec, 5 sec);
+//	SlowTimer:[*] = (7 sec, 13 sec);
+	

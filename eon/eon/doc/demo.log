@@ -1,0 +1,158 @@
+This is pdfTeXk, Version 3.14159-1.10b (Web2C 7.4.5) (format=pdflatex 2004.10.20)  11 MAY 2006 14:22
+ %&-line parsing enabled.
+**demo
+(./demo.tex{/usr/share/texmf/pdftex/config/pdftex.cfg}
+LaTeX2e <2001/06/01>
+Babel <v3.7h> and hyphenation patterns for american, french, german, ngerman, n
+ohyphenation, loaded.
+(/usr/share/texmf/tex/latex/base/article.cls
+Document Class: article 2001/04/21 v1.4e Standard LaTeX document class
+(/usr/share/texmf/tex/latex/base/size10.clo
+File: size10.clo 2001/04/21 v1.4e Standard LaTeX file (size option)
+)
+\c@part=\count79
+\c@section=\count80
+\c@subsection=\count81
+\c@subsubsection=\count82
+\c@paragraph=\count83
+\c@subparagraph=\count84
+\c@figure=\count85
+\c@table=\count86
+\abovecaptionskip=\skip41
+\belowcaptionskip=\skip42
+\bibindent=\dimen102
+) (./latex8.sty
+IEEE 8.5 x 11-Inch Proceedings Style `latex8.sty'.
+\@ctmp=\skip43
+\@figindent=\skip44
+) (/usr/share/texmf/tex/latex/psnfss/times.sty
+Package: times 2002/09/08 PSNFSS-v9.0a (SPQR) 
+)
+(/usr/share/texmf/tex/latex/graphics/epsfig.sty
+Package: epsfig 1999/02/16 v1.7a (e)psfig emulation (SPQR)
+
+(/usr/share/texmf/tex/latex/graphics/graphicx.sty
+Package: graphicx 1999/02/16 v1.0f Enhanced LaTeX Graphics (DPC,SPQR)
+
+(/usr/share/texmf/tex/latex/graphics/keyval.sty
+Package: keyval 1999/03/16 v1.13 key=value parser (DPC)
+\KV@toks@=\toks14
+)
+(/usr/share/texmf/tex/latex/graphics/graphics.sty
+Package: graphics 2001/07/07 v1.0n Standard LaTeX Graphics (DPC,SPQR)
+
+(/usr/share/texmf/tex/latex/graphics/trig.sty
+Package: trig 1999/03/16 v1.09 sin cos tan (DPC)
+)
+(/usr/share/texmf/tex/latex/config/graphics.cfg
+File: graphics.cfg 2001/08/31 v1.1 graphics configuration of teTeX/TeXLive
+)
+Package graphics Info: Driver file: pdftex.def on input line 80.
+
+(/usr/share/texmf/tex/latex/graphics/pdftex.def
+File: pdftex.def 2002/06/19 v0.03k graphics/color for pdftex
+\Gread@gobject=\count87
+))
+\Gin@req@height=\dimen103
+\Gin@req@width=\dimen104
+)
+\epsfxsize=\dimen105
+\epsfysize=\dimen106
+)
+(/usr/share/texmf/tex/latex/base/ifthen.sty
+Package: ifthen 2001/05/26 v1.1c Standard LaTeX ifthen package (DPC)
+)
+
+LaTeX Warning: Unused global option(s):
+    [times].
+
+(./demo.aux)
+\openout1 = `demo.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 63.
+LaTeX Font Info:    ... okay on input line 63.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 63.
+LaTeX Font Info:    ... okay on input line 63.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 63.
+LaTeX Font Info:    ... okay on input line 63.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 63.
+LaTeX Font Info:    ... okay on input line 63.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 63.
+LaTeX Font Info:    ... okay on input line 63.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 63.
+LaTeX Font Info:    ... okay on input line 63.
+LaTeX Font Info:    Try loading font information for OT1+ptm on input line 63.
+ (/usr/share/texmf/tex/latex/psnfss/ot1ptm.fd
+File: ot1ptm.fd 2001/06/04 font definitions for OT1/ptm.
+)
+(/usr/share/texmf/tex/context/base/supp-pdf.tex
+(/usr/share/texmf/tex/context/base/supp-mis.tex
+loading : Context Support Macros / Missing
+\protectiondepth=\count88
+\scratchcounter=\count89
+\scratchtoks=\toks15
+\scratchdimen=\dimen107
+\scratchskip=\skip45
+\scratchmuskip=\muskip10
+\scratchbox=\box26
+\scratchread=\read1
+\scratchwrite=\write3
+\zeropoint=\dimen108
+\minusone=\count90
+\thousandpoint=\dimen109
+\emptytoks=\toks16
+\nextbox=\box27
+\nextdepth=\dimen110
+\everyline=\toks17
+\!!counta=\count91
+\!!countb=\count92
+\recursecounter=\count93
+)
+loading : Context Support Macros / PDF
+\nofMPsegments=\count94
+\nofMParguments=\count95
+\everyMPtoPDFconversion=\toks18
+)
+LaTeX Font Info:    Try loading font information for OT1+phv on input line 85.
+ (/usr/share/texmf/tex/latex/psnfss/ot1phv.fd
+File: ot1phv.fd 2001/06/04 scalable font definitions for OT1/phv.
+)
+LaTeX Font Info:    Font shape `OT1/phv/bx/n' in size <14.4> not available
+(Font)              Font shape `OT1/phv/b/n' tried instead on input line 85.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <7> on input line 85.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <5> on input line 85.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <10> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 85.
+LaTeX Font Info:    Try loading font information for OMS+ptm on input line 85.
+
+(/usr/share/texmf/tex/latex/psnfss/omsptm.fd
+File: omsptm.fd 
+)
+LaTeX Font Info:    Font shape `OMS/ptm/m/n' in size <10> not available
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 85.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <12> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 90.
+
+<fig/turtle.jpg, id=1, 1145.02782pt x 792.71156pt>
+File: fig/turtle.jpg Graphic file (type jpg)
+ <use fig/turtle.jpg>
+(./demo.bbl) [1{/exp/rcf/common/share/texmf-umass/dvips/config/pdftex.map}
+
+
+ <./fig/turtle.jpg>] (./demo.aux) ) 
+Here is how much of TeX's memory you used:
+ 1110 strings out of 50437
+ 13296 string characters out of 690232
+ 63395 words of memory out of 1500001
+ 4128 multiletter control sequences out of 10000+25000
+ 18664 words of font info for 34 fonts, out of 400000 for 1000
+ 14 hyphenation exceptions out of 10000
+ 32i,8n,21p,195b,371s stack positions out of 3000i,500n,3000p,50000b,5000s
+ 16 PDF objects out of 65536
+ 0 named destinations out of 20000
+ 5 words of extra memory for PDF output out of 65536
+{/usr/share/texmf/dvips/psnfss/8r.enc}</usr/
+share/texmf/fonts/type1/bluesky/cm/cmsy10.pfb>
+Output written on demo.pdf (1 page, 201224 bytes).

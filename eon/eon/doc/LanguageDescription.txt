@@ -1,0 +1,59 @@
+/*------------------------------------------------------------------
+eFlux Language Description The main program:
+Types
+Declarations
+States // NEW
+State Ordering // NEW
+Timers // Some source nodes will be timers
+Sources // Same as in Flux
+Expressions
+Errors 
+-------------------------------------------------------------------*/
+
+
+// TYPES
+"typedef" <typedef return name> <typedef name>
+// e.g. typedef text TestText
+
+
+// DECLARATIONS
+<node name> [Platform] (Input Signature Here) => (Ouput Signature Here);
+// e.g. ReadRequest[TELOS] (uint16_t connid) => (uint16_t connid,
+uint8_t type, request_t request);
+
+
+// SOURCES
+"source" <source name> => <node name>
+// e.g.         source Listen => Page;
+//sources are tuneable, but you never turn off a source
+//though the source can turn itself off it it wants to.
+"source" <source name> (value) => <node name>
+// e.g.         source Listen (3) => Page;
+
+
+// STATES
+"statedef" <state name>; // e.g. statedef FullText;
+"statedef" <state name> (level); // e.g. statedef FullText (10);
+
+
+// STATE ORDERING
+"state_ordering" = { {state_def_1}, {state_def_2_1, state_def_2_2, ...
+, state_def_2_n}, ... , {state_def_n} };
+// e.g. state_ordering = { {Video(8)}, {Video(5), Audio(8)},
+{Audio(3), FullImage(9)}, ... , {FullText}};
+
+
+// EXPRESSIONS
+<node name> = <node name_1> -> ... -> <node name_N>;
+// e.g.         Page = ReadRequest -> Handler;
+<node name> [*,.., typedef ,*,()] = <node name_1> -> ... -> <node name_N>;
+// e.g.         Handler[*,text,*, ()] = SrvShortText -> TelosClose;
+<node name> [*,.., typedef ,*, (requirements here)] = <node name_1> -> ... -> <node name_N>;
+// e.g. Handler [*,text,*, (Video, Audio)] = SrvVideoAudio -> StargateClose;
+
+
+// ERRORS
+"handle error" <node name> => <error node name>
+// e.g.         source SrvShortText => SorryErr;
+
+//Should we be able to define a default error handler?  Just a thought.

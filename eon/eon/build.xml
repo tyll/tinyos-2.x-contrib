@@ -1,0 +1,100 @@
+<?xml version="1.0"?>
+<project name="eon" basedir="." default="all">
+  <property name="src.dir" value="src"/>
+  <property name="classes.dir" value="./bin"/>
+  <property name="lib.dir" value="lib"/>
+  <property name="java_cup.classes" 
+	    value="./lib/javacuplex.jar"/>
+  <property name="jars" 
+            value="lib/javacuplex.jar:lib/getopt.jar:lib/seda.jar"/>
+
+  <target name="clean" description="Delete generated files">
+    <delete dir="${classes.dir}/edu" failonerror="false"/>
+    <delete failonerror="false">
+      <fileset dir="generated">
+	<include name="*.java"/>
+      </fileset>
+    </delete>
+    <delete failonerror="false">
+      <fileset dir="docs">
+	<include name="**/*.html"/>
+      </fileset>
+    </delete>
+  </target>
+
+  <target name="generate" description="Generate code">
+    
+	<antcall target="scanner-generate"/>
+	<antcall target="parser-generate"/>
+    <antcall target="config-scanner-generate"/>
+    <antcall target="config-parser-generate"/>
+    
+  </target>
+
+  <target name="prepare" description="Get ready...">
+    <mkdir dir="${classes.dir}"/>
+  </target>	
+
+  <target name="scanner-generate">
+    <taskdef name="jlex" classname="JLex.JLexTask" 
+	     classpath="${java_cup.classes}"/>
+    <jlex file="${src.dir}/edu/umass/eflux/grammar.lex"/>
+    <move file="${src.dir}/edu/umass/eflux/grammar.lex.java" 
+    	  tofile="${src.dir}/edu/umass/eflux/Yylex.java"/>
+  	
+  </target>
+   
+  
+  <target name="parser-generate">
+    <taskdef name="java-cup" classname="java_cup.AntTask" 
+	     classpath="${java_cup.classes}"/>
+    <java-cup file="${src.dir}/edu/umass/eflux/parser.cup"/>
+  	<move file="sym.java" tofile="${src.dir}/edu/umass/eflux/sym.java"/>
+    <move file="parser.java" tofile="${src.dir}/edu/umass/eflux/parser.java"/>
+  </target>
+	
+  <target name="compile" depends="prepare,generate">
+    <javac srcdir="${src.dir}/edu/umass/eflux"
+	    destdir="${classes.dir}"
+	    debug="true"
+	   classpath="lib/javacuplex.jar:lib/jdsl.jar:lib/getopt.jar"/>
+  </target>
+	
+	<target name="config-scanner-generate">
+	  	<taskdef name="jlex" classname="JLex.JLexTask" 
+	  		classpath="${java_cup.classes}"/>
+	  	<jlex file="${src.dir}/edu/umass/eflux/nesc/config.lex"/>
+	  	<move file="${src.dir}/edu/umass/eflux/nesc/config.lex.java" 
+	  	  	    	  tofile="${src.dir}/edu/umass/eflux/nesc/Yylex.java"/>
+	  </target>
+		
+	<target name="config-parser-generate">
+	    <taskdef name="java-cup" classname="java_cup.AntTask" 
+		     classpath="${java_cup.classes}"/>
+	    <java-cup file="${src.dir}/edu/umass/eflux/nesc/config.cup"/>
+	  	<move file="sym.java" tofile="${src.dir}/edu/umass/eflux/nesc/sym.java"/>
+	    <move file="parser.java" tofile="${src.dir}/edu/umass/eflux/nesc/parser.java"/>
+	  </target>
+	  
+	
+<!--
+  <target name="compile" depends="prepare,generate">
+    <javac srcdir="${src.dir}/edu/umass/eflux"
+	   bootclasspath="${jsr14}/gjc-rt.jar:${jsr14}/collect.jar:/System/Library/Frameworks/JavaVM.framework/Classes/classes.jar"
+	   source="1.5"
+	   target="jsr14"
+	   destdir="${classes.dir}"
+	   classpath="lib/javacuplex.jar"/>
+  </target>
+-->
+  <target name="doc">
+    <javadoc sourcepath="${src.dir}"
+	     destdir="docs"
+	     packagenames="edu.umass.eflux"/>
+  </target>
+  
+  <target name="all" depends="compile"/>
+
+
+ 
+</project>

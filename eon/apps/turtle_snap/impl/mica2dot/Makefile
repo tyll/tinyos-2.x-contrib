@@ -1,0 +1,13 @@
+COMPONENT = Runtime
+SENSORBOARD=mica2dotsb
+PFLAGS +=-I%T/lib/TinyRely
+PFLAGS +=-Iruntime
+PFLAGS +=-I%T/lib/Util -I../../tos/lib/Util
+#PFLAGS +=-DTEST_BEACON
+#PFLAGS +=-DRUNTIME_TEST
+#PFLAGS +=-DGPSTEST
+#PFLAGS += -DWITH_DELUGE
+#PFLAGS += -DWITH_WATER_SENSOR
+MSG_SIZE = 31
+include ../Makerules
+

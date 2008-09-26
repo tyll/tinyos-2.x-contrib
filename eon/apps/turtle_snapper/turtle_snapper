@@ -1,0 +1,146 @@
+typedef accept IsAccept;
+
+
+
+platform tinynode:
+
+//Node definition	
+//Beacon flow	
+	BeaconTimer() => ();
+	BeaconBWSelect() => ();
+	SetHiTxBW() => (uint16_t bw);
+	//SetMedTxBW() => (uint16_t bw);
+	SetLowTxBW() => (uint16_t bw);
+	//SetNoTxBW() => (uint16_t bw);
+	BeaconFlow(uint16_t bw) => ();
+	Beacon(uint16_t bw) => (uint16_t bw, uint16_t dest_addr);
+	SendAcks(uint16_t bw, uint16_t dest_addr) => (uint16_t bw, uint16_t dest_addr);
+	SendData(uint16_t bw, uint16_t dest_addr) => (uint16_t bw, uint16_t dest_addr);
+	SendArchive(uint16_t bw, uint16_t dest_addr) => ();
+	
+
+//ListenBeacon flow	
+	ListenBeacon() => (uint16_t addr, uint16_t delay);
+	RxBWSelect(uint16_t addr, uint16_t delay) => ();
+	//SetNoRxBW(uint16_t addr, uint16_t delay) => (uint16_t addr, uint16_t delay, uint16_t bw);
+	SetLowRxBW(uint16_t addr, uint16_t delay) => (uint16_t addr, uint16_t delay, uint16_t bw);
+	//SetMedRxBW(uint16_t addr, uint16_t delay) => (uint16_t addr, uint16_t delay, uint16_t bw);
+	SetHiRxBW(uint16_t addr, uint16_t delay) => (uint16_t addr, uint16_t delay, uint16_t bw);
+	
+	ListenBeaconFlow(uint16_t addr, uint16_t delay, uint16_t bw) => ();
+	WantIt(uint16_t addr, uint16_t delay, uint16_t bw) => (uint16_t addr, uint16_t delay, uint16_t bw, bool accept);
+	//PathSelect(uint16_t addr, uint16_t delay, uint16_t bw, bool accept) => ();
+	SendResponse(uint16_t addr, uint16_t delay, uint16_t bw, bool accept) => (uint16_t addr, uint16_t delay, uint16_t bw);
+	RecvAcksNPkts(uint16_t addr, uint16_t delay, uint16_t bw) => ();
+	//IgnoreConnection(uint16_t addr, uint16_t delay, uint16_t bw, bool accept) => ();
+
+
+	
+
+	
+//LogConnectionEvents
+	ConnectionDone() => (uint16_t addr, uint16_t duration, uint8_t quality);
+	LogConnectionFlow(uint16_t addr, uint16_t duration, uint8_t quality) => ();
+	LogConnectionEvent(uint16_t addr, uint16_t duration, uint8_t quality) => (chunkarr_t chunkarr);
+	
+	
+//LogChunk Flow
+	LogFlow(chunkarr_t chunkarr) => ();
+	LogOwn(chunkarr_t chunkarr) => (chunkarr_t chunkarr);
+	LogFirst(chunkarr_t chunkarr) => ();
+	
+	
+
+//Runtime data collection flow
+	RTDataTimer () => ();
+	RTDataFlow () => ();
+	StoreRTData() => (chunkarr_t chunkarr);
+
+//Flow data collection flow
+	PathDoneTimer () => ();
+	PathDoneFlow () => ();
+	StorePathData() => (chunkarr_t chunkarr);
+	
+//GPS Timer flow
+	GoodMorning() => ();
+	GPSTimer() => ();
+	GPSFlow() => ();
+	
+	
+	GetGPS() => (GpsData_t data, uint16_t numsats, bool toofew);
+	StoreGPSData(GpsData_t data, uint16_t numsats, bool toofew) => (chunkarr_t chunkarr);
+	
+	
+// Data Collection flow
+	//CollectData() => (uint16_t page, uint16_t src_addr);
+	
+//	CaseSelect (int action, uint16_t bundle, uint16_t src_addr) => ();
+	//CollectFlow(uint16_t page, uint16_t src_addr) => ();
+	//GetDataPage(uint16_t page, uint16_t src_addr) => ();
+
+
+	
+	
+	
+//Required for compilation	
+	
+	stateorder {[HiGPS, HiBW], LowBW};
+	
+//Sources
+	source BeaconTimer => BeaconBWSelect;
+	source timer GPSTimer => GPSFlow;
+	source timer RTDataTimer => RTDataFlow;
+	source timer PathDoneTimer => PathDoneFlow;
+	source ConnectionDone => LogConnectionFlow;
+	source GoodMorning => GPSFlow;
+	
+	source ListenBeacon => RxBWSelect;
+	
+	
+//Flows	
+	
+	BeaconBWSelect:[][HiBW] = SetHiTxBW -> BeaconFlow;
+	//BeaconBWSelect:[][MedBW] = SetMedTxBW -> BeaconFlow;
+	//BeaconBWSelect:[][LowBW] = SetLowTxBW -> BeaconFlow;
+	BeaconBWSelect:[][*] = SetLowTxBW -> BeaconFlow;
+	//BeaconBWSelect:[][*] = SetNoTxBW -> BeaconFlow;
+	
+	BeaconFlow = Beacon -> SendAcks -> SendData -> SendArchive;
+	
+	
+	
+	//Response to Beacons
+	RxBWSelect:[*,*][HiBW] = SetHiRxBW -> ListenBeaconFlow;
+	//RxBWSelect:[*,*][MedBW] = SetMedRxBW -> ListenBeaconFlow;
+	//RxBWSelect:[*,*][LowBW] = SetLowRxBW -> ListenBeaconFlow;
+	RxBWSelect:[*,*][*] = SetLowRxBW -> ListenBeaconFlow;
+	//RxBWSelect:[*,*][*] = SetNoRxBW -> ListenBeaconFlow;
+	
+	
+	//ListenBeaconFlow = WantIt -> PathSelect;
+	ListenBeaconFlow = WantIt -> SendResponse -> RecvAcksNPkts;
+	//PathSelect:[*,*,*,accept][] = SendResponse -> RecvAcksNPkts;
+	//PathSelect:[*,*,*,*][] = IgnoreConnection;
+	
+		
+	
+	//Data Collection Flows
+	GPSFlow = GetGPS -> StoreGPSData -> LogFlow;
+	RTDataFlow = StoreRTData -> LogFlow;
+	PathDoneFlow = StorePathData -> LogFlow;
+	LogConnectionFlow = LogConnectionEvent -> LogFlow;
+	
+	//Data Logging Flows
+	LogFlow = LogOwn -> LogFirst;
+
+	//CollectFlow = GetDataPage;
+	
+				
+//Timer Values
+
+	RTDataTimer:[*] = (1 hr, 1 hr);
+	GPSTimer:[HiGPS] = (1 hr, 14 hr);
+	GPSTimer:[*] = (14 hr, 18 hr);
+	PathDoneTimer:[*] = (93 min,  93 min);
+	//PathDoneTimer:[*] = (43 sec,  43 sec);
+

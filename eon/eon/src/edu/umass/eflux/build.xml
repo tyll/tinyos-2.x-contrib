@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<project name="eflux" basedir="." default="all">
+  <property name="src.dir" value="src"/>
+  <property name="classes.dir" value="classes"/>
+  <property name="java_cup.classes" 
+	    value="./lib/javacuplex.jar"/>
+
+  <target name="clean" description="Delete generated files">
+    <delete dir="${classes.dir}/edu" failonerror="false"/>
+    <delete failonerror="false">
+      <fileset dir="generated">
+	<include name="*.java"/>
+      </fileset>
+    </delete>
+    <delete failonerror="false">
+      <fileset dir="docs">
+	<include name="**/*.html"/>
+      </fileset>
+    </delete>
+  </target>
+
+  <target name="scanner-generate">
+    <taskdef name="jlex" classname="JLex.JLexTask" 
+	     classpath="${java_cup.classes}"/>
+    <jlex file="grammar.lex"/>
+    <move file="grammar.lex.java" tofile="generated/Yylex.java"/>
+  </target>
+   
+  <target name="parser-generate">
+    <taskdef name="java-cup" classname="java_cup.AntTask" 
+	     classpath="${java_cup.classes}"/>
+    <java-cup file="parser.cup"/>
+    <move file="sym.java" tofile="generated/sym.java"/>
+    <move file="parser.java" tofile="generated/parser.java"/>
+  </target>
+  
+  <target name="compile">
+    <javac srcdir="src/edu/umass/eflux"
+	   destdir="classes"
+	   classpath="lib/javacuplex.jar"/>
+  </target>
+
+  <target name="compile-generated" 
+	  depends="compile,scanner-generate,parser-generate">
+    <javac srcdir="generated"
+	   destdir="classes"
+	   classpath="lib/javacuplex.jar:./classes"/>
+  </target>
+
+  <target name="doc">
+    <javadoc sourcepath="src"
+	     destdir="docs"
+	     packagenames="edu.umass.eflux"/>
+  </target>
+  <target name="all" depends="compile-generated"/>
+</project>

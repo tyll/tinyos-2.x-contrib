@@ -1,0 +1,68 @@
+typedef accept IsAccept;
+
+
+
+platform tinynode:
+
+//Node definition	
+//Beacon flow	
+	BeaconTimer() => ();
+	BeaconBWSelect() => ();
+	SetNoTxBW() => (uint16_t bw);
+	BeaconFlow(uint16_t bw) => ();
+	Beacon(uint16_t bw) => (uint16_t bw, uint16_t dest_addr);
+	SendAcks(uint16_t bw, uint16_t dest_addr) => (uint16_t bw, uint16_t dest_addr);
+	SendArchive(uint16_t bw, uint16_t dest_addr) => ();
+	
+
+//ListenBeacon flow	
+ListenBeaconBase() => (uint16_t addr, uint16_t delay);
+	RxBWSelect(uint16_t addr, uint16_t delay) => ();
+	//SetNoRxBW(uint16_t addr, uint16_t delay) => (uint16_t addr, uint16_t delay, uint16_t bw);
+	//SetLowRxBW(uint16_t addr, uint16_t delay) => (uint16_t addr, uint16_t delay, uint16_t bw);
+	//SetMedRxBW(uint16_t addr, uint16_t delay) => (uint16_t addr, uint16_t delay, uint16_t bw);
+	SetHiRxBW(uint16_t addr, uint16_t delay) => (uint16_t addr, uint16_t delay, uint16_t bw);
+	
+	//ListenBeaconFlow(uint16_t addr, uint16_t delay, uint16_t bw) => ();
+	//WantIt(uint16_t addr, uint16_t delay, uint16_t bw) => (uint16_t addr, uint16_t delay, uint16_t bw, bool accept);
+	//PathSelect(uint16_t addr, uint16_t delay, uint16_t bw, bool accept) => ();
+	SendResponse(uint16_t addr, uint16_t delay, uint16_t bw) => (uint16_t addr, uint16_t delay, uint16_t bw);
+	RecvAcksNPkts(uint16_t addr, uint16_t delay, uint16_t bw) => ();
+	//IgnoreConnection(uint16_t addr, uint16_t delay, uint16_t bw, bool accept) => ();
+
+//Nodes for sending the data over the GPRS modem
+	GPRSTimer() => ();
+	GPRSFlow() => ();
+	GPRSSend() => ();
+	
+
+	
+	
+	
+	
+//Required for compilation	
+	
+	stateorder {};
+	
+//Sources	
+	source BeaconTimer => BeaconBWSelect;
+	source GPRSTimer => GPRSFlow;
+		
+	source ListenBeaconBase => RxBWSelect;
+	
+	
+//Flows	
+	
+	BeaconBWSelect:[][*] = SetNoTxBW -> BeaconFlow;
+	
+	BeaconFlow = Beacon -> SendAcks -> SendArchive;
+	GPRSFlow = GPRSSend;
+	
+	
+	//Response to Beacons
+	RxBWSelect:[*,*][*] = SetHiRxBW -> SendResponse -> RecvAcksNPkts;
+	
+	
+
+	
+				

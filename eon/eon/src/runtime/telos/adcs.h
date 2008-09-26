@@ -1,0 +1,12 @@
+enum
+{
+  TOS_ADC_A0_PORT = unique("ADCPort"),
+
+  TOSH_ACTUAL_ADC_A0_PORT = ASSOCIATE_ADC_CHANNEL (INPUT_CHANNEL_A0,
+						   REFERENCE_VREFplus_AVss,
+						   REFVOLT_LEVEL_1_5),
+						 
+  VREF = 2600,
+  TIMERRES = (uint32_t)32768
+};
+

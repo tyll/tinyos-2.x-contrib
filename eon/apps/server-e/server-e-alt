@@ -1,0 +1,82 @@
+typedef text TestText;
+typedef image TestImage;
+typedef audio TestAudio;
+typedef video TestVideo;
+
+typedef stargate_video StargateTestVideo;
+typedef stargate_audio StargateTestAudio;
+typedef stargate_image StargateTestImage;
+
+
+platform TELOS:
+
+	Listen ()
+		=> (RequestMsg request);
+
+	Page (RequestMsg request)
+		=> ();
+
+	ReadRequest (RequestMsg request)
+		=> (RequestMsg request, uint8_t type);
+		
+	TelosHandler (RequestMsg request, uint8_t type)
+		=> ();
+		
+	Sorry (RequestMsg request, uint8_t type)
+		=> ();
+
+	
+	RedirectWifi (RequestMsg request, uint8_t type)
+		=> (RequestMsg request, uint8_t type, uint16_t port_num);
+		
+	
+
+platform STARGATE:
+
+	StargatePage (RequestMsg request, uint8_t type, uint16_t port_num)
+		=> ();
+	
+	StargateListen (RequestMsg request, uint8_t type, uint16_t port_num)
+		=> (int socket, uint8_t type, char *filename);
+	
+	ReadData (int socket, uint8_t type, char *filename)
+		=> (int socket, uint8_t type, char *data, int size);
+
+	ReadText (RequestMsg request, uint8_t type)
+		=> (RequestMsg request, uint8_t type, char *data, int size);
+			
+	SendWifi (int socket, uint8_t type, char *data, int size)
+		=> (int socket); 
+
+	SendZigbee (RequestMsg request, uint8_t type, char *data, int size)
+		=> (); 
+		
+	CloseWifi (int socket)
+		=> ();
+
+	
+stateorder  {Video_HiBR,
+			[Video_LoBR, Audio_HiFi],
+			[Audio_LoFi, Image_HiDef],
+			Image_LoDef,
+			Image_Thumb,
+			Text
+			};
+
+
+source Listen => Page;
+
+
+Page = ReadRequest -> TelosHandler;
+
+StargatePage = StargateListen -> ReadData -> SendWifi -> CloseWifi;
+
+TelosHandler:[*, video][Video_LoBR]  = RedirectWifi -> StargatePage;
+TelosHandler:[*, audio][Audio_LoFi]  = RedirectWifi -> StargatePage;
+TelosHandler:[*, image][Image_Thumb] = RedirectWifi -> StargatePage;
+TelosHandler:[*, text][Text]         = ReadText -> SendZigbee;
+TelosHandler:[*, *][*]               = Sorry;
+
+
+handle error ReadText => SorryErr;
+

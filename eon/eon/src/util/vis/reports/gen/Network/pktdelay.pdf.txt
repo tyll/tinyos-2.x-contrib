@@ -1,0 +1,3 @@
+This figure shows the delay (in days) for each delivered packet over time 
+(time 
+generated is shown on the x axis).

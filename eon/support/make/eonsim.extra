@@ -1,0 +1,118 @@
+TOSCONTRIB=$(CONTRIBDIR)
+SIM_DIR = $(TOSCONTRIB)/eon/tos/lib/tossim
+SIM_ENERGY_DIR = $(TOSCONTRIB)/eon/tos/lib/tossim/energy
+
+SIM_ENERGY_FLAGS = -I$(SIM_ENERGY_DIR) -I$(SIM_DIR)
+
+GCC=gcc
+GPP=g++
+OPTFLAGS = -pg -g -O0
+LIBS = -lm -lstdc++ 
+PFLAGS += -fnesc-nido-tosnodes=1000 -fnesc-simulate -fnesc-nido-motenumber=sim_node\(\) $(SIM_ENERGY_FLAGS) -tossim 
+CFLAGS += -I/usr/local/include/python2.5
+WFLAGS = -Wno-nesc-data-race
+PYTHON_VERSION=2.5
+
+
+BUILDDIR   = simbuild/$(PLATFORM)
+
+CEFILE = $(SIM_DIR)/sim_energy.c
+CEOBJFILE = $(BUILDDIR)/sim_energy.o
+
+SRFILE = $(SIM_DIR)/sim_radio.c
+SROBJFILE = $(BUILDDIR)/sim_radio.o
+
+CFILE    = $(BUILDDIR)/sim.c
+OBJFILE    = $(BUILDDIR)/sim.o
+CXXFILE    = $(SIM_DIR)/tossim.c
+CXXOBJFILE = $(BUILDDIR)/tossim.o
+HASHFILE    = $(TOSDIR)/lib/tossim/hashtable.c
+HASHOBJFILE = $(BUILDDIR)/c-support.o
+PYFILE     = $(SIM_DIR)/tossim_wrap.cxx
+PYOBJFILE  = $(BUILDDIR)/pytossim.o
+PYDIR      =/usr/include/python$(PYTHON_VERSION)
+SIMDIR     =$(TOSDIR)/lib/tossim
+XML        = app.xml
+DUMPTYPES = -fnesc-dump=components -fnesc-dump=variables -fnesc-dump=constants -fnesc-dump=typedefs -fnesc-dump=interfacedefs -fnesc-dump=tags
+
+ifeq ($(findstring cygwin, $(OSTYPE)),cygwin)
+  PLATFORM_FLAGS=-DUSE_DL_IMPORT -fpic
+  SHARED_OBJECT=_TOSSIM.dll
+  PLATFORM_BUILD_FLAGS= -fpic -W1,--enabled-auto-image-base 
+  PLATFORM_LIB_FLAGS = -L/usr/lib/python$(PYTHON_VERSION)/config -L/$(PYDIR)/config -lstdc++ -lpython$(PYTHON_VERSION)
+else 
+ifeq ($(OS), Windows_NT) # Some TinyOS installs are like this
+  PLATFORM_FLAGS=-DUSE_DL_IMPORT -fpic 
+  SHARED_OBJECT=_TOSSIM.dll
+  PLATFORM_BUILD_FLAGS= -fpic -W1,--enabled-auto-image-base 
+  PLATFORM_LIB_FLAGS =-shared -L/usr/lib/python$(PYTHON_VERSION)/config -L/$(PYDIR)/config -lstdc++ -lpython$(PYTHON_VERSION)
+else 
+ifeq ($(findstring darwin, $(OSTYPE)), darwin)
+  PLATFORM_FLAGS=-fPIC
+  PLATFORM_CC_FLAGS=-bundle
+  SHARED_OBJECT=_TOSSIMmodule.so
+  PLATFORM_BUILD_FLAGS=-flat_namespace -undefined suppress 
+  PLATFORM_LIB_FLAGS = -lstdc++ 
+else # linux
+  PLATFORM_FLAGS=-shared -fPIC
+  SHARED_OBJECT=_TOSSIMmodule.so
+  PLATFORM_LIB_FLAGS = -lstdc++ 
+  PLATFORM_BUILD_FLAGS= -shared -fPIC
+endif
+endif
+endif
+ 
+BUILD_DEPS = sim-exe
+
+# lib/tossim has to come at the end in order to ensure basic TOSSIM
+# implementations are the last resort, so put it directly in the call
+
+sim-exe: sim-storage builddir $(BUILD_EXTRA_DEPS) FORCE
+	@echo "  placing object files in $(BUILDDIR)"
+	@echo "  writing XML schema to $(XML)"
+	@echo "  compiling $(COMPONENT) to object file sim.o"
+	$(NCC) -c $(PLATFORM_FLAGS) -o $(OBJFILE) $(OPTFLAGS)  $(PFLAGS)  $(CFLAGS) $(WFLAGS) $(COMPONENT).nc $(LDFLAGS)  $(DUMPTYPES) -fnesc-dumpfile=$(XML)
+
+	@echo "  compiling Python support and C libraries into pytossim.o, tossim.o, and c-support.o"
+	$(GPP) -c $(PLATFORM_CC_FLAGS) $(PLATFORM_FLAGS) -o $(PYOBJFILE) $(OPTFLAGS) $(CFLAGS) $(PYFILE) -I$(PYDIR) -I$(SIM_DIR) -I$(SIMDIR) -I$(SIM_ENERGY_DIR) -DHAVE_CONFIG_H 
+	$(GPP) -c $(PLATFORM_CC_FLAGS) $(PLATFORM_FLAGS) -o $(CXXOBJFILE) $(OPTFLAGS) $(CFLAGS) $(CXXFILE) -I$(PYDIR) -I$(SIM_DIR) -I$(SIMDIR) -I$(SIM_ENERGY_DIR)
+	$(GPP) -c $(PLATFORM_CC_FLAGS) $(PLATFORM_FLAGS) -o $(HASHOBJFILE) $(OPTFLAGS) $(CFLAGS) $(HASHFILE) -I$(PYDIR) -I$(SIM_DIR) -I$(SIMDIR) -I$(SIM_ENERGY_DIR)
+	
+	@echo "  compiling energy monitoring support into $(CEOBJFILE)"
+	$(GPP) -c $(PLATFORM_CC_FLAGS) $(PLATFORM_FLAGS) -o $(CEOBJFILE) $(OPTFLAGS) $(CFLAGS) $(SIM_ENERGY_FLAGS) $(CEFILE) -I$(PYDIR)  -I$(SIMDIR)
+	
+	@echo "  compiling eon network support into $(SROBJFILE)"
+	$(GPP) -c $(PLATFORM_CC_FLAGS) $(PLATFORM_FLAGS) -o $(SROBJFILE) $(OPTFLAGS) $(CFLAGS) $(SIM_ENERGY_FLAGS) $(SRFILE) -I$(PYDIR)  -I$(SIMDIR)
+	
+	@echo "  linking into shared object ./$(SHARED_OBJECT)"
+	$(GPP) $(PLATFORM_BUILD_FLAGS) $(PLATFORM_CC_FLAGS) $(PYOBJFILE) $(OBJFILE) $(CXXOBJFILE) $(HASHOBJFILE) $(CEOBJFILE) $(SROBJFILE) $(PLATFORM_LIB_FLAGS) $(LIBS) -o $(SHARED_OBJECT)
+	@echo "  copying Python script interface TOSSIM.py from $(TOSCONTRIB)/eon/tos/lib/tossim to local directory"
+	@cp $(SIM_DIR)/TOSSIM.py .
+	@echo " "
+	
+	@echo "  copying Eon TOSSIM wrapper EONSIM.py from $(TOSCONTRIB)/eon/tos/lib/tossim to local directory"
+	@cp $(SIM_DIR)/EONSIM.py .
+	@echo " "
+	@echo "*** Successfully built $(PLATFORM) TOSSIM(eon) library. "
+
+
+VOLUME_ALLOCATOR_FLAGS ?= 
+STORAGEFILE = $(BUILDDIR)/StorageVolumes.h
+
+
+# Build storage file if volumes.xml present
+#ifneq ($(wildcard $(VOLUME_FILE)), )
+sim-storage: $(STORAGEFILE)
+
+
+
+
+$(STORAGEFILE): $(VOLUME_FILE)
+	@echo 'generating StorageVolumes.h for tossim'
+	$(VOLUME_ALLOCATOR) $(VOLUME_ALLOCATOR_FLAGS) $(PLATFORMDIR) <$(VOLUME_FILE) > $(STORAGEFILE) || rm -f $(STORAGEFILE)
+	
+#else
+
+#sim-storage:
+
+#endif

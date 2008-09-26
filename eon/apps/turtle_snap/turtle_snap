@@ -1,0 +1,121 @@
+typedef full IsStreamFull;
+typedef baseStation IsBaseStation;
+typedef collector isCollector;
+//typedef interested isInterested;
+typedef accept  IsAccepted;
+
+//typedef isBeginTraversalMsg IsBeginTraversalMsg;
+//typedef isGoNextMsg IsGoNextMsg;
+//typedef isGetNextChunkMsg IsGetNextChunkMsg;
+//typedef isEndCollectionSession IsEndCollectionSession;
+
+typedef isGetBundleMsg IsGetBundleMsg;
+typedef isDeleteBundleMsg IsDeleteBundleMsg;
+typedef isDeleteAllBundlesMsg IsDeleteAllBundlesMsg;
+
+
+platform mica2dot:
+
+//Node definition	
+//Beacon flow	
+	BeaconTimer() => ();
+	BeaconFlow() => ();
+	Beacon() => ();
+
+//Listen flow	
+	ListenBeacon() => (uint16_t addr, uint8_t version);
+	ListenBeaconFlow(uint16_t addr, uint8_t version) => ();
+	LogConnectionEvent(uint16_t addr, uint8_t version) => ();
+
+//Runtime data collection flow
+	RTDataTimer () => ();
+	RTDataFlow () => ();
+	
+	//WaterStatus() => (uint16_t howwet);
+	//AddToRTDataStream(uint16_t howwet) => (uint32_t num);
+	AddToRTDataStream() => (uint32_t num);
+	StoreRTData(uint32_t num) => ();
+	CompressRTData(uint32_t num) => ();	
+	
+//GPS Timer flow
+	GPSTimer() => ();
+	GPSFlow() => ();
+	//WaterCheck() => (uint16_t howwet);
+	GetGPS() => (GpsData_t data);
+	Compress(uint32_t num) => (stream_t stream);
+	CommitGPSData(stream_t stream) => ();
+	AddToGPSStream(GpsData_t data) => (uint32_t num);
+	StoreGPSData(uint32_t num) => ();
+	Finish(uint32_t num) => ();
+	
+	
+// Data Collection flow
+	CollectData() => (int action, uint16_t bundle, uint16_t src_addr);
+	
+	//DataCollectionFlow(int action, uint16_t bundle, uint16_t src_addr) => ();
+	
+	CaseSelect (int action, uint16_t bundle, uint16_t src_addr) => ();
+	
+	GetBundleMsg(int action, uint16_t bundle, uint16_t src_addr) => ();
+	//DeleteBundleMsg(int action, uint16_t bundle, uint16_t src_addr) => ();
+	DeleteAllBundlesMsg(int action, uint16_t bundle, uint16_t src_addr) => ();
+	
+	//BeginTraversal(int msg_type, uint8_t seq_num, uint16_t src_addr) => ();
+	//GoNextMsg(int msg_type, uint8_t seq_num, uint16_t src_addr) => ();
+	//GetNextChunkMsg(int msg_type, uint8_t seq_num, uint16_t src_addr) => ();
+	//GetBundleMsg(int msg_type, uint8_t seq_num, uint16_t src_addr) => ();
+	//DeleteBundleMsg(int msg_type, uint8_t seq_num, uint16_t src_addr) => ();
+	//EndCollectionSession(int msg_type, uint8_t seq_num, uint16_t src_addr) => ();
+	//ERR(int msg_type, uint8_t seq_num, uint16_t src_addr) => ();
+	
+	
+//Required for compilation	
+	stateorder {HiPower};
+	
+//Sources	
+	source timer BeaconTimer => BeaconFlow;
+	source ListenBeacon => ListenBeaconFlow;
+	source timer GPSTimer => GPSFlow;
+	source timer RTDataTimer => RTDataFlow;
+	source CollectData => CaseSelect;
+	
+	
+	
+//Flows	
+	//DataCollectionFlow = ReadRequest -> CaseSelect;
+	
+	
+	
+	BeaconFlow = Beacon;
+	ListenBeaconFlow = LogConnectionEvent;
+	
+	//GPSFlow = WaterCheck -> GetGPS -> AddToGPSStream -> StoreGPSData;
+	GPSFlow = GetGPS -> AddToGPSStream -> StoreGPSData;
+	
+	//RTDataFlow = WaterStatus -> AddToRTDataStream -> StoreRTData;
+	RTDataFlow = AddToRTDataStream -> StoreRTData;
+	
+	StoreRTData:[full][*] = CompressRTData;
+	StoreRTData:[*][*] =  Finish;
+	
+	//CaseSelect:[isBeginTraversalMsg,*,*][*] = BeginTraversal;
+	//CaseSelect:[isGoNextMsg,*,*][*] = GoNextMsg;
+	//CaseSelect:[isGetNextChunkMsg,*,*][*] = GetNextChunkMsg;
+	//CaseSelect:[isEndCollectionSession,*,*][*] = EndCollectionSession;
+	//CaseSelect:[*,*,*][*] = ERR;
+
+	
+	CaseSelect:[isGetBundleMsg,*,*][*] = GetBundleMsg;
+	//CaseSelect:[isDeleteBundleMsg,*,*][*] = DeleteBundleMsg;
+	CaseSelect:[isDeleteAllBundlesMsg,*,*][*] = DeleteAllBundlesMsg;
+				
+	StoreGPSData:[full][*] = Compress -> CommitGPSData;
+	StoreGPSData:[*][*] = Finish;
+	
+	BeaconTimer:[*] = (25 min, 25 min);
+	//BeaconTimer:[*] = (2 min, 2 min);
+	
+	RTDataTimer:[*] = (1 hr, 1 hr);
+	//RTDataTimer:[*] = (1 min, 1 min);
+	GPSTimer:[*] = (1 hr,  10 hr);
+	//GPSTimer:[*] = (1 min,  2 min);

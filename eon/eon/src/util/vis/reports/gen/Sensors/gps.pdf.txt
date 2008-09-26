@@ -1,0 +1,2 @@
+This figure shows daily gps attempts(red), serious attempts(blue), and 
+successes(green).  A serious attempt is defined as an attempt where the node does not give up early (can see enough satelites).  An unsuccessful serious attempt wastes a <b>LOT<b> of energy. 

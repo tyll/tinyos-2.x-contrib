@@ -1,0 +1,84 @@
+\documentclass{article}
+
+
+
+\setlength{\topmargin}{-0.75in}
+\setlength{\textheight}{9in}
+\setlength{\textwidth}{6.5in}
+\setlength{\oddsidemargin}{0in}
+\setlength{\evensidemargin}{0in}
+
+\begin{document}
+
+\title{Energy Prediction and Adaptation in flux-e}
+\author{Jacob Sorber\\Matt Brennan}
+\maketitle
+
+
+\section{Goal and Premise}
+Given an energy buffer and source, our obvious goal is to never deplete our resources. Additionally, we want our energy state to remain as stable as possible, as this will give the user the most predictable system response. \\
+We assume that there is periodicity in both the system load and the energy harvesting.  We divide this period in to epochs, and make our state adjustments on these boundaries.  
+
+\section{Definitions and Data Structures}
+\begin{eqnarray*}
+{paths\_trig} & \equiv & \mbox{set of triggered paths}\\
+{paths\_timed} & \equiv & \mbox{set of timed paths}\\
+{period} & \equiv & \mbox{length of time over which load and supply repeats}\\
+{epoch} & \equiv & \mbox{division of a period for which statistics are separately}\\
+{states} & \equiv & \mbox{set of possible energy states} \\
+\delta_c & \equiv & \mbox{cost prediction adjustment dampening factor} \in(0,1)\\
+\delta_r & \equiv & \mbox{revenue prediction adjustment dampening factor} \in(0,1)\\
+\delta_b & \equiv & \mbox{buffer adjustment dampening factor} \in(0,1)\\
+{cost\_actual} & \equiv  & \mbox{actual energy spent during previous epoch}\\
+{cost\_pred}   & \equiv  & \mbox{predicted energy cost for previous epoch}\\
+{rev\_actual} & \equiv  & \mbox{actual energy acquisition during previous epoch}\\
+{rev\_pred}   & \equiv  & \mbox{energy acquisition predicted for previous epoch}\\
+{timer\_level} & \equiv & \mbox{percentage of timer range selected} \\
+{freq}[{path}][{state}] & \equiv  &\mbox{probability of taking a given path in a given state}\\
+{load}[{epoch}] & \equiv & \mbox{average of loads during given epoch}\\
+{energy\_in}[{epoch}] & \equiv & \mbox{average energy revenue during given epoch}\\
+{cost\_static} & \equiv & \mbox{minimum energy cost of an epoch (ie, when idle)}\\
+{cost}[{path}] & \equiv & \mbox{average energy cost of a given path, in addition to }{cost\_static}\\
+{buffer\_level} & \equiv & \mbox{the percent of the buffer's capacity currently in use}\\
+{buffer\_goal} & \equiv & \mbox{the percent of the buffer's capacity to aim for}\\
+{scale\_cost} & \equiv & \mbox{a scaling factor to the stochastic energy consumption}\\
+{scale\_rev} & \equiv & \mbox{a scaling factor to the energy revenue}\\
+\end{eqnarray*}
+
+
+\section{State Selection}
+
+At the beginning of each ${epoch}$, we predict the base energy cost and revenue for the next ${period}$ (that is to say, the next ${NUM\_EPOCHS}$).  Base energy cost is calculated based on the probability of taking a triggered path, and assuming that timed paths are taken at the minimum frequency allowed for the state. A goal is set based on the expected revenue and the ${buffer\_level}$.  We then select the highest state which will have a cost lower than our goal.
+
+Timer periods remain unselected.  To determine them, we calculate the cost for the same state with maximum frequency for all the active timers.  We find where our goal lies between the minimum and maximum costs, and scale the timers proportionally.
+
+
+More precisely,
+
+\begin{eqnarray*}
+{scale\_rev} & = & 1 + \left(\delta_r\frac{{rev\_actual}-{rev\_pred}}{{rev\_pred}}\right) \\
+{scale\_cost} & =&  1 + \left(\delta_c\frac{{cost\_actual}-{cost\_pred}}{{cost\_pred}}\right) \\
+{predicted\_cost}_{min}[{state}]&  =&  \sum_{e\in{epoch}}\sum_{p\in{paths\_trig}}\left[ {freq}[p][{state}] \cdot {load}[e] \cdot {cost}[p] \right] \cdot {scale\_cost} +\\
+                          &  &  \sum_{e\in{epoch}}\sum_{p\in{paths\_timed}}{cost}[p]\cdot1/{max\_period}_p \\\\
+{predicted\_cost}_{max}[{state}]&  =&  \sum_{e\in{epoch}}\sum_{p\in{paths\_trig}}\left[ {freq}[p][{state}] \cdot {load}[e] \cdot {cost}[p] \right] \cdot {scale\_cost} +\\
+                          &  &   \sum_{e\in{epoch}}\sum_{p\in{paths\_timed}}{cost}[p]\cdot1/{min\_period}_p \\\\
+{predicted\_revenue}&  =&  \sum_{e\in{epoch}} {energy\_in}[e] \cdot {scale\_rev}\\
+{goal} & = & {predicted\_revenue} \cdot \delta_b\left(({buffer\_level} - {buffer\_goal}\cdot{buffer\_capacity}\right)
+\\
+\end{eqnarray*}
+\ttfamily
+${state}$ = ${MAX\_STATE}$ ;\\
+while (${predicted\_cost}_{min} < {goal}$) \\
+\hspace{1cm}${state}$--;\\
+\({timer\_level} = \frac{{goal} - {predicted\_cost}_{min}}{{predicted\_cost}_{min} - {goal}}\)
+    
+\rmfamily
+
+
+
+
+\section{Path Cost Measurement}
+
+Given the energy flow through the buffer (implemented as a hardware fuel gauge), and the total consumption of the system (implemented as a software fuel gauge), we are able to keep track of the power being consumed during execution of paths.  We allow for the possibility of parallel path execution by attributing equal parts of the total power consumption to each active path.  Acknowledging that this method may result in skewed values of ${cost}[{path}]$, we argue probabilistically that this will have nominal effect on our overall energy prediction.  If two paths with large energy consumption differences have a high enough probability of running in parallel enough to skew each other's results, that same high probability infers that it is unnecessary to distinguish between their values.
+
+\end{document}

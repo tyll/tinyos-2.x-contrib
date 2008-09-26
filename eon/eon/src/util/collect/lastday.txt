@@ -1,0 +1,242 @@
+<bundle>
+ <energyin>0</energyin>
+<energyout>9178731</energyout>
+<volts>4.084</volts>
+<reserve>2664000</reserve>
+<temp>22.1</temp>
+<state>1</state>
+<grade>0</grade>
+<pathcost num="0">4294967295</pathcost>
+<pathcost num="1">4294967295</pathcost>
+<pathcost num="2">4294967295</pathcost>
+<pathcost num="3">4294967295</pathcost>
+<pathcost num="4">4294967295</pathcost>
+<pathcost num="5">4294967295</pathcost>
+<pathcost num="6">4294967295</pathcost>
+<pathcost num="7">4294967295</pathcost>
+<pathcost num="8">4294967295</pathcost>
+<pathcost num="9">4294967295</pathcost>
+<pathcost num="10">4294967295</pathcost>
+<pathcost num="11">4294967295</pathcost>
+<pathcost num="12">4294967295</pathcost>
+<pathcost num="13">4294967295</pathcost>
+<pathcost num="14">4294967295</pathcost>
+<pathcost num="15">4294967295</pathcost>
+<pathcost num="16">4294967295</pathcost>
+<pathcost num="17">4294967295</pathcost>
+<pathcost num="18">4294967295</pathcost>
+<pathcost num="19">4294967295</pathcost>
+<pathcost num="20">4294967295</pathcost>
+<pathcost num="21">4294967295</pathcost>
+<pathcost num="22">4294967295</pathcost>
+<pathcost num="23">4294967295</pathcost>
+<pathcost num="24">4294967295</pathcost>
+<pathcost num="25">4294967295</pathcost>
+<pathcost num="26">4294967295</pathcost>
+<pathcost num="27">4294967295</pathcost>
+<pathcost num="28">4294967295</pathcost>
+<pathcost num="29">4294967295</pathcost>
+<pathcost num="30">4294967295</pathcost>
+<pathcost num="31">4294967295</pathcost>
+<pathcost num="32">4294967295</pathcost>
+<pathcost num="33">4294967295</pathcost>
+<pathcost num="34">4294967295</pathcost>
+<pathcost num="35">4294967295</pathcost>
+<pathcost num="36">4294967295</pathcost>
+<pathcost num="37">4294967295</pathcost>
+<pathcost num="38">4294967295</pathcost>
+<pathcost num="39">4294967295</pathcost>
+<pathcost num="40">4294967295</pathcost>
+<pathcost num="41">4294967295</pathcost>
+<pathcost num="42">4294967295</pathcost>
+<pathcost num="43">4294967295</pathcost>
+<srcprob src="0">0</srcprob>
+<srcprob src="1">0</srcprob>
+<srcprob src="2">0</srcprob>
+<srcprob src="3">0</srcprob>
+<srcprob src="4">0</srcprob>
+<pathprob path="0">10</pathprob>
+<pathprob path="1">10</pathprob>
+<pathprob path="2">10</pathprob>
+<pathprob path="3">10</pathprob>
+<pathprob path="4">10</pathprob>
+<pathprob path="5">10</pathprob>
+<pathprob path="6">10</pathprob>
+<pathprob path="7">10</pathprob>
+<pathprob path="8">10</pathprob>
+<pathprob path="9">10</pathprob>
+<pathprob path="10">12</pathprob>
+<pathprob path="11">12</pathprob>
+<pathprob path="12">12</pathprob>
+<pathprob path="13">12</pathprob>
+<pathprob path="14">12</pathprob>
+<pathprob path="15">12</pathprob>
+<pathprob path="16">12</pathprob>
+<pathprob path="17">12</pathprob>
+<pathprob path="18">25</pathprob>
+<pathprob path="19">25</pathprob>
+<pathprob path="20">25</pathprob>
+<pathprob path="21">25</pathprob>
+<pathprob path="22">25</pathprob>
+<pathprob path="23">25</pathprob>
+<pathprob path="24">25</pathprob>
+<pathprob path="25">25</pathprob>
+<pathprob path="26">5</pathprob>
+<pathprob path="27">5</pathprob>
+<pathprob path="28">5</pathprob>
+<pathprob path="29">5</pathprob>
+<pathprob path="30">5</pathprob>
+<pathprob path="31">5</pathprob>
+<pathprob path="32">5</pathprob>
+<pathprob path="33">5</pathprob>
+<pathprob path="34">5</pathprob>
+<pathprob path="35">5</pathprob>
+<pathprob path="36">5</pathprob>
+<pathprob path="37">5</pathprob>
+<pathprob path="38">5</pathprob>
+<pathprob path="39">5</pathprob>
+<pathprob path="40">5</pathprob>
+<pathprob path="41">5</pathprob>
+<pathprob path="42">5</pathprob>
+<pathprob path="43">5</pathprob>
+<connections turtle="0" meetings="0"/>
+<connections turtle="0" meetings="0"/>
+<connections turtle="0" meetings="0"/>
+<connections turtle="0" meetings="0"/>
+<connections turtle="0" meetings="0"/>
+<connections turtle="0" meetings="0"/>
+<connections turtle="0" meetings="0"/>
+<connections turtle="0" meetings="0"/>
+<connections turtle="0" meetings="0"/>
+<connections turtle="0" meetings="0"/>
+<connections turtle="0" meetings="0"/>
+<connections turtle="0" meetings="0"/>
+<connections turtle="0" meetings="0"/>
+<connections turtle="0" meetings="0"/>
+<connections turtle="0" meetings="0"/>
+<bundle\>
+
+<bundle>
+ <energyin>131020</energyin>
+<energyout>4294901986</energyout>
+<volts>4.079</volts>
+<reserve>2660670</reserve>
+<temp>31.3</temp>
+<state>1</state>
+<grade>0</grade>
+<pathcost num="0">4294967295</pathcost>
+<pathcost num="1">4294967295</pathcost>
+<pathcost num="2">4294967295</pathcost>
+<pathcost num="3">4294967295</pathcost>
+<pathcost num="4">4294967295</pathcost>
+<pathcost num="5">4294967295</pathcost>
+<pathcost num="6">4294967295</pathcost>
+<pathcost num="7">4294967295</pathcost>
+<pathcost num="8">4294967295</pathcost>
+<pathcost num="9">4294967295</pathcost>
+<pathcost num="10">4294967295</pathcost>
+<pathcost num="11">4294967295</pathcost>
+<pathcost num="12">4294967295</pathcost>
+<pathcost num="13">4294967295</pathcost>
+<pathcost num="14">4294967295</pathcost>
+<pathcost num="15">4294967295</pathcost>
+<pathcost num="16">0</pathcost>
+<pathcost num="17">4294967295</pathcost>
+<pathcost num="18">4294967295</pathcost>
+<pathcost num="19">4294967295</pathcost>
+<pathcost num="20">4294967295</pathcost>
+<pathcost num="21">4294967295</pathcost>
+<pathcost num="22">4294967295</pathcost>
+<pathcost num="23">4294967295</pathcost>
+<pathcost num="24">4294967295</pathcost>
+<pathcost num="25">4294967295</pathcost>
+<pathcost num="26">4294967295</pathcost>
+<pathcost num="27">4294967295</pathcost>
+<pathcost num="28">4294967295</pathcost>
+<pathcost num="29">4294967295</pathcost>
+<pathcost num="30">4294967295</pathcost>
+<pathcost num="31">4294967295</pathcost>
+<pathcost num="32">4294967295</pathcost>
+<pathcost num="33">4294967295</pathcost>
+<pathcost num="34">4294967295</pathcost>
+<pathcost num="35">4294967295</pathcost>
+<pathcost num="36">4294967295</pathcost>
+<pathcost num="37">4294967295</pathcost>
+<pathcost num="38">4294967295</pathcost>
+<pathcost num="39">4294967295</pathcost>
+<pathcost num="40">4294967295</pathcost>
+<pathcost num="41">4294967295</pathcost>
+<pathcost num="42">4294967295</pathcost>
+<pathcost num="43">4294967295</pathcost>
+<pathcost num="44">0</pathcost>
+<pathcost num="45">0</pathcost>
+<pathcost num="46">0</pathcost>
+<pathcost num="47">0</pathcost>
+<srcprob src="0">0</srcprob>
+<srcprob src="1">0</srcprob>
+<srcprob src="2">0</srcprob>
+<srcprob src="3">0</srcprob>
+<srcprob src="4">0</srcprob>
+<pathprob path="0">10</pathprob>
+<pathprob path="1">10</pathprob>
+<pathprob path="2">10</pathprob>
+<pathprob path="3">10</pathprob>
+<pathprob path="4">9</pathprob>
+<pathprob path="5">10</pathprob>
+<pathprob path="6">10</pathprob>
+<pathprob path="7">10</pathprob>
+<pathprob path="8">10</pathprob>
+<pathprob path="9">10</pathprob>
+<pathprob path="10">12</pathprob>
+<pathprob path="11">12</pathprob>
+<pathprob path="12">12</pathprob>
+<pathprob path="13">12</pathprob>
+<pathprob path="14">12</pathprob>
+<pathprob path="15">12</pathprob>
+<pathprob path="16">13</pathprob>
+<pathprob path="17">12</pathprob>
+<pathprob path="18">25</pathprob>
+<pathprob path="19">25</pathprob>
+<pathprob path="20">25</pathprob>
+<pathprob path="21">25</pathprob>
+<pathprob path="22">25</pathprob>
+<pathprob path="23">25</pathprob>
+<pathprob path="24">25</pathprob>
+<pathprob path="25">25</pathprob>
+<pathprob path="26">5</pathprob>
+<pathprob path="27">5</pathprob>
+<pathprob path="28">5</pathprob>
+<pathprob path="29">5</pathprob>
+<pathprob path="30">5</pathprob>
+<pathprob path="31">5</pathprob>
+<pathprob path="32">5</pathprob>
+<pathprob path="33">5</pathprob>
+<pathprob path="34">5</pathprob>
+<pathprob path="35">5</pathprob>
+<pathprob path="36">5</pathprob>
+<pathprob path="37">5</pathprob>
+<pathprob path="38">5</pathprob>
+<pathprob path="39">5</pathprob>
+<pathprob path="40">5</pathprob>
+<pathprob path="41">5</pathprob>
+<pathprob path="42">5</pathprob>
+<pathprob path="43">5</pathprob>
+<connections turtle="255" meetings="0"/>
+<connections turtle="255" meetings="0"/>
+<connections turtle="255" meetings="0"/>
+<connections turtle="255" meetings="0"/>
+<connections turtle="255" meetings="0"/>
+<connections turtle="255" meetings="0"/>
+<connections turtle="255" meetings="0"/>
+<connections turtle="255" meetings="0"/>
+<connections turtle="255" meetings="0"/>
+<connections turtle="255" meetings="0"/>
+<connections turtle="255" meetings="0"/>
+<connections turtle="255" meetings="0"/>
+<connections turtle="255" meetings="0"/>
+<connections turtle="255" meetings="0"/>
+<connections turtle="255" meetings="0"/>
+<bundle\>
+
+<bundle>
+ 

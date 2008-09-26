@@ -1,0 +1,58 @@
+Title: 
+Introduction
+	Energy management is a serious issue in embedded sensor systems.
+	Remote locations, long term large-scale deployments, and limitations in battery capacity prohibit the use of traditional energy sources.
+	Environmental sources, such as solar and wind, present an abundant supply of energy; however the rate at which it can be harvested is often highly variable and difficult to predict.
+		Not surprising since we are predicting the weather.
+		The difference between a sunny and cloudy are significant.
+	In the literature, these approaches have been used
+		Plan for the worst case
+			This approach involves adjusting system power consumption to meet the worst-case energy production (i.e. always plan for a cloudy winter day).
+			The result is either poor performance or bigger, heavier, and more expensive hardware.
+			Also potentially wastes a lot of energy
+		Explicitly adapt application behavior based on the energy source
+			Suggested by lots of people (Mani, etc)
+			Increased complexity and more opportunities for bugs to crop up.
+			Mapping between functionality and energy consumption is not straightforward 
+			System designer is probably not the right person to make these decisions.
+		Automatically adapt behavior in the OS
+			ECOSystem provides transparent adaptation by treating energy as a shared schedulable resource.  
+			No change to existing application code is required
+			Not very flexible.  All parts of the system are scaled down together and does not allow adaptations that change application functionality.
+			In many systems it might be better to sacrifice one functionality rather than degrade the quality of more imporant functions.
+	This paper proposes a new approach in which we separate system adaptation into two parts: the high-level adaptation policy and the low-level details about when and how much to adapt system behavior.
+	
+	This paper presents eFlux, an extension of the Flux programming language, which acheives this goal.  
+	A Flux program describes the flow of data and control through computational nodes written in C, C++, nesC, Java.
+	The Flux style is well suited to embedded systems and sensors which typically react to both events, like network requests or periodic timers.
+	eFlux allows a programmer to augment a Flux program with an adaptation policy, which consists of a list of prioritized adjustments that can be made in response to...
+	
+	
+Language Description
+	Flux Overview
+	Extensions
+Energy Adaptation Approach
+	Overview
+	
+Implementation
+	Hardware
+	Compiler
+	Runtime System
+Evaluation
+	Simple development (anecdotal)
+		A good fit for sensor style programming
+	Efficiency and Overhead
+		What is the flux overhead? Energy, Memory?
+			Performance, Memory, Energy
+			
+		What is the cost of automatic adaptation and energy source profiling?
+	Simulation results
+		Do simulation results predict performance?
+		How accurate do predictions need to be?
+Related Work
+	Mani's energy harvesting work
+	Heliomote (I think they did explicit adaptation).
+	ECOSystem
+	Odyssey
+	Prometheus
+Conclusion

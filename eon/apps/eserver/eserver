@@ -1,0 +1,40 @@
+typedef text TestText;
+typedef image TestImage;
+typedef audio TestAudio;
+typedef video TestVideo;
+
+platform STARGATE:
+
+	Page (int socket) => ();
+
+	ReadRequest (int socket) => (int socket, bool close, char* file);
+
+	Reply (int socket, bool close, int length, char* content, char* output) => ();
+
+	ReadWrite (int socket, bool close, char* file) => (int socket, bool close, int length, char* content, char* output);
+
+	Listen () => (int socket);
+
+	Handler (int socket, bool close, char* file) => ();
+
+
+	Unavailable(int socket, bool close, char* file) => ();
+stateorder  {Video,
+		Audio,
+		Image,
+		Text
+		};
+
+source Listen => Page;
+
+Page = ReadRequest -> Handler;// -> ReadWrite -> Reply;
+
+Handler:[*,*,video][Video] = ReadWrite -> Reply;
+Handler:[*,*,audio][Audio] = ReadWrite -> Reply;
+Handler:[*,*,image][Image] = ReadWrite -> Reply;
+Handler:[*,*,text][Text] = ReadWrite -> Reply;
+Handler:[*,*,*][*] = Unavailable;
+
+handle error ReadWrite => FourOhFor;
+
+handle error ReadRequest => BadRequest;

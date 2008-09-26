@@ -1,0 +1,39 @@
+
+
+platform tinynode:
+
+//Node definition	
+//Scan flow
+	ScanTimer() => ();
+	ScanFlow() => ();
+	Scan() => ();
+	SerialSend() => (); //sends the current status
+	
+
+//Recv Status
+	RecvStatus() => (uint16_t addr, uint16_t volts, uint8_t act, uint8_t state, uint8_t grade);
+	RecvFlow(uint16_t addr, uint16_t volts, uint8_t act, uint8_t state, uint8_t grade) => ();
+	StoreStatus(uint16_t addr, uint16_t volts, uint8_t act, uint8_t state, uint8_t grade) => ();
+	
+	
+
+	
+//Required for compilation	
+	
+	stateorder {Blank};
+	
+//Sources	
+	source timer ScanTimer => ScanFlow;
+	source RecvStatus => RecvFlow;
+	
+//Flows	
+	
+	ScanFlow = Scan -> SerialSend;
+
+	
+	//ReceiveData
+	RecvFlow = StoreStatus;
+	
+	
+//Timer Values
+	ScanTimer:[*]= (5 sec, 5 sec);

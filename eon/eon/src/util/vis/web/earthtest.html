@@ -1,0 +1,83 @@
+<html>
+<head>
+    <title>Google</title>
+    <script src="http://www.google.com/jsapi?key=ABQIAAAAdVOguwJxLPHkv2IM6MtoThQ1ErpkAAyWYqZowUDg_55KpKJYQxShCHQhCtqI4S5VjijGrBFgxUp7ww"
+      type="text/javascript"></script>
+    <script type="text/javascript">
+
+    google.load("earth", "1");
+	google.load("maps", "2.99");
+	
+	var ge = null;
+	var geocoder;
+	
+	
+	function init()
+	{
+		geocoder = new GClientGeocoder();
+		google.earth.createInstance("map3d", initCB, failureCB);
+	}
+	
+	function initCB(object) {
+  ge = object;
+  ge.getWindow().setVisibility(true);
+}
+
+function failureCB(object) {
+  alert('load failed');
+}
+
+// attempt to fetch a  KML file and show it
+
+function finished(object) {
+  if (!object) {
+    alert('bad or NULL kml');
+    return;
+  }
+  ge.getFeatures().appendChild(object);
+  var la = ge.createLookAt('');
+  la.set(42.3391, -72.4558, 75, ge.ALTITUDE_RELATIVE_TO_GROUND, 0, 60, 500);
+  ge.getView().setAbstractView(la);
+}
+
+
+function fetchKML()
+{
+	var url = 'http://prisms.cs.umass.edu/~sorber/vis2/data.kml';
+	google.earth.fetchKml(ge, url, finished);
+
+}
+
+function submitLocation() {
+  var address = document.getElementById('address').value;
+  geocoder.getLatLng(
+    address, 
+    function(point) {
+      if (point && ge != null) {
+        var la = ge.createLookAt('');     
+        la.set(point.y, point.x, 100, ge.ALTITUDE_RELATIVE_TO_GROUND, 
+               0, 0, 4000);
+        ge.getView().setAbstractView(la);
+      }
+    }
+  );
+}
+
+
+
+  </script>
+</head>
+<body onload='init()' id='body'>
+  <div>
+    <form name='searchform' id='searchform' action='javascript:fetchKML();void(0);'>
+      <input type=text size=60 id='address'></input>
+      <input type=submit value='Go to location'>
+    </form>
+  </div>
+
+  <div id='map3d_container' style='border: 1px solid silver; height: 500px;'>
+
+    <div id='map3d' style='height: 100%;'></div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,8 @@
+
+body    {background-color: #ffffcc }
+table { background-color: #ffffff;
+	border: solid black 2px;
+	padding:5px;}
+td.justbottom {text-align:center;
+		valign: bottom;}
+img {border: none;}

@@ -731,11 +731,10 @@ implementation {
       *   3. this is faster
       *   4. it doesn't require the link estimator to have stabilized on a link
       */
-    event bool CompareBit.shouldInsert(message_t *msg, void* payload, uint8_t len, bool white_bit) {
+    event bool CompareBit.shouldInsert(message_t *msg, void* payload, uint8_t len) {
            
            bool found = FALSE;
            uint16_t pathEtx;
-           //uint16_t linkEtx = evaluateEtx(0);
            uint16_t neighEtx;
            int i;
            routing_table_entry* entry;

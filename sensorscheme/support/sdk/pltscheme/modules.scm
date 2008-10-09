@@ -37,7 +37,7 @@
     (if (and val (eq? (car val) kind)) val #f)))
 
 (define mdl-path-list '("."))
-(define lib-path-list (list (build-path (or (getenv "TOSROOT") "/Users/leonevers/sensorscheme") "support" "sdk" "sensorscheme")))
+(define lib-path-list (list (build-path (getenv "TOSROOT") "support" "sdk" "sensorscheme")))
 (define (find-module file)
   (let-values ([(file path-list) (if (and (list? file) (eq? (car file) 'lib))
                                      (values (if (symbol? (cadr file)) (string-append (symbol->string (cadr file)) ".ss") 
@@ -162,7 +162,7 @@
 
 (define macro-namespace (parameterize ([current-namespace (make-namespace)])
                           (namespace-require '(all-except (lib "1.ss" "srfi") reverse! member map for-each assoc append!))
-                          (namespace-require `(file ,(path->string (build-path (or (getenv "TOSROOT") "/Users/leonevers/sensorscheme")
+                          (namespace-require `(file ,(path->string (build-path (getenv "TOSROOT")
                                                                                "support" "sdk" "pltscheme" "internal-forms.scm"))))
                           (current-namespace)
                           ))

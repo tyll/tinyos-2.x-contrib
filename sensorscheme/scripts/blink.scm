@@ -2,10 +2,10 @@
   
   (require (lib std))
   
-  (define (blink n)
+  (define (do-blink n)
     (blink n)
-    (call-at-time (+ n 1) blink))
+    (call-at-time (+ n 1) do-blink))
   
-  (blink 0)
+  (do-blink 0)
   
   )

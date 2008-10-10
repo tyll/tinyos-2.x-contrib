@@ -1,11 +1,12 @@
 (ssmodule collection
   
 (provide 
-   parent neighbors 
+   parent hops neighbors 
    send-collect send-intercept
    recv-intercept)
     
   (define-primitive parent (simple ParentPrim))
+  (define-primitive hops (simple HopsPrim))
   (define-primitive neighbors (simple NeighborsPrim))
   
   (define-primitive send-collect (sender CollectSender))

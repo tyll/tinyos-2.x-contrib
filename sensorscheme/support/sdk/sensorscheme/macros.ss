@@ -1,7 +1,7 @@
 (ssmodule
-  macros
+    macros
   
-  (provide or cond define-handler case when begin do unless define lambda let define-macro letrec and quasiquote let*)  
+  (provide lambda define-macro cond define-handler case when begin do unless define define-const include let letrec and or quasiquote let*)  
   ; macro's to translate to the internal basic forms
   (%define-macro% 
    lambda 
@@ -25,37 +25,51 @@
                    [(symbol? (car exprs)) 
                     (cons '%define-macro% exprs)]
                    [(pair? (car exprs))
-                     ; defining a function
-                     (list '%define-macro% (car (car exprs)) 
-                           (cons '%lambda% (cons (cdr (car exprs)) (cdr exprs))))]
+                    ; defining a function
+                    (list '%define-macro% (car (car exprs)) 
+                          (cons '%lambda% (cons (cdr (car exprs)) (cdr exprs))))]
                    [else (error 'define-macro "incorrect syntax")])))
   
   (define-macro (define . exprs) 
     (cond 
       [(not (pair? exprs)) (error 'define "incorrect syntax")]
       [(symbol? (car exprs)) 
-        (cons '%define% exprs)]
+       (cons '%define% exprs)]
       [(pair? (car exprs))
-        ; defining a function
-        (list '%define% (car (car exprs)) 
-              (cons 'lambda (cons (cdr (car exprs)) (cdr exprs))))]
+       ; defining a function, make it constant
+       (list '%define-const% (car (car exprs)) 
+             (cons 'lambda (cons (cdr (car exprs)) (cdr exprs))))]
       [else (error 'define "incorrect syntax")]))
   
   (define-macro (define-handler nameargs . exprs) 
     (if (symbol? nameargs) 
-        `(%define-handler% ,nameargs ,@exprs)
+        `(%begin% (%include ,nameargs%) (%define-const% ,nameargs ,@exprs))
         ; else first argument must be a list, defining a function
-        `(%define-handler% ,(car nameargs)
-                           (lambda (src ,@(cdr nameargs)) ,@exprs))))
+        `(%begin% (%include% ,(car nameargs)) (%define-const% ,(car nameargs)
+                                                        (lambda (src ,@(cdr nameargs)) ,@exprs)))))
   
-  ;(define-macro if 
-  ;  (lambda exns `(%if% ,@exns)))
+  (define-macro (define-const . exprs) 
+    (cond 
+      [(not (pair? exprs)) (error 'define-const "incorrect syntax")]
+      [(symbol? (car exprs)) 
+       (cons '%define-const% exprs)]
+      [(pair? (car exprs))
+       ; defining a function
+       (list '%define-const% (car (car exprs)) 
+             (cons 'lambda (cons (cdr (car exprs)) (cdr exprs))))]
+      [else (error 'define "incorrect syntax")]))
   
-  ;(define-macro quote 
-  ;  (lambda (exn) `(%quote%,exns)))
   
-  ;(define-macro set! 
-  ;  (lambda (var val) `(%set!% ,var val)))
+  #;(define-macro if 
+      (lambda exns `(%if% ,@exns)))
+  
+  #;(define-macro quote 
+      (lambda (exn) `(%quote% ,exn)))
+  
+  #;(define-macro set! 
+      (lambda (var val) `(%set!% ,var val)))
+  
+  (define-macro (include . exns) `(%include% ,@exns))
   
   
   

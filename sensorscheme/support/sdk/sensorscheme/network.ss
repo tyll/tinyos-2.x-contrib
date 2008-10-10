@@ -5,8 +5,8 @@
   
   (provide bcast redundant-bcast)
   
-  (define (bcast msg)
-    (send-local -1 msg))
+  (define (bcast mess)
+    (send-local -1 mess))
   
   (include recv-local)
   

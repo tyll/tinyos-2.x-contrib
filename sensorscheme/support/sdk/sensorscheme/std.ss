@@ -7,22 +7,22 @@
    caaar caadr cadar caddr cdaar cdadr cddar cdddr 
    caaaar caaadr caadar caaddr cadaar cadadr caddar cadddr 
    cdaaar cdaadr cdadar cdaddr cddaar cddadr cdddar cddddr 
-   member memf map map2 filter any every foldl foldr for-each 
+   member memf map map2 filter filter-map any every find foldl foldr for-each 
    equal? = zero? my-append reverse append-reverse append-reverse! 
    sum length avg min max assoc assf assoc-put! assoc-remove! assoc-and-remove! 
    call-with-current-continuation let/cc do-at-time !=
    
    ; macros
-   or cond define-handler case when begin do unless define lambda let define-macro letrec and quasiquote let*
+   lambda define-macro cond define-handler case when begin do unless define define-const include let letrec and or quasiquote let*
    
    ;primitives
    id defined? car cdr set-car! set-cdr! cons + - * / % 
    bitwise-and bitwise-ior bitwise-xor > >= < <= eq? 
    null? pair? symbol? number? boolean? bitwise-not not 
    random now call-at-time sensor blink append list 
-   eval eval-handler apply call/cc 
-   send-local send-serial 
-   recv-local recv-serial
+   print eval inject-handler apply call/cc 
+   send-local send-local/ack send-serial 
+   recv-local recv-local/ack recv-serial
    
    ;comm
    handle msg
@@ -93,7 +93,12 @@
           [(fn (car ls)) (cons (car ls) (filter fn (cdr ls)))]
           [else (filter fn (cdr ls))]))
   
-  ;;;; some helper functions
+  (define (filter-map fn ls)
+    (if (pair? ls) 
+        (let ([r (fn (car ls))])
+          (if r (cons r (filter-map fn (cdr ls)))
+              (filter-map fn (cdr ls))))
+        ()))
   
   (define (any fn ls) 
     (cond [(null? ls) #f]
@@ -104,6 +109,11 @@
     (cond [(null? ls) #t]
           [(not (fn (car ls))) #f]
           [else (every fn (cdr ls))]))
+  
+  (define (find fn ls) 
+    (cond [(null? ls) #f]
+          [(fn (car ls)) (car ls)]
+          [else (find fn (cdr ls))]))
   
   (define (foldl fn init ls)
     (define (foldl-hlp curr ls)
@@ -232,11 +242,11 @@
   
   ; procedure to handle forwarding messages through protocol layers
   (define (handle src msg) 
-    (apply (eval (car msg)) (cons src (cdr msg))))    
+    (apply (eval (car msg)) (cons src (cdr msg))))
   
-    (define-macro (msg tag . body)
+  (define-macro (msg tag . body)
     `(list ',tag ,@body))  
-   
-
+  
+  
   
   ) ; end of service definition  

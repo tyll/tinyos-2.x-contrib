@@ -39,6 +39,10 @@
 
   (require (lib std))
   
+  (provide first second third fourth fifth sixth seventh eighth ninth tenth)
+  (provide nth set-nth!)
+  (provide take drop take! take-right drop-right drop-right! split-at split-at! last last-pair)
+  
   (define first  car)
   (define second cadr)
   (define third  caddr)
@@ -50,8 +54,9 @@
   (define (ninth   x) (car  (cddddr (cddddr x))))
   (define (tenth   x) (cadr (cddddr (cddddr x))))
   
-  ;(define (car+cdr pair) (values (car pair) (cdr pair)))
-
+  (define (nth n x) (car (drop x n)))
+  (define (set-nth! n x) (set-car! (drop x n)))
+  
   ;; take & drop
   
   (define (take lis k)

@@ -3,10 +3,11 @@
   (require (lib std) (lib network))
   
   (define (bcastblink t)
-    (bcast (msg blinkleds (/ t 4)))
-    (call-at-time (+ t 4) bcastblink))
+    (call-at-time (+ t 4) bcastblink)
+    (bcast (msg blinkleds (/ t 4))))
   
-  (define-handler (blinkleds t))
+  (define-handler (blinkleds n)
+    (blink n))
   
   (bcastblink 0)
   

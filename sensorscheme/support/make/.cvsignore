@@ -40,3 +40,12 @@ null.target
 Makerules
 docs.extra
 mica2.target
+epic
+cthreads.extra
+epic.target
+dynthreads.extra
+shimmer.target
+threads.extra
+tosboot.extra
+savepp.extra
+tframe.extra

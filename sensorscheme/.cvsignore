@@ -8,3 +8,5 @@ README
 .settings
 .project
 .pydevproject
+TinyOS_Plugin_Makefile
+.targetsOptions

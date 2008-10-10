@@ -8,6 +8,7 @@
 #include <setjmp.h>
 #include "message.h"
 #include "SensorScheme.h"
+#include "printfdebug.h"
 
 module SensorSchemeC {
   uses {
@@ -84,7 +85,11 @@ implementation {
 #else 
   ss_val_t freeCell;
 #endif 
+  // global var to store freecell to cross setjmp/longjmp
+  // make sure to save every time before calling longjmp!!
+  ss_val_t save_freeCell;
 
+/////////////////// interface SSRuntime  //////////////////////////////
 
   command ss_val_t SSRuntime.getArgs() {return args;}
   command void SSRuntime.setArgs(ss_val_t val) {args = val;}
@@ -102,6 +107,7 @@ implementation {
   command void SSRuntime.setTimerQueue(ss_val_t val) {timerQueue = val;}
 
   command void SSRuntime.error(int16_t v) {
+    save_freeCell = freeCell;
     longjmp(jmpEnv, v);
   }
 
@@ -112,204 +118,14 @@ implementation {
     return C_car(cdr(call SSRuntime.getArgs()));
   }
 
-
- command bool MsgPool.empty() {
-    return call Pool.empty();
-  }
-  
-  command message_t *MsgPool.get() {
-    return call Pool.get();
-  }
-  
-  command uint8_t MsgPool.maxSize() {
-    return call Pool.maxSize();
-  }
-  
-  command error_t MsgPool.put(message_t *newVal) {
-    return call Pool.put(newVal);
-  }
-  
-  command uint8_t MsgPool.size() {
-    return call Pool.size();
-  }
- 
- 
-  event void Boot.booted() {
-    SEND_PRIM_LIST(SENDER_BOOT)
-    RECEIVER_LIST(RECEIVER_BOOT)
-
-    // reset root set
-    timerQueue = SYM_NIL;
-    sendQueue = SYM_NIL;
-    recvQueue = SYM_NIL;
-    //  prepare for garbage collection
-    freeCell.idx = CELLS_END;
-    globalEnv = SYM_NIL;
-    // read and execute init message
-    rcvData = (uint8_t *)initMessage;
-    rcvEnd = rcvData+initSize;
-    sensorSchemeEval(SS_INIT);
-  }
-
-  event void ReadSensor.readDone(error_t error, uint16_t val) { }
-
-  event void Sender.sendDone[uint8_t prim](message_t *msg, error_t error) {
-    dbg("SensorSchemeC", "Send %u completed.\n", prim);
-    sendPacket = msg;
-    sndRoutine = prim;
-
-    {
-      // continue execution after message sent
-      // confirmation of previous message
-      ss_val_t oldQueue = SYM_NIL;
-      ss_val_t tQueue = sendQueue;
-      uint8_t *data = call Sender.getPayload[sndRoutine](sendPacket);
-      sndData = data;
-      sndEnd = call Sender.getPayloadEnd[sndRoutine](sendPacket);
-      sndAddr = call Sender.getDestination[sndRoutine](sendPacket);
-      while (!isNull(tQueue)) {
-        ss_val_t qItem = car(tQueue); // get actual list item.
-        dbg("SensorSchemeC", "checking sendQueue: %i, %u.\n", tQueue.idx, sendQItemRoutine(qItem));
-        if (eqSeqNo(sendQItemSeq(qItem), data[0]) &&
-            sendQItemRoutine(qItem) == sndRoutine) {
-        if (isNull(oldQueue)) sendQueue = cdr(tQueue);
-                     else cdr(oldQueue) = cdr(tQueue);
-        dbg("SensorSchemeC", "Found sendQItem! 0x%hhx.\n", data[0]);
-        if (error != SUCCESS) {
-          stack = contStack(sendQItemCont(qItem));
-          envir = contEnv(sendQItemCont(qItem));
-          value = SYM_FALSE;
-          sensorSchemeEval(SS_CONTINUE);
-          return;
-        }
-          if (data[0] & MSGSEQ_END) {
-            // last message done, return
-            call Pool.put(sendPacket);
-            dbg("SensorSchemeC", "put Pool item: 0x%x. new size: %hhu\n", sendPacket, call Pool.size());
-          stack = contStack(sendQItemCont(qItem));
-          envir = contEnv(sendQItemCont(qItem));
-          value = SYM_TRUE;
-          sensorSchemeEval(SS_CONTINUE);
-          return;
-          }
-
-          //reset globals to start new message formation
-          byteBufIdx = 0;
-          bits = 0;
-          bitCount = 4;
-          sndData[0] = msgSeq = nextSeqNo(sendQItemSeq(qItem));
-          sndData++;
-          {
-          ss_val_t b = sendQItemBytes(qItem);
-          while (!isNull(b)) {
-              *sndData = smallnumVal(car(b));
-              sndData++;
-              b = cdr(b);
-          }}
-          if (data[0] & MSGSEQ_END) {
-            // just sending last bit of last message
-            dbg("SensorSchemeC", "Last message: %hhu, %hhu.\n", msgSeq, data[0]);
-          sensorSchemeEval(SS_SENDLAST);
-          return;
-          }
-          dbg("SensorSchemeC", "Continuing with message %hhu.\n", msgSeq);
-          args = (sendQItemArgs(qItem));
-          stack = sendQItemStack(qItem);
-          value = sendQItemCont(qItem);
-          sensorSchemeEval(SS_SENDDONE);
-          return;
-        } else {
-        // TODO: also check for correct message dest
-          oldQueue = tQueue;
-          tQueue = cdr(tQueue);
-        }
-      }
-      // no continuation record found for this message
-      return;
-    }
-  }
-
-  task void receiveTask() {
-    // handle received message
-    dbg("SensorSchemeC", "Received %hhx of length %u from node %hu.\n", rcvData[0], rcvEnd-rcvData, rcvAddr);
-    if (rcvData[0] & MSGSEQ_START) {
-      //received start of chain
-      sensorSchemeEval(SS_STARTREAD);
-      return;
-    } else {
-      /* else next one in chain */
-      ss_val_t oldQueue = SYM_NIL;
-      ss_val_t tQueue = recvQueue;
-      while (!isNull(tQueue)) {
-        ss_val_t qItem = car(tQueue); // get actual list item.
-        dbg("SensorSchemeC", "checking recvQueue %i: %hhu, %hu, %hu.\n",
-            tQueue.idx, rcvQItemSeqNo(qItem), rcvQItemSrc(qItem), rcvQItemRoutine(qItem));
-        if (eqSeqNo(rcvQItemSeqNo(qItem), rcvData[0]) &&
-            rcvQItemSrc(qItem) == rcvAddr &&
-            rcvQItemRoutine(qItem)  == rcvRoutine) {
-          if (isNull(oldQueue)) recvQueue = cdr(tQueue);
-                       else cdr(oldQueue) = cdr(tQueue);
-          dbg("SensorSchemeC", "Found rcvQItem! 0x%hhx from %hu. packet:", rcvData[0], rcvAddr);
-          {uint8_t *data = call Receiver.getPayload[rcvRoutine](receivePacket);
-            for (; data < rcvEnd; data++) dbg_clear("SensorSchemeC", " %hhx", *data);}
-          dbg_clear("SensorSchemeC", ".\n");
-          bits = rcvQItemBits(qItem);
-          bitCount = rcvQItemBitCount(qItem);
-          stack = rcvQItemStack(qItem);
-          rcvData++;
-          sensorSchemeEval(SS_RECEIVE);
-          return;
-        } else {
-          oldQueue = tQueue;
-          tQueue = cdr(tQueue);
-        }
-      }
-    }
-    // no continuation found, ignore message
-    return;
-  }
-
-  event message_t* Receiver.receive[uint8_t routine](message_t* msg, am_addr_t addr,
-      uint8_t *data, uint8_t *end) {
-    message_t* newMsg = call Pool.get();
-    dbg("SensorSchemeC", "get Pool item: 0x%x. size left: %hhu\n", newMsg, call Pool.size());
-    dbg("SensorSchemeC", "Received packet of length %hu.\n", end-data);
-    if (newMsg == NULL) {
-      return msg;
-    }
-    receivePacket = msg;
-    rcvRoutine = routine;
-    rcvData = data;
-    rcvEnd = end;
-    rcvAddr = addr;
-    post receiveTask();
-    return newMsg;
-  }
-
-  event void Timer.fired() {
-    ss_val_t qItem;
-    dbg("SensorSchemeC", "Timer.fired() impuls %i at %s.\n", call Timer.getNow(), sim_time_string());
-    // execute scheduled timer
-    if (!isPair(timerQueue)) return;
-    qItem = car(timerQueue);
-    timerQueue = cdr(timerQueue);
-    if (!isNull(timerQueue)) {
-      call SSRuntime.startTimer(timerQItemTime(first(timerQueue)));
-    }
-    value = timerQItemThunk(qItem);
-    envir = timerQItemEnvir(qItem);
-
-    sensorSchemeEval(SS_TIMER);
-  }
-
   command uint32_t SSRuntime.now() {
     uint32_t now = call Timer.getNow();
-    dbg("SensorSchemeC", "SSRuntime.now() %u, %u.\n", now, now / (1024 / SS_TICKS_PER_SECOND));
+    dbg("SensorSchemeDebug", "SSRuntime.now() %u, %u.\n", now, now / (1024 / SS_TICKS_PER_SECOND));
     return now / (1024 / SS_TICKS_PER_SECOND);
   }
 
   command void SSRuntime.startTimer(uint32_t t) {
-    dbg("SensorSchemeC", "SSRuntime.startTimer(%u): %u.\n", t, t * (1024 / SS_TICKS_PER_SECOND));
+    dbg("SensorSchemeDebug", "SSRuntime.startTimer(%u): %u.\n", t, t * (1024 / SS_TICKS_PER_SECOND));
     call Timer.startOneShotAt(0, t * (1024 / SS_TICKS_PER_SECOND));
   }
 
@@ -332,6 +148,233 @@ implementation {
     return (ss_type(c) == T_BIGNUM ?
         (int32_t)(cells(bignumIdx(c)).l.lval) :
         smallnumVal(c));
+  }
+
+
+/////////////////// interface MsgPool  //////////////////////////////
+
+ command bool MsgPool.empty() {
+    return call Pool.empty();
+  }
+  
+  command message_t *MsgPool.get() {
+    message_t *msg = call Pool.get();
+    dbg("SensorSchemePool", "get Pool item: 0x%x. size left: %hhu\n", msg, call Pool.size());
+    return msg;
+  }
+  
+  command uint8_t MsgPool.maxSize() {
+    return call Pool.maxSize();
+  }
+  
+  command error_t MsgPool.put(message_t *newVal) {
+    error_t err = call Pool.put(newVal);
+    dbg("SensorSchemePool", "put Pool item: 0x%x. new size: %hhu\n", newVal, call Pool.size());
+    return err;
+  }
+  
+  command uint8_t MsgPool.size() {
+    return call Pool.size();
+  }
+ 
+ 
+/////////////////// interface Boot  //////////////////////////////
+
+  event void Boot.booted() {
+    call Leds.led0On();  
+    SEND_PRIM_LIST(SENDER_BOOT)
+    RECEIVER_LIST(RECEIVER_BOOT)
+
+    // reset root set
+    timerQueue = SYM_NIL;
+    sendQueue = SYM_NIL;
+    recvQueue = SYM_NIL;
+    
+    envir = SYM_NIL;
+    globalEnv = SYM_NIL;
+
+    args = SYM_NIL;
+    value = SYM_NIL;
+    stack = SYM_NIL;
+    
+    //  prepare for garbage collection
+    save_freeCell.idx = freeCell.idx = CELLS_END;
+
+    // read and execute init message
+    sensorSchemeEval(SS_INIT);
+    call Leds.led0Off();
+  }
+
+/////////////////// interface ReadSensor  //////////////////////////////
+
+  event void ReadSensor.readDone(error_t error, uint16_t val) { }
+
+/////////////////// interface Sender  //////////////////////////////
+
+  event void Sender.sendDone[uint8_t prim](message_t *msg, error_t error) {
+    call Leds.led0Off();
+    sendPacket = msg;
+    sndRoutine = prim;
+
+    {
+      // continue execution after message sent
+      // confirmation of previous message
+      ss_val_t oldQueue = SYM_NIL;
+      ss_val_t tQueue = sendQueue;
+      uint8_t *data = call Sender.getPayload[sndRoutine](sendPacket);
+      sndData = data;
+      pr_dbg_f("SensorSchemeGC", "end of message or failed: %i\n", data[0]);
+      sndEnd = call Sender.getPayloadEnd[sndRoutine](sendPacket);
+      sndAddr = call Sender.getDestination[sndRoutine](sendPacket);
+      while (!isNull(tQueue)) {
+        ss_val_t qItem = car(tQueue); // get actual list item.
+        dbg("SensorSchemeDebug", "checking sendQueue: %i, %u.\n", tQueue.idx, sendQItemRoutine(qItem));
+        if (eqSeqNo(sendQItemSeq(qItem), data[0]) &&
+            sendQItemRoutine(qItem) == sndRoutine) {
+          if (isNull(oldQueue)) sendQueue = cdr(tQueue);
+                       else cdr(oldQueue) = cdr(tQueue);
+          dbg("SensorSchemeDebug", "Found sendQItem! 0x%hhx.\n", data[0]);
+          if (error != SUCCESS || (data[0] & MSGSEQ_END)) {
+            // insuccessful send or last message done. stop transmission
+            call MsgPool.put(sendPacket);
+            dbg("SensorSchemeDebug", "Failed sending or end of message: 0x%hx.\n", data[0]);
+            value = (error != SUCCESS) ? SYM_FALSE : SYM_TRUE;
+            stack = contStack(sendQItemCont(qItem));
+            envir = contEnv(sendQItemCont(qItem));
+            sensorSchemeEval(SS_CONTINUE);
+            return;
+          }
+
+          //reset globals to start new message formation
+          byteBufIdx = 0;
+          bits = 0;
+          bitCount = 4;
+          sndData[0] = msgSeq = nextSeqNo(sendQItemSeq(qItem));
+          sndData++;
+          {
+            ss_val_t b = sendQItemBytes(qItem);
+            while (!isNull(b)) {
+              *sndData = smallnumVal(car(b));
+              sndData++;
+              b = cdr(b);
+            }
+          }
+          if (data[0] & MSGSEQ_END) {
+            // just sending last bit of last message
+            // this only gets executed if a full packet is sent previously, but whole message is already encoded 
+            // TODO: !!! make sure local state variables get values !!!
+            dbg("SensorSchemeDebug", "Last message: %hhu, %hhu.\n", msgSeq, data[0]);
+            sensorSchemeEval(SS_SENDLAST);
+            return;
+          }
+          dbg("SensorSchemeDebug", "Continuing with message %hhu.\n", msgSeq);
+          args = (sendQItemArgs(qItem));
+          stack = sendQItemStack(qItem);
+          value = sendQItemCont(qItem);
+          sensorSchemeEval(SS_SENDDONE);
+          return;
+        } else {
+          // TODO: also check for correct message dest
+          oldQueue = tQueue;
+          tQueue = cdr(tQueue);
+        }
+      }
+      // no continuation record found for this message
+      dbg("SensorSchemeC", "Error: no continuation record for message!\n");
+      return;
+    }
+  }
+
+/////////////////// interface Receiver  //////////////////////////////
+
+  task void receiveTask() {
+    // handle received message
+    dbg("SensorSchemeC", "Received %hhx of length %u from node %hu.\n", rcvData[0], rcvEnd-rcvData, rcvAddr);
+    if (rcvData[0] & MSGSEQ_START) {
+      //received start of chain
+      sensorSchemeEval(SS_STARTREAD);
+      return;
+    } else {
+      /* else next one in chain */
+      ss_val_t oldQueue = SYM_NIL;
+      ss_val_t tQueue = recvQueue;
+      while (!isNull(tQueue)) {
+        ss_val_t qItem = car(tQueue); // get actual list item.
+        dbg("SensorSchemeDebug", "checking recvQueue %i: %hhu, %hu, %hu.\n",
+            tQueue.idx, rcvQItemSeqNo(qItem), rcvQItemSrc(qItem), rcvQItemRoutine(qItem));
+        if (rcvQItemTime(qItem) < call SSRuntime.now()) {
+          dbg("SensorSchemeC", "recvQueue item (%x: %hhx, %hu, %hu) too old: %i. Now is %i.\n",
+          tQueue.idx, rcvQItemSeqNo(qItem), rcvQItemSrc(qItem), rcvQItemRoutine(qItem), rcvQItemTime(qItem), call SSRuntime.now());
+          if (isNull(oldQueue)) recvQueue = cdr(tQueue);
+                       else cdr(oldQueue) = cdr(tQueue);
+          tQueue = cdr(tQueue);
+          continue;
+        }
+        if (eqSeqNo(rcvQItemSeqNo(qItem), rcvData[0]) &&
+            rcvQItemSrc(qItem) == rcvAddr &&
+            rcvQItemRoutine(qItem)  == rcvRoutine) {
+          if (isNull(oldQueue)) recvQueue = cdr(tQueue);
+                       else cdr(oldQueue) = cdr(tQueue);
+          dbg("SensorSchemeDebug", "Found rcvQItem! 0x%hhx from %hu. packet:", rcvData[0], rcvAddr);
+          {uint8_t *data = call Receiver.getPayload[rcvRoutine](receivePacket);
+            for (; data < rcvEnd; data++) dbg_clear("SensorSchemeDebug", " %hhx", *data);}
+          dbg_clear("SensorSchemeDebug", ".\n");
+          bits = rcvQItemBits(qItem);
+          bitCount = rcvQItemBitCount(qItem);
+          stack = rcvQItemStack(qItem);
+          dbg_clear("SensorSchemeRD", "!(%hx, %hhx, %hhu)!, [%hx]", stack.idx, bits, bitCount, qItem.idx);
+          rcvData++;
+          sensorSchemeEval(SS_RECEIVE);
+          return;
+        } else {
+          oldQueue = tQueue;
+          tQueue = cdr(tQueue);
+        }
+      }
+    }
+    dbg("SensorSchemeC", "not found recvQueue item for message %hhx.\n", rcvData[0]);
+    call MsgPool.put(receivePacket); receivePacket = NULL;
+    // no continuation found, ignore message
+    return;
+  }
+
+  event message_t* Receiver.receive[uint8_t routine](message_t* msg, am_addr_t addr,
+      uint8_t *data, uint8_t *end) {
+    message_t* newMsg = call MsgPool.get();
+    dbg("SensorSchemeRD", "Packet (len %hu):", end-data);
+    {uint8_t *tmpdata = data;
+      for (; tmpdata < end; tmpdata++) dbg_clear("SensorSchemeRD", " %hhx",*tmpdata);
+      dbg_clear("SensorSchemeRD", "\n");}
+    if (newMsg == NULL) {
+      dbgerror("SensorSchemeError", "No packet in Pool while receiving!\n");
+      return msg;
+    }
+    receivePacket = msg;
+    rcvRoutine = routine;
+    rcvData = data;
+    rcvEnd = end;
+    rcvAddr = addr;
+    post receiveTask();
+    return newMsg;
+  }
+
+/////////////////// interface Timer  //////////////////////////////
+
+  event void Timer.fired() {
+    ss_val_t qItem;
+    dbg("SensorSchemeDebug", "Timer.fired() impulse %i at %s.\n", call Timer.getNow(), sim_time_string());
+    // execute scheduled timer
+    if (!isPair(timerQueue)) return;
+    qItem = car(timerQueue);
+    timerQueue = cdr(timerQueue);
+    if (!isNull(timerQueue)) {
+      call SSRuntime.startTimer(ss_numVal(timerQItemTime(first(timerQueue))));
+    }
+    value = timerQItemFunc(qItem);
+    envir = timerQItemEnvir(qItem);
+    args = cons(timerQItemTime(qItem), SYM_NIL);
+    stack = SYM_NIL;
+    sensorSchemeEval(SS_TIMER);
   }
 
   default command ss_val_t Primitive.eval[uint8_t pr]() {
@@ -397,6 +440,14 @@ implementation {
  * -------------- The sensorscheme core functions follow from here ---------------
  */
 
+  static uint16_t length(ss_val_t list) {
+    uint16_t res = 0;
+    while (isPair(list)) {
+      res++;
+      list = cdr(list);
+    }
+    return res;
+  }
 
   ss_val_t reverse_m(ss_val_t list, ss_val_t res) {
     while (!isNull(list)) {
@@ -413,7 +464,7 @@ implementation {
     ss_val_t q = SYM_NIL;
 
 MARK_UP:
-    if (isPair(a))
+    if (isPair(a)) {
       if (isFree(a) && !isPrimitive(a)) {
         p = car(a);
         car(a) = q;
@@ -422,7 +473,7 @@ MARK_UP:
         a = p;
         goto MARK_UP;
       } else goto MARK_DOWN;
-    else {
+    } else {
       if (ss_type(a) == T_BIGNUM) {
           setUsed(bignumIdx(a));
       }
@@ -431,15 +482,6 @@ MARK_UP:
 
 MARK_DOWN:
     if (eq(q, SYM_NIL)) {
-#ifdef TOSSIM
-      uint16_t res = 0;
-      for (freeCell.idx = CELLS_START; freeCell.idx < CELLS_END; incFree) {
-        if (!isFree(freeCell)) {
-          res = res+1;
-        }
-      }
-      dbg_clear("SensorSchemeGC", "%hu, ", res);
-#endif
       return;
     } else if isGC(q) {
       p = cdr(q);
@@ -470,13 +512,14 @@ MARK_DOWN:
   ss_val_t gc(ss_val_t a, ss_val_t b) {
     /* indicate garbage collection in progress */
     ss_val_t res;
-    dbg("SensorSchemeGC", "<");
+    pr_dbg("SensorSchemeGC", "GC: <");
+#ifndef TOSSIM
     call Leds.led2On();
+#endif
     /* first free all cells */
     for (freeCell.idx = CELLS_START; freeCell.idx < CELLS_END; incFree) {
         setFree(freeCell);
     }
-
     /* then trace cells and mark used ones */
     mark(globalEnv);
     mark(timerQueue);
@@ -488,29 +531,34 @@ MARK_DOWN:
     mark(ss_envir);
     mark(a);
     mark(b);
-    dbg_clear("SensorSchemeGC", ">\n");
 
     /* finally return a new cell or panic when all is full */
     for (freeCell.idx = CELLS_START; freeCell.idx < CELLS_END; incFree) {
       if (isFree(freeCell)) {
         res = freeCell;
-        car(freeCell) = a;                    
-        cdr(freeCell) = b;                    
-        incFree;    
-        call Leds.led2Off();
-        return res;
+        goto GC_SUCCESS;
       }
     }
     // if reached here, all memory is full.
     // free up receive queue as last resort
+    dbgerror("SensorSchemeC", "memory full after gc!\n");
     if (!isNull(recvQueue)) {
       res = recvQueue;
-      recvQueue = SYM_NIL;
-      call Leds.led2Off();
-      return res;
+      recvQueue = cdr(recvQueue);
+      goto GC_SUCCESS;
     }
     // nothing more to do. time to panic !!
     longjmp(jmpEnv, ERROR_OUT_OF_MEMORY);
+
+GC_SUCCESS:    
+        car(res) = a;                    
+        cdr(res) = b;                    
+        incFree;    
+#ifndef TOSSIM        
+        call Leds.led2Off();
+#endif        
+        pr_dbg_clear_f("SensorSchemeGC", "> %u, %u\n", res.idx - CELLS_START, length(ss_stack));
+        return res;
   }
 
 /* cons: get new cell */
@@ -531,7 +579,7 @@ MARK_DOWN:
   }
 
   inline void write_byte(uint8_t val) {
-    dbg_clear("SensorSchemeWR", "[%hhu]", val);
+    //dbg_clear("SensorSchemeWR", "[%hhu]", val);
     byteBuf[byteBufIdx++] = val;
   }
 
@@ -550,12 +598,20 @@ MARK_DOWN:
     int16_t ret = setjmp(jmpEnv);
     if (ret) {
       // longjmp called
-      dbg("SensorSchemeC", "sensorScheme exits with code %hhu.\n", ret);
+      if (ret != ERROR_NONE) {
+        dbgerror("SensorSchemeError", "%s.\n", error_str[ret]);
+      if (receivePacket) call MsgPool.put(receivePacket); receivePacket = NULL;
+      } else {
+        dbg("SensorSchemeDebug", "%s.\n", error_str[ret]);
+      }
       return;
     }
-    dbg("SensorSchemeC", "sensorScheme called on entrypoint %hhu.\n", entry);
+    dbg("SensorSchemeDebug", "sensorScheme called on entrypoint %hhu.\n", entry);
+    freeCell = save_freeCell;
     switch (entry) {
       case SS_INIT:
+        rcvData = (uint8_t *)initMessage;
+        rcvEnd = rcvData+initSize;
         bitCount = 0;
         dbg("SensorSchemeRD", "Init message: ");
         do_call(RD_SEXPR, ss_args, OP_HANDLEINIT, ss_args);
@@ -570,7 +626,7 @@ MARK_DOWN:
       case SS_CONTINUE:
         goto OP_RETURN; break;
       case SS_TIMER:
-        do_call(OP_APPLY, SYM_NIL, OP_EXIT, SYM_NIL); break;
+        do_call(OP_APPLY, ss_args, OP_EXIT, SYM_NIL); break;
     }
 OP_RETURN: {
       // pop one item off the stack and return
@@ -595,8 +651,22 @@ OP_HANDLEMSG: {
     // expects: message in ss_value,
     //          sender in ss_args
     dbg_clear("SensorSchemeRD", "\n");
-    call Pool.put(receivePacket);
-    dbg("SensorSchemeC", "put Pool item: 0x%x. new size: %hhu\n", receivePacket, call Pool.size());
+
+    //  make sure message is ended correctly. If this is not end of packet, something's wrong.
+    if (!((call Receiver.getPayload[rcvRoutine](receivePacket))[0] & MSGSEQ_END)) {
+        do_error(ERROR_MSG_ENDMARKER);
+    }
+    while (bitCount != 0) {
+      if (! eq(makeSymbol(bits & 0x03), TOK_BRCLOSE))
+        do_error(ERROR_MSG_TERMINATION);
+      bits >>= 2;
+      bitCount--;
+    }
+    if (rcvEnd > rcvData) {
+        do_error(ERROR_MSG_CONTENT_END);
+    }
+
+    call MsgPool.put(receivePacket); receivePacket = NULL;
 //  C_symVal(C_car(ss_value)); /* Message needs to start with handler symbol. */
     do_call(OP_EVAL, car(ss_value), OP_APPLY, cons(ss_args, cdr(ss_value)));
 }
@@ -610,21 +680,24 @@ OP_HANDLEINIT: {
         
 OP_EVAL:
     if (isSymbol(ss_args)) {
-      dbg("SensorSchemeC", "OP_EVAL symbol %hu.\n", symVal(ss_args));
+      dbg("SensorSchemeDebug", "OP_EVAL symbol %hu.\n", symVal(ss_args));
+      if (lt(SYM(255), ss_args)) {
+        do_return(ss_args);
+      }
       if (lteq(ss_args, SYM(LAST_PRIM))) {
         if (lt(ss_args, SYM(ID))) {
           do_return(ss_args);
         } else if (eq(ss_args, SYM(ID))) {
           do_return(ss_makeNum(TOS_NODE_ID));
         } else { // make primitive from symbol
-          dbg("SensorSchemeC", "OP_EVAL primitive %hu.\n", symVal(ss_args));
+          dbg("SensorSchemeDebug", "OP_EVAL primitive %hu.\n", symVal(ss_args));
           do_return(makePrimitive(symVal(ss_args)));
         }
       }
       else if (lteq(ss_args, SYM(LAST_LOCAL))) {
         /* defined symbol */
         ss_val_t x = globalEnv;
-        dbg("SensorSchemeC", "OP_EVAL defined sym.\n");
+        dbg("SensorSchemeDebug", "OP_EVAL defined sym.\n");
         while (!isNull(x)) {
           if (eq(car(car(x)), ss_args)) {
             do_return(cdr(car(x)));
@@ -637,14 +710,14 @@ OP_EVAL:
         uint16_t n = symVal(ss_args);
         ss_val_t x = ss_envir;
         ss_val_t y = ss_envir;
-        dbg("SensorSchemeC", "OP_EVAL local %%l%hhu.\n", 255-n);
+        dbg("SensorSchemeDebug", "OP_EVAL local %%l%hhu.\n", 255-n);
         while (n < 256) {
-          dbg("SensorSchemeC", "OP_EVAL local prepare x = 0x%hx.\n", x.idx);
+          dbg("SensorSchemeDebug", "OP_EVAL local prepare x = 0x%hx.\n", x.idx);
           x = cdr(x);
           n++;
         }
         while (!isNull(x)) {
-          dbg("SensorSchemeC", "OP_EVAL local return x = 0x%hx.\n", x.idx);
+          dbg("SensorSchemeDebug", "OP_EVAL local return x = 0x%hx.\n", x.idx);
           x = cdr(x);
           y = cdr(y);
         }
@@ -657,24 +730,28 @@ OP_EVAL:
       if (isSymbol(car(ss_args)) && lteq(car(ss_args), SYM(SET))) {
         // is internal function
         if (eq(car(ss_args), SYM(LAMBDA))) { /* called 1554 times */
-          dbg("SensorSchemeC", "OP_EVAL lambda.\n");
+          dbg("SensorSchemeDebug", "OP_EVAL lambda.\n");
           do_return(makeClosure(cdr(ss_args), ss_envir));
         } else if (eq(car(ss_args), SYM(IF))) { /* called 611 times */
-          dbg("SensorSchemeC", "OP_EVAL if.\n");
+          dbg("SensorSchemeDebug", "OP_EVAL if.\n");
           do_call(OP_EVAL, car(cdr(ss_args)), OP_IF_CONT, cons(cdr(cdr(ss_args)), ss_envir));
         } else if (eq(car(ss_args), SYM(SET))) { /* called 558 times */
-          dbg("SensorSchemeC", "OP_EVAL set!.\n");
+          dbg("SensorSchemeDebug", "OP_EVAL set!.\n");
           do_call(OP_EVAL, car(cdr(cdr(ss_args))), OP_SET_CONT, cons(car(cdr(ss_args)), ss_envir));
         } else if (eq(car(ss_args), SYM(QUOTE))) { /* called 102 times */
-          dbg("SensorSchemeC", "OP_EVAL quote.\n");
+          dbg("SensorSchemeDebug", "OP_EVAL quote.\n");
           do_return(car(cdr(ss_args)));
         } else if (eq(car(ss_args), SYM(DEFINE))) { /* called 1 time */
-          dbg("SensorSchemeC", "OP_EVAL define.\n");
-          do_call(OP_EVAL, car(cdr(cdr(ss_args))), OP_DEF_CONT, cons(cdr(ss_args), ss_envir));
+          dbg("SensorSchemeDebug", "OP_EVAL define.\n");
+          if (isPair(cdr(ss_args))) {
+            do_call(OP_EVAL, car(cdr(cdr(ss_args))), OP_DEF_CONT, cons(cdr(ss_args), ss_envir));
+          } else { 
+            do_return(SYM_FALSE);
+          }
         }
       }
       // first do eval head of list (function) then eval arguments
-      dbg("SensorSchemeC", "OP_EVAL application %hi.\n", ss_args.idx);
+      dbg("SensorSchemeDebug", "OP_EVAL application %hi.\n", ss_args.idx);
       do_call(OP_EVAL, car(ss_args), OP_ARGEVAL_CONT, cons(cdr(ss_args), cons(SYM_NIL, ss_envir)));
     } else {
       do_return(ss_args);
@@ -682,15 +759,15 @@ OP_EVAL:
 
 OP_APPLY:
 {
-    //FN_APPLY procedure to arguments
+    // apply procedure to arguments
     // expects:
-    //   procedure to apply in ss_value
-    //   parameters in ss_args
-    //   ss_stack, ss_envir as usual
+    //   procedure to apply in value
+    //   parameters in args
+    //   stack, envir as usual
     ss_val_t code;
     if (isPrimitive(ss_value)) {
       uint8_t prim = primVal(ss_value);
-        dbg("SensorSchemeC", "OP_APPLY primitive %hi.\n", prim);
+        dbg("SensorSchemeDebug", "OP_APPLY primitive %hi.\n", prim);
       if (prim < NUM_SIMPLEPRIMS) {
         do_return(call Primitive.eval[prim]());
       } else if (prim < NUM_EVALPRIMS) {
@@ -706,7 +783,7 @@ OP_APPLY:
       }
     } else if (isClosure(ss_value)) {
       ss_val_t cArgs = closureArgs(ss_value);
-      dbg("SensorSchemeC", "OP_APPLY closure.\n");
+      dbg("SensorSchemeDebug", "OP_APPLY closure.\n");
       code = closureCode(ss_value);
       envir = closureEnv(ss_value);
       while (isPair(cArgs)) {
@@ -733,7 +810,7 @@ OP_APPLY:
         goto OP_EVAL;
       }
     } else if (isContinuation(ss_value)) {
-      dbg("SensorSchemeC", "OP_APPLY continuation.\n");
+      dbg("SensorSchemeDebug", "OP_APPLY continuation.\n");
       callContinuation(ss_value, car(ss_args));
     } else {
       do_error(ERROR_NOT_CALLABLE); /* Cannot call this kind of function. */
@@ -756,7 +833,7 @@ OP_SET_CONT:
 {
     ss_val_t sym = car(ss_args);
     envir = cdr(ss_args);
-    dbg("SensorSchemeC", "OP_SET continuation.\n");
+    dbg("SensorSchemeDebug", "OP_SET continuation.\n");
     // assign local or global var.
     if (lteq(sym, SYM(LAST_LOCAL))) {
         /* else newly defined symbol */
@@ -809,7 +886,7 @@ OP_DEF_CONT: {
     ss_val_t t = globalEnv;
     envir = cdr(ss_args);
     C_symVal(sym); // check whether symbol is given
-    dbg("SensorSchemeC", "OP_DEF_CONT %hu.\n", symVal(sym));
+    dbg("SensorSchemeDebug", "OP_DEF_CONT %hu.\n", symVal(sym));
     while (!isNull(t)) {
         if (eq(sym, car(car(t)))) {
             cdr(car(t)) = ss_value;
@@ -854,6 +931,7 @@ OP_ARGEVAL_CONT:
 }
 
 OP_EXIT:
+    save_freeCell = freeCell;
     longjmp(jmpEnv, ERROR_NONE);
 
 /* ---------------- reading part ---------------------------------- */
@@ -865,10 +943,11 @@ RD_BYTE:
       rcvData++;
       do_return(res);
     } else {
-      /* save the ss_stack, reuse when next message arrives */
+      /* save the stack, reuse when next message arrives */
       uint8_t *data = call Receiver.getPayload[rcvRoutine](receivePacket);
-      ss_val_t itm = makeRcvQItem(rcvAddr, data[0], bits, bitCount, rcvRoutine);
-      dbg_clear("SensorSchemeRD", "\n");dbg("SensorSchemeRD","End of packet read from %hu, seq: 0x%hhx, [%hx].\n", rcvAddr, data[0], ss_stack.idx);
+      ss_val_t itm = makeRcvQItem(16, rcvAddr, data[0], bits, bitCount, rcvRoutine);
+      dbg_clear("SensorSchemeRD", "!(%hx, %hhx, %hhu)!", ss_stack.idx, bits, bitCount);
+      dbg_clear("SensorSchemeRD", "\n");dbg("SensorSchemeRD","End of packet read from %hu, seq: 0x%hhx, [%hx].\n", rcvAddr, data[0], itm.idx);
       if (isNull(recvQueue)) {
         recvQueue = cons(itm, SYM_NIL);
         dbg("SensorSchemeRD", "set recvQueue to: %hu\n", recvQueue.idx);
@@ -878,10 +957,9 @@ RD_BYTE:
           tQueue = cdr(tQueue);
         }
         cdr(tQueue) = cons(itm, SYM_NIL);
-        dbg("SensorSchemeRD", "append recvQueue: %hu\n", cdr(tQueue).idx);
+        dbg("SensorSchemeRD", "append recvQueue: %hx\n", cdr(tQueue).idx);
       }
-      call Pool.put(receivePacket);
-      dbg("SensorSchemeC", "put Pool item: 0x%x. new size: %hhu\n", receivePacket, call Pool.size());
+      call MsgPool.put(receivePacket); receivePacket = NULL;
       goto OP_EXIT;
     }
 
@@ -892,6 +970,7 @@ RD_BITS:
 RD_BITS_CONT2:
     {
       ss_val_t res = makeSymbol(bits & 0x03);
+      dbg_clear("SensorSchemeRD", "<%hhu>", res.idx >> 2);
       bits >>= 2;
       bitCount--;
       do_return(res);
@@ -928,8 +1007,6 @@ RD_DWORD_CONT2: {
 RD_SEXPR:
     // processes message string to form sexpr
     // expects message in rcvData,
-    //         current index in idx
-    //         length of message
     do_call(RD_BITS, ss_args, RD_SEXPR_CONT1, SYM_NIL);
 RD_SEXPR_CONT1:
     if (eq(ss_value, TOK_BROPEN)) {
@@ -937,7 +1014,7 @@ RD_SEXPR_CONT1:
         do_call(RD_SEXPR, ss_args, RD_LIST, SYM_NIL);
         do_return(ss_value);
     } else if (eq(ss_value, TOK_BRCLOSE)) {
-        do_return(SYM(BRCLOSE));
+        do_return(TOK_BRCLOSE);
     } else if (eq(ss_value, TOK_SYM)) {
         do_call(RD_BYTE, ss_args, RD_SEXPR_SYM, SYM_NIL);
     } else /*if (eq(ss_value, TOK_NUM))*/ {
@@ -945,8 +1022,26 @@ RD_SEXPR_CONT1:
     }
 
 RD_SEXPR_SYM:
+    if (eq(makeSymbol(primVal(ss_value)), SYM(STRING))) {
+        do_call(RD_BITS, ss_args, RD_SYM_NIBBLE1, SYM_NIL);
+    }
     dbg_clear("SensorSchemeRD", "s%hi", primVal(ss_value));
     do_return(makeSymbol(primVal(ss_value)));
+
+RD_SYM_NIBBLE1:
+    dbg_clear("SensorSchemeRD", "$<%hhu:", symVal(ss_value));
+    do_call(RD_BITS, ss_args, RD_SYM_NIBBLE2, ss_value);
+RD_SYM_NIBBLE2: {
+    uint8_t num = symVal(ss_args) << 2 | symVal(ss_value);
+    ss_val_t symnum = makeSymbol(num);
+    dbg_clear("SensorSchemeRD", "%hhu>$ ", symVal(ss_value));
+    do_call(RD_BYTE, ss_args, RD_SYM_STRING, symnum);
+    }
+RD_SYM_STRING: {
+    uint16_t num = symVal(ss_args) << 8 | symVal(ss_value);
+    dbg_clear("SensorSchemeRD", "s%hi, sym %hi", num, makeSymbol(num));
+    do_return(makeSymbol(num));
+    }
 
 RD_SEXPR_NUM:
     if (eq(ss_value, TOK_NIBBLE)) {
@@ -970,8 +1065,8 @@ RD_SEXPR_NIBBLE2: {
   }
 
 RD_SEXPR_BYTE:
-    dbg_clear("SensorSchemeRD", "%hhi", primVal(ss_value));
-    do_return(makeSmallnum(primVal(ss_value)));
+    dbg_clear("SensorSchemeRD", "%hi", (int8_t)primVal(ss_value));
+    do_return(makeSmallnum((int8_t)primVal(ss_value)));
 
 
 RD_LIST:
@@ -979,7 +1074,7 @@ RD_LIST:
     // expects: list item just read in ss_value
     //          previously read items in ss_args
     //          message in rcvData
-    if (eq(ss_value, SYM(BRCLOSE))) {
+    if (eq(ss_value, TOK_BRCLOSE)) {
         dbg_clear("SensorSchemeRD", ")");
         do_return(reverse_m(ss_args, SYM_NIL));
     } else if (eq(ss_value, SYM(DOT))) {
@@ -1009,10 +1104,10 @@ RD_DOT:
  * returns #t or #f in ss_value
  */
 WR_START: {
-    sendPacket = call Pool.get();
-    dbg("SensorSchemeC", "get Pool item: 0x%x. size left: %hhu\n", sendPacket, call Pool.size());
+    sendPacket = call MsgPool.get();
     if (!sendPacket) {
-      dbg("SensorSchemeC", "WR_START: no packet in pool.\n");
+      //printf("No packet in pool for writing.\n");call PrintfFlush.flush();
+      dbgerror("SensorSchemeError", "No packet in pool for writing!.\n");
       do_return(SYM_FALSE); // sending didn't succeed, just fail returning FALSE. TODO: make robust!!
     }
     sndData = call Sender.getPayload[sndRoutine](sendPacket);
@@ -1104,11 +1199,12 @@ WR_LIST_DOT:
 WR_FINISH: {
     // last packet of message.
     // send it, and continue
-    dbg_clear("SensorSchemeWR", "\nEnd of message.");
+    dbg_clear("SensorSchemeWR", "End of message.");
     msgSeq |= MSGSEQ_END; // this will make WR_SEND detect it is the last packet
     if (bitCount > 0) {
       while (bitCount > 0) {
         bits >>= 2;
+        bits |= (symVal(TOK_BRCLOSE) << 6);
         bitCount--;
       }
     }
@@ -1116,7 +1212,7 @@ WR_FINISH: {
   }
 
 WR_BITS: {
-    dbg_clear("SensorSchemeWR", "<%hu>", symVal(ss_args));
+    // dbg_clear("SensorSchemeWR", "<%hu>", symVal(ss_args));
     if (bitCount == 0) {
       if (sndData+byteBufIdx+1 >= sndEnd) {
 WR_SEND: {
@@ -1143,15 +1239,16 @@ WR_SEND: {
             (call Sender.getPayload[sndRoutine](sendPacket))[0] = msgSeq;
         dbg_clear("SensorSchemeWR", "}\n");
 WR_SEND_LAST:
-        dbg_clear("SensorSchemeWR", "Packet :");
-        {uint8_t *data = call Sender.getPayload[sndRoutine](sendPacket);
+        { uint8_t *data = call Sender.getPayload[sndRoutine](sendPacket);
+          dbg("SensorSchemeWR", "Packet (len %hu):", sndData-data);
           for (; data < sndData; data++) dbg_clear("SensorSchemeWR", " %hhx",*data);
           dbg_clear("SensorSchemeWR", "\n");}
         switch (call Sender.send[sndRoutine](sndAddr, sendPacket, sndData)) {
           case SUCCESS: {
           /* store current continuation in queue */
+            call Leds.led0On();
             sendQueue = cons(makeSendQItem(msgSeq, b, sndRoutine), sendQueue);
-            //dbg("SensorSchemeWR", "send SUCCESS\n");
+freeCell.idx = CELLS_END;
             goto OP_EXIT;
           }
           case EBUSY: {
@@ -1159,9 +1256,16 @@ WR_SEND_LAST:
                for now just fall-through to FAIL */
             dbg("SensorSchemeWR", "send EBUSY\n");
           }
+          case EOFF: {
+            dbg("SensorSchemeWR", "send EOFF\n");
+          }
           case FAIL: {
-            /* Continuation already in 'ss_value' */
             dbg("SensorSchemeWR", "send FAIL\n");
+          }
+          default: {
+            dbg("SensorSchemeWR", "send not succeded with unknown error.\n");
+            call MsgPool.put(sendPacket);
+            /* Continuation already in 'ss_value' */
             callContinuation(ss_value, SYM_FALSE);
           }
         }

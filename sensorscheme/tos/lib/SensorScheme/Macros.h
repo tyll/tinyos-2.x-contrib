@@ -41,7 +41,7 @@
     if (!(p)) do_error(v)
 
 #define do_error(v) ({                          \
-    dbg("SensorSchemeC", "error %hu in %s line %u\n", v, __FILE__, __LINE__); \
+    dbgerror("SensorSchemeC", "error %hu in %s line %u\n", v, __FILE__, __LINE__); \
     call SSRuntime.error(v);})
 
 
@@ -103,23 +103,24 @@
 #define MSGSEQ_START        (1<<7)
 #define MSGSEQ_END          (MSGSEQ_START >> 1)
 #define MSGSEQ_NUMMASK      (~(MSGSEQ_START | MSGSEQ_END))
-#define MSGSEQ_NEWMASK      (~MSGSEQ_START)
 
 
-#define nextSeqNo(n)            ((n + 1) & MSGSEQ_NEWMASK)
+#define nextSeqNo(n)            (((n + 1) & MSGSEQ_NUMMASK) | ((n) & MSGSEQ_END))
 #define newSeqNo(n)             ((nextSeqNo(n) & (~MSGSEQ_END))| MSGSEQ_START)
 #define eqSeqNo(a, b)           ((a & MSGSEQ_NUMMASK) == (b & MSGSEQ_NUMMASK))
 
 
-#define makeRcvQItem(src, seq, b, bc, rt)  cons(ss_makeNum(src), \
-                                cons(makeSmallnum(nextSeqNo(seq)),                  \
-                                cons(makeSmallnum(rt << 10 | b << 2 | bc), ss_stack)))
-#define rcvQItemSrc(q)          (am_addr_t)ss_numVal(first(q))
-#define rcvQItemSeqNo(q)        (ss_numVal(second(q)) & 0xff)
-#define rcvQItemBits(q)         (uint8_t)(smallnumVal(third(q)) >> 2)
-#define rcvQItemBitCount(q)     (smallnumVal(third(q)) & 3)
-#define rcvQItemRoutine(q)      (smallnumVal(third(q)) >> 10)
-#define rcvQItemStack(q)        cdr(cdr(cdr(q)))
+#define makeRcvQItem(tm, src, seq, b, bc, rt)  cons(ss_makeNum(call SSRuntime.now() + tm), \
+                                cons(ss_makeNum(src), \
+                                cons(makeSmallnum(nextSeqNo(seq)), \
+                                cons(makeSmallnum(rt << 10 | b << 2 | bc), ss_stack))))
+#define rcvQItemTime(q)         ss_numVal(first(q))
+#define rcvQItemSrc(q)          (am_addr_t)ss_numVal(second(q))
+#define rcvQItemSeqNo(q)        (ss_numVal(third(q)) & 0xff)
+#define rcvQItemBits(q)         (uint8_t)(smallnumVal(fourth(q)) >> 2)
+#define rcvQItemBitCount(q)     (smallnumVal(fourth(q)) & 3)
+#define rcvQItemRoutine(q)      (smallnumVal(fourth(q)) >> 10)
+#define rcvQItemStack(q)        cdr(cdr(cdr(cdr(q))))
 
 #define makeSendQItem(seq, b, rt) ss_cons(makeSmallnum(seq | (rt - FIRST_SEND_PRIM) << 8), \
                                 ss_cons(b, ss_cons(ss_args, ss_cons(ss_stack, ss_value))))
@@ -131,8 +132,8 @@
 #define sendQItemCont(q)        cdr(cdr(cdr(cdr(q))))
 
 #define makeTimerQItem(tm, fn)  ss_cons(ss_makeNum(tm), fn)
-#define timerQItemTime(q)       ss_numVal(car(q))
-#define timerQItemThunk(q)      cdr(q)
+#define timerQItemTime(q)       car(q)
+#define timerQItemFunc(q)       cdr(q)
 #define timerQItemEnvir(q)      cdr(cdr(cdr(q)))
 
 #endif

@@ -3,14 +3,9 @@
 
 #include "Types.h"
 #include "Macros.h"
-
-
-typedef nx_struct SensorSchemeMsg {
-  nx_uint8_t data[1];
-} SensorSchemeMsg;
+#include "SensorSchemeMsg.h"
 
 enum {
-  AM_SENSORSCHEME_MSG = 7,
   AM_SSCOLLECT_MSG = 8,
   CL_SSCOLLECT_MSG = 9,
   CL_SSINTERCEPT_MSG = 10,
@@ -18,8 +13,8 @@ enum {
 };
 
 enum {
-  POOL_SIZE = 8,
-  ROOT_QUEUE_SIZE = 8,
+  POOL_SIZE = 2,
+  ROOT_QUEUE_SIZE = 4,
   SS_TICKS_PER_SECOND = 16,
 };
 
@@ -52,18 +47,32 @@ enum errorcode_t {
   ERROR_ARG_NOT_PAIR,
   ERROR_ARG_NOT_SYMBOL,
   ERROR_ARG_NOT_NUMBER,
+  ERROR_MSG_ENDMARKER,
+  ERROR_MSG_TERMINATION,
+  ERROR_MSG_CONTENT_END,
 } errorcode_t;
 
-typedef struct sub_send_t {
-    uint8_t *(* const getPayload)(message_t *pkt);
-    uint8_t *(* const getPayloadEnd)(message_t *pkt);
-    am_addr_t(* const getDestination)(message_t *pkt);
-    error_t  (* const send)(am_addr_t addr, message_t* pkt, uint8_t *dataEnd);
-  } sub_send_t;
-
-typedef struct sub_receive_t {
-    uint8_t *(* const getPayload)(message_t *pkt);
-  } sub_receive_t;
+char const* error_str[] = {
+	[ERROR_NULL] = "NULL error, should not occur",
+	[ERROR_NONE] = "Terminated normally",
+	[ERROR_OUT_OF_MEMORY] = "Out of memory!",
+	[ERROR_ILLEGAL_WRITE] = "Illegal write",
+	[ERROR_SYMBOL_NOT_FOUND] = "Symbol not found",
+	[ERROR_TOO_FEW_ARGS] = "Too few arguments to closure",
+	[ERROR_TOO_MANY_ARGS] = "Too many arguments to closure",
+	[ERROR_ILLEGAL_CLOSURE] = "Illegal closure format",
+	[ERROR_NOT_CALLABLE] = "calling an object that is not callable",
+	[ERROR_UNKNOWN_PRIMTIIVE] = "Unknwn primitive",
+	[ERROR_SYMBOL_NOT_BOUND] = "Symbol not bound",
+	[ERROR_PRIMITIVE_ARGUMENT_COUNT] = "Wrong number of arguments to primitive",
+	[ERROR_MESSAGE_FORMAT] = "Message format",
+	[ERROR_ARG_NOT_PAIR] = "Argument is not a pair",
+	[ERROR_ARG_NOT_SYMBOL] = "Argument is not a symbol",
+	[ERROR_ARG_NOT_NUMBER] = "Argument is not a number",
+	[ERROR_MSG_ENDMARKER] = "Message has no end marker",
+	[ERROR_MSG_TERMINATION] = "Message not terminated properly",
+	[ERROR_MSG_CONTENT_END] = "Message content not finished yet",
+};
 
 #define LABEL_LIST(_)  \
   _(OP_EXIT)           \
@@ -84,6 +93,9 @@ typedef struct sub_receive_t {
   _(RD_LIST)           \
   _(RD_DOT)            \
   _(RD_SEXPR_SYM)      \
+  _(RD_SYM_NIBBLE1)    \
+  _(RD_SYM_NIBBLE2)    \
+  _(RD_SYM_STRING)     \
   _(RD_SEXPR_NUM)      \
   _(RD_SEXPR_NIBBLE1)  \
   _(RD_SEXPR_NIBBLE2)  \
@@ -107,7 +119,7 @@ typedef struct sub_receive_t {
     _(_TRUE, 0)            \
     _(_FALSE, 0)           \
 /* read symbols */         \
-    _(BRCLOSE, 0)          \
+    _(STRING, 0)          \
     _(DOT, 0)              \
 /* the special forms */    \
     _(LAMBDA, 0)           \
@@ -142,7 +154,8 @@ typedef struct sub_receive_t {
     SEND_PRIM_LIST(PRIM_ENUM)
   } symbols_t;
 
-  enum receivers{
+  enum receivers {
+	  _dummy_receiver,
     RECEIVER_LIST(PRIM_ENUM)
   } receivers_t;
 
@@ -156,7 +169,7 @@ typedef struct sub_receive_t {
 #define FIRST_SEND_PRIM     (NUM_APPLYPRIMS)
 #define LAST_PRIM           (NUM_PRIMS - 1)
 
-#define LAST_LOCAL          (256-16)
+#define LAST_LOCAL          (256-8)
 
 
 #endif

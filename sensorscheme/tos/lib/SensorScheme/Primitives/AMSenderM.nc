@@ -37,8 +37,9 @@ implementation {
   }
   
   command ss_val_t SSSender.eval(am_addr_t *addr) {
-    dbg("SensorSchemeC", "AMSender.eval.\n");
+    dbg("SensorSchemeC", "AMSender.eval. ");
     *addr = C_numVal(arg_1);
+    dbg_clear("SensorSchemeC", "dest = %hx.\n", ss_numVal(arg_1));
     return arg_2;
   }
   
@@ -55,6 +56,7 @@ implementation {
   }
   
   command error_t SSSender.send(am_addr_t addr, message_t* pkt, uint8_t *dataEnd) {
+    dbg("SensorSchemeC", "AMSender.send. %x, len %u \n", (call SSSender.getPayload(pkt))[0], dataEnd - call SSSender.getPayload(pkt));
     return call AMSend.send(addr, pkt, dataEnd - call SSSender.getPayload(pkt));
   }
 

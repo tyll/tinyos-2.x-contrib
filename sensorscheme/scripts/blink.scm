@@ -1,11 +1,11 @@
 (ssmodule blink
   
   (require (lib std))
+
+  (define (blink0 t)
+    (blink t)
+    (call-at-time (+ t 1) blink0))
   
-  (define (do-blink n)
-    (blink n)
-    (call-at-time (+ n 1) do-blink))
-  
-  (do-blink 0)
+  (blink0 0)
   
   )

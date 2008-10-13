@@ -9,6 +9,6 @@
   (define-handler (blinkleds n)
     (blink n))
   
-  (bcastblink 0)
+  (bcastblink (now))
   
   )

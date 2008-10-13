@@ -8,23 +8,6 @@
 
 (define *parteval-ns* (make-base-namespace))
 
-(define (specialize-module mod-name node-id)
-  (define (select-module todo-mdls done-mdls)
-    (printi "specialize-module  ~s ~s~n" (map ssmodule-name todo-mdls) (map ssmodule-name done-mdls))
-    (if (or (null? todo-mdls) (member (car todo-mdls) done-mdls)) (values '() '() '())          
-        (let-values ([(mdls1 defs1 inits1) 
-                      (select-module (ssmodule-requires (car todo-mdls)) done-mdls)])
-          (let*-values ([(new-inits new-defs) (specialize-module-exprs (ssmodule-init (car todo-mdls)) '() (car todo-mdls))])
-            (printi "~nmodule ~s defs: ~s~n       inits: ~s~n" 
-                    (ssmodule-name (car todo-mdls)) new-defs new-inits)
-            (let-values ([(mdls2 defs2 inits2) (select-module (cdr todo-mdls) (cons (car todo-mdls) done-mdls))])
-              (values (append (list (car todo-mdls)) mdls1 mdls2) 
-                      (append new-defs defs1 defs2) (append new-inits inits1 inits2)))))))
-  (let ([s-mod (process-module mod-name)])
-    (when (number? node-id) (hash-set! (ssmodule-defines s-mod) 'id `(const ,node-id)))
-    (let-values ([(mdls defs inits) (select-module (list s-mod) null)])
-      (values mdls defs inits))))
-
 ; auxillary funcitons for variables in environments
 (define (constant-var? exp) (eq? (second exp) 'const))
 (define (constant-value c) (third c))
@@ -188,12 +171,11 @@
           (reverse defs)))
 
 
-
-; renames all local variables to the standard local-variable names, 
-; that can be indexed by name
-; exp: exression to rename (should come from top level of module)
-; returns renamed verion of exp, sharing structures where possible
-(define (rename-locals exp)
+; transforms, collects and rename after specialization in a single passob 
+; collect only those definitions that are referred
+; transform proc into lanbda, and remove include statements
+; renames all local variables to the numeric local-variable names, 
+(define (transform-rename defs inits)
   (define (varlist l n)
     (cond ((null? l) null)
           ((symbol? l) (cons (cons l (string->symbol (string-append "%l" (number->string n)))) null))
@@ -203,25 +185,47 @@
     (cond ((null? v) null)
           ((symbol? v) (cdr (assoc v al)))
           (else (cons (cdr (assoc (car v) al)) (replace-vars (cdr v) al)))))
-  (define (rename-locals-inner exp locals)
-    (cond [(pair? exp)
-           (case (car exp)
-             [(%lambda%) (let* ((ll (varlist (cadr exp) (length locals)))
-                                (nvars (replace-vars (cadr exp) ll))
-                                (nlocs (append ll locals)))
-                           (cons '%lambda% 
-                                 (cons nvars (map (lambda (x) (rename-locals-inner x nlocs)) (cddr exp)))))]
-             [(quote) exp]
-             [else (map (lambda (x) (rename-locals-inner x locals)) exp)]
-             )]
-          [(symbol? exp) (let ((r (assoc exp locals)))
-                           (if r (cdr r) exp))]
-          [else exp]))
-  #;(printf "rename-locals ~s~n" exp)
-  (let ([r (rename-locals-inner exp null)])
-    ; (printf ": ~s~n" r)
-    r))
+  (define (transform-inner expr locals)
+    (match expr
+      [(list '%include% syms ...) '()]
+      [(list 'if pred conseq alt) `(if ,(transform-inner pred locals) ,(transform-inner conseq locals) ,(transform-inner alt locals))]
+      [(list 'if pred conseq) `(if ,(transform-inner pred locals) ,(transform-inner conseq locals))]
+      [(list 'quote val) expr]
+      [(list 'set! (? symbol? var) val) `(set! var ,(transform-inner val locals))]
+      [(list '%lambda% params body ...) (raise-user-error transform-rename "no lambda's should occur here: ~s" expr)]
+      [(list '%proc% _ params body ...) 
+       (let* ([ll (varlist params (length locals))]
+              [nvars (replace-vars params ll)]
+              [nlocs (append ll locals)])
+         `(%lambda% ,nvars ,@(map (lambda (x) (transform-inner x nlocs)) body)))]
+      [(list exprs ...) (map (lambda (x) (transform-inner x locals)) exprs)]
+      [(? symbol? sym) (let ((r (assoc sym locals)))
+                         (if r (cdr r) sym))]
+      [(or (? number? _) (? null? _) (? boolean? _) (? string? _)) expr]
+      [expr (raise-user-error transform-rename "illegal expression: ~s" expr)]
+      ))
+  (values (map (match-lambda [(list name kind val) (list name kind (transform-inner val null))]
+                             [expr (raise-user-error transform-rename "unknown format of definition: ~s" expr)]) defs) 
+          (map (cut transform-inner <> null) inits)))
 
+; main funciotn of the module: specialize code wrt constants and prepare to make message.
+(define (specialize-module mod-name node-id)
+  (define (specialize-all todo-mdls done-mdls)
+    (printi "specialize-module  ~s ~s~n" (map ssmodule-name todo-mdls) (map ssmodule-name done-mdls))
+    (if (or (null? todo-mdls) (member (car todo-mdls) done-mdls)) (values '() '() '())          
+        (let-values ([(mdls1 defs1 inits1) 
+                      (specialize-all (ssmodule-requires (car todo-mdls)) done-mdls)])
+          (let*-values ([(new-inits new-defs) (specialize-module-exprs (ssmodule-init (car todo-mdls)) defs1 (car todo-mdls))])
+            (printi "~nmodule ~s defs: ~s~n       inits: ~s~n" 
+                    (ssmodule-name (car todo-mdls)) new-defs new-inits)
+            (let-values ([(mdls2 defs2 inits2) (specialize-all (cdr todo-mdls) (cons (car todo-mdls) done-mdls))])
+              (values (append (list (car todo-mdls)) mdls1 mdls2) 
+                      (append new-defs defs2) (append new-inits inits1 inits2)))))))
+  (let ([s-mod (process-module mod-name)])
+    (when (number? node-id) (hash-set! (ssmodule-defines s-mod) 'id `(const ,node-id)))
+    (let*-values ([(mdls defs inits) (specialize-all (list s-mod) null)]
+                  [(sel-defs sel-inits) (transform-rename defs inits)])
+      (values mdls sel-defs sel-inits))))
 
 (define s-e-cnt 0)
 (define (s-e-cnt-same)

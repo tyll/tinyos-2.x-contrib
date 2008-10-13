@@ -241,38 +241,38 @@
         (printf "message: ~s~n" msg))
       msg))
 
-  ; renames all local variables to the standard local-variable names, 
-  ; that can be indexed by name
-  ; exp: exression to rename (should come from top level of module)
-  ; returns renamed verion of exp, sharing structures where possible
-  (define (rename-locals exp)
-    (define (varlist l n)
-      (cond ((null? l) null)
-            ((symbol? l) (cons (cons l (string->symbol (string-append "%l" (number->string n)))) null))
-            (else (cons (cons (car l) (string->symbol (string-append "%l" (number->string n)))) 
-                        (varlist (cdr l) (+ n 1))))))
-    (define (replace-vars v al) 
-      (cond ((null? v) null)
-            ((symbol? v) (cdr (assoc v al)))
-            (else (cons (cdr (assoc (car v) al)) (replace-vars (cdr v) al)))))
-    (define (rename-locals-inner exp locals)
-      (cond [(pair? exp)
-             (case (car exp)
-               [(%lambda%) (let* ((ll (varlist (cadr exp) (length locals)))
-                                  (nvars (replace-vars (cadr exp) ll))
-                                  (nlocs (append ll locals)))
-                             (cons '%lambda% 
-                                   (cons nvars (map (lambda (x) (rename-locals-inner x nlocs)) (cddr exp)))))]
-               [(quote) exp]
-               [else (map (lambda (x) (rename-locals-inner x locals)) exp)]
-               )]
-            [(symbol? exp) (let ((r (assoc exp locals)))
-                             (if r (cdr r) exp))]
-            [else exp]))
-    #;(printf "rename-locals ~s~n" exp)
-    (let ([r (rename-locals-inner exp null)])
-      ; (printf ": ~s~n" r)
-      r))
+; renames all local variables to the standard local-variable names, 
+; that can be indexed by name
+; exp: exression to rename (should come from top level of module)
+; returns renamed verion of exp, sharing structures where possible
+(define (rename-locals exp)
+  (define (varlist l n)
+    (cond ((null? l) null)
+          ((symbol? l) (cons (cons l (string->symbol (string-append "%l" (number->string n)))) null))
+          (else (cons (cons (car l) (string->symbol (string-append "%l" (number->string n)))) 
+                      (varlist (cdr l) (+ n 1))))))
+  (define (replace-vars v al) 
+    (cond ((null? v) null)
+          ((symbol? v) (cdr (assoc v al)))
+          (else (cons (cdr (assoc (car v) al)) (replace-vars (cdr v) al)))))
+  (define (rename-locals-inner exp locals)
+    (cond [(pair? exp)
+           (case (car exp)
+             [(%lambda%) (let* ((ll (varlist (cadr exp) (length locals)))
+                                (nvars (replace-vars (cadr exp) ll))
+                                (nlocs (append ll locals)))
+                           (cons '%lambda% 
+                                 (cons nvars (map (lambda (x) (rename-locals-inner x nlocs)) (cddr exp)))))]
+             [(quote) exp]
+             [else (map (lambda (x) (rename-locals-inner x locals)) exp)]
+             )]
+          [(symbol? exp) (let ((r (assoc exp locals)))
+                           (if r (cdr r) exp))]
+          [else exp]))
+  #;(printf "rename-locals ~s~n" exp)
+  (let ([r (rename-locals-inner exp null)])
+    ; (printf ": ~s~n" r)
+    r))
 
 
 

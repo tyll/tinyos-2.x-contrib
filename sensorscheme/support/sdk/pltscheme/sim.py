@@ -51,6 +51,7 @@ for i in range(1, NUM):
     t.getNode(i).bootAtTime(tm)
     print "Booting ", i, " at time ", tm
 
+#t.addChannel("SensorSchemeDebug", sys.stdout)
 t.addChannel("SensorSchemeC", sys.stdout)
 t.addChannel("SensorSchemeRD", sys.stdout)
 #t.addChannel("SensorSchemeC", os.popen("grep (", "w"))

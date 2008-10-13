@@ -4,7 +4,7 @@
 
 #lang scheme
 
-(require (file "sensor-net.scm") (file "modules.scm") (file "symmap.scm")
+(require (file "sensor-net.scm") (file "modules.scm") (file "symmap.scm") (file "specialize.scm")
          (only-in srfi/1 lset-union lset-difference append-map append-reverse filter-map take drop)
          (only-in srfi/13 string-drop-right string-contains string-reverse)
          scheme/pretty)
@@ -16,13 +16,14 @@
 (define c-autogen-msg (format "/* ~a~n * ~a~n */~n" autogen-msg1 autogen-msg2))
 (define scheme-autogen-msg (format "; ~a~n; ~a~n~n" autogen-msg1 autogen-msg2))
 
-; vaiables tht hold the command line parameter switches.
+; variables tht hold the command line parameter switches and the setter function
+(define *node-id* #f)
+(define (set-node-id! n) (set! *node-id* n))
+
 (define *appdir* #f)
-; and the setter function
 (define (set-appdir! v) (set! *appdir* v))
-; vaiables tht hold the command line parameter switches.
+
 (define *verbose* #f)
-; and the setter function
 (define (set-verbose! v) (set! *verbose* v))
 
 (define (make-initmessage-h string)
@@ -54,7 +55,7 @@
   (define (prim-entry el)
     (format "  _(~a, ~s) /* ~s : ~s */ \\~n" (c-ident (car el)) (cadr el) (car el) (symnum symmap (car el))))
   
-  (let-values ([(simple eval appl send) (apply values (map (lambda (x) (filter-kind x)) '(simple eval appl send)))])
+  (let-values ([(simple eval app sender) (apply values (map (lambda (x) (filter-kind x)) '(simple eval apply sender)))])
     
     (begin0 
       (format "~n~n/* builtin primitive functions defined here. */
@@ -65,8 +66,8 @@
 #define RECEIVER_LIST(_) \\~n~a~n" 
             (apply string-append (map prim-entry simple))
             (apply string-append (map prim-entry eval))
-            (apply string-append (map prim-entry appl))
-            (apply string-append (map prim-entry send))
+            (apply string-append (map prim-entry app))
+            (apply string-append (map prim-entry sender))
             (apply string-append (map prim-entry recvs)))
       (write-symmap-file symmap *appdir*)))))
 
@@ -81,6 +82,8 @@
       ([(code-module)
         (command-line #:argv cmdline
                       #:once-each 
+                      [("-s" "--specialize") node-id "specialize the program for the node with given ID" 
+                                         (set-node-id! (string->number node-id))]
                       [("-a" "--appdir") dir "the directory where the TinyOS application is generated" 
                                          (set-appdir! (string->path dir))]
                       [("-m" "--macroexand") "print macro-expansion information" 
@@ -102,7 +105,8 @@
     (printf "Generating NesC application for module ~s ...~n" code-module)
     (printf "Target directory is ~a~n" *appdir*)
     
-    (let*-values ([(mdls defs inits) (compile-module code-module)]
+    (let*-values (#;[(mdls defs inits) (compile-module code-module)]
+                  [(mdls defs inits) (specialize-module code-module *node-id*)]
                   [(defines consts primitives receivers) 
                    (apply values (map (lambda (x) (filter-defs defs x)) '(define const primitive receiver)))]                  
                   [(code) `((%define% ,@(apply append defines) ,@(apply append consts)) ,@inits)])

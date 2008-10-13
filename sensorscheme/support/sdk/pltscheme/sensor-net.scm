@@ -161,7 +161,7 @@
   
   ; encode a message using the encoding in a symbols.map file, and update the file
   (define (net-encode-mapfile sexpr path)
-    (let* ([symmap (read-symmap-file path) ]
+    (let* ([symmap (read-symmap-file path)]
            [encoded (net-encode sexpr symmap)])
       (write-symmap-file symmap path)   
       encoded))

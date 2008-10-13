@@ -7,7 +7,8 @@
 (require (file "sensor-net.scm") (file "modules.scm") (file "symmap.scm") (file "specialize.scm")
          (only-in srfi/1 lset-union lset-difference append-map append-reverse filter-map take drop)
          (only-in srfi/13 string-drop-right string-contains string-reverse)
-         scheme/pretty)
+         scheme/pretty
+         scheme/system)
 
 (provide main)
 
@@ -15,16 +16,22 @@
 (define autogen-msg2 "build process. Do not edit manually.")
 (define c-autogen-msg (format "/* ~a~n * ~a~n */~n" autogen-msg1 autogen-msg2))
 (define scheme-autogen-msg (format "; ~a~n; ~a~n~n" autogen-msg1 autogen-msg2))
+(define make-autogen-msg (format "# ~a~n# ~a~n~n" autogen-msg1 autogen-msg2))
 
 ; variables tht hold the command line parameter switches and the setter function
 (define *node-id* #f)
 (define (set-node-id! n) (set! *node-id* n))
 
-(define *appdir* #f)
-(define (set-appdir! v) (set! *appdir* v))
 
 (define *verbose* #f)
 (define (set-verbose! v) (set! *verbose* v))
+
+
+(define *appdir* (current-directory))
+(define (set-appdir! v) 
+  (when (not (directory-exists? v))
+    (make-directory v))
+  (set! *appdir* v))
 
 (define (make-initmessage-h string)
   (define (byte-const byte)
@@ -48,28 +55,28 @@
 ; and updates symbols file if needed
 (define (make-primitives-h prims recvs)
   (let ([symmap (read-symmap-file *appdir*)])
-  (define (filter-kind sym)
-    (filter-map (lambda (el) (if (eq? (caadr el) sym)
-                                 (cons (car el) (cdadr el)) #f)) prims))
-  
-  (define (prim-entry el)
-    (format "  _(~a, ~s) /* ~s : ~s */ \\~n" (c-ident (car el)) (cadr el) (car el) (symnum symmap (car el))))
-  
-  (let-values ([(simple eval app sender) (apply values (map (lambda (x) (filter-kind x)) '(simple eval apply sender)))])
+    (define (filter-kind sym)
+      (filter-map (lambda (el) (if (eq? (caadr el) sym)
+                                   (cons (car el) (cdadr el)) #f)) prims))
     
-    (begin0 
-      (format "~n~n/* builtin primitive functions defined here. */
+    (define (prim-entry el)
+      (format "  _(~a, ~s) /* ~s : ~s */ \\~n" (c-ident (car el)) (cadr el) (car el) (symnum symmap (car el))))
+    
+    (let-values ([(simple eval app sender) (apply values (map (lambda (x) (filter-kind x)) '(simple eval apply sender)))])
+      
+      (begin0 
+        (format "~n~n/* builtin primitive functions defined here. */
 #define SIMPLE_PRIM_LIST(_) \\~n~a
 #define EVAL_PRIM_LIST(_) \\~n~a
 #define APPLY_PRIM_LIST(_) \\~n~a
 #define SEND_PRIM_LIST(_) \\~n~a
 #define RECEIVER_LIST(_) \\~n~a~n" 
-            (apply string-append (map prim-entry simple))
-            (apply string-append (map prim-entry eval))
-            (apply string-append (map prim-entry app))
-            (apply string-append (map prim-entry sender))
-            (apply string-append (map prim-entry recvs)))
-      (write-symmap-file symmap *appdir*)))))
+                (apply string-append (map prim-entry simple))
+                (apply string-append (map prim-entry eval))
+                (apply string-append (map prim-entry app))
+                (apply string-append (map prim-entry sender))
+                (apply string-append (map prim-entry recvs)))
+        (write-symmap-file symmap *appdir*)))))
 
 
 (define (main cmdline)
@@ -81,11 +88,12 @@
   (let*-values 
       ([(code-module)
         (command-line #:argv cmdline
-                      #:once-each 
-                      [("-s" "--specialize") node-id "specialize the program for the node with given ID" 
-                                         (set-node-id! (string->number node-id))]
+                      #:once-any 
                       [("-a" "--appdir") dir "the directory where the TinyOS application is generated" 
                                          (set-appdir! (string->path dir))]
+                      #:once-each 
+                      [("-s" "--specialize") node-id "specialize the program for the node with given ID" 
+                                             (set-node-id! (string->number node-id))]
                       [("-m" "--macroexand") "print macro-expansion information" 
                                              (set-module-macroexpand! #t)]
                       [("-v" "--verbose") "be verbose" 
@@ -95,50 +103,47 @@
                       (unless (file-exists? filename) (raise-user-error 'build "~s does not exist" filename)) 
                       filename) ; return a single filename to compile
         ]
-       [(base name must-be-dir?) (split-path (path->complete-path (string->path code-module)))]
-       [(module-name) (string-drop-right (path->string name) 
-                                         (+ 1 (string-contains (string-reverse code-module) ".")))])
-    (when (not *appdir*) (set! *appdir* (build-path base module-name)))
-    (when (not (directory-exists? *appdir*))
-      (make-directory *appdir*))
+       [(src-dir) (build-path *appdir* "src")]
+       [(gw-dir) (build-path *appdir* "ssgw")])
+    (when (not (directory-exists? src-dir)) (make-directory src-dir))
+    (when (not (directory-exists? gw-dir)) (make-directory gw-dir))
     
     (printf "Generating NesC application for module ~s ...~n" code-module)
     (printf "Target directory is ~a~n" *appdir*)
     
-    (let*-values (#;[(mdls defs inits) (compile-module code-module)]
-                  [(mdls defs inits) (specialize-module code-module *node-id*)]
+    (let*-values ([(mdls defs inits) (specialize-module code-module *node-id*)]
                   [(defines consts primitives receivers) 
                    (apply values (map (lambda (x) (filter-defs defs x)) '(define const primitive receiver)))]                  
                   [(code) `((%define% ,@(apply append defines) ,@(apply append consts)) ,@inits)])
       (when *verbose* (printf " defs: ~s~n~n  consts ~s~n~n inits: ~s~n~n code: ~s~n~n" defs consts inits code))
       
-      (with-output-to-file (build-path *appdir* "Primitives.h")
+      (with-output-to-file (build-path src-dir "Primitives.h")
         ; code to compile into binary image
         (lambda () 
           (display c-autogen-msg)
           (display (make-primitives-h primitives receivers))) #:exists 'replace)
       
-      (let ([bytes (net-encode-mapfile code *appdir*)])
+      #;(let ([bytes (net-encode-mapfile code gw-dir)])
         (printf "Module ~s compiled to size of ~a bytes ~n" code-module (length bytes))
-        (with-output-to-file (build-path *appdir* "InitMessage.h")
+        (with-output-to-file (build-path src-dir "InitMessage.h")
           ; init message
           (lambda () 
             (display c-autogen-msg)
             (display (make-initmessage-h bytes))) #:exists 'replace))
       
-      (with-output-to-file (build-path *appdir* "InitMessage.scm")
+      #;(with-output-to-file (build-path gw-dir "initmessage.scm")
         ; simulation version
         (lambda () 
           (display scheme-autogen-msg)
           (pretty-print code)) #:exists 'replace)
       
-      (with-output-to-file (build-path *appdir* "config.ncf") 
+      #;(with-output-to-file (build-path gw-dir "config.ncf") 
         ; save the compiled code
         (lambda () 
           (display scheme-autogen-msg)
           (write-node-conf mdls defs inits)) #:exists 'replace)
       
-      (with-output-to-file (build-path *appdir* (string-append module-name "C.nc")) 
+      #;(with-output-to-file (build-path src-dir "SensorSchemeAppC.nc") 
         ; build message with injector and code
         (lambda () 
           (display c-autogen-msg)
@@ -147,20 +152,16 @@
 #include \"InitMessage.h\"
 #include \"printfdebug.h\"
 
-configuration ~aC {}
+configuration SensorSchemeAppC {}
 
 #include \"implementation.h\"
-" module-name)) #:exists 'replace)
+")) #:exists 'replace)
       
-      (if (file-exists? (build-path *appdir* "Makefile"))
-          (printf "Makefile already exists, not overwriting.~n")
-          (begin
-            (printf "Generating Makefile ...~n")
-            (with-output-to-file (build-path *appdir* "Makefile") 
-              ; build message with injector and code
-              (lambda () 
-                (printf "COMPONENT=~aC
-
+      #;(with-output-to-file (build-path src-dir "SensorScheme.include")
+        ; makefile include
+        (lambda () 
+          (display make-autogen-msg)
+          (printf "
 CFLAGS += -I$(TOSDIR)/lib/SensorScheme \\
           -I$(TOSDIR)/lib/SensorScheme/Interfaces \\
           -I$(TOSDIR)/lib/SensorScheme/Primitives \\
@@ -172,12 +173,9 @@ CFLAGS += -I$(TOSDIR)/lib/SensorScheme \\
 CFLAGS += -DPRINTF_DBG=\"\\\"SensorSchemePrint\"\\\"
 
 include $(MAKERULES)
-" module-name)) #:exists 'replace)))
-      
-      (if (file-exists? (build-path *appdir* "sim.py"))
-          (printf "Simulation script already exists, not overwriting.~n")
-          (begin
-            (printf "Generating sim.py ...~n")
-            (copy-file (build-path (getenv "TOSROOT") "support" "sdk" "pltscheme" "sim.py") (build-path *appdir* "sim.py")))))))
+")) #:exists 'replace))
+    
+    (printf "copying additional build files... ~n")
+    #;(system "cp -n $TOSROOT/support/sdk/pltscheme/buildfiles/* .")))
 
 (main (current-command-line-arguments))

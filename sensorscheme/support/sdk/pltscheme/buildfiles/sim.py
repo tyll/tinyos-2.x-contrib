@@ -15,9 +15,11 @@ BOOT_TIME = DURATION / 10
 # should be 100 at least
 NOISETRACE_LENGTH = 100
 
-
 t = Tossim([])
 r = t.radio ()
+
+#generate the linkgain.out file from linkconfig.txt
+os.system("java net.tinyos.sim.LinkLayerModel linkconfig.txt")
 
 f = open("../linkgain.out", "r")
 

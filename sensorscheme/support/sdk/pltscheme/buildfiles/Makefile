@@ -12,3 +12,4 @@ include src/SensorScheme.include
 ssclean:
 	rm -r src; rm -r ssgw
 	
+include $(MAKERULES)

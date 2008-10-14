@@ -105,8 +105,8 @@
         ]
        [(src-dir) (build-path *appdir* "src")]
        [(gw-dir) (build-path *appdir* "ssgw")])
-    (when (not (directory-exists? src-dir)) (make-directory src-dir))
-    (when (not (directory-exists? gw-dir)) (make-directory gw-dir))
+    (unless (directory-exists? src-dir) (make-directory src-dir))
+    (when (directory-exists? gw-dir) (delete-directory/files gw-dir)) (make-directory gw-dir)
     
     (printf "Generating NesC application for module ~s ...~n" program-module)
     (printf "Target directory is ~a~n" *appdir*)
@@ -169,16 +169,18 @@ CFLAGS += -I$(TOSDIR)/lib/SensorScheme \\
           -I$(TOSDIR)/lib/net \\
           -I$(TOSDIR)/lib/net/le \\
           -I$(TOSDIR)/lib/net/ctp
-
-CFLAGS += -DPRINTF_DBG=\"\\\"SensorSchemePrint\"\\\"
-
-include $(MAKERULES)
 ")) #:exists 'replace))
     
     (printf "copying additional build files... ~n")
-    (for-each (lambda (f) (with-handlers ([exn:fail:filesystem? (lambda (exp) #f)])
-                            (when (file-exists? f) (copy-file f *appdir*)))) 
-              (directory-list (build-path (getenv "TOSROOT") "support" "sdk" "pltscheme" "buildfiles")))
+    (let ([buildfiles (build-path (getenv "TOSROOT") "support" "sdk" "pltscheme" "buildfiles")])
+      (for-each (lambda (f)
+                  (with-handlers ([exn:fail:filesystem? (lambda (exp) (printf "could not copy file to applicaiot directory~n"))])
+                    (when (file-exists? (build-path buildfiles f)) 
+                      (let*-values ([(dest) (build-path *appdir* f)])
+                        (unless (file-exists? dest)
+                          (printf "    ~a~n" (path->string f))
+                          (copy-file (build-path buildfiles f) dest)))))) 
+                (directory-list buildfiles)))
     
     (unless (null? make-args)
       (printf "executing \"make ~a\" to build TinyOS application~n" (string-join make-args " "))

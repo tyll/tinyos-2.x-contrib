@@ -10,3 +10,4 @@ README
 .pydevproject
 TinyOS_Plugin_Makefile
 .targetsOptions
+.cache

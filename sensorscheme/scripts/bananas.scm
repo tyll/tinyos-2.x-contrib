@@ -40,15 +40,15 @@
          [else (if (member 'coffee types) LED_RED LED_GREEN)])        
        (if (> state 0) LED_BLUE 0)))
   
-  (define (time-loop state) 
+  (define (time-loop t state) 
     (bcast (msg announce type))      
     (let* ([types type-list]
            [new-state (update-state state types)])
       (set! type-list ())
       (blink (led-blink new-state types))
-      (call-at-time (+ (now) (if (= new-state 0) 8 (- (* new-state 4) 2))) 
-        (lambda () (blink 0)))
-      (do-at-time (+ (now) 16) 
-        (time-loop new-state))))
-  (time-loop 0)
+      (call-at-time (+ t (if (= new-state 0) 8 (- (* new-state 4) 2))) 
+        (lambda (t) (blink 0)))
+      (call-at-time (+ t 16) (lambda (t) (time-loop t new-state)))))
+  
+  (time-loop (now) 0)
   )

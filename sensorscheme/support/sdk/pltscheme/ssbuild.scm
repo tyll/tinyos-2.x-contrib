@@ -53,8 +53,8 @@
 
 ; generates the contents of the primitives.h file from deduced primitives 
 ; and updates symbols file if needed
-(define (make-primitives-h prims recvs)
-  (let ([symmap (read-symmap-file *appdir*)])
+(define (make-primitives-h prims recvs dir)
+  (let ([symmap (read-symmap-file dir)])
     (define (filter-kind sym)
       (filter-map (lambda (el) (if (eq? (caadr el) sym)
                                    (cons (car el) (cdadr el)) #f)) prims))
@@ -76,7 +76,7 @@
                 (apply string-append (map prim-entry app))
                 (apply string-append (map prim-entry sender))
                 (apply string-append (map prim-entry recvs)))
-        (write-symmap-file symmap *appdir*)))))
+        (write-symmap-file symmap dir)))))
 
 
 (define (main cmdline)
@@ -86,7 +86,7 @@
                       (cons (car el) (cddr el)) #f)) defs))
   
   (let*-values 
-      ([(code-module)
+      ([(program-module make-args)
         (command-line #:argv cmdline
                       #:once-any 
                       [("-a" "--appdir") dir "the directory where the TinyOS application is generated" 
@@ -99,19 +99,19 @@
                       [("-v" "--verbose") "be verbose" 
                                           (set-module-verbose! #t)
                                           (set-verbose! #t)]
-                      #:args (filename) ; expects one command-line argument: a filename
-                      (unless (file-exists? filename) (raise-user-error 'build "~s does not exist" filename)) 
-                      filename) ; return a single filename to compile
+                      #:args (program-module . make-args)
+                      (unless (file-exists? program-module) (raise-user-error 'build "~s does not exist" program-module)) 
+                      (values program-module make-args))
         ]
        [(src-dir) (build-path *appdir* "src")]
        [(gw-dir) (build-path *appdir* "ssgw")])
     (when (not (directory-exists? src-dir)) (make-directory src-dir))
     (when (not (directory-exists? gw-dir)) (make-directory gw-dir))
     
-    (printf "Generating NesC application for module ~s ...~n" code-module)
+    (printf "Generating NesC application for module ~s ...~n" program-module)
     (printf "Target directory is ~a~n" *appdir*)
     
-    (let*-values ([(mdls defs inits) (specialize-module code-module *node-id*)]
+    (let*-values ([(mdls defs inits) (specialize-module program-module *node-id*)]
                   [(defines consts primitives receivers) 
                    (apply values (map (lambda (x) (filter-defs defs x)) '(define const primitive receiver)))]                  
                   [(code) `((%define% ,@(apply append defines) ,@(apply append consts)) ,@inits)])
@@ -121,29 +121,29 @@
         ; code to compile into binary image
         (lambda () 
           (display c-autogen-msg)
-          (display (make-primitives-h primitives receivers))) #:exists 'replace)
+          (display (make-primitives-h primitives receivers gw-dir))) #:exists 'replace)
       
-      #;(let ([bytes (net-encode-mapfile code gw-dir)])
-        (printf "Module ~s compiled to size of ~a bytes ~n" code-module (length bytes))
+      (let ([bytes (net-encode-mapfile code gw-dir)])
+        (printf "Module ~s compiled to size of ~a bytes ~n" program-module (length bytes))
         (with-output-to-file (build-path src-dir "InitMessage.h")
           ; init message
           (lambda () 
             (display c-autogen-msg)
             (display (make-initmessage-h bytes))) #:exists 'replace))
       
-      #;(with-output-to-file (build-path gw-dir "initmessage.scm")
+      (with-output-to-file (build-path gw-dir "initmessage.scm")
         ; simulation version
         (lambda () 
           (display scheme-autogen-msg)
           (pretty-print code)) #:exists 'replace)
       
-      #;(with-output-to-file (build-path gw-dir "config.ncf") 
+      (with-output-to-file (build-path gw-dir "config.ncf") 
         ; save the compiled code
         (lambda () 
           (display scheme-autogen-msg)
           (write-node-conf mdls defs inits)) #:exists 'replace)
       
-      #;(with-output-to-file (build-path src-dir "SensorSchemeAppC.nc") 
+      (with-output-to-file (build-path src-dir "SensorSchemeAppC.nc") 
         ; build message with injector and code
         (lambda () 
           (display c-autogen-msg)
@@ -157,7 +157,7 @@ configuration SensorSchemeAppC {}
 #include \"implementation.h\"
 ")) #:exists 'replace)
       
-      #;(with-output-to-file (build-path src-dir "SensorScheme.include")
+      (with-output-to-file (build-path src-dir "SensorScheme.include")
         ; makefile include
         (lambda () 
           (display make-autogen-msg)
@@ -176,6 +176,13 @@ include $(MAKERULES)
 ")) #:exists 'replace))
     
     (printf "copying additional build files... ~n")
-    #;(system "cp -n $TOSROOT/support/sdk/pltscheme/buildfiles/* .")))
+    (for-each (lambda (f) (with-handlers ([exn:fail:filesystem? (lambda (exp) #f)])
+                            (when (file-exists? f) (copy-file f *appdir*)))) 
+              (directory-list (build-path (getenv "TOSROOT") "support" "sdk" "pltscheme" "buildfiles")))
+    
+    (unless (null? make-args)
+      (printf "executing \"make ~a\" to build TinyOS application~n" (string-join make-args " "))
+      (system (format "make ~a" (string-join make-args " ")))
+      '())))
 
 (main (current-command-line-arguments))

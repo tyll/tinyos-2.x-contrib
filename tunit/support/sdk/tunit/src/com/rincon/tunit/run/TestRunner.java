@@ -140,7 +140,7 @@ public class TestRunner {
     }
 
     createTunitPathFile();
-    
+
     report = new TestReport(testRunProperties, aggregatedSuiteProperties,
         packageId);
 
@@ -158,28 +158,32 @@ public class TestRunner {
     log.trace("TestRunner.runTest()");
 
     // 1. Build and install the project on all test run nodes
-    if (!install()) { 
+    if (!install()) {
       return;
     }
-    
+
     // 2. Connect serial forwarders, run the test, disconnect sf's.
-    log.debug("Connecting serial forwarders"); if (!testManager.connectAll()) {
-    TestResult result = new TestResult("__ConnectSerialForwarders");
-    result.error("SFError", "Could not connect all serial forwarders!");
-    report.addResult(result); return; }
+    log.debug("Connecting serial forwarders");
+    if (!testManager.connectAll()) {
+      TestResult result = new TestResult("__ConnectSerialForwarders");
+      result.error("SFError", "Could not connect all serial forwarders!");
+      report.addResult(result);
+      return;
+    }
 
     CmdFlagExecutor.executeCmdFlag("start", suiteProperties.getStartCmd(),
         report);
-    
-    log.debug("Running test"); 
-    new ResultCollector(report, runProperties, suiteProperties, testMap, statsMap, assertionMap);
-    
+
+    log.debug("Running test");
+    new ResultCollector(report, runProperties, suiteProperties, testMap,
+        statsMap, assertionMap);
+
     CmdFlagExecutor
         .executeCmdFlag("stop", suiteProperties.getStopCmd(), report);
-    
+
     log.debug("Disconnecting serial forwarders");
     testManager.disconnectAll();
-    
+
   }
 
   /**
@@ -191,8 +195,9 @@ public class TestRunner {
         .getXmlReportDirectory());
     try {
       xmlWrite.write();
-      StatisticsChart.write(StatisticsReport.log(runProperties.getName(), buildDirectory, "TestingProgress",
-          "[Total Problems]", report.getTotalErrors()
+      StatisticsChart.write(StatisticsReport.log(runProperties.getName(),
+          buildDirectory, "TestingProgress", "[Total Problems]", report
+              .getTotalErrors()
               + report.getTotalFailures(), "[Total Tests]", report
               .getTotalTests()), 500, 325);
     } catch (IOException e) {
@@ -303,7 +308,7 @@ public class TestRunner {
 
         log.debug("Total nodes to install: " + focusedTarget.totalNodes());
         String reinstallExtras;
-        for (int nodeIndex = 0; nodeIndex < focusedTarget.totalNodes(); nodeIndex++) {
+        for (int nodeIndex = focusedTarget.totalNodes() - 1; nodeIndex >= 0; nodeIndex--) {
           focusedNode = focusedTarget.getNode(nodeIndex);
           reinstallExtras = " reinstall." + focusedNode.getId() + " ";
           reinstallExtras += focusedNode.getInstallExtras();
@@ -315,15 +320,25 @@ public class TestRunner {
             report.addResult(focusedResult);
             return false;
           }
+          
+          // Wait 3 second between each install.
+          synchronized(this) {
+            try {
+              wait(3000);
+            } catch (InterruptedException e) {
+              // TODO Auto-generated catch block
+              e.printStackTrace();
+            }
+          }
         }
       }
     }
 
     try {
-      if(make.getRomSize() > 0) {
-        StatisticsChart.write(StatisticsReport.log(runProperties.getName(), buildDirectory, "Footprint",
-            "[RAM Bytes]", make.getRamSize(), "[ROM Bytes]", make.getRomSize()),
-            500, 325);
+      if (make.getRomSize() > 0) {
+        StatisticsChart.write(StatisticsReport.log(runProperties.getName(),
+            buildDirectory, "Footprint", "[RAM Bytes]", make.getRamSize(),
+            "[ROM Bytes]", make.getRomSize()), 500, 325);
       }
 
     } catch (IOException e) {
@@ -419,50 +434,76 @@ public class TestRunner {
   }
 
   /**
-   * This is responsible for creating the package ID that helps us uniquely 
+   * This is responsible for creating the package ID that helps us uniquely
    * locate the code for the test and the settings under which it ran.
    * 
    * @return
    */
   private String createPackageIdentification() {
-    String returnString = runProperties.getName()
-      + ".";
-    
-    String packageDir = 
-           buildDirectory.getAbsolutePath().substring(
-            TUnit.getBasePackageDirectory().getAbsolutePath().length())
-            .replace(File.separatorChar, '.');
-    
-    if(packageDir.startsWith(".")) {
+    String returnString = runProperties.getName() + ".";
+
+    String packageDir = buildDirectory.getAbsolutePath().substring(
+        TUnit.getBasePackageDirectory().getAbsolutePath().length()).replace(
+        File.separatorChar, '.');
+
+    if (packageDir.startsWith(".")) {
       packageDir = packageDir.replaceFirst("\\.", "");
     }
-    
+
     return returnString + packageDir;
   }
-  
+
   /**
-   * Create a file in the local test directory 
+   * Create a file in the local test directory
    */
   private void createTunitPathFile() {
-	  File outFile = new File(buildDirectory, ".tunitPath");
-	  if(outFile.exists()) {
-		  outFile.delete();
-	  }
+    PrintWriter out;
+    File outFile;
     
-	  PrintWriter out;
-    try {
-      out = new PrintWriter(
-              new BufferedWriter(new FileWriter(outFile)));
+    // Step 1: Create a .tunitPath file for the local test directory
+    outFile = new File(buildDirectory, ".tunitPath");
+    if (outFile.exists()) {
+      outFile.delete();
+    }
 
-      
-      String reportDirectory = TUnit.getStatsReportDirectory().getAbsolutePath() + File.separatorChar + StatisticsReport.generateStatsSubDirectory(runProperties.getName(), buildDirectory);
+    try {
+      out = new PrintWriter(new BufferedWriter(new FileWriter(outFile)));
+
+      String reportDirectory = TUnit.getStatsReportDirectory()
+          .getAbsolutePath()
+          + File.separatorChar
+          + StatisticsReport.generateStatsSubDirectory(runProperties.getName(),
+              buildDirectory);
       
       new File(reportDirectory).mkdirs();
       out.write(reportDirectory + "\n");
       out.close();
-      
+
     } catch (IOException e) {
       e.printStackTrace();
     }
+    
+    // Step 2: Create another .tunitPath file for the root directory
+    outFile = new File(TUnit.getRootDirectory(), ".tunitPath");
+    if(outFile.exists()) {
+      outFile.delete();
+    }
+
+    try {
+      out = new PrintWriter(new BufferedWriter(new FileWriter(outFile)));
+
+      String reportDirectory = TUnit.getStatsReportDirectory()
+          .getAbsolutePath()          
+          + File.separatorChar
+          + StatisticsReport.generateStatsSubDirectory("",
+              TUnit.getRootDirectory());
+
+      new File(reportDirectory).mkdirs();
+      out.write(reportDirectory + "\n");
+      out.close();
+
+    } catch (IOException e) {
+      e.printStackTrace();
+    }    
   }
 }

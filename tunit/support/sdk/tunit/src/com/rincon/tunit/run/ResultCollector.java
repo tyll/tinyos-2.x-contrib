@@ -210,6 +210,7 @@ public class ResultCollector extends Thread implements Messenger,
     // 1. Ping the node and get a response.
     synchronized (this) {
       log.trace("ResultCollector.run()::initialize");
+      
       for (int retries = 0; retries < 20 && initializing; retries++) {
         log.info("Ping...");
         link.ping();
@@ -229,7 +230,7 @@ public class ResultCollector extends Thread implements Messenger,
           log.info("No pong yet.");
         }
       }
-
+      
       if (initializing) {
         // Still initializing? We failed.
         log.error("Did not get a pong from the node, initialization failed");

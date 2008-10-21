@@ -123,6 +123,15 @@ public class Sf implements SerialForwarder, Messenger, PhoenixError {
   }
   
   public void connect() {
+    synchronized(this) {
+      log.trace("Pausing 5 seconds before connect...");
+      try {
+        wait(5000);
+      } catch(InterruptedException e) {
+        e.printStackTrace();
+      }
+    }
+    
     if (provider == null) {
       provider = new SfProvider(motecom, port, this, this, this);
       provider.start();
@@ -131,6 +140,7 @@ public class Sf implements SerialForwarder, Messenger, PhoenixError {
       synchronized (this) {
 
         // Initial wait period maybe helps dropped pong issues
+       
         try {
           wait(2000);
         } catch (InterruptedException e) {

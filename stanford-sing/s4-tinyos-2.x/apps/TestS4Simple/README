@@ -1,0 +1,12 @@
+Authors: Tahir Azim (tazim@cs.stanford.edu), Qasim Mansoor (47qasim@niit.edu.pk).
+
+This is a tinyos-2.0.2 port of the S4 routing protocol, originally written for
+TinyOS-1.x by Lili Qiu, Yun Mao, Feng Wang, Simon Lam and Jonathan Smith.
+
+To run this code in TOSSIM, simply 'cd' into s4-tinyos-2.x/apps/TestS4Simple and
+run "./batch_run.sh". That script should compile the code for TOSSIM and run a 
+C++-based TOSSIM simulation. The simulation simply routes a packet from node ID
+82 to node ID 203 in a 225 node grid. Of course, this is all assuming that you
+have TOSROOT etc. set to the right directories of your tinyos-2.0.2 installation.
+
+

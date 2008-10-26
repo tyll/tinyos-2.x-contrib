@@ -32,7 +32,7 @@ implementation
   components MainC;
   MainC.SoftwareInit -> StdOutM.Init;
  
-  components StdOutM, PlatformStdOutC;
+  components StdOutM, UartC;
   StdOut = StdOutM;
-  StdOutM.UART -> PlatformStdOutC;
+  StdOutM.UART -> UartC;
 }

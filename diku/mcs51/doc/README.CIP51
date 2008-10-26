@@ -1,0 +1,1 @@
+sudo ~/ec2drv/src/ec2tools/ec2writeflash --port=USB --start=0x0000 --hex Blinky.hex

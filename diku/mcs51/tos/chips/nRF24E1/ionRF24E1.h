@@ -18,8 +18,8 @@
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
- * FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL STANFORD
- * UNIVERSITY OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE UNIVERSITY
+ * OF COPENHAGEN OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
  * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
@@ -52,56 +52,57 @@
 #define SIG_TIMER2              __vector_5
 #define SIG_ADC                 __vector_8
 
-sfr DPS __attribute((x86));
+uint8_t volatile DPS __attribute((sfrAT0x86));
 //sfr at 0x86 DPS;
 
-sfr P0_DIR __attribute((x94));
+uint8_t volatile P0_DIR __attribute((sfrAT0x94));
 //sfr at 0xFD P0_DIR;
 
-sfr P1_DIR __attribute((x96));
+uint8_t volatile P1_DIR __attribute((sfrAT0x96));
 //sfr at 0xFE P0_DIR;
 
-sfr P0_ALT __attribute((x95));
+uint8_t volatile P0_ALT __attribute((sfrAT0x95));
 //sfr at 0x95 P0_ALT;
 
-sfr P1_ALT __attribute((x97));
+//Defined in io8051.h
+//uint8_t volatile P1_ALT __attribute((sfrAT0x97));
 //sfr at 0x97 P1_ALT;
 
-sfr RADIO __attribute((xA0));
+uint8_t volatile RADIO __attribute((sfrAT0xA0));
 //sfr at 0xA0 RADIO;
 
-sfr IP __attribute((xB8));
+uint8_t volatile IP __attribute((sfrAT0xB8));
 //sfr at 0xB8 IP;
 
-sfr EIE __attribute((xE8));
+uint8_t volatile EIE __attribute((sfrAT0xE8));
 //sfr at 0xE8 EIE;
 
-sfr IE __attribute((xA8));
+uint8_t volatile IE __attribute((sfrAT0xA8));
 //sfr at 0xA8 IE;
 
 /*  IE  */ 
 
-sbit EA __attribute((xAF));
+//Defined in mcs51/io8051.h
+//uint8_t volatile EA __attribute((sbitAT0xAF));
 //sbit at IE^7 EA;
 
-sbit ET2 __attribute((xAD));
+uint8_t volatile ET2 __attribute((sbitAT0xAD));
 //sbit at IE^5 ET2;
 
-sbit ES __attribute((xAC));
+uint8_t volatile ES __attribute((sbitAT0xAC));
 //sbit at IE^4 ES;
 
-sbit ET1 __attribute((xAB));
+uint8_t volatile ET1 __attribute((sbitAT0xAB));
 //sbit at IE^3 ET1;
 
-sbit EX1 __attribute((xAA));
+uint8_t volatile EX1 __attribute((sbitAT0xAA));
 //sbit at IE^2 EX1;
 
-sbit ET0 __attribute((xA9));
+uint8_t volatile ET0 __attribute((sbitAT0xA9));
 //sbit at IE^1 ET0;
 
-sbit EX0 __attribute((xA8));
+uint8_t volatile EX0 __attribute((sbitAT0xA8));
 //sbit at IE^0 EX0;
-
 
 /* RADIO */
 
@@ -114,5 +115,8 @@ sbit EX0 __attribute((xA8));
 #define SBIT_DR1 0xA2
 #define SBIT_CLK1 0xA1
 #define SBIT_DATA 0xA0
+
+#define UART_OFFSET_NUM 0x30
+#define UART_OFFSET_CHR 0x37
 
 #endif // _H_ionRF24E1_H

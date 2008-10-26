@@ -18,8 +18,8 @@
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
- * FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL STANFORD
- * UNIVERSITY OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE UNIVERSITY
+ * OF COPENHAGEN OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
  * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
@@ -30,18 +30,11 @@
  */
 
 /**
- * This is a crude hack that works, in the absence of generic
- * componts. The identifiers for the sfr registers needs to be
- * globally defined and I cannot come up with a way to pass a
- * reference to these identifiers through a generic compontnt
- *
- * The purpose of this file is mostly to show a working example for
- * 8051 variants. The particular chips are likely to diverge from
- * these definitions, in particular in the number of pins, but also
- * features such as tristating the pins (for exmple cc2430 supports
- * this).
+ * This file is identical to HplMcs51GeneralIOC, except it adds
+ * the additional IO ports found on the CC2430 that were not found
+ * in the classic 8051.
  * 
- * @author Marti Leopold <leopold@diku.dk>
+ * @author Martin Leopold <leopold@diku.dk>
  *
  */
 

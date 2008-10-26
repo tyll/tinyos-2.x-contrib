@@ -6,7 +6,7 @@
 
 <img src="http://www.tinyos.net/scoop/images/tos-jwall.jpg"></img>
 
-<h1>University of Copenhagen, Department of Computer Science (DIKU) TinyOS projects</h1>
+<h1>University of Copenhagen, Department of Computer Science (<a href="http://www.diku.dk">DIKU</a>) TinyOS projects</h1>
 
 <p>
 This page contains a list of the currently available DIKU
@@ -17,17 +17,55 @@ requires that you obtain and install this first.
 <table>
 <tr><td><a href="#mcs51">MCS51</a>
     <td>TinyOS 2 support for MCS51 (8051) based architectures (cc2430,
-    nRF24E1, etc.). Visit the project website for more information
+    nRF24E1, etc.). Visit the project website for more information:<br>
     <a
     href="http://www.tinyos8051wg.net/">http://www.tinyos8051wg.net/</a>
 
 <tr><td><a href="#sensinode">Sensinode</a>
      <td>TinyOS 2 support for <a href="http://www.sensinode.com">Sensinode</a> motes (Micro.4, Nano).
+<tr><td><a href="#freescale">Freescale</a>
+    <td>Support for the Freescale hcs08 and mc13192 chips
 <tr><td><a href="#common">Common</a>
-    <td>Libraries share among the above projects (SimpleMac, StdOut, etc.)
+    <td>Libraries shared among the above projects (SimpleMac, StdOut, etc.)
 <tr>
 </table>
 </p>
+
+
+<h3>Documentation</h3>
+The projects found in this director are documented by readme files in
+each directory, for further see:
+<ul>
+<li><a href="mcs51/doc">mcs51/doc</a>
+<li><a href="mcs51/sensinode">sensinode/doc</a>
+</ul>
+
+<h3>Setup</h3>
+The projects found in this directory is setup via a few environment
+variables. These must be setup prior to using the projects, see the
+<a href="env">env</a> script for further.
+<br>
+To use these projects setup the following variables:
+<pre>
+ TOSDIR (location of T2 tree)
+ MAKERULES (location of T2 Makerules)
+ TOSMAKE_PATH
+   list of directories to search for .target files (separated by space)
+ CONTRIBROOT (root of the contrib directory)
+   x.target and x.platform uses this to include nesC source files
+</pre>
+
+Adding a CONTRIBROOT variable as opposed to using relative paths to
+locate the appropriate include directories allows compiling
+applications in both the contrib dir and in the orriginal T2 tree.
+
+Examples:
+<pre>
+ export TOSDIR=~/tinyos-2.x/tos
+ export MAKERULES=$TOSDIR/../support/make/Makerules
+ export CONTRIBROOT=~/tinyos-2.x-contrib
+ export TOSMAKE_PATH="$TOSMAKEPATH $CONTRIBROOT/diku/sensinode/support/make $CONTRIBROOT/diku/mcs51/support/make"
+</pre>
 
 <a name="mcs51">
 <h3>Mcs51 (8051)</h3>
@@ -50,8 +88,7 @@ code resides there.
 <pre>
 sensinode
 +--apps
-|  +--TestMicro4                  - Simple test app. printing a few registers
-|  +--TestMicro4Radio             - Radio test app
+   +--README
 +--support
 |  +--make
 |     +--micro4.target            - T2 .target definition (recursively includes msp.rules)
@@ -63,6 +100,34 @@ sensinode
 |     +--nano                      - Nano platform definition
 </pre>
 
+<a name="freescale">
+<h3>Freescale</h3>
+
+TinyOS 2 support for the Freescale hcs08 MCU and the mc13192 radio
+(envisioned as an 802.15.4 platform, however this is not supported by
+this port). The two chips are combined to the dig528 platform.
+
+<pre>
++--apps
+|  +--ActiveMessageTest
+|  +--Blink
+|  +--GeneralIOTest
+|  +--KbiTest
+|  +--Mc13192SendRecieveTest
+|  +--Null2Ser
+|  +--Null2SerTask
+|  +--RtiTest
++--support
+|   +--make
+|      +--CodeWarrior
++--tos
+|  +--chips   
+|  |  +--hcs08
+|  |  +--mc13192
+|  +--interfaces
+|  +--platforms
+|     +--dig528
+</pre>
 
 <a name="common">
 <h3>Common</h3>
@@ -75,14 +140,26 @@ common
 +--apps
    +--TestSimpleMac                 - SimpleMac test application for Nano/Micro.4 platforms
    +--CompressionTest               - Compressed data received via uart
+   +--BlinkNoTimerTask              - Like Blink, but without timer
+   +--Echo                          - Echo chars sent via the Uart
+   +--LogRecorder                   - Event recording application for debug and profile
+   +--TestAll                       - Test a variety of device drivers (Uart, Adc, etc.)
+   +--Testlogger                    - Test the LogRecorder
+   +--TTXDemo                       - Demo from TTX
+   +--USBSerialEcho                 - Like Echo using the USB CDC Uart
 +--lib
    +--stdout                        - A general purpose print library that accepts multiple chars
-   +--simplemac                     - An extremely simple mac layer
+   +--simplemac                     - An extremely simple mac layerb
+   +--buffermanager
+   +--compression
+   +--logger
+   +--usb
 +--tools
    +--compression                   - PC side compression tools as well as general purpose algorithms (lz77, huffmann, simple, passthru)
 +--tos
    +--interfaces
       +--GpioCounterCapture.nc      - A parametrized GpioCapture (allows other widths than 16 bit)
+      +--SerialControl.nc
    +--system
       +--tos.h                      - Replaces T2 tos.h with ecombine with bool type
 

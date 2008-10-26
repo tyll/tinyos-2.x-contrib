@@ -1,0 +1,7 @@
+USBSerialEcho
+=============
+
+This appliation is indentical to Echo exept it uses the USB serial
+port emulation (USB Communication Class device). So while this
+application is very simple it tests the rather compilcated USB CDC
+implementations.

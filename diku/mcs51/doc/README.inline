@@ -1,0 +1,23 @@
+Inline tool developed by Universtity of Utah
+
+The tool has two inlineing modes "auto" which follows the inlining
+annotation produced by nescC and "smart" that attempts to inline based
+on a size heuristics.
+
+The inline parameters can be tuned at compile time using the
+INLINE_FLAGS variable. The default inline flags assumes a concernative
+strategy:
+    INLINE_FLAGS = --8051 --auto --clean --shorten
+
+utah-inliner.pl
+
+A few options (--help for more)
+
+  --auto (default)   Inline functions marked for inlining
+  --smart            Use smart inlining heuristics
+  --clean            Cleans file up during inlining
+                     Cleaner assumes it can see the whole program
+  --shorten          Shorten temporary variable names
+
+  --nolowerconst     Do not lower constants (such as sizeof)
+  --noprintline      Do not print original locations in output

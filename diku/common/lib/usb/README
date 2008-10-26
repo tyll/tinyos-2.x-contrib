@@ -1,0 +1,55 @@
+USB Stack for TinyOS
+
+This directory contains a simple USB stack for TinyOS. It was
+developed for the SiLabs c808051f34x, but it should general enough to
+encompass any device with a built in USB port. Each such system will
+have to provide a USBControl interface and all endpoints using
+USBEndpoint interfaces.
+
+We provide a USB serial port emulator (conforming to the
+Communications Class Device - CDC) that should work with any operating
+system claiming to support USB. The implementation is split in two: a
+byte level and a packet level interface.
+
+The byte level version is limited in performance due to the way the
+individual bytes are tranferred over the USB bus: each
+SerialByteComm.put() results in one USB packet per byte, the USB
+packets are spaced one per ms. Essentially limiting the outbound
+bandwidth to 8 kbit. This means that for example a simple echo
+application will fail horribly if the bytes are transmitted to the
+device at full speed, since it will not be able to return bytes at the
+same rate.
+
+The driver is setup in the following heirachy (using the serial driver
+as example):
+
+
+                       |SerialByteComm
+  +--------------------+--------------------------+
+  |               USBSerialCDC                    |
+  +--------------------+--------------------------+
+                       | PacketComm
+  +--------------------+--------------------------+
+  |            USBCommunicationClassDevice        |
+  +--------+-----------------+----------+---------+
+           | USBDevice       |          |
+  +--------+--------------+  |          |
+  |   USBControlEndpoint  |  |Endpoint1 |Endpoint2
+  +-+-----------+---------+  |          |
+    |USBControl |Endpoint0   |          |
+  +-+-----------+------------+----------+---------+
+  |                  PlatformUSB                  |
+  +-----------------------------------------------+
+
+The code here is inspired by a couple of sources, first the SiLabs
+examples and secondly a CDC implementation provided in the Cygnal
+forum:
+
+  http://www.cygnal.org/ubb/Forum9/HTML/000945.html
+  http://www.cygnal.org/ubb/Forum9/HTML/001050.html
+
+The CDC spcification can be found here
+ http://www.usb.org/developers/devclass_docs/usbcdc11.pdf
+
+And the USB-2.0 specification can be found here:
+ http://www.usb.org/developers/docs/

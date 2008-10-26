@@ -1,0 +1,87 @@
+#
+# Copyright (c) 2008 Polaric
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+# - Redistributions of source code must retain the above copyright
+#   notice, this list of conditions and the following disclaimer.
+# - Redistributions in binary form must reproduce the above copyright
+#   notice, this list of conditions and the following disclaimer in the
+#   documentation and/or other materials provided with the
+#   distribution.
+# - Neither the name of Polaric nor the names of its contributors may
+#   be used to endorse or promote products derived from this software
+#   without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
+# CONTRIBUTORS ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+# INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED.  IN NO EVENT SHALL POLARIC OR ITS CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+# EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+# LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
+# OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+# STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+# ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+
+#
+#
+# FILE: c8051F340TB/.platform
+# 
+# Includes that should take precedence come first.  Platforms come before
+# chips because they may override files.  These must be specified as
+# @includes instead of -I's to @opts, otherwise the %T won't be processed
+# by ncc. 
+#
+#
+
+$CR = $ENV{"CONTRIBROOT"} if defined($ENV{"CONTRIBROOT"});
+
+$PATH_LIST = "$ENV{'CONTRIBROOT'}/diku/mcs51/tos/chips/cip51 $ENV{'CONTRIBROOT'}/diku/mcs51/tos/chips/mcs51";
+
+@dirs = `find $PATH_LIST -type d ! -regex ".*\.svn.*"`;
+chomp(@dirs);
+push(@includes, @dirs);
+
+@dirs = `find $ENV{'CONTRIBROOT'}/diku/common \! -name "apps*" -type d \! -regex ".*\.svn.*" \! -regex ".*apps.*"`;
+chomp(@dirs);
+push(@includes, @dirs);
+
+#qw doesn't replace variable so build list manually
+@LIST=(
+  "%T/interfaces",
+  "%T/system",
+  "%T/lib/timer",
+  "%T/lib/serial",
+  "%T/lib/power",
+);
+
+push( @includes, @LIST);
+
+
+# None of these seems to end up as commandline options!? In particular
+# target is povided by the Makefile
+
+#@opts = qw(
+#  -gcc=avr-gcc
+#  -mmcu=atmega128
+#  -fnesc-target=avr
+#  -fnesc-no-debug
+#  -fnesc-scheduler=TinySchedulerC,TinySchedulerC.TaskBasic,TaskBasic,TaskBasic,runTask,postTask
+#
+#);
+
+push (@opts, qw(
+		-fnesc-no-debug
+		-fnesc-scheduler=TinySchedulerC,TinySchedulerC.TaskBasic,TaskBasic,TaskBasic,runTask,postTask
+		)
+      );
+
+push @opts, "-mingw-gcc" if $cygwin;
+push @opts, "-gcc=avr-gcc" if $cygwin;

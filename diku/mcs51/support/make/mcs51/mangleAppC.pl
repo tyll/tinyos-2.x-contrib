@@ -18,8 +18,8 @@
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 # ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 # LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-# FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL STANFORD
-# UNIVERSITY OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+# FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE UNIVERSITY
+# OF COPENHAGEN OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
 # INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 # (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
 # SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
@@ -63,7 +63,8 @@ my $string_h_match = 0;
 my $string_h_seen = 0;
 my %enums = ();
 my $typedef_struct = "";
-my $typedef_struct_ident = "";
+my $typedef_struct_ident = "";     # Current typedef struct (if any) for error output
+my %typedef_struct_ident_all = (); # Index of all typdef struct definition
 my $typedef_struct_lines = 0;
 my $typedef_struct_empty = 0;
 my $typedef_struct_closed = 0;
@@ -111,6 +112,15 @@ EOF
   s{([\w\$]+)}{ (my $t=$1) =~ s/\$/__/g; $t }ge if /\$/;
 
 #
+# Abort if app has no tasks
+#
+
+  if(m{SchedulerBasicP__NUM_TASKS = 0U,}){
+      print STDERR "The TinyOS 8051wg port does not allow applications without tasks. Add at least one task to your app.\n";
+      exit 1;
+  }
+
+#
 # Replace sfr related definitions with non ANSI-C dialekts
 #
  # Kill the dummy typedef's
@@ -132,7 +142,7 @@ EOF
 if(m{uint(\d+)_t\s+volatile\s+(.*)\s+__attribute(?:__)?\(\((?:__)?(sfr|sbit|sfr16)AT(.{4})(?:__)?\)\).*;}) {
      my $width=$1; my $ident=$2;  my $type=$3; my $addr=$4;
      if($width==16 && $type ne "sfr16") {
-	 printf "Error";
+	 printf "SFR width error line $line_no, width=$width $type";
 	 exit;
      }
      if ( $KEIL ) {$_ = "$type $ident = $addr;\n"; }
@@ -162,15 +172,8 @@ if(m{uint(\d+)_t\s+volatile\s+(.*)\s+__attribute(?:__)?\(\((?:__)?(sfr|sbit|sfr1
       $_ = $_ . "#include \"stdbool.h\"\n";
   }
 
-
-  # Replace dummy xdata types with type and storrage class specifier
-  if (s{uint(8|16)_t_xdata}{uint$1_t xdata}g) {      
-      $memory_att_match = 1;  # Don't replace data with _data
-  }
-
   # Replace dummy code types with type and storrage class specifier
   s{uint(8|16)_t_code}{uint$1_t code}g;
-
 #
 #  Remove string.h definitions (memset, memcpy, strnlen, ..). Get Keil versions from string.h
 # 
@@ -195,6 +198,34 @@ if(m{uint(\d+)_t\s+volatile\s+(.*)\s+__attribute(?:__)?\(\((?:__)?(sfr|sbit|sfr1
  #  }
  #  
 
+
+# Replace uint8_t_xdata types with real types these are used to
+# on-the-fly access to specific memory locations in name memory
+# areas. This is usefull to address registers in say xdata memory in a
+# way that looks slightly like ansi-C.
+#
+#  (*(uint16_t_xdata*)) = ?
+#
+# As an alternative you could imagine defining these as variables
+# with absolute locations:
+#   uint8_t xdata MDMCTRL0H_VAR at addr;
+#
+# However mangling this in a compiler agnostic way is probaby more
+# difficult than stickting to something that looks like ANSI-C
+#
+#
+
+  $memory_att_match = 0;
+
+  # Replace dummy xdata types with type and storrage class specifier
+  if ($KEIL && s{uint(8|16)_t_xdata}{uint$1_t xdata}g) {
+      $memory_att_match = 1;  # Don't replace data with _data
+  }
+  if (($IAR || $SDCC) &&
+      s{uint(8|16)_t_xdata}{uint$1_t __xdata}g) {
+      $memory_att_match = 1;  # Don't replace data with _data
+  }
+
 #
 # Replace attribute definition corresponding to memory segments (storrage class)
 #   For Keil the small memory model puts all variables in data
@@ -204,17 +235,16 @@ if(m{uint(\d+)_t\s+volatile\s+(.*)\s+__attribute(?:__)?\(\((?:__)?(sfr|sbit|sfr1
 #   Keil, SDCC: uint8_t xdata j;
 #   IAR       : uint8_t __xdata j;
 
-  $memory_att_match = 0;
+
   if( ($KEIL ) &&
-      s{\s+(.*)\s+__attribute(?:__)?\(\((?:__)?((?:x|p)?data)(?:__)?\)\)}
+      s{\s+((?:\w)+(?:\[(?:.*)\])?)\s+__attribute(?:__)?\(\((?:__)?((?:x|p)?data|code)(?:__)?\)\)}
       { $2 $1} ) {
       $memory_att_match = 1;  # Dont replace with _data later on
   }
 
   if( ( $IAR || $SDCC) &&
-      s{\s+(.*)\s+__attribute(?:__)?\(\((?:__)?((?:x|p)?data)(?:__)?\)\)}
-      { $1} ) { # Drop types and rely on default for now..
-#      { __$2 $1} ) {
+      s{\s+(.*)\s+__attribute(?:__)?\(\((?:__)?((?:x|p)?data|code)(?:__)?\)\)}
+      { __$2 $1} ) { # Drop types and rely on default for now..
       $memory_att_match = 1;  # Dont replace with _data later on
   }
 
@@ -231,12 +261,12 @@ if(m{uint(\d+)_t\s+volatile\s+(.*)\s+__attribute(?:__)?\(\((?:__)?(sfr|sbit|sfr1
   # SDCC:
   #  http://sdcc.sourceforge.net/doc/sdccman.html/node64.html
   # void timer_isr (void) __interrupt (1) __using (1)  
- if(m{^\s*(?:void\s+)?__attribute(?:__)?\(\((?:__)?interrupt(?:__)?\)\)\s+(?:void\s+)?([_[:alpha:]]+)(\d+)\s*\(void\)}&&
+  if(m{^\s*(?:void\s+)?__attribute(?:__)?\(\((?:__)?interrupt(?:__)?\)\)\s+(?:void\s+)?([_[:alpha:]]+)(\d+)\s*\(\s*void\s*\)}&&
      $_ !~ m{;}) {
-     my $int_no=$2; my $func_name=$1;
-     if ( $KEIL ) {$_ = "void $func_name$int_no(void) interrupt $int_no\n"; }
-     if ( $SDCC ) {$_ = "void $func_name$int_no(void) __interrupt ($int_no)\n"; }
- }
+      my $int_no=$2; my $func_name=$1;
+      if ( $KEIL ) {$_ = "void $func_name$int_no(void) interrupt $int_no\n"; }
+      if ( $SDCC ) {$_ = "void $func_name$int_no(void) __interrupt ($int_no)\n"; }
+  }
 
   # Remove function prototypes
   # (for some reason nesc doesn't produce prototypes and function defs the same way..
@@ -264,12 +294,44 @@ if(m{uint(\d+)_t\s+volatile\s+(.*)\s+__attribute(?:__)?\(\((?:__)?(sfr|sbit|sfr1
       #s{(__attribute\s*\(\(.*\)\))}{/*$1*/};
       s{(__attribute(?:__)?\s*\(\(.*\)\))}{/*$1*/};
   }
+
+#
+# Struct variable initializers
+#
+
+  # Keil cannot handle an initializer of a struct variable in the same line
+  # as the variable definition, e.g.
+  #   my_struct s = prev_struct;
+  #
+  # On the other hand it handles the following
+  #   my_struct s;
+  #   s = prev_struct;
+
+  # Cascade typedef'ed versions
+  if($KEIL && m{typedef\s*(?:\/\*.*\*\/)?\s*(\w+)\s*(?:\/\*.*\*\/)?\s*(\w+)\s*;}){
+      my $from = $1;
+      my $to   = $2;
+      if(defined($typedef_struct_ident_all{$from})) {
+          $typedef_struct_ident_all{$to} = 1;
+      }
+  }
+
+  if($KEIL && m{(\w+)\s+(\w+)\s+=\s+(.+)}) {
+      my $type = $1;
+      my $ident = $2;
+      my $initializer = $3;
+
+      if(defined($typedef_struct_ident_all{$type})){
+          $_ = "$type $ident;" . 
+              "$ident = $initializer";
+      }
+  }
+
 #
 # Mangle wierdness of empty array/typedef defitions..
 #
 
-  # keil seems to barf if 0-length array is specified with the actual 0
-  # specifying [] instead of 0 seems to be the solution
+  # keil seems to throw up over C99 autolength array definitions
   #
   # Look for the actual definition of the array length an mangle if 0
   #
@@ -280,7 +342,7 @@ if(m{uint(\d+)_t\s+volatile\s+(.*)\s+__attribute(?:__)?\(\((?:__)?(sfr|sbit|sfr1
   # Turns out nescc produces a lot of these based on enums. So we need
   # to look them up and replace the ones that are 0 (sigh)
 
-  if (($KEIL || $IAR) && m{(\w+) = (\d+)U}){
+  if (($KEIL || $IAR) && m{((?:\w|\$)+) = (\d+)U?}){
       $enums{$1} = $2;
   }
   if (($KEIL || $IAR) && m{^\s*(typedef|volatile)\s+(\w+)\s+(\w+)\[(\w+)\];}) {
@@ -302,7 +364,7 @@ if(m{uint(\d+)_t\s+volatile\s+(.*)\s+__attribute(?:__)?\(\((?:__)?(sfr|sbit|sfr1
      #    != * which is a regular pointer!
       my $quit = 0;
       if (m/\[\].*;/) {
-	  print STDERR "Structs with non-fixed length is not allowed in Keil\n";
+	  print STDERR "Structs with C99 array auto-lenght (non-fixed length) is not allowed in Keil\n";
 	  $quit = 1; 
       }
       if (m/struct.*{/) {
@@ -316,9 +378,9 @@ if(m{uint(\d+)_t\s+volatile\s+(.*)\s+__attribute(?:__)?\(\((?:__)?(sfr|sbit|sfr1
   }
 
 #
-#  Kill size_t
+#  Kill size_t (why???)
 #
- s{^\s*(typedef unsigned int size_t;)}{//$1};
+# s{^\s*(typedef unsigned int size_t;)}{//$1};
 
 #
 #  Remove variable number of arguments for dbg_* functions
@@ -340,12 +402,16 @@ if ( $KEIL ) {
 }
 
 #
-# Replace keyword "data" with "_data"
+# Replace keyword "data" with "_data" (and atad for IAR)
 #
   # replace keyword data with something else
   # Don't match xdata and __attribute((xdata))
   if ($memory_att_match == 0) {
+      if($IAR) {
+	  s/(?!x)(.)data/$1atad/g;
+      } else {
 	  s/(?!x)(.)data/$1_data/g;
+      }
   }
   $memory_att_match=0; # One line at a time...
 
@@ -393,8 +459,11 @@ if ( $KEIL ) {
   # structures - which again is a nono in Keil). eg.
   #    unsigned long long myvar;
 
+  s{(typedef __builtin_va_list __gnuc_va_list;)}{/*$1*/};
+
   s{(typedef u?int64_t __nesc_nxbase_nx(?:le)?_u?int64_t\s*;)}{/*$1*/};
-  if (!s{(typedef\s*(?:unsigned)?\s*long\s*long\s*(?:int)?\s*\w+;)}{/*$1*/}) {
+#  if ($comment_level==0 &  !s{(typedef\s*(?:unsigned)?\s*long\s*long\s*(?:int)?\s*\w+;)}{/*$1*/}) {
+  if (!s{(typedef (?:\w|\s)+ _*u?int64_t\s*;)}{/*$1*/}) {
       s{((?:unsigned)?\s*long\s*long\s*(?:int)?\s*)(\w+;)}{
          float* $2
       };
@@ -417,9 +486,6 @@ if ( $KEIL ) {
 # dropping the timer tags will never work. They are used to cascade a
 # bunch other types that will eventually fail =[..
 #
-# So the big chunk of code bellow will probably never find an empty
-# struct to eliminate...
-# 
 
   # It is important that these are run last - after any other
   # modyfications to the lines if no we might risk missing other
@@ -442,32 +508,40 @@ if ( $KEIL ) {
   #   name;
 
   if ($typedef_struct_lines) {
-      $typedef_struct_lines++;
-      $typedef_struct = $typedef_struct . $_;
-      #if (/^.*\}.*$/) { # Found the end } of the typedef
-      if (/}/) { # Found the end } of the typedef
+      # Reached last line i typedef
+      # The ; might not be on the same line as the }
+
+      if (m{.*\}.*}) { # Found the end } of the typedef
 	  $typedef_struct_closed = 1;
-	  if ( $typedef_struct_lines == 2) {
+	  if ( $typedef_struct_lines == 1) {
 	      $typedef_struct_empty = 1;
 	  }
       }
-      # Reached last line i typedef
-      # The ; might not be on the same line as the }
-      if ($typedef_struct_closed && /^(.*);/ ) {
+      $typedef_struct_lines++;
+      $typedef_struct = $typedef_struct . $_;
+
+      # look for ";"
+      if ($typedef_struct_closed==1 && m{(^.*\s+(\w+))?;} ) {
 	  my $identifyer = "";
 	  # This fails if the identifier is right after ; fortunately it isn't
-	  # for our lines =]
-	  if ($1 ne "") {
+	  # for our lines  
+	  if (defined($1) &&
+	      $1 ne "") {
 	      $identifyer = $1;
 	  }
-          # Remember the name of the empty struct - we need this to 
+
+	  # Remember the name of the empty struct - we need this to 
           # kill more lines that use this name later...
+          $typedef_struct_ident_all{$identifyer} = 1;
+
+	  # Remove the empty struct
 	  if ($typedef_struct_empty){
 	      $typedef_struct_empty_ident{$identifyer} = 1;
 
 	      my @list = split(/\n/, $typedef_struct);
 	      $_ = "";
 	      # Comments in comments are bad mkay
+	      $_ = $_ . "/* Empty struct $identifyer removed \n*/";
 	      foreach my $line (@list) {
 		  if ($line =~ /\/\/.*/) {
 		      $_ = $_ . $line;
@@ -478,6 +552,15 @@ if ( $KEIL ) {
 	  } else { # The struct was not empty...
 	      $_ = $typedef_struct;
 	  }
+          $_ = $_ . "/*YYYYY $identifyer*/";
+
+          #if ($identifyer eq "in_queue_item_t") {
+          #    $_ = $_ . "//HIHI";
+          #}
+          #if ($identifyer eq "__nesc_unnamed4275") {
+          #    $_ = $_ . "//HOHO";
+          #}
+          
 	  $typedef_struct_closed = 0;
 	  $typedef_struct_lines = 0;
 	  $typedef_struct_empty = 0;
@@ -511,19 +594,17 @@ if ( $KEIL ) {
      }
   }
 
-  # We know these are empty...
-  if( /^struct __nesc_attr_atmostonce {/  ||
-      /^struct __nesc_attr_atleastonce {/ ||
-      /^struct __nesc_attr_exactlyonce {/ ) {
+  # In addition to the empty "typedef struct" nescc creates some empty "structs"
+  if( /^struct __nesc_attr_\w+ {/ ) {
       $empty_struct=1;
       $_ = "/*" . $_;
   }
-  if ( $empty_struct && /\}\;/) {
+  if ($empty_struct && /\}\s*\;/) {
       $empty_struct = 0;
       chomp($_);
       $_ = $_ . "*/\n";
   }
-   
+ 
   print;
 
 }

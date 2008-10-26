@@ -19,8 +19,8 @@
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
- * FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL STANFORD
- * UNIVERSITY OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE UNIVERSITY
+ * OF COPENHAGEN OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
  * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
@@ -50,6 +50,8 @@ implementation
 {
   components HplMcs51GeneralIOC, 
     PlatformP,
+    new ReverseGPIOP() as Led0_rev,
+    new ReverseGPIOP() as Led2_rev,
     new NoPinC();
 
   // Let LedsP (from system) handle the Led init...
@@ -57,11 +59,13 @@ implementation
 
   /* 
    * The bizare Led interface assumes that the led pins are active
-   * high...
+   * low...
    */
 
-  Led0 = HplMcs51GeneralIOC.P10;
-  Led1 = NoPinC;
-  Led2 = HplMcs51GeneralIOC.P13;
+  Led0_rev -> HplMcs51GeneralIOC.P10;
+  Led2_rev -> HplMcs51GeneralIOC.P13;
 
+  Led0 = Led0_rev.Out;
+  Led1 = NoPinC;
+  Led2 = Led2_rev.Out;
 }

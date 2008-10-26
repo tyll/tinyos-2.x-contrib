@@ -1,0 +1,4 @@
+Echo
+====
+Echo serial characters received on the Uart. It uses the uart defined
+for the platform in UartC.

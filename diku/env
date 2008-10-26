@@ -2,7 +2,7 @@ export TOSROOT=/opt/tinyos-2.x
 export TOSDIR=$TOSROOT/tos/
 export MAKERULES=$TOSDIR/../support/make/Makerules
 export CONTRIBROOT=/opt/tinyos-2.x-contrib
-export TOSMAKE_PATH="$TOSMAKEPATH $CONTRIBROOT/diku/sensinode/support/make $CONTRIBROOT/diku/mcs51/support/make"
+export TOSMAKE_PATH="$TOSMAKEPATH $CONTRIBROOT/diku/sensinode/support/make $CONTRIBROOT/diku/mcs51/support/make $CONTRIBROOT/diku/freescale/support/make"
 
 # Supported Compilers: keil, iar, sdcc
 export MCS51_COMPILER=keil

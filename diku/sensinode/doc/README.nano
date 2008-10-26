@@ -1,0 +1,15 @@
+Programming the Nano
+ Using the D100 programmer:
+ nano_programmer -1 -d /dev/ttyUSB0 --program build/nano/app.hex
+
+Built in Serial port on D100 programmer
+Connect the port output from the nano on the right side of the board
+to the left:
+  D3 -> MISO1 (RX)
+  D4 -> MOSI1 (TX)
+
+Firmware upgrade
+To upgrade the firmware of the D100 programmer, place jumpers on J70 and J72
+(BTSTRP_EN) and program using msp430-bsl
+
+env PYTHONPATH=/opt/msp430/lib/python2.3/site-packages/ /opt/msp430/bin/msp430-bsl --invert-test --invert-reset -c /dev/ttyUSB0 -r -e -I -p -v d100_nano.ihex

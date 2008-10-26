@@ -18,8 +18,8 @@
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
- * FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL STANFORD
- * UNIVERSITY OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE UNIVERSITY
+ * OF COPENHAGEN OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
  * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
@@ -58,11 +58,12 @@
 #define READ_BIT(port, bit)   (((port) & _BV(bit)) != 0)
 #define FLIP_BIT(port, bit)   ((port) ^= _BV(bit))
 
-// Define the input/output valus of the Px_DIR registers
-// One could imagine some 8051 implementation being wierd enough to change
-// these
-#define MAKE_IO_PIN_OUTPUT(dir_reg, pin) dir_reg |= _BV(pin)
-#define MAKE_IO_PIN_INPUT(dir_reg, pin)  dir_reg &= _BV(pin)
+// Define the input/output direction of the Px_DIR registers
+// this is the classic 8051 implementation, some variants
+// have other definitions
+
+#define MAKE_IO_PIN_OUTPUT(dir_reg, pin) dir_reg |=  _BV(pin)
+#define MAKE_IO_PIN_INPUT(dir_reg, pin)  dir_reg &= ~_BV(pin)
 
 // Test whether an IO pin is set to input or output
 #define IS_IO_PIN_OUTPUT(dir_reg, pin) dir_reg | _BV(pin)

@@ -1,0 +1,37 @@
+StdOut
+======
+A minimalisting prety printing library (not entirely unlike printf).
+By wiring to the StdOutC components will be able to print human
+readable text to the UART defined for the platform in UartC. To
+disable printing the application can later wire to StdNull;
+
+In addition to printing strings the interface provides methods for
+printing integers in different bases: base 16 (hex), base 10, base 2
+(binary).
+
+The strings are copied to an internal print buffer, but no concurrency
+checks are performed - if a program call print to often the output
+will be garbled.
+
+configuration TestAppC {
+} implementation {
+  components TestAppP;
+  components StdOutC;
+  //components StdNull as StdOutC;
+  TestAppP.StdOut -> StdOutC;
+
+....
+
+module TestAppP {
+  uses interface StdOut;
+} implementation {
+
+ async event void StdOut.get( uint8_t byte ) {
+ }
+
+ ...
+ 
+ call StdOut.print("Hello World\n\r");
+ call StdOut.printBase10uint16(x);
+ call StdOut.printBase2uint16(x);
+ 

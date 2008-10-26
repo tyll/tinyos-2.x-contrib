@@ -8,25 +8,29 @@
 #
 #
 
-# A starting point.. The compiler and posibly mangler should probably
-# end up here at some point
-#  - Martin Leopold (Sep 4, 2006)
-
 $CR = $ENV{"CONTRIBROOT"} if defined($ENV{"CONTRIBROOT"});
+
+$PATH_LIST = "$ENV{'CONTRIBROOT'}/diku/mcs51/tos/chips/nRF24E1 $ENV{'CONTRIBROOT'}/diku/mcs51/tos/chips/mcs51";
+
+@dirs = `find $PATH_LIST -type d ! -regex ".*\.svn.*"`;
+chomp(@dirs);
+push(@includes, @dirs);
+
+@dirs = `find $ENV{'CONTRIBROOT'}/diku/common -type d \! -regex ".*\.svn.*" \! -regex ".*apps.*"`;
+chomp(@dirs);
+push(@includes, @dirs);
 
 #qw doesn't replace variable so build list manually
 @LIST=(
-  "$CR/diku/mcs51/tos/platforms/nRF24E1_EVBOARD",
-  "$CR/diku/mcs51/tos/chips/nRF24E1",
-  "$CR/diku/mcs51/tos/chips/nRF24E1/mcs8051",
-  "$CR/diku/mcs51/tos/chips/mcs51",
-  "$CR/diku/mcs51/tos/chips/mcs51/pins",
+  "%T/interfaces",
+  "%T/system",
   "%T/lib/timer",
   "%T/lib/serial",
   "%T/lib/power"
 );
 
 push( @includes, @LIST);
+
 
 # None of these seems to end up as commandline options!? In particular
 # target is povided by the Makefile
@@ -40,12 +44,13 @@ push( @includes, @LIST);
 #
 #);
 
-#push @opts, "-mingw-gcc" if $cygwin;
-
 push (
-    @opts, qw(
-	      -gcc=/opt/tinyos-2.x/support/make/mcs51/Keil.bat
+     @opts, qw(
 	      -fnesc-no-debug
 	      -fnesc-scheduler=TinySchedulerC,TinySchedulerC.TaskBasic,TaskBasic,TaskBasic,runTask,postTask
 	      )
-    ) if defined ($cygwin);
+     );
+# ) if defined ($cygwin);
+
+push @opts, "-mingw-gcc" if $cygwin;
+push @opts, "-gcc=avr-gcc" if $cygwin;

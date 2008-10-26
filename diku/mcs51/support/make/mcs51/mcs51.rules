@@ -49,7 +49,7 @@ ifndef MCS51_COMPILER
 endif
 
 ifndef MCS51_IAR_PATH
-	MCS51_IAR_PATH=Program\ Files/IAR\ Systems/Embedded\ Workbench\ 4.0\ Evaluation\ version/common/bin
+	MCS51_IAR_PATH=Program Files/IAR Systems/Embedded Workbench 5.0 Evaluation version/common/bin
 endif
 
 OSNAME = $(shell uname)

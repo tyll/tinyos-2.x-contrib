@@ -1,0 +1,2 @@
+COMPONENT=USBSerialEchoC
+include $(MAKERULES)

@@ -1,0 +1,11 @@
+SimpleMac
+=========
+
+An minimalistic interface to access 802.15.4 like radios (without the
+802.15.4 protocol layer. It transmits packes using simple abstractions:
+
+interface SimpleMac {
+   command error_t sendPacket(packet_t *packet);
+   event void sendPacketDone(packet_t *packet, error_t result);
+   event packet_t *receivedPacket(packet_t *packet);
+....

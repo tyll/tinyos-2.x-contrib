@@ -1,0 +1,53 @@
+BufferManager
+=============
+
+This generic buffer manager for memory management in a traditional
+get/free semantics, not unlike malloc/free, but with buffer sizes
+fixed at compiletime. It is based on the ideas proposed in The Case
+for Buffer Allocation in TinyOS (Klaus S. Madsen) and the
+implementation is inspired by the one used by Jan Flora in his IEEE
+802.15.4 stack TinyFour. The BufferManager interface is accessed
+through to simple methods, to get a new buffer simply call the get()
+method, which will return NULL if no buffer is available.
+
+
+interface BufferManager<page_t> {
+   command page_t * get(); // Return NULL if no buffer is available
+   command error_t free(page_t* p);
+   command uint8_t freeBuffers();
+}
+
+We provide two implementations of the BufferManager interface:
+
+* FIFOBufferManagerP: This buffer manager implements a simple queue to
+  hold free buffer, new and free call simply pop or push a pointer from
+  the queue. The queue implementation is borrowed from the TinyOS queue
+  implementation and duplicated here, since we simply want a dequeue on
+  an empty queue to return a NULL pointer. <br>It is implemented as a
+  queue and /no/ safeguards are implemented on free - as a result
+  freeFail will never be signaled.
+
+* SafeBufferManagerP: This buffer manager ensures that no buffer can be
+  released twice, it's slightly slower than FIFOBufferManager, but
+  should be slightly safer too.
+  
+
+configuration TestAppC{
+   component TestAppP,
+        MainC,
+        FIFOBufferMangerP as BufferManager;
+
+   MainC.SoftwareInit -> BufferManagerP.Init;
+   TestAppP -> BufferManager;
+
+....
+
+module USBCommunicationClassDeviceP{
+   uses interface BufferManager<buffer_t> as BufferManager;
+...
+  buffer_t *bufM
+  buf = call BufferManager.get();
+  if (buf != NULL) {
+...
+  call BufferManager.free(buf);
+

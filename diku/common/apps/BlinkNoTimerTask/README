@@ -1,0 +1,8 @@
+BlinkNoTimerTask
+================
+A minimalistic application that blinks timers using a delayloop. This
+application is much simpler than the Blink application from the man
+TinyOS distribution which requires operational timers.
+
+In adition it uses a task as opposed to Blink, since at least 1 task
+is required by the TinyOS 8051wg port.

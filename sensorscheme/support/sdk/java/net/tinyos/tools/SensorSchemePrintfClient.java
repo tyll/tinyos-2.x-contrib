@@ -28,7 +28,6 @@
 
 package net.tinyos.tools;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -53,8 +52,6 @@ public class SensorSchemePrintfClient implements MessageListener {
   }
 
   public void messageReceived(int to, Message message) {
-	int start=0;
-	String expandedString="";
     PrintfMsg msg = (PrintfMsg)message;
     StringBuilder msgContents=new StringBuilder();
     
@@ -64,49 +61,8 @@ public class SensorSchemePrintfClient implements MessageListener {
     	  msgContents.append(nextChar);
     }
     String msgString=msgContents.toString();
-    Pattern symbolPattern=Pattern.compile("\\%s(-?[0-9]+)");
-    Matcher symbolMatcher=symbolPattern.matcher(msgString);
-    while (symbolMatcher.find()){
-    	expandedString+=msgString.subSequence(start, symbolMatcher.start());
-    	expandedString+=this.symbolsMap.get(Integer.valueOf(symbolMatcher.group(1)));
-    	start=symbolMatcher.end();
-    }
-    expandedString+=msgString.subSequence(start, msgString.length());
-    System.out.print(expandedString);
+    System.out.print(SensorSchemeUtils.expandSymbols(msgString, this.symbolsMap));
   }
-  
-  // Copied from http://www.javapractices.com/topic/TopicAction.do?Id=42
-  static public String getContents(File aFile) {
-	    //...checks on aFile are elided
-	    StringBuilder contents = new StringBuilder();
-	    
-	    try {
-	      //use buffering, reading one line at a time
-	      //FileReader always assumes default encoding is OK!
-	      BufferedReader input =  new BufferedReader(new FileReader(aFile));
-	      try {
-	        String line = null; //not declared within while loop
-	        /*
-	        * readLine is a bit quirky :
-	        * it returns the content of a line MINUS the newline.
-	        * it returns null only for the END of the stream.
-	        * it returns an empty String if two newlines appear in a row.
-	        */
-	        while (( line = input.readLine()) != null){
-	          contents.append(line);
-	          contents.append(System.getProperty("line.separator"));
-	        }
-	      }
-	      finally {
-	        input.close();
-	      }
-	    }
-	    catch (IOException ex){
-	      ex.printStackTrace();
-	    }
-	    
-	    return contents.toString();
-	  }
   
   
   private static void usage() {
@@ -148,23 +104,12 @@ public class SensorSchemePrintfClient implements MessageListener {
     else {
       phoenix = BuildSource.makePhoenix(source, PrintStreamMessenger.err);
     }
-    
-    File symbolsFile=new File(symFileName);
-    if(!symbolsFile.exists()){
-    	System.err.println("File does not exist: "+symFileName);
+    HashMap<Integer, String> buildMap=null;
+    try{
+    	buildMap=SensorSchemeUtils.loadSymbols(symFileName);
+    } catch (IOException ioe){
+    	System.err.println(ioe.getMessage());
     	System.exit(1);
-    }else if(!symbolsFile.canRead()){
-    	System.err.println("Permission denied: "+symFileName);
-    	System.exit(1);
-    }
-    
-    String unparsedSymbolsMap=getContents(symbolsFile);
-    
-    Pattern getSymbolsPattern=Pattern.compile("\\(+\"?(.*?)\"?[\\s](-?[0-9]+)\\)+");
-    Matcher getSymbolsMatcher=getSymbolsPattern.matcher(unparsedSymbolsMap);
-    HashMap<Integer,String> buildMap=new HashMap<Integer,String>();
-    while(getSymbolsMatcher.find()){
-    	buildMap.put(Integer.valueOf(getSymbolsMatcher.group(2)), getSymbolsMatcher.group(1));
     }
     
     System.out.print(phoenix);

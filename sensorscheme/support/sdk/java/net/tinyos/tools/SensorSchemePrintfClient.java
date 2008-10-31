@@ -64,7 +64,7 @@ public class SensorSchemePrintfClient implements MessageListener {
     	  msgContents.append(nextChar);
     }
     String msgString=msgContents.toString();
-    Pattern symbolPattern=Pattern.compile("\\%s(-?[0-9]+) ");
+    Pattern symbolPattern=Pattern.compile("\\%s(-?[0-9]+)");
     Matcher symbolMatcher=symbolPattern.matcher(msgString);
     while (symbolMatcher.find()){
     	expandedString+=msgString.subSequence(start, symbolMatcher.start());

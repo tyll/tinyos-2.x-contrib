@@ -1,16 +1,34 @@
 <html>
 <head>
-   <title>Mts4x0 alternatice implemntation</title>
+   <title>Mts4x0 alternative implementation</title>
 </head>
 <body TEXT="#000000" BGCOLOR="#FFFFFF" LINK="#0000EF" VLINK="#55188A" ALINK="#FF0000">
 
 <img src="http://www.tinyos.net/scoop/images/tos-jwall.jpg"></img>
 
-<h1>Mts4x0 alternatice implemntation</h1>
+<h1>Mts4x0 alternative implementation</h1>
 
 <p>
-alternative implementation for mts420 sensor board, mainly supportts the leadtek GPS 
+Driver for mts420 sensor board, mainly supports the leadtek GPS,<br>
+<br>
+
+It has a generic support for the hardware switches (adg715) and is organized in a portable way, with chips/platforms and sensorboards directories.
+<br>
+
+It takes a careful path to make proper initialisation and shut down of
+the switch devices on the board, <br> watch error status and try to
+keep everything in a coherent state even when errors occurs. <br>
 </p>
+
+Feel free to mail <a href="mailto:aurelien.francillon@inrialpes.fr">me</a> for
+more information, bug report, patches etc...
+<br><br>
+TODO List :
+<li> support for sensors on the board other than the gps dirver, 
+<li> adding support for the mts420cc board
+<li> improving atm128 uart 2 support 
+<li> using the tinyos python libraries on the pc side
+<li> general review and validation of the code 
 
 </body>
 </html>

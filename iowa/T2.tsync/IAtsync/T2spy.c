@@ -72,7 +72,7 @@ typedef struct micaTOS_Msg
    uint8_t length;
    uint8_t pad2;
    uint8_t type;
-   uint8_t data[29];  
+   uint8_t data[28];  
    } micaTOS_Msg;
 typedef micaTOS_Msg * micaTOS_MsgPtr;
 
@@ -163,6 +163,16 @@ uint32_t moteInt(uint8_t * g) {
    return b;
    }
 
+/***** Convert a mote nx_uint32_t *********/
+uint32_t nx_moteInt(uint8_t * g) {
+   uint32_t b;
+   b = (g[3]&0xff);
+   b += (g[2]&0xff) << 8;
+   b += (g[1]&0xff) << 16;
+   b += (g[0]&0xff) << 24;
+   return b;
+   }
+
 /******** show raw hex data ***********/   
 void showhex( void * p, int n ) {
    int i;
@@ -201,7 +211,7 @@ void getStreamMica( int socket, micaTOS_MsgPtr p ) {
    r = read(socket, &n, 1); 
    if (r < 0) { perror("getStream error"); exit(errno); }
    if (r == 0) { fprintf(stderr,"connection broken!\n"); exit(0); }
-   // fprintf(stderr,"got message for %d bytes\n",n-6); 
+   fprintf(stderr,"got message for %d bytes\n",n-6); 
    
    // now read the data
    if ( n > sizeof(micaTOS_Msg) ) { 
@@ -213,8 +223,8 @@ void getStreamMica( int socket, micaTOS_MsgPtr p ) {
       if (r < 0) { perror("getStream error"); exit(errno); }
       if (r == 0) { fprintf(stderr,"connection broken!\n"); exit(0); }
       }
-   // showhex(s,n);
-   // printf("\n");
+   showhex(s,n);
+   printf("\n");
    return;
 } 
 
@@ -492,7 +502,7 @@ void displayBeac( beaconMsgPtr p ) {
    double L,V,delay;
    char lnib,rnib;
    uint32_t w;
-
+ 
    // show elapsed time since start of run
    gettimeofday(&T,NULL);
    T.tv_sec -= startT.tv_sec;
@@ -519,7 +529,7 @@ void displayBeac( beaconMsgPtr p ) {
    V += (double) moteInt(&p->Virtual[2]) / (double) TPS;
 
    // obtain MAC delay interval from beacon
-   delay = (double)moteInt((uint8_t *)p->Delay) / (double) TPS;
+   delay = (double)nx_moteInt((uint8_t *)p->Delay) / (double) TPS;
    // add delay to other times (adjusting properly)
    L += delay;
    V += delay;
@@ -572,7 +582,7 @@ int main(int argc, char **argv) {
        }
      }
    if (motetype == 0) { printHelp(); exit(1); }
-   if (motetype == MICAZ) TPS = 1024*1024;  // (native could be 921778)  
+   if (motetype == MICAZ) TPS = 921778;   
    if (motetype == TELOS) TPS = 1024*1024;
 
    gettimeofday( &startT, NULL );

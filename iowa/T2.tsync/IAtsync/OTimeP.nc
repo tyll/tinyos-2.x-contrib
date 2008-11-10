@@ -169,8 +169,9 @@ implementation {
   /**
    * OTime.getLocalTime returns current local clock,
    * provided by system clock, with skew computed to
-   * update the LocalOffset value.  BUT RESULT DOES NOT
-   * APPLY SKEW to the time value returned -- this is important!
+   * update the LocalOffset value, as a side-effect. 
+   * NOTE:  the RESULT DOES NOT APPLY SKEW to the time 
+   * value returned -- this is important!
    */
   command void OTime.getLocalTime( timeSyncPtr p ) { 
     bigClock a;
@@ -308,6 +309,30 @@ implementation {
   async command uint32_t OTime.getNativeMicro() {
     uint32_t v;
     atomic v = call CounterMicro.get();
+    return v;
+    }
+
+  /**
+   * Telos:
+   *  just like getNative32, i.e., 32khz counter * 2^10 
+   * MicaZ:
+   *  return the native microsecond clock
+   */
+  async command uint32_t OTime.getStableMicro32() {
+    uint32_t v;
+    #if defined(PLATFORM_TELOSB)
+     atomic v = call Counter32.get() << 5;
+    #elif defined(PLATFORM_MICAZ)
+     atomic v = call CounterMicro.get(); // get native microseconds
+     #if defined(MIXED_CC2420)
+     { timeSync_t x;
+       x.ClockL = v;
+       x.ClockH = 0;
+       call OTime.Z2Tel(&x);
+       return x.ClockL;
+     }
+     #endif
+    #endif
     return v;
     }
 
@@ -529,7 +554,7 @@ implementation {
   /**
    *  Convert MicaZ time value (microsec) to Telos (microsec)
    */
-  command void OTime.Z2Tel( timeSyncPtr p ) {
+  async command void OTime.Z2Tel( timeSyncPtr p ) {
     bigClock u;
     uint64_t d;
     u.partsInt.hi = p->ClockH;

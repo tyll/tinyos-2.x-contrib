@@ -1,34 +1,38 @@
-These are some notes on Iowa Timesync for T2 (3 Nov 07). 
+These are some notes on Iowa Timesync for T2 including
+TEP132 and TEP133, as of 10 November 2008.  
+
 Ted Herman <ted-herman@uiowa.edu>
 
 CHANGES TO TinyOS  
 
-Two changes to the current distribution of TinyOS were needed for
+Several changes to the current distribution of TinyOS were needed for
 this implemention.  
 
-1.  Added #include <message.h> to RadioTimeStamping.nc
+1.  MicaCounter32khz16C.nc added, to provide Counter<T32khz,uint16_t>
+    (but this is just a wiring wrapper for CounterOne16C). 
 
-    I didn't see this in the current CVS snapshot either, but found
-    it necessary to get things to compile.
+2.  Msp430CounterMicro32C.nc added, but not currently used (maybe used
+    in an enhancement to get binary microsecond timing on Telos).
 
-2.  Had to add CounterMicro32C.nc for 32-bit microsecond counter support 
-
-    This wiring, a modification of a wiring written by Cory Sharp,
-    (not found in T2 distribution) was needed to provide a 32-bit, binary
-    microsecond counter.  The fact that it is only wiring indicates that
-    the current T2 has the needed code already.  Copyright on the wiring
-    is standard UCB copyright, though I got this wiring from Boomerang, 
-    then asked Cory for permission (now at Sentilla).
+3.  Numerous changes to cc2420 stack, mainly to support <TMicro, uint32_t>
+    interfaces;  TEP132 and TEP133 are engineered for T32khz or TMilli 
+    timer granularity, but we hope to use microsecond timing where this is
+    feasible.  The changes to the cc2420 stack are enabled only if the 
+    compilation flag -DSTAMPMICRO is included.  The microsecond timing is
+    consistent with TEP132 and TEP133.  However, an additional change 
+    is to stamp messages with the MAC/queueing delay rather than the 
+    clock of the transmitter.  This is useful for statistics, testing, 
+    and keeping all the packet processing within the stack rather than 
+    using any hooks to application code. 
 
 UNRESOLVED ISSUES 
 
-I haven't tested skew compensation yet;  it worked pretty well under
-T1, and if it isn't debugged here, that shouldn't be difficult.  Without
-skew compensation, the accuracy seems to be around 300 microseconds
-(= 10 jiffies using 32KHz counter) for a 1-minute beacon.  With skew
-compensation, it might be around 10 times better, or around 1-2 jiffies
-(again, using 32KHz counter as base of the clock, since the microsecond
-counter just isn't stable enough).  
+Mixed Telos/CC2420 operation hasn't been tested, though we did get this
+to work under earlier Tinyos releases.  Skew compensation has been lightly
+tested, getting to about 300 microseconds for a 1-minute beacon on Telos
+and around 40 microseconds on MicaZ.  With FTSP's linear regression, the
+synchonization could be up to 10x better, but we haven't pushed skew 
+compensation for rootless timesync.  
 
 STYLE BUGS
 
@@ -73,24 +77,29 @@ of interest to the user:
 	       (Ooops, this one's not offered by TsyncC, but that shouldn't
 	       stop you from using it.)
 
-5.  PowCon --  Not yet tested, but eventually enabled application-layer
-               power control (ideally, could be combined with LPL for 
-	       applications that periodically sleep for very low power,
-	       long-life operation).
+5.  PowCon --  Enables application-layer power control (ideally, could 
+               be combined with LPL for applications that periodically 
+	       sleep for very low power, long-life operation).
 
 HOWTO Make & Wiring
 
 The Makefile in this directory has two nonstandard lines, 
 
-  PFLAGS= -IIAtsync
+  PFLAGS += -DSTAMPMICRO needed for the microsecond clock.
+
+  PFLAGS += -I../IAtsync
 
        needed because the modules and wiring of the timesync software
        are in the IAtsync directory
 
+  PFLAGS += =I../tos/chips/cc2420 (and related includes)
+
+       needed to get the stack modications for cc2420
+
   PFLAGS+= -DTRACK
 
        the TRACK option is needed to enable (i) skew compensation, which
-       should increase the clock precision by an order of magnitude; (ii)
+       could increase the clock precision by an order of magnitude; (ii)
        to enable efficient, bidirectional topology control in a static 
        network.  If you have mobile nodes, remove the -DTRACK option.  Also,
        some Neighbor functions may not mean much when -DTRACK is removed.
@@ -120,16 +129,10 @@ IMPORTANT TODOs
 
 All of this code was ported from a version working on TinyOS 1, which 
 supported several radio stacks, tmote (for Boomerang), telosb, micaz, 
-mica2, and even mica motes.  This T1 version even supported timesync
+mica2, and even mica motes.  The T1 version even supported timesync
 between telosb and micaz motes.  Also, there was provision for UART 
 connection between a mote and basestation (well, actually just using 
-the USB).  Currently, only the telosb version has been ported to T2,
+the USB).  Currently, only the telosb and micaz version have been tested,
 but if you look at the code you will see lots of places with legacy 
 micaz/mica2 provisions, and these can be worked on further to get broader
 support.
-
-The Power Control component (PowConC) and its interface haven't been
-tested/debugged for T2.  The technique for power control, copied
-dumbly from lpl, should be tested.  Also, it would be nice to have 
-some way of combining this form of application-layer power control
-with lpl.

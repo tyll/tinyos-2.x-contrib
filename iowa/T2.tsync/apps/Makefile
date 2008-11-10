@@ -1,18 +1,17 @@
 COMPONENT=testTsyncC
 
-# Much software is in IAtsync/ subdirectory
-PFLAGS= -I../IAtsync 
+PFLAGS = -DSTAMPMICRO
 
-# optional:  set group
-#DEFAULT_LOCAL_GROUP=0xaa
-# or maybe TOS_AM_GROUP=0xaa
+# Much software is in IAtsync/ subdirectory
+PFLAGS += -I../IAtsync -I../tos/chips/cc2420 -I../tos/chips/cc2420/packet 
+PFLAGS += -I../tos/chips/cc2420/transmit -I../tos/chips/cc2420/receive 
 
 # use -DTRACK to get neighborhood
 # tracking (biconnected links, 
 # needed for skew compensation)  
 # (note: TRACK and POWCON together
 #        is an untested combo)
-#PFLAGS += -DTRACK
+PFLAGS += -DTRACK
 
 # use -DPOWCON to turn off the 
 # radio between beacons (saves
@@ -28,10 +27,6 @@ PFLAGS= -I../IAtsync
 # partition during initialization)
 #PFLAGS += -DSTOPJUMP
 
-# use -DMIXED_CC2420 for networks
-# with both Telosb and MicaZ motes
-#PFLAGS += -DMIXED_CC2420
-
 # use this to change the frequency
 # of the Zigbee chip (use channel 
 # 11, 15, 20, 25 or 26 -- which seem 
@@ -42,13 +37,14 @@ PFLAGS= -I../IAtsync
 # MicaZ/Telos hardware (see ZigBee.txt)
 #CFLAGS +=-DCC2420_DEF_RFPOWER=0x1F
 
-# experimental:  use the microsecond
-# clock for some timings
-#PFLAGS += -DUSE_MICROSECOND_CLOCK
-
 # use -DDEMO_LIGHTS 
 # only for demonstration of timesync
 #PFLAGS += -DDEMO_LIGHTS
+
+# MIXED_CC2420 aims to convert MicaZ clock
+# to binary milliseconds, which could be 
+# used for communication with Telos
+#PFLAGS += -DMIXED_CC2420
 
 # use -v to see lots of extra messages
 # during the compilation procedure

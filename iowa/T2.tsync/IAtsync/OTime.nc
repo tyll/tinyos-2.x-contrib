@@ -95,6 +95,14 @@ interface OTime {
   async command uint32_t getNative32( );
 
   /**
+   * Telos:
+   *  just like getNative32, i.e., 32khz counter * 2^10 
+   * MicaZ:
+   *  return the native microsecond clock
+   */
+  async command uint32_t getStableMicro32( );
+
+  /**
    *   Return current native microsecond counter value (different from
    *   getLocalTime32, because there is no 48-bit clock backing up carries,
    *   and on msp430 platform, getLocalTime uses the 32kHz counter).
@@ -274,9 +282,9 @@ interface OTime {
 
   /**
    * Conversion from 921600 ticks per second to 2^20 ticks per second
-   * (but also works for 32 KHz conversion, ie 28800 to 32768)
+   * (but also works for 32 "KHz" conversion, ie 28800 to 32768)
    */
-  command void Z2Tel( timeSyncPtr p );
+  async command void Z2Tel( timeSyncPtr p );
   async command void Z2Tels( uint32_t * p );
 
   /**

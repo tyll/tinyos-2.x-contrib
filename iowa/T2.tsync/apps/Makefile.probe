@@ -1,5 +1,6 @@
 COMPONENT=probeTsyncC
 
-PFLAGS= -I../IAtsync
+# Much software is in IAtsync/ subdirectory
+PFLAGS  = -DSTAMPMICRO -I../IAtsync 
 
 include $(MAKERULES)

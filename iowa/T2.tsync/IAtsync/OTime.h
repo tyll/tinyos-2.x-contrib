@@ -19,12 +19,15 @@ typedef union bigClock {
   enum { MAX_SKEW_AMT = 300,
          INTERVAL_WO_SKEW = 1048576u, // 2**20 SysTime units
          INTERVAL_WO_SKEW_POWER = 20, // log of above
-         DO_SKEW_ADJUST = TRUE       // use skew/or not
+         ONE_BYTE_TIME_UNIT = 146,    //  actually rounded (145.636 on MicaZ) 
+         DO_SKEW_ADJUST = TRUE        // use skew/or not
         };
 
   #if defined(PLATFORM_MICAZ) || defined(PLATFORM_MICA2)
   enum { TPS = 921600u };  // the timer rate using 1/8 prescaler 
                            // as determined by Miklos at Vandy
+			   // BUT, my own measurements indicate that
+			   // the actual rate is 921778
   #endif
   #ifdef PLATFORM_MICA128
   enum { TPS = 500000u };  // on a Mica128, we have 4 Mhz, so 

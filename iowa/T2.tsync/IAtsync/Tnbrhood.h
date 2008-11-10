@@ -16,8 +16,6 @@ enum { NUM_NEIGHBORS = 12,    // 12 because of payload in TinyOS msg
        EXCHANGE_LMARGIN = 1,     //  1 slots "left" margin (1/8 second)
        EXCHANGE_RMARGIN = 0,     //  0 slots "right" margin (0/8 second)
        HEALTH_CHECK_FREQ = 8*60, //  check once per minute nbr health
-       ONE_BYTE_TIME_UNIT = 146, //  actually rounded (145.636 on MicaZ) 
-                              //    (see OTime for 1-byte time units) 
        OUTLIER_LIMIT = 16,    // this is two seconds in eighth-sec units
        // These modes are for both neighbor tables and control
        MODE_NORMAL = 0x80,

@@ -47,7 +47,8 @@ typedef struct beaconMsg {
   timeSync_t Xor;     // XOR of Local and Virtual (for error check)
   uint8_t mode;       // sender's mode 
   uint8_t NbrSize;    // neighborhood size of sender
-  uint32_t Delay;     // processing and MAC delay of sending beacon 
+  // Delay is **VIRTUAL FIELD**
+  // uint32_t Delay;     // processing and MAC delay of sending beacon 
 } beaconMsg; // 28 byte payload 
 typedef beaconMsg * beaconMsgPtr;
 

@@ -1,3 +1,5 @@
+// OBSOLETE  10 November 2008
+
 /*									tab:4
  * "Copyright (c) 2000-2005 The Regents of the University  of California.  
  * All rights reserved.

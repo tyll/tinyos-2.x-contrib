@@ -52,12 +52,10 @@ implementation {
   components new PowCommC(AM_PROBE_ACK) as CommProbeAck;
   components new PowCommC(AM_PROBE_DEBUG) as CommProbeDebug;
   components MarginC;
-  components CC2420PacketC;
-  components CC2420TransmitC;
   #if defined(PLATFORM_TELOSB)
-  components Counter32khz16C;
+  // components Counter32khz16C;
   #elif defined(PLATFORM_MICAZ)
-  components MicaCounter32khz16C as Counter32khz16C;
+  // components MicaCounter32khz16C as Counter32khz16C;
   #endif
   #ifdef TRACK
   components TskewC;
@@ -73,23 +71,25 @@ implementation {
   TsyncP.OTime -> OTimeC.OTime;
   TsyncP.Tnbrhood -> TnbrhoodC.Tnbrhood;
   TsyncP.Neighbor -> TnbrhoodC.Neighbor[0];
-  TsyncP.BeaconSend -> CommBeacon.AMSend;
   #ifdef TUART
   TsyncP.UARTSend -> CommUART.AMSend;
   #endif
   TsyncP.BeaconReceive -> CommBeacon.Receive;
-  TsyncP.CC2420PacketBody -> CC2420PacketC; 
   TsyncP.ProbeSend -> CommProbeAck.AMSend;
   TsyncP.ProbeDebug -> CommProbeDebug.AMSend;
   TsyncP.ProbeReceive -> CommProbe.Receive;
   TsyncP.MsgLeds -> NoLedsC.Leds;
   TsyncP.Leds -> LedsC.Leds;
-  TsyncP.RadioTimeStamping -> CC2420TransmitC;
-  TsyncP.CC2420Transmit -> CC2420TransmitC;
-  TsyncP.Counter -> Counter32khz16C;
+  // TsyncP.Counter -> Counter32khz16C;
   // following is for a demonstration mode
   #ifdef DEMO_LIGHTS
   TsyncP.ShowLeds -> LedsC.Leds;
   #endif
+  // RadioStack Specific
+  components CC2420TimeSyncMessageC;
+  components CC2420PacketC;
+  TsyncP.PacketTimeStamp -> CC2420PacketC;
+  TsyncP.BeaconSend -> CC2420TimeSyncMessageC.TimeSyncAMSendMicro[AM_BEACON];
+  TsyncP.TimeSyncPacket -> CC2420TimeSyncMessageC.TimeSyncPacketMicro;
   }
 

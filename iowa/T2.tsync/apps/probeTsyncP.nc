@@ -36,6 +36,7 @@
  */
 //--EOCpr712 (do not remove this line, which terminates copyright include)
 
+#include "OTime.h"
 #include "Beacon.h"
 #include "Timer.h"
 

@@ -41,36 +41,20 @@
 #include "Tnbrhood.h"
 #include "PowCon.h"
 
-#if defined(PLATFORM_TELOSB)
-// Telosb microsecond resolution-timer has about 0.5% accuracy
-// over time;  not good!  Except, when interval is around 6200
-// microseconds, it still beats the 32kHz counter, because a 
-// jiffie for the latter is 30.5 microseconds
-enum { MICROSEC_BETTER = 6200 };
-#endif
-#if defined(PLATFORM_MICAZ) & !defined(MIXED_CC2420)
-// structure for timestamp recording, local to this module
-typedef struct timeTable {
-  uint32_t timeMicro;    // 32-bit value, from Microsecond counter
-  uint16_t key;          // a "time" for an SFD detection event
-  } timeTable;       
-enum { timeTableSize = 3 };
-#endif
-
 module TsyncP {
   provides interface Tsync;
   provides interface Boot as componentBoot;
   uses {
     interface Boot;
-    interface RadioTimeStamping;
-    interface CC2420PacketBody;
-    interface CC2420Transmit;
     interface Counter<T32khz,uint16_t>;
     interface SplitControl as AMControl;
-    interface AMSend as BeaconSend; 
     interface Receive as BeaconReceive;
     interface AMSend as ProbeSend;
     interface AMSend as ProbeDebug;
+    // interface AMSend as BeaconSend; 
+    interface TimeSyncAMSend<TMicro,uint32_t> as BeaconSend;
+    interface TimeSyncPacket<TMicro,uint32_t>;
+    interface PacketTimeStamp<TMicro,uint32_t>;
     interface Receive as ProbeReceive;
     interface OTime;
     interface Leds as MsgLeds;
@@ -117,10 +101,6 @@ implementation {
   int16_t showDiff;   
   beaconMsg buf;
   bool bufFree;
-  #if defined(PLATFORM_MICAZ) & !defined(MIXED_CC2420)
-    norace timeTable timTab[timeTableSize];
-    uint8_t timeIndx = 0;
-  #endif
   /*---------------- end of variables for received beacon --------*/
 
   /***** variables for responding to a probe **********************/
@@ -128,9 +108,6 @@ implementation {
 
   /***** variables for generating a beacon ************************/ 
   message_t msg;       
-  norace uint32_t xDelay;    // for Delay calculation
-  norace uint32_t yDelay;    // (microsec) for Delay calculation
-  norace uint8_t delay[4];   // mini-buffer for CC2420 write
   bool msgFree;
   /*---------------- end of variables for generating a beacon ----*/
 
@@ -140,16 +117,6 @@ implementation {
     c->ClockH = a->ClockH ^ b->ClockH;
     c->ClockL = a->ClockL ^ b->ClockL;
     }
-
-  #if defined(PLATFORM_MICAZ) & !defined(MIXED_CC2420)
-  /*** function for lookup by "time" in timTab array of timeTable ******/
-  timeTable* ttFind(uint16_t t) {
-    uint8_t i;
-    for (i=0; i<timeTableSize; i++) if (timTab[i].key == t) break;
-    if (i < timeTableSize) return &timTab[i];
-    return NULL;
-    }
-  #endif
 
   /*** task to initialize variables, signal other components to init ***/
   task void allInit() {
@@ -204,40 +171,36 @@ implementation {
     }
 
   /***** build a basic beacon message *****************************/ 
-  void buildBeacon( beaconMsgPtr p ) {  // note: p may be unaligned
+  uint32_t buildBeacon( beaconMsgPtr p ) {  // note: p may be unaligned
     beaconMsg bMsg;
     timeSync_t genTime;
+    uint32_t stamptime;
     bMsg.mode = mode;
     bMsg.NbrSize = call Tnbrhood.Nsize();
     bMsg.sndId = TOS_NODE_ID;
     bMsg.prevDiff = showDiff;
     showDiff = 16000 + DEBUGCOUNT;
     call OTime.pubLocalTime( &genTime );
+    stamptime = call OTime.getStableMicro32();
     bMsg.Local = genTime;
-    bMsg.Delay = 0;
-    #if defined(PLATFORM_TELOSB)
-     xDelay = call OTime.getNative32();
-     #if defined(USE_MICROSECOND_CLOCK)
-     yDelay = call OTime.getNativeMicro();
-     #endif
-    #elif defined(PLATFORM_MICAZ)
-    yDelay = call OTime.getNativeMicro();
-    #endif
     call OTime.conv1LocalTime( &genTime );   
     bMsg.Virtual = genTime;
     timeSyncXOR(&bMsg.Local,&bMsg.Virtual,&bMsg.Xor);
     memcpy((uint8_t*)p,(uint8_t*)&bMsg,sizeof(beaconMsg));
+    return stamptime;
     }
 
   /***** Generate a beacon ****************************************/ 
   task void genBeacon() {
+    uint32_t stamptime;
     error_t r;
     // cases for skipping the beacon this time
     if (TOS_NODE_ID == 0 || !msgFree) return;
     call MsgLeds.led0Toggle();
     msgFree = FALSE;
-    buildBeacon((beaconMsgPtr)&msg.data); 
-    r = call BeaconSend.send(AM_BROADCAST_ADDR, &msg, sizeof(beaconMsg)); 
+    stamptime = buildBeacon((beaconMsgPtr)&msg.data); 
+    r = call BeaconSend.send(AM_BROADCAST_ADDR, 
+                             &msg, sizeof(beaconMsg), stamptime); 
     if (r != SUCCESS) { 
        call Wakker.soleSet(1,1);  // retry soon:  somebody else had channel
        msgFree = TRUE; 
@@ -337,21 +300,6 @@ implementation {
        }
     }
 
-  /***** Adjust beacon times for MAC delay ************************/ 
-  bool adjMacDelay( beaconMsgPtr q ) {
-    uint32_t w;
-    if (q->Delay == 0) return FALSE;
-    if (q->Delay > MAX_MAC_DELAY) return FALSE;  // Sanity check
-    w = q->Virtual.ClockL;
-    w = q->Virtual.ClockL + q->Delay;
-    if (w < q->Virtual.ClockL) q->Virtual.ClockH++;
-    q->Virtual.ClockL = w;
-    w = q->Local.ClockL + q->Delay;
-    if (w < q->Local.ClockL) q->Local.ClockH++; 
-    q->Local.ClockL = w;
-    return TRUE;
-    }
-
   /***** record (for skew) incoming beacon if it is sane **********/ 
   int8_t saneRecord( beaconMsgPtr q, timeSyncPtr loc ) {
     // loc should be local Clock corresonding to arrival time of q
@@ -422,9 +370,6 @@ implementation {
       mode &= ~MODE_DISCARD;   // don't forget: remove discard bit
       return (void)(bufFree = TRUE); 
       }
-
-    // compensate for MAC delay, if that is possible to do
-    if (!adjMacDelay(q)) return (void)(bufFree = TRUE); 
 
     // for experiments, reject some addresses
     if (!(call Neighbor.allow(q->sndId))) return (void)(bufFree = TRUE);
@@ -610,48 +555,21 @@ implementation {
       bufFree = TRUE;  // shouldn't be executed.
     }
 
-  /***** Determine receiveTime for a Beacon or Probe message ******/
+  /***** Determine receiveTime for a Beacon message ******/
   // return TRUE if the time is calculated, otherwise FALSE because
   // of rollover or some other condition
   bool calcReceiveTime(message_t* m, timeSyncPtr z) {
     timeSync_t myStamp;
-    cc2420_metadata_t* q;
-    #if defined(PLATFORM_MICAZ) & !defined(MIXED_CC2420)
-    timeTable* v;
-    uint32_t recClockMicro;
-    #else
-    uint16_t curClock;
-    #endif
+    uint32_t stamptime;
     if (!bufFree) return FALSE; 
-    q = call CC2420PacketBody.getMetadata(m);
-
-    #if defined(PLATFORM_MICAZ) & !defined(MIXED_CC2420)
-      v = ttFind(q->time);
-      if (v == NULL) return FALSE;
-      call OTime.getLocalTime(z);    // current Local clock 
-      recClockMicro = call OTime.getLastLTMicro();  // & associated microsec  
-      if (recClockMicro < v->timeMicro) return FALSE; // abort if clock rollover
-      myStamp.ClockL = recClockMicro - v->timeMicro;
-      myStamp.ClockH = 0;
-      call OTime.subtract(z,&myStamp,z);
-      // Postcondition:  z is the local time when msg was received
-
-    #else
-      call OTime.getLocalTime(z); 
-      curClock = call Counter.get();   // 32768Hz on Telos, 28800Hz on MicaZ
-      if (curClock <= q->time) return FALSE; // this code can't tolerate rollover
-      myStamp.ClockL = curClock - q->time;
-      // the following conversion (multiply by 32) works on either 
-      // Telos or MicaZ platforms, converting to native microseconds
-      myStamp.ClockL = myStamp.ClockL << 5;  // convert to Microseconds
-      myStamp.ClockH = 0;
-      #if defined(PLATFORM_MICAZ) & defined(MIXED_CC2420)
-      call OTime.Z2Tels(&myStamp.ClockL);   // convert to binary microseconds
-      #endif
-      call OTime.subtract(z,&myStamp,z);
-      // Postcondition:  z is the local time when msg was received
-    #endif
-
+    stamptime = call TimeSyncPacket.eventTime(m); 
+    if (!(call TimeSyncPacket.isValid(m))) return FALSE;
+    myStamp.ClockL = call OTime.getStableMicro32();
+    if (stamptime >= myStamp.ClockL) return FALSE;
+    myStamp.ClockL -= stamptime;   
+    myStamp.ClockH = 0;
+    call OTime.getLocalTime(z);
+    call OTime.subtract(z,&myStamp,z);
     return TRUE;
     }
 
@@ -680,13 +598,21 @@ implementation {
     beaconProbeAck pamsg;
     beaconProbeMsg q;
     timeSync_t probeTime;
+    timeSync_t stamptime;
+    uint32_t current;
 
     if (!bufFree) return m; 
-    if (!calcReceiveTime(m,&probeTime)) return m;
+    if (!(call PacketTimeStamp.isValid(m))) return m;
+    stamptime.ClockL = call PacketTimeStamp.timestamp(m);
+    call OTime.getLocalTime(&probeTime);
+    current = call OTime.getStableMicro32();
+    if (current < stamptime.ClockL) return m;
+    stamptime.ClockL = current - stamptime.ClockL;
+    stamptime.ClockH = 0;
+    call OTime.subtract(&probeTime,&stamptime,&probeTime);
 
     call MsgLeds.led1Toggle();
     memcpy((uint8_t*)&q,(uint8_t*)pl,sizeof(beaconProbeMsg));
-
     pamsg.mode = mode;
     pamsg.skew = call OTime.getSkew();
     pamsg.calibRatio = call OTime.calibrate();
@@ -704,7 +630,6 @@ implementation {
     #ifdef TUART
     beaconMsgPtr p = (beaconMsgPtr)&msg.data;
     buildBeacon(p);  // get fresh times (to be exact)
-    p->Delay = 0;    // no delay known for UART
     if (SUCCESS == call 
       UARTSend.send(AM_UART_ADDR, &msg, sizeof(beaconMsg))) return;
     #endif
@@ -745,52 +670,6 @@ implementation {
     call Wakker.clear();
     }
 
-  // events for timestamping
-  async event void RadioTimeStamping.transmittedSFD(uint16_t time, 
-                                                    message_t* m) {
-    uint32_t ct; 
-    if (m != &msg) return;
-    #if defined(PLATFORM_TELOSB)
-     #if !defined(USE_MICROSECOND_CLOCK)
-     ct = call OTime.getNative32();
-     if (ct <= xDelay ) xDelay = 0; 
-     else               xDelay = ct - xDelay; 
-     #else
-     ct = call OTime.getNative32();
-     if (ct <= xDelay ) xDelay = 0; 
-     else               xDelay = ct - xDelay; 
-     if (xDelay < MICROSEC_BETTER) {  // for Telos architecture only
-       ct = call OTime.getNativeMicro();  // can improve using Microsec timer
-       if (ct > yDelay) xDelay = ct - yDelay; 
-       }
-     #endif
-    #elif defined(PLATFORM_MICAZ)
-    ct = call OTime.getNativeMicro();
-    if (ct <= yDelay ) yDelay = 0; 
-    else               yDelay = ct - yDelay; 
-    xDelay = yDelay;
-     #if defined(MIXED_CC2420)
-     call OTime.Z2Tels(&xDelay);  // convert to binary microsecond units 
-     #endif  
-    #endif
-    memcpy(delay,(uint8_t*)&xDelay,4);  // copy computed delay to stable buffer
-    call CC2420Transmit.modify(
-         offsetof(message_t,data)+offsetof(beaconMsg,Delay),delay,4);
-    }
-  async event void RadioTimeStamping.receivedSFD(uint16_t time) { 
-    #if defined(PLATFORM_MICAZ) & !defined(MIXED_CC2420)
-    atomic {
-       timeIndx = (timeIndx >= timeTableSize) ? 0 : timeIndx;
-       timTab[timeIndx].key = time;
-       timTab[timeIndx].timeMicro = call OTime.getNativeMicro();
-       // += 800 result ~ 1.1msec
-       // timTab[timeIndx].timeMicro += 2000;  // an ad-hoc correction factor
-       timeIndx = timeIndx + 1;
-       }
-    #endif
-    }
-  // provided because CC2420Transmit interface is used
-  async event void CC2420Transmit.sendDone(message_t* t, error_t e) { }
   async event void Counter.overflow() { }
   }
 

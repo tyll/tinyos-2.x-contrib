@@ -1,9 +1,0 @@
-
- - If Traffic Class & Flow Control are passed inline, they form a 28
-bit field.  this means that following fields (next header, HC2 fields)
-are not byte aligned.  However, the implementation will add 4 padding
-bits following HC1 fields before the HC2 fields (if present).
-
-
- - must match link-layer sender with fragment tag when reconstructing.
- - must add fragment pool to allow out-of-order delivery.

@@ -1,0 +1,35 @@
+NodeConnectivity is used to simulate constrained networks.
+
+Usage:
+
+You'll need:
+
+1) An .nss file.  Describes with virtual node ID's (i.e. ones not
+corresponding to physical reality on MoteLab) which nodes can talk to each
+other.  Note that the error rates are _bit level_, not packet level.  For now
+just 1.0's (== no connectivity) and 0.0's (perfect connectivity) are used.
+
+2) A mapping file.  See exampleMap.txt.  This describes how to map the
+virtual node ID's in the .nss file onto MoteLab (or other)
+TOS_LOCAL_ADDRESS's.
+
+3) createNodeConnectivityM.pl.  Given the above two files generates a TinyOS
+component NodeConnecitivityM.nc.  Link this into your binary and you can use
+calls similar to the following:
+
+  bool connResult =
+    call NodeConnectivity.connected(fromMote, toMote);
+
+The best place to do this constraining is probably in Receive.receive() but
+it could be used on the send end as well (assuming that you are sending to a
+specific mote and not to TOS_BCAST_ADDR).
+
+NOTES:
+  
+  Nodes that do not appear in the mapping file will not be able to
+  communicate with any other nodes.
+
+  This directory includes topos/ which has a bunch of example topology files
+  that could be used to create topologies of different types.
+
+  Doing this requires care and use of the MoteLab connectivity information.

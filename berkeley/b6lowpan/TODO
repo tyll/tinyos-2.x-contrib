@@ -1,0 +1,71 @@
+ 
+ @title TODO list
+ @author Stephen Dawson-Haggerty <stevedh@eecs.berkeley.edu>
+ @release public
+---------------------------------------------------------------------
+
+There are many areas where the b6lowpan IP stack falls short.  This
+document is a list of them, with suggested projects to fix them.
+Patches are appreciated; they should be sent to
+stevedh@eecs.berkeley.edu.  Much of this work could be accomplished by
+integrating previous ideas and implementations into the stack to make
+it easy to use.
+
+
+ 1. MAC
+---------------------------------------------------------------------
+   a. Low Power
+        The stack works in small deployments with the default LPL layer in
+        TinyOS; however, the performance is poor due to long receive
+        checks.  Optimizing this layer is an important task so that
+        TinyOS has a real low-power stack which works well.
+   b. EUID-64 Address mode
+        The current TinyOS MAC does not support the 64-bit addressing
+        mode of the 802.15.4 radios.  Any new MAC which is developed
+        should provide this support.  Full integration of EUID-64
+        support is likely to be a largeish patch as it requires integration
+        with the header compression layer.  Ideas and code are appreciated.
+
+ 2. Network Architecture
+---------------------------------------------------------------------
+
+There have been many proposed architectures for the implementation of
+networked protocols in sensor networks.  These
+include NLA and SP as network- and link-layer abstractions.  The
+current implementation does not effectively separate the
+neighbor-table maintenance, forwarding, and routing functions.  It
+is possible to re-architect the stack around such a decomposition,
+although this should not be undertaken without serious thought.
+Discussion and suggestions are welcome.
+
+ 3. Routing
+---------------------------------------------------------------------
+
+The current routing algorithm is appropriate for large, mostly static
+networks.  However, it is not the be-all end-all; certainly much work
+has and will be done on routing.  Performing that work within the IP
+framework makes comparison easy and allows people to experiment with
+different algorithms.  For instance, S4 or DYMO could be used. Working
+code is appreciated and can be integrated in to provide a choices for
+routing.  The current routing interface is broad and concentrates link
+estimation and routing.  Implementers should keep in mind that these
+may be teased apart in the long run.
+
+Multicast is another area where we currently don't implement anything
+and there is a big potential gain.  The simplest approach would be to
+implement only network-wide multicast (something like ff05::1) using
+trickle; this would be a welcome enhancement.  Other more
+sophisticated schemes are also possible; however I would beware of
+increasing the code size for more special-cases schemes.  Including
+these as a compile time option is a good choice.
+
+ 4. Transport
+---------------------------------------------------------------------
+
+There is currently no TCP implementation; architecturally it is not
+clear how to efficiently integrate TCP into the stack.  However, we
+can probably agree on an interface which will allow us sufficient
+flexibility to change the internals while preserving application
+semantics.  Working code is welcome.
+
+Other more novel transport protocols are also solicited.

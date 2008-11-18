@@ -281,7 +281,13 @@ implementation {
         call SpiResource.release();
       }
       
-      if ( m_timestamp_size && rxFrameLength > 10 ) {
+      //new packet is buffered up, or we don't have timestamp in fifo, or ack
+      if ( ( m_missed_packets && call FIFO.get() ) || !call FIFOP.get()
+            || !m_timestamp_size
+            || rxFrameLength <= 10) {
+        call PacketTimeStamp.clear(m_p_rx_buf);
+      }
+      else {
           if (m_timestamp_size==1)
             call PacketTimeStamp.set(m_p_rx_buf, m_timestamp_queue[ m_timestamp_head ]);
           m_timestamp_head = ( m_timestamp_head + 1 ) % TIMESTAMP_QUEUE_SIZE;
@@ -292,10 +298,8 @@ implementation {
             m_timestamp_head = 0;
             m_timestamp_size = 0;
           }
-      } else {
-        call PacketTimeStamp.clear(m_p_rx_buf);
-      }
-      
+      } 
+
       // We may have received an ack that should be processed by Transmit
       // buf[rxFrameLength] >> 7 checks the CRC
       if ( ( buf[ rxFrameLength ] >> 7 ) && rx_buf ) {

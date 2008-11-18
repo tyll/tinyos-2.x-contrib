@@ -40,6 +40,7 @@
  */
 
 #include "TestPacketTimeStamp.h"
+#include "Timer.h"
 
 module TestPacketTimeStampP
 {

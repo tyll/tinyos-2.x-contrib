@@ -185,9 +185,7 @@ public class DataLogger implements MessageListener {
 		    	++rxTimes.numSmallErrors;
 		    	rxTimes.sumSmallErrors+=rx_error;
 			    //System.out.println("RXTX  ok: ids ["+txId+"->"+rxId+"  ], msg "+msgId+", exp_time "+exp_rx_time+", time "+rxTime+" (error "+rx_error+")");
-			    	//if (rxTimes.numSmallErrors%1000==0)
-		    		//System.out.println("Node "+txId+": "+rxTimes.numSmallErrors+" RX timestamps without error (avg "+(rxTimes.sumSmallErrors/rxTimes.numSmallErrors)+")");
-		    }		
+		    }
 		}
 		for (TxRx txRxId:rx_node_times.keySet())
 			if (txId==txRxId.tx && txRxId.rx>rxId)// && (rxId==FILTER_RX_ID||txRxId.rx==FILTER_RX_ID))
@@ -208,8 +206,6 @@ public class DataLogger implements MessageListener {
 				    	++rxTimes.numSmallErrors2;
 				    	rxTimes.sumSmallErrors2+=rx_error;
 					    //System.out.println("RXRX  ok: ids ["+txRxId.tx+"->"+rxId+","+txRxId.rx+"], msg "+msgId+", exp_time "+exp_rx_time+", time "+rxTime+" (error "+rx_error+")");
-					    	//if (rxTimes.numSmallErrors2%1000==0)
-				    		//System.out.println("Node "+rxId+": "+rxTimes.numSmallErrors2+" RX/RX timestamps without error (avg "+(rxTimes.sumSmallErrors2/rxTimes.numSmallErrors2)+")");
 				    }		
 				}
 			}

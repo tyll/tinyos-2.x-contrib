@@ -451,7 +451,6 @@ void upd_source_route(struct source_header *sh, hw_addr_t addr) {
 
 int remove_sourceroute(struct split_ip_msg *msg) {
   struct source_header *sh;
-  struct rinstall_header *rih;
   struct generic_header *g_hdr;
   uint8_t removeSource = 1;
   if (msg->hdr.nxt_hdr == NXTHDR_SOURCE) {
@@ -475,15 +474,6 @@ int remove_sourceroute(struct split_ip_msg *msg) {
       if ((sh->dispatch & IP_EXT_SOURCE_CONTROLLER) == IP_EXT_SOURCE_CONTROLLER)
         return 1;
     
-
-      // If this is an rinstall header moving through, we need to
-      //  updated the current position of the path, similar to
-      //  what we do for source headers.
-      if (sh->nxt_hdr == NXTHDR_INSTALL) {
-        rih = msg->headers->next->hdr.rih;
-        rih->current++;
-        info("Incrementing current of rih to 0x%x\n", rih->current);
-      }
     }
     if (removeSource) {
       msg->hdr.nxt_hdr = sh->nxt_hdr;
@@ -498,8 +488,6 @@ int remove_sourceroute(struct split_ip_msg *msg) {
 
 
 void handle_serial_packet(struct split_ip_msg *msg) {
-  path_t* tPath;
-  path_t* i;
 #ifdef DBG_TRACK_FLOWS
   uint8_t flags = 0x00;
 #endif
@@ -521,36 +509,6 @@ void handle_serial_packet(struct split_ip_msg *msg) {
         msg->hdr.dst_addr[15] != __my_address[15]))) {
       info("Received packet destined to 0x%x\n", msg->hdr.dst_addr[15]);
      
-     // If this packet is not source routed, check to see if we're on the best path before
-     //  issuing a route install
-     if (msg->hdr.nxt_hdr != NXTHDR_SOURCE) { 
-       tPath = nw_get_route(cmpr_from_IP(msg->hdr.src_addr), cmpr_from_IP(msg->hdr.dst_addr));
-        for (i = tPath; i != NULL; i = i->next) {
-          if (i->node == cmpr_from_IP(__my_address)) {
-	    info("Not installing route for packet from 0x%x to 0x%x (on best path)\n", 
-                 cmpr_from_IP(msg->hdr.src_addr), cmpr_from_IP(msg->hdr.dst_addr));
-            nw_free_path(tPath);
-            ip_to_pan(msg);
-            return;
-          }
-        }
-        nw_free_path(tPath);
-      }
-      
-      // We send the route installation packet before forwarding the actual
-      //  packet, with the thinking being that the route can be set up, in
-      //  case acks are issued by the destination on the packet
-      //
-      // We have to first select the flags that we want:
-     
-      //  At this point, if it's not source routed, then this packet
-      //  shouldn't be coming through us so we install a route
-      if (msg->hdr.nxt_hdr != NXTHDR_SOURCE) {
-        info("installing route for packet from 0x%x to 0x%x\n", 
-             cmpr_from_IP(msg->hdr.src_addr), cmpr_from_IP(msg->hdr.dst_addr));
-      } else {
-        info("Packet had a source header so no route install\n"); 
-      }
       ip_to_pan(msg);
       // do routing
   } else {
@@ -840,9 +798,6 @@ int serial_input() {
         if (ntoh16(msg->hdr.plen) > INET_MTU - sizeof(struct ip6_hdr)) goto discard_packet;
 
         msg->metadata.sender = pkt.src;
-        if (u_info.rih != NULL)
-          info("Has a rinstall_header for src 0x%x with match: 0x%x\n", 
-               pkt.src, ntoh16(u_info.rih->match.dest));;
 
         ip_memcpy(u_info.header_end, u_info.payload_start, ntoh16(msg->hdr.plen));
 #ifdef DBG_TRACK_FLOWS

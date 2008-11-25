@@ -50,7 +50,20 @@ implementation {
   
   command am_addr_t SSSender.getDestination(message_t* pkt) {
     dbg("SensorSchemeC", "CollectionSender.getDestination\n");
+/* If running in TOSSIM return the COLLECTION_ROOTNODE id (0). else
+ * if this node is the root return the id of this node.
+ * else return the ID of the parent node.... Not sure if this is the
+ * correct behaviour. Might need some debugging
+ */
+#ifdef TOSSIM
     return COLLECTION_ROOTNODE;
+#elif defined(COLLECTION_ROOT)
+    return TOS_NODE_ID;
+#else
+    am_addr_t parent;
+    call CtpInfo.getParent(&parent);
+    return parent;
+#endif
   }
   
   command error_t SSSender.send(am_addr_t addr, message_t* pkt, uint8_t *dataEnd) {

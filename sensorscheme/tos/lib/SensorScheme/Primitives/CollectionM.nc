@@ -5,6 +5,8 @@
 
 includes SensorScheme;
 
+#include "printf.h"
+
 module CollectionM {
   provides {
     interface SSSender as CollectSSSender;
@@ -12,6 +14,7 @@ module CollectionM {
     interface SSReceiver as InterceptSSReceiver;
     interface SSPrimitive as Parent;
     interface SSPrimitive as Neighbors;
+    interface SSPrimitive as Etx;
   }
   uses {
     interface SSRuntime;
@@ -44,11 +47,22 @@ implementation {
   task void serialEchoTask();
 
   error_t startCollector() {
+
+    printf("running startCollector\n");
+    printfflush();
+
     error_t result = call CollectControl.start();
+#ifdef TOSSIM
     if (result == SUCCESS && TOS_NODE_ID  == COLLECTION_ROOTNODE) {
 	    call RootControl.setRoot();
-      return call SerialControl.start();
+	    return call SerialControl.start();
     }
+#elsif defined(COLLECTION_ROOT))
+    if (result == SUCCESS) {
+	    call RootControl.setRoot();
+            return call SerialControl.start();
+    }
+#endif
     return result;
   }
   
@@ -104,7 +118,20 @@ implementation {
   }
   
   command am_addr_t CollectSSSender.getDestination(message_t* pkt) {
+/* If running in TOSSIM return the COLLECTION_ROOTNODE id (0). else
+ * if this node is the root return the id of this node.
+ * else return the ID of the parent node.... Not sure if this is the
+ * correct behaviour. Might need some debugging
+ */
+#ifdef TOSSIM
     return COLLECTION_ROOTNODE;
+#elif defined(COLLECTION_ROOT)
+    return TOS_NODE_ID;
+#else
+    am_addr_t parent;
+    call CtpInfo.getParent(&parent);
+    return parent;
+#endif
   }
   
   command error_t CollectSSSender.send(am_addr_t addr, message_t* pkt, uint8_t *dataEnd) {
@@ -198,7 +225,20 @@ implementation {
   }
   
   command am_addr_t InterceptSSSender.getDestination(message_t* pkt) {
+/* If running in TOSSIM return the COLLECTION_ROOTNODE id (0). else
+ * if this node is the root return the id of this node.
+ * else return the ID of the parent node.... Not sure if this is the
+ * correct behaviour. Might need some debugging
+ */
+#ifdef TOSSIM
     return COLLECTION_ROOTNODE;
+#elif defined(COLLECTION_ROOT)
+    return TOS_NODE_ID;
+#else
+    am_addr_t parent;
+    call CtpInfo.getParent(&parent);
+    return parent;
+#endif
   }
   
   command error_t InterceptSSSender.send(am_addr_t addr, message_t* pkt, uint8_t *dataEnd) {
@@ -208,10 +248,29 @@ implementation {
   default error_t command CollectSend.send(message_t *msg, uint8_t len) {
     return FAIL;
   }
-  
+
+  command ss_val_t Etx.eval(){
+    uint16_t etx;
+    error_t ret;
+    printf("Evalling etx");
+    ret=call CtpInfo.getEtx(&etx);
+    if(ret==SUCCESS){
+      return ss_makeNum(etx);
+    } else {
+      return ss_makeNum(-1);
+    }
+  }; 
+ 
   command ss_val_t Parent.eval() {
+    // Changed by Ardjan to actually return the parent...... Will this work?
     am_addr_t parent;
-    return ss_makeNum(call CtpInfo.getParent(&parent));
+    error_t res;
+    res=call CtpInfo.getParent(&parent);
+    if(res==SUCCESS){
+      return ss_makeNum(parent);
+    } else {
+      return ss_makeNum(-1);
+    }
   };
   
   command ss_val_t Neighbors.eval() {

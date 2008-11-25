@@ -18,10 +18,11 @@ push( @includes, qw(
   %T/../../tinyos-2.x-contrib/blaze/tos/chips/ccxx00/acks
   %T/../../tinyos-2.x-contrib/blaze/tos/chips/ccxx00/alarm
   %T/../../tinyos-2.x-contrib/blaze/tos/chips/ccxx00/am
-  %T/../../tinyos-2.x-contrib/blaze/tos/chips/ccxx00/cc1100
-  %T/../../tinyos-2.x-contrib/blaze/tos/chips/ccxx00/cc2500
+  %T/../../tinyos-2.x-contrib/blaze/tos/chips/ccxx00/radios/cc1100
+  %T/../../tinyos-2.x-contrib/blaze/tos/chips/ccxx00/radios/cc2500
   %T/../../tinyos-2.x-contrib/blaze/tos/chips/ccxx00/crc
   %T/../../tinyos-2.x-contrib/blaze/tos/chips/ccxx00/csma
+  %T/../../tinyos-2.x-contrib/blaze/tos/chips/ccxx00/csma/singlesense
   %T/../../tinyos-2.x-contrib/blaze/tos/chips/ccxx00/init
   %T/../../tinyos-2.x-contrib/blaze/tos/chips/ccxx00/interfaces
   %T/../../tinyos-2.x-contrib/blaze/tos/chips/ccxx00/link
@@ -35,18 +36,6 @@ push( @includes, qw(
   %T/../../tinyos-2.x-contrib/blaze/tos/chips/ccxx00/spi
   %T/../../tinyos-2.x-contrib/blaze/tos/chips/ccxx00/transmit
   %T/../../tinyos-2.x-contrib/blaze/tos/chips/ccxx00/unique
-
-  ## Ghostrider supporting libraries
-  %T/interfaces
-  %T/system
-  %T/lib/net/ctp
-  %T/lib/queue
-  %T/lib/rfresource
-  %T/lib/tmdcontrol
-  %T/chips/rrc_msp430
-  %T/chips/rrc_msp430/flash
-  %T/chips/rrc_msp430/dma
-  %T/chips/rrc_stm25p
 
   ## trunk/tinyos-2.x Directories
   %T/../../tinyos-2.x/tos/interfaces

@@ -2,11 +2,12 @@
   
   (require (lib std) (lib collection) (lib network))
   
-  (define (time-loop) 
-    (call-at-time (+ (now) 256) time-loop)
-    (send-collect (msg sense-val (now) (parent) (neighbors))))
+  (define (time-loop t) 
+    (call-at-time (+ t 256) time-loop)
+    (send-collect (msg sense-val t (etx) (parent) (neighbor-quality)))
+    (print t (etx) (parent) (neighbor-quality)))
   
-  (time-loop)
+  (time-loop (now))
   
-  (include recv-intercept)  
+  ;(include recv-intercept)  
   )

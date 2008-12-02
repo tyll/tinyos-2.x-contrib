@@ -8,7 +8,6 @@
 #include <setjmp.h>
 #include "message.h"
 #include "SensorScheme.h"
-#include "printfdebug.h"
 
 module SensorSchemeC {
   uses {
@@ -223,7 +222,7 @@ implementation {
       ss_val_t tQueue = sendQueue;
       uint8_t *data = call Sender.getPayload[sndRoutine](sendPacket);
       sndData = data;
-      pr_dbg_f("SensorSchemeGC", "end of message or failed: %i\n", data[0]);
+      dbg("SensorSchemeGC", "end of message or failed: %i\n", data[0]);
       sndEnd = call Sender.getPayloadEnd[sndRoutine](sendPacket);
       sndAddr = call Sender.getDestination[sndRoutine](sendPacket);
       while (!isNull(tQueue)) {
@@ -512,7 +511,7 @@ MARK_DOWN:
   ss_val_t gc(ss_val_t a, ss_val_t b) {
     /* indicate garbage collection in progress */
     ss_val_t res;
-    pr_dbg("SensorSchemeGC", "GC: <");
+    dbg("SensorSchemeGC", "GC: <");
 #ifndef TOSSIM
     call Leds.led2On();
 #endif
@@ -557,7 +556,7 @@ GC_SUCCESS:
 #ifndef TOSSIM        
         call Leds.led2Off();
 #endif        
-        pr_dbg_clear_f("SensorSchemeGC", "> %u, %u\n", res.idx - CELLS_START, length(ss_stack));
+        dbg_clear("SensorSchemeGC", "> %u, %u\n", res.idx - CELLS_START, length(ss_stack));
         return res;
   }
 
@@ -1106,7 +1105,6 @@ RD_DOT:
 WR_START: {
     sendPacket = call MsgPool.get();
     if (!sendPacket) {
-      //printf("No packet in pool for writing.\n");call PrintfFlush.flush();
       dbgerror("SensorSchemeError", "No packet in pool for writing!.\n");
       do_return(SYM_FALSE); // sending didn't succeed, just fail returning FALSE. TODO: make robust!!
     }
@@ -1253,22 +1251,22 @@ freeCell.idx = CELLS_END;
           }
           case EBUSY: {
             /* TODO: change it to retry transmission
-               for now just fall-through to FAIL */
+               for now just report failure */
             dbg("SensorSchemeWR", "send EBUSY\n");
-          }
+          } break;
           case EOFF: {
             dbg("SensorSchemeWR", "send EOFF\n");
-          }
+          } break;
           case FAIL: {
             dbg("SensorSchemeWR", "send FAIL\n");
-          }
+          } break;
           default: {
             dbg("SensorSchemeWR", "send not succeded with unknown error.\n");
-            call MsgPool.put(sendPacket);
-            /* Continuation already in 'ss_value' */
-            callContinuation(ss_value, SYM_FALSE);
           }
         }
+        call MsgPool.put(sendPacket);
+        /* Continuation already in 'ss_value' */
+        callContinuation(ss_value, SYM_FALSE);
       }}
       *sndData = bits;
       sndData++;

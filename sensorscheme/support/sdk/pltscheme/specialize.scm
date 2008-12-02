@@ -141,27 +141,21 @@
             (cond [(equal? left right) left]
                   [else `(if ,sp-pred ,left ,right)])))))
   
-  (define (specialize-lambda env params body)
-    (let* ([body-env (append (reverse (map (lambda (p) (list p 'var)) params)) env)]
-           [new-body (map (cut specialize-expr body-env <>) body)])
-      (printi "specialize-lambda ~s ~s~n" params new-body)
-      `(%proc% ,env ,params ,@new-body)))
   
   (define (specialize-expr env expr)
     (printi-up "specialize-expr ~s with ~s~n" expr env)
     (let ([res (match expr
+                 [(or (list 'quote _) (? number? _) (? null? _) (? boolean? _) (? string? _)) expr]
                  [(list '%include% syms ...) (printi "syms: ~s~n" syms) (map find-global syms) expr]
                  [(list 'if pred conseq alt) (specialize-if env pred conseq alt)]
                  [(list 'if pred conseq) (specialize-if env pred conseq #f)]
-                 [(list 'quote val) expr]
-                 [(list 'set! (? symbol? var) val) (lookup var env) `(set! ,var #;,val ,(specialize-expr env val))]
-                 [(list '%lambda% params body ...) (specialize-lambda env params body)]
+                 [(list 'set! (? symbol? var) val) (lookup var env) `(set! ,var ,(specialize-expr env val))]
+                 [(list '%lambda% params body ...) 
+                  `(%proc% ,env ,params ,@(map (cut specialize-expr (append (reverse (map (lambda (p) (list p 'var)) params)) env) <>) body))]
                  [(list '%proc% _ params body ...) `(%proc% ,env ,params ,@body)]
                  [(list fn exprs ...) (specialize-app env fn exprs)]
                  [(? symbol? sym) (cond [(lookup sym env) => (lambda (v) (if (constant-var? v) (constant-value v) sym))]
                                         [else (raise-user-error 'specialize-program "reference of unknown variable ~s" sym)])]
-                 [(or (? number? _) (? null? _) (? boolean? _) (? string? _)) expr]
-                 
                  [expr (raise-user-error 'specialize-expr "illegal expression: ~s" expr)])])
       (printi-dn "specialize-expr result ~s   :   ~s~n" expr res)
       res))

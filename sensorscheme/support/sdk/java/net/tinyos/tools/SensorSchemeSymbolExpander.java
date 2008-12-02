@@ -33,16 +33,11 @@ public class SensorSchemeSymbolExpander {
 		    	System.exit(1);
 		    }
 		    BufferedReader stdInReader=new BufferedReader(new InputStreamReader(System.in));
-		    try{
-		    	String unexpandedLine;
-		    	while (true){
-		    		unexpandedLine=stdInReader.readLine();
-		    		System.out.println(SensorSchemeUtils.expandSymbols(unexpandedLine, buildMap));
-		    	}
-		    }catch(IOException ioe){
-		    	//End of input? whatever, just quit.
-		    	System.exit(1);
+		    String unexpandedLine=stdInReader.readLine();
+		    while (unexpandedLine != null){
+		    	System.out.println(SensorSchemeUtils.expandSymbols(unexpandedLine, buildMap));
+		    	unexpandedLine=stdInReader.readLine();
 		    }
-		  }
+	}
 
 }

@@ -2,10 +2,9 @@
  * @author Leon Evers
  */
 
+includes printf;
 
 includes SensorScheme;
-
-#include "printf.h"
 
 module PrintPrimM {
   provides interface SSPrimitive;
@@ -16,38 +15,53 @@ module PrintPrimM {
 
 implementation {
 
+#ifdef TOSSIM 
+#define doprint(...) \
+  dbg_clear("SensorSchemePrint", __VA_ARGS__) 
+#define doflush() 
+#else
+#define doprint(...) \
+  printf(__VA_ARGS__) 
+
+#define doflush() \
+  printfflush() 
+#endif
+
+  
   void printElem(ss_val_t val) {
     if (isNull(val)) {
-      printf("()");
+      doprint("()");
     } else if (isSymbol(val)) {
-      printf("%%s%i", C_symVal(val));
+      doprint("%%s%i", C_symVal(val));
     } else if (isNumber(val)) {
-      printf("%li", C_numVal(val));
+      doprint("%li", C_numVal(val));
     } else if (isPair(val)) {
-      printf("(");
+      doprint("(");
       while (isPair(val)) {
         printElem(car(val));
         if (isPair(cdr(val))) {
-          printf(" ");
+          doprint(" ");
         }
         val = cdr(val);
       }
-      printf(")");
+      doprint(")");
     }
   }
 
   command ss_val_t SSPrimitive.eval() {
     ss_val_t val = ss_args;
-    dbg("");
+#ifdef TOSSIM 
+    dbg("SensorSchemePrint", ""); 
+#endif
     while (isPair(val)) {
       printElem(car(val));
       if (isPair(cdr(val))) {
-        printf(" ");
+        doprint(" ");
       }
       val = cdr(val);
     }
-    printf("\n");
-    printfflush();
+    doprint("\n");
+    doflush();
     return SYM_FALSE;
   }
 }

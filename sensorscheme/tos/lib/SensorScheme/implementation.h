@@ -30,12 +30,4 @@ implementation {
   APPLY_PRIM_LIST(APPLY_PRIM_CONFIG)
   SEND_PRIM_LIST(SEND_PRIM_CONFIG)
   RECEIVER_LIST(RECEIVER_CONFIG)
-
-#ifdef DO_PRINTF_DBG
-  components PrintfC;
-
-//  App.PrintfControl -> PrintfC;
-//  App.PrintfFlush -> PrintfC;
-
-#endif // DO_PRINTF_DBG
 }

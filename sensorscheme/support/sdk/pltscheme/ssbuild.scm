@@ -150,7 +150,6 @@
           (printf "
 #include \"Primitives.h\"
 #include \"InitMessage.h\"
-#include \"printfdebug.h\"
 
 configuration SensorSchemeAppC {}
 
@@ -184,7 +183,6 @@ CFLAGS += -I$(TOSDIR)/lib/SensorScheme \\
     
     (unless (null? make-args)
       (printf "executing \"make ~a\" to build TinyOS application~n" (string-join make-args " "))
-      (system (format "make ~a" (string-join make-args " ")))
-      '())))
+      (exit (system (format "make ~a" (string-join make-args " ")))))))
 
 (main (current-command-line-arguments))

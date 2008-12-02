@@ -3,18 +3,19 @@
  */
 
 
-includes SensorScheme;
+includes printf;
 
-#include "printf.h"
+includes SensorScheme;
 
 module CollectionM {
   provides {
     interface SSSender as CollectSSSender;
     interface SSSender as InterceptSSSender;
     interface SSReceiver as InterceptSSReceiver;
+    interface SSPrimitive as Etx;
     interface SSPrimitive as Parent;
     interface SSPrimitive as Neighbors;
-    interface SSPrimitive as Etx;
+    interface SSPrimitive as NeighQuality;
   }
   uses {
     interface SSRuntime;
@@ -47,20 +48,19 @@ implementation {
   task void serialEchoTask();
 
   error_t startCollector() {
-
-    printf("running startCollector\n");
-    printfflush();
-
     error_t result = call CollectControl.start();
-#ifdef TOSSIM
-    if (result == SUCCESS && TOS_NODE_ID  == COLLECTION_ROOTNODE) {
-	    call RootControl.setRoot();
-	    return call SerialControl.start();
-    }
-#elsif defined(COLLECTION_ROOT))
+    dbg("CollectionM", "running startCollector\n");
+    
+#if defined(COLLECTION_ROOT) || defined(TOSSIM) 
     if (result == SUCCESS) {
-	    call RootControl.setRoot();
-            return call SerialControl.start();
+#ifdef TOSSIM
+      if (TOS_NODE_ID == 0)
+#endif
+      {
+        dbg("CollectionM", "setting this node as root\n");    
+  	    call RootControl.setRoot();
+        return call SerialControl.start();
+      }
     }
 #endif
     return result;
@@ -252,32 +252,41 @@ implementation {
   command ss_val_t Etx.eval(){
     uint16_t etx;
     error_t ret;
-    printf("Evalling etx");
     ret=call CtpInfo.getEtx(&etx);
     if(ret==SUCCESS){
       return ss_makeNum(etx);
     } else {
-      return ss_makeNum(-1);
+      return SYM_FALSE;
     }
   }; 
  
   command ss_val_t Parent.eval() {
-    // Changed by Ardjan to actually return the parent...... Will this work?
     am_addr_t parent;
     error_t res;
     res=call CtpInfo.getParent(&parent);
     if(res==SUCCESS){
       return ss_makeNum(parent);
     } else {
-      return ss_makeNum(-1);
+      return SYM_FALSE;
     }
   };
   
   command ss_val_t Neighbors.eval() {
-    uint8_t n;
+    int8_t n;
     ss_val_t res = SYM_NIL;
-    for(n = call CtpInfo.numNeighbors(); n > 0; n--) {
+    for(n = call CtpInfo.numNeighbors()-1; n >= 0; n--) {
       res = ss_cons(ss_makeNum(call CtpInfo.getNeighborAddr(n)), res);
+    }
+    return res;
+  };
+
+  command ss_val_t NeighQuality.eval() {
+    int8_t n;
+    ss_val_t res = SYM_NIL;
+    for(n = call CtpInfo.numNeighbors()-1; n >= 0; n--) {
+      res = ss_cons(ss_cons(ss_makeNum(call CtpInfo.getNeighborAddr(n)), 
+        ss_cons(ss_makeNum(call CtpInfo.getNeighborLinkQuality(n)),
+          ss_cons(ss_makeNum(call CtpInfo.getNeighborRouteQuality(n)), SYM_NIL))), res);
     }
     return res;
   };

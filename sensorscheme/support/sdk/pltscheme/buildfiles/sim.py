@@ -3,6 +3,7 @@ from TOSSIM import *
 import sys
 import os
 import random
+from subprocess import *
 # The number of nodes to use in the simulation
 NUM = 15
 # the duration that the simulation runs in seconds
@@ -21,7 +22,7 @@ r = t.radio ()
 #generate the linkgain.out file from linkconfig.txt
 os.system("java net.tinyos.sim.LinkLayerModel linkconfig.txt")
 
-f = open("../linkgain.out", "r")
+f = open("linkgain.out", "r")
 
 lines = f.readlines()
 for line in lines:
@@ -39,45 +40,49 @@ for line in lines:
   str = line.strip()
   if (str != ""):
     val = int(str)
-    for i in range(1, NUM):
+    for i in range(0, NUM - 1):
       t.getNode(i).addNoiseTraceReading(val)
     n-=1
     if n <= 0: break
 
-for i in range(1, NUM):
+for i in range(0, NUM - 1):
   print "Creating noise model for ",i;
   t.getNode(i).createNoiseModel()
 
-for i in range(1, NUM):
+for i in range(0, NUM - 1):
     tm = int(random.random() * BOOT_TIME * t.ticksPerSecond())
     t.getNode(i).bootAtTime(tm)
     print "Booting ", i, " at time ", tm
 
+p = Popen('java net.tinyos.tools.SensorSchemeSymbolExpander', shell=True, bufsize=1,
+	          stdin=PIPE, stdout=sys.stdout, close_fds=True)	
+t.addChannel("SensorSchemePrint", p.stdin)
+
 #t.addChannel("SensorSchemeDebug", sys.stdout)
-t.addChannel("SensorSchemeC", sys.stdout)
-t.addChannel("SensorSchemeRD", sys.stdout)
-#t.addChannel("SensorSchemeC", os.popen("grep (", "w"))
-t.addChannel("SensorSchemeWR", sys.stdout)
-t.addChannel("LedsC", sys.stdout)
+#t.addChannel("SensorSchemeC", sys.stdout)
+#t.addChannel("SensorSchemeRD", sys.stdout)
+#t.addChannel("SensorSchemeWR", sys.stdout)
+#t.addChannel("LedsC", sys.stdout)
 #t.addChannel("AM", sys.stdout)
 #t.addChannel("TossimPacketModelC", sys.stdout)
 #t.addChannel("Packet", sys.stdout)
-t.addChannel("Boot", sys.stdout)
+#t.addChannel("Boot", sys.stdout)
+#t.addChannel("CollectionM", sys.stdout)
 
 # do something interesting with a newly created SerialPacket
-# note: this only works when tossim is compiled with sin-sf
-#sp = t.newSerialPacket()
+# note: this only works when tossim is compiled with sim-sf
+sp = t.newSerialPacket()
 
-#th = Throttle(t, 1000)
-#th.initialize()
-#sf = SerialForwarder(9009)
+th = Throttle(t, 1000)
+th.initialize()
+sf = SerialForwarder(9002)
 
 while (DURATION  > t.time() / t.ticksPerSecond()):
-#  th.checkThrottle()
-#  sf.process()
+  th.checkThrottle()
+  sf.process()
   t.runNextEvent()
 
-#th.printStatistics()
+th.printStatistics()
 
 print "Completed simulation."
 

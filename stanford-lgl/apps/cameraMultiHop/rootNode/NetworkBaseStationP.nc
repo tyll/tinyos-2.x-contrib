@@ -171,7 +171,7 @@ implementation
   }
 
   event message_t* ReceiveMsgPart.receive(message_t* msg, void* payload, uint8_t len) {
-	  call RadioAMPacket.setType(msg, AM_BIGMSG_FRAME_PART);
+	  call RadioAMPacket.setType(msg, AM_CTP_BIGMSG_FRAME_PART);
 	  memcpy(call RadioPacket.getPayload(msg,len), payload, len);
 	  //call Leds.led1Toggle();
 	  return receive(msg, payload, len);

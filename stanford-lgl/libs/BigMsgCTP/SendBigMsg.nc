@@ -35,26 +35,33 @@
 
 interface SendBigMsg
 {
-	/**
-	 * broadcasts a message
-	 * @param start1 the start of the data to be sent
-	 * @param end1 points one byte after the last byte of the data.
-	 * @return FAIL if the component is busy sending another message
-	 */
-	command error_t send(uint8_t *start_buf, uint32_t total_size);
+    /**
+     * sends a big buffer of data to the base station
+     * @param start_buf - the start of the data to be sent
+     * @param total_size - length of the data.
+     * @return FAIL if the component is busy sending another message
+     */
+    command error_t send(uint8_t *start_buf, uint32_t total_size);
 
-	/**
-	 * Re-Sends parts of a message
-	 * @param start_buf  - the start of the data to be sent
-	 * @param from  - points to the first frame
-	 * @param numFrames - number of consecutive frames to send
-	 * @return FAIL if the component is busy sending another message
-	 */
-	command error_t resend(uint8_t *start_buf, uint16_t from, uint16_t numFrames);
+    /**
+     * Re-Sends parts of a message
+     * @param start_buf  - the start of the data to be sent
+     * @param from  - points to the first frame
+     * @param numFrames - number of next consecutive frames to send (0 sends
+     *                   'from' packet only)
+     * @return FAIL if the component is busy sending another message
+     */
+    command error_t resend(uint8_t *start_buf, uint16_t from, uint16_t numFrames);
 
-	/**
-	 * Fired when a successfully initiated <code>send</code> terminates.
-	 * @param success SUCCESS, if the message was sent succesfully.
-	 */
-	event void sendDone(error_t success);
+    /**
+     * Re-Sends parts of a message, the same as resend(), except it uses
+     * last start_buf pointer.
+     */
+    command error_t resendLast(uint16_t from, uint16_t numFrames);
+    
+    /**
+     * Fired when a successfully initiated <code>send</code> terminates.
+     * @param success SUCCESS, if the message was sent succesfully.
+     */
+    event void sendDone(error_t success);
 }

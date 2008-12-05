@@ -32,31 +32,27 @@
 /**
  * @author Brano Kusy (branislav.kusy@gmail.com)
  */
-#include "BigMsg.h"
+#include "BigMsgCTP.h"
 
 configuration SendBigMsgC
 {
-	provides
-	{
-		interface SendBigMsg;
-	}
+    provides
+    {
+        interface Init;
+        interface SendBigMsg;
+    }
 }
 
 implementation
 {
-	components MainC, SendBigMsgM, LedsC;
+    components MainC, SendBigMsgM, LedsC;
 
-	SendBigMsg = SendBigMsgM.SendBigMsg;
-	SendBigMsgM.Boot -> MainC;
+    SendBigMsg = SendBigMsgM.SendBigMsg;
+    Init = SendBigMsgM;
+    SendBigMsgM.Boot -> MainC;
 
-	components ActiveMessageC as AM;
-	components new CollectionSenderC(AM_CTP_BIGMSG_FRAME_PART) as FrameSendC;
-	SendBigMsgM.AMPacket -> AM;
-	SendBigMsgM.FrameSend -> FrameSendC;
-	SendBigMsgM.Leds -> LedsC;
-	
-#if BIGMSG_TIMER > 0
-  components new TimerMilliC() as Timer0;
-  SendBigMsgM.Timer0 -> Timer0;
-#endif
+    components CollectionC, new CollectionSenderC(AM_CTP_BIGMSG_FRAME_PART) as FrameSendC;
+    SendBigMsgM.CollectionControl -> CollectionC;
+    SendBigMsgM.FrameSend -> FrameSendC;
+    SendBigMsgM.Leds -> LedsC;
 }

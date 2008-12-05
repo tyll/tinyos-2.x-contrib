@@ -64,7 +64,7 @@
  * @date August 10 2005
  */
 
-#include "BigMsg.h"
+#include "BigMsgCTP.h"
 
 configuration NetworkBaseStationC {
 }

@@ -33,70 +33,47 @@
  * @author Brano Kusy (branislav.kusy@gmail.com)
  */
 
-#include "BigMsg.h"
+#include "BigMsgCTP.h"
 
 module SendBigMsgM
 {
   provides
   {
     interface SendBigMsg;
+    interface Init;
   }
 
   uses
   {
     interface Boot;
-    interface Packet;
-    interface Packet as AMPacket;
+    interface StdControl as CollectionControl;
     interface Send as FrameSend;
     interface Leds;
-#if BIGMSG_TIMER > 0
-    interface Timer<TMilli> as Timer0;
-#endif
   }
 }
 
 implementation
 {
   uint8_t *buffer;
-  bigmsg_frame_request_t req;
   uint32_t total_size;
+  bigmsg_frame_request_t req;
+  uint8_t ready = 1;
 
   message_t tx_msg;
 
   event void Boot.booted()
   {
-    buffer = 0;
-  }
-
-  task void processFrame();
-
-#if BIGMSG_TIMER > 0
-  event void Timer0.fired()
-  {
-      if (req.send_next_n_parts)
-      {
-        post processFrame();
-        call Timer0.startOneShot(BIGMSG_TIMER);
-      }
-  }
-#endif
-
-  void nextFrame()
-  {
-#if BIGMSG_TIMER > 0
-      ;
-#else
-      post processFrame();
-#endif
+    call Init.init();
   }
   
-  void startFrame()
+  command error_t Init.init()
   {
-      post processFrame();
-
-#if BIGMSG_TIMER > 0
-      call Timer0.startOneShot(BIGMSG_TIMER);
-#endif
+    call CollectionControl.start();
+    buffer = 0;
+    total_size = 0;
+    req.send_next_n_parts = 0;
+    
+    return SUCCESS;
   }
 
   task void processFrame()
@@ -106,37 +83,34 @@ implementation
     uint32_t buf_offset;
     uint8_t len;
 
+    msgData->part_id = req.part_id;
+    msgData->node_id = TOS_NODE_ID;
     buf_offset = req.part_id<<BIGMSG_DATA_SHIFT;
 
     if (buf_offset >= total_size)
     {
+      call Leds.led0On();
       buffer = 0;
+      ready = 1;
       signal SendBigMsg.sendDone(FAIL);
-      call Leds.led1Toggle();
       return;
     }
 
     len = (total_size - buf_offset < BIGMSG_DATA_LENGTH) ? total_size - buf_offset : BIGMSG_DATA_LENGTH;
-
-    msgData->part_id = req.part_id;
-    msgData->node_id = TOS_NODE_ID;
     memcpy(msgData->buf,&(buffer[buf_offset]),len);
     if (len < BIGMSG_DATA_LENGTH)
       memset(&(msgData->buf[len]),0,BIGMSG_DATA_LENGTH-len);
 
-    //if (call FrameSend.send(&tx_msg, len+BIGMSG_HEADER_LENGTH) == FAIL)
-    //tos java doesn't support variable length messages, so we just send a full length msg
-    if (call FrameSend.send(&tx_msg, BIGMSG_DATA_LENGTH+BIGMSG_HEADER_LENGTH) == FAIL)
-  		nextFrame();
+    if (call FrameSend.send(&tx_msg, BIGMSG_DATA_LENGTH+BIGMSG_HEADER_LENGTH) != SUCCESS)
+      post processFrame();
   }
 
 
   event void FrameSend.sendDone(message_t* bufPtr, error_t error)
   {
-
-    if (error==FAIL)
+    if (error!= SUCCESS)
     {
-      nextFrame();
+      post processFrame();
       return;
     }
 
@@ -144,41 +118,50 @@ implementation
     {
       req.part_id++;
       req.send_next_n_parts--;
-      nextFrame();
-      call Leds.led2Toggle();
+      post processFrame();
     }
     else
+    {
+      ready=1;
       signal SendBigMsg.sendDone(SUCCESS);
+    }
   }
 
   command error_t SendBigMsg.send(uint8_t *start_buf, uint32_t size)
   {
-    if (size==0 )//|| busy==1)
+    if (!ready || size==0)
       return FAIL;
+    ready = 0;
 
     buffer = start_buf;
     req.part_id = 0;
-    req.send_next_n_parts = size>>BIGMSG_DATA_SHIFT;
+    req.send_next_n_parts = (size-1)>>BIGMSG_DATA_SHIFT;
     total_size = size;
-    startFrame();
+    post processFrame();
     return SUCCESS;
   }
 
-  command error_t SendBigMsg.resend(uint8_t *start_buf, uint16_t from, uint16_t numFrames)
+  command error_t SendBigMsg.resend(uint8_t *start_buf, uint16_t from, uint16_t nextNumFrames)
   {
-//    if (buffer!=0)
-//      return FAIL;
-
     buffer = start_buf;
+
+    return call SendBigMsg.resendLast(from, nextNumFrames);
+  }
+
+  command error_t SendBigMsg.resendLast(uint16_t from, uint16_t nextNumFrames)
+  {
+    int end_idx = (total_size-1)>>BIGMSG_DATA_SHIFT;
+    if (!ready || buffer==0 || from > end_idx)
+      return FAIL;
+    ready = 0;
+
     req.part_id = from;
-    req.send_next_n_parts = numFrames;
-    //total_size = numFrames<<BIGMSG_DATA_SHIFT;
-    startFrame();
+    req.send_next_n_parts = ((from+nextNumFrames)>end_idx)?(end_idx-from):nextNumFrames;
+    post processFrame();
 
     return SUCCESS;
   }
 
-  default event void SendBigMsg.sendDone(error_t success)
-  {}
+  default event void SendBigMsg.sendDone(error_t success) {}
 }
 

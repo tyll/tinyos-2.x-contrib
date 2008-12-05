@@ -36,8 +36,6 @@
 #ifndef _BIGMSG_H_
 #define _BIGMSG_H_
 
-#define BIGMSG_TIMER 0 /*set TIMER to 0 to send from SendDone task*/
-
 #define BIGMSG_HEADER_LENGTH 4
 #define BIGMSG_DATA_SHIFT 6
 #define BIGMSG_DATA_LENGTH (1<<BIGMSG_DATA_SHIFT)
@@ -47,20 +45,19 @@
 
 enum
 {
-  AM_CTP_BIGMSG_FRAME_PART=0x8E,
-  AM_BIGMSG_FRAME_PART=0x6e
+  AM_CTP_BIGMSG_FRAME_PART=0x5E
 };
 
 typedef nx_struct bigmsg_frame_part{
-	nx_uint16_t part_id;
-	nx_uint16_t node_id; //ID of the node that sent the image
-	nx_uint8_t buf[BIGMSG_DATA_LENGTH];
+    nx_uint16_t part_id;
+    nx_uint16_t node_id;
+    nx_uint8_t buf[BIGMSG_DATA_LENGTH];
 } bigmsg_frame_part_t;
 
 typedef nx_struct bigmsg_frame_request{
-	nx_uint16_t part_id;
-	nx_uint16_t node_id; //Target node
-	nx_uint16_t send_next_n_parts;
+    nx_uint16_t part_id;
+    nx_uint16_t node_id;
+    nx_uint16_t send_next_n_parts;
 } bigmsg_frame_request_t;
 #endif //_BIGMSG_H_
 

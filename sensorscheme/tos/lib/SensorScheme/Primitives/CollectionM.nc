@@ -35,8 +35,9 @@ module CollectionM {
     interface CtpInfo;
     interface CtpCongestion;
 
-    interface AMPacket as SerialPacket;
-    interface AMSend as SerialSend;
+    interface Packet as SerialPacket;
+    interface AMPacket as SerialAMPacket;
+    interface AMSend as SerialSend[am_id_t id];
 
     interface Queue<message_t*>;
     interface Pool<message_t>;
@@ -163,6 +164,7 @@ implementation {
       dbg("CollectionM", "Queuing for serial, size = %hu.\n", call Queue.size());
       return tmp;
     }
+    dbg("CollectionM", "Not queued for serial, size = %hu.\n", call Queue.size());
     return msg; 
   }
   
@@ -171,13 +173,15 @@ implementation {
       return;
     } else {
       message_t* msg = call Queue.dequeue();
-      uint8_t *ptr = call Packet.getPayload(msg, 0);
-      uint8_t i, len = call Packet.payloadLength(msg);
-      dbg("CollectionM", "Sending packet to serial (from %hu):", call SerialPacket.source(msg));
+      uint8_t *ptr = call SerialPacket.getPayload(msg, 0);
+      uint8_t i, len = call SerialPacket.payloadLength(msg);      
+      am_id_t id = call SerialAMPacket.type(msg);
+      am_addr_t addr = call SerialAMPacket.destination(msg);
+      dbg("CollectionM", "Sending packet to serial (from %hu):", call SerialAMPacket.source(msg));
       for (i = 0; i <  + len; i++) {
         dbg_clear("CollectionM", " %hhx", ptr[i]);
       } dbg_clear("CollectionM", "\n");
-      if (!call SerialSend.send(0xffff, msg, call Packet.payloadLength(msg)) == SUCCESS) {
+      if (!call SerialSend.send[id](addr, msg, len) == SUCCESS) {
         call Pool.put(msg);
       } 
     }
@@ -192,7 +196,7 @@ implementation {
   }
   
   event bool Intercept.forward(message_t *msg, void *payload, uint8_t len) {
-    signal InterceptSSReceiver.receive(msg, call SerialPacket.source(msg), payload, payload+len);
+    signal InterceptSSReceiver.receive(msg, call SerialAMPacket.source(msg), payload, payload+len);
     return FALSE;
   }
   
@@ -200,7 +204,7 @@ implementation {
     return (uint8_t *) call Packet.getPayload(pkt, 0);
   }
 
-  event void SerialSend.sendDone(message_t *msg, error_t error) {
+  event void SerialSend.sendDone[am_id_t id](message_t *msg, error_t error) {
     dbg("CollectionM", "Serial send done.\n");
     call Pool.put(msg);
     if (!call Queue.empty()) {
@@ -242,7 +246,7 @@ implementation {
   }
   
   command error_t InterceptSSSender.send(am_addr_t addr, message_t* pkt, uint8_t *dataEnd) {
-    return call CollectSend.send(pkt, dataEnd - call InterceptSSSender.getPayload(pkt));
+    return call InterceptSend.send(pkt, dataEnd - call InterceptSSSender.getPayload(pkt));
   }
 
   default error_t command CollectSend.send(message_t *msg, uint8_t len) {

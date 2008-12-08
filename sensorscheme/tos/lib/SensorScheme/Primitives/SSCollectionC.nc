@@ -17,6 +17,7 @@ configuration SSCollectionC {
     interface Send as InterceptSend;
     interface Receive as CollectReceive;
     interface Receive as InterceptReceive;
+    interface Intercept;
   }
 } 
 
@@ -25,8 +26,7 @@ implementation {
     
   components CollectionM;
   components CollectionC;
-  components SerialActiveMessageC;
-  components new SerialAMSenderC(AM_SSCOLLECT_MSG);
+  components SerialActiveMessageC as Serial;
 
   components LedsC;
   components new QueueC(message_t*, ROOT_QUEUE_SIZE);
@@ -39,10 +39,11 @@ implementation {
   InterceptSend = CollectionM.InterceptSend;
   CollectReceive = CollectionM.CollectReceive;
   InterceptReceive = CollectionM.InterceptReceive;
+  Intercept = CollectionM.Intercept;
     
   Parent = CollectionM.Parent;
 
-  CollectionM.SerialSend -> SerialAMSenderC;
+  CollectionM.SerialSend -> Serial;
 
   CollectionM.SSRuntime -> SensorSchemeC;
   CollectionM.CollectControl -> CollectionC;
@@ -52,8 +53,9 @@ implementation {
   CollectionM.CtpCongestion -> CollectionC;
   CollectionM.CollectionPacket -> CollectionC;
   
-  CollectionM.SerialControl -> SerialActiveMessageC;
-  CollectionM.SerialPacket -> SerialActiveMessageC.AMPacket;
+  CollectionM.SerialControl -> Serial;
+  CollectionM.SerialPacket -> Serial.Packet;
+  CollectionM.SerialAMPacket -> Serial.AMPacket;
 
   CollectionM.Leds -> LedsC;
   CollectionM.Queue -> QueueC;

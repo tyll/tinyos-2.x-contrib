@@ -13,8 +13,8 @@ enum {
 };
 
 enum {
-  POOL_SIZE = 2,
-  ROOT_QUEUE_SIZE = 4,
+  POOL_SIZE = 8,
+  ROOT_QUEUE_SIZE = 8,
   SS_TICKS_PER_SECOND = 16,
 };
 

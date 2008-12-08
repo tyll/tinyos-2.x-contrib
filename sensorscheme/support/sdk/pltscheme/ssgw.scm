@@ -2,11 +2,13 @@
 
 #lang scheme
 
-(require scheme/port srfi/13
+(require scheme/port srfi/13 srfi/26
          (file "sensor-net.scm"))
 
 ; ssgw 
 ; 
+
+(define *prot-version* "U ")
 
 (define *listen-port* 7828)
 
@@ -19,7 +21,8 @@
 (define (reset-state!) #f)
 
 (define (open-comm-ports s)
-  (cond [(string-prefix? "serial@" s) (let* ([serial (string-drop s (string-length "serial@"))]
+  (cond [(string-prefix? "serial@" s) (raise-user-error "serial port connections are not yet supported")
+                                      (let* ([serial (string-drop s (string-length "serial@"))]
                                              [sep (string-index serial #\:)]
                                              [speed (if sep (string-drop serial (+ 1 sep)) 57600)] 
                                              [port (if sep (string-take serial sep) serial)])
@@ -40,6 +43,17 @@
                                         [else (raise-user-error "unknown protocol specified: " (car msg))]) path)])
     (printf "received message: ~s~n" msg)
     (printf "~s~n" encoded)))
+
+(define (decode-pkts pkts base) 
+  (if (null? pkts) #f
+      (if (= (bitwise-and (caar pkts) #x80) 0) (decode-pkts (cdr pkts) base)
+          (let loop ([pkts pkts]
+                     [seqno (caar pkts)]
+                     [msg (cdar pkts)])
+            (cond [(null? pkts) (if (= (bitwise-and seqno #x40) 0) (begin (printf "incomplete message~n") #f) 
+                                    (net-decode-mapfile msg (build-path base "ssgw")))]
+                  [(= (bitwise-and (+ seqno 1) #x3f) (bitwise-and (caar pkts) #x3f)) (loop (cdr pkts) (caar pkts) (append msg (cdar pkts)))]
+                  [else (loop (cdr pkts) seqno msg)])))))
 
 (define (main argv)
   (let*-values 
@@ -67,32 +81,51 @@
                                                (reset-state!))
                              #:args (base) (path->complete-path base))]
        [(sin sout) (open-comm-ports *serial-port*)]
-       [(sin-evt) (read-string-evt 1 sin)]
        [(acc-evt) (tcp-accept-evt (tcp-listen *listen-port*))]
        
-       [(client-sock-ls) null])
+       [(client-sock-ls) null]       
+       [(pkt-hash) (make-hash)])
     
-    (file-stream-buffer-mode sin 'none)
-    (file-stream-buffer-mode sout 'none)
     (printf "SensorScheme gateway deamon~nBase configuration path: ~a~n" base)
-    (with-input-from-file (build-path base "config.ncf") read)
+    (with-input-from-file (build-path base "ssgw" "config.ncf") read)
+    
+    (file-stream-buffer-mode sin 'none)
+    (file-stream-buffer-mode sout 'none)
+    (write-string *prot-version* sout)
+    (flush-output sout)
+    (when (not (equal? (read-string (string-length *prot-version*) sin) *prot-version*)) (raise-user-error "Network uses incorrect protocol version"))
+    
     
     (let loop () 
-      (printf "~s~n" (apply sync (handle-evt acc-evt (lambda (s) 
-                                                       (set! client-sock-ls (cons s client-sock-ls))
-                                                       (file-stream-buffer-mode (second s) 'line)
-                                                       (fprintf (second s) "~a~n" base)))
-                            #;(handle-evt sin-evt (lambda (e) (printf "~s~n" e)))
-                            (append (map (lambda (s) (handle-evt (eof-evt (car s)) (lambda (ln) 
-                                                                                     (printf "eof!!~n")
-                                                                                     (close-input-port (car s))
-                                                                                     (close-output-port (cadr s))
-                                                                                     (set! client-sock-ls 
-                                                                                           (filter (lambda (el) (not (equal? s el)))
-                                                                                                   client-sock-ls))))) client-sock-ls)
-                                    (map (lambda (s) (handle-evt (read-bytes-line-evt (car s) 'linefeed) 
-                                                                 (lambda (ln) (when (not (eof-object? ln)) (send-to-net ln base sout)))))
-                                         client-sock-ls)))) 
+      (apply sync (handle-evt acc-evt (lambda (s) 
+                                        (set! client-sock-ls (cons s client-sock-ls))
+                                        (file-stream-buffer-mode (second s) 'line)
+                                        (fprintf (second s) "~a~n" base)))
+             (handle-evt (read-bytes-evt 1 sin) 
+                         (lambda (e) (if (eof-object? e)
+                                         (exit 0)
+                                         (let* ([bstr (read-bytes (bytes-ref e 0) sin)]
+                                                [msgls (bytes->list bstr)]) 
+                                           (case (bytes-ref bstr 7)
+                                             [(#x71) (case (list-ref msgls 15) 
+                                                       [(9 10) (let ([src (integer-bytes->integer bstr #f #t 12 14)])
+                                                              (hash-update! pkt-hash src 
+                                                                            (lambda (v) (cons (list-tail msgls 16) v)) (lambda () null))
+                                                              (unless (= (bitwise-and (bytes-ref bstr 16) #x40) 0)
+                                                                (printf "~s : ~a~n" src (decode-pkts (reverse (hash-ref pkt-hash src)) base))
+                                                                (hash-remove! pkt-hash src)))]
+                                                       [else (printf "unknown collection protocol~n")])]
+                                             [else (printf "unknown message type: ~s~n" (list-ref msgls 7))])))))
+             (append (map (lambda (s) (handle-evt (eof-evt (car s)) (lambda (ln) 
+                                                                      (printf "eof!!~n")
+                                                                      (close-input-port (car s))
+                                                                      (close-output-port (cadr s))
+                                                                      (set! client-sock-ls 
+                                                                            (filter (lambda (el) (not (equal? s el)))
+                                                                                    client-sock-ls))))) client-sock-ls)
+                     (map (lambda (s) (handle-evt (read-bytes-line-evt (car s) 'linefeed) 
+                                                  (lambda (ln) (when (not (eof-object? ln)) (send-to-net ln base sout)))))
+                          client-sock-ls))) 
       (loop))))
 
 (main (current-command-line-arguments))

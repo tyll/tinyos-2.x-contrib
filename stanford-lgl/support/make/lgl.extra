@@ -1,6 +1,6 @@
 ifeq ($(PLATFORM),intelmote2)
 	ASSEMBLY_FILES += $(LGL_CONTRIB)/tos/chips/pxa27x/memsetup-pxa.s
-	PFLAGS := -I$(LGL_CONTRIB)/tos/chips/OV7649 $(PFLAGS)
+	PFLAGS := -I$(LGL_CONTRIB)/tos/chips/ov7649 $(PFLAGS)
 	PFLAGS := -I$(LGL_CONTRIB)/tos/chips/pxa27x $(PFLAGS)
 	PFLAGS := -I$(LGL_CONTRIB)/tos/platforms/intelmote2 $(PFLAGS)
 	PFLAGS := -I$(LGL_CONTRIB)/tos/platforms/intelmote2/chips/da9030 $(PFLAGS)

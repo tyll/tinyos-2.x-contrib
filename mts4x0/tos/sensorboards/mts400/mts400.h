@@ -36,12 +36,17 @@ enum{
 
 // power switch 
 enum{
-	PWR_GPS_PWR=0x40,
-	PWR_GPS_ENA=0x80,
+	PWR_GPS_ENA = 0x80,
+	PWR_GPS_PWR = 0x40,
 	PWR_PRESSURE= 0x04,
 	ALLOFF=0,
 	ALLON=0,
-	
+	// values according to the datasheet not tested 
+	// please report sucess /failure ...
+	PWR_ACCEL   = 0x20, 
+	PWR_EEPROM  = 0x10,
+	PWR_LIGHT   = 0x01,
+	PWR_HUMIDITY= 0x08,
 };
 
 // data switch 

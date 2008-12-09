@@ -82,7 +82,12 @@ implementation
     GPS_POWER_ON,
     GPS_POWER_OFF,
     GPS_TURN_POWER_ON,
-    GPS_TURN_POWER_OFF
+    GPS_TURN_POWER_OFF,
+    ACCEL_POWER_ON,
+    ACCEL_POWER_OFF,    
+    ACCEL_TURN_POWER_ON,
+    ACCEL_TURN_POWER_OFF,    
+
   };
   // power/data switches state
   uint8_t PowerSwitchState=GPS_POWER_OFF;
@@ -400,21 +405,93 @@ implementation
   // get and set are unused so nothing to do in getDone and SetDone ...
   event void DataSwitch.setDone(error_t error){};
   event void DataSwitch.getDone(error_t error,uint8_t value){};
-  event void PowerSwitch.setDone(error_t error){};
   event void PowerSwitch.getDone(error_t error,uint8_t value){};
 
 
-  // TODO :
-
+  // TODO : code not tested please report success/failure 
 
   command error_t AccelPower.start(){
+    
+    printState();
+		if(sensorBoardState!= IDLE )
+      return FAIL;
+   
+ 
+		// Only possible if no operation is ongoing
+		switch (PowerSwitchState){
+		case  ACCEL_POWER_OFF:
+      {
+        error_t err;
+        // PWR_GPS_PWR is active down
+        PowerSwitchState=ACCEL_TURN_POWER_ON;
+        err=call PowerSwitch.set(PWR_ACCEL,1);
+        return err;
+      }
+		case ACCEL_TURN_POWER_ON:
+			return SUCCESS;
+		case ACCEL_POWER_ON:
+			return EALREADY;
+		case ACCEL_TURN_POWER_OFF:
+      return EBUSY;
+		default:
+			return FAIL;
+		}
+
+
   }
   command error_t AccelPower.stop(){
+
+		if(sensorBoardState!= IDLE ){
+      return FAIL;
+		}
+    
+		switch(PowerSwitchState){
+		case ACCEL_POWER_ON:
+			PowerSwitchState=ACCEL_TURN_POWER_OFF;
+      return call PowerSwitch.set(PWR_ACCEL,0);
+		case ACCEL_TURN_POWER_OFF:
+			return SUCCESS;
+		case ACCEL_TURN_POWER_ON:
+			return EBUSY;
+		case ACCEL_POWER_OFF:
+			return EALREADY;
+		default:
+			return FAIL;
+		}
+    
+
   }
+
+  event void PowerSwitch.setDone(error_t error){
+
+    switch(PowerSwitchState){
+    case ACCEL_TURN_POWER_ON:
+      if (error==SUCCESS){
+        PowerSwitchState=ACCEL_POWER_ON;
+			}else {
+        PowerSwitchState=ACCEL_POWER_OFF;
+			}
+      signal AccelPower.startDone(error);
+      break;
+
+    case ACCEL_TURN_POWER_OFF:
+      if (error==SUCCESS)
+        PowerSwitchState=ACCEL_POWER_OFF;
+      else
+        PowerSwitchState=ACCEL_POWER_ON;
+      signal AccelPower.stopDone(error);
+      break;
+
+    default:
+      // BUGG?
+    }
+    
+  };
+
  default event void  AccelPower.startDone(error_t error) {};
  default event void  AccelPower.stopDone(error_t error) {};
 
-
+  // TODO : 
   command error_t EEPROMPower.start(){
   }
   command error_t EEPROMPower.stop(){

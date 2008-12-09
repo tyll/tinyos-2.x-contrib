@@ -36,6 +36,7 @@
 module SendStatsP {
   provides {
     interface Send;
+    interface PacketStats;
   }
   uses {
     interface Send as SubSend;
@@ -43,10 +44,10 @@ module SendStatsP {
     interface CC2420PacketBody;
     interface PacketAcknowledgements;
     interface AMPacket;
-#ifdef CC2420SYNC_DEBUG
+//#ifdef CC2420SYNC_DEBUG
     interface DsnSend as DSN;
     interface DsnCommand<uint8_t> as GetStatsCommand;
-#endif    
+//#endif    
   }
 }
 
@@ -120,8 +121,15 @@ implementation {
     signal Send.sendDone(msg, error);
   }
   
+  command uint16_t PacketStats.getBroadcast() {  return n_broadcast; }
+  command uint16_t PacketStats.getUnicast() {  return n_unicast_long; }
+  command uint16_t PacketStats.getUnicastAck() {  return n_unicast_long_acked; }
+  command uint16_t PacketStats.getSyncUnicast() {  return n_unicast_short; }
+  command uint16_t PacketStats.getSyncUnicastAck() {  return n_unicast_short_acked; }
+  
+  
   /***************** DSN events ************************/
-#ifdef CC2420SYNC_DEBUG  
+//#ifdef CC2420SYNC_DEBUG  
   event void GetStatsCommand.detected(uint8_t * values, uint8_t n) {
     call DSN.logInt(n_broadcast);
     call DSN.logInt(n_unicast_long);
@@ -130,7 +138,7 @@ implementation {
     call DSN.logInt(n_unicast_short_acked);
     call DSN.log("Stats: %i | %i %i | %i %i");
   }
-#endif
+//#endif
   /***************** Functions ***********************/
 
 

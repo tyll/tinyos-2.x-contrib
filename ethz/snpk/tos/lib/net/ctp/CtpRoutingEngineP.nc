@@ -116,13 +116,12 @@ generic module CtpRoutingEngineP(uint8_t routingTableSize, uint32_t minInterval,
         interface CtpCongestion;
         interface CompareBit;
         
-        interface DSN;
-	interface DsnCommand<uint8_t> as GetTopologyCommand;
+        interface DsnSend as DSN;
+	//interface DsnCommand<uint8_t> as GetTopologyCommand;
 	// interface DsnCommand<am_addr_t> as SetParentCommand;
         interface LowPowerListening;
         interface Leds;
-	interface Queue<fe_queue_entry_t*> as SendQueue;
-	interface CC2420Packet;
+	//interface Queue<fe_queue_entry_t*> as SendQueue;
     }
 }
 
@@ -158,13 +157,6 @@ implementation {
     uint32_t parentChanges;
     /* end statistics */
 
-    uint32_t routeUpdateTimerCount;
-
-    // Maximimum it takes to hear four beacons
-    enum {
-      DEATH_TEST_INTERVAL = (maxInterval * 4) / (BEACON_INTERVAL / 1024),
-    };
-    
     // forward declarations
     void routingTableInit();
     uint8_t routingTableFind(am_addr_t);
@@ -203,12 +195,11 @@ implementation {
        uint32_t remaining = currentInterval;
        remaining -= t;
        tHasPassed = TRUE;
-       call BeaconTimer.startOneShot(t);
+       call BeaconTimer.startOneShot(remaining);
     }
 
     command error_t Init.init() {
         uint8_t maxLength;
-        routeUpdateTimerCount = 0;
         radioOn = FALSE;
         running = FALSE;
         parentChanges = 0;
@@ -283,15 +274,15 @@ implementation {
     /* Is this quality measure better than the minimum threshold? */
     // Implemented assuming quality is EETX
     bool passLinkEtxThreshold(uint16_t etx) {
-	//return TRUE;
-        return (etx < ETX_THRESHOLD);
+    	return TRUE;
+        //return (etx < ETX_THRESHOLD);
     }
 
     /* Converts the output of the link estimator to path metric
      * units, that can be *added* to form path metric measures */
-    uint16_t evaluateEtx(uint8_t quality) {
-        //dbg("TreeRouting","%s %d -> %d\n",__FUNCTION__,quality, quality+10);
-	return ((uint16_t)quality + 10);
+    uint16_t evaluateEtx(uint16_t quality) {
+    	//dbg("TreeRouting","%s %d -> %d\n",__FUNCTION__,quality, quality+10);
+        return (quality + 10);
     }
 
     /* updates the routing information, using the info that has been received
@@ -404,6 +395,9 @@ implementation {
                     routeInfo.parent = best->neighbor;
                     routeInfo.etx = best->info.etx;
                     routeInfo.congested = best->info.congested;
+                }
+                if (currentEtx - minEtx > 20) {
+                    call CtpInfo.triggerRouteUpdate();
                 }
             }
         }    
@@ -527,6 +521,7 @@ implementation {
          return (ctp_routing_header_t*)call BeaconSend.getPayload(m, call BeaconSend.maxPayloadLength());
        }
     
+    
     /* Handle the receiving of beacon messages from the neighbors. We update the
      * table, but wait for the next route update to choose a new parent */
     event message_t* BeaconReceive.receive(message_t* msg, void* payload, uint8_t len) {
@@ -629,7 +624,6 @@ implementation {
             return FAIL;
         if (routeInfo.parent == INVALID_ADDR)    
             return FAIL;
-        
         if (state_is_root == 1) {
         	*etx = 0;
         } else {
@@ -716,20 +710,15 @@ implementation {
     default event void Routing.routeFound() {
     }
 
-    /* This should see if the node should be inserted in the table.
-      * If the white_bit is set, this means the LL believes this is a good
-      * first hop link. 
-      * The link will be recommended for insertion if it is better* than some
+    /* The link will be recommended for insertion if it is better* than some
       * link in the routing table that is not our parent.
       * We are comparing the path quality up to the node, and ignoring the link
       * quality from us to the node. This is because of a couple of things:
-      *   1. because of the white bit, we assume that the 1-hop to the candidate
-      *      link is good (say, etx=1)
+      *   1. we expect this call only for links with white bit set
       *   2. we are being optimistic to the nodes in the table, by ignoring the
       *      1-hop quality to them (which means we are assuming it's 1 as well)
       *      This actually sets the bar a little higher for replacement
       *   3. this is faster
-      *   4. it doesn't require the link estimator to have stabilized on a link
       */
     event bool CompareBit.shouldInsert(message_t *msg, void* payload, uint8_t len) {
            
@@ -921,10 +910,9 @@ implementation {
     command bool CtpInfo.isOneHop() {
     	return routeInfo.etx==0 && routeInfo.parent != INVALID_ADDR;;
     }
+    
   // DSN specific
-  event void DSN.receive(void *msg, uint8_t len) { 
-  }
-
+    /*
   event void GetTopologyCommand.detected(uint8_t * values, uint8_t n) {
     // log neighbour table
     uint8_t i;

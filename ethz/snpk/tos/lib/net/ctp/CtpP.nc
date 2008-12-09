@@ -150,7 +150,7 @@ implementation {
   Router.RouteTimer -> RouteUpdateTimer;
   Router.CollectionDebug = CollectionDebug;
   Router.Leds -> LedsC;
-  Router.SendQueue -> SendQueueP;
+  //Router.SendQueue -> SendQueueP;
   Forwarder.CollectionDebug = CollectionDebug;
   Forwarder.CtpInfo -> Router;
   Router.CtpCongestion -> Forwarder;
@@ -160,9 +160,6 @@ implementation {
 
   components new TimerMilliC() as RetxmitTimer;
   Forwarder.RetxmitTimer -> RetxmitTimer;
-
-  components new TimerMilliC() as CongestionTimer;
-  Forwarder.CongestionTimer -> CongestionTimer;
 
   components RandomC;
   Router.Random -> RandomC;
@@ -201,14 +198,11 @@ implementation {
   Forwarder.LowPowerListening->Lpl;
 
   components CC2420PacketC,
-  NeighbourSyncC,
-  new DsnCommandC("get topology", uint8_t, 0) as GetTopologyCommand;
+  NeighbourSyncC;
+  //new DsnCommandC("get topology", uint8_t, 0) as GetTopologyCommand;
   //new DsnCommandC("set parent", am_addr_t, 1) as SetParentCommand;
-  Router.GetTopologyCommand->GetTopologyCommand;
+  //Router.GetTopologyCommand->GetTopologyCommand;
   //Router.SetParentCommand->SetParentCommand;
-
-  Router.CC2420Packet->CC2420PacketC;
-  Forwarder.CC2420Packet->CC2420PacketC;
   Forwarder.NeighbourSyncFlowPacket -> NeighbourSyncC;
   
 #if defined(PLATFORM_TELOSB) || defined(PLATFORM_MICAZ)
@@ -228,6 +222,6 @@ implementation {
     //  Estimator.LinkPacketMetadata -> ActiveMessageC;
   MainC.SoftwareInit -> Estimator;
   
-  components new DsnCommandC("get dropped", uint8_t , 0) as GetDroppedPacketsCommand;
-  Forwarder.GetDroppedPacketsCommand->GetDroppedPacketsCommand;
+  //components new DsnCommandC("get dropped", uint8_t , 0) as GetDroppedPacketsCommand;
+  //Forwarder.GetDroppedPacketsCommand->GetDroppedPacketsCommand;
 }

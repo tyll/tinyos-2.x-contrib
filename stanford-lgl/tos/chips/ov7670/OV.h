@@ -13,7 +13,7 @@
 *   distribution.
 * - Neither the name of the Stanford University nor the names of
 *   its contributors may be used to endorse or promote products derived
-*   from this software without specific prior written permission
+*   from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -29,41 +29,48 @@
 * OF THE POSSIBILITY OF SUCH DAMAGE.
 */ 
 /**
+ * @brief Driver module for the OmniVision OV7649 Camera
+ * @author
+ *		Andrew Barton-Sweeney (abs@cs.yale.edu)
+ *		Evan Park (evanpark@gmail.com)
+ */
+/**
+ * @brief Ported to TOS2
  * @author Brano Kusy (branislav.kusy@gmail.com)
  */ 
-/**
- * Modified for ov7670
- * @author Ralph Kling
- */
-#include "cameraJpegTest.h"
+#ifndef _OV_H
+#define _OV_H
 
-configuration cameraJpegTestC { }
-implementation {
-  components MainC, LedsC, SendBigMsgC, cameraJpegTestM, JpegM;
-  cameraJpegTestM.Boot -> MainC;
-  cameraJpegTestM.Leds -> LedsC;
-  cameraJpegTestM.SendBigMsg -> SendBigMsgC;
-  cameraJpegTestM.Jpeg ->JpegM;
-  JpegM.Leds -> LedsC;
-  components new TimerMilliC() as Timer0;
-  cameraJpegTestM.Timer0 -> Timer0;
+typedef struct {
+	uint8_t config;
+}  __attribute__ ((packed)) ov_config_t;
 
-  // Sccb interface
-  components XbowCamC;
-  cameraJpegTestM.XbowCam -> XbowCamC;
-  cameraJpegTestM.CameraInit -> XbowCamC;
+typedef struct {
+	uint8_t color;
+	uint8_t config;
+	uint8_t stat;
+}  __attribute__ ((packed)) ov_stat_t;
 
-  // Serial Forwarder
-  components SerialActiveMessageC as Serial;
-  cameraJpegTestM.SerialControl -> Serial;
-  cameraJpegTestM.Packet -> Serial; 
-  cameraJpegTestM.CmdReceive  -> Serial.Receive[AM_CMD_MSG];
-  cameraJpegTestM.ImgStatSend     -> Serial.AMSend[AM_IMG_STAT];
+enum {
+	COLOR_RGB565_XYZ,
+	COLOR_UYVY_XYZ,
+	COLOR_RGB565,
+	COLOR_UYVY,
+	COLOR_8BITGRAY,
+	COLOR_1BITBW,
+}; 
 
-  components HplOV7670C;
-  cameraJpegTestM.OVAdvanced -> HplOV7670C;
-  cameraJpegTestM.OVDbgReceive  -> Serial.Receive[AM_OV_DBG];
-  cameraJpegTestM.OVDbgSend     -> Serial.AMSend[AM_OV_DBG];
-  cameraJpegTestM.PXADbgReceive  -> Serial.Receive[AM_PXA_DBG];
-  cameraJpegTestM.PXADbgSend     -> Serial.AMSend[AM_PXA_DBG];
-}
+enum {
+	OV_CONFIG_YUV,
+	OV_CONFIG_RGB,
+};
+
+enum {
+	//OV_STAT_IDLE	= 0x00,
+	OV_STAT_CAPTURE	= 0x01,
+	OV_STAT_PROCESS	= 0x02,
+	OV_STAT_ERROR	= 0x04,
+	OV_STAT_FLIP	= 0x10,
+};
+
+#endif /* _OV_H */

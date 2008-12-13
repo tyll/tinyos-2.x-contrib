@@ -13,7 +13,7 @@
 *   distribution.
 * - Neither the name of the Stanford University nor the names of
 *   its contributors may be used to endorse or promote products derived
-*   from this software without specific prior written permission
+*   from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -29,41 +29,24 @@
 * OF THE POSSIBILITY OF SUCH DAMAGE.
 */ 
 /**
+ * @brief Driver module for the OmniVision OV7649 Camera
+ * @author
+ *		Andrew Barton-Sweeney (abs@cs.yale.edu)
+ *		Evan Park (evanpark@gmail.com)
+ */
+/**
+ * @brief Ported to TOS2
  * @author Brano Kusy (branislav.kusy@gmail.com)
  */ 
-/**
- * Modified for ov7670
- * @author Ralph Kling
+ /**
+ * HplOV7649SCCB is the Hpl inteface to serial camera control bus 
+ * (SCCB) of the OV7649 camera chip.
+ *
  */
-#include "cameraJpegTest.h"
 
-configuration cameraJpegTestC { }
-implementation {
-  components MainC, LedsC, SendBigMsgC, cameraJpegTestM, JpegM;
-  cameraJpegTestM.Boot -> MainC;
-  cameraJpegTestM.Leds -> LedsC;
-  cameraJpegTestM.SendBigMsg -> SendBigMsgC;
-  cameraJpegTestM.Jpeg ->JpegM;
-  JpegM.Leds -> LedsC;
-  components new TimerMilliC() as Timer0;
-  cameraJpegTestM.Timer0 -> Timer0;
-
-  // Sccb interface
-  components XbowCamC;
-  cameraJpegTestM.XbowCam -> XbowCamC;
-  cameraJpegTestM.CameraInit -> XbowCamC;
-
-  // Serial Forwarder
-  components SerialActiveMessageC as Serial;
-  cameraJpegTestM.SerialControl -> Serial;
-  cameraJpegTestM.Packet -> Serial; 
-  cameraJpegTestM.CmdReceive  -> Serial.Receive[AM_CMD_MSG];
-  cameraJpegTestM.ImgStatSend     -> Serial.AMSend[AM_IMG_STAT];
-
-  components HplOV7670C;
-  cameraJpegTestM.OVAdvanced -> HplOV7670C;
-  cameraJpegTestM.OVDbgReceive  -> Serial.Receive[AM_OV_DBG];
-  cameraJpegTestM.OVDbgSend     -> Serial.AMSend[AM_OV_DBG];
-  cameraJpegTestM.PXADbgReceive  -> Serial.Receive[AM_PXA_DBG];
-  cameraJpegTestM.PXADbgSend     -> Serial.AMSend[AM_PXA_DBG];
+interface HplSCCB {
+  command error_t init();
+  command error_t three_write(uint8_t data_out, uint8_t address);
+  command error_t two_write(uint8_t address);
+  command error_t read(uint8_t *data_in);
 }

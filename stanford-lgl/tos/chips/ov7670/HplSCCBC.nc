@@ -13,7 +13,7 @@
 *   distribution.
 * - Neither the name of the Stanford University nor the names of
 *   its contributors may be used to endorse or promote products derived
-*   from this software without specific prior written permission
+*   from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -29,41 +29,29 @@
 * OF THE POSSIBILITY OF SUCH DAMAGE.
 */ 
 /**
+ * @brief Driver module for the OmniVision OV7649 Camera
+ * @author
+ *		Andrew Barton-Sweeney (abs@cs.yale.edu)
+ *		Evan Park (evanpark@gmail.com)
+ */
+/**
+ * @brief Ported to TOS2
  * @author Brano Kusy (branislav.kusy@gmail.com)
  */ 
-/**
- * Modified for ov7670
- * @author Ralph Kling
- */
-#include "cameraJpegTest.h"
-
-configuration cameraJpegTestC { }
+ configuration HplSCCBC
+{
+  provides {
+	interface HplSCCB[uint8_t IdentAddr];
+  }
+}
 implementation {
-  components MainC, LedsC, SendBigMsgC, cameraJpegTestM, JpegM;
-  cameraJpegTestM.Boot -> MainC;
-  cameraJpegTestM.Leds -> LedsC;
-  cameraJpegTestM.SendBigMsg -> SendBigMsgC;
-  cameraJpegTestM.Jpeg ->JpegM;
-  JpegM.Leds -> LedsC;
-  components new TimerMilliC() as Timer0;
-  cameraJpegTestM.Timer0 -> Timer0;
+  components HplSCCBM, LedsC, GeneralIOC;
 
-  // Sccb interface
-  components XbowCamC;
-  cameraJpegTestM.XbowCam -> XbowCamC;
-  cameraJpegTestM.CameraInit -> XbowCamC;
+  // Interface wiring
+  HplSCCB	= HplSCCBM; 
 
-  // Serial Forwarder
-  components SerialActiveMessageC as Serial;
-  cameraJpegTestM.SerialControl -> Serial;
-  cameraJpegTestM.Packet -> Serial; 
-  cameraJpegTestM.CmdReceive  -> Serial.Receive[AM_CMD_MSG];
-  cameraJpegTestM.ImgStatSend     -> Serial.AMSend[AM_IMG_STAT];
-
-  components HplOV7670C;
-  cameraJpegTestM.OVAdvanced -> HplOV7670C;
-  cameraJpegTestM.OVDbgReceive  -> Serial.Receive[AM_OV_DBG];
-  cameraJpegTestM.OVDbgSend     -> Serial.AMSend[AM_OV_DBG];
-  cameraJpegTestM.PXADbgReceive  -> Serial.Receive[AM_PXA_DBG];
-  cameraJpegTestM.PXADbgSend     -> Serial.AMSend[AM_PXA_DBG];
+  // Component wiring
+  HplSCCBM.Leds -> LedsC.Leds;
+  HplSCCBM.SIOD -> GeneralIOC.GeneralIO[56];	//A40-3 
+  HplSCCBM.SIOC -> GeneralIOC.GeneralIO[57];	//A40-4 
 }

@@ -31,7 +31,7 @@
 /**
  * @author Brano Kusy (branislav.kusy@gmail.com)
  */ 
-#include "enalabCam.h"
+#include "xbowCam.h"
 #include "cameraJpegTest.h"
 #include "sdram.h"
 #include "jpeghdr.h"
@@ -44,14 +44,14 @@ module cameraJpegTestM
 		interface SendBigMsg;
 		interface Jpeg;
 		interface Timer<TMilli> as Timer0;
-		interface EnalabCam;
+		interface XbowCam;
 		interface Init as CameraInit;
 		interface SplitControl as SerialControl;
 		interface Packet;
 		interface Receive as CmdReceive;
 		interface AMSend as ImgStatSend;
 		//dbg
-		interface HplOV7649Advanced as OVAdvanced;
+		interface HplOV7670Advanced as OVAdvanced;
 		interface AMSend as OVDbgSend;
 		interface Receive as OVDbgReceive;
 		interface AMSend as PXADbgSend;
@@ -66,6 +66,9 @@ implementation
   message_t img_stat_msg;
 	message_t pxa_dbg_msg;
 	task void send_pxa_dbg();
+
+	uint8_t subSamp[100000];
+
 	//----------------------------------------------------------------------------
 	// StdControl Interface Implementation
 	//----------------------------------------------------------------------------  
@@ -134,9 +137,15 @@ implementation
     {//BW JPG encoder can read every second byte, no fix required
       if (!(img_stat.type&IMG_JPG))
       {
-    		for (i = 0; i < frame->header->size; i++)
-    			frame->buf[i] = frame->buf[2*i+1];
-    		frame->header->size /= 2;
+	
+    		for (i = 0; i < frame->header->size / 2; i++)
+    			frame->buf[i] = frame->buf[2 * i + 1];
+    		frame->header->size = frame->header->size / 2;
+		/*
+    		for (i = 0; i < frame->header->size / 2; i++)
+    			frame->buf[i] = frame->buf[2 * i];
+    		frame->header->size = frame->header->size / 2;
+		*/
     	}
     }
 		else
@@ -168,17 +177,18 @@ implementation
 	{
 	}
 
-	async event void EnalabCam.acquireDone()
+	async event void XbowCam.acquireDone()
 	{
-    post fixAcqBuffer();
+	  post fixAcqBuffer(); //
+	  post startProcessing();
 	}
 
 	task void acquireTask() {
 		img_stat.timeAcq = -call Timer0.getNow();
 		if (!(img_stat.type&IMG_COL))
-			frame = call EnalabCam.acquire(COLOR_UYVY, (void*)BASE_FRAME_ADDRESS);
+			frame = call XbowCam.acquire(COLOR_UYVY, (void*)BASE_FRAME_ADDRESS, subSamp, 0);
 		else
-			frame = call EnalabCam.acquire(COLOR_RGB565, (void*)BASE_FRAME_ADDRESS);
+			frame = call XbowCam.acquire(COLOR_RGB565, (void*)BASE_FRAME_ADDRESS, subSamp, 0);
 	}
 	
 	/* ---------------- DEBUG/REMOTE COMMANDS -------------------*/

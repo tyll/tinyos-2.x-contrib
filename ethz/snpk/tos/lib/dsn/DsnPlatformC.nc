@@ -85,5 +85,33 @@ implementation {
 	components ActiveMessageAddressC;
 	DsnPlatformTinyNodeP.setAmAddress -> ActiveMessageAddressC;
 #endif
+	
+// tinynode ##############################################################
+	#if defined(PLATFORM_TINYNODE184)
+	#ifndef USART
+	#define USART 1
+	#endif
+		components HplMsp430GeneralIOC;
+	   	components new Msp430GpioC() as TxPin;
+		#if USART == 1
+			components new DsnPlatformTinyNode184P(FALSE);
+			components new Msp430Uart1C() as Uart;
+			components HplMsp430Usart1C as HplUsart;
+			TxPin.HplGeneralIO -> HplMsp430GeneralIOC.UTXD1;
+			Resource = DsnPlatformTinyNode184P.DummyResource;
+			DsnPlatformTinyNode184P.Resource -> Uart;
+		#endif
+		DsnPlatform = DsnPlatformTinyNode184P;
+		UartStream = Uart;
+		Uart.Msp430UartConfigure -> DsnPlatformTinyNode184P;
+		DsnPlatformTinyNode184P.TxPin -> TxPin;
+		DsnPlatformTinyNode184P.HplMsp430Usart->HplUsart;
+
+		components ActiveMessageC;
+		DsnPlatformTinyNode184P.Packet->ActiveMessageC;
+		DsnPlatformTinyNode184P.RadioControl->ActiveMessageC;
+		components ActiveMessageAddressC;
+		DsnPlatformTinyNode184P.setAmAddress -> ActiveMessageAddressC;
+	#endif
 
 }

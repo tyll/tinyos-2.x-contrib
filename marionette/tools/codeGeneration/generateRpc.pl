@@ -302,13 +302,13 @@ $s .= "};\n\n";
 
 for $fullName (sort keys %requiredEventFunctions) {
     $rpc = $requiredEventFunctions{$fullName};
-    $s .= "typedef struct $rpc->{'functionName'}EventMsg {\n";
+    $s .= "typedef struct {\n";
     $params = $rpc->{"params"};
     for ($count=0; $count < $rpc->{'numParams'} ; $count++)
     {
 	$s = sprintf "%s  %s %s;\n", $s, $params->{"param$count"}->{'type'}->{'typeDecl'},  $params->{"param$count"}->{'name'};
     }
-    $s .= "};\n\n";
+    $s .= "} $rpc->{'functionName'}EventMsg_t;\nextern $rpc->{'functionName'}EventMsg_t $rpc->{'functionName'}EventMsg;\n\n";
 }
 
 #send the generated code out to a file
@@ -326,7 +326,8 @@ close(RPCM);
 $includes->{'/*#ifndef RPC_NO_DRAIN
 includes Drain;
 #endif // !RPC_NO_DRAIN*/'}=1;
-$includes->{'includes Rpc;\nincludes RpcEventMsgs;'}=1;
+$includes->{'includes Rpc;'}=1;
+$includes->{'includes RpcEventMsgs;'}=1;
 
 $s = "#ifndef TOSH_DATA_LENGTH
 #define TOSH_DATA_LENGTH 28
@@ -825,7 +826,7 @@ for my $requiredFunc (values %requiredFunctions) {
     $s .= sprintf("\b) {\n");
 
     if ($requiredFunc->{functionType} eq 'event') {
-	$s .= sprintf("    $requiredFunc->{functionName}EventMsg* responseMsg = ($requiredFunc->{functionName}EventMsg*) malloc(sizeof($requiredFunc->{functionName}EventMsg));
+	$s .= sprintf("    $requiredFunc->{functionName}EventMsg *responseMsg = ($requiredFunc->{functionName}EventMsg*) malloc(sizeof($requiredFunc->{functionName}EventMsg));
     uint8_t* byteSrc;
     uint16_t maxLength;
     uint16_t id = %s;

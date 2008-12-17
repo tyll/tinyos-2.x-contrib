@@ -315,23 +315,10 @@ class Rpc( RoutingMessages.RoutingMessages) :
 
     schema = minidom.parse(nescDecls.findBuildFile(app.buildDir, "rpcSchema.xml"))
     functions, = schema.childNodes[0].getElementsByTagName("rpcFunctions")
-<<<<<<< Rpc.py
-#    callbacks, = schema.childNodes[0].getElementsByTagName("callbackFunctions")
-=======
     callbacks, = schema.childNodes[0].getElementsByTagName("callbackFunctions")
->>>>>>> 1.3.4.1
     functions = [node for node in functions.childNodes if node.nodeType == 1]
-<<<<<<< Rpc.py
-#    callbacks = [node for node in callbacks.childNodes if node.nodeType == 1]
-=======
     callbacks = [node for node in callbacks.childNodes if node.nodeType == 1]
->>>>>>> 1.3.4.1
     for funcDef in functions: 
       self._messages[funcDef.tagName] = RpcFunction(funcDef, self)
-<<<<<<< Rpc.py
-#    for callbackDef in callbacks:
-#      self._messages[callbackDef.tagName] = CallbackFunction(callbackDef, self)
-=======
     for callbackDef in callbacks:
       self._messages[callbackDef.tagName] = CallbackFunction(callbackDef, self)
->>>>>>> 1.3.4.1

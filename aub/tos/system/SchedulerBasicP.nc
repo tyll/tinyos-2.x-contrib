@@ -36,7 +36,7 @@
  * @author Philip Levis
  * @author Cory Sharp
  * @author Mohamed Moubarak
- * @date   Oct 10 2008
+ * @date   October 10 2008
  */
 
 #include "hardware.h"

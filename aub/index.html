@@ -14,19 +14,55 @@
 
 <p>TinyTune is a performance analyzer for TinyOS 2.x. It follows the statistical profiling approach to take a snapshot of the system at each interval. The tool runs regardless of the running application and regardless of the location of the node which means that a node can be monitored while it is deployed in a real life application. It does so using a revolutionary technique. The tool can pinpoint runtime bottlenecks, memory bottlenecks, and a whole range of metrics. The tool will also be able to alert the programmer if his/her code does not conform with some of the "TinyOS Programming Hints" found in the document TinyOS Programming by Philip Levis. The developer requires no knowledge other than his/her application and the tool itself is extendible.</P>
 
-<img src="Sample.bmp" border="0"></img>
-
 <h1>News</h1>
 
-<p>Dec 24 2008</p>
+<h3>Dec 24 2008</h3>
 <p>Code added to <a href = "http://tinyos.cvs.sourceforge.net/viewvc/tinyos/tinyos-2.x-contrib/aub">tinyos-2.x-contrib</a></p>
 
 <h1>Usage</h1>
 
-<p>Under Construction</p>
+<p>Performance analysis consists of <b>2 phases</b>. the first phase involves running the tool, and the second phase involves collecting and plotting the results.</p>
+
+<h3>Phase 1: Adding the Code and Runnig the Tool</h3>
+
+<p>The following is the skeleton of the contributed code</p>
+
+<pre>
+aub
++--apps
+|  +--RadioSenseToLeds
+|     +--RadioSenseToLedsC.nc
+|     +--RadioSenseToLeds.h
+|     +--Makefile
+|     +--README.txt
+|     +--RadioSenseToLedsAppC.nc
++--tos
+|  +--chips
+|  |  +--msp430
+|  |     +--timer
+|  |        +--Msp430TimerCommonP.nc
+|  +--lib
+|  |  +--printf
+|  |     +--PrintP.nc
+|  |     +--PrintC.nc
+|  +--system
+|  |  +--MainC.nc
+|  |  +--SchedulerBasicP.nc
+</pre>
+
+<p>All the files above are modified versions of the originals. Download the files from <a href = "http://tinyos.cvs.sourceforge.net/viewvc/tinyos/tinyos-2.x-contrib/aub">here</a>, compile the application and download it to the mote. This has been implemented for The Telos motes or the Tmote Sky motes only. The mote has to be connected to a PC through USB. It still could be part of a network while connected. Although the tool could still work while not connected, information on how to gather data wirelessly is not included here and will be added soon.</p>
+
+<h3>Phase 2: Collecting and Plotting the Data</h3>
+
+<p>Since our implementation uses the <a href = "http://docs.tinyos.net/index.php/The_TinyOS_printf_Library">Printf library</a>, all you need to do to collect the data is to run the PrintfClient on the PC. you should be able to fire it up with the command:<br /><br />
+
+java net.tinyos.tools.PrintfClient -comm serial@port:mote<br /><br />
+
+Change the port and mote according to your set up. (e.g. java net.tinyos.tools.PrintfClient -comm serial@/dev/ttyUSB0:tmote )<br />Save the output in a file. Now comes the plotting. Your saved file will contain a column of numbers. Each row/number representing the module that was running at that point of time. To map each number to its corresponding module name, use the app.c file generated when you compiled the application. could be found under apps/RadioSenseToLeds/build/telosb.</p>
+
+<img src="Sample.bmp" border="0"></img>
 
 <h1>Links</h1>
-
 
 <p><a href="http://www.tinyos.net/" title="What is TinyOS?">What is TinyOS</a></p>
 <p><a href="http://moubarak.me" title="Mohamed Moubarak's HomePage">Personal HomePage</a></p>

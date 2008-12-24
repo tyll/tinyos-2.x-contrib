@@ -58,15 +58,28 @@ aub
 
 java net.tinyos.tools.PrintfClient -comm serial@port:mote<br /><br />
 
-Change the port and mote according to your set up. (e.g. java net.tinyos.tools.PrintfClient -comm serial@/dev/ttyUSB0:tmote )<br />Save the output in a file. Now comes the plotting. Your saved file will contain a column of numbers. Each row/number representing the module that was running at that point of time. To map each number to its corresponding module name, use the app.c file generated when you compiled the application. could be found under apps/RadioSenseToLeds/build/telosb.</p>
+Change the port and mote according to your set up. (e.g. java net.tinyos.tools.PrintfClient -comm serial@/dev/ttyUSB0:tmote )<br />Save the output in a file. Now comes the plotting. Your saved file will contain a column of numbers. Each row/number representing the module that was running at that point of time. To map each number to its corresponding module name, use the app.c file generated when you compiled the application. could be found under apps/RadioSenseToLeds/build/telosb.By counting the occurance of each number/module and plotting it over the total number of results, you can get a plot similar to the one below. The figure below is the performance of TinyOS running the RadioSenseToLeds application.</p>
 
 <img src="Sample.bmp" border="0"></img>
+
+<h3>Running Your own application</h3>
+
+<p>In order to analyze any other application, just make sure that the follwing line appears in its Makefile:<br /><br />
+
+CFLAGS += -I$(TOSDIR)/lib/printf<br /><br />
+
+Adding this line does it all, no change is required in the application code.</p>
+
+Please send any comments to mohamed at moubarak dot me
+
+<h1>Current Work</h1>
+
+<p>Currently i am working on automating the data collection and plotting process. As for future work, i will work on a high level language that can be used to query a network for performance measurements based on different metrics.</p>
 
 <h1>Links</h1>
 
 <p><a href="http://www.tinyos.net/" title="What is TinyOS?">What is TinyOS</a></p>
 <p><a href="http://moubarak.me" title="Mohamed Moubarak's HomePage">Personal HomePage</a></p>
-<p>Under Construction</p>
 
 <div align="center">
 <!-- ---- Quick-counter.net ---- -->

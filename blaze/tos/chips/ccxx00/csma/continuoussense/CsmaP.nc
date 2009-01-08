@@ -63,10 +63,15 @@ module CsmaP {
     interface BlazeRegister as MCSM1;
     interface BlazeRegister as IOCFG2;
     
+    interface BlazeRegister as PKTSTATUS;
+    interface BlazeStrobe as SIDLE;
+    
     interface BlazePacket;
     interface BlazePacketBody;
     interface BlazeRegister as PaReg;
     interface BlazeRegSettings[radio_id_t radioId];
+    
+    interface ReceiveMode;
     
     interface Random;
     interface State;
@@ -117,6 +122,7 @@ implementation {
   /***************** Tasks ****************/
   task void forceSend();
   task void sendDone();
+  task void delayedRequestResource();
   
   void runSpiOperations();
   void enableEnergyDetect();
@@ -219,13 +225,12 @@ implementation {
   /***************** Interrupt Events ****************/
   async event void RxInterrupt.fired[radio_id_t radioId]() {
     atomic {
-      if(call State.isState(S_BACKOFF)) {
-
+      if(call State.isState(S_BACKOFF) || call State.isState(S_START_INITIAL_BACKOFF)) { 
         if(energyDetectEnabled) {
           call BackoffTimer.stop();
           disableEnergyDetect();
           call Resource.release();
-          call Resource.request();
+          post delayedRequestResource();
         }
       }
     }
@@ -233,13 +238,12 @@ implementation {
   
   async event void EnergyInterrupt.fired[radio_id_t radioId]() {
     atomic {
-      energyInterruptFired = TRUE;;
+      energyInterruptFired = TRUE;
     }
   }
   
   
   /***************** AsyncSend Events ****************/
-
   async event void AsyncSend.sendDone[radio_id_t id](error_t error) {
     atomic myError = error;
     post sendDone();
@@ -274,7 +278,7 @@ implementation {
 
   /***************** BackoffTimer Events ****************/
   async event void BackoffTimer.fired() {
-    atomic {      
+    atomic {
       if(call Resource.isOwner()) {
         runSpiOperations();
         
@@ -283,7 +287,10 @@ implementation {
       }
     }
   }
-  
+    
+  /***************** ReceiveMode Events ****************/
+  event void ReceiveMode.srxDone() {
+  }
   
   /***************** Tasks ****************/
   /**
@@ -311,7 +318,7 @@ implementation {
   task void sendDone() {
     error_t atomicError;
     atomic atomicError = myError;
-    
+
     if(call BlazePacket.getPower(myMsg) > 0) {
       // Set the radio back to default PA settings
       call PaReg.write(call BlazeRegSettings.getPa[myRadio]());
@@ -331,8 +338,16 @@ implementation {
     signal Send.sendDone[myRadio](myMsg, atomicError);
   }
   
+  task void delayedRequestResource() {
+    if(call Resource.request() != SUCCESS) {
+      post delayedRequestResource();
+    }
+  }
+  
   /***************** Functions ****************/
   void runSpiOperations() {
+    uint8_t pktstatus;
+    
     switch(call State.getState()) {
       case S_START_INITIAL_BACKOFF:
         call State.forceState(S_BACKOFF);
@@ -347,8 +362,21 @@ implementation {
           
         } else if(energyInterruptFired) {
           disableEnergyDetect();
-          call Resource.release();
           
+          call Csn.clr[myRadio]();
+          call PKTSTATUS.read(&pktstatus);
+          if(!(pktstatus & 0x20) && !(pktstatus & 0x08)) {
+            // Make sure our carrier-sense line is really valid by kicking in 
+            // and out of RX mode, as long as we aren't receiving a packet.
+            // We have to do this because of a hardware carrier-sense problem
+            // related to manually duty cycling the radio in the presence of
+            // nearby transmitters.
+            call SIDLE.strobe();
+            call ReceiveMode.blockingSrx(myRadio);
+            call Csn.set[myRadio]();
+          }
+          
+          call Resource.release();
           call Resource.request();
           
         } else {
@@ -403,24 +431,46 @@ implementation {
     }
     
   }
+  
+  /** 
+   * DEBUG
+  task void rxBlinky() {
+    int8_t rssi;
+    bool set;
+    if(energyDetectEnabled) {
+      if(call EnergyIo.get[0]()) {
+        call Leds.led0On();
+      } else {
+        call Leds.led0Off();
+      }
+    } else {
+      call Leds.led0Off();
+    }
+    
+    post rxBlinky();
+  }
+  */
+  
     
   /**
    * You must own the SPI bus resource before beginning energy detects.
    */
   void enableEnergyDetect() {  
     energyInterruptFired = FALSE;
-    energyInterruptFired = TRUE;
     energyDetectEnabled = TRUE;
     
     call Csn.clr[myRadio]();
     // The EnergyIo right now represents CHIP_RDY.
     while(call EnergyIo.get[myRadio]());
-          
-    //(tunit)//assertFail("Enable Interrupt");
+    
+#if BLAZE_ENABLE_TIMING_LEDS
+    call Leds.led3On();
+#endif
+    
     call EnergyInterrupt.enableRisingEdge[myRadio]();
     
     // Carrier sense
-    call IOCFG2.write(0xE);
+    call IOCFG2.write(0x0E);  // Carrier-Sense
     call Csn.set[myRadio]();
   }
   
@@ -428,6 +478,11 @@ implementation {
    * You must own the SPI bus resource before ending energy detects
    */
   void disableEnergyDetect() {
+
+#if BLAZE_ENABLE_TIMING_LEDS
+    call Leds.led3Off();
+#endif
+    
     energyInterruptFired = FALSE;
     energyDetectEnabled = FALSE;
     call Csn.clr[myRadio]();
@@ -453,9 +508,10 @@ implementation {
    * correct amount of initial backoff time to use
    */
   void requestInitialBackoff() {
-    atomic myInitialBackoff = ( call Random.rand16() % 
-        (0x1F * BLAZE_BACKOFF_PERIOD) + BLAZE_MIN_INITIAL_BACKOFF);
-        
+    atomic myInitialBackoff =  
+        call Random.rand16() % (0x1F * BLAZE_BACKOFF_PERIOD) + 
+            BLAZE_MIN_INITIAL_BACKOFF;
+            
     signal InitialBackoff.requestBackoff[(call BlazePacketBody.getHeader(myMsg))->type](myMsg);
   }
   
@@ -466,21 +522,20 @@ implementation {
    */
   void requestCongestionBackoff() {
     uint16_t fairnessBackoff;
-    
     /*
      * As more congestion backoffs occur, we are waiting longer. This node
      * should have a higher priority on the channel than nodes that
      * haven't been waiting as long
      */
-    if(BLAZE_MIN_INITIAL_BACKOFF > totalCongestionBackoffs) {
-      fairnessBackoff = 0;
+    if(BLAZE_MIN_INITIAL_BACKOFF > (totalCongestionBackoffs * 2)) {
+      fairnessBackoff = BLAZE_MIN_INITIAL_BACKOFF - (totalCongestionBackoffs * 2);
       
     } else {
-      fairnessBackoff = BLAZE_MIN_INITIAL_BACKOFF - totalCongestionBackoffs;
+      fairnessBackoff = 0;
     }
     
     atomic myCongestionBackoff = 
-        (call Random.rand16() % (0x7 * BLAZE_BACKOFF_PERIOD)) 
+        call Random.rand16() % (0x7 * BLAZE_BACKOFF_PERIOD)
             + BLAZE_MIN_BACKOFF + fairnessBackoff;
     
     signal CongestionBackoff.requestBackoff[(call BlazePacketBody.getHeader(myMsg))->type](myMsg);
@@ -494,7 +549,6 @@ implementation {
     uint16_t atomicBackoff;
     energyInterruptFired = FALSE;
     totalCongestionBackoffs = 0;
-    
     requestInitialBackoff();
     atomic atomicBackoff = myInitialBackoff;
     call BackoffTimer.start( atomicBackoff );
@@ -510,7 +564,6 @@ implementation {
     if(totalCongestionBackoffs > 1024) {
       totalCongestionBackoffs = 1024;
     }
-    
     requestCongestionBackoff();
     atomic atomicBackoff = myCongestionBackoff;
     call BackoffTimer.start( atomicBackoff );

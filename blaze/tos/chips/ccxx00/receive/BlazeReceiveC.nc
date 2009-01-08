@@ -84,6 +84,7 @@ implementation {
       
   BlazeReceiveP.Resource -> BlazeSpiResourceC;
   BlazeReceiveP.RXFIFO -> Spi.RXFIFO;
+  BlazeReceiveP.SFRX -> Spi.SFRX;
   
   BlazeReceiveP.RadioStatus -> Spi.RadioStatus;
 
@@ -108,4 +109,8 @@ implementation {
   components LedsC;
   BlazeReceiveP.Leds -> LedsC;
   
+#if BLAZE_ENABLE_CRC_32
+  components PacketCrcC;
+  BlazeReceiveP.PacketCrc -> PacketCrcC;
+#endif
 }

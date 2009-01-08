@@ -63,7 +63,9 @@ module BlazeReceiveP {
     interface BlazeRegSettings[ radio_id_t id ];
     
     interface BlazeFifo as RXFIFO;
-  
+    
+    interface BlazeStrobe as SFRX;
+    
     interface Resource;
     interface ReceiveMode;
     interface Alarm<T32khz,uint32_t> as AckGap;
@@ -75,6 +77,10 @@ module BlazeReceiveP {
     interface State;
     interface Random;
     interface Leds;
+  
+#if BLAZE_ENABLE_CRC_32  
+    interface PacketCrc;
+#endif
   }
 
 }
@@ -140,6 +146,7 @@ implementation {
   bool passesAddressFilter(blaze_header_t *header, radio_id_t id);
   bool passesPanFilter(blaze_header_t *header, radio_id_t id);
   bool shouldAck(blaze_header_t *header, radio_id_t id);
+  bool passesCrcFilter(void *header);
   
   void ackBackoff();
   void requestAckBackoff();
@@ -200,10 +207,12 @@ implementation {
 #if BLAZE_ENABLE_TIMING_LEDS
     call Leds.led0On();
 #endif
-        
+    
     if(call State.requestState(S_RX_LENGTH) != SUCCESS) {
       return;
     }
+    
+    call RxInterrupt.disable[id]();
     
     atomic m_id = id;
     
@@ -314,29 +323,33 @@ implementation {
         if(isDataPacket(header, id)) {
           if(passesAddressFilter(header, id)) {
             if(passesPanFilter(header, id)) {
-              if(shouldAck(header, id)) {
-                // Send an ack and then receive the packet in AckSend.sendDone()
-                atomic {
-                  acknowledgement.dest = header->src;
-                  acknowledgement.dsn = header->dsn;
-                  acknowledgement.src = call ActiveMessageAddress.amAddress();
-                }
+              if( passesCrcFilter( header ) ) {
+                if(shouldAck(header, id)) {
+                  // Send an ack and then receive the packet in AckSend.sendDone()
+                  atomic {
+                    acknowledgement.dest = header->src;
+                    acknowledgement.dsn = header->dsn;
+                    acknowledgement.src = call ActiveMessageAddress.amAddress();
+                  }
             
-                totalAcks = 0;
+                  totalAcks = 0;
                 
-                call Csn.clr[ id ]();
+                  call Csn.clr[ id ]();
                 
-                if(call AckSend.send[ id ](&acknowledgement, TRUE, 0) != SUCCESS) {
+                  if(call AckSend.send[ id ](&acknowledgement, TRUE, 0) != SUCCESS) {
+                    post receiveDone();
+                  }
+                
+                  // else, drop the ack and continue at AckSend.sendDone()...
+                  return;
+                
+                } else {
+                  // Do not send an acknowledgement, just receive this packet
                   post receiveDone();
+                  return;
                 }
-                
-                // else, drop the ack and continue at AckSend.sendDone()...
-                return;
-                
               } else {
-                // Do not send an acknowledgement, just receive this packet
-                post receiveDone();
-                return;
+                //CRC FAILED, put any debug code here
               }
             }
           }
@@ -379,7 +392,12 @@ implementation {
   event void BlazeConfig.commitDone[radio_id_t id]() {
   }
   
-  /***************** Tasks s****************/
+  /***************** ReceiveMode Events ****************/
+  event void ReceiveMode.srxDone() {
+    cleanUp();
+  }
+  
+  /***************** Tasks ****************/
   task void receiveDone() {
     blaze_metadata_t *metadata = call BlazePacketBody.getMetadata( m_msg );
     uint8_t *buf = (uint8_t*) call BlazePacketBody.getHeader( m_msg );
@@ -451,9 +469,6 @@ implementation {
     call ReceiveMode.srx(id);
   }
   
-  event void ReceiveMode.srxDone() {
-    cleanUp();
-  }
   
   /**
    * Clean up after a receive
@@ -480,15 +495,17 @@ implementation {
     
     atomic {
       call State.toIdle();
+      call RxInterrupt.enableRisingEdge[id]();
       call Resource.release();
 
       if(call RxIo.get[id]()) {
         if(call State.requestState(S_RX_LENGTH) == SUCCESS) {
+          call RxInterrupt.disable[id]();
           call Resource.request();
           return;
         }
       }
-       
+      
 #if BLAZE_ENABLE_TIMING_LEDS    
       call Leds.led0Off();
 #endif
@@ -497,8 +514,6 @@ implementation {
       call Leds.led0Off();
 #endif
       
-      // TODO if there are no more packets to be received, put the radio into
-      // RX mode one more time
     }
   }
   
@@ -527,6 +542,14 @@ implementation {
         && ((( header->fcf >> FCF_ACK_REQ ) & 0x01) == 1);
   }
   
+  bool passesCrcFilter(void *header) {
+#if BLAZE_ENABLE_CRC_32
+    return call PacketCrc.verifyCrc( header );
+#else
+    return TRUE;
+#endif
+  }
+  
   /**
    * Keep the SPI bus resource under the control of the receive branch until
    * we know any acknowledgment for the current transmission could have gotten 
@@ -544,8 +567,9 @@ implementation {
    * an override from a higher layer.
    */
   void requestAckBackoff() {
-    atomic myAckBackoff = ( call Random.rand16() % (0x7 * BLAZE_BACKOFF_PERIOD) 
-              + (BLAZE_ACK_WAIT));
+    atomic myAckBackoff = 
+        call Random.rand16() % (0x7 * BLAZE_BACKOFF_PERIOD)
+              + (BLAZE_ACK_WAIT);
     
     signal AckBackoff.requestBackoff[(call BlazePacketBody.getHeader(m_msg))->type](m_msg);
   }

@@ -54,6 +54,14 @@
  * If several components call back, then the last component to get its 
  * word in has the final say. 
  * 
+ * With a manually duty cycling CC1100 radio waking up in
+ * the middle of another node's transmission, the carrier-sense line and RSSI
+ * will remain high even after the transmitter is gone (and I verified this with
+ * a spectrum analyzer).  This prevents you from transmitting for a *long* time.
+ * The continuous sense implementation takes care of this by kicking the radio
+ * in and out of RX mode between backoffs, but only when a packet is not being
+ * received.
+ * 
  * @author David Moss
  */
 configuration CsmaC {
@@ -89,9 +97,14 @@ implementation {
   CsmaP.PaReg -> BlazeSpiC.PA;
   CsmaP.IOCFG2 -> BlazeSpiC.IOCFG2;
   CsmaP.MCSM1 -> BlazeSpiC.MCSM1;
+  CsmaP.PKTSTATUS -> BlazeSpiC.PKTSTATUS;
+  CsmaP.SIDLE -> BlazeSpiC.SIDLE;
   
   components BlazeTransmitC;
   CsmaP.AsyncSend -> BlazeTransmitC.AsyncSend;
+  
+  components new ReceiveModeC();
+  CsmaP.ReceiveMode -> ReceiveModeC;
   
   components BlazePacketC;
   CsmaP.BlazePacketBody -> BlazePacketC;

@@ -29,6 +29,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE
  */
 
+
 /**
  * Internal interface for Blaze to get portions of a packet.
  * @author David Moss

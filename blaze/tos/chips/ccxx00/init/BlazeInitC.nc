@@ -41,6 +41,7 @@ configuration BlazeInitC {
   provides {
     interface SplitControl[ radio_id_t id ];
     interface BlazeCommit[ radio_id_t id ];
+    interface RadioOnTime;
   }
 }
 
@@ -51,13 +52,15 @@ implementation {
       BlazeSpiC,
       BlazeCentralWiringC,
       new BlazeSpiResourceC() as InitResourceC,
-      new BlazeSpiResourceC() as DeepSleepResourceC;
+      new BlazeSpiResourceC() as DeepSleepResourceC,
+      new TimerMilliC();
       
   
   MainC.SoftwareInit -> BlazeInitP;
 
   SplitControl = BlazeInitP;
   BlazeCommit = BlazeInitP;
+  RadioOnTime = BlazeInitP;
 
   BlazeInitP.Csn -> BlazeCentralWiringC.Csn;
   BlazeInitP.Gdo0_io -> BlazeCentralWiringC.Gdo0_io;
@@ -81,6 +84,7 @@ implementation {
   BlazeInitP.SRES -> BlazeSpiC.SRES;
   
   BlazeInitP.RadioInit -> BlazeSpiC;
+  BlazeInitP.Timer -> TimerMilliC;
   
   BlazeInitP.PaReg -> BlazeSpiC.PA;
   

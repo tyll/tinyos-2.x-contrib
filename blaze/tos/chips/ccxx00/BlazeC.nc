@@ -94,6 +94,9 @@ configuration BlazeC {
     
     /** CTP Required Interface */
     interface LinkPacketMetadata;
+    
+    /** Find out how long any radio has been turned on in any state */
+    interface RadioOnTime;
   }
 }
 
@@ -136,6 +139,7 @@ implementation {
   components UniqueReceiveC;
   components BlazeReceiveC;
   components BlazeInitC;
+  RadioOnTime = BlazeInitC;
   
   /***************** Send Layers ****************/
   BlazeActiveMessageC.SubSend -> UniqueSendC.Send;

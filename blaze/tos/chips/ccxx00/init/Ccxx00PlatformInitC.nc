@@ -46,14 +46,20 @@ implementation {
       HplRadioSpiC,
       BlazeCentralWiringC;
       
-  RealMainP.PlatformInit -> Ccxx00PlatformInitP;
+  RealMainP.PlatformInit -> Ccxx00PlatformInitP.PlatformInit;
   
   Ccxx00PlatformInitP.Resource -> HplRadioSpiC;
   Ccxx00PlatformInitP.SIDLE -> BlazeSpiC.SIDLE;
   Ccxx00PlatformInitP.SPWD -> BlazeSpiC.SPWD;
+  Ccxx00PlatformInitP.SRES -> BlazeSpiC.SRES;
   Ccxx00PlatformInitP.Csn -> BlazeCentralWiringC.Csn;
   Ccxx00PlatformInitP.ChipRdy -> BlazeCentralWiringC.Gdo2_io;
   Ccxx00PlatformInitP.Gdo0 -> BlazeCentralWiringC.Gdo0_io;
+  
+  components LedsC;
+  components LedsP;
+  Ccxx00PlatformInitP.Leds -> LedsC;
+  Ccxx00PlatformInitP.LedsInit -> LedsP;
   
 }
 

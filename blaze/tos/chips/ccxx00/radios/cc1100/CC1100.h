@@ -322,7 +322,7 @@ enum CC1100_config_reg_state_enums {
   CC1100_CONFIG_BSCFG = 0x1C,
   CC1100_CONFIG_AGCTRL2 = 0xC7,   // If no Tx, lower LNA's (look at AGC)
   CC1100_CONFIG_AGCTRL1 = 0x10,   // CCA thresholds
-  CC1100_CONFIG_AGCTRL0 = 0xB0,
+  CC1100_CONFIG_AGCTRL0 = 0xB0, 
   
   /*  
    * The rest is taken care of by default radio settings

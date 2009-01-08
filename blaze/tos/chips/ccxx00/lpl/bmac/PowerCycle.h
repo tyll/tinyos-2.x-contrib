@@ -51,7 +51,7 @@
  * flakey, without turning off the radio immediately.  It adds hysteresis.
  */
 #ifndef TRANSMITTER_QUALITY_THRESHOLD
-#define TRANSMITTER_QUALITY_THRESHOLD 3
+#define TRANSMITTER_QUALITY_THRESHOLD 4
 #endif
 
 #endif

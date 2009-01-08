@@ -48,6 +48,14 @@
 #define BLAZE_ENABLE_LPL_LEDS 0
 #endif
 
+#ifndef BLAZE_ENABLE_CRC_32
+#define BLAZE_ENABLE_CRC_32 0
+#endif
+
+#ifndef PRINTF_DUTY_CYCLE
+#define PRINTF_DUTY_CYCLE 0
+#endif
+
 typedef uint8_t blaze_status_t;
 typedef uint8_t radio_id_t;
 
@@ -66,6 +74,9 @@ typedef nx_struct blaze_header_t {
 } blaze_header_t;
 
 typedef nx_struct blaze_footer_t {
+#if BLAZE_ENABLE_CRC_32
+  nx_uint32_t crc;
+#endif
 } blaze_footer_t;
 
 typedef nx_struct blaze_metadata_t {

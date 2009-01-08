@@ -83,6 +83,7 @@ implementation {
   BlazeTransmitP.TXFIFO -> Spi.TXFIFO;
   
   BlazeTransmitP.STX -> Spi.STX;
+  BlazeTransmitP.SFRX -> Spi.SFRX;
   BlazeTransmitP.TxReg -> Spi.TXREG;
   BlazeTransmitP.WORCTRL -> Spi.WORCTRL;
   BlazeTransmitP.MCSM1 -> Spi.MCSM1;
@@ -100,4 +101,8 @@ implementation {
   components LedsC;
   BlazeTransmitP.Leds -> LedsC;
     
+#if BLAZE_ENABLE_CRC_32
+  components PacketCrcC;
+  BlazeTransmitP.PacketCrc -> PacketCrcC;
+#endif
 }

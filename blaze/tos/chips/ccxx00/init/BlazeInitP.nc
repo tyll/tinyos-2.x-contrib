@@ -53,6 +53,7 @@ module BlazeInitP {
     interface Init;
     interface SplitControl[ radio_id_t id ];
     interface BlazeCommit[ radio_id_t id ];
+    interface RadioOnTime;
     
     interface ReceiveMode[uint8_t clientId];
   }
@@ -83,6 +84,7 @@ module BlazeInitP {
     interface BlazeStrobe as SRES;
     
     interface BusyWait<TMicro, uint16_t>;
+    interface Timer<TMilli>;
     
     interface BlazeRegister as PaReg;
     
@@ -101,6 +103,10 @@ implementation {
   uint8_t currentOperation;
   
   uint8_t srxClient;
+  
+  uint32_t totalRadioOnTime;
+  
+  uint32_t timeOn;
   
   enum {
     S_STARTING,
@@ -121,6 +127,9 @@ implementation {
       shutDown();
     }
     
+    totalRadioOnTime = 0;
+    timeOn = 0;
+    
     m_id = NO_RADIO;
     return SUCCESS;
   }
@@ -134,6 +143,8 @@ implementation {
   command error_t SplitControl.start[ radio_id_t id ]() {
     atomic m_id = id;
     atomic currentOperation = S_STARTING;
+    
+    timeOn = call Timer.getNow();
     
     call Power.set[ m_id ]();
     
@@ -180,6 +191,30 @@ implementation {
     return SUCCESS;
   }
   
+  /***************** RadioOnTime Commands ****************/
+  /**
+   * @return the total amount of time, in binary-milliseconds, the radio has
+   *     been turned on.
+   */
+  command uint32_t RadioOnTime.getTotalOnTime() {
+    uint32_t total = totalRadioOnTime;
+    
+    if(timeOn > 0) {
+      total += call Timer.getNow() - timeOn;
+    }
+    
+    return total;
+  }
+ 
+  /**
+   * @return the actual duty cycle % moved over two decimal places.
+   *     In other words, 16.27% duty cycle will read 1627.
+   */  
+  command uint16_t RadioOnTime.getDutyCycle() {
+    return (uint16_t) (((double) totalRadioOnTime / (double) call Timer.getNow()) * 10000);
+  }
+  
+  
   /***************** ReceiveMode Commands ****************/
   command void ReceiveMode.srx[uint8_t clientId](radio_id_t radioId) {
     srxClient = clientId;
@@ -197,30 +232,8 @@ implementation {
             BLAZE_TOTAL_INIT_REGISTERS);
   }
   
-  
-  /***************** RadioInit Events ****************/
-  event void RadioInit.initDone() { 
+  command void ReceiveMode.blockingSrx[uint8_t clientId](radio_id_t radioId) {
     uint8_t status;
-    
-    call Gdo0_io.makeInput[ m_id ]();
-    call Gdo2_io.makeInput[ m_id ]();
-    
-    call Csn.set[ m_id ]();
-    call Csn.clr[ m_id ]();
-    
-    // Startup the radio in Rx mode by default
-    call SFRX.strobe();
-    call SFTX.strobe();
-    call SIDLE.strobe();
-    
-    call BusyWait.wait(1000);
-    
-    while(call RadioStatus.getRadioStatus() != BLAZE_S_IDLE);
-    
-    call PaReg.write(call BlazeRegSettings.getPa[ m_id ]());
-    
-    call Gdo0_int.enableRisingEdge[ m_id ](); 
-
     call SRX.strobe();
 
     while((status = call RadioStatus.getRadioStatus()) != BLAZE_S_RX) {
@@ -240,11 +253,27 @@ implementation {
         
       } else if (status == BLAZE_S_SETTLING) {
         // do nothing but don't quit the loop
-        
+          
       } else if (status != BLAZE_S_TX) {
         call SRX.strobe();
       }
     }
+  }
+  
+  
+  /***************** RadioInit Events ****************/
+  event void RadioInit.initDone() { 
+    call Gdo0_io.makeInput[ m_id ]();
+    call Gdo2_io.makeInput[ m_id ]();
+    
+    call Csn.set[ m_id ]();
+    call Csn.clr[ m_id ]();
+    
+    call PaReg.write(call BlazeRegSettings.getPa[ m_id ]());
+    
+    call Gdo0_int.enableRisingEdge[ m_id ](); 
+    
+    call ReceiveMode.blockingSrx[0](m_id);
     
     call Csn.set[ m_id ]();
     
@@ -280,6 +309,7 @@ implementation {
   
   event void DeepSleepResource.granted() {
     uint8_t id;
+        
     atomic id = m_id;
     call Csn.set[id]();
     call Csn.clr[id]();
@@ -290,11 +320,22 @@ implementation {
     
     shutDown();
     
-    call BusyWait.wait(1000);
+    totalRadioOnTime += call Timer.getNow() - timeOn;
+    timeOn = 0;
+
+#if PRINTF_DUTY_CYCLE
+    printf("Age=%lu; Radio-On=%lu; Duty=%05lu\n\r", call Timer.getNow(), totalRadioOnTime, (uint32_t) (((double) totalRadioOnTime / (double) call Timer.getNow()) * 10000));
+#endif
+
     signal SplitControl.stopDone[m_id](SUCCESS);
   }
   
 
+  /***************** Timer Events ****************/
+  event void Timer.fired() {
+    // This is only used to keep track of the radio on-time
+  }
+  
   /***************** Interrupts ****************/
   async event void Gdo0_int.fired[radio_id_t id]() {
   }
@@ -326,6 +367,7 @@ implementation {
     
     call Power.clr[ id ]();
   }
+  
   
   /***************** Tasks ****************/
   
@@ -380,7 +422,6 @@ implementation {
   
   default command blaze_init_t *BlazeRegSettings.getDefaultRegisters[ radio_id_t id ]() { return NULL; }
   default command uint8_t BlazeRegSettings.getPa[ radio_id_t id ]() { return 0xC0; }
-  
   default event void BlazeCommit.commitDone[ radio_id_t id ]() {}
   
   default event void ReceiveMode.srxDone[uint8_t clientId]() {}

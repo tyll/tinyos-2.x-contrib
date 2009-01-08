@@ -50,7 +50,7 @@
  * Not measured
  */
 #ifndef DUTY_ON_TIME
-#define DUTY_ON_TIME 5 
+#define DUTY_ON_TIME 11 
 #endif
 
 

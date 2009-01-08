@@ -76,6 +76,7 @@ module BlazeTransmitP {
     interface BlazeFifo as TXFIFO;
   
     interface BlazeStrobe as STX;
+    interface BlazeStrobe as SFRX;
       
     interface BlazeRegister as PaReg;
     interface BlazeRegister as TxReg;
@@ -89,6 +90,10 @@ module BlazeTransmitP {
     interface RadioStatus;
     interface State;
     interface Leds;
+    
+#if BLAZE_ENABLE_CRC_32
+    interface PacketCrc;
+#endif
   }
 }
 
@@ -135,6 +140,10 @@ implementation {
     atomic force = forcePkt;
     atomic duration = preambleDurationMs;
     
+#if BLAZE_ENABLE_CRC_32
+    call PacketCrc.computeCrc( myMsg );
+#endif
+    
     return transmit();
   }
   
@@ -162,7 +171,6 @@ implementation {
                                      error_t error ) {
     
     uint8_t id;
-    uint8_t txBytes;
     
     if(!call State.isIdle()) {
       atomic id = m_id;
@@ -174,6 +182,9 @@ implementation {
       call Leds.set(1);
 #endif
       
+      while(call RadioStatus.getRadioStatus() != BLAZE_S_RX);
+      
+      /*
       // Wait for the TX FIFO to clear 
       do {
         call TXBYTES.read(&txBytes);
@@ -184,6 +195,9 @@ implementation {
       } else {
         finishTx();
       }
+      */
+      
+      finishTx();
     }
   }
   
@@ -255,13 +269,6 @@ implementation {
     
     // Receives take priority; don't drop acknowledgments.
     // This is the last chance to abort a transmit for a receive.
-    /* 
-     * TODO this really helps acknowledgment success rate, 
-     * especially with long preamble transmissions.  But we seem to lock up here
-     * because our receive branch is not working properly or something. Fix
-     * that receive branch!  Why is the RxIo line high and BlazeReceiveP isn't
-     * doing anything about it?
-     */
     if(call State.isState(S_TX_PACKET) && call RxIo.get[id]()) {     
 #if BLAZE_ENABLE_TIMING_LEDS
       call Leds.led2Off();
@@ -317,6 +324,7 @@ implementation {
       call Leds.led2Off();
       call Leds.led1Off();
 #endif
+      
       return EBUSY;
     }
       
@@ -327,6 +335,7 @@ implementation {
     } else {
       call TXFIFO.write(msg, (call BlazePacketBody.getHeader(msg))->length + 1);
     }
+    
     return SUCCESS;
   }
   

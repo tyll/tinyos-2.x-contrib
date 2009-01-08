@@ -50,6 +50,10 @@ module LplP {
 
 implementation {
   
+  enum {
+    STATIC_WAKEUP_INCREASE = 5,
+  };
+  
   /***************** Prototypes ***************/
   uint16_t getActualDutyCycle(uint16_t dutyCycle);
   
@@ -114,14 +118,14 @@ implementation {
    */
   command void LowPowerListening.setRxSleepInterval[radio_id_t radioId](message_t *msg, 
       uint16_t sleepIntervalMs) {
-    (call BlazePacketBody.getMetadata(msg))->rxInterval = sleepIntervalMs + 3;
+    (call BlazePacketBody.getMetadata(msg))->rxInterval = sleepIntervalMs + STATIC_WAKEUP_INCREASE;
   }
   
   /**
    * @return the destination node's sleep interval configured in this message
    */
   command uint16_t LowPowerListening.getRxSleepInterval[radio_id_t radioId](message_t *msg) {
-    return (call BlazePacketBody.getMetadata(msg))->rxInterval - 3;
+    return (call BlazePacketBody.getMetadata(msg))->rxInterval - STATIC_WAKEUP_INCREASE;
   }
   
   /**

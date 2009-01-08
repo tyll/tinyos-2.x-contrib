@@ -13,10 +13,13 @@ compile time.
 
 
 LOW POWER COMMUNICATIONS PLUG-IN STATUS
-* alwayson works
-* xmac works
-* bmac works (needs further testing)
-* boxmac1 works (needs further testing)
+* alwayson works <- recommend.
+* bmac works <- recommend.
+
+* xmac works, but receive checks are not very efficient
+
+* boxmac1 shell is complete, needs testing
+* boxmac2 shell is complete, needs testing
 
 * WoR has reliability and range issues
 

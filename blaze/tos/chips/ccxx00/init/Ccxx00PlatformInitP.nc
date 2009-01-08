@@ -44,9 +44,14 @@ module Ccxx00PlatformInitP {
     interface Resource;
     interface BlazeStrobe as SIDLE;
     interface BlazeStrobe as SPWD;
+    interface BlazeStrobe as SRES;
+    
     interface GeneralIO as Csn[radio_id_t radioId];
     interface GeneralIO as ChipRdy[radio_id_t radioId];
     interface GeneralIO as Gdo0[radio_id_t radioId];
+    
+    interface Leds;
+    interface Init as LedsInit;
   }
 }
 
@@ -56,21 +61,38 @@ implementation {
   command error_t PlatformInit.init() {
     error_t error;
     int i;
+    uint32_t timeout;
+    
+    call LedsInit.init();
     
     if((error = call Resource.immediateRequest()) != SUCCESS) {
       return error;
-      
     }
     
     for(i = 0; i < uniqueCount(UQ_BLAZE_RADIO); i++) {
       call ChipRdy.makeInput[i]();
       call Gdo0.makeInput[i]();
-      
       call Csn.set[i]();
       call Csn.makeOutput[i]();
-      
+    }
+    
+    for(i = 0; i < uniqueCount(UQ_BLAZE_RADIO); i++) {
+      timeout = 0;
       call Csn.clr[i]();
-      while(call ChipRdy.get[i]());
+      while(call ChipRdy.get[i]()) {
+        timeout++;
+        if(timeout > 10000) {
+          // Many times the ChipRdy line never drops low, causing our platform
+          // init to lock up completely. As usual, reset and pray.
+          call Csn.set[i]();
+          call Csn.clr[i]();
+          call SRES.strobe();
+          call Csn.set[i]();
+          i--;
+          continue;
+        }
+      }
+      
       call SIDLE.strobe();
       call SPWD.strobe();
       call Csn.set[i]();

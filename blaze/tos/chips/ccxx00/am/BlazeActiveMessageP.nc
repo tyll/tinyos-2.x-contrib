@@ -36,7 +36,7 @@
  * of the data payload.
  *
  * @author Philip Levis
- * @version $Revision$ $Date$
+ * @author David Moss
  */
  
 #include "Blaze.h"
@@ -181,15 +181,12 @@ implementation {
   
   /***************** SubSend Events ****************/
   event void SubSend.sendDone(message_t* msg, error_t result) {
-    call Leds.led1Off();
     signal AMSend.sendDone[call AMPacket.type(msg)](msg, result);
   }
 
   
   /***************** SubReceive Events ****************/
   event message_t* SubReceive.receive(message_t* msg, void* payload, uint8_t len) {
-    call Leds.led0Toggle();
-    
     if (call AMPacket.isForMe(msg)) {
       return signal Receive.receive[call AMPacket.type(msg)](msg, payload, len - BLAZE_SIZE);
     } else {

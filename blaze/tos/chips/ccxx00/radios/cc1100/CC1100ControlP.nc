@@ -70,6 +70,7 @@ implementation {
   /** TRUE if we should auto-acknowledge packets if an ack is requested */
   bool autoAck;
   
+  
   /** Default register values. Change the configuration by editing CC1100.h */
   uint8_t regValues[] = {
       CC1100_CONFIG_IOCFG2, 
@@ -128,10 +129,11 @@ implementation {
 #endif
 
 #if defined(NO_ADDRESS_RECOGNITION)
-    addressRecognition = FALSE;
+    call BlazeConfig.setAddressRecognition(FALSE);
 #else
-    addressRecognition = TRUE;
+    call BlazeConfig.setAddressRecognition(TRUE);
 #endif
+
 
 #if defined(NO_PAN_RECOGNITION)
     panRecognition = FALSE;
@@ -270,7 +272,6 @@ implementation {
     } 
     
     regValues[BLAZE_CHANNR] = freqToChannel(freqKhz);
-    
     return SUCCESS;
   }
   

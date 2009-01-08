@@ -124,11 +124,7 @@ implementation {
         ( FRAME_TYPE_DATA << FCF_FRAME_TYPE );
     
     setAck(myMsg, FALSE);
-    
-#if BLAZE_ENABLE_TIMING_LEDS
-    ////call Leds.led3On();
-#endif
-    
+        
     error = call SubSend.send[id](msg, len);
     
     if(error != SUCCESS) {
@@ -217,11 +213,20 @@ implementation {
               dsn == header->dsn) {
                 
         // This is our acknowledgement
+        setAck(atomicMsg, TRUE);
+        
+        /**
+         * The rest of this would speed up the amount of time it takes to send
+         * the next packet.  But it also makes channel sharing unfair, because
+         * other nodes are waiting to use the channel.  You can put this back in
+         * and let one node capture the channel for a short period of time, 
+         * but I'll take it out to let the nodes share the channel fairly.
+        
         atomic state = S_SEND_DONE;
         call AckWaitTimer.stop();
-        setAck(atomicMsg, TRUE);
         call ChipSpiResource.attemptRelease();
         post sendDone();
+         */
       }
     }
   }
@@ -245,11 +250,6 @@ implementation {
   
   /***************** Tasks ****************/
   task void sendDone() {
-    
-#if BLAZE_ENABLE_TIMING_LEDS
-    ////call Leds.led3Off();
-#endif
-    
     atomic state = S_IDLE;
     signal Send.sendDone[radioId](myMsg, SUCCESS);
   }

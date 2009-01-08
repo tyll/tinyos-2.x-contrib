@@ -93,6 +93,9 @@ implementation {
   /** Tracks some number of times we've seen a transmitter, or not */
   uint8_t transmitterQuality;
   
+  /** TRUE if we are to perform preamble quality detects on out */
+  bool testPreambleQuality;
+
   /**
    * Radio Power, Check State, and Duty Cycling State
    */
@@ -109,7 +112,6 @@ implementation {
   
   /***************** Prototypes ****************/
   task void carrierSense();
-
   
   void startOffTimer();
   
@@ -229,9 +231,13 @@ implementation {
     if(sending) {
       return FAIL;
     }
+    
+#if BLAZE_ENABLE_LPL_LEDS
+    call Leds.led2On();
+#endif
+ 
     sending = TRUE;
     
-    //(tunit)//assertFail("Send.send()");
     currentMsg = msg;
     currentLen = len;
     
@@ -254,7 +260,9 @@ implementation {
   
   /***************** SubSend Events ****************/
   event void SubSend.sendDone[radio_id_t radioId](message_t *msg, error_t error) {
-    //(tunit)//assertFail("SubSend.sendDone");
+#if BLAZE_ENABLE_LPL_LEDS
+    call Leds.led2Off();
+#endif
     startOffTimer();
     sending = FALSE;
     signal Send.sendDone[radioId](msg, error);
@@ -277,7 +285,6 @@ implementation {
   event void OnTimer.fired() {
     if(isDutyCycling()) {
       if(call RadioPowerState.getState() == S_OFF && !sending) {
-        //(tunit)//assertFail("OnTimer: start");
         beginStart();
         received = FALSE;
         
@@ -307,7 +314,6 @@ implementation {
   
   /***************** RxInterrupt Events ****************/
   async event void RxInterrupt.fired[radio_id_t radioId]() {
-    // TODO should we go to sleep if packets are transmitting for other nodes?
     atomic received = TRUE;
   }
   
@@ -321,8 +327,13 @@ implementation {
   task void carrierSense() {
     if(sending || received) {
       // Keep the radio on for a bit.  The system is doing something.
+      // A send will trigger a sendDone which will continue with startOffTimer()
       call Resource.release();
-      startOffTimer();
+      
+      if(received) {
+        // Leave it on for awhile and then turn off.
+        startOffTimer();
+      }
       
     } else if(!transmitterFound()) {
       if(transmitterQuality == 0) {
@@ -336,18 +347,18 @@ implementation {
     
     } else {
       transmitterQuality++;
+      call Resource.release();
       if(transmitterQuality > TRANSMITTER_QUALITY_THRESHOLD) {
         transmitterQuality = TRANSMITTER_QUALITY_THRESHOLD;
+        testPreambleQuality = TRUE;
       }
       
-      // Keep sensing the carrier until the energy on the channel goes away,
-      // or something happens. Maybe we should incorporate the PQT here too
-      // to make sure the transmitted data is valid and not a jammer.
-      post carrierSense();
+      // Keep doing checks until the anomaly goes away.
+      call Resource.request();
     }
     
   }
-  
+    
   /***************** Functions ****************/
   /**
    * Start the off timer, leaving the radio on for a short period of time
@@ -380,7 +391,6 @@ implementation {
         return TRUE;
       }
       
-      //(tunit)//assertFail("Sig SC.stopDone()");
       call SplitControlState.forceState(S_OFF);
       currentRadio = NO_RADIO;
       signal SplitControl.stopDone[radio](SUCCESS);
@@ -392,7 +402,6 @@ implementation {
         return TRUE;
       }
       
-      //(tunit)//assertFail("Sig SC.startDone()");
       // Starting while we're duty cycling first turns off the radio
       call SplitControlState.forceState(S_ON);
       signal SplitControl.startDone[radio](SUCCESS);
@@ -407,12 +416,10 @@ implementation {
    */
   void beginStart() {
     error_t error;
-      
-    //(tunit)//assertFail("beginStart()");
+   
     error = call SubControl.start[currentRadio]();
     
     if(error == EALREADY) {
-      //(tunit)//assertFail("Already on");
       startDone();
     }
   }
@@ -423,8 +430,6 @@ implementation {
   void beginStop() {
     error_t error;
     
-    //(tunit)//assertFail("beginStop()");
-     
     if(sending) {
       // Don't turn the radio off
       return;
@@ -432,7 +437,6 @@ implementation {
     
     error = call SubControl.stop[currentRadio]();
     if(error == EALREADY) {
-      //(tunit)//assertFail("Already off");
       stopDone(); 
     }
   }
@@ -442,7 +446,7 @@ implementation {
    */
   void startDone() {
     error_t error;
-    //(tunit)//assertFail("startDone()");
+    
     call RadioPowerState.forceState(S_ON);
     
 #if BLAZE_ENABLE_LPL_LEDS
@@ -456,10 +460,8 @@ implementation {
     }
     
     if(sending) {
-      //(tunit)//assertFail("Sending..");
       error = call SubSend.send[currentRadio](currentMsg, currentLen);
       if(error != SUCCESS) {
-        //(tunit)//assertFail("Send imm. fail");  
         startOffTimer();
         sending = FALSE;
         signal Send.sendDone[currentRadio](currentMsg, error);
@@ -477,8 +479,6 @@ implementation {
     call Leds.led3Off();
     call Leds.set(0);
 #endif
-    
-    //(tunit)//assertFail("stopDone()");
     
     if(finishSplitControlRequests()) {
       // Don't duty cycle anymore.
@@ -502,9 +502,9 @@ implementation {
    * for a short period of time and try to receive a packet.
    */
   void receiveCheck() {
-    //(tunit)//assertFail("RX Check");
     received = FALSE;
     transmitterQuality = 0;
+    testPreambleQuality = FALSE;
     
     if(call Resource.immediateRequest() == SUCCESS) {
       post carrierSense();
@@ -519,6 +519,7 @@ implementation {
    */
   bool transmitterFound() {
     uint8_t pktstatus;
+    
     call Csn.clr[currentRadio]();
     call PKTSTATUS.read(&pktstatus);
     call Csn.set[currentRadio]();
@@ -527,7 +528,14 @@ implementation {
     // PQT_REACHED = 0x20
     // CCA = 0x10
     
-    return (pktstatus & 0x40);
+    if(testPreambleQuality) {
+      // Byte Detect
+      return (pktstatus & 0x20);
+      
+    } else {
+      // Energy Detect
+      return (pktstatus & 0x40);
+    }
   }
   
   
@@ -537,6 +545,10 @@ implementation {
    * we should back off and try again later.
    */
   void attemptToTurnOff() {
+    if(call OffTimer.isRunning()) {
+      return;
+    }
+    
     if(call SplitControlState.isState(S_ON) && isDutyCycling()) {
       
       if(!sending && !received) {

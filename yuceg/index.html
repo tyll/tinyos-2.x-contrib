@@ -1,16 +1,106 @@
-<html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+
+<html lang="en">
 <head>
-   <title>Index Placeholder</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta name="description" content="Cooperative,Scheduler,TinyOS,yield,multithread,multitask,thread,context switch,Yazd university,operating system,embedded system">
+  <meta name="keywords" content="Cooperative,Scheduler,TinyOS,yield,multithread,multitask,thread,context switch,Yazd university,operating system,embedded system">
+  <title>Cooperative TinyOS Scheduler</title>
+
+  <style type="text/css" media="screen">
+	body {font-size:75%;color:#222;background:#fff;font-family:"Helvetica Neue", Arial, Helvetica, sans-serif;}
+	h1, h2, h3, h4, h5, h6 {font-weight:normal;color:#111;}
+	p {margin:0 0 1.5em;}
+	.container {width:950px;margin:0 auto;}
+	a {text-decoration:none}
+	hr {background:#ddd;color:#ddd;clear:both;float:none;width:100%;height:.1em;margin:0 0 1.45em;border:none;}
+	hr.space {background:#fff;color:#fff;}
+	.error, .notice, .success {padding:.8em;margin-bottom:1em;border:2px solid #ddd;}
+	.error {background:#FBE3E4;color:#8a1f11;border-color:#FBC2C4;}
+	.notice {background:#FFF6BF;color:#514721;border-color:#FFD324;}
+	.success {background:#E6EFC2;color:#264409;border-color:#C6D880;}
+	.error a {color:#8a1f11;}
+	.notice a {color:#514721;}
+	.success a {color:#264409;}
+	pre {margin:1.5em 0;white-space:pre;}
+	pre, code, tt {font:1em 'andale mono', 'lucida console', monospace;line-height:1.5;}
+	li ul, li ol {margin:0 1.5em;}
+	ul, ol {margin:0 1.5em 1.5em 1.5em;}
+	ul {list-style-type:disc;}
+	ol {list-style-type:decimal;}	
+	.last {margin-right:0;padding-right:0;}
+	.clearfix:after, .container:after {content:"\0020";display:block;height:0;clear:both;visibility:hidden;overflow:hidden;}
+	.clearfix, .container {display:block;}
+	.clear {clear:both;}
+  </style>
 </head>
-<body TEXT="#000000" BGCOLOR="#FFFFFF" LINK="#0000EF" VLINK="#55188A" ALINK="#FF0000">
+<body>
 
-<img src="http://www.tinyos.net/scoop/images/tos-jwall.jpg"></img>
+  <div class="container">  
+    <h1>Cooperative TinyOS Scheduler</h1>
+    <hr>
+    
+    <p>This contrib project provides Cooperative task scheduling capabilities for TinyOS-2.x. 
+	The Cooperative Scheduler for TinyOS 2.x supports new Job interface. Jobs are suitable for less critical and long computations because they are cooperatively preemptable.
+	In this Scheduler basic TinyOS tasks have higher priority than jobs. </p>
+	<p>The main difference between Job and TinyOS regular task 
+is that Job allows multiple entry points and suspending 
+and resuming of execution at certain locations of its 
+code but TinyOS task has one entry point and execute 
+in run-to-completion manner.</p>
+ 
+	  <div class="success">
+		<h2> Installation & Usage : </h2>
+        <p>Copy entire project <i>tos</i> directory to <i>tos</i> directory of your TinyOs Installation or place all project files into your
+		application directory. Then go to shell and type:<br>$make mica2 <br> $make micaz<br>
+		Currently supported platforms are mica2 & micaz (ATMega128L based platforms). There are two sample application exists in <i>apps</i> directory.</p>
+	  </div>	
+		<p></p>	
+		
+	  <div class="notice">
+        <h2> Project Structure :</h2>
+<pre>Cooperative Scheduler
+|--apps
+|  |--BlockingBlink
+|  |  |--BlinkAppC.nc
+|  |  |--BlinkC.nc
+|  |  |--Makefile
+|  |  |--TinySchedulerC.nc
+|  |--BlockingRadioCountToLeds
+|  |  |--Makefile
+|  |  |--RadioCountToLeds.h
+|  |  |--RadioCountToLedsAppC.nc
+|  |  |--RadioCountToLedsC.nc
+|  |  |--TinySchedulerC.nc
+|--tos
+|  |--chips
+|  |  |--atm128
+|  |  |  |--context_switch.h
+|  |--interfaces
+|  |  |--BlockingRead.nc
+|  |  |--Job.nc
+|  |  |--JobControl.nc
+|  |  |--msleep.nc
+|  |  |--Socket.nc
+|  |--system
+|  |  |--BlockingReadC.nc
+|  |  |--BlockingReadP.nc
+|  |  |--job.h
+|  |  |--msleepC.nc
+|  |  |--msleepP.nc
+|  |  |--SchedulerP.nc
+|  |  |--SocketP.nc
+</pre>
+	</div>			
+      <div class="error">
+        <h2> Notes :</h2>
+		<ol>
+		<li><p>I only tested the code with <a href="http://compilers.cs.ucla.edu/avrora/">Avrora</a>. if you are successfully run this code on real mote, please inform me.</p></li>
+		<li><p>For parts of the code (context switch section), I used TinyThread Implementation written by William P. McCartney from Cleveland State University</p></li>
+		</ol>
+      </div>	
 
-<h1>Index Placeholder</h1>
-
-<p>
-This file is a placeholder for your personal index file.  It is linked to from your entry in the main index file found in <i>tinyos-2.x-contrib/index.html</i>.  It should be used to document any projects contained in this directory.  Please update it as appropriate. 
-</p>
-
+  </div>
 </body>
 </html>

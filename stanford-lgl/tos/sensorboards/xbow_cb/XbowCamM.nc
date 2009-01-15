@@ -50,7 +50,7 @@
  * @version October 25, 2007
  */
 
-#include "enalabCam.h"
+#include "XbowCam.h"
 #include "OV7670.h"
 
 module XbowCamM

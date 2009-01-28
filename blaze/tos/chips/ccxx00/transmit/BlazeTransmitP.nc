@@ -355,8 +355,6 @@ implementation {
       return EBUSY;
     }
     
-    call Leds.led2On();
-    
     // CCA Passed
     if(transmitDelay > 0) {
       post startTimer();
@@ -418,8 +416,6 @@ implementation {
     uint8_t myState;
     
     atomic id = m_id;
-    
-    call Leds.led2Off();
     
     call Csn.set[ id ]();
     

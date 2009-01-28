@@ -23,5 +23,5 @@ are more reliable.  Reliability wins.
 
 Since we took WoR out of commission, the structure of BlazeC's SplitControl 
 has changed. WoR needs to become re-compatible with the inlined SplitControl 
-structure to work again.
+structure to work again.  THIS IS ONLY HERE FOR REFERENCE, NOT TO USE.
 

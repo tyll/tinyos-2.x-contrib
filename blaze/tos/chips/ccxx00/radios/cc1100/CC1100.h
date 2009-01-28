@@ -141,7 +141,7 @@ enum{
   CC1100_PA_PLUS_5 = 0x85,
   CC1100_PA_PLUS_0 = 0x60,
   CC1100_PA_MINUS_5 = 0x57,
-  CC1100_PA_MINUS_10 = 0x26,	
+  CC1100_PA_MINUS_10 = 0x26,
 };
 
 #ifndef CC1100_PA
@@ -317,7 +317,10 @@ enum CC1100_config_reg_state_enums {
   
   /** TX on CCA; Stay in Rx after Rx and Tx */
   CC1100_CONFIG_MCSM1 = 0x3F,
+  
+  /** I experimented with a cal every 4th time, but I never saw any, ever..? */
   CC1100_CONFIG_MCSM0 = 0x18,
+  
   CC1100_CONFIG_FOCCFG = 0x1D,
   CC1100_CONFIG_BSCFG = 0x1C,
   CC1100_CONFIG_AGCTRL2 = 0xC7,   // If no Tx, lower LNA's (look at AGC)

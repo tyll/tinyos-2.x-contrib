@@ -53,6 +53,9 @@ module PowerCycleP {
     interface Send as SubSend[radio_id_t radioId];
     interface Receive as SubReceive[radio_id_t radioId];
     interface SplitControl as SubControl[radio_id_t radioId];
+    interface LowPowerListening;
+    interface PacketAcknowledgements;
+    interface AMPacket;
     
     interface Timer<TMilli> as OnTimer;
     interface Timer<TMilli> as OffTimer;
@@ -238,6 +241,12 @@ implementation {
  
     sending = TRUE;
     
+    if(call LowPowerListening.getRxSleepInterval(msg) > 0) {
+      if(call AMPacket.destination(msg) == AM_BROADCAST_ADDR) {
+        call PacketAcknowledgements.noAck(msg);
+      }
+    }
+    
     currentMsg = msg;
     currentLen = len;
     
@@ -270,6 +279,10 @@ implementation {
   
   /***************** SubReceive Events ****************/
   event message_t *SubReceive.receive[radio_id_t radioId](message_t *msg, void *payload, uint8_t len) {
+#if BLAZE_ENABLE_LPL_LEDS
+    call Leds.led0Toggle();
+#endif
+
     if(isDutyCycling()) {
       if(!call RadioPowerState.isState(S_ON)) {
         beginStart();
@@ -519,9 +532,24 @@ implementation {
    */
   bool transmitterFound() {
     uint8_t pktstatus;
+    uint16_t fail = 0;
     
     call Csn.clr[currentRadio]();
-    call PKTSTATUS.read(&pktstatus);
+    
+#if BLAZE_ENABLE_WHILE_LOOP_LEDS
+      call Leds.set(8);
+#endif
+
+    do {
+      call PKTSTATUS.read(&pktstatus);
+      fail++;
+    } while(!(pktstatus & 0x50) && fail < 0xFFF);
+    
+    
+#if BLAZE_ENABLE_WHILE_LOOP_LEDS
+      call Leds.set(0);
+#endif
+
     call Csn.set[currentRadio]();
     
     // CS = 0x40

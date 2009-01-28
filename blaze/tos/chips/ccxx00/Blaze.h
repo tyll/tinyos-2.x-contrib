@@ -49,7 +49,7 @@
 #endif
 
 #ifndef BLAZE_ENABLE_CRC_32
-#define BLAZE_ENABLE_CRC_32 0
+#define BLAZE_ENABLE_CRC_32 1
 #endif
 
 #ifndef PRINTF_DUTY_CYCLE

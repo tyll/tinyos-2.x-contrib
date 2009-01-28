@@ -318,11 +318,13 @@ implementation {
   task void sendDone() {
     error_t atomicError;
     atomic atomicError = myError;
-
+    
+    call Csn.clr[myRadio]();
     if(call BlazePacket.getPower(myMsg) > 0) {
       // Set the radio back to default PA settings
       call PaReg.write(call BlazeRegSettings.getPa[myRadio]());
     }
+    call Csn.set[myRadio]();
     
     if(energyDetectEnabled) {
       disableEnergyDetect();
@@ -373,8 +375,9 @@ implementation {
             // nearby transmitters.
             call SIDLE.strobe();
             call ReceiveMode.blockingSrx(myRadio);
-            call Csn.set[myRadio]();
           }
+          
+          call Csn.set[myRadio]();
           
           call Resource.release();
           call Resource.request();
@@ -384,16 +387,23 @@ implementation {
           // Attempt to send the message
           disableEnergyDetect();
           
+          call Csn.set[myRadio]();
+          call Csn.clr[myRadio]();
+          
           if(call BlazePacket.getPower(myMsg) > 0) {
             // This packet has custom PA settings
             call PaReg.write(call BlazePacket.getPower(myMsg));
           }
           
+          call Csn.set[myRadio]();
+          
           if(call AsyncSend.send[myRadio](myMsg, FALSE, (call BlazePacketBody.getMetadata(myMsg))->rxInterval) != SUCCESS) {
+            call Csn.clr[myRadio]();
             if(call BlazePacket.getPower(myMsg) > 0) {
               // Set the PA back to default for whatever ack's are taking place
               call PaReg.write(call BlazeRegSettings.getPa[myRadio]());
             }
+            call Csn.set[myRadio]();
             
             call Resource.release();
             call Resource.request();
@@ -406,10 +416,12 @@ implementation {
           disableEnergyDetect();
         }
       
+        call Csn.clr[myRadio]();
         if(call BlazePacket.getPower(myMsg) > 0) {
           // This packet has custom PA settings
           call PaReg.write(call BlazePacket.getPower(myMsg));
         }
+        call Csn.set[myRadio]();
         
         post forceSend();
         break;
@@ -461,8 +473,18 @@ implementation {
     
     call Csn.clr[myRadio]();
     // The EnergyIo right now represents CHIP_RDY.
+    
+#if BLAZE_ENABLE_WHILE_LOOP_LEDS
+      call Leds.set(7);
+#endif
+
     while(call EnergyIo.get[myRadio]());
     
+    
+#if BLAZE_ENABLE_WHILE_LOOP_LEDS
+      call Leds.set(0);
+#endif
+
 #if BLAZE_ENABLE_TIMING_LEDS
     call Leds.led3On();
 #endif

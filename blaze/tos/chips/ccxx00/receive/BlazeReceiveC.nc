@@ -49,6 +49,8 @@ configuration BlazeReceiveC {
     interface SplitControl[ radio_id_t id ];
     interface State as ReceiveState;
     interface Backoff as AckBackoff[am_id_t amId];
+    interface PacketCount as ReceivedPacketCount;
+    interface PacketCount as OverheardPacketCount;
   }
 }
 
@@ -60,6 +62,8 @@ implementation {
   SplitControl = BlazeReceiveP.SplitControl;
   RxNotify = BlazeReceiveP.RxNotify;
   AckBackoff = BlazeReceiveP.AckBackoff;
+  ReceivedPacketCount = BlazeReceiveP.ReceivedPacketCount;
+  OverheardPacketCount = BlazeReceiveP.OverheardPacketCount;
   
   components new StateC();
   BlazeReceiveP.State -> StateC;
@@ -72,7 +76,6 @@ implementation {
   BlazeReceiveP.RxInterrupt -> BlazeCentralWiringC.Gdo0_int;
   BlazeReceiveP.ChipRdy -> BlazeCentralWiringC.Gdo2_io;
   BlazeReceiveP.BlazeRegSettings -> BlazeCentralWiringC.BlazeRegSettings;
-  
   
   components MainC;
   MainC.SoftwareInit -> BlazeReceiveP;

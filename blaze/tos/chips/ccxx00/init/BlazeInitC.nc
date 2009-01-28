@@ -91,9 +91,6 @@ implementation {
   components BusyWaitMicroC;
   BlazeInitP.BusyWait -> BusyWaitMicroC;
   
-  components HplRadioResetC;
-  BlazeInitP.RadioReset -> HplRadioResetC;
-  
   components LedsC;
   BlazeInitP.Leds -> LedsC;
   

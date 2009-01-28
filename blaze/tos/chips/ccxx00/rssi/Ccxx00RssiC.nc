@@ -60,5 +60,6 @@ implementation {
   Ccxx00RssiP.Resource -> BlazeSpiResourceC;
   Ccxx00RssiP.Csn -> BlazeCentralWiringC.Csn;
   Ccxx00RssiP.RSSI -> BlazeSpiC.RSSI;
+  Ccxx00RssiP.PKTSTATUS -> BlazeSpiC.PKTSTATUS;
   
 }

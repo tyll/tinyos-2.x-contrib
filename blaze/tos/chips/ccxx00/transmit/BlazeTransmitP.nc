@@ -64,6 +64,7 @@ module BlazeTransmitP {
   provides {
     interface AsyncSend[ radio_id_t id ];
     interface AsyncSend as AckSend[ radio_id_t radioId ];
+    interface PacketCount as TransmittedPacketCount;
   }
   
   uses {
@@ -72,6 +73,7 @@ module BlazeTransmitP {
     interface GeneralIO as RxIo[radio_id_t radioId];
     interface BlazePacketBody;
     interface BlazeRegSettings;
+    interface ReceiveMode;
     
     interface BlazeFifo as TXFIFO;
   
@@ -83,8 +85,7 @@ module BlazeTransmitP {
     interface BlazeRegister as WORCTRL;
     interface BlazeRegister as MCSM1;
     interface BlazeRegister as TXBYTES;
-    
-    interface ReceiveMode as ReceiveModeAfterTx;
+    interface BlazeRegister as MARCSTATE;
     
     interface Timer<TMilli>;
     interface RadioStatus;
@@ -112,11 +113,11 @@ implementation {
   
   /***************** Global Variables ****************/
   uint8_t m_id;
-  
   void *myMsg;
   bool force;
   uint16_t duration;
-  
+  uint32_t transmittedPacketCount = 0;
+    
   /***************** Prototypes ****************/
   error_t transmit();
   void disableWor();
@@ -127,6 +128,7 @@ implementation {
   
   /***************** AsyncSend Commands ****************/
   async command error_t AsyncSend.send[ radio_id_t id ](void *msg, bool forcePkt, uint16_t preambleDurationMs) {
+    error_t error;
     if(call State.requestState(S_TX_PACKET) != SUCCESS) {
       return FAIL;
     }
@@ -144,7 +146,11 @@ implementation {
     call PacketCrc.computeCrc( myMsg );
 #endif
     
-    return transmit();
+    if((error = transmit()) == SUCCESS) {
+      transmittedPacketCount++;
+    }
+    
+    return error;
   }
   
   /***************** AckSend Commands ****************/  
@@ -165,50 +171,54 @@ implementation {
     return transmit();
   }
   
+  /***************** PacketCount Commands ****************/
+  command uint32_t TransmittedPacketCount.getTotal() {
+    return transmittedPacketCount;
+  }
   
   /***************** TXFIFO Events ****************/
   async event void TXFIFO.writeDone( uint8_t* tx_buf, uint8_t tx_len,
                                      error_t error ) {
     
     uint8_t id;
+    uint8_t count = 0;
     
     if(!call State.isIdle()) {
       atomic id = m_id;
       
       call Csn.set[id]();
       call Csn.clr[id]();
-      
+
 #if BLAZE_ENABLE_WHILE_LOOP_LEDS
       call Leds.set(1);
 #endif
-      
-      while(call RadioStatus.getRadioStatus() != BLAZE_S_RX);
-      
-      /*
-      // Wait for the TX FIFO to clear 
-      do {
-        call TXBYTES.read(&txBytes);
-      } while((txBytes & 0x3F) > 0);
-      
-      if(rxAfterTx()) {
-        call ReceiveModeAfterTx.srx(id);
-      } else {
-        finishTx();
+
+      while(call RadioStatus.getRadioStatus() != BLAZE_S_RX) {
+        count++;
+        call Csn.set[id]();
+        call Csn.clr[id]();
+        if(count > 50) {
+          call ReceiveMode.srx(id);
+          return;
+        }
       }
-      */
+
+#if BLAZE_ENABLE_WHILE_LOOP_LEDS
+      call Leds.set(0);
+#endif
       
       finishTx();
     }
   }
   
-  event void ReceiveModeAfterTx.srxDone() {
-    finishTx();
-  }
-  
-  
 
   async event void TXFIFO.readDone( uint8_t* tx_buf, uint8_t tx_len, 
       error_t error ) {
+  }
+  
+  /***************** ReceiveMode Events ****************/
+  event void ReceiveMode.srxDone() {
+    finishTx();
   }
   
   /***************** Local Functions ****************/  
@@ -248,25 +258,38 @@ implementation {
      *
      * For now, the RXFIFO fills up and is flushed in the next while loop, 
      * which clears the RxIo line and gets the receive branch moving again.
-     */
+     *
     if(call State.isState(S_TX_PACKET) && call RxIo.get[id]()) {
 #if BLAZE_ENABLE_TIMING_LEDS
       call Leds.led2Off();
 #endif
       call State.toIdle();
+      call Leds.led1Off();
       return FAIL;
     }
+    */
     
     call Csn.clr[ id ]();
     
+#if BLAZE_ENABLE_WHILE_LOOP_LEDS
+      call Leds.set(2);
+#endif
+
     while(call ChipRdy.get[id]());
     
+#if BLAZE_ENABLE_WHILE_LOOP_LEDS
+      call Leds.set(0);
+#endif
+
     /** Ensure WoR is disabled before attempting any transmission */
-    disableWor();
+    //disableWor();
     
     call Csn.set[id]();
     call Csn.clr[id]();
     
+    call ReceiveMode.blockingSrx(id);
+    
+    /*
     // Receives take priority; don't drop acknowledgments.
     // This is the last chance to abort a transmit for a receive.
     if(call State.isState(S_TX_PACKET) && call RxIo.get[id]()) {     
@@ -275,15 +298,17 @@ implementation {
 #endif
       call Csn.set[id]();
       call State.toIdle();
+      call Leds.led1Off();
       return FAIL;
     }
+    */
     
     /*
      * Attempt to transmit.  If the radio goes into TX mode, then our transmit
      * is occurring.  Otherwise, there was something on the channel that
      * prevented CCA from passing
      */
-    
+     
     if(forcing) {
       for(killSwitch = 0; (status = call RadioStatus.getRadioStatus()) != BLAZE_S_TX
           && killSwitch < MAX_FORCE_ATTEMPTS; killSwitch++) {
@@ -295,6 +320,7 @@ implementation {
       }
       
     } else {
+
 
 #if BLAZE_ENABLE_WHILE_LOOP_LEDS
       call Leds.set(3);
@@ -313,6 +339,7 @@ implementation {
 #if BLAZE_ENABLE_WHILE_LOOP_LEDS
       call Leds.set(0);
 #endif
+
     }
     
     if(status != BLAZE_S_TX) {
@@ -327,7 +354,9 @@ implementation {
       
       return EBUSY;
     }
-      
+    
+    call Leds.led2On();
+    
     // CCA Passed
     if(transmitDelay > 0) {
       post startTimer();
@@ -390,6 +419,8 @@ implementation {
     
     atomic id = m_id;
     
+    call Leds.led2Off();
+    
     call Csn.set[ id ]();
     
     myState = call State.getState();
@@ -399,6 +430,7 @@ implementation {
 #if BLAZE_ENABLE_TIMING_LEDS
       call Leds.led2Off();
 #endif
+      
       signal AsyncSend.sendDone[ id ](SUCCESS);
       
     } else {

@@ -68,7 +68,6 @@ module BlazeInitP {
     interface GeneralIO as Power[ radio_id_t id ];
     interface GpioInterrupt as Gdo0_int[ radio_id_t id ];
     interface GpioInterrupt as Gdo2_int[ radio_id_t id ];
-    interface RadioReset[ radio_id_t id ];
     
     interface BlazeRegSettings[ radio_id_t id ];
     interface RadioStatus;
@@ -148,11 +147,6 @@ implementation {
     
     call Power.set[ m_id ]();
     
-    call Csn.set[m_id]();
-    call Csn.clr[m_id]();
-    while(call Gdo2_io.get[m_id]());
-    call Csn.set[m_id]();
-    
     burstInit();
     
     return SUCCESS;
@@ -211,7 +205,7 @@ implementation {
    *     In other words, 16.27% duty cycle will read 1627.
    */  
   command uint16_t RadioOnTime.getDutyCycle() {
-    return (uint16_t) (((double) totalRadioOnTime / (double) call Timer.getNow()) * 10000);
+    return (uint16_t) (((double) call RadioOnTime.getTotalOnTime() / (double) call Timer.getNow()) * 10000);
   }
   
   
@@ -223,8 +217,17 @@ implementation {
     
     call SIDLE.strobe();
     call SRES.strobe();
-    while(call Gdo2_io.get[radioId]());
     
+#if BLAZE_ENABLE_WHILE_LOOP_LEDS
+      call Leds.set(4);
+#endif
+
+    while(call Gdo2_io.get[radioId]());
+
+#if BLAZE_ENABLE_WHILE_LOOP_LEDS
+      call Leds.set(0);
+#endif
+
     call SIDLE.strobe();
     
     call RadioInit.init(BLAZE_IOCFG2, 
@@ -235,6 +238,10 @@ implementation {
   command void ReceiveMode.blockingSrx[uint8_t clientId](radio_id_t radioId) {
     uint8_t status;
     call SRX.strobe();
+
+#if BLAZE_ENABLE_WHILE_LOOP_LEDS
+      call Leds.set(5);
+#endif
 
     while((status = call RadioStatus.getRadioStatus()) != BLAZE_S_RX) {
       call Csn.set[m_id]();
@@ -254,18 +261,21 @@ implementation {
       } else if (status == BLAZE_S_SETTLING) {
         // do nothing but don't quit the loop
           
-      } else if (status != BLAZE_S_TX) {
+      } else {
         call SRX.strobe();
       }
     }
+    
+#if BLAZE_ENABLE_WHILE_LOOP_LEDS
+      call Leds.set(0);
+#endif
+
   }
   
   
   /***************** RadioInit Events ****************/
   event void RadioInit.initDone() { 
-    call Gdo0_io.makeInput[ m_id ]();
-    call Gdo2_io.makeInput[ m_id ]();
-    
+
     call Csn.set[ m_id ]();
     call Csn.clr[ m_id ]();
     
@@ -295,10 +305,23 @@ implementation {
     uint8_t id;
     atomic id = m_id;
     
-    call RadioReset.blockUntilPowered[id]();
+    call Gdo0_io.makeInput[ m_id ]();
+    call Gdo2_io.makeInput[ m_id ]();
     
+    call Csn.set[id]();
     call Csn.clr[id]();
+
+#if BLAZE_ENABLE_WHILE_LOOP_LEDS
+      call Leds.set(6);
+#endif
+
     while(call Gdo2_io.get[id]());
+    
+    
+#if BLAZE_ENABLE_WHILE_LOOP_LEDS
+      call Leds.set(0);
+#endif
+
     call SIDLE.strobe();
     
     call RadioInit.init(BLAZE_IOCFG2, 

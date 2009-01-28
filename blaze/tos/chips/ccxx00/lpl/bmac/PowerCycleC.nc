@@ -88,6 +88,11 @@ implementation {
   PowerCycleP.OffTimer -> OffTimerC;
   PowerCycleP.Leds -> LedsC;
   
+  components ActiveMessageC;
+  PowerCycleP.LowPowerListening -> ActiveMessageC;
+  PowerCycleP.PacketAcknowledgements -> ActiveMessageC;
+  PowerCycleP.AMPacket -> ActiveMessageC;
+  
   components BlazeCentralWiringC;
   PowerCycleP.RxInterrupt -> BlazeCentralWiringC.Gdo0_int;
   PowerCycleP.Csn -> BlazeCentralWiringC.Csn;

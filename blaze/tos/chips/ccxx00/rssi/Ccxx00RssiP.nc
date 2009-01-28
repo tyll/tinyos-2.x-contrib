@@ -42,6 +42,7 @@ module Ccxx00RssiP {
   
   uses {
     interface BlazeRegister as RSSI;
+    interface BlazeRegister as PKTSTATUS;
     interface GeneralIO as Csn[radio_id_t radioId];
     interface Resource;
     interface SplitControlManager[radio_id_t radioId];
@@ -83,8 +84,17 @@ implementation {
   /****************** Functions ****************/
   void readRssi() {
     int8_t rssi;
+    uint8_t pktstatus;
+    uint16_t timeout = 0;
     
     call Csn.clr[currentClient]();
+    
+    // Verify RSSI is valid:
+    do {
+      call PKTSTATUS.read(&pktstatus);
+      timeout++;
+    } while(!(pktstatus & 0x50) && (timeout < 0xFFF));
+    
     call RSSI.read(&rssi);
     call Csn.set[currentClient]();
     call Resource.release();

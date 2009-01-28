@@ -118,14 +118,22 @@ implementation {
    */
   command void LowPowerListening.setRxSleepInterval[radio_id_t radioId](message_t *msg, 
       uint16_t sleepIntervalMs) {
-    (call BlazePacketBody.getMetadata(msg))->rxInterval = sleepIntervalMs + STATIC_WAKEUP_INCREASE;
+    if(sleepIntervalMs > 0) {
+      (call BlazePacketBody.getMetadata(msg))->rxInterval = sleepIntervalMs + STATIC_WAKEUP_INCREASE;
+    }
   }
   
   /**
    * @return the destination node's sleep interval configured in this message
    */
   command uint16_t LowPowerListening.getRxSleepInterval[radio_id_t radioId](message_t *msg) {
-    return (call BlazePacketBody.getMetadata(msg))->rxInterval - STATIC_WAKEUP_INCREASE;
+    uint16_t currentRxInterval = (call BlazePacketBody.getMetadata(msg))->rxInterval;
+    
+    if(currentRxInterval > 0) {
+      return currentRxInterval - STATIC_WAKEUP_INCREASE;
+    }
+    
+    return 0;
   }
   
   /**

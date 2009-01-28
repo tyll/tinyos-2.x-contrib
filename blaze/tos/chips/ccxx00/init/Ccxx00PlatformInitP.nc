@@ -79,6 +79,12 @@ implementation {
     for(i = 0; i < uniqueCount(UQ_BLAZE_RADIO); i++) {
       timeout = 0;
       call Csn.clr[i]();
+      
+#if BLAZE_ENABLE_WHILE_LOOP_LEDS
+      call Leds.set(9);
+#endif
+
+      // First, wait for the chip to be ready to use.
       while(call ChipRdy.get[i]()) {
         timeout++;
         if(timeout > 10000) {
@@ -93,6 +99,20 @@ implementation {
         }
       }
       
+      // Second, do another reset. Yes, this is mandatory.
+      call Csn.set[i]();
+      call Csn.clr[i]();
+      call SRES.strobe();
+      call Csn.set[i]();
+      call Csn.clr[i]();
+      while(call ChipRdy.get[i]());
+      
+#if BLAZE_ENABLE_WHILE_LOOP_LEDS
+      call Leds.set(0);
+#endif
+      
+      // Finally, put the radio to sleep.
+      call Csn.clr[i]();
       call SIDLE.strobe();
       call SPWD.strobe();
       call Csn.set[i]();

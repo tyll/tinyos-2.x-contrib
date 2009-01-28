@@ -60,6 +60,7 @@ configuration BlazeTransmitC {
   provides {
     interface AsyncSend[ radio_id_t id ];
     interface AsyncSend as AckSend[ radio_id_t radioId ];
+    interface PacketCount as TransmittedPacketCount;
   }
 }
 
@@ -68,6 +69,7 @@ implementation {
   components BlazeTransmitP;
   AsyncSend = BlazeTransmitP.AsyncSend;
   AckSend = BlazeTransmitP.AckSend;
+  TransmittedPacketCount = BlazeTransmitP.TransmittedPacketCount;
   
   components new StateC();
   BlazeTransmitP.State -> StateC;
@@ -88,15 +90,16 @@ implementation {
   BlazeTransmitP.WORCTRL -> Spi.WORCTRL;
   BlazeTransmitP.MCSM1 -> Spi.MCSM1;
   BlazeTransmitP.TXBYTES -> Spi.TXBYTES;
-  
-  components new ReceiveModeC() as ReceiveModeAfterTxC;
-  BlazeTransmitP.ReceiveModeAfterTx -> ReceiveModeAfterTxC;
-  
+  BlazeTransmitP.MARCSTATE -> Spi.MARCSTATE;
+    
   components new TimerMilliC();
   BlazeTransmitP.Timer -> TimerMilliC;
   
   components BlazePacketC;
   BlazeTransmitP.BlazePacketBody -> BlazePacketC;
+  
+  components new ReceiveModeC();
+  BlazeTransmitP.ReceiveMode -> ReceiveModeC;
   
   components LedsC;
   BlazeTransmitP.Leds -> LedsC;

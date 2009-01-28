@@ -51,6 +51,8 @@ module BlazeReceiveP {
     interface AckReceive;
     interface RxNotify[ radio_id_t id ];
     interface Backoff as AckBackoff[am_id_t amId];
+    interface PacketCount as ReceivedPacketCount;
+    interface PacketCount as OverheardPacketCount;
   }
   
   uses {
@@ -107,6 +109,12 @@ implementation {
   
   /** Total number of acks sent for the current received message */
   uint8_t totalAcks;
+  
+  /** Total number of packets received into this node for statistics */
+  uint32_t totalPacketsReceived = 0;
+  
+  /** Total number of packets overheard by this node for statistics */
+  uint32_t totalPacketsOverheard = 0;
   
   
   enum receive_states{
@@ -194,11 +202,21 @@ implementation {
     return SUCCESS;
   }
   
+  /***************** PacketCount Commands ****************/
+  command uint32_t ReceivedPacketCount.getTotal() {
+    return totalPacketsReceived;
+  }
+  
+  command uint32_t OverheardPacketCount.getTotal() {
+    return totalPacketsOverheard;
+  }
+  
+  
   /***************** RxInterrupt Events ****************/
   async event void RxInterrupt.fired[ radio_id_t id ]() {
     if((call BlazeRegSettings.getDefaultRegisters[id]())[BLAZE_IOCFG0] != 0x01) {
       return;
-    } 
+    }
     
 #if BLAZE_ENABLE_SPI_WOR_RX_LEDS
     call Leds.led0On();
@@ -324,6 +342,8 @@ implementation {
           if(passesAddressFilter(header, id)) {
             if(passesPanFilter(header, id)) {
               if( passesCrcFilter( header ) ) {
+                totalPacketsReceived++;
+                
                 if(shouldAck(header, id)) {
                   // Send an ack and then receive the packet in AckSend.sendDone()
                   atomic {
@@ -357,6 +377,7 @@ implementation {
           // This is a data packet that is not for me.
           // Allow the real destination node time to acknowledge the packet 
           // without interruption from this node's transmit branch.
+          totalPacketsOverheard++;
           ackBackoff();
           return;
         }

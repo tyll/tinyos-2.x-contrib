@@ -208,10 +208,6 @@ implementation {
   
   /***************** Tasks ***************/
   task void send() {
-    if(call PacketLink.getRetries(currentSendMsg) > 0) {
-      call PacketAcknowledgements.requestAck(currentSendMsg);
-    }
-    
     if(call SubSend.send(currentSendMsg, currentSendLen) != SUCCESS) {
       post send();
     }

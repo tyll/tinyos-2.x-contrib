@@ -95,8 +95,17 @@ configuration BlazeC {
     /** CTP Required Interface */
     interface LinkPacketMetadata;
     
-    /** Find out how long any radio has been turned on in any state */
+    /** Stats: Find out how long any radio has been turned on in any state */
     interface RadioOnTime;
+    
+    /** Stats: Total number of packets transmitted by this node */
+    interface PacketCount as TransmittedPacketCount;
+    
+    /** Stats: Total number of packets received by this node */
+    interface PacketCount as ReceivedPacketCount;
+    
+    /** Stats: Total number of packets overheard by this node */
+    interface PacketCount as OverheardPacketCount;
   }
 }
 
@@ -137,9 +146,10 @@ implementation {
   
   components UniqueSendC;
   components UniqueReceiveC;
+
   components BlazeReceiveC;
   components BlazeInitC;
-  RadioOnTime = BlazeInitC;
+  components BlazeTransmitC;
   
   /***************** Send Layers ****************/
   BlazeActiveMessageC.SubSend -> UniqueSendC.Send;
@@ -165,6 +175,13 @@ implementation {
   BlazeSplitControl = SplitControlManagerC.SplitControl;
   SplitControlManagerC.SubControl -> LplC.SplitControl;
   LplC.SubControl -> Ccxx00PowerManagerC.SplitControl;
+  
+  
+  /***************** Radio Statistics and Usage Collection ****************/
+  RadioOnTime = BlazeInitC;
+  ReceivedPacketCount = BlazeReceiveC.ReceivedPacketCount;
+  OverheardPacketCount = BlazeReceiveC.OverheardPacketCount;
+  TransmittedPacketCount = BlazeTransmitC.TransmittedPacketCount;
   
 }
 

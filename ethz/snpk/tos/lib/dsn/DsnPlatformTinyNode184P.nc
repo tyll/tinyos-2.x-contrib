@@ -1,4 +1,5 @@
 #include "DSN.h"
+#include "msp430usart.h"
 generic module DsnPlatformTinyNode184P(bool useHandshake) {
 	provides {
 		interface DsnPlatform;
@@ -6,14 +7,13 @@ generic module DsnPlatformTinyNode184P(bool useHandshake) {
 		interface Resource as DummyResource; // this resource is once granted, never released
 	}
 	uses {
-		interface HplMsp430Usart;
+		interface HplMsp430UsciUart as HplMsp430Usart;
 		interface GeneralIO as TxPin;
 		interface GeneralIO as RxRTSPin;
 		interface GeneralIO as RxCTSPin;
 		interface GpioInterrupt as RxRTSInt;
 		command void setAmAddress(am_addr_t a);
 		interface Packet;
-		interface SplitControl as RadioControl;
 		interface Resource;
 	}
 }
@@ -81,7 +81,7 @@ implementation {
 	}
 	
 	command uint8_t DsnPlatform.getHeaderLength() {
-		return sizeof(sx1211_header_t);
+		return 0;
 	}
 	
 	command void* DsnPlatform.getHeader( message_t* msg ) {
@@ -89,16 +89,13 @@ implementation {
 	}
 	
 	command uint8_t DsnPlatform.getPayloadLength(message_t * msg) {
-		return call Packet.payloadLength(msg);
+		return 0;
 	}
 	
 	async command bool DsnPlatform.isHandshake() {
 		return useHandshake;
 	}
-	  	
-	event void RadioControl.startDone(error_t error) {}
-	event void RadioControl.stopDone(error_t error) {}
-	
+	  		
   	async command msp430_uart_union_config_t* Msp430UartConfigure.getConfig() {
 	    return &dsn_config;
   	}

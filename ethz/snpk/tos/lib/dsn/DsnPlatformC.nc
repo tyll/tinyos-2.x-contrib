@@ -95,8 +95,8 @@ implementation {
 	   	components new Msp430GpioC() as TxPin;
 		#if USART == 1
 			components new DsnPlatformTinyNode184P(FALSE);
-			components new Msp430Uart1C() as Uart;
-			components HplMsp430Usart1C as HplUsart;
+			components new Msp430UartA1C() as Uart;
+			components HplMsp430UsciA1C as HplUsart;
 			TxPin.HplGeneralIO -> HplMsp430GeneralIOC.UTXD1;
 			Resource = DsnPlatformTinyNode184P.DummyResource;
 			DsnPlatformTinyNode184P.Resource -> Uart;
@@ -107,9 +107,6 @@ implementation {
 		DsnPlatformTinyNode184P.TxPin -> TxPin;
 		DsnPlatformTinyNode184P.HplMsp430Usart->HplUsart;
 
-		components ActiveMessageC;
-		DsnPlatformTinyNode184P.Packet->ActiveMessageC;
-		DsnPlatformTinyNode184P.RadioControl->ActiveMessageC;
 		components ActiveMessageAddressC;
 		DsnPlatformTinyNode184P.setAmAddress -> ActiveMessageAddressC;
 	#endif

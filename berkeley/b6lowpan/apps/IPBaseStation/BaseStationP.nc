@@ -173,7 +173,7 @@ implementation
     echo_busy = TRUE;
     // delay sending the reply for a bit
     // the pc seems to usually drop the packet if we don't do this; 
-    call ConfigureTimer.startOneShot(50);
+    call ConfigureTimer.startOneShot(200);
   }
 
   event void Boot.booted() {

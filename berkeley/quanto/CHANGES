@@ -1,0 +1,16 @@
+Changes Friday, Feb 13th, 2009
+Rodrigo Fonseca
+
+Summary
+* Brought the code up to date with current tinyos-2.x HEAD (as of Feb 13th, 2009)
+  Thanks to Thomas Schmid (UCLA) for a patch for the UART and the EnergyMeter
+
+* Added some improvements and fixes, mainly a new streaming logging method over 
+  the UART, some improvements on how the scheduler handles returning from interrupts.
+  
+  
+  New scheduler that has a new type of task (TaskQuanto) that runs at low priority
+  New serial stack that uses low priority tasks to run Quanto logging
+  Switch from interrupt to a scheduled task does not log an extra switch to idle
+  
+

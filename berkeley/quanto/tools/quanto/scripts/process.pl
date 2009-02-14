@@ -214,6 +214,7 @@ if ($plots[0][1] =~ /idle/) {
 }
 print GP "plot [0:][0:5] \\\n";
 print GP "h=". $seen_resource{$plots[0][0]} .", h+w w boxes fs solid lt -1 t '',\\\n";
+print GP "       h-w w boxes fs solid lt rgbcolor 'white' t '',\\\n";
 $last_height = $seen_resource{$plots[0][0]};
 print GP "'$foutname.dat' index 0 u (us2ms(\$2)):(h-w):(us2ms(\$4)) w boxes fs solid lt $lt{$plots[0][1]} t '$plots[0][1]'";
 
@@ -231,6 +232,7 @@ for (my $i = 1; $i < scalar @plots; $i++) {
     if ($seen_resource{$plots[$i][0]} != $last_height) {
        $last_height = $seen_resource{$plots[$i][0]};
        print GP ",\\\n h=$last_height, h+w w boxes fs solid lt -1 t ''";
+       print GP ",\\\n       h-w w boxes fs solid lt rgbcolor 'white' t ''";
     }
     print GP ",\\\n       ''index $i u (us2ms(\$2)):(h-w):(us2ms(\$4)) w boxes fs solid lt $lt{$plots[$i][1]} t '$title'";
 }

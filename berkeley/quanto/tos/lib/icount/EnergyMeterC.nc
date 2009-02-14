@@ -46,4 +46,8 @@ implementation {
   EnergyMeterP.Msp430TimerA -> Msp430TimerC.TimerA;
   EnergyMeterP.Port21 -> HplMsp430GeneralIOC.Port21;
   EnergyMeterP.Port62 -> HplMsp430GeneralIOC.Port62;
+  EnergyMeterP.Port63 -> HplMsp430GeneralIOC.Port63;
+  EnergyMeterP.Port64 -> HplMsp430GeneralIOC.Port64;
+  EnergyMeterP.Port65 -> HplMsp430GeneralIOC.Port65;
+  
 }

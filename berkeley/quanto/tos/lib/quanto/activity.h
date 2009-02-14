@@ -25,6 +25,8 @@ enum {
     ACT_TYPE_IDLE  = 0,
     ACT_TYPE_UNKNOWN = 0x7F,
     ACT_TYPE_QUANTO  = 0x7E,
+
+    ACT_TYPE_QUANTO_WRITER = 0x77,
 };
 
 #if 0
@@ -36,6 +38,9 @@ enum {
 inline act_t mk_act_local(act_type_t a) {
     return (act_t) ((TOS_NODE_ID & ACT_NODE_MASK) << ACT_NODE_OFF | 
                     (a & ACT_TYPE_MASK));
+}
+inline uint8_t is_idle(act_type_t a) {
+    return (!(a & ACT_TYPE_MASK));
 }
 #endif
 #endif

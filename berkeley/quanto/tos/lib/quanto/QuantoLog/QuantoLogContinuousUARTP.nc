@@ -119,7 +119,7 @@ implementation {
             xe->res_id = e->res_id;
             xe->time   = e->time;
             xe->ic     = e->ic;
-            xe->act    = e->act;
+            xe->arg    = e->act;
 
             if (call UARTSend.send(AM_BROADCAST_ADDR, &uart_msg, len) == SUCCESS) {
                m_sending = 1;
@@ -236,6 +236,7 @@ implementation {
         call SerialControl.stop();
         call EnergyMeter.pause();
         m_state = STOPPING;
+        return SUCCESS;
     } 
 
 	event void SerialControl.stopDone(error_t error) {

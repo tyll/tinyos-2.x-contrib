@@ -34,11 +34,11 @@
  * @version $Revision$ $Date$
  */
 
-module CC2420CsmaP {
+module CC2420CsmaP @safe() {
 
   provides interface SplitControl;
   provides interface Send;
-  provides interface RadioBackoff[am_id_t amId];
+  provides interface RadioBackoff;
 
   uses interface Resource;
   uses interface CC2420Power;
@@ -46,7 +46,6 @@ module CC2420CsmaP {
   uses interface CC2420Transmit;
   uses interface RadioBackoff as SubBackoff;
   uses interface Random;
-  uses interface AMPacket;
   uses interface Leds;
   uses interface CC2420Packet;
   uses interface CC2420PacketBody;
@@ -67,7 +66,7 @@ implementation {
     S_TRANSMITTING,
   };
 
-  message_t* m_msg;
+  message_t* ONE_NOK m_msg;
   
   error_t sendErr = SUCCESS;
   
@@ -75,7 +74,6 @@ implementation {
   norace bool ccaOn;
   
   /****************** Prototypes ****************/
-  task void startDone_task();
   task void startDone_task();
   task void stopDone_task();
   task void sendDone_task();
@@ -140,21 +138,22 @@ implementation {
       m_msg = p_msg;
     }
 
-    header->length = len;
+    header->length = len + CC2420_SIZE;
     header->fcf &= 1 << IEEE154_FCF_ACK_REQ;
     header->fcf |= ( ( IEEE154_TYPE_DATA << IEEE154_FCF_FRAME_TYPE ) |
 		     ( 1 << IEEE154_FCF_INTRAPAN ) |
 		     ( IEEE154_ADDR_SHORT << IEEE154_FCF_DEST_ADDR_MODE ) |
 		     ( IEEE154_ADDR_SHORT << IEEE154_FCF_SRC_ADDR_MODE ) );
-    header->src = call AMPacket.address();
+
     metadata->ack = FALSE;
     metadata->rssi = 0;
     metadata->lqi = 0;
-    metadata->time = 0;
-    
+    metadata->timesync = FALSE;
+    metadata->timestamp = CC2420_INVALID_TIMESTAMP;
+
     ccaOn = TRUE;
-    signal RadioBackoff.requestCca[((cc2420_header_t*)(m_msg->data - 
-        sizeof(cc2420_header_t)))->type](m_msg);
+    signal RadioBackoff.requestCca(m_msg);
+
     call CC2420Transmit.send( m_msg, ccaOn );
     return SUCCESS;
 
@@ -162,7 +161,7 @@ implementation {
 
   command void* Send.getPayload(message_t* m, uint8_t len) {
     if (len <= call Send.maxPayloadLength()) {
-      return m->data;
+      return (void* COUNT_NOK(len))m->data;
     }
     else {
       return NULL;
@@ -178,7 +177,7 @@ implementation {
    * Must be called within a requestInitialBackoff event
    * @param backoffTime the amount of time in some unspecified units to backoff
    */
-  async command void RadioBackoff.setInitialBackoff[am_id_t amId](uint16_t backoffTime) {
+  async command void RadioBackoff.setInitialBackoff(uint16_t backoffTime) {
     call SubBackoff.setInitialBackoff(backoffTime);
   }
   
@@ -186,7 +185,7 @@ implementation {
    * Must be called within a requestCongestionBackoff event
    * @param backoffTime the amount of time in some unspecified units to backoff
    */
-  async command void RadioBackoff.setCongestionBackoff[am_id_t amId](uint16_t backoffTime) {
+  async command void RadioBackoff.setCongestionBackoff(uint16_t backoffTime) {
     call SubBackoff.setCongestionBackoff(backoffTime);
   }
       
@@ -195,7 +194,7 @@ implementation {
    * event
    * @param ccaOn TRUE to enable CCA, which is the default.
    */
-  async command void RadioBackoff.setCca[am_id_t amId](bool useCca) {
+  async command void RadioBackoff.setCca(bool useCca) {
     ccaOn = useCca;
   }
   
@@ -223,20 +222,19 @@ implementation {
     call SubBackoff.setInitialBackoff ( call Random.rand16() 
         % (0x1F * CC2420_BACKOFF_PERIOD) + CC2420_MIN_BACKOFF);
         
-    signal RadioBackoff.requestInitialBackoff[((cc2420_header_t*)(msg->data - 
-        sizeof(cc2420_header_t)))->type](msg);
+    signal RadioBackoff.requestInitialBackoff(msg);
   }
 
   async event void SubBackoff.requestCongestionBackoff(message_t *msg) {
     call SubBackoff.setCongestionBackoff( call Random.rand16() 
         % (0x7 * CC2420_BACKOFF_PERIOD) + CC2420_MIN_BACKOFF);
 
-    signal RadioBackoff.requestCongestionBackoff[((cc2420_header_t*)(msg->data - 
-        sizeof(cc2420_header_t)))->type](msg);
+    signal RadioBackoff.requestCongestionBackoff(msg);
   }
   
   async event void SubBackoff.requestCca(message_t *msg) {
     // Lower layers than this do not configure the CCA settings
+    signal RadioBackoff.requestCca(msg);
   }
   
   
@@ -288,17 +286,15 @@ implementation {
   default event void SplitControl.stopDone(error_t error) {
   }
   
-  
-  default async event void RadioBackoff.requestInitialBackoff[am_id_t amId](
-      message_t *msg) {
+  default async event void RadioBackoff.requestInitialBackoff(message_t *msg) {
   }
 
-  default async event void RadioBackoff.requestCongestionBackoff[am_id_t amId](
-      message_t *msg) {
+  default async event void RadioBackoff.requestCongestionBackoff(message_t *msg) {
   }
   
-  default async event void RadioBackoff.requestCca[am_id_t amId](
-      message_t *msg) {
+  default async event void RadioBackoff.requestCca(message_t *msg) {
   }
+  
+  
 }
 

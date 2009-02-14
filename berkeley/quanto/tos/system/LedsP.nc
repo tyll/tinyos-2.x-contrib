@@ -1,6 +1,6 @@
 // $Id$
 
-/*									tab:4
+/*
  * "Copyright (c) 2000-2005 The Regents of the University  of California.  
  * All rights reserved.
  *
@@ -30,7 +30,7 @@
  * @date   March 21, 2005
  */
 
-module LedsP {
+module LedsP @safe() {
   provides {
     interface Init;
     interface Leds;

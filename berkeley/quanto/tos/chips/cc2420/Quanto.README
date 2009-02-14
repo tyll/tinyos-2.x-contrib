@@ -29,3 +29,19 @@ The RadioContext is painted:
 
  - with Idle after TXFIFO.writedone, unless we are not sampling CCA
 
+Some relevant pages from the datasheet:
+States: pg 43
+Currents: pgs 12 and 13
+CC2420 Quiescent current: 13 ~29 uA
+Voltage regulator off: 1uA
+Power down mode: 20uA 
+Idle mode: 426uA (crystal oscillator and voltage regulator)
+Receive mode: 19.7mA
+Transmit mode: 
+ 31      0  dBm     17.4 mA
+ 19     -5  dBm     14   mA
+ 11     -10 dBm     11   mA
+  7     -15 dBm      9.9 mA
+  3     -25 dBm      8.5 mA
+
+Is the Listen pw the same as the RX?

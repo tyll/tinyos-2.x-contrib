@@ -47,6 +47,11 @@ implementation
   components new TimerMilliC() as Timer1;
   components new TimerMilliC() as Timer2;
 
+  //components QuantoLogPortWriterC;
+  components QuantoLogMyUARTWriterC;
+  components ResourceContextsC;
+  
+  BlinkC.CPUContext -> ResourceContextsC.CPUContext;
 
   BlinkC -> MainC.Boot;
 
@@ -54,14 +59,5 @@ implementation
   BlinkC.Timer1 -> Timer1;
   BlinkC.Timer2 -> Timer2;
   BlinkC.Leds -> LedsC;
-
-  components ResourceContextsC;
-  //components QuantoLogContinuousUARTC as QuantoLog;
-  //components QuantoLogRawUARTC as QuantoLog;
-  components QuantoLogStagedUARTC as QuantoLog;
-  components UserButtonC;
-  BlinkC.CPUContext -> ResourceContextsC.CPUContext;
-  BlinkC.QuantoLog -> QuantoLog;
-  BlinkC.UserButtonNotify -> UserButtonC;
 }
 

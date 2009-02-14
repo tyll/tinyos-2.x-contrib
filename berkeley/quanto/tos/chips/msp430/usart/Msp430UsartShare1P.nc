@@ -39,6 +39,7 @@ configuration Msp430UsartShare1P {
 
   provides interface HplMsp430UsartInterrupts as Interrupts[ uint8_t id ];
   provides interface Resource[ uint8_t id ];
+  provides interface ResourceRequested[ uint8_t id ];
   provides interface ArbiterInfo;
 
   uses interface ResourceConfigure[ uint8_t id ];
@@ -52,6 +53,7 @@ implementation {
 
   components new FcfsArbiterC( MSP430_HPLUSART1_RESOURCE ) as ArbiterC;
   Resource = ArbiterC;
+  ResourceRequested = ArbiterC;
   ResourceConfigure = ArbiterC;
   ArbiterInfo = ArbiterC;
   UsartShareP.ArbiterInfo -> ArbiterC;

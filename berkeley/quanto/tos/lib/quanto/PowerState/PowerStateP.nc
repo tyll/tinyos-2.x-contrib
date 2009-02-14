@@ -35,28 +35,40 @@ implementation {
     inline async command void
     PowerState.setBits[uint8_t id](powerstate_t mask, uint8_t offset, powerstate_t value)
     {
-       powerstate_t new_value = (m_state[id] & ~mask) | ((value << offset) & mask);  
+       powerstate_t new_value;
+       atomic {
+        new_value = (m_state[id] & ~mask) | ((value << offset) & mask);  
+       }
        call PowerState.set[id](new_value);
     }
 
     inline async command void
     PowerState.unsetBits[uint8_t id](powerstate_t mask)
     {
-        powerstate_t new_value = (m_state[id] & ~mask);
+        powerstate_t new_value;
+        atomic {
+          new_value = (m_state[id] & ~mask);
+        }
         call PowerState.set[id](new_value);
     }        
 
     inline async command void
     PowerState.setBit[uint8_t id](uint8_t bit)
     {
-        powerstate_t new_value = (m_state[id] | (1 << bit));
+        powerstate_t new_value;
+        atomic {
+          new_value = (m_state[id] | (1 << bit));
+        }
         call PowerState.set[id](new_value);
     }        
 
     inline async command void
     PowerState.unsetBit[uint8_t id](uint8_t bit)
     {
-        powerstate_t new_value = (m_state[id] & ~(1 << bit));
+        powerstate_t new_value;
+        atomic {
+            new_value = (m_state[id] & ~(1 << bit));
+        }
         call PowerState.set[id](new_value);
     }        
 

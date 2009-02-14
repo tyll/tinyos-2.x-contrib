@@ -12,6 +12,8 @@ Using Quanto:
  * Ideally you need a mote that has iCount (some Epic boards do). If
    you don't have iCount, then you will get no energy readings, just
    activity and timings
+ * We have a new logging system that logs to the UART. It adds some
+   overhead, but you may choose to use it instead.
  * The logging system is quite poor in this version. It logs 700
    messages to RAM and then dumps it to the UART.
 

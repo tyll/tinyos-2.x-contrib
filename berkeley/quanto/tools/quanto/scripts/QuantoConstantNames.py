@@ -10,6 +10,7 @@ QuantoActivityNames = {
   QuantoCoreConstants.ACT_TYPE_IDLE : 'idle',
   QuantoCoreConstants.ACT_TYPE_UNKNOWN : 'unkn',
   QuantoCoreConstants.ACT_TYPE_QUANTO  : 'quanto_logging',
+  QuantoCoreConstants.ACT_TYPE_QUANTO_WRITER : 'writer',
   QuantoCC2420Constants.ACT_PXY_CC2420_RX: 'pxy_RX',
   QuantoTimerConstants.ACT_TIMER : 'VTimer',
   Msp430Constants.ACT_PXY_ADC     : 'int_ADC'    ,

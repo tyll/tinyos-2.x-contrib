@@ -37,10 +37,11 @@
  */
 
 #include "IEEE802154.h"
-#include "CC2420.h"
+#include "message.h"
+#include "AM.h"
 #include "activity.h"
 
-module CC2420ReceiveP {
+module CC2420ReceiveP @safe() {
 
   provides interface Init;
   provides interface StdControl;
@@ -60,7 +61,8 @@ module CC2420ReceiveP {
   uses interface CC2420Packet;
   uses interface CC2420PacketBody;
   uses interface CC2420Config;
-  
+  uses interface PacketTimeStamp<T32khz,uint32_t>;
+
   uses interface Leds;
 
   uses interface SingleContext as RadioContext;
@@ -84,8 +86,8 @@ implementation {
     SACK_HEADER_LENGTH = 7,
   };
 
-  uint16_t m_timestamp_queue[ TIMESTAMP_QUEUE_SIZE ];
-  
+  uint32_t m_timestamp_queue[ TIMESTAMP_QUEUE_SIZE ];
+
   uint8_t m_timestamp_head;
   
   uint8_t m_timestamp_size;
@@ -101,7 +103,7 @@ implementation {
   
   norace uint8_t m_bytes_left;
   
-  norace message_t* m_p_rx_buf;
+  norace message_t* ONE_NOK m_p_rx_buf;
 
   message_t m_rx_buf;
   
@@ -116,6 +118,7 @@ implementation {
   void receive();
   void waitForNextPacket();
   void flush();
+  bool passesAddressCheck(message_t * ONE msg);
   
   task void receiveDone_task();
   
@@ -132,6 +135,10 @@ implementation {
       reset_state();
       m_state = S_STARTED;
       atomic receivingPacket = FALSE;
+      /* Note:
+         We use the falling edge because the FIFOP polarity is reversed. 
+         This is done in CC2420Power.startOscillator from CC2420ControlP.nc.
+       */
       call InterruptFIFOP.enableFallingEdge();
     }
     return SUCCESS;
@@ -152,7 +159,7 @@ implementation {
    * Start frame delimiter signifies the beginning/end of a packet
    * See the CC2420 datasheet for details.
    */
-  async command void CC2420Receive.sfd( uint16_t time ) {
+  async command void CC2420Receive.sfd( uint32_t time ) {
     if ( m_timestamp_size < TIMESTAMP_QUEUE_SIZE ) {
       uint8_t tail =  ( ( m_timestamp_head + m_timestamp_size ) % 
                         TIMESTAMP_QUEUE_SIZE );
@@ -202,8 +209,8 @@ implementation {
   async event void RXFIFO.readDone( uint8_t* rx_buf, uint8_t rx_len,
                                     error_t error ) {
     cc2420_header_t* header = call CC2420PacketBody.getHeader( m_p_rx_buf );
-    cc2420_metadata_t* metadata = call CC2420PacketBody.getMetadata( m_p_rx_buf );
-    uint8_t* buf = (uint8_t*) header;
+    uint8_t tmpLen __DEPUTY_UNUSED__ = sizeof(message_t) - (offsetof(message_t, data) - sizeof(cc2420_header_t));
+    uint8_t* COUNT(tmpLen) buf = TCAST(uint8_t* COUNT(tmpLen), header);
     rxFrameLength = buf[ 0 ];
 
     switch( m_state ) {
@@ -292,16 +299,25 @@ implementation {
         call SpiResource.release();
       }
       
-      if ( m_timestamp_size ) {
-        if ( rxFrameLength > 10 ) {
-          metadata->time = m_timestamp_queue[ m_timestamp_head ];
+      //new packet is buffered up, or we don't have timestamp in fifo, or ack
+      if ( ( m_missed_packets && call FIFO.get() ) || !call FIFOP.get()
+            || !m_timestamp_size
+            || rxFrameLength <= 10) {
+        call PacketTimeStamp.clear(m_p_rx_buf);
+      }
+      else {
+          if (m_timestamp_size==1)
+            call PacketTimeStamp.set(m_p_rx_buf, m_timestamp_queue[ m_timestamp_head ]);
           m_timestamp_head = ( m_timestamp_head + 1 ) % TIMESTAMP_QUEUE_SIZE;
           m_timestamp_size--;
-        }
-      } else {
-        metadata->time = 0xffff;
+
+          if (m_timestamp_size>0) {
+            call PacketTimeStamp.clear(m_p_rx_buf);
+            m_timestamp_head = 0;
+            m_timestamp_size = 0;
+          }
       }
-      
+
       // We may have received an ack that should be processed by Transmit
       // buf[rxFrameLength] >> 7 checks the CRC
       if ( ( buf[ rxFrameLength ] >> 7 ) && rx_buf ) {
@@ -338,14 +354,20 @@ implementation {
    */
   task void receiveDone_task() {
     cc2420_metadata_t* metadata = call CC2420PacketBody.getMetadata( m_p_rx_buf );
-    uint8_t* buf = (uint8_t*) call CC2420PacketBody.getHeader( m_p_rx_buf );;
+    cc2420_header_t* header = call CC2420PacketBody.getHeader( m_p_rx_buf);
+    uint8_t length = header->length;
+    uint8_t tmpLen __DEPUTY_UNUSED__ = sizeof(message_t) - (offsetof(message_t, data) - sizeof(cc2420_header_t));
+    uint8_t* COUNT(tmpLen) buf = TCAST(uint8_t* COUNT(tmpLen), header);
     
-    metadata->crc = buf[ rxFrameLength ] >> 7;
-    metadata->lqi = buf[ rxFrameLength ] & 0x7f;
-    metadata->rssi = buf[ rxFrameLength - 1 ];
-    m_p_rx_buf = signal Receive.receive( m_p_rx_buf, m_p_rx_buf->data, 
-                                         rxFrameLength );
-
+    metadata->crc = buf[ length ] >> 7;
+    metadata->lqi = buf[ length ] & 0x7f;
+    metadata->rssi = buf[ length - 1 ];
+    
+    if (passesAddressCheck(m_p_rx_buf) && length >= CC2420_SIZE) {
+      m_p_rx_buf = signal Receive.receive( m_p_rx_buf, m_p_rx_buf->data, 
+					   length - CC2420_SIZE);
+    }
+    
     atomic receivingPacket = FALSE;
     waitForNextPacket();
   }
@@ -401,6 +423,7 @@ implementation {
     call RXFIFO.beginRead( (uint8_t*)(call CC2420PacketBody.getHeader( m_p_rx_buf )), 1 );
   }
 
+
   /**
    * Determine if there's a packet ready to go, or if we should do nothing
    * until the next packet arrives
@@ -451,4 +474,17 @@ implementation {
     m_missed_packets = 0;
   }
 
+  /**
+   * @return TRUE if the given message passes address recognition
+   */
+  bool passesAddressCheck(message_t *msg) {
+    cc2420_header_t *header = call CC2420PacketBody.getHeader( msg );
+    
+    if(!(call CC2420Config.isAddressRecognitionEnabled())) {
+      return TRUE;
+    }
+    
+    return (header->dest == call CC2420Config.getShortAddr()
+        || header->dest == AM_BROADCAST_ADDR);
+  }
 }

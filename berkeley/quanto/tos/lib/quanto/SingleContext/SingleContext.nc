@@ -47,12 +47,20 @@ interface SingleContext {
      */
     async command act_t enterInterrupt(act_t newActivity);
 
-    /** Called before the end of an interrupt handler.
+    /** Called before the end of an interrupt handler. If the
+     *  restore activity is _idle_, this function doesn't register
+     *  change. This is because the task loop will do so
+     *  appropriately.
      *  @param restoreContext the old context to be restored after the
      *                        handler returns. This is kept as a stack
      *                        variable by the handler.
      */
     async command void   exitInterrupt(act_t restoreActivity);
+    /** Forces an exitInterrupt returning the context to idle. 
+     *  This should be called by the scheduler, on the first time
+     *  after waking up from an interrupt.
+     */
+    async command void   exitInterruptIdle();
 
 }
 

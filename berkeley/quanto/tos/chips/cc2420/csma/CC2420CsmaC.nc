@@ -44,7 +44,7 @@ configuration CC2420CsmaC {
   provides interface SplitControl;
   provides interface Send;
   provides interface Receive;
-  provides interface RadioBackoff[am_id_t amId];
+  provides interface RadioBackoff;
 
 }
 
@@ -54,9 +54,6 @@ implementation {
   RadioBackoff = CsmaP;
   SplitControl = CsmaP;
   Send = CsmaP;
-  
-  components CC2420ActiveMessageC;
-  CsmaP.AMPacket -> CC2420ActiveMessageC;
   
   components CC2420ControlC;
   CsmaP.Resource -> CC2420ControlC;

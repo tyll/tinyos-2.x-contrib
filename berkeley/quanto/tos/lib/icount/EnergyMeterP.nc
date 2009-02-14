@@ -36,6 +36,10 @@ module EnergyMeterP {
     interface Msp430Timer as Msp430TimerA;
     interface HplMsp430GeneralIO as Port21;
     interface HplMsp430GeneralIO as Port62;
+    interface HplMsp430GeneralIO as Port63;
+    interface HplMsp430GeneralIO as Port64;
+    interface HplMsp430GeneralIO as Port65;
+    
   }
   provides {
     interface EnergyMeter;
@@ -61,6 +65,16 @@ implementation {
 
     // Must make input b/c 2.1 and 6.2 are connected together.
     call Port62.makeInput();
+    
+
+    // Quanto Testbed Mote configure iCount
+    call Port63.makeOutput();
+    call Port64.makeOutput();
+    call Port65.makeOutput();
+    call Port63.set();
+    call Port64.set();
+    call Port65.set();
+    
   }
 
   // Handle counter overflows every 0xFFFF cycles.

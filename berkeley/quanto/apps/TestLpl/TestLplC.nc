@@ -23,9 +23,43 @@ module TestLplC {
 }
 implementation {
 
-    uint8_t started;
+    uint8_t state;
+    enum {S_STARTED, S_FULL, S_FLUSHING, S_IDLE, ACT_MAIN=21};
+    //0,1,2,3
    
+    /* Entering different states */
+    void start() {
+        state = S_STARTED;
+        call Leds.led0Off();
+        call Leds.led1Off();
+        call QuantoLog.record();
+    }
+
+    void stop() {
+        state = S_FULL;
+        call Leds.led0On(); 
+        call Leds.led1Off();
+    }
+
+    void flush() { 
+        state = S_FLUSHING;
+        call Leds.led0Off(); 
+        call Leds.led1On();
+        call QuantoLog.flush();
+    }
+    
+    void enterIdle() {
+        call Leds.led0On();
+        call Leds.led1On();
+
+        call Leds.led2Off();
+
+        state = S_IDLE;
+    }
+ 
+
     event void Boot.booted() {
+        call CPUContext.set(mk_act_local(ACT_MAIN));
         call AMControl.start();
     }
 
@@ -38,40 +72,34 @@ implementation {
         } else {
             call AMControl.start();
         }
+        enterIdle();
     }
 
     event void AMControl.stopDone(error_t err) {
     }
 
-    void start() {
-        started = 1;
-        call Leds.led0On();
-        call QuantoLog.record();
-    }
 
-    void stop() {
-        call Leds.led0Off(); 
-        call Leds.led1Off();
-        call QuantoLog.flush();
-        started = 0;
-    }
- 
     event void UserButtonNotify.notify(button_state_t buttonState) {
         if (buttonState == BUTTON_PRESSED) {
-            if (!started)
-              start();
-            else
-              stop();
+            switch (state) {
+                case S_IDLE:    start(); break;
+                case S_STARTED: stop(); flush(); break;  
+                case S_FULL:    flush(); break;
+            }
         }
     }
 
     event void QuantoLog.full() {
         stop();
     }
+    
+    event void QuantoLog.flushDone() {
+        enterIdle();
+    }
 
 
     event message_t* Receive.receive(message_t* msg, void* payload, uint8_t len) {
-        call Leds.led1On();
+        call Leds.led2Toggle();
         return msg;
    } 
 }

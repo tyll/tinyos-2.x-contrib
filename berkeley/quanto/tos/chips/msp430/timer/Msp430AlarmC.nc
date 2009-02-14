@@ -29,7 +29,7 @@
  *          intended use.
  */
 
-generic module Msp430AlarmC(typedef frequency_tag)
+generic module Msp430AlarmC(typedef frequency_tag) @safe()
 {
   provides interface Init;
   provides interface Alarm<frequency_tag,uint16_t> as Alarm;

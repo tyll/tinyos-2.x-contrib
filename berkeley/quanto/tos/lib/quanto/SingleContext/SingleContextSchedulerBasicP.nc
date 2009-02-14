@@ -66,11 +66,13 @@ implementation
     NO_TASK = 255,
   };
 
+
   volatile uint8_t m_head;
   volatile uint8_t m_tail;
   volatile uint8_t m_next[NUM_TASKS];
 
   volatile act_t m_act[NUM_TASKS];
+  volatile bool m_wokeup;
 
   // Helper functions (internal functions) intentionally do not have atomic
   // sections.  It is left as the duty of the exported interface functions to
@@ -91,14 +93,30 @@ implementation
       }
       m_next[id] = NO_TASK;
 
-      call CPUContext.set(m_act[id]);
+      // If this is the first time after a wakeup, then
+      // we wokeup from idle. If the interrupt scheduled a
+      // task, then we should exit the interrupt to the task,
+      // and not to idle. m_wokeup will be false if this is
+      // not waking up, but rather walking the task queue.
+      if (m_wokeup) {
+        call CPUContext.exitInterrupt(m_act[id]);
+        m_wokeup = FALSE;
+      }
+      else {
+        call CPUContext.set(m_act[id]);
+      }
       m_act[id] = ACT_INVALID;
 
       return id;
     }
     else
     {
-      call CPUContext.setIdle();
+      if (m_wokeup) {
+        call CPUContext.exitInterruptIdle();
+        m_wokeup = FALSE;
+      } else {
+        call CPUContext.setIdle();
+      }
       return NO_TASK;
     }
   }
@@ -175,6 +193,7 @@ implementation
         while ((nextTask = popTask()) == NO_TASK)
         {
           call McuSleep.sleep();
+          m_wokeup = TRUE;
         }
       }
       signal TaskBasic.runTask[nextTask]();

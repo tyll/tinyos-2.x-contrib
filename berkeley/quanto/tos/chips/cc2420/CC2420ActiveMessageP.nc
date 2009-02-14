@@ -1,4 +1,4 @@
-/*									tab:4
+/*
  * "Copyright (c) 2005 Stanford University. All rights reserved.
  *
  * Permission to use, copy, modify, and distribute this software and
@@ -34,7 +34,7 @@
  
 #include "CC2420.h"
 
-module CC2420ActiveMessageP {
+module CC2420ActiveMessageP @safe() {
   provides {
     interface AMSend[am_id_t id];
     interface Receive[am_id_t id];
@@ -42,7 +42,9 @@ module CC2420ActiveMessageP {
     interface AMPacket;
     interface Packet;
     interface SendNotifier[am_id_t id];
+    interface RadioBackoff[am_id_t id];
   }
+  
   uses {
     interface Send as SubSend;
     interface Receive as SubReceive;
@@ -50,28 +52,31 @@ module CC2420ActiveMessageP {
     interface CC2420PacketBody;
     interface CC2420Config;
     interface ActiveMessageAddress;
+    interface RadioBackoff as SubBackoff;
     interface SingleContext as CPUContext;
   }
 }
 implementation {
 
-  enum {
-    CC2420_SIZE = MAC_HEADER_SIZE + MAC_FOOTER_SIZE,
-  };
-  
   /***************** AMSend Commands ****************/
   command error_t AMSend.send[am_id_t id](am_addr_t addr,
 					  message_t* msg,
 					  uint8_t len) {
     cc2420_header_t* header = call CC2420PacketBody.getHeader( msg );
+    
+    if (len > call Packet.maxPayloadLength()) {
+      return ESIZE;
+    }
+    
     header->type = id;
     header->dest = addr;
     header->destpan = call CC2420Config.getPanAddr();
+    header->src = call AMPacket.address();
     header->activity = call CPUContext.get();
     
     signal SendNotifier.aboutToSend[id](addr, msg);
     
-    return call SubSend.send( msg, len + CC2420_SIZE );
+    return call SubSend.send( msg, len );
   }
 
   command error_t AMSend.cancel[am_id_t id](message_t* msg) {
@@ -142,8 +147,8 @@ implementation {
 
   /***************** Packet Commands ****************/
   command void Packet.clear(message_t* msg) {
-    memset(call CC2420PacketBody.getHeader(msg), sizeof(cc2420_header_t), 0);
-    memset(call CC2420PacketBody.getMetadata(msg), sizeof(cc2420_metadata_t), 0);
+    memset(call CC2420PacketBody.getHeader(msg), 0x0, sizeof(cc2420_header_t));
+    memset(call CC2420PacketBody.getMetadata(msg), 0x0, sizeof(cc2420_metadata_t));
   }
   
   command uint8_t Packet.payloadLength(message_t* msg) {
@@ -172,7 +177,6 @@ implementation {
   /***************** SubReceive Events ****************/
   event message_t* SubReceive.receive(message_t* msg, void* payload, uint8_t len) {
     cc2420_header_t* header; 
-
     if(!(call CC2420PacketBody.getMetadata(msg))->crc) {
       return msg;
     }
@@ -183,10 +187,10 @@ implementation {
                                       //previous context to the new one, if valid.
 
     if (call AMPacket.isForMe(msg)) {
-      return signal Receive.receive[call AMPacket.type(msg)](msg, payload, len - CC2420_SIZE);
+      return signal Receive.receive[call AMPacket.type(msg)](msg, payload, len);
     }
     else {
-      return signal Snoop.receive[call AMPacket.type(msg)](msg, payload, len - CC2420_SIZE);
+      return signal Snoop.receive[call AMPacket.type(msg)](msg, payload, len);
     }
   }
   
@@ -199,6 +203,48 @@ implementation {
   event void CC2420Config.syncDone( error_t error ) {
   }
   
+  
+  /***************** RadioBackoff ***********************/
+
+  async event void SubBackoff.requestInitialBackoff(message_t *msg) {
+    signal RadioBackoff.requestInitialBackoff[(TCAST(cc2420_header_t* ONE,
+        (uint8_t*)msg + offsetof(message_t, data) - sizeof(cc2420_header_t)))->type](msg);
+  }
+
+  async event void SubBackoff.requestCongestionBackoff(message_t *msg) {
+    signal RadioBackoff.requestCongestionBackoff[(TCAST(cc2420_header_t* ONE,
+        (uint8_t*)msg + offsetof(message_t, data) - sizeof(cc2420_header_t)))->type](msg);
+  }
+  async event void SubBackoff.requestCca(message_t *msg) {
+    // Lower layers than this do not configure the CCA settings
+    signal RadioBackoff.requestCca[(TCAST(cc2420_header_t* ONE,
+        (uint8_t*)msg + offsetof(message_t, data) - sizeof(cc2420_header_t)))->type](msg);
+  }
+
+  async command void RadioBackoff.setInitialBackoff[am_id_t amId](uint16_t backoffTime) {
+    call SubBackoff.setInitialBackoff(backoffTime);
+  }
+  
+  /**
+   * Must be called within a requestCongestionBackoff event
+   * @param backoffTime the amount of time in some unspecified units to backoff
+   */
+  async command void RadioBackoff.setCongestionBackoff[am_id_t amId](uint16_t backoffTime) {
+    call SubBackoff.setCongestionBackoff(backoffTime);
+  }
+
+      
+  /**
+   * Enable CCA for the outbound packet.  Must be called within a requestCca
+   * event
+   * @param ccaOn TRUE to enable CCA, which is the default.
+   */
+  async command void RadioBackoff.setCca[am_id_t amId](bool useCca) {
+    call SubBackoff.setCca(useCca);
+  }
+
+
+  
   /***************** Defaults ****************/
   default event message_t* Receive.receive[am_id_t id](message_t* msg, void* payload, uint8_t len) {
     return msg;
@@ -209,10 +255,20 @@ implementation {
   }
 
   default event void AMSend.sendDone[uint8_t id](message_t* msg, error_t err) {
-    return;
   }
 
   default event void SendNotifier.aboutToSend[am_id_t amId](am_addr_t addr, message_t *msg) {
+  }
+  default async event void RadioBackoff.requestInitialBackoff[am_id_t id](
+      message_t *msg) {
+  }
+
+  default async event void RadioBackoff.requestCongestionBackoff[am_id_t id](
+      message_t *msg) {
+  }
+  
+  default async event void RadioBackoff.requestCca[am_id_t id](
+      message_t *msg) {
   }
   
 }

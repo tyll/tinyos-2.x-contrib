@@ -51,7 +51,7 @@
  * It needs the number of clients to allocate the array to do that, and
  * because this changed the interface I decided to rename the component.
  * Rodrigo. */ 
-generic module SimpleArbiterContextP(uint8_t num_clients) {
+generic module SimpleArbiterContextP(uint8_t num_clients) @safe() {
   provides {
     interface Resource[uint8_t id];
     interface ResourceRequested[uint8_t id];
@@ -115,6 +115,7 @@ implementation {
     atomic {
       if(state == RES_BUSY && resId == id) {
         if(call Queue.isEmpty() == FALSE) {
+          resId = NO_RES;
           reqResId = call Queue.dequeue();
           call CPUContext.set(clientContext[reqResId]); //restores CPUContext
           state = RES_GRANTING;

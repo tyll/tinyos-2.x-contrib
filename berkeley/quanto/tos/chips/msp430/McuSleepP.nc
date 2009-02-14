@@ -38,7 +38,7 @@
  *
  */
 
-module McuSleepP {
+module McuSleepP @safe() {
   provides {
     interface McuSleep;
     interface McuPowerState;
@@ -116,6 +116,8 @@ implementation {
     call CPUPowerState.set(powerState);
     temp = msp430PowerBits[powerState] | SR_GIE;
     __asm__ __volatile__( "bis  %0, r2" : : "m" (temp) );
+    // All of memory may change at this point...
+    asm volatile ("" : : : "memory");
     __nesc_disable_interrupt();
   }
 

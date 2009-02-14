@@ -14,5 +14,18 @@ It maps one SingleContextG entry (parameterized by global id) to one SingleConte
 (parameterized by local id). The local id is defined to be unique from the 
 string SINGLE_CONTEXT_UNIQUE defined in SingleContext.h
 
+Scheduler
+---------
+The scheduler for quanto is SingleContextSchedulerQuantoTasksP, as wired in TinySchedulerC.nc 
+in this directory.
+
+This scheduler correctly propagates activity labels as tasks get scheduled.
+
+This scheduler adds the a lowest-priority TaskQuanto queue, that runs Quanto logging tasks
+at the lowest priority. They also allow scheduling tasks to run under an activity that is not
+the current activity when they get scheduled, without causing extra activity-switches to do
+that. 
+
+TaskQuanto tasks are used by the Low-priority serial stack for streaming quanto logging.
 
 

@@ -40,9 +40,48 @@
  
 typedef uint8_t cc2420_status_t;
 
+#ifndef TFRAMES_ENABLED
+#define CC2420_IFRAME_TYPE
+#endif
+
 /**
- * CC2420 header.  An I-frame (interoperability frame) header has an 
- * extra network byte specified by 6LowPAN
+ * CC2420 header definition.
+ * 
+ * An I-frame (interoperability frame) header has an extra network 
+ * byte specified by 6LowPAN
+ * 
+ * Length = length of the header + payload of the packet, minus the size
+ *   of the length byte itself (1).  This is what allows for variable 
+ *   length packets.
+ * 
+ * FCF = Frame Control Field, defined in the 802.15.4 specs and the
+ *   CC2420 datasheet.
+ *
+ * DSN = Data Sequence Number, a number incremented for each packet sent
+ *   by a particular node.  This is used in acknowledging that packet, 
+ *   and also filtering out duplicate packets.
+ *
+ * DestPan = The destination PAN (personal area network) ID, so your 
+ *   network can sit side by side with another TinyOS network and not
+ *   interfere.
+ * 
+ * Dest = The destination address of this packet. 0xFFFF is the broadcast
+ *   address.
+ *
+ * Src = The local node ID that generated the message.
+ * 
+ * Network = The TinyOS network ID, for interoperability with other types
+ *   of 802.15.4 networks. 
+ * 
+ * Type = TinyOS AM type.  When you create a new AMSenderC(AM_MYMSG), 
+ *   the AM_MYMSG definition is the type of packet.
+ * 
+ * TOSH_DATA_LENGTH defaults to 28, it represents the maximum size of 
+ * the payload portion of the packet, and is specified in the 
+ * tos/types/message.h file.
+ *
+ * All of these fields will be filled in automatically by the radio stack 
+ * when you attempt to send a message.
  */
 typedef nx_struct cc2420_header_t {
   nxle_uint8_t length;
@@ -57,7 +96,9 @@ typedef nx_struct cc2420_header_t {
   nxle_uint8_t network;
 #endif
 
+#ifndef TINYOS_IP
   nxle_uint8_t type;
+#endif
   nxle_uint16_t activity; //Quanto activity
 } cc2420_header_t;
   
@@ -80,7 +121,8 @@ typedef nx_struct cc2420_metadata_t {
   nx_uint8_t tx_power;
   nx_bool crc;
   nx_bool ack;
-  nx_uint16_t time;
+  nx_bool timesync;
+  nx_uint32_t timestamp;
   nx_uint16_t rxInterval;
 
   /** Packet Link Metadata */
@@ -119,10 +161,10 @@ typedef nx_struct cc2420_packet_t {
 #endif
 
 /** 
- * The 6LowPAN ID has yet to be defined for a TinyOS network.
+ * The 6LowPAN NALP ID for a TinyOS network is 63 (TEP 125).
  */
 #ifndef TINYOS_6LOWPAN_NETWORK_ID
-#define TINYOS_6LOWPAN_NETWORK_ID 0x0
+#define TINYOS_6LOWPAN_NETWORK_ID 0x3f
 #endif
 
 
@@ -133,6 +175,8 @@ enum {
   MAC_FOOTER_SIZE = sizeof( uint16_t ),
   // MDU
   MAC_PACKET_SIZE = MAC_HEADER_SIZE + TOSH_DATA_LENGTH + MAC_FOOTER_SIZE,
+
+  CC2420_SIZE = MAC_HEADER_SIZE + MAC_FOOTER_SIZE,
 };
 
 enum cc2420_enums {
@@ -364,4 +408,10 @@ enum cc2420_sfdmux_enums {
   CC2420_SFDMUX_SFD = 0,
   CC2420_SFDMUX_XOSC16M_STABLE = 24,
 };
+
+enum
+{
+  CC2420_INVALID_TIMESTAMP  = 0x80000000L,
+};
+
 #endif

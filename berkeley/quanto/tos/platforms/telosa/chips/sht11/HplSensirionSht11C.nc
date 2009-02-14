@@ -55,10 +55,6 @@ implementation {
 
   DATAM -> HplMsp430GeneralIOC.Port15;
   SCKM -> HplMsp430GeneralIOC.Port16;
-  //Changes to use the chip connected to the Monibus
-  //DATAM -> HplMsp430GeneralIOC.Port26; 
-  //SCKM -> HplMsp430GeneralIOC.Port23;
-  //This is irrelevant with the Monibus
   PWRM -> HplMsp430GeneralIOC.Port17;
 
   DATA = DATAM;

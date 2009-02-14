@@ -35,7 +35,7 @@
 #include "activity.h"
 #include "QuantoTimer.h"
 
-generic module VirtualizeTimerP(typedef precision_tag, int max_timers)
+generic module VirtualizeTimerP(typedef precision_tag, int max_timers) @safe()
 {
   provides interface Timer<precision_tag> as Timer[uint8_t num];
   uses interface Timer<precision_tag> as TimerFrom;
@@ -60,7 +60,7 @@ implementation
   } Timer_t;
 
   Timer_t m_timers[NUM_TIMERS];
-  bool m_simers_changed;
+  bool m_timers_changed;
 
   task void updateFromTimer();
 
@@ -87,6 +87,7 @@ implementation
                 call CPUContext.set(timer->act); //push
                 signal Timer.fired[num]();
                 call CPUContext.set(c);            //pop
+                break;
               }
           }
       }
@@ -212,6 +213,5 @@ implementation
   default event void Timer.fired[uint8_t num]()
   {
   }
-
 }
 

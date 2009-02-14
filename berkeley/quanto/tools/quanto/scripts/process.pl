@@ -11,10 +11,11 @@ use Getopt::Std;
 # Input format:
 # <type> <subtype> <resource_name> t(us): <time> icount: <icount> arg:|ctx: <arg|ctx>
 
-my $I_COUNT_THRESH = 4;
+my $I_COUNT_THRESH = 2;
 
 my %opts;
 my ($logtime, $last_conv_time, $conv_time, $last_time, $delta_time, $ldt);
+my (%acc_log_recs, $last_cpu_act);
 
 getopts("f:l",\%opts);
 
@@ -47,6 +48,15 @@ while(<FIN>) {
     if (!defined $first) {
         $first = $time;
     }
+    # Log number of log statements per cpu activity
+    if (defined $last_cpu_act) {
+        $acc_log_recs{$last_cpu_act}++;
+    }
+    if ($type eq 'single_chg' && $resource eq 'cpu') {
+        $last_cpu_act = $arg;
+    }
+
+
     if ($type eq 'single_chg' or $type eq 'multi_chg') {
         $to_ctx = $arg;
     } else {
@@ -76,11 +86,11 @@ while(<FIN>) {
         $conv_time = $time;
     }
     push @{$log{$resource}},[$time, $conv_time,$to_ctx,$type];
-    
+ 
     if (! scalar @elog || $E - $elog[-1][2] > $I_COUNT_THRESH) {
         push @elog, [$time, $conv_time, $E];
     }
-
+   
     #if ($type eq 'normal' && $from_ctx =~ /^int_/) {
         #$msg = "[should be a bind, or PXY context leaked to tasks]";
     #} els
@@ -130,7 +140,12 @@ open STAT, ">$fin.times" or die "Can't create $fin.times\n";
 for my $resource (keys %acc) {
     print STAT "Total times for $resource\n========================\n";
     for my $ctx (sort {$acc{$resource}{$b} <=> $acc{$resource}{$a}} keys %{$acc{$resource}}) {
-        print STAT " $ctx $acc{$resource}{$ctx} " . ($acc{$resource}{$ctx}/$total_acc{$resource})."\n";
+        print STAT " $ctx $acc{$resource}{$ctx} " .  ($acc{$resource}{$ctx}/$total_acc{$resource});
+        if ($resource eq 'cpu') {
+            print STAT " $acc_log_recs{$ctx}";
+        }
+        print STAT "\n";
+
     }
     print STAT "\n";
 }

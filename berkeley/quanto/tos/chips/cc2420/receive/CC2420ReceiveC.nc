@@ -75,6 +75,7 @@ implementation {
   CC2420ReceiveP.SACK -> Spi.SACK;
   CC2420ReceiveP.CC2420Packet -> CC2420PacketC;
   CC2420ReceiveP.CC2420PacketBody -> CC2420PacketC;
+  CC2420ReceiveP.PacketTimeStamp -> CC2420PacketC;
   CC2420ReceiveP.CC2420Config -> CC2420ControlC;
 
   components ResourceContextsC;

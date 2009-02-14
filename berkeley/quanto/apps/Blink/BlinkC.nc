@@ -35,7 +35,6 @@
  **/
 
 #include "Timer.h"
-#include <UserButton.h>
 
 module BlinkC
 {
@@ -44,43 +43,25 @@ module BlinkC
   uses interface Timer<TMilli> as Timer2;
   uses interface Leds;
   uses interface Boot;
-  //Context stuff
   uses interface SingleContext as CPUContext;
-  uses interface Notify<button_state_t> as UserButtonNotify;
-  uses interface QuantoLog;
 }
 implementation
 {
   enum {
-    ACT_RED = 1,
-    ACT_GREEN = 2,
-    ACT_BLUE = 3,
+   ACT_RED = 1,
+   ACT_GREEN = 2,
+   ACT_BLUE = 3,
+   BASE_PERIOD = 100,
   };
-
-  void start() {
-    call QuantoLog.record();
-  }
 
   event void Boot.booted()
   {
     call CPUContext.set(mk_act_local(ACT_RED));
-    call Timer0.startPeriodic( 250 );
+    call Timer0.startPeriodic( BASE_PERIOD );
     call CPUContext.set(mk_act_local(ACT_GREEN));
-    call Timer1.startPeriodic( 500 );
+    call Timer1.startPeriodic( BASE_PERIOD<<1 );
     call CPUContext.set(mk_act_local(ACT_BLUE));
-    call Timer2.startPeriodic( 1000 );
-    call UserButtonNotify.enable();
-  }
-
-  event void QuantoLog.full()
-  {
-     call QuantoLog.flush();
-  }
-
-  event void UserButtonNotify.notify(button_state_t buttonState) {
-    if (buttonState == BUTTON_PRESSED) {
-        start();
-    }
+    call Timer2.startPeriodic( BASE_PERIOD<<2 );
   }
 
   event void Timer0.fired()

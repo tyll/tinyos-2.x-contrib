@@ -1,4 +1,4 @@
-/*									tab:4
+/*
  * "Copyright (c) 2005 Stanford University. All rights reserved.
  *
  * Permission to use, copy, modify, and distribute this software and
@@ -79,7 +79,7 @@ implementation {
 #endif
 
   
-  RadioBackoff = CsmaC;
+  RadioBackoff = AM;
   Packet = AM;
   AMSend = AM;
   SendNotifier = AM;
@@ -114,6 +114,8 @@ implementation {
   AM.CC2420PacketBody -> CC2420PacketC;
   AM.CC2420Config -> CC2420ControlC;
 
+  AM.SubBackoff -> CsmaC;
+  
   //CPUContext
   AM.CPUContext -> ResourceContextsC.CPUContext; 
 }

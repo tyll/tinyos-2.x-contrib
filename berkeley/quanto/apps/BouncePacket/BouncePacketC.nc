@@ -7,7 +7,6 @@ module BouncePacketC {
     uses {
         interface Boot;
         interface Random;
-        interface QuantoLog;
         interface Timer<TMilli> as Timer0;
         interface Timer<TMilli> as Timer1;
         interface Timer<TMilli> as StopTimer;
@@ -27,7 +26,9 @@ implementation {
 
     enum {
         ACT_BOUNCE = 0x10,
-        TOTAL_TIMEOUT = 8000,
+        S_STARTED = 1, 
+        S_IDLE,
+        STOP_TIMER = 12000,
     };
 
     typedef nx_struct bounce_msg {
@@ -52,7 +53,7 @@ implementation {
 
     am_addr_t peer;
 
-    uint8_t started;
+    uint8_t state;
     bool stopped[N];
     
     /* Get a free buffer from the buffer pool
@@ -70,7 +71,7 @@ implementation {
         if (i == 0)
             call Leds.led1On();
         else if (i == 1)
-            call Leds.led2On();
+            call Leds.led0On();
     }
     
     void clearBusy(uint8_t i) {
@@ -78,7 +79,7 @@ implementation {
         if (i == 0)
             call Leds.led1Off();
         else if (i == 1)
-            call Leds.led2Off();
+            call Leds.led0Off();
     }
 
     uint8_t getNodeIndex(am_addr_t addr) {
@@ -105,7 +106,7 @@ implementation {
 
     void initState() {
         uint8_t i;
-        started = FALSE;
+        state = S_IDLE;
         for (i = 0; i < N; i++) {
             clearBusy(i);
             stopped[i] = FALSE;
@@ -118,7 +119,7 @@ implementation {
         call AMControl.start();
         for (i = 0; i < N; i++) 
             buffer[i] = &msg_buf[i];
-        //call Leds.led2On();
+        state = S_IDLE;
     }
 
     event void AMControl.startDone(error_t err) {
@@ -169,17 +170,13 @@ implementation {
         uint8_t i;
         act_t c;
 
-        if (started)
+        if (state != S_IDLE)
             return;
 
-        call StopTimer.startOneShot(TOTAL_TIMEOUT);
-        call QuantoLog.record();
-        //mk_act_local returns a act_t with the given activity and
-        //  the local node as the node part
         c = call CPUContext.get();
         call CPUContext.set(mk_act_local(ACT_BOUNCE));
-        //start logging
-        started = TRUE;
+
+        state = S_STARTED;
 
         //scheduleSend for the first packet
         i = getFreeBuffer();
@@ -190,6 +187,7 @@ implementation {
             bm->origin = TOS_NODE_ID;
             scheduleSend(i, getTime() >> 1);
         } 
+        call StopTimer.startOneShot( STOP_TIMER );
         //restore the CPU Context
         call CPUContext.set(c);
     }
@@ -197,8 +195,7 @@ implementation {
     event void StopTimer.fired() {
         call Timer0.stop();
         call Timer1.stop();
-        call QuantoLog.flush();
-        started = FALSE;
+        initState();
     }
 
     void stop(am_addr_t addr) {
@@ -213,20 +210,13 @@ implementation {
         if (count_done == N) {
             //stop logging
             call StopTimer.stop();
-            call QuantoLog.flush();
-            count_done = 0;
-            started = FALSE;
+            initState();
         }
-    }
-
-
-    event void QuantoLog.full() {
     }
  
     event void UserButtonNotify.notify(button_state_t buttonState) {
         if (buttonState == BUTTON_PRESSED) {
-            if (!started) {
-                initState();
+            if (state == S_IDLE) {
                 start();
             }
         }
@@ -237,7 +227,7 @@ implementation {
         message_t* rcv_buf;
         bounce_msg* bm = (bounce_msg*)payload;
         uint8_t i;
-        if (!started) { 
+        if (state == S_IDLE) { 
             start();
         }
         if ((i = getFreeBuffer()) == N) {

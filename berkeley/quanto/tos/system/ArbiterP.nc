@@ -69,7 +69,7 @@
 
 #include "activity.h"
  
-generic module ArbiterP(uint8_t default_owner_id) {
+generic module ArbiterP(uint8_t default_owner_id) @safe() {
   provides {
     interface Resource[uint8_t id];
     interface ResourceRequested[uint8_t id];
@@ -141,16 +141,19 @@ implementation {
         if(call Queue.isEmpty() == FALSE) {
           reqResId = call Queue.dequeue();
           call CPUContext.set(clientContext[reqResId]); //restores CPUContext
+          resId = NO_RES;
           state = RES_GRANTING;
           post grantedTask();
+          call ResourceConfigure.unconfigure[id]();
         }
         else {
           resId = default_owner_id;
           state = RES_CONTROLLED;
           call ResourceContext.setIdle();
+          call ResourceConfigure.unconfigure[id]();
           signal ResourceDefaultOwner.granted();
         }
-        call ResourceConfigure.unconfigure[id]();
+        return SUCCESS;
       }
     }
     return FAIL;

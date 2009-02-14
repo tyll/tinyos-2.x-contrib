@@ -32,6 +32,7 @@
 /**
  * @author Jonathan Hui <jhui@archrock.com>
  * @author Vlado Handziski <handzisk@tkn.tu-berlin.de>
+ * @author Eric B. Decker <cire831@gmail.com>
  * @version $Revision$ $Date$
  */
 
@@ -42,14 +43,13 @@ generic module Msp430UartImplP() {
 
   provides interface Resource[ uint8_t id ];
   provides interface ResourceConfigure[ uint8_t id ];
-  //provides interface Msp430UartControl as UartControl[ uint8_t id ];
-  provides interface UartStream;
-  provides interface UartByte;
+  provides interface UartStream[ uint8_t id ];
+  provides interface UartByte[ uint8_t id ];
   
   uses interface Resource as UsartResource[ uint8_t id ];
   uses interface Msp430UartConfigure[ uint8_t id ];
   uses interface HplMsp430Usart as Usart;
-  uses interface HplMsp430UsartInterrupts as UsartInterrupts;
+  uses interface HplMsp430UsartInterrupts as UsartInterrupts[ uint8_t id ];
   uses interface Counter<T32khz,uint16_t>;
   uses interface Leds;
 
@@ -58,12 +58,13 @@ generic module Msp430UartImplP() {
 
 implementation {
   
-  norace uint8_t *m_tx_buf, *m_rx_buf;
   norace uint16_t m_tx_len, m_rx_len;
+  norace uint8_t * COUNT_NOK(m_tx_len) m_tx_buf, * COUNT_NOK(m_rx_len) m_rx_buf;
   norace uint16_t m_tx_pos, m_rx_pos;
   norace uint8_t m_byte_time;
+  norace uint8_t current_owner;
   
-  norace act_t m_activity;
+  //norace act_t m_activity;
   
   async command error_t Resource.immediateRequest[ uint8_t id ]() {
     return call UsartResource.immediateRequest[ id ]();
@@ -78,6 +79,8 @@ implementation {
   }
 
   async command error_t Resource.release[ uint8_t id ]() {
+    if (call UsartResource.isOwner[id]() == FALSE)
+      return FAIL;
     if ( m_rx_buf || m_tx_buf )
       return EBUSY;
     return call UsartResource.release[ id ]();
@@ -94,24 +97,32 @@ implementation {
     call Usart.resetUsart(TRUE);
     call Usart.disableIntr();
     call Usart.disableUart();
-    call Usart.resetUsart(FALSE);
+
+    /* leave the usart in reset */
+    //call Usart.resetUsart(FALSE); // this shouldn't be called.
   }
 
   event void UsartResource.granted[ uint8_t id ]() {
     signal Resource.granted[ id ]();
   }
   
-  async command error_t UartStream.enableReceiveInterrupt() {
+  async command error_t UartStream.enableReceiveInterrupt[ uint8_t id ]() {
+    if (call UsartResource.isOwner[id]() == FALSE)
+      return FAIL;
     call Usart.enableRxIntr();
     return SUCCESS;
   }
   
-  async command error_t UartStream.disableReceiveInterrupt() {
+  async command error_t UartStream.disableReceiveInterrupt[ uint8_t id ]() {
+    if (call UsartResource.isOwner[id]() == FALSE)
+      return FAIL;
     call Usart.disableRxIntr();
     return SUCCESS;
   }
 
-  async command error_t UartStream.receive( uint8_t* buf, uint16_t len ) {
+  async command error_t UartStream.receive[ uint8_t id ]( uint8_t* buf, uint16_t len ) {
+    if (call UsartResource.isOwner[id]() == FALSE)
+      return FAIL;
     if ( len == 0 )
       return FAIL;
     atomic {
@@ -124,21 +135,22 @@ implementation {
     return SUCCESS;
   }
   
-  async event void UsartInterrupts.rxDone( uint8_t data ) {
+  async event void UsartInterrupts.rxDone[uint8_t id]( uint8_t data ) {
     if ( m_rx_buf ) {
       m_rx_buf[ m_rx_pos++ ] = data;
       if ( m_rx_pos >= m_rx_len ) {
 	uint8_t* buf = m_rx_buf;
 	m_rx_buf = NULL;
-	signal UartStream.receiveDone( buf, m_rx_len, SUCCESS );
+	signal UartStream.receiveDone[id]( buf, m_rx_len, SUCCESS );
       }
-    }
-    else {
-      signal UartStream.receivedByte( data );
+    } else {
+      signal UartStream.receivedByte[id]( data );
     }
   }
   
-  async command error_t UartStream.send( uint8_t* buf, uint16_t len ) {
+  async command error_t UartStream.send[ uint8_t id ]( uint8_t* buf, uint16_t len ) {
+    if (call UsartResource.isOwner[id]() == FALSE)
+      return FAIL;
     if ( len == 0 )
       return FAIL;
     else if ( m_tx_buf )
@@ -146,38 +158,48 @@ implementation {
     m_tx_buf = buf;
     m_tx_len = len;
     m_tx_pos = 0;
-    m_activity = call CPUContext.get();
+    current_owner = id;    
+    //m_activity = call CPUContext.get();
     call Usart.tx( buf[ m_tx_pos++ ] );
     return SUCCESS;
   }
   
-  async event void UsartInterrupts.txDone() {
-    if ( m_tx_pos < m_tx_len ) {
+  async event void UsartInterrupts.txDone[uint8_t id]() {
+    if(current_owner != id) {
+      uint8_t* buf = m_tx_buf;
+      m_tx_buf = NULL;
+      signal UartStream.sendDone[id]( buf, m_tx_len, FAIL );
+    }
+    else if ( m_tx_pos < m_tx_len ) {
       call Usart.tx( m_tx_buf[ m_tx_pos++ ] );
     }
     else {
       uint8_t* buf = m_tx_buf;
       m_tx_buf = NULL;
-      call CPUContext.bind(m_activity);
-      signal UartStream.sendDone( buf, m_tx_len, SUCCESS );
+      //call CPUContext.bind(m_activity);
+      signal UartStream.sendDone[id]( buf, m_tx_len, SUCCESS );
     }
   }
   
-    async command error_t UartByte.send( uint8_t data ) {
-      call Usart.clrTxIntr();
-      call Usart.disableTxIntr ();
-      call Usart.tx( data );
-      while( !call Usart.isTxIntrPending() );
-      call Usart.clrTxIntr();
-      call Usart.enableTxIntr();
+  async command error_t UartByte.send[ uint8_t id ]( uint8_t data ) {
+    if (call UsartResource.isOwner[id]() == FALSE)
+      return FAIL;
+    call Usart.clrTxIntr();
+    call Usart.disableTxIntr ();
+    call Usart.tx( data );
+    while( !call Usart.isTxIntrPending() );
+    call Usart.clrTxIntr();
+    call Usart.enableTxIntr();
     return SUCCESS;
   }
   
-  async command error_t UartByte.receive( uint8_t* byte, uint8_t timeout ) {
+  async command error_t UartByte.receive[ uint8_t id ]( uint8_t* byte, uint8_t timeout ) {
     
     uint16_t timeout_micro = m_byte_time * timeout + 1;
     uint16_t start;
     
+    if (call UsartResource.isOwner[id]() == FALSE)
+      return FAIL;
     start = call Counter.get();
     while( !call Usart.isRxIntrPending() ) {
       if ( ( call Counter.get() - start ) >= timeout_micro )
@@ -200,4 +222,8 @@ implementation {
   }
 
   default event void Resource.granted[ uint8_t id ]() {}
+
+  default async event void UartStream.sendDone[ uint8_t id ](uint8_t* buf, uint16_t len, error_t error) {}
+  default async event void UartStream.receivedByte[ uint8_t id ](uint8_t byte) {}
+  default async event void UartStream.receiveDone[ uint8_t id ]( uint8_t* buf, uint16_t len, error_t error ) {}
 }

@@ -20,5 +20,6 @@ PFLAGS +=  -I. \
           -I$(QUANTO_ROOT)/tos/chips/cc2420/receive \
           -I$(QUANTO_ROOT)/tos/chips/cc2420/spi \
           -I$(QUANTO_ROOT)/tos/chips/sht11 \
-          -I$(QUANTO_ROOT)/tos/platforms/telosa/chips/sht11
+          -I$(QUANTO_ROOT)/tos/platforms/telosa/chips/sht11 \
+          -I$(QUANTO_ROOT)/tos/lib/serial
 

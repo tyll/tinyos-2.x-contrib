@@ -1,10 +1,71 @@
 
 import traceback
 import sys
+import re
 
 from tinyos.message.SerialPacket import SerialPacket
+from HexByteConversion import HexToByte,ByteToHex
+from QuantoLogMsgV import QuantoLogMsgV
+from QuantoLogEntry import DEFAULT_MESSAGE_SIZE as entry_len
 from QuantoLogEntry import QuantoLogEntry
 
+validLineRe = re.compile("^[0-9A-Fa-f\s]+$")
+
+def entriesFromVFile(fin):
+    """ Returns an iterator over the entries in the open file fin.
+        Expects a file with each line corresponding to a QuantoLogMsgV,
+        with NO AM HEADER.
+        A QuantoLogMsgV is an array of Quanto messages, preceeded by a
+        single-byte integer denoting how many log entries there are in
+        the message.
+        See QuantoLogStagedMyUART.h
+    """
+    for line in fin:
+        line = line.rstrip()
+        if not validLineRe.match(line) :
+            continue
+        try:
+            bytes = HexToByte(line)
+        except Exception, x:
+            print >>sys.stderr, x
+            continue
+        try:
+            msg = QuantoLogMsgV( data=bytes, data_length = len(bytes) );
+        except Exception, x:
+            print >>sys.stderr, x
+            continue
+        n = msg.get_n();
+        for i in range(n):
+            pos = 1 + i*entry_len
+            try:
+                entry = QuantoLogEntry( data=bytes[pos:pos+entry_len], data_length=entry_len)
+            except Exception, x:
+                print >>sys.stderr, x
+                continue
+            yield entry
+
+def entriesFromLFile(fin):
+    """ Returns an iterator over the entries in the open file fin.
+        Expects a file with each line corresponding to a QuantoLogEntry
+        with NO AM HEADER
+    """
+    for line in fin:
+        line = line.rstrip()
+        if not validLineRe.match(line) :
+            continue
+        try:
+            bytes = HexToByte(line)
+        except Exception, x:
+            print >>sys.stderr, x
+            continue
+        try:
+            entry = QuantoLogEntry( data=bytes, data_length = len(bytes))
+        except Exception, x:
+            print >>sys.stderr, x
+            continue
+        yield entry
+
+        
 def getUartLogPayload(packet):
     """
     Get a Quanto Log Entry from the UART packet.
@@ -43,6 +104,30 @@ def getUartLogPayload(packet):
         return msg
     else:
         return None
+
+def getUartMyLogPayload(packet):
+    """
+    Get a Quanto Log Entry from the UART packet.
+    This version reads the packet that is just the log message
+    outside of an active message.
+    """ 
+    try:
+        data_start = 0
+        data_end = 12
+        data = packet[data_start:data_end]
+
+    except Exception, x:
+        print >>sys.stderr, x
+        print >>sys.stderr, traceback.print_tb(sys.exc_info()[2])
+    try:
+        msg = QuantoLogEntry(data=data,
+                         data_length = len(data))
+     
+    except Exception, x:
+        print >>sys.stderr, x
+        print >>sys.stderr, traceback.print_tb(sys.exc_info()[2])
+        return None
+    return msg
 
 """
 HexByteConversion

@@ -1,6 +1,7 @@
 #include <Timer.h>
+#include "QuantoLogStagedMyUART.h"
 #define AM_BOUNCEPACKET 0xCA
-configuration TestLplPacketAppC
+configuration TestLplAppC
 {
 }
 implementation
@@ -10,7 +11,7 @@ implementation
     components RandomC;
     components LedsC;
 
-    components QuantoLogRawUARTC as CLog;
+    components new QuantoLogStagedMyUARTC(QLOG_ONESHOT) as CLog;
 
     components ActiveMessageC;
     components new AMReceiverC(AM_BOUNCEPACKET);

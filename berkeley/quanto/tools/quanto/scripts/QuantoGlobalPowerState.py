@@ -36,8 +36,15 @@ class GlobalPowerState:
         compBit[compNames[i]] = i
 
     def __init__(self):
+        self.clear()
+
+    def clear(self):
         self._values = ['-' for i in range(len(GlobalPowerState.compNames))]
     
+    def getBitByName(self, name):
+        '''Gets the bit indicated by name.'''
+        return self._values[GlobalPowerState.compBit[name]]
+
     def setBitByName(self, name, value):     
         '''Sets the bit indicated by name.
             
@@ -47,8 +54,12 @@ class GlobalPowerState:
         self._values[GlobalPowerState.compBit[name]] = value
         return True
 
+    def getBit(self, bit):
+        '''Gets the bit indicated by the index 'bit'.'''
+        return self._values[bit]
+
     def setBit(self, bit, value):
-        '''Sets the bit indicated by bit.
+        '''Sets the bit indicated by the index 'bit'.
 
            Returns True if the state changed, False otherwise'''
         if (self._values[bit] == value):
@@ -86,9 +97,11 @@ class GlobalPowerState:
         old_values = list(self._values)
         
         # CPU State: idle or busy, inferred from activity
-        if (type == QuantoLogConstants.MSG_TYPE_SINGLE_CHG):
+        if (type == QuantoLogConstants.MSG_TYPE_FLUSH_REPORT):
+            self.clear()
+        elif (type == QuantoLogConstants.MSG_TYPE_SINGLE_CHG):
             if (entry.get_res_id() == ResourceConstants.CPU_RESOURCE_ID):
-               if (activity(entry.get_act()).get_activity_type() == QuantoCoreConstants.ACT_TYPE_IDLE):
+               if (activity(entry.get_arg()).get_activity_type() == QuantoCoreConstants.ACT_TYPE_IDLE):
                     self.setBitByName('cpu',0)
                else:
                     self.setBitByName('cpu',1)
@@ -97,28 +110,34 @@ class GlobalPowerState:
             #LED States: directly from the powerstate.
             #Can also be inferred by the activities alone.
             if (entry.get_res_id() == ResourceConstants.LED0_RESOURCE_ID):
-                self.setBitByName('led0',entry.get_powerstate())
+                self.setBitByName('led0',entry.get_arg())
             elif (entry.get_res_id() == ResourceConstants.LED1_RESOURCE_ID):
-                self.setBitByName('led1',entry.get_powerstate())
+                self.setBitByName('led1',entry.get_arg())
             elif (entry.get_res_id() == ResourceConstants.LED2_RESOURCE_ID):
-                self.setBitByName('led2',entry.get_powerstate())
+                self.setBitByName('led2',entry.get_arg())
 
             #CC2420: has complicated power states, setting several bits.
             #        Each transmit power level is a different bit,
             #        but they are exclusive. See the constants for
             #        more info.
             elif (entry.get_res_id() == ResourceConstants.CC2420_RESOURCE_ID):
-                ps = entry.get_powerstate()
+                ps = entry.get_arg()
                 #other states
                 map( lambda x: self.setBitByName( x, _getCC2420PowerBitValues(ps, x) ), 
                     ('2420starting','2420listen','2420rx','2420stopping','2420rxfifo','2420txfifo'))
+                #if rx !listen
+                if (_getCC2420PowerBitValues(ps, '2420rx')):
+                    self.setBitByName('2420listen',0)
     
-                #tx : must get power
+                #tx : must get power. 
+                #First zero all power bits in the global power state to 0
                 map( lambda x: self.setBitByName( x, 0),
                     ('2420tx3', '2420tx7', '2420tx11', '2420tx15',
                      '2420tx19', '2420tx23', '2420tx27', '2420tx31')
                 )
+                #Now find the correct one
                 if (_getCC2420PowerBitValues(ps, '2420tx')):
+                    self.setBitByName('2420listen',0)     #tx xor listen!
                     power = ps & QuantoCC2420Constants.CC2420_POWERLEVEL_MASK
                     if (power == 3):
                         self.setBitByName( '2420tx3', 1)

@@ -78,7 +78,7 @@ MSP430REG_NORACE3(TYPE_##name,name,name##_)
 // creating potentially broken object code.  Union casts are the appropriate work
 // around.  Unfortunately, they require a function definiton.
 #define DEFINE_UNION_CAST(func_name,to_type,from_type) \
-to_type func_name(from_type x) { union {from_type f; to_type t;} c = {f:x}; return c.t; }
+to_type func_name(from_type x) @safe() { union {from_type f; to_type t;} c = {f:x}; return c.t; }
 
 // redefine ugly defines from msp-gcc
 #ifndef DONT_REDEFINE_SR_FLAGS
@@ -122,6 +122,17 @@ to_type func_name(from_type x) { union {from_type f; to_type t;} c = {f:x}; retu
 
 #ifdef signal
 #undef signal
+#endif
+
+
+// Re-definitions for safe tinyOS
+// These rely on io.h being included at the top of this file
+// thus pulling the affected header files before the re-definitions
+#ifdef SAFE_TINYOS
+#undef ADC12MEM
+#define ADC12MEM            TCAST(int* ONE, ADC12MEM_) /* ADC12 Conversion Memory (for C) */
+#undef ADC12MCTL
+#define ADC12MCTL           TCAST(char * ONE, ADC12MCTL_)
 #endif
 
 // define platform constants that can be changed for different compilers
@@ -168,20 +179,20 @@ MSP430REG_NORACE2(I2CDCTLnr,I2CDCTL);
 // be detectde by nesc.
 
 #define TOSH_ASSIGN_PIN_HEX(name, port, hex) \
-void TOSH_SET_##name##_PIN() { MSP430REG_NORACE2(r,P##port##OUT); r |= hex; } \
-void TOSH_CLR_##name##_PIN() { MSP430REG_NORACE2(r,P##port##OUT); r &= ~hex; } \
-void TOSH_TOGGLE_##name##_PIN() { MSP430REG_NORACE2(r,P##port##OUT); r ^= hex; } \
-uint8_t TOSH_READ_##name##_PIN() { MSP430REG_NORACE2(r,P##port##IN); return (r & hex); } \
-void TOSH_MAKE_##name##_OUTPUT() { MSP430REG_NORACE2(r,P##port##DIR); r |= hex; } \
-void TOSH_MAKE_##name##_INPUT() { MSP430REG_NORACE2(r,P##port##DIR); r &= ~hex; } \
-void TOSH_SEL_##name##_MODFUNC() { MSP430REG_NORACE2(r,P##port##SEL); r |= hex; } \
-void TOSH_SEL_##name##_IOFUNC() { MSP430REG_NORACE2(r,P##port##SEL); r &= ~hex; }
+void TOSH_SET_##name##_PIN() @safe() { MSP430REG_NORACE2(r,P##port##OUT); r |= hex; } \
+void TOSH_CLR_##name##_PIN() @safe() { MSP430REG_NORACE2(r,P##port##OUT); r &= ~hex; } \
+void TOSH_TOGGLE_##name##_PIN() @safe(){ MSP430REG_NORACE2(r,P##port##OUT); r ^= hex; } \
+uint8_t TOSH_READ_##name##_PIN() @safe() { MSP430REG_NORACE2(r,P##port##IN); return (r & hex); } \
+void TOSH_MAKE_##name##_OUTPUT() @safe() { MSP430REG_NORACE2(r,P##port##DIR); r |= hex; } \
+void TOSH_MAKE_##name##_INPUT() @safe() { MSP430REG_NORACE2(r,P##port##DIR); r &= ~hex; } \
+void TOSH_SEL_##name##_MODFUNC() @safe() { MSP430REG_NORACE2(r,P##port##SEL); r |= hex; } \
+void TOSH_SEL_##name##_IOFUNC() @safe() { MSP430REG_NORACE2(r,P##port##SEL); r &= ~hex; }
 
 #define TOSH_ASSIGN_PIN(name, port, bit) \
 TOSH_ASSIGN_PIN_HEX(name,port,(1<<(bit)))
 
 typedef uint8_t mcu_power_t @combine("mcombine");
-mcu_power_t mcombine(mcu_power_t m1, mcu_power_t m2) {
+mcu_power_t mcombine(mcu_power_t m1, mcu_power_t m2) @safe() {
   return (m1 < m2) ? m1: m2;
 }
 enum {
@@ -193,13 +204,13 @@ enum {
   MSP430_POWER_LPM4   = 5
 };
 
-void __nesc_disable_interrupt(void)
+void __nesc_disable_interrupt(void) @safe()
 {
   dint();
   nop();
 }
 
-void __nesc_enable_interrupt(void)
+void __nesc_enable_interrupt(void) @safe()
 {
   eint();
 }
@@ -213,7 +224,7 @@ void __nesc_atomic_end(__nesc_atomic_t reenable_interrupts);
    is #defined, to avoid duplicate functions definitions wheb binary
    components are used. Such functions do need a prototype in all cases,
    though. */
-__nesc_atomic_t __nesc_atomic_start(void) @spontaneous()
+__nesc_atomic_t __nesc_atomic_start(void) @spontaneous() @safe()
 {
   __nesc_atomic_t result = ((READ_SR & SR_GIE) != 0);
   __nesc_disable_interrupt();
@@ -221,13 +232,32 @@ __nesc_atomic_t __nesc_atomic_start(void) @spontaneous()
   return result;
 }
 
-void __nesc_atomic_end(__nesc_atomic_t reenable_interrupts) @spontaneous()
+void __nesc_atomic_end(__nesc_atomic_t reenable_interrupts) @spontaneous() @safe()
 {
   asm volatile("" : : : "memory"); /* ensure atomic section effect visibility */
   if( reenable_interrupts )
     __nesc_enable_interrupt();
 }
 #endif
+
+/* Floating-point network-type support.
+   These functions must convert to/from a 32-bit big-endian integer that follows
+   the layout of Java's java.lang.float.floatToRawIntBits method.
+   Conveniently, for the MSP430 family, this is a straight byte copy...
+*/
+
+typedef float nx_float __attribute__((nx_base_be(afloat)));
+
+inline float __nesc_ntoh_afloat(const void *COUNT(sizeof(float)) source) @safe() {
+  float f;
+  memcpy(&f, source, sizeof(float));
+  return f;
+}
+
+inline float __nesc_hton_afloat(void *COUNT(sizeof(float)) target, float value) @safe() {
+  memcpy(target, &value, sizeof(float));
+  return value;
+}
 
 #endif//_H_msp430hardware_h
 

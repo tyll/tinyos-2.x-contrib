@@ -44,7 +44,6 @@ configuration CC2420TransmitC {
     interface StdControl;
     interface CC2420Transmit;
     interface RadioBackoff;
-    interface RadioTimeStamping;
     interface ReceiveIndicator as EnergyIndicator;
     interface ReceiveIndicator as ByteIndicator;
   }
@@ -56,7 +55,6 @@ implementation {
   StdControl = CC2420TransmitP;
   CC2420Transmit = CC2420TransmitP;
   RadioBackoff = CC2420TransmitP;
-  RadioTimeStamping = CC2420TransmitP;
   EnergyIndicator = CC2420TransmitP.EnergyIndicator;
   ByteIndicator = CC2420TransmitP.ByteIndicator;
 
@@ -93,7 +91,9 @@ implementation {
   components CC2420PacketC;
   CC2420TransmitP.CC2420Packet -> CC2420PacketC;
   CC2420TransmitP.CC2420PacketBody -> CC2420PacketC;
-  
+  CC2420TransmitP.PacketTimeStamp -> CC2420PacketC;
+  CC2420TransmitP.PacketTimeSyncOffset -> CC2420PacketC;
+
   components LedsC;
   CC2420TransmitP.Leds -> LedsC;
 

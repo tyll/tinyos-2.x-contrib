@@ -54,21 +54,25 @@ implementation
   MSP430REG_NORACE(ADC12IFG);
   MSP430REG_NORACE(ADC12IE);
   MSP430REG_NORACE(ADC12IV);
+
+  // SFRs are accessed directly or cast to a pointer, both works fine
+  // (we don't access all SFRs directly, because that would result in
+  // much higher memory footprint)
   
   async command void HplAdc12.setCtl0(adc12ctl0_t control0){
-    ADC12CTL0 = *(uint16_t*)&control0; 
+    ADC12CTL0 = *((uint16_t*) &control0); 
   }
   
   async command void HplAdc12.setCtl1(adc12ctl1_t control1){
-    ADC12CTL1 = *(uint16_t*)&control1; 
+    ADC12CTL1 = *((uint16_t*) &control1); 
   }
   
   async command adc12ctl0_t HplAdc12.getCtl0(){ 
-    return *(adc12ctl0_t*) &ADC12CTL0; 
+    return *((adc12ctl0_t*) &ADC12CTL0); 
   }
   
   async command adc12ctl1_t HplAdc12.getCtl1(){
-    return *(adc12ctl1_t*) &ADC12CTL1; 
+    return *((adc12ctl1_t*) &ADC12CTL1); 
   }
   
   async command void HplAdc12.setMCtl(uint8_t i, adc12memctl_t memControl){
@@ -93,15 +97,8 @@ implementation
   async command uint16_t HplAdc12.getIEFlags(){ return (uint16_t) ADC12IE; } 
   
   async command void HplAdc12.resetIFGs(){ 
-    if (!ADC12IFG)
-      return;
-    else {
-      // workaround, because ADC12IFG is not writable 
-      uint8_t i;
-      volatile uint16_t tmp;
-      for (i=0; i<16; i++)
-        tmp = call HplAdc12.getMem(i);
-    }
+    ADC12IV = 0; 
+    ADC12IFG = 0;
   } 
   
   async command void HplAdc12.startConversion(){ 
@@ -109,9 +106,13 @@ implementation
     ADC12CTL0 |= (ADC12SC + ENC); 
   }
   
-  async command void HplAdc12.stopConversion(){ 
+  async command void HplAdc12.stopConversion(){
+    // stop conversion mode immediately, conversion data is unreliable
+    uint16_t ctl1 = ADC12CTL1;
+    ADC12CTL1 &= ~(CONSEQ0 | CONSEQ1);
     ADC12CTL0 &= ~(ADC12SC + ENC); 
-    ADC12CTL0 &= ~(ADC12ON); 
+    ADC12CTL0 &= ~(ADC12ON);
+    ADC12CTL1 |= (ctl1 & (CONSEQ0 | CONSEQ1));
   }
   
   async command void HplAdc12.enableConversion(){ 

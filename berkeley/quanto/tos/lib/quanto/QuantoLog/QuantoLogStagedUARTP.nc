@@ -28,7 +28,7 @@ implementation {
     uint16_t count;
     uint16_t report_index;
 
-    enum {LOGSIZE = 700};
+    enum {LOGSIZE = 20};
 
     entry_t log[LOGSIZE];
 

@@ -10,7 +10,6 @@ implementation
     components RandomC;
     components LedsC;
 
-    components QuantoLogRawUARTC as CLog;
     components new TimerMilliC() as Timer0;
     components new TimerMilliC() as Timer1;
     components new TimerMilliC() as StopTimer;
@@ -20,6 +19,9 @@ implementation
     components new AMReceiverC(AM_BOUNCEPACKET);
     
     components ResourceContextsC;
+
+    //Enable continuous streaming log over the UART
+    components QuantoLogMyUARTWriterC;
 
     Bounce.Boot -> MainC;
     Bounce.Random -> RandomC;
@@ -34,7 +36,6 @@ implementation
     Bounce.AMSend -> AMSenderC;
     Bounce.Receive -> AMReceiverC;
 
-    Bounce.QuantoLog -> CLog;
     Bounce.UserButtonNotify -> UserButtonC;
 
     Bounce.CPUContext -> ResourceContextsC.CPUContext;
@@ -42,7 +43,6 @@ implementation
     components CC2420ActiveMessageC;
     Bounce.RadioBackoff -> CC2420ActiveMessageC.RadioBackoff[AM_BOUNCEPACKET];
     Bounce.LowPowerListening -> CC2420ActiveMessageC;
-
 
     
 }

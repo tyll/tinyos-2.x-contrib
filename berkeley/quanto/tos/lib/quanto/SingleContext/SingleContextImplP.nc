@@ -85,6 +85,8 @@ implementation {
     SingleContext.exitInterrupt[uint8_t res_id](act_t restore_ctx) 
     {
         act_t old;
+        if (restore_ctx == ctx_local_idle)
+            return;
         atomic {
             old = m_context[res_id];
             m_context[res_id] = restore_ctx;
@@ -92,6 +94,19 @@ implementation {
         signal SingleContextTrack.exitedInterrupt[res_id](restore_ctx);   
     }
 
+    async inline command void 
+    SingleContext.exitInterruptIdle[uint8_t res_id]() 
+    {
+        act_t old;
+        atomic {
+            old = m_context[res_id];
+            m_context[res_id] = ctx_local_idle;
+        }
+        signal SingleContextTrack.exitedInterrupt[res_id](ctx_local_idle);   
+    }
+
+
+    
     async inline command void  
     SingleContext.setUnknown[uint8_t res_id]() 
     {

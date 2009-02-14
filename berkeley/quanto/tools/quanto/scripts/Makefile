@@ -1,6 +1,7 @@
 FILES=QuantoLogEntry.py QuantoLogConstants.py QuantoCoreConstants.py \
       ResourceConstants.py Msp430Constants.py \
-      QuantoTimerConstants.py  QuantoCC2420Constants.py   
+      QuantoTimerConstants.py  QuantoCC2420Constants.py \
+      QuantoLogMsgV.py
 all: $(FILES)
 clean:
 	rm $(FILES) *.pyc
@@ -8,6 +9,13 @@ QuantoLogEntry.py: $(QUANTO_ROOT)/tos/lib/quanto/QuantoLog/RawUartMsg.h
 	mig -o $@ -python-classname=QuantoLogEntry python \
               $(QUANTO_ROOT)/tos/lib/quanto/QuantoLog/RawUartMsg.h \
               nx_entry_t
+
+QuantoLogMsgV.py: $(QUANTO_ROOT)/tos/lib/quanto/QuantoLog/QuantoLogStagedMyUART.h \
+                  $(QUANTO_ROOT)/tos/lib/quanto/QuantoLog/RawUartMsg.h 
+	mig -o $@ -python-classname=QuantoLogMsgV python \
+              $(QUANTO_ROOT)/tos/lib/quanto/QuantoLog/QuantoLogStagedMyUART.h \
+              quanto_vlog_msg_t
+
 
 QuantoLogConstants.py: $(QUANTO_ROOT)/tos/lib/quanto/QuantoLog/RawUartMsg.h 
 	nescc-ncg $(CFLAGS) -o $@ -python-classname=QuantoLogConstants python \
@@ -46,7 +54,8 @@ QuantoCoreConstants.py: $(QUANTO_ROOT)/tos/lib/quanto/activity.h
                 ACT_TYPE_OFF \
                 ACT_TYPE_IDLE \
                 ACT_TYPE_UNKNOWN \
-                ACT_TYPE_QUANTO
+                ACT_TYPE_QUANTO \
+                ACT_TYPE_QUANTO_WRITER
 
 ResourceConstants.py: $(QUANTO_ROOT)/tos/lib/quanto/ResourceContexts.h
 	nescc-ncg $(CFLAGS) -I%T -o $@ -python-classname=ResourceConstants\

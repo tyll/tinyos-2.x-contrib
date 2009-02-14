@@ -1,10 +1,9 @@
 This is a simple test that only has tasks carrying around context.
-It is a test to make sure the SingleActivity implementation works, even though it
+It is a test to make sure the SingleContext implementation works, even though it
 only uses the CPUContext.
 
 The application has three 'activities': main, a, b. A and B alternate to do some
-work, and the first one to finish returns to the main activity. No
-timers are used here.
+work, and the first one to finish returns to the main activity.
 
 To run, program a mote and keep it connected to the serial port.
 Press the user button to start, and then wait for the data to come.

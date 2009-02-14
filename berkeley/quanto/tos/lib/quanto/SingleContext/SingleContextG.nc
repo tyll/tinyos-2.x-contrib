@@ -65,6 +65,12 @@ implementation {
         call SingleContextLocal.exitInterrupt[id](restoreContext);
     }
 
+    inline async command void SingleContext.exitInterruptIdle[uint8_t id]()  
+    {
+        call SingleContextLocal.exitInterruptIdle[id]();
+    }
+
+
 
     /* SingleContextTrack */
 
@@ -130,6 +136,10 @@ implementation {
 
     default async command void
     SingleContextLocal.exitInterrupt[uint8_t id](act_t restoreContext) {
+    }
+
+    default async command void
+    SingleContextLocal.exitInterruptIdle[uint8_t id]() {
     }
 
     /* SingleContextTrack */

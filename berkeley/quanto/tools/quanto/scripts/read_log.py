@@ -13,7 +13,6 @@ import os
 sys.path.insert(0,os.getcwd())
 
 from LogUtil import *
-from HexByteConversion import HexToByte
 from QuantoActivity import activity
 from QuantoConstantNames import *
 from QuantoCoreConstants import QuantoCoreConstants 
@@ -43,27 +42,18 @@ except IOError, e:
     exit()
 
 
-validLineRe = re.compile("^[0-9A-Fa-f\s]+$")
-
 first = True
 initialTime = 0
 pState = GlobalPowerState()
 lastStateKey = None;
 cumTime = {}
 cumIc = {}
+cumChanges = {}
 
-for line in fin:
-    line = line.rstrip()
-    if not validLineRe.match(line) :
-        continue
-    try:
-        bytes = HexToByte(line)
-    except Exception, x:
-        continue
+entries = entriesFromLFile(fin)
 
-    entry = getUartLogPayload ( bytes );
-    if entry is None:
-        continue
+
+for entry in entries:
 
     pState.updateFromEntry(entry)
     type = (entry.get_type() >> 4 ) & 0x0F
@@ -91,16 +81,16 @@ for line in fin:
     # interrupt routine, which is the routine that will correct the base.
     ic = entry.get_ic();
     if (entry.get_type() == QuantoLogConstants.SINGLE_CHG_ENTER_INT and
-        (activity(entry.get_act())).get_activity_type() == Msp430Constants.ACT_PXY_TIMERA1):
+        (activity(entry.get_arg())).get_activity_type() == Msp430Constants.ACT_PXY_TIMERA1):
         ic += 65536
     s += ' icount: ' + str(ic)
     if (type == QuantoLogConstants.MSG_TYPE_SINGLE_CHG or
         type == QuantoLogConstants.MSG_TYPE_MULTI_CHG ):
-        s += ' ctx: %s ' % activity(entry.get_act())
+        s += ' ctx: %s ' % activity(entry.get_arg())
     elif (type == QuantoLogConstants.MSG_TYPE_POWER_CHG):
-        s += ' arg: 0x%0X ' % entry.get_act()
+        s += ' arg: 0x%0X ' % entry.get_arg()
     else:
-        s += ' arg: ' + str(entry.get_act())
+        s += ' arg: ' + str(entry.get_arg())
     s += ' ps: ' + pState.getKey()
     print >> fout, s
     
@@ -110,6 +100,7 @@ for line in fin:
         cumTime[lastStateKey] = cumTime.get(lastStateKey, 0) + delta
         delta = ic - lastStateIc
         cumIc[lastStateKey] = cumIc.get(lastStateKey, 0) + delta
+        cumChanges[lastStateKey] = cumChanges.get(lastStateKey, 0) + 1
 
     lastStateKey = pState.__str__()
     lastStateTime = time
@@ -119,11 +110,11 @@ for line in fin:
 fin.close()
 fout.close()
 
-print >>fpwr, '#state          time      icount'
+print >>fpwr, '#state          time      icount    occurrences'
 print >>fpwr, '#states:',pState.getHeader()
 print >>fpwr, '#=============================================='
 for key in sorted(cumTime.keys(), key=lambda x:cumIc[x], reverse=True):
-    print >>fpwr, key ,  cumTime[key]  , cumIc[key]
+    print >>fpwr, key ,  cumTime[key]  , cumIc[key], cumChanges[key]
 
 fpwr.close()
 

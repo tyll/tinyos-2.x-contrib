@@ -69,15 +69,22 @@ typedef nx_struct nx_entry_t {
     nx_uint8_t res_id;     //resource id this entry refers to
     nx_uint32_t time;      //local time of the node
     nx_uint32_t ic;        //icount
-    nx_union {
-        nx_uint16_t act;         //for single and multiple act changes
-        nx_uint16_t powerstate;  //for powerstate changes
-        nx_uint16_t event_count; //for count entries
-    };
+    nx_uint16_t arg;
+//    nx_union {          // THIS UNION BREAKS MIG PYTHON
+//        nx_uint16_t arg;
+//        nx_uint16_t act;         //for single and multiple act changes
+//        nx_uint16_t powerstate;  //for powerstate changes
+//        nx_uint16_t event_count; //for count entries
+//    };
 } nx_entry_t;
 
-typedef nx_struct ctx_log_msg_t {
+typedef nx_struct quanto_log_msg_t {
     nx_entry_t entry;
 } quanto_log_msg_t;
+
+typedef nx_struct quanto_log_cnt_msg_t {
+    nx_uint8_t seq;
+    nx_entry_t entry;
+} quanto_log_cnt_msg_t;
 
 #endif

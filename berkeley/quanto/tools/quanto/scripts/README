@@ -1,0 +1,23 @@
+There are three experimental programs here to parse logs, and which
+one to use depends on the way the log was generated.
+
+Summary:
+ * if you used any of the *MyUART components, don't use
+   read_log_am.py
+ * if you used QuantoLogMyUARTWriterC, use read_log.py
+ * if you used QuantoLogStagedMyUARTC, use read_log_staged.py
+
+The currently preferred way to generate logs is by using
+the QuantoLogMyUARTWriterC component, which doesn't require
+configuration and does streaming logs over a custom UART stack.
+The custom UART stack uses the same framing that the normal stack,
+but it DOES NOT USE AM. Less overhead.
+The custom UART stack accounts for its own use of CPU time and
+schedules Quanto transmissions of log data only when the CPU would
+otherwise be idle. 
+The disadvantage is that it currently does not work with other
+components using the stack, so, no serial for you. It's possible to
+make them play together, we just haven't gotten there yet.
+For these logs, just use read_log.py.
+
+

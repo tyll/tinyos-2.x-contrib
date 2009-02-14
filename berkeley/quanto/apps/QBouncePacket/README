@@ -1,0 +1,43 @@
+Example of Bounce using QuantoLogStagedMyUARTC(QLOG_CONTINUOUS) as a logger.
+This logger does not signal full and does auto-flushing.
+
+Simple application that involves two nodes.
+
+* Program 2 nodes, one with id 1 and the other with id 32.
+* Each node will send one packet to the other, and the two will bounce
+  packets until the ttl is exausted.
+
+* After that, they will log their context fun to the UART
+
+The context is not set explicitly here, but the nodes implicitly set the
+CPU context, at startup, to <NODE>:unknown.
+
+This should be enough to show when the CPU was busy doing things on behalf of
+the packet sent by node 1 and by node 2.
+
+Todo: debug the receive "paining". Currently see add,add,rm,rm
+----------------------
+Experiments: see sample-runs/README
+--------------------
+Receiving a packet:
+ TIMERB1
+ PORT1: (Msp430 port 1.0, CC2420 FIFOP), signals beginReceive
+ 11 int_UART0RX int. with idle
+ changes to Packet context (app context carried in packet)
+
+ receive:
+  acquire SpiResource
+
+Components that wire to the CC2420SpiResource:
+chips/cc2420/control/CC2420ControlC.nc:  components new CC2420SpiC() as Spi;
+chips/cc2420/control/CC2420ControlC.nc:  components new CC2420SpiC() as SyncSpiC;
+chips/cc2420/control/CC2420ControlC.nc:  components new CC2420SpiC() as RssiResource;
+chips/cc2420/receive/CC2420ReceiveC.nc:  components new CC2420SpiC() as Spi;
+chips/cc2420/transmit/CC2420TransmitC.nc:  components new CC2420SpiC() as Spi;
+
+ 
+
+
+
+
+

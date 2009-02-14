@@ -1,0 +1,11 @@
+Modules that implement very basic compression primitives.
+
+BitBuffer is just that, a buffer that allows bit level sequential
+access.
+
+EliasGamma encodes and decodes integers to their Elias Gamma
+representation, using a BitBuffer as a backing store.
+
+MoveToFront implements move to front encoding and decoding.
+
+

@@ -1,0 +1,10 @@
+Labjack log reader.
+
+Authors: Prabal Dutta/ Rodrigo Fonseca
+
+This logger sets up a TCP connection to a Labjack UE9, and reads a
+stream of bytes from a mote.
+
+Each ue9 sample is 16 bits, we use 8 and skip the others, except for
+bit 2, which is used for framing.
+

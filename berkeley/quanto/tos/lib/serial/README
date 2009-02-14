@@ -1,0 +1,18 @@
+This is an experimental set of serial interfaces for Quanto logging.
+
+The current best one is MySerialWriterC.nc, which implements a streaming 
+logging interface.
+
+It has the following features:
++ Requires no configuration
++ Has no AM header, and hence less overhead
++ Accounts for its own CPU time usage, using the 'writer' activity
+
+- Currently requires exclusive access to the UART (I think)
+- Only transmits
+
+The negative points are temporary, and can be fixed.
+
+Files:
+  MySerialWriterC/P : the module used by QuantoLogMyUARTWriter
+  LPSerialP/ImplP : low priority serial modules

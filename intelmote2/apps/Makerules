@@ -4,4 +4,4 @@ TOSMAKE_PATH += $(INTELMOTE2_CONTRIB_DIR)/support/make
 include $(MAKERULES)
 
 #Include intelmote2 Libs and platforms
-$(call TOSMake_include,intelmote2.extra)
+#$(call TOSMake_include,intelmote2.extra)

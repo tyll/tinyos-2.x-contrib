@@ -6,8 +6,8 @@ TOSCONTRIB?=../../../
 
 
 ifeq ($(SENSORBOARD),mts400)
-	CFLAGS+=-I$(TOSCONTRIB)/mts4x0/tos/chips/leadtekgps9546
-	CFLAGS+=-I$(TOSCONTRIB)/mts4x0/tos/lib/gps/
+	CFLAGS+=-I$(TOSCONTRIB)/mts4x0/tos/sensorboards/mts400/
+	CFLAGS+=-I$(TOSCONTRIB)/mts4x0/tos/chips/adg715/
 endif
 
 ifeq ($(SENSORBOARD),mts420ca)

@@ -2,7 +2,9 @@ COMPONENT=TestMts400SwitchesAppC
 #CFLAGS+=-DTOSH_DATA_LENGTH=31 -DPRINTF_BUFFER_SIZE=1024 -g -ggdb -O0 
 SENSORBOARD?=mts420ca
 
-CFLAGS += -I$(TOSDIR)/lib/printf
+CLASSPATH= $(TOSROOT)/support/sdk/java/:.
+
+CFLAGS += -I$(TOSDIR)/lib/printf/2_0_2
 
 BUILD_EXTRA_DEPS += PrintfMsg.class PrintfClient.class
 %.class: %.java

@@ -30,7 +30,7 @@
  */
 
 /** 
- * 250 kBaud Manchester (2-FSK)
+ * 250 kBaud (MSK)
  */
  
 /**
@@ -175,10 +175,10 @@ enum cc2500_config_reg_state_enums {
   
   CC2500_CONFIG_MDMCFG4 = 0x2D,
   CC2500_CONFIG_MDMCFG3 = 0x3B,
-  CC2500_CONFIG_MDMCFG2 = 0x0B,
+  CC2500_CONFIG_MDMCFG2 = 0x7B,
   CC2500_CONFIG_MDMCFG1 = 0x22,
   CC2500_CONFIG_MDMCFG0 = 0xF8,
-  CC2500_CONFIG_DEVIATN = 0x44,
+  CC2500_CONFIG_DEVIATN = 0x01,
   CC2500_CONFIG_MCSM2 = 0x07,
   
   /** TX on CCA; Stay in Rx after Rx and Tx */

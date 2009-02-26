@@ -57,5 +57,8 @@
 #define BLAZE_MIN_BACKOFF 20
 #endif
 
+#ifndef BLAZE_CSMA_TIMEOUT
+#define BLAZE_CSMA_TIMEOUT 5120
+#endif
 
 #endif

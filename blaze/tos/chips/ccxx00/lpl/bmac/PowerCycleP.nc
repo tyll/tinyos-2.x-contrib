@@ -532,7 +532,7 @@ implementation {
    */
   bool transmitterFound() {
     uint8_t pktstatus;
-    uint16_t fail = 0;
+    uint8_t fail = 0;
     
     call Csn.clr[currentRadio]();
     
@@ -540,11 +540,16 @@ implementation {
       call Leds.set(8);
 #endif
 
+    // Wait for RSSI to be valid.  We have seen the radio get stuck here
+    // saying CS and CCA are both invalid => RSSI is invalid.
     do {
-      call PKTSTATUS.read(&pktstatus);
       fail++;
-    } while(!(pktstatus & 0x50) && fail < 0xFFF);
+      call PKTSTATUS.read(&pktstatus);
+    } while(!(pktstatus & 0x50) && fail != 0);
     
+    if(fail == 0) {
+      return FALSE;
+    }
     
 #if BLAZE_ENABLE_WHILE_LOOP_LEDS
       call Leds.set(0);

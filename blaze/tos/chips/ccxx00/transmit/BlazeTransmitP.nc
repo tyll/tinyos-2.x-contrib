@@ -197,6 +197,7 @@ implementation {
         count++;
         call Csn.set[id]();
         call Csn.clr[id]();
+        
         if(count > 50) {
           call ReceiveMode.srx(id);
           return;
@@ -310,6 +311,11 @@ implementation {
      */
      
     if(forcing) {
+      
+#if BLAZE_ENABLE_WHILE_LOOP_LEDS
+      call Leds.set(10);
+#endif
+      
       for(killSwitch = 0; (status = call RadioStatus.getRadioStatus()) != BLAZE_S_TX
           && killSwitch < MAX_FORCE_ATTEMPTS; killSwitch++) {
         call STX.strobe();
@@ -318,6 +324,10 @@ implementation {
           break;
         }
       }
+      
+#if BLAZE_ENABLE_WHILE_LOOP_LEDS
+      call Leds.set(0);
+#endif
       
     } else {
 

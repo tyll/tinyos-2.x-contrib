@@ -47,7 +47,7 @@ interface BlazePacket {
 
   /**
    * Set transmission power for a given packet. Valid ranges are
-   * between 0 and 31.
+   * defined by the radio's datasheet / smartrf studio / CCxx00.h files.
    *
    * @param p_msg the message.
    * @param power transmission power.

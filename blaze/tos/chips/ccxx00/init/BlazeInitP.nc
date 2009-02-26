@@ -237,6 +237,7 @@ implementation {
   
   command void ReceiveMode.blockingSrx[uint8_t clientId](radio_id_t radioId) {
     uint8_t status;
+    uint8_t fail = 0;
     call SRX.strobe();
 
 #if BLAZE_ENABLE_WHILE_LOOP_LEDS
@@ -244,6 +245,11 @@ implementation {
 #endif
 
     while((status = call RadioStatus.getRadioStatus()) != BLAZE_S_RX) {
+      fail++;
+      if(fail == 0) {
+        break;
+      }
+      
       call Csn.set[m_id]();
       call Csn.clr[m_id]();
       
@@ -260,7 +266,7 @@ implementation {
         
       } else if (status == BLAZE_S_SETTLING) {
         // do nothing but don't quit the loop
-          
+       
       } else {
         call SRX.strobe();
       }

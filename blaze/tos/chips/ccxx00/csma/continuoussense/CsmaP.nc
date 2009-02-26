@@ -73,6 +73,8 @@ module CsmaP {
     
     interface ReceiveMode;
     
+    interface Timer<TMilli> as TimeoutTimer;
+    
     interface Random;
     interface State;
     interface Leds;
@@ -184,6 +186,7 @@ implementation {
       call Resource.request();
       
     } else {
+      call TimeoutTimer.startOneShot(BLAZE_CSMA_TIMEOUT);
       call State.forceState(S_START_INITIAL_BACKOFF);
       call Resource.request();
     }
@@ -287,7 +290,13 @@ implementation {
       }
     }
   }
-    
+  
+  /***************** TimeoutTimer Events ****************/
+  event void TimeoutTimer.fired() {
+    call State.forceState(S_CANCEL);
+  }
+  
+  
   /***************** ReceiveMode Events ****************/
   event void ReceiveMode.srxDone() {
   }
@@ -304,12 +313,22 @@ implementation {
    * hardware CCA.
    */
   task void forceSend() {
+    call Csn.set[myRadio]();
+    call Csn.clr[myRadio]();
+    
     if(call AsyncSend.send[myRadio](myMsg, TRUE, (call BlazePacketBody.getMetadata(myMsg))->rxInterval) != SUCCESS) {
+      
+      call Csn.set[myRadio]();
+      
       if(call State.isState(S_CANCEL) || call State.isState(S_STOPPING)) {
         atomic myError = ECANCEL;
         post sendDone();
         
       } else {
+        call Csn.clr[myRadio]();
+        call SIDLE.strobe();
+        call ReceiveMode.blockingSrx(myRadio);
+        call Csn.set[myRadio]();
         post forceSend();
       }
     }
@@ -318,6 +337,8 @@ implementation {
   task void sendDone() {
     error_t atomicError;
     atomic atomicError = myError;
+    
+    call TimeoutTimer.stop();
     
     call Csn.clr[myRadio]();
     if(call BlazePacket.getPower(myMsg) > 0) {
@@ -403,6 +424,13 @@ implementation {
               // Set the PA back to default for whatever ack's are taking place
               call PaReg.write(call BlazeRegSettings.getPa[myRadio]());
             }
+            
+            call Csn.set[myRadio]();
+            call Csn.clr[myRadio]();
+            
+            call SIDLE.strobe();
+            call ReceiveMode.blockingSrx(myRadio);
+            
             call Csn.set[myRadio]();
             
             call Resource.release();

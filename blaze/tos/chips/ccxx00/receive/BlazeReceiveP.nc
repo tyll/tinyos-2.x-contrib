@@ -384,6 +384,7 @@ implementation {
       }
       
       // Didn't pass through our filters
+      totalPacketsOverheard++;
       cleanUp();
       break;
       

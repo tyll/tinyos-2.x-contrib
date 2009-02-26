@@ -119,6 +119,9 @@ implementation {
   components RandomC;
   CsmaP.Random -> RandomC;
   
+  components new TimerMilliC();
+  CsmaP.TimeoutTimer -> TimerMilliC;
+  
   components LedsC;
   CsmaP.Leds -> LedsC;
     

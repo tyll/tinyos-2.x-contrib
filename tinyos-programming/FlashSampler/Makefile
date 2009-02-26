@@ -1,0 +1,3 @@
+SENSORBOARD=mts300
+COMPONENT=FlashSamplerAppC
+include $(MAKERULES)

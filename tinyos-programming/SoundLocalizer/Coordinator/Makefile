@@ -1,0 +1,2 @@
+COMPONENT=CoordinatorAppC
+include $(MAKERULES)

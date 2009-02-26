@@ -1,0 +1,4 @@
+SENSORBOARD=mts300
+COMPONENT=AntiTheftAppC
+include $(MAKERULES)
+

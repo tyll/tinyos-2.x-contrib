@@ -1,0 +1,2 @@
+COMPONENT=DetectorAppC
+include $(MAKERULES)

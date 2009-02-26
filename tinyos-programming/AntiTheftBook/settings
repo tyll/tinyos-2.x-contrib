@@ -1,0 +1,1 @@
+MOTECOM=$1 java net.tinyos.tools.Send 00 ff ff ff ff 04 00 2b 00 01 10 00

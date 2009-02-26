@@ -1,0 +1,3 @@
+COMPONENT=AntiTheftAppC
+include $(MAKERULES)
+

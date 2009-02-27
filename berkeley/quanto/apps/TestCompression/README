@@ -1,0 +1,2 @@
+Simple test for BitBufferC, and the compression primitives EliasGammaC and MoveToFrontC.
+At this point it is to be run in Tossim only.

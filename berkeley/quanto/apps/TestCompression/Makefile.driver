@@ -1,0 +1,4 @@
+all:
+	make micaz sim quanto
+	g++ -g -c -o Driver.o Driver.C -I$(TOSROOT)/tos/lib/tossim/
+	g++ -o Driver Driver.o simbuild/micaz/tossim.o simbuild/micaz/sim.o simbuild/micaz/c-support.o

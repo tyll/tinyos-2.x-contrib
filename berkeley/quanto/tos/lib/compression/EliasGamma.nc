@@ -1,7 +1,7 @@
 /** @author Rodrigo Fonseca */
 
 interface EliasGamma {
-    /* Encodes a 32-bit unsigned positive integer to the buffer.
+    /* Encode a [32, 16, 8]-bit unsigned *positive* integer to the buffer.
      * @param buffer A bitBuf with enough space for the encoded
      *               integer
      * @param n The integer to be encoded. n > 0.
@@ -18,9 +18,9 @@ interface EliasGamma {
     /* Decodes an up to 32-bit integer from the buffer.
      * Returns 0 in case of an error. The bitBuf is not
      * altered in case of an error. */
-    uint32_t decode32(bitBuf* buffer);
-    uint16_t decode16(bitBuf* buffer);
-    uint8_t  decode8(bitBufer* buffer);
+    command uint32_t decode32(bitBuf* buffer);
+    command uint16_t decode16(bitBuf* buffer);
+    command uint8_t   decode8(bitBuf* buffer);
 }
 
 

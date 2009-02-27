@@ -1,4 +1,4 @@
-module MoveToFrontP {
+generic module MoveToFrontC() {
     provides interface MoveToFront;
 }
 implementation {
@@ -26,30 +26,30 @@ implementation {
     command void MoveToFront.init() {
         int i;
         for (i = 0; i < 255; i++)
-            mtf->next[i] = i+1;
-        mtf->h = 0;
+            mtf.next[i] = i+1;
+        mtf.h = 0;
     }
 
     /* moves b to the front and returns the
      * distance */
     command uint8_t MoveToFront.encode(uint8_t b) {
         uint8_t p, i;
-        p = mtf->h;
+        p = mtf.h;
         if (p == b)
             return 0;
         //search the list for b.
-        for (i = 1, p = mtf->h; 
-             mtf->next[p] != b; 
-             i++, p = mtf->next[p])
+        for (i = 1, p = mtf.h; 
+             mtf.next[p] != b; 
+             i++, p = mtf.next[p])
             ;
         //i is the position in the list
         //now we move to front
-        if (mtf->next[b] == b)                 //is b the last?
-            mtf->next[p] = p;                  //now p is the last
+        if (mtf.next[b] == b)                 //is b the last?
+            mtf.next[p] = p;                  //now p is the last
         else
-            mtf->next[p] = mtf->next[b];      //next(p) = next(b)
-        mtf->next[b] = mtf->h;                 //b comes before head
-        mtf->h = b;                             //head points to b
+            mtf.next[p] = mtf.next[b];      //next(p) = next(b)
+        mtf.next[b] = mtf.h;                 //b comes before head
+        mtf.h = b;                             //head points to b
     
         return i;
     }
@@ -59,22 +59,22 @@ implementation {
         uint8_t i;
     
         if (b == 0)
-            return mtf->h;
+            return mtf.h;
         //if not head, we have to find the b-th element in the 
         //list, move it to the front, and return it.    
-        for (i = 1, p = mtf->h;
+        for (i = 1, p = mtf.h;
              i < b ; 
-             i++, p = mtf->next[p])
+             i++, p = mtf.next[p])
             ;
         //p = predecessor of the value v
-        v = mtf->next[p];   
+        v = mtf.next[p];   
         //move to front
-        if (mtf->next[v] == v)
-            mtf->next[p] = p;
+        if (mtf.next[v] == v)
+            mtf.next[p] = p;
         else
-            mtf->next[p] = mtf->next[v];
-        mtf->next[v] = mtf->h;
-        mtf->h = v;
+            mtf.next[p] = mtf.next[v];
+        mtf.next[v] = mtf.h;
+        mtf.h = v;
         
         return  v;
     }

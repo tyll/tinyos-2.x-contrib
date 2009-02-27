@@ -1,10 +1,11 @@
 #include "BitBuffer.h"
-generic module BitBufferP(uint16_t SIZE) {
+/** @param BB_SIZE number of bytes in the buffer */
+generic module BitBufferC(uint16_t BB_SIZE) {
     provides interface BitBuffer;
 }
 implementation {
     // We overlay the bitBuf pointer to this unnamed struct, which 
-    // actually has the allocated space of SIZE entries.
+    // actually has the allocated space of BB_SIZE entries.
     // The bitBuf type is externally visible, so that other
     // modules can use the storage in this module by reference.
     // The size field exists so that these external users can
@@ -13,7 +14,7 @@ implementation {
         uint16_t size_in_bits;
         uint16_t pos;
         uint16_t rpos;
-        uint8_t buf[SIZE];
+        uint8_t buf[BB_SIZE];
     } buffer;
 
     bitBuf *buf = (bitBuf*)&buffer;
@@ -22,13 +23,13 @@ implementation {
         return buf;
     }
 
-    command uint8_t* BitBuffer.getBytes() {
-        return &buf->buf;
-    }
+//    command uint8_t* BitBuffer.getBytes() {
+//        return &buf->buf;
+//    }
 
     command void BitBuffer.clear() {
-        memset(buf->buf, 0, SIZE);
-        but->size_in_bits = SIZE << 3;
+        memset(buf->buf, 0, BB_SIZE);
+        buf->size_in_bits = BB_SIZE << 3;
         buf->pos = 0;
         buf->rpos = 0;
     }
@@ -39,7 +40,7 @@ implementation {
     }
     
     inline command uint16_t BitBuffer.getSize() {
-        return SIZE;
+        return BB_SIZE;
     }
 
     inline command uint16_t BitBuffer.getNBytes() 
@@ -64,21 +65,21 @@ implementation {
     }
 
     inline command error_t BitBuffer.putBit(bool bit) {
-        return bitBuf_putBit(bit);
+        return bitBuf_putBit(buf, bit);
     }
     
     command error_t BitBuffer.putByte(uint8_t byte) {
-        uint16_t l = BitBuffer.getNBytes();
-        if (l == SIZE)
+        uint16_t l = call BitBuffer.getNBytes();
+        if (l == BB_SIZE)
             return FALSE;
-        BitBuffer.pad(); //pad can't increase the length
+        call BitBuffer.pad(); //pad can't increase the length
         buf->buf[l] = byte;
         buf->pos += 8; 
         return TRUE;
     }
 
     command uint8_t BitBuffer.getNextBit() {
-        return bitBuffer_getNextBit(buf);
+        return bitBuf_getNextBit(buf);
     }
 
     command void BitBuffer.setReadPos(uint16_t rpos) {

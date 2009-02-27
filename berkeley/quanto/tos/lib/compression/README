@@ -8,4 +8,46 @@ representation, using a BitBuffer as a backing store.
 
 MoveToFront implements move to front encoding and decoding.
 
+---------------------------
 
+Move To Front encoding:
+
+ We implement move to front encoding of a list of integers between 0 and 255.
+ To use, instantiate a MoveToFrontC, call init on it, and throw integers at it.
+ To decode, initialize the component again (or use another one), and feed it the
+ encoded sequence.
+
+EliasGamma:
+
+ The coded can encode and decode 8, 16, and 32 bit integers using the elias gamma code.
+ It can code positive numbers only (no 0!).
+ It is a universal code, meaning it does not depend on the input, and also meaning that 
+ it will be optimal for a certain distribution of integer frequencies. From the number of
+ bits that it assigns to each integer, the code is optimal is the probabilities are
+ 
+ 1 : 1/2
+ 2,3 : 1/8
+ 4,...,7: 1/32
+ 8,...,15: 1/128
+ 16,...,31: 1/512 
+ ...
+
+ If there is locality, the output of MTF will have lots of low numbers, and using Elias-Gamma
+ will be a win. The worst case for coding 8-bit integers with EG is to produce
+	
+ To code a number N:
+ 1. take floor(log_2(N)) = l
+ 2. write l in unary: l zeroes
+ 3. write N with no trailing left 0's
+
+ For example:
+ 1: l = 0 -> 1
+ 3: l = 1 -> 0 1 1
+ 9: l = 3 -> 000 1 001
+ 14: l = 3 -> 000 1 110
+ 49: l = 5 -> 00000 1 10001
+ ...
+ 255: l = 7 -> 0000000 1 1111111
+
+ Note that, to decode, the number of consecutive 0's tells you how many digits to consider
+ to decode the next number.

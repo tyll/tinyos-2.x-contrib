@@ -64,6 +64,11 @@ interface BitBuffer {
     /* Gets the read position */
     command uint16_t getReadPos();
 
+    /** Returns a pointer to the actual byte buffer.
+     *  getNBytes() bytes will be used.
+     */
+    command uint8_t* getBytes();
+
     /** Returns a pointer to the internal bitBuf representation.
      *  ONLY USE IF YOU KNOW WHAT YOU ARE DOING!!!
      */

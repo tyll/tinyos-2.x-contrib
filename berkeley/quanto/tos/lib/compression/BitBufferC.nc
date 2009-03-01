@@ -23,12 +23,12 @@ implementation {
         return buf;
     }
 
-//    command uint8_t* BitBuffer.getBytes() {
-//        return &buf->buf;
-//    }
+    command uint8_t* BitBuffer.getBytes() {
+        return (uint8_t*)&(buf->buf);
+    }
 
     command void BitBuffer.clear() {
-        memset(buf->buf, 0, BB_SIZE);
+        memset(buf->buf, 0, BB_SIZE); //maybe get rid of this step
         buf->size_in_bits = BB_SIZE << 3;
         buf->pos = 0;
         buf->rpos = 0;

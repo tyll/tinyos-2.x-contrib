@@ -166,13 +166,20 @@ uint32_t elias_gamma_decode(bitBuf *buf) {
     uint8_t l = 0;
     uint32_t n = 0;
     uint8_t i;
-    while (! bitBuf_getNextBit(buf))
+    int b;
+    while (!(b = bitBuf_getNextBit(buf)))
         l++;
+    if (b == -1)
+      return 0;
     n |= 1 << l;
     for (i = l; i > 0; i--) {
-       if (bitBuf_getNextBit(buf))
+       if ((b = bitBuf_getNextBit(buf)) == 1) {
            n |= 1 << (i-1); 
+       } else if (b == -1) {
+           return 0;
+       }
     }
+    fprintf(stderr, " eg: %d \n", n);
     return n;
 }
 

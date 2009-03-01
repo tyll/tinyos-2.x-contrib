@@ -41,6 +41,13 @@
  * the QuantoLogCompressedMyUartWriter.
  * The program reads from STDIN the output of Listen, and
  * assumes the format: <block size> <bit stream>
+ * The compression uses a combination of techniques.
+ * For discrete entities (type, resource, activity), we 
+ * use an 8-bit Move To Front encoder followed by an Elias-gamma
+ * encoder. For continuous entities (time and icount), we
+ * use a simple delta encoder followed by Elias-gamma encoding
+ * as well. Since EG can't encode 0, we add 1 to some of these.
+ * The decoding process is the reverse transformations. 
  */
 
 
@@ -49,18 +56,22 @@
  * what QuantoLogCompressedMyUartWriterP.CompressTask does.
  */
 int 
-decode_block (bitBuf* buf, entry_t* block, int block_size)
+decode_block (bitBuf* buf, entry_t* block, int block_size, bool is_mtf_init)
 {
    int i;
    uint32_t d;
    uint8_t  m;
-   mtf_encoder mtf;
+   static mtf_encoder mtf;
 
    static uint32_t last_time = 0;
    static uint32_t last_icount = 0;
+
+   if (is_mtf_init) {
+      mtf_init(&mtf);
+   } 
    
    //decode type    (EG(MTF+1))'
-   mtf_init(&mtf);
+   //mtf_init(&mtf);
    for (i = 0; i < block_size; i++) {
       if (! (d = elias_gamma_decode(buf)))
          break;
@@ -71,7 +82,7 @@ decode_block (bitBuf* buf, entry_t* block, int block_size)
    if (i < block_size) return 0;
 
    //decode resource (EG(MTF+1))'
-   mtf_init(&mtf);
+   //mtf_init(&mtf);
    for (i = 0; i < block_size; i++) {
       if (!(d = elias_gamma_decode(buf)))
          break;
@@ -103,7 +114,7 @@ decode_block (bitBuf* buf, entry_t* block, int block_size)
    if (i < block_size) return 0;
 
    //decode activity MSB (EG(MTF+1))'
-   mtf_init(&mtf);
+   //mtf_init(&mtf);
    for (i = 0; i < block_size; i++) {
       if (!(d = elias_gamma_decode(buf)))
          break;
@@ -114,7 +125,7 @@ decode_block (bitBuf* buf, entry_t* block, int block_size)
    if (i < block_size) return 0;
 
    //decode activity LSB (EG(MTF+1))'
-   mtf_init(&mtf);
+   //mtf_init(&mtf);
    for (i = 0; i < block_size; i++) {
       if (!(d = elias_gamma_decode(buf)))
          break;
@@ -155,28 +166,30 @@ void print_block_hex(FILE* f, entry_t* block, int block_size)
 int main() 
 {
    bitBuf *buf;      //input from mote
-   entry_t *block;  //decoded log entries
+   entry_t *block = 0;  //decoded log entries
    char line_buf[BITBUFSIZE*3];
    char* p;
 
    int line_count = 0;
-   int block_size;
+   int skipped_lines = 0;
+   int total_bytes = 0;
+
+   int header;
+   bool is_mtf_init;
+
+   bool syncd = 0;
+   int block_size = 0;
    unsigned int s;
    uint8_t b;
 
    buf = bitBuf_new(BITBUFSIZE); 
 
    memset(line_buf, 0, sizeof(line_buf));
-   bitBuf_clear(buf);
    while (fgets(line_buf, sizeof(line_buf), stdin) != NULL) {
-      line_count++;
-      fprintf(stderr, "line %d: %s", line_count, line_buf);
+      fprintf(stderr, "line: %s", line_buf);
       p = line_buf;
-      if (! sscanf(p, "%X", &block_size)) {
-         fprintf(stderr,"Invalid block size at line %d\n%s\n", line_count, line_buf);
-         break;
-      }
-      p+=3;
+      
+      bitBuf_clear(buf);
       //fill BitBuffer
       while ( sscanf(p, "%X", &s) == 1) {
          b = (uint8_t)s;
@@ -185,23 +198,65 @@ int main()
          fprintf(stderr, "%02X ", b);
       }
       fprintf(stderr, "\n");
-      fprintf(stderr, "line %d: read %d bytes\n", line_count, bitBuf_length(buf));
-   
-      //alocate block
-      block = (entry_t*)malloc(block_size*sizeof(entry_t));
+      fprintf(stderr, "read %d bytes\n", bitBuf_length(buf));
+
+      // Guess the block size
+      if (block_size == 0) {
+         int count = 0;
+         fprintf(stderr, "guessing block size...");
+         for (count = 0; elias_gamma_decode(buf) != 0; count++);
+         if (count % 6 != 1) {
+            fprintf(stderr, " read %d integers, not 6b+1, confused.\n", count);
+            exit(1);
+         } else {
+            block_size = count / 6;
+            fprintf(stderr, " cool, block size is %d!\n", block_size);
+         }
+         //pretend it never happened
+         bitBuf_resetReadPos(buf);
+         //alocate block
+         block = (entry_t*)malloc(block_size*sizeof(entry_t));
+      }
+
+      //decode header
+      header = elias_gamma_decode(buf);
+      if (header == 1) {
+         is_mtf_init = 0;
+      } else if (header == 2) {
+         is_mtf_init = 1;
+      } else {
+         fprintf(stderr, "This can't happen, header is not 1 or 2 (it is %d)\n", header);
+         exit(2);
+      }
+
+      syncd |= is_mtf_init;
+     
+      if (!syncd) {
+         fprintf(stderr, "waiting for MTF sync...\n");
+         continue;
+      }
+
+      //we are syncd!
+      line_count++;
       
       //decode block
-      if (!decode_block(buf, block, block_size)) {
+      if (!decode_block(buf, block, block_size, is_mtf_init)) {
          fprintf(stderr, "Error decoding line %d\n!!!", line_count);
+         skipped_lines++;
       } else {
+         total_bytes += bitBuf_length(buf);
          print_block_hex(stdout, block, block_size);
       }
 
-      //cleanup for next line
-      free(block);
+      //just to make sure...
       memset(line_buf, 0, sizeof(line_buf));
-      bitBuf_clear(buf);
    }
+   free(block);
+   //print some stats
+   total_bytes += line_count - skipped_lines; 
+   fprintf(stderr, "Total lines: %d ( %d error ). Block size: %d Compr. Bytes: %d Decoded Bytes: %d Compression Factor: %f\n",
+           line_count, skipped_lines, block_size, total_bytes, 12*block_size*(line_count - skipped_lines),
+           ((line_count - skipped_lines)*12.0*block_size)/total_bytes);
    exit(0);
 }
 

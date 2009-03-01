@@ -58,6 +58,7 @@ typedef struct entry_t {
     };
 } entry_t;
 
+#ifndef _QUANTO_C
 typedef nx_struct nx_entry_t {
     //nx_union {
         nx_uint8_t type;       //type of the entry, see enum above
@@ -86,5 +87,6 @@ typedef nx_struct quanto_log_cnt_msg_t {
     nx_uint8_t seq;
     nx_entry_t entry;
 } quanto_log_cnt_msg_t;
+#endif //_QUANTO_C
 
 #endif

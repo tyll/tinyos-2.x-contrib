@@ -1,10 +1,11 @@
 #ifndef QLOG_COMP_MY_UART
 #define QLOG_COMP_MY_UART
     enum {
-        CBLOCKSIZE = 10,   //  # msgs compressed at once
+        CBLOCKSIZE = 20,   //  # msgs compressed at once
         BUFFERSIZE = 100,  //  # msgs in event buffer. Must be
                            //    a multiple of CBLOCKSIZE.
-        BITBUFSIZE = 234   //  # size in bytes of the bit buffer.
+        BITBUFSIZE = 234,  //  # size in bytes of the bit buffer.
+        MTFRESET   = 10,   //  # reset mtf every MTFRESET blocks
     };
 
     /* The BitBuffer size has to be larger than the entry size X

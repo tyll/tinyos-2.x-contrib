@@ -45,6 +45,8 @@ implementation {
 #endif
     static act_t m_act_idle;
     static act_t act_quanto_log;
+
+    uint8_t m_mtf_init;
    
     bitBuf* m_bitbuf;
     uint8_t* m_bitbuf_bytes;
@@ -79,6 +81,7 @@ implementation {
         call BitBuffer.clear();
         m_bitbuf = call BitBuffer.getBuffer();
         m_bitbuf_bytes = call BitBuffer.getBytes();
+        m_mtf_init = 0;
 
         call WriterInit.init();
         call WriterControl.start();
@@ -133,6 +136,37 @@ implementation {
             call CompressTask.postTask(act_quanto_log);
     }
 
+    /* Compression format:
+     *
+     * Each block of B = CBLOCKSIZE entries is encoded as a
+     * sequence of 6*B+1 Elias-Gamma-encoded integers.
+     * The entries are transposed, such that the types are encoded
+     * in sequence, then the resource_ids, etc.
+     * Elias-Gamma doesn't allow encoding of 0, which is why we add
+     * 1 to the results of MTF
+     * MTF is a stateful encoder. We only reset every MTFRESET blocks,
+     * to explore locality among blocks. The downside is that we cannot
+     * decode until we see a block for which we know MTF is reset.
+     * We don't encode the size of the block. The decoder guesses the 
+     * size of the block by the number of integers encoded in one block.
+     *
+     *   1: header (1 int)
+     *      EG(1) if not mtf_init
+     *      EG(2) if mtf_init
+     *   2: type (B ints)
+     *      EG(MTF(type)+1)
+     *   3: res_id
+     *      EG(MTF(res_id)+1)
+     *   4: time
+     *      EG( (time - last_time) )
+     *   5: icount
+     *      EG( (icount - last_icount) )
+     *   6: activity most significant byte
+     *      EG(MTF(MSB(act))+1)
+     *   7: activity least signigicant byte
+     *      EG(MTF(LSB(act))+1)
+     *   
+     */
     event void CompressTask.runTask() {
         //assumes BitBuffer is clear
         uint8_t i;
@@ -140,18 +174,28 @@ implementation {
         static uint32_t last_time = 0;
         static uint32_t last_ic = 0;
         entry_t* e;
+        uint8_t mtf_init = !m_mtf_init;
+
+        m_mtf_init = (m_mtf_init + 1) % MTFRESET;
 
         atomic {
             e = &buf[m_head];
         }
-        
+       
         call BitBuffer.clear();
 
-        /* Place integer with size of block */
-        call BitBuffer.putByte((uint8_t)CBLOCKSIZE);
+        /* Header: if mtf_init, will encode 2,
+                   if not     , will encode 1.
+         */
+        if (mtf_init) {
+            call MoveToFront.init();
+            call EliasGamma.encode8(m_bitbuf, 2);
+        } else {
+            call EliasGamma.encode8(m_bitbuf, 1);
+        }
+
 
         /* Encode type         (EG(MTF+1))*/
-        call MoveToFront.init();
         for (i = 0; i < CBLOCKSIZE; i++) {
             call EliasGamma.encode16 (
                 m_bitbuf,
@@ -159,7 +203,7 @@ implementation {
             );
         } 
         /* Encode resource     (EG(MTF+1))*/
-        call MoveToFront.init();
+        //call MoveToFront.init();
         for (i = 0; i < CBLOCKSIZE; i++) {
             call EliasGamma.encode16 (
                 m_bitbuf,
@@ -177,7 +221,7 @@ implementation {
             last_ic = e[i].ic;
         }
         /* Encode msb activity (EG(MTF+1))*/
-        call MoveToFront.init();
+        //call MoveToFront.init();
         for (i = 0; i < CBLOCKSIZE; i++) {
             m = (uint8_t)((e[i].act >> 8) & 0xff);
             call EliasGamma.encode16 (
@@ -186,7 +230,7 @@ implementation {
             );
         }
         /* Encode lsb activity (EG(MTF+1))*/
-        call MoveToFront.init();
+        //call MoveToFront.init();
         for (i = 0; i < CBLOCKSIZE; i++) {
             m = (uint8_t)(e[i].act & 0xff);
             call EliasGamma.encode16 (

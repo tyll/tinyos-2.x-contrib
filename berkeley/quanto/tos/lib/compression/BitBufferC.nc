@@ -28,7 +28,7 @@ implementation {
     }
 
     command void BitBuffer.clear() {
-        memset(buf->buf, 0, BB_SIZE); //maybe get rid of this step
+        memset(buf->buf, 0, BB_SIZE);
         buf->size_in_bits = BB_SIZE << 3;
         buf->pos = 0;
         buf->rpos = 0;

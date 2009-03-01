@@ -78,12 +78,18 @@ implementation {
         uint8_t l = 0;
         uint32_t n = 0;
         uint8_t i;
-        while (! bitBuf_getNextBit(buf))
+        uint8_t b;
+        while (! (b = bitBuf_getNextBit(buf)))
             l++;
+        if (b == INVALID_BIT)
+            return 0;
         n |= 1 << l;
         for (i = l; i > 0; i--) {
-           if (bitBuf_getNextBit(buf))
+           if ((b = bitBuf_getNextBit(buf)) == 1 ) {
                n |= 1 << (i-1); 
+           } else if (b == INVALID_BIT) {
+               return 0;
+           }
         }
         return n;
     }
@@ -92,12 +98,18 @@ implementation {
         uint8_t l = 0;
         uint16_t n = 0;
         uint8_t i;
-        while (! bitBuf_getNextBit(buf))
+        uint8_t b;
+        while (! (b = bitBuf_getNextBit(buf)))
             l++;
+        if (b == INVALID_BIT)
+            return 0;
         n |= 1 << l;
         for (i = l; i > 0; i--) {
-           if (bitBuf_getNextBit(buf))
+           if ((b = bitBuf_getNextBit(buf)) == 1 ) {
                n |= 1 << (i-1); 
+           } else if (b == INVALID_BIT) {
+               return 0;
+           }
         }
         return n;
     }
@@ -106,12 +118,18 @@ implementation {
         uint8_t l = 0;
         uint8_t n = 0;
         uint8_t i;
-        while (! bitBuf_getNextBit(buf))
+        uint8_t b;
+        while (! (b = bitBuf_getNextBit(buf)))
             l++;
+        if (b == INVALID_BIT)
+            return 0;
         n |= 1 << l;
         for (i = l; i > 0; i--) {
-           if (bitBuf_getNextBit(buf))
+           if ((b = bitBuf_getNextBit(buf)) == 1 ) {
                n |= 1 << (i-1); 
+           } else if (b == INVALID_BIT) {
+               return 0;
+           }
         }
         return n;
     }

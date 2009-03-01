@@ -1,0 +1,27 @@
+#-*-Makefile-*- vim:syntax=make
+
+PLATFORM = meshbean900
+SENSORBOARD ?= 
+PROGRAMMER ?= avrdude
+
+
+ifeq ($(PROGRAMMER),avrdude)
+  PROGRAMMER_PART ?= -pm1281 -U efuse:w:0xff:m
+endif
+
+ifeq ($(PROGRAMMER),uisp)
+  PROGRAMMER_PART ?= -dpart=ATmega1281 --wr_fuse_e=ff
+endif
+
+#Setting Fusebits as default
+AVR_FUSE_H ?= 0x99
+AVR_FUSE_L ?= 0xC2
+
+ifdef RF212_CHANNEL
+PFLAGS += -DRF212_DEF_CHANNEL=$(RF212_CHANNEL)
+endif
+
+$(call TOSMake_include_platform,avr)
+
+meshbean900: $(BUILD_DEPS)
+	@:

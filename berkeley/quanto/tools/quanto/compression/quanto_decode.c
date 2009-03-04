@@ -171,13 +171,18 @@ int main()
    char* p;
 
    int line_count = 0;
+   int error_lines = 0;
+   int initial_skip = 0;
    int skipped_lines = 0;
    int total_bytes = 0;
+   int decoded_bytes = 0;
 
    int header;
    bool is_mtf_init;
 
    bool syncd = 0;
+   bool initial_sync = 0;
+
    int block_size = 0;
    unsigned int s;
    uint8_t b;
@@ -186,7 +191,8 @@ int main()
 
    memset(line_buf, 0, sizeof(line_buf));
    while (fgets(line_buf, sizeof(line_buf), stdin) != NULL) {
-      fprintf(stderr, "line: %s", line_buf);
+      line_count++;
+      fprintf(stderr, "line %d: %s", line_count, line_buf);
       p = line_buf;
       
       bitBuf_clear(buf);
@@ -224,6 +230,7 @@ int main()
          is_mtf_init = 0;
       } else if (header == 2) {
          is_mtf_init = 1;
+         initial_sync |= is_mtf_init;
       } else {
          fprintf(stderr, "This can't happen, header is not 1 or 2 (it is %d)\n", header);
          exit(2);
@@ -231,18 +238,24 @@ int main()
 
       syncd |= is_mtf_init;
      
+
       if (!syncd) {
          fprintf(stderr, "waiting for MTF sync...\n");
+         if (!initial_sync) {
+            initial_skip++;
+         } else {
+            skipped_lines++;
+         }
          continue;
       }
 
       //we are syncd!
-      line_count++;
       
       //decode block
       if (!decode_block(buf, block, block_size, is_mtf_init)) {
-         fprintf(stderr, "Error decoding line %d\n!!!", line_count);
-         skipped_lines++;
+         fprintf(stderr, "Error decoding line %d !!!\n", line_count);
+         error_lines++;
+         syncd = 0;
       } else {
          total_bytes += bitBuf_length(buf);
          print_block_hex(stdout, block, block_size);
@@ -253,10 +266,10 @@ int main()
    }
    free(block);
    //print some stats
-   total_bytes += line_count - skipped_lines; 
-   fprintf(stderr, "Total lines: %d ( %d error ). Block size: %d Compr. Bytes: %d Decoded Bytes: %d Compression Factor: %f\n",
-           line_count, skipped_lines, block_size, total_bytes, 12*block_size*(line_count - skipped_lines),
-           ((line_count - skipped_lines)*12.0*block_size)/total_bytes);
+   decoded_bytes = 12 * block_size * (line_count - (skipped_lines + initial_skip + error_lines));
+   fprintf(stderr, "Total lines: %d ( %d initial skip, %d errors, %d skipped ). \nBlock size: %d Compr. Bytes: %d Decoded Bytes: %d Compression Factor: %f\n",
+           line_count, initial_skip, error_lines, skipped_lines, 
+           block_size, total_bytes, decoded_bytes, 1.0*decoded_bytes/total_bytes);
    exit(0);
 }
 

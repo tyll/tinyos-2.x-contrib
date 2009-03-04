@@ -145,7 +145,9 @@ void elias_gamma_encode(uint32_t b, bitBuf* buf) {
     uint32_t m;
     uint8_t l = 0;
     //put as many 0's as l = floor(log2(b))
-    printf("eg: encoding %d : ", b);
+#ifdef EG_DEBUG
+    fprintf(stderr,"eg: encoding %d : ", b);
+#endif
     while (bb >>= 1) {
         l++;
         printf("0");
@@ -153,10 +155,14 @@ void elias_gamma_encode(uint32_t b, bitBuf* buf) {
     }
     //copy b to the buffer starting from the msb
     for (m = 1 << l; m ; m >>= 1) {
-        printf("%d", (b&m)?1:0);
+#ifdef EG_DEBUG
+        fprintf(stderr, "%d", (b&m)?1:0);
+#endif
         bitBuf_putBit(buf,(b & m)?1:0);
     }
-    printf("\n");
+#ifdef EG_DEBUG
+    fprintf(stderr, "\n");
+#endif
 }
 
 /* Decode the next elias_gamma integer from the buffer. 
@@ -167,8 +173,12 @@ uint32_t elias_gamma_decode(bitBuf *buf) {
     uint32_t n = 0;
     uint8_t i;
     int b;
-    while (!(b = bitBuf_getNextBit(buf)))
+    while (!(b = bitBuf_getNextBit(buf))) {
+#ifdef EG_DEBUG
+        fprintf(stderr, "0");
+#endif
         l++;
+    }
     if (b == -1)
       return 0;
     n |= 1 << l;
@@ -179,7 +189,9 @@ uint32_t elias_gamma_decode(bitBuf *buf) {
            return 0;
        }
     }
-    fprintf(stderr, " eg: %d \n", n);
+#ifdef EG_DEBUG
+    fprintf(stderr, " eg: %u \n", n);
+#endif
     return n;
 }
 

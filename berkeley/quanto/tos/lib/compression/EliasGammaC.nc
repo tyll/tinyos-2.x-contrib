@@ -21,7 +21,7 @@ implementation {
         for (i = 0; i < l; i++)            //put l 0's
             bitBuf_putBit(buf, 0);
     
-        for (m = 1 << l ; m ; m >>= 1) {   //copy b to buffer from the msb
+        for (m = (uint32_t)1 << l ; m ; m >>= 1) {   //copy b to buffer from the msb
             bitBuf_putBit(buf,(b & m)?1:0);
         }
         return  len;
@@ -43,7 +43,7 @@ implementation {
         for (i = 0; i < l; i++)            //put l 0's
             bitBuf_putBit(buf, 0);
     
-        for (m = 1 << l ; m ; m >>= 1) {   //copy b to buffer from the msb
+        for (m = (uint16_t)1 << l ; m ; m >>= 1) {   //copy b to buffer from the msb
             bitBuf_putBit(buf,(b & m)?1:0);
         }
         return  len;

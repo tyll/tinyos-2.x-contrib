@@ -56,7 +56,7 @@
  * what QuantoLogCompressedMyUartWriterP.CompressTask does.
  */
 int 
-decode_block (bitBuf* buf, entry_t* block, int block_size, bool is_mtf_init)
+decode_block (bitBuf* buf, entry_t* block, int block_size, bool sync)
 {
    int i;
    uint32_t d;
@@ -66,13 +66,14 @@ decode_block (bitBuf* buf, entry_t* block, int block_size, bool is_mtf_init)
    static uint32_t last_time = 0;
    static uint32_t last_icount = 0;
 
-   if (is_mtf_init) {
+   if (sync) {
       mtf_init(&mtf);
    } 
    
    //decode type    (EG(MTF+1))'
    //mtf_init(&mtf);
    for (i = 0; i < block_size; i++) {
+      fprintf(stderr,"type, i: %d ", i);
       if (! (d = elias_gamma_decode(buf)))
          break;
       d -= 1;
@@ -84,6 +85,7 @@ decode_block (bitBuf* buf, entry_t* block, int block_size, bool is_mtf_init)
    //decode resource (EG(MTF+1))'
    //mtf_init(&mtf);
    for (i = 0; i < block_size; i++) {
+      fprintf(stderr,"res_id, i: %d ", i);
       if (!(d = elias_gamma_decode(buf)))
          break;
       d -= 1;
@@ -94,9 +96,16 @@ decode_block (bitBuf* buf, entry_t* block, int block_size, bool is_mtf_init)
 
    //decode time    (EG(delta))'
    for (i = 0; i < block_size; i++) {
+      fprintf(stderr,"time, i: %d ", i);
       if (!(d = elias_gamma_decode(buf)))
          break;
-      d += last_time;
+      if (i == 0 && sync) {
+         //decode absolute time+1
+         d -= 1;
+      } else {
+         //decode delta
+         d += last_time;
+      }
       block[i].time = d;
       last_time = d;
    }
@@ -104,10 +113,17 @@ decode_block (bitBuf* buf, entry_t* block, int block_size, bool is_mtf_init)
 
    //decode icount (EG(delta +1))'
    for (i = 0; i < block_size; i++) {
+      fprintf(stderr,"icount, i: %d ", i);
       if (!(d = elias_gamma_decode(buf)))
          break;
-      d -= 1;
-      d += last_icount;
+      if (i == 0 && sync) {
+         //decode absolute icount+1
+         d -= 1;
+      } else {
+         //decode delta
+         d += last_icount;
+         d -= 1;
+      }
       block[i].ic = d;
       last_icount = d;
    }
@@ -116,6 +132,7 @@ decode_block (bitBuf* buf, entry_t* block, int block_size, bool is_mtf_init)
    //decode activity MSB (EG(MTF+1))'
    //mtf_init(&mtf);
    for (i = 0; i < block_size; i++) {
+      fprintf(stderr,"act msb, i: %d ", i);
       if (!(d = elias_gamma_decode(buf)))
          break;
       d -= 1;
@@ -127,6 +144,7 @@ decode_block (bitBuf* buf, entry_t* block, int block_size, bool is_mtf_init)
    //decode activity LSB (EG(MTF+1))'
    //mtf_init(&mtf);
    for (i = 0; i < block_size; i++) {
+      fprintf(stderr,"act lsb, i: %d ", i);
       if (!(d = elias_gamma_decode(buf)))
          break;
       d -= 1;
@@ -177,8 +195,15 @@ int main()
    int total_bytes = 0;
    int decoded_bytes = 0;
 
+   int error_sync = 0;
+   int error_nosync = 0;
+   int error_skip_sync = 0;
+   int error_skip_nosync = 0;
+   int sync_lines = 0;
+   int nosync_lines = 0;
+
    int header;
-   bool is_mtf_init;
+   bool sync;
 
    bool syncd = 0;
    bool initial_sync = 0;
@@ -227,20 +252,32 @@ int main()
       //decode header
       header = elias_gamma_decode(buf);
       if (header == 1) {
-         is_mtf_init = 0;
+         sync = 0;
       } else if (header == 2) {
-         is_mtf_init = 1;
-         initial_sync |= is_mtf_init;
+         sync = 1;
+         initial_sync |= sync;
       } else {
          fprintf(stderr, "This can't happen, header is not 1 or 2 (it is %d)\n", header);
          exit(2);
       }
 
-      syncd |= is_mtf_init;
-     
+      syncd |= sync;
+    
+      if (sync) {
+         sync_lines++;
+      } else {
+         nosync_lines++;
+      }
 
       if (!syncd) {
          fprintf(stderr, "waiting for MTF sync...\n");
+         if (!decode_block(buf, block, block_size, sync)) {
+            if (sync) {
+               error_skip_sync++;
+            } else {
+               error_skip_nosync++;
+            }
+         } 
          if (!initial_sync) {
             initial_skip++;
          } else {
@@ -252,9 +289,14 @@ int main()
       //we are syncd!
       
       //decode block
-      if (!decode_block(buf, block, block_size, is_mtf_init)) {
+      if (!decode_block(buf, block, block_size, sync)) {
          fprintf(stderr, "Error decoding line %d !!!\n", line_count);
          error_lines++;
+         if (sync) {
+            error_sync++;
+         } else {
+            error_nosync++;
+         }
          syncd = 0;
       } else {
          total_bytes += bitBuf_length(buf);
@@ -270,6 +312,12 @@ int main()
    fprintf(stderr, "Total lines: %d ( %d initial skip, %d errors, %d skipped ). \nBlock size: %d Compr. Bytes: %d Decoded Bytes: %d Compression Factor: %f\n",
            line_count, initial_skip, error_lines, skipped_lines, 
            block_size, total_bytes, decoded_bytes, 1.0*decoded_bytes/total_bytes);
+   fprintf(stderr, "Errors in sync lines: %d / %d (%.3f)\n",
+            error_sync + error_skip_sync, sync_lines, 
+           (error_sync + error_skip_sync)*1.0/sync_lines);
+   fprintf(stderr, "Errors in nosync lines: %d / %d (%.3f)\n",
+            error_nosync + error_skip_nosync, nosync_lines, 
+           (error_nosync + error_skip_nosync)*1.0/nosync_lines);
    exit(0);
 }
 

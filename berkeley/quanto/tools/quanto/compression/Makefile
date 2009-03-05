@@ -2,12 +2,15 @@ CC = gcc
 QUANTO_LOG = $(QUANTO_ROOT)/tos/lib/quanto/QuantoLog
 INCLUDES = $(QUANTO_LOG)/QuantoLogCompressedMyUartWriter.h libquantocode.h
 
-CFLAGS = -g -Wall
+CFLAGS = -g -Wall #-DEG_DEBUG
 LDFLAGS = -L.
 INCLUDEFLAGS = -I$(QUANTO_LOG)
 
-all: check_quanto_root quanto_decode
+all: check_quanto_root quanto_decode test
 quanto_decode: quanto_decode.c libquantocode.a $(INCLUDES)
+	$(CC) $(CFLAGS) $(INCLUDEFLAGS) $< $(LDFLAGS) -lquantocode -o $@
+
+test: test.c libquantocode.a libquantocode.h
 	$(CC) $(CFLAGS) $(INCLUDEFLAGS) $< $(LDFLAGS) -lquantocode -o $@
    
 libquantocode.a : libquantocode.o

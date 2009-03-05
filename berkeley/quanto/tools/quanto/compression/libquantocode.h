@@ -70,6 +70,11 @@ void elias_gamma_encode(uint32_t b, bitBuf* buf);
 uint32_t elias_gamma_decode(bitBuf *buf);
 
 
+/************ 32-bit Elias Delta Codec ***************/
+/* Elias Delta encodes the length portion of the elias
+ * gamma code using elias gamma */
+void elias_delta_encode(uint32_t b, bitBuf* buf);
+uint32_t elias_delta_decode(bitBuf *buf);
 /************ 8-bit Move To Front Codec **************/
 typedef struct {
     uint8_t order[256];

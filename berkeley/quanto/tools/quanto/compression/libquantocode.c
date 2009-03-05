@@ -150,7 +150,9 @@ void elias_gamma_encode(uint32_t b, bitBuf* buf) {
 #endif
     while (bb >>= 1) {
         l++;
-        printf("0");
+#ifdef EG_DEBUG
+        fprintf(stderr, "0");
+#endif
         bitBuf_putBit(buf, 0);
     }
     //copy b to the buffer starting from the msb
@@ -191,6 +193,58 @@ uint32_t elias_gamma_decode(bitBuf *buf) {
     }
 #ifdef EG_DEBUG
     fprintf(stderr, " eg: %u \n", n);
+#endif
+    return n;
+}
+
+/************ 32-bit Elias Delta Codec ***************/
+/* Elias Delta encodes the length portion of the elias
+ * gamma code using elias gamma */
+
+void elias_delta_encode(uint32_t b, bitBuf* buf) {
+    uint32_t bb = b;
+    uint32_t m;
+    uint8_t l = 0;
+
+#ifdef EG_DEBUG
+    fprintf(stderr,"ed: encoding %d : ", b);
+#endif
+    //determine l = floor(log2(b))
+    while (bb >>= 1) {
+        l++;
+    }
+    //encode l+1 in elias_gamma
+    elias_gamma_encode(l+1, buf);
+    //copy b to the buffer, skipping the msb
+    for (m = (1 << l) >> 1; m ; m >>= 1) {
+        bitBuf_putBit(buf,(b & m)?1:0);
+#ifdef EG_DEBUG
+        fprintf(stderr, "%d", (b&m)?1:0);
+#endif
+    }
+#ifdef EG_DEBUG
+    fprintf(stderr, "\n");
+#endif
+}
+
+uint32_t elias_delta_decode(bitBuf *buf) {
+   uint32_t l;
+   uint32_t n = 0;
+   uint8_t i;
+    int b;
+   l = elias_gamma_decode(buf);
+   if (!l) return 0;
+   l--;
+   n |= 1 << l;
+     for (i = l; i > 0; i--) {
+       if ((b = bitBuf_getNextBit(buf)) == 1) {
+           n |= 1 << (i-1); 
+       } else if (b == -1) {
+           return 0;
+       }
+    }
+#ifdef EG_DEBUG
+    fprintf(stderr, " ed: %u \n", n);
 #endif
     return n;
 }

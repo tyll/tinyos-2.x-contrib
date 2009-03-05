@@ -12,11 +12,12 @@ implementation {
 
     components new BitBufferC(BITBUFSIZE) as BitBuffer,
                new MoveToFrontC() as MTF,
-               EliasGammaC;
+               //EliasDeltaC as Elias;
+               EliasGammaC as Elias;
     
     QLog.BitBuffer -> BitBuffer;
     QLog.MoveToFront -> MTF;
-    QLog.EliasGamma -> EliasGammaC;
+    QLog.Elias -> Elias;
 
     //components PortWriterC;
     components MySerialWriterC;

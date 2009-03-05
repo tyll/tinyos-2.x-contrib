@@ -5,7 +5,7 @@
         BUFFERSIZE = 100,  //  # msgs in event buffer. Must be
                            //    a multiple of CBLOCKSIZE.
         BITBUFSIZE = 234,  //  # size in bytes of the bit buffer.
-        MTFRESET   = 10,   //  # reset mtf every MTFRESET blocks
+        MTFSYNC   = 10,   //  # reset mtf every MTFRESET blocks
     };
 
     /* The BitBuffer size has to be larger than the entry size X

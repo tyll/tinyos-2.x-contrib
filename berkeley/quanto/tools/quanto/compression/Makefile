@@ -6,7 +6,7 @@ CFLAGS = -g -Wall #-DEG_DEBUG
 LDFLAGS = -L.
 INCLUDEFLAGS = -I$(QUANTO_LOG)
 
-all: check_quanto_root quanto_decode test
+all: check_quanto_root quanto_decode
 quanto_decode: quanto_decode.c libquantocode.a $(INCLUDES)
 	$(CC) $(CFLAGS) $(INCLUDEFLAGS) $< $(LDFLAGS) -lquantocode -o $@
 

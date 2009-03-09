@@ -3,9 +3,9 @@ configuration HplAdc12P {
 }
 implementation
 {
-    components HplAdc12P, ResourceContextsC;
+    components HplAdc12ImplP, ResourceContextsC;
     HplAdc12P.CPUContext -> ResourceContextsC.CPUContext;
     
-    HplAdc12 = HplAdc12P;
+    HplAdc12 = HplAdc12ImplP;
 }
     

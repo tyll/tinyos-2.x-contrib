@@ -40,9 +40,9 @@ implementation {
     entry_t* m_w_entry;
 
     entry_t buf[BUFFERSIZE];
-    uint8_t m_head; //remove from head
-    uint8_t m_tail; //insert at tail
-    uint8_t m_size;    
+    uint16_t m_head; //remove from head
+    uint16_t m_tail; //insert at tail
+    uint16_t m_size;    
 
     uint8_t m_state = S_STOPPED;
 
@@ -93,6 +93,11 @@ implementation {
 #endif
             if (m_size < BUFFERSIZE) {
                 e = &buf[m_tail];
+                m_tail = (m_tail + 1) % BUFFERSIZE;
+                m_size++;
+                if ((to_write = (m_size == 1))) {
+                    m_w_entry = e;
+                }
             }
         }
         if (e != NULL) {
@@ -107,13 +112,6 @@ implementation {
             e->res_id = id;
             e->act  = value; //also works for powerstate
 
-            atomic {
-                m_tail = (m_tail + 1) % BUFFERSIZE;
-                m_size++;
-                if ((to_write = (m_size == 1))) {
-                    m_w_entry = e;
-                }
-            }
         } 
         if (to_write) 
             call PrepareWriteTask.postTask(act_quanto_log);

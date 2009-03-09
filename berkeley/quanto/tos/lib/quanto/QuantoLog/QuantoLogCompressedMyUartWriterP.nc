@@ -36,12 +36,13 @@ module QuantoLogCompressedMyUartWriterP {
         interface BitBuffer;
         interface MoveToFront;
         interface EliasGamma as Elias;
+        //interface EliasDelta as Elias;
     }
 }
 implementation {
     enum {S_STOPPED, S_STARTED};
 #ifdef COUNT_LOG
-    uint32_t count;
+    uint32_t m_count;
 #endif
     static act_t m_act_idle;
     static act_t act_quanto_log;
@@ -55,9 +56,9 @@ implementation {
     uint8_t* m_bitbuf_bytes;
 
     entry_t buf[BUFFERSIZE];
-    uint8_t m_head; //remove from head
-    uint8_t m_tail; //insert at tail
-    uint8_t m_size;    
+    uint16_t m_head; //remove from head
+    uint16_t m_tail; //insert at tail
+    uint16_t m_size;    
 
     uint8_t m_state = S_STOPPED;
 
@@ -76,15 +77,15 @@ implementation {
             m_act_idle = mk_act_local(ACT_TYPE_IDLE);
             act_quanto_log = mk_act_local(ACT_TYPE_QUANTO_WRITER);
 #ifdef COUNT_LOG
-            count = 0;
+            m_count = 0;
 #endif
+            m_sync = 0;
         }
 
         call MoveToFront.init();
         call BitBuffer.clear();
         m_bitbuf = call BitBuffer.getBuffer();
         m_bitbuf_bytes = call BitBuffer.getBytes();
-        m_sync = 0;
 
         call WriterInit.init();
         call WriterControl.start();
@@ -106,15 +107,21 @@ implementation {
     recordChange(uint8_t id, uint16_t value, uint8_t type) {
         entry_t *e = NULL;
         uint8_t to_write = FALSE;
+#ifdef COUNT_LOG
+        uint32_t count;
+#endif        
         if (m_state != S_STARTED) {
             return;
         }
         atomic {
 #ifdef COUNT_LOG
-            count++;
+            count = m_count++;
 #endif
             if (m_size < BUFFERSIZE) {
                 e = &buf[m_tail];
+                m_size++;
+                m_tail = (m_tail + 1) % BUFFERSIZE;
+                to_write = (m_size == CBLOCKSIZE);
             }
         }
         if (e != NULL) {
@@ -128,12 +135,6 @@ implementation {
             e->type = type;
             e->res_id = id;
             e->act  = value; //also works for powerstate
-
-            atomic {
-                m_size++;
-                m_tail = (m_tail + 1) % BUFFERSIZE;
-                to_write = (m_size == CBLOCKSIZE);
-            }
         } 
         if (to_write) 
             call CompressTask.postTask(act_quanto_log);

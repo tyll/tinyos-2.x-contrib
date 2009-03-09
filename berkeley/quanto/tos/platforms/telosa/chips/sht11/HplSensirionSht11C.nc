@@ -77,7 +77,6 @@ implementation {
   Resource = Arbiter;
  
   components ResourceContextsC;
-  Arbiter.CPUContext -> ResourceContextsC.CPUContext;
   Arbiter.ResourceContext -> ResourceContextsC.Sht11Context;  
  
   components new SplitControlPowerManagerC();

@@ -61,11 +61,9 @@ implementation {
   App.Packet -> AMSenderC;
 
   components ResourceContextsC;
-  components QuantoLogRawUARTC as QuantoLog;
-  components UserButtonC;
+  components QuantoLogCompressedMyUartWriterC;
+  //components QuantoLogMyUARTWriterC;
   App.CPUContext -> ResourceContextsC.CPUContext;
-  App.QuantoLog -> QuantoLog;
-  App.UserButtonNotify -> UserButtonC;
 }
 
 

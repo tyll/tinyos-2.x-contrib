@@ -1,6 +1,7 @@
 COMPONENT=RadioCountToLedsAppC
 BUILD_EXTRA_DEPS = RadioCountMsg.py RadioCountMsg.class
 CFLAGS += -DCC2420_DEF_CHANNEL=26
+CFLAGS += -DCOUNT_LOG
 RadioCountMsg.py: RadioCountToLeds.h
 	mig python -target=$(PLATFORM) $(CFLAGS) -python-classname=RadioCountMsg RadioCountToLeds.h radio_count_msg -o $@
 

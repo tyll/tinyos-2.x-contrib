@@ -54,8 +54,6 @@ module RadioCountToLedsC {
     interface Packet;
 
     interface SingleContext as CPUContext;
-    interface Notify<button_state_t> as UserButtonNotify;
-    interface QuantoLog;
   }
 }
 implementation {
@@ -68,30 +66,14 @@ implementation {
     ACT_MAIN = 1,
   };
   
-  void start() {
-    call QuantoLog.record();
-  }
-
-  event void QuantoLog.full()
-  {
-     call QuantoLog.flush();
-  }
-
-  event void UserButtonNotify.notify(button_state_t buttonState) {
-    if (buttonState == BUTTON_PRESSED) {
-        start();
-    }
-  }
-
   event void Boot.booted() {
     call AMControl.start();
-    call UserButtonNotify.enable();
   }
 
   event void AMControl.startDone(error_t err) {
     if (err == SUCCESS) {
       call CPUContext.set(mk_act_local(ACT_MAIN));
-      call MilliTimer.startPeriodic(250);
+      call MilliTimer.startPeriodic(200);
     }
     else {
       call AMControl.start();

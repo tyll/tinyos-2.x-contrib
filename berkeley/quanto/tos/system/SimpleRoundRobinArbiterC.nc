@@ -93,7 +93,7 @@ implementation {
 
   Arbiter.Queue -> Queue;
 
-  ResourceContext = Arbiter;
+  ResourceContext = Arbiter.ResourceContext;
   components ResourceContextsC; 
   Arbiter.CPUContext -> ResourceContextsC.CPUContext;
 }

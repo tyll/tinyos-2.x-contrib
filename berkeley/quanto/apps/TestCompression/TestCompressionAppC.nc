@@ -8,9 +8,15 @@ implementation {
 	TestCompressionC.MoveToFront -> MtF;
 	
 	components new BitBufferC(200) as BB;
-	components EliasGammaC;
+	components EliasGammaC, EliasDeltaC;
 	TestCompressionC.BitBuffer -> BB;
 	TestCompressionC.EliasGamma -> EliasGammaC;
+	TestCompressionC.EliasDelta -> EliasDeltaC;
+
+   components LedsC;
+   TestCompressionC.Leds -> LedsC;
+
+   //components QuantoLogCompressedMyUartWriterC;
 }
 
 

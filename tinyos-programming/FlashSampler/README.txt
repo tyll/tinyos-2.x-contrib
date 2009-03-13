@@ -25,10 +25,10 @@ Usage:
 
     $ make micaz install <your usual installation options>)
 
-2. Once you turn the mote on, it will sample to flash for 32s at 1kHz,
+2. Once you turn the mote on, it will sample to flash for ~30s at 1kHz,
    write a summary of the sample to the log, go to sleep for a minute,
    then repeat. LED 0 is on during sampling, LED 1 is on during
-   summarization.
+   summarization. LED 2 is toggled on every buffer swap during sampling.
 
 Known bugs/limitations:
 

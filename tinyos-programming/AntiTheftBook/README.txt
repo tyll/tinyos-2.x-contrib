@@ -64,10 +64,25 @@ micaz or iris if using either of those motes)
 5. Connect the root mica2 mote to your PC and switch on all motes.
 
 6. Admire the blinking LEDs and the theft detection!
+
+   Run ./listen <your packet source> to get a hex dump of theft report packets
+   in versions 6.3, 6.4 and 6.5.2, e.g.
+
+      $ ./listen serial@/dev/tty.usbserial-M49W90J5:telosb
+      serial@/dev/tty.usbserial-M49W90J5:115200: resynchronising
+      00 FF FF 00 0B 02 00 2A 00 0B 
+      00 FF FF 00 0B 02 00 2A 00 0B 
+      00 FF FF 00 0B 02 00 2A 00 0B 
+
    Run ./settings <your packet source> to change settings in versions
-   6.3, 6.4 and 6.5.2
-   Run ./listen <your packet source> to listen for theft report packets
-   in versions 6.3, 6.4 and 6.5.2
+   6.3, 6.4 and 6.5.2: the required acceleration variance is increased
+   to 16 (from 4, thus requiring stronger shaking) and the checking interval
+   is increased to 4s (from 1/4s)
+
+      $ ./settings serial@/dev/tty.usbserial-M49W90J5:telosb
+      serial@/dev/tty.usbserial-M49W90J5:115200: resynchronising
+      00 FF FF FF FF 04 00 2B 00 10 10 00 
+
 
 Known bugs/limitations:
 

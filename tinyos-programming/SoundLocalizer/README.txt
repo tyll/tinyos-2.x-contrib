@@ -31,7 +31,10 @@ None.
 
 Usage:
 
-1. Compile and install the coordinator code:
+1. Compile and install the coordinator code.
+
+   If you are using TinyOS 2.1 or earlier, please first apply the patch 
+   under Known Bugs below.
 
     $ (cd Coordinator; make micaz install.0 <your usual installation options>)
 
@@ -53,7 +56,19 @@ Usage:
 
 Known bugs/limitations:
 
-The precision of the time synchronization will affect the reliability
-of the "closest to the sound" detection process.
+- If on step 4, the motes turn on their red LED, you need to make the
+following change to tinyos-2.x/tos/chips/atm128/i2c/Atm128I2CMasterPacketP.nc:
+in the AsyncStdControl.start command (around line 90), replace
+	call I2C.init(FALSE);
+
+with
+
+#ifndef ATM128_EXTERNAL_PULLDOWN
+#define ATM128_EXTERNAL_PULLDOWN FALSE
+#endif
+	call I2C.init(ATM128_EXTERNAL_PULLDOWN);
+
+- Better time synchronization would produce more reliable "closest to the
+sound" detection...
 
 $Id$

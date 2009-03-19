@@ -1,7 +1,7 @@
 #-*-Makefile-*- vim:syntax=make
 #$Id$
 
-NESC_DECLS_GEN_PL ?= $(TOSROOT)/../tinyos-2.x-contrib/marionette/tools/codeGeneration/generateNescDecls.pl
+NESC_DECLS_GEN_PL ?= $(MARIONETTEROOT)/tools/codeGeneration/generateNescDecls.pl
 POST_BUILD_EXTRA_DEPS += build_nescDecls
 
 build_nescDecls: $(NESCDECLS_DEPS) FORCE

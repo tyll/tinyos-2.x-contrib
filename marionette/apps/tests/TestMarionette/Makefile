@@ -1,18 +1,20 @@
 COMPONENT=TestMarionetteAppC
 
+###############
+##IF THIS DOESN'T COMPILE:
+# 1. make sure that you sourced the file tinyos-2.x-contrib/marionette/support/sdk/python/tinyos/marionette/util/pytosProfile
+# 2. make sure that pytosProfile sets the variable MARIONETTEROOT correctly
+# 3. try the following: cp tinyos-2.x-contrib/marionette/support/make/*.extra tinyos-2.x/support/make/
+
+
 GOALS += marionette
 
-#GOALS += nucleus
-#PFLAGS += -DUSE_NUCLEUS
-#TINYOS_NP ?= BNP
-
 PFLAGS += -DTOSH_MAX_TASKS_LOG2=8
-MARIONETTE_ROOT=../../..
 
-CFLAGS += -I$(MARIONETTE_ROOT)/tos/lib/Rpc
-CFLAGS += -I$(MARIONETTE_ROOT)/tos/lib/RamSymbols
+CFLAGS += -I$(MARIONETTEROOT)/tos/lib/Rpc
+CFLAGS += -I$(MARIONETTEROOT)/tos/lib/RamSymbols
 
-TOSMAKE_PATH += $(MARIONETTE_ROOT)/support/make
+TOSMAKE_PATH += $(MARIONETTEROOT)/support/make
 
 MAKERULES := $(TOSROOT)/support/make/Makerules
 include $(MAKERULES)

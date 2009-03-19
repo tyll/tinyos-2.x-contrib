@@ -1,7 +1,7 @@
 #-*-Makefile-*- vim:syntax=make
 #$Id$
 
-RPC_GEN_PL ?= $(TOSROOT)/../tinyos-2.x-contrib/marionette/tools/codeGeneration/generateRpc.pl
+RPC_GEN_PL ?= $(MARIONETTEROOT)/tools/codeGeneration/generateRpc.pl
 BUILD_EXTRA_DEPS += rpc_dep
 
 PFLAGS += -I$(BUILDDIR)

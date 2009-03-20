@@ -150,7 +150,7 @@ module UdpP {
     setSrcAddr(msg);
     memcpy(&msg->hdr.ip6_dst, dest->sin6_addr.s6_addr, 16);
     
-    if (local_ports[clnt] == 0 && alloc_lport(clnt) == 0) {
+    if (local_ports[clnt] == 0 && (local_ports[clnt] = alloc_lport(clnt)) == 0) {
       ip_free(msg);
       return FAIL;
     }

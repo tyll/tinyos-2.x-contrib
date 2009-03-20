@@ -105,6 +105,5 @@ void config_print(int fd, int argc, char **argv) { //struct config *c) {
   VTY_printf ("  router address: %s\r\n", buf);
   VTY_printf("  proxy dev: %s\r\n", lastconfig->proxy_dev);
   VTY_printf("  channel: %i\r\n", lastconfig->channel);
-  VTY_printf("  version: %s\r\n", STR($Id$));
   VTY_flush();
 }

@@ -1,0 +1,160 @@
+#!/usr/bin/env python
+# -*- python -*-
+#
+# Parser for simple BRPC grammar using ply (python lex/yacc bindings).
+#
+# There are no 'structs': the only types are primative integers, and
+# arbitrary-length arrays of them.  The first augmentation will be to
+# add structs.
+#
+# This file is a bit of a hash... sorry about that.  There's got to be
+# a better macro language...
+#
+# @author Stephen Dawson-Haggerty <stevedh@eecs.berkeley.edu>
+#
+import sys,os
+import ply.lex as lex
+import ply.yacc as yacc
+
+
+reserved = {
+    'uint8_t'  : 'UINT8',
+    'uint16_t' : 'UINT16',
+    'uint32_t' : 'UINT32',
+    'program'  : 'PROGRAM',
+    'command'  : 'COMMAND',
+    'event'    : 'EVENT',
+    }
+
+tokens = [
+    'NUMBER', 
+    'LBRACE',
+    'RBRACE',
+    'LPAREN',
+    'RPAREN',
+    'LBRACKET',
+    'RBRACKET',
+    'COMMA',
+    'EQUALS',
+    'SEMI',
+    'ID',
+    'COMMENT',
+    ] + reserved.values()
+
+t_LPAREN   = r'\('
+t_RPAREN   = r'\)'
+t_LBRACKET = r'\['
+t_RBRACKET = r'\]'
+t_LBRACE   = r'\{'
+t_RBRACE   = r'\}'
+t_SEMI     = r'\;'
+t_COMMA    = r'\,'
+t_EQUALS   = r'\='
+
+def t_COMMENT(t):
+    r'\#.*'
+    pass
+
+# handle reserved words and ids.
+def t_ID(t):
+    r'[a-zA-Z][a-zA-Z0-9_]*'
+    t.type = reserved.get(t.value, 'ID')
+    return t
+
+def t_NUMBER(t):
+    r'\d+'
+    try:
+        t.value = int(t.value)
+    except ValueError:
+        print "Integer value too large", t.value
+        t.value = 0
+    return t
+
+t_ignore = " \t"
+
+def t_newline(t):
+    r'\n'
+    t.lexer.lineno += t.value.count("\n")
+
+def t_error(t):
+    print "Illegal character '%s'" % t.value[0]
+
+lex.lex()
+
+if len(sys.argv) != 2:
+    print "Usage: %s <interface>" % sys.argv[0]
+    sys.exit(1)
+    
+f = open(sys.argv[1], "r")
+data = ''
+for l in f.readlines():
+    data += l
+
+def p_program(p):
+    '''program : PROGRAM ID LBRACE fun_list RBRACE EQUALS NUMBER SEMI'''
+    p[0] = (p[2], p[4], p[7])
+
+def p_fun_list(p):
+    '''fun_list : fun
+                | fun fun_list'''
+    if len(p) == 2:
+        p[0] = [p[1]]
+    else:
+        p[0] = [p[1]] + p[2]
+
+def p_fun(p):
+    '''fun : COMMAND ID LPAREN arg_list RPAREN SEMI
+           | EVENT ID LPAREN arg_list RPAREN SEMI'''
+    p[0] = (p[1], p[2], p[4])
+
+def p_arg_list(p):
+    '''arg_list : arg_type
+                | arg_type COMMA arg_list'''
+    if len(p) == 2:
+        p[0] = [p[1]]
+    else:
+        p[0] = [p[1]] + p[3]
+
+def p_arg_type(p):
+    '''arg_type : atomic_type
+                | array_type'''
+    p[0] = p[1]
+
+
+def p_atomic_type(p):
+    '''atomic_type : atype ID'''
+    p[0] = (1, p[2], p[1])
+
+def p_array_type(p):
+    '''array_type : atype LBRACKET RBRACKET ID'''
+    p[0] = (0, p[4], p[1])
+
+def p_atype(p):
+    '''atype : UINT8
+             | UINT16
+             | UINT32'''
+    p[0] = p[1]
+
+# Error rule for syntax errors
+def p_error(p):
+    print "Syntax error in input!"
+
+yacc.yacc()
+
+program = yacc.parse(data)
+print program
+
+# generate the stubs from the parsed AST.  the marshaling and
+# unmarshaling is all taken care of in the c bindings.
+#
+from brpcgen_c import brpcgen_c
+from brpcgen_nesc import brpcgen_nesc
+
+c_frontend = brpcgen_c(program)
+c_frontend.autogen()
+
+nesc_frontend = brpcgen_nesc(program)
+nesc_frontend.autogen()
+
+ 
+

@@ -1,0 +1,25 @@
+
+ @title TCP Socket Documentation
+ @author Stephen Dawson-Haggerty
+ @release internal
+----------------------------------------------------------------------
+
+ip-stack provides a very simple TCP stack; it is currently quite
+"alpha"; in particular the connection state machine has known bugs
+which may prevent it from being stable over the long term.
+
+The interface is located in tos/lib/net/b6lowpan/interfaces/Tcp.nc is
+necessarily more complex.  In particular, buffering is a significant issue.
+
+In this iteration, per-socket buffers must be provided by applications
+from an accept() or connect() context.  The stack will manage the
+buffer; copying new data into the transmit buffer, while storing
+out-of-order segments in the receive buffer and maintaining a bitmap
+of which sequence numbers have been received.
+
+Usage
+----------------------------------------------------------------------
+
+There is currently no available documentation or examples of the tcp
+implementation.
+

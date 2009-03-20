@@ -1,0 +1,20 @@
+#!/usr/bin/make -f
+
+include /usr/share/cdbs/1/rules/buildcore.mk
+include /usr/share/cdbs/1/class/autotools.mk
+include /usr/share/cdbs/1/rules/debhelper.mk
+include /usr/share/cdbs/1/rules/simple-patchsys.mk
+
+DEB_UPDATE_RCD_PARAMS = defaults 50
+
+debian/copyright: debian/copyright.in COPYRIGHT
+	cat $^ > $@
+
+pre-build:: debian/copyright 
+
+clean::
+	rm -f gram.c gram.h scanner.c
+
+common-install-prehook-arch::
+	install -m 644 debian/simple-radvd.conf `pwd`/debian/radvd/usr/share/doc/radvd/examples/
+	install -m 644 radvd.conf.example `pwd`/debian/radvd/usr/share/doc/radvd/examples/

@@ -1,0 +1,16 @@
+#!/bin/sh
+
+set -e
+
+if [ "$1" = configure ]; then
+  if ! getent passwd radvd >/dev/null; then
+    adduser --quiet --system --no-create-home --home /var/run/radvd radvd
+  fi
+  for i in /var/run/radvd; do
+    if ! dpkg-statoverride --list $i >/dev/null; then
+      dpkg-statoverride --update --add radvd root 4755 $i
+    fi
+  done
+fi
+
+#DEBHELPER#

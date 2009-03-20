@@ -1,0 +1,13 @@
+This is radvd.  It was originally packaged by Adam Heath, on Fri Aug  4 21:45:09 CDT 2000.
+and is now maintained by Andreas Rottmann <rotty@debian.org>.
+
+It was downloaded from 
+
+http://v6web.litech.org/radvd/dist/radvd-0.7.1.tar.gz
+
+No modifications where needed for debian integration.
+
+The upstream copyright follows:
+
+----
+

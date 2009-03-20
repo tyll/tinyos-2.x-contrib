@@ -1,0 +1,9 @@
+#!/bin/sh
+
+set -e
+
+#DEBHELPER#
+
+if [ "$1" = purge ]; then
+  dpkg-statoverride --remove /var/run/radvd
+fi

@@ -21,44 +21,39 @@
  * Author: Miklos Maroti
  */
 
-#include <HplRF212.h>
-
-configuration RF212PacketC
+configuration ActiveMessageC
 {
 	provides
 	{
+		interface SplitControl;
+
+		interface AMSend[uint8_t id];
+		interface Receive[uint8_t id];
+		interface Receive as Snoop[uint8_t id];
 		interface Packet;
 		interface AMPacket;
-		interface PacketAcknowledgements;
-		interface PacketField<uint8_t> as PacketLinkQuality;
-		interface PacketField<uint8_t> as PacketTransmitPower;
-		interface PacketField<uint8_t> as PacketRSSI;
-		interface PacketField<uint16_t> as PacketSleepInterval;
-		interface PacketField<uint8_t> as PacketTimeSyncOffset;
 
-		interface PacketTimeStamp<TRadio, uint32_t> as PacketTimeStampRadio;
+		interface PacketAcknowledgements;
+		interface LowPowerListening;
+
+		interface PacketTimeStamp<TMicro, uint32_t> as PacketTimeStampMicro;
 		interface PacketTimeStamp<TMilli, uint32_t> as PacketTimeStampMilli;
 	}
 }
 
 implementation
 {
-	components RF212PacketP, IEEE154PacketC, LocalTimeMicroC, LocalTimeMilliC;
+	components RF230ActiveMessageC as MAC;
 
-	RF212PacketP.IEEE154Packet -> IEEE154PacketC;
-	RF212PacketP.LocalTimeRadio -> LocalTimeMicroC;
-	RF212PacketP.LocalTimeMilli -> LocalTimeMilliC;
+	SplitControl = MAC;
+	AMSend       = MAC;
+	Receive      = MAC.Receive;
+	Snoop        = MAC.Snoop;
+	Packet       = MAC;
+	AMPacket     = MAC;
 
-	Packet = RF212PacketP;
-	AMPacket = IEEE154PacketC;
-
-	PacketAcknowledgements	= RF212PacketP;
-	PacketLinkQuality	= RF212PacketP.PacketLinkQuality;
-	PacketTransmitPower	= RF212PacketP.PacketTransmitPower;
-	PacketRSSI		= RF212PacketP.PacketRSSI;
-	PacketSleepInterval	= RF212PacketP.PacketSleepInterval;
-	PacketTimeSyncOffset	= RF212PacketP.PacketTimeSyncOffset;
-
-	PacketTimeStampRadio	= RF212PacketP;
-	PacketTimeStampMilli	= RF212PacketP;
+	PacketAcknowledgements	= MAC;
+	LowPowerListening		= MAC;
+	PacketTimeStampMilli	= MAC;
+	PacketTimeStampMicro	= MAC;
 }

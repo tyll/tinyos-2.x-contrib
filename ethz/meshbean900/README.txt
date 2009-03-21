@@ -1,35 +1,39 @@
 ======================================================================
-          TinyOS Support for the Meshnetics MeshBean900
+      TinyOS Support for the Meshnetics MeshBean and MeshBean900
 ======================================================================
 
 
- The Meshbean900 development board from Meshnetics[1] is based on the 
- ZigBit900 module. The ZigBit900 module contains an Atmel ATMega1281 
- microcontroller and an Atmel AT86RF212 transceiver operating in the 
- 900 MHz band. The development board features a number of peripheral 
- devices such as temperature and light sensors, a serial identifier 
- chip, an UART-to-USB converter and an extension connector for 
- additional devices. 
+ The MeshBean/MeshBean900 development boards from Meshnetics[1] are
+ based on the ZigBit/ZigBit900 modules. Both the ZigBit and the
+ ZigBit900 module contains an Atmel ATMega1281 microcontroller and an
+ Atmel radio transceiver. The radio chip of the ZigBit module (AT86RF230)
+ is operating in the 2.4 GHz band while the ZigBit900 module (AT86RF212)
+ is operating in the 900 MHz band. The MeshBean development boards
+ feature a number of peripheral devices such as temperature and light
+ sensors, a serial identifier chip, an UART-to-USB converter and an
+ extension connector for additional devices. 
 
 
 ----------------------------------------------------------------------
  File Structure
 ----------------------------------------------------------------------
 
- To use the Meshbean900 together with TinyOS 2.x, you need to add the
- following directories and files to your TinyOS installation path:
+ To use the MeshBean/MeshBean900 together with TinyOS 2.x, you need to
+ add the following directories and files to the TinyOS installation path:
 
  support
  |-make
-    |-meshbean900.target      make target for the Meshbean900 platform
+    |-meshbean.target         make target for the MeshBean platform
+    |-meshbean900.target      make target for the MeshBean900 platform
 
     |-avr
       |-jtagicemkII.extra     AVR JTAGICE mkII programmer support
 
  tos
  |-platforms
-    |-meshbean900             platform-specific implementation (LED, 
-                              UART, user buttons)
+    |-meshbean                platform-specific implementation (LED, 
+                              UART, user buttons) for the MeshBean
+                              platform
       |-chips
 
         |-atm128 
@@ -46,49 +50,49 @@
         |-rf212               platform-specific implementation for the
                               Atmel AT86RF212 radio chip
         
-        |-tsl2550             TSL2550 dual channel light sensor (I2C)           
+        |-tsl2550             TSL2550 dual channel light sensor (I2C)          
+ 
+|-platforms
+    |-meshbean900             platform-specific implementation for the
+                              MeshBean900 platform, the Meshbean900
+                              platform inherits from the Meshbean platform
 
- tos
- |-chips
-    |-rf212                   chip-specific implementation for the
-                              AT86RF212 radio chip 
 
 
 ----------------------------------------------------------------------
  Software Dependencies
 ----------------------------------------------------------------------
 
- TinyOS 2.1.0 or more recent is required
- If you need support for the DS2411 serial id chip, the following
- additional files are required from the TinyOS 2.x CVS repository [2]:
-
- tos/interfaces/LocalIeeeEui64.nc 
- tos/types/IeeeEui64.h 
- tos/chips/ds2401 
+ The latest TinyOS 2.x from the CVS repository is required.
 
 
 ----------------------------------------------------------------------
- Installing on the Meshbean900 
+ Installing on the MeshBean/MeshBean900 
 ----------------------------------------------------------------------
 
- An application for the Meshbean900 platform can be compiled using the
- "meshbean900" make target in TinyOS: 
+ An application for the MeshBean platform can be compiled using the
+ "meshbean" make target in TinyOS: 
+
+ $ make meshbean
+
+ For the MeshBean900 platform use the "meshbean900" target:
 
  $ make meshbean900
 
- There exist different ways to install the binary image on the Meshbean900
- module:
+
+ There exist different ways to install the binary image on the Meshbean/
+ Meshbean900 module:
 
   (1) Using the BitCloud bootloader from Meshnetics which is pre-installed
-      on the Meshbean900 board. Follow the steps in the BitCloud documentation
-      to install a binary image in the SREC format on the node. 
+      on the MeshBean/MeshBean900 board. Follow the steps in the BitCloud
+      documentation to install a binary image in the SREC format on the node. 
 
       NOTE: The BitCloud bootloader is only available for Windows. However,
             there exist also a Linux version from a third-party [3].
 
   (2) Using a JTAG programmer to download the binary image in the SREC format.
       WARNING: This will overwrite any existing BitCloud bootloader on the
-      Meshbean900 module!!!
+      MeshBean/MeshBean900 module!!!
 
 
 ----------------------------------------------------------------------

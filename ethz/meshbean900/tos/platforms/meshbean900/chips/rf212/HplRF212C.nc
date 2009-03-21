@@ -21,7 +21,7 @@
  * Author: Miklos Maroti
  */
 
-#include <HplRF212.h>
+#include <RadioConfig.h>
 
 configuration HplRF212C
 {
@@ -29,43 +29,41 @@ configuration HplRF212C
 	{
 		interface GeneralIO as SELN;
 		interface Resource as SpiResource;
-		interface SpiByte;
+		interface FastSpiByte;
 
 		interface GeneralIO as SLP_TR;
 		interface GeneralIO as RSTN;
 
 		interface GpioCapture as IRQ;
 		interface Alarm<TRadio, uint16_t> as Alarm;
-
-		interface HplRF212;
 	}
 }
 
 implementation
 {
-	
-	components Atm128SpiC as SpiC;
-	SpiResource = SpiC.Resource[unique("Atm128SpiC.Resource")];
-	SpiByte = SpiC;
-	
-	components HplRF212P, HplAtm128GeneralIOC as IO;
-	SLP_TR = IO.PortB4;
-	RSTN = IO.PortA7;
-	SELN = IO.PortB0;
+	components HplRF212P;
+	IRQ = HplRF212P.IRQ;
+
 	HplRF212P.PortCLKM -> IO.PortB5;
 	HplRF212P.PortIRQ -> IO.PortE5;
 	
-	HplRF212 = HplRF212P;
-	
+	components Atm128SpiC as SpiC;
+	SpiResource = SpiC.Resource[unique("Atm128SpiC.Resource")];
+	FastSpiByte = SpiC;
+
+	components HplAtm128GeneralIOC as IO;
+	SLP_TR = IO.PortB4;
+	RSTN = IO.PortA7;
+	SELN = IO.PortB0;
+
 	components HplAtm128InterruptC;
-	HplRF212P.Interrupt -> HplAtm128InterruptC.Int5;
-	IRQ = HplRF212P;
-	
+    HplRF212P.Interrupt -> HplAtm128InterruptC.Int5;
+
+	components HplAtm128Timer1C as TimerC;
+	HplRF212P.Timer -> TimerC;
+
 	components new AlarmOne16C() as AlarmC;
 	Alarm = AlarmC;
-	
-	components HplAtm128Timer1C;
-	HplRF212P.Timer -> HplAtm128Timer1C;
 
 	components RealMainP;
 	RealMainP.PlatformInit -> HplRF212P.PlatformInit;

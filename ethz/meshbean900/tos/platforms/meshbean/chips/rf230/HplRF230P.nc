@@ -21,40 +21,57 @@
  * Author: Miklos Maroti
  */
 
-#include <HplRF212.h>
-
-configuration TimeSyncMessageC
+module HplRF230P
 {
 	provides
 	{
-		interface SplitControl;
+		interface GpioCapture as IRQ;
+		interface Init as PlatformInit;
+	}
 
-		interface Receive[uint8_t id];
-		interface Receive as Snoop[am_id_t id];
-		interface Packet;
-		interface AMPacket;
-
-		interface TimeSyncAMSend<TRF212, uint32_t> as TimeSyncAMSendRadio[am_id_t id];
-		interface TimeSyncPacket<TRF212, uint32_t> as TimeSyncPacketRadio;
-
-		interface TimeSyncAMSend<TMilli, uint32_t> as TimeSyncAMSendMilli[am_id_t id];
-		interface TimeSyncPacket<TMilli, uint32_t> as TimeSyncPacketMilli;
+	uses
+	{
+		interface HplAtm128Interrupt as Interrupt;
+		interface GeneralIO as PortCLKM;
+		interface GeneralIO as PortIRQ;
+		interface HplAtm128Timer<uint16_t> as Timer;
 	}
 }
 
 implementation
 {
-	components RF212TimeSyncMessageC;
-  
-	SplitControl = RF212TimeSyncMessageC;
-  
-	Receive		= RF212TimeSyncMessageC.Receive;
-	Snoop		= RF212TimeSyncMessageC.Snoop;
-	Packet		= RF212TimeSyncMessageC;
-	AMPacket	= RF212TimeSyncMessageC;
+	command error_t PlatformInit.init()
+	{
+		call PortCLKM.makeInput();
+		call PortCLKM.clr();
+		call PortIRQ.makeInput();
+		call PortIRQ.clr();
+		return SUCCESS;
+	}
+	
+	async event void Interrupt.fired() {
+		uint16_t time = call Timer.get();
+		signal IRQ.captured(time);
+	}
+	
+	async command error_t IRQ.captureRisingEdge()
+	{
+		call Interrupt.edge(TRUE);
+		call Interrupt.enable();
+	
+		return SUCCESS;
+	}
 
-	TimeSyncAMSendRadio = RF212TimeSyncMessageC;
-	TimeSyncPacketRadio = RF212TimeSyncMessageC;
-	TimeSyncAMSendMilli = RF212TimeSyncMessageC;
-	TimeSyncPacketMilli = RF212TimeSyncMessageC;
+	async command error_t IRQ.captureFallingEdge()
+	{
+		// falling edge comes when the IRQ_STATUS register of the RF230 is read
+		return FAIL;	
+	}
+
+	async command void IRQ.disable()
+	{
+		call Interrupt.disable();
+	}
+	
+	async event void Timer.overflow() {}
 }

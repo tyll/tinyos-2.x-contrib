@@ -21,16 +21,12 @@
  * Author: Miklos Maroti
  */
 
-#include <util/crc16.h>
-#include "Atm128Spi.h"
-
 module HplRF212P
 {
 	provides
 	{
 		interface GpioCapture as IRQ;
 		interface Init as PlatformInit;
-		interface HplRF212;
 	}
 
 	uses
@@ -46,17 +42,18 @@ implementation
 {
 	command error_t PlatformInit.init()
 	{
+		call PortCLKM.makeInput();
+		call PortCLKM.clr();
 		call PortIRQ.makeInput();
 		call PortIRQ.clr();
 		return SUCCESS;
 	}
-
-
+	
 	async event void Interrupt.fired() {
 		uint16_t time = call Timer.get();
 		signal IRQ.captured(time);
 	}
-
+	
 	async command error_t IRQ.captureRisingEdge()
 	{
 		call Interrupt.edge(TRUE);
@@ -76,51 +73,5 @@ implementation
 		call Interrupt.disable();
 	}
 
-
-    async event void Timer.overflow() {}
-
-	// TODO: Check why the default crcByte implementation is in a different endianness
-	inline async command uint16_t HplRF212.crcByte(uint16_t crc, uint8_t data)
-	{
-		return _crc_ccitt_update(crc, data);
-	}
-
-	inline async command void HplRF212.spiSplitWrite(uint8_t data)
-	{
-		// the SPI must have been started, so do not waste time here
-		// SET_BIT(SPCR, SPE);
-
-		SPDR = data;
-	}
-
-	inline async command uint8_t HplRF212.spiSplitRead()
-	{
-	    while( !( SPSR & 0x80 ) )
-			;
-		return SPDR;
-	}
-
-	inline async command uint8_t HplRF212.spiSplitReadWrite(uint8_t data)
-	{
-		uint8_t b;
-
-	    while( !( SPSR & 0x80 ) )
-			;
-		b = SPDR;
-		SPDR = data;
-
-		return b;
-	}
-
-	inline async command uint8_t HplRF212.spiWrite(uint8_t data)
-	{
-		// the SPI must have been started, so do not waste time here
-		// SET_BIT(SPCR, SPE);
-
-		SPDR = data;
-	    while( !( SPSR & 0x80 ) )
-			;
-
-		return SPDR;
-	}
+	async event void Timer.overflow() {}
 }

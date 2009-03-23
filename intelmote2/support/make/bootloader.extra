@@ -9,7 +9,7 @@ PROGRAM = bootloader
 BOOTLOADER = present
 
 #PXA27X_JTAG ?= $(TOSDIR)/../contrib/imote2/tools/bin/USBLoaderHost.exe
-PXA27X_JTAG ?= /cygdrive/c/tinyos-1.x/contrib/imote2/tools/bin/USBLoaderHost.exe
+PXA27X_JTAG ?= $(INTELMOTE2_CONTRIB_DIR)/tools/platforms/intelmote2/bootloader//USBLoaderHost.exe
 program: FORCE
 	@echo "    installing $(PLATFORM) binary using the USB boot loader"
 	$(PXA27X_JTAG) -p $(INSTALL_BIN)

@@ -121,7 +121,15 @@ class nescType( object ) :
     if xmlDefinition != None and xmlDefinition.tagName == self._xmlTag and \
            xmlDefinition.hasAttribute("cname") and \
            xmlDefinition.getAttribute("cname") == self.cType :
-      return 1
+      #check if this is a network type and matches
+      if xmlDefinition.hasAttribute("network"):
+        if xmlDefinition.getAttribute("network") == self.nescType :
+          print "Got a network type%s"%self.nescType
+          return 1
+        else:
+          return 0
+      else:
+        return 1
     elif self.nescType == "void" and xmlDefinition.tagName == self._xmlTag :
       #void is a special xml case that doesn't have cname defined (grr)
       return 1

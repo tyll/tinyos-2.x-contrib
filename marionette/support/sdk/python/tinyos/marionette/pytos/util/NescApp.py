@@ -42,58 +42,116 @@ class NescTypes( object ) :
 
     #figure out the sizes of all the basic types for this platform (by scanning the xml file)
     platformTypes = {}
-    typeRE = re.compile('cname=\"([\w\s]+?)\" size=\"I:(\d+?)\"')
+    platformAlignment = {}
+    typeRE = re.compile('alignment=\"I:(\d+?)\" cname=\"([\w\s]+?)\" size=\"I:(\d+?)\"')
     infile = open(xmlFilename, 'r')
     if xmlFileDOM == None :
       xmlFileDOM = minidom.parse(xmlFilename)
     for line in infile :
       match = typeRE.search(line)
       if match != None:
-        platformTypes[match.groups()[0]] = int(match.groups()[1])      
+        platformTypes[match.groups()[1]] = int(match.groups()[2])      
+        platformAlignment[match.groups()[1]] = int(match.groups()[0])      
+    #figure out alignment
+    alignment = "<"
+    if (platformAlignment.has_key("int") and platformAlignment["int"] == 1) or \
+       (platformAlignment.has_key("unsigned int") and platformAlignment["unsigned int"] == 1) :
+      alignment = ">"
     #define all the basic types
     self.addType(
       nescType("uint8_t", "unsigned char", "int", "type-int", "B",1,0))
     self.addType(
       nescType("int8_t", "signed char", "int", "type-int", "b", 1, 0))
+    self.addType(
+      nescType("nx_uint8_t", "unsigned char", "int", "type-int", "!B",1,0))
+    self.addType(
+      nescType("nx_int8_t", "signed char", "int", "type-int", "!b", 1, 0))
+    self.addType(
+      nescType("nxle_uint8_t", "unsigned char", "int", "type-int", "<B",1,0))
+    self.addType(
+      nescType("nxle_int8_t", "signed char", "int", "type-int", "<b", 1, 0))
+    #define the int-based types based on native int size
     if (platformTypes.has_key("int") and platformTypes["int"] == 4) or \
        (platformTypes.has_key("unsigned int") and platformTypes["unsigned int"] == 4) :
       self.addType(
-        nescType("uint16_t", "unsigned short", "int", "type-int", "H", 2, 0))
+        nescType("uint16_t", "unsigned short", "int", "type-int", alignment+"H", 2, 0))
       self.addType(
-        nescType("int16_t", "short", "int", "type-int", "h", 2, 0))
+        nescType("int16_t", "short", "int", "type-int", alignment+"h", 2, 0))
       self.addType(
-        nescType("uint32_t", "unsigned int", "int", "type-int", "L",4,0))
+        nescType("uint32_t", "unsigned int", "int", "type-int", alignment+"L",4,0))
       self.addType(
-        nescType("int32_t", "int", "int", "type-int", "L", 4, 0))
+        nescType("int32_t", "int", "int", "type-int", alignment+"L", 4, 0))
       self.addType(
-        nescType("unsigned long", "unsigned long", "int", "type-int", "L",4,0))
+        nescType("nx_uint16_t", "unsigned short", "int", "type-int", "!H", 2, 0))
       self.addType(
-        nescType("long", "long", "int", "type-int", "l", 4, 0))
+        nescType("nx_int16_t", "short", "int", "type-int", "!h", 2, 0))
+      self.addType(
+        nescType("nx_uint32_t", "unsigned int", "int", "type-int", "!L",4,0))
+      self.addType(
+        nescType("nx_int32_t", "int", "int", "type-int", "!L", 4, 0))
+      self.addType(
+        nescType("nxle_uint16_t", "unsigned short", "int", "type-int", "<H", 2, 0))
+      self.addType(
+        nescType("nxle_int16_t", "short", "int", "type-int", "<h", 2, 0))
+      self.addType(
+        nescType("nxle_uint32_t", "unsigned int", "int", "type-int", "<L",4,0))
+      self.addType(
+        nescType("nxle_int32_t", "int", "int", "type-int", "<L", 4, 0))
+      self.addType(
+        nescType("unsigned long", "unsigned long", "int", "type-int", alignment+"L",4,0))
+      self.addType(
+        nescType("long", "long", "int", "type-int", alignment+"l", 4, 0))
     else : #int is 2 bytes long (the default)
       self.addType(
-        nescType("unsigned short", "unsigned short", "int", "type-int", "H", 2, 0))
+        nescType("unsigned short", "unsigned short", "int", "type-int", alignment+"H", 2, 0))
       self.addType(
-        nescType("short", "short", "int", "type-int", "h", 2, 0))
+        nescType("short", "short", "int", "type-int", alignment+"h", 2, 0))
       self.addType(
-        nescType("uint16_t", "unsigned int", "int", "type-int", "H", 2, 0))
+        nescType("uint16_t", "unsigned int", "int", "type-int", alignment+"H", 2, 0))
       self.addType(
-        nescType("int16_t", "int", "int", "type-int", "h", 2, 0))
+        nescType("int16_t", "int", "int", "type-int", alignment+"h", 2, 0))
       self.addType(
-        nescType("uint32_t", "unsigned long", "int", "type-int", "L",4,0))
+        nescType("uint32_t", "unsigned long", "int", "type-int", alignment+"L",4,0))
       self.addType(
-        nescType("int32_t", "long", "int", "type-int", "l", 4, 0))
+        nescType("int32_t", "long", "int", "type-int", alignment+"l", 4, 0))
+      self.addType(
+        nescType("nx_uint16_t", "unsigned int", "int", "type-int", "!H", 2, 0))
+      self.addType(
+        nescType("nx_int16_t", "int", "int", "type-int", "!h", 2, 0))
+      self.addType(
+        nescType("nx_uint32_t", "unsigned long", "int", "type-int", "!L",4,0))
+      self.addType(
+        nescType("nx_int32_t", "long", "int", "type-int", "!l", 4, 0))
+      self.addType(
+        nescType("nxle_uint16_t", "unsigned int", "int", "type-int", "<H", 2, 0))
+      self.addType(
+        nescType("nxle_int16_t", "int", "int", "type-int", "<h", 2, 0))
+      self.addType(
+        nescType("nxle_uint32_t", "unsigned long", "int", "type-int", "<L",4,0))
+      self.addType(
+        nescType("nxle_int32_t", "long", "int", "type-int", "<l", 4, 0))
+    #define the longs and floats
     self.addType(
-      nescType("int64_t", "long long", "long", "type-int", "q", 8, 0))
+      nescType("int64_t", "long long", "long", "type-int", alignment+"q", 8, 0))
     self.addType(
-      nescType("uint64_t", "unsigned long long", "long", "type-int", "Q", 8, 0))
+      nescType("uint64_t", "unsigned long long", "long", "type-int", alignment+"Q", 8, 0))
     self.addType(
-      nescType("float", "float", "float", "type-float", "f", 4, 0))
+      nescType("nx_int64_t", "long long", "long", "type-int", "!q", 8, 0))
+    self.addType(
+      nescType("nx_uint64_t", "unsigned long long", "long", "type-int", "!Q", 8, 0))
+    self.addType(
+      nescType("nxle_int64_t", "long long", "long", "type-int", "<q", 8, 0))
+    self.addType(
+      nescType("nxle_uint64_t", "unsigned long long", "long", "type-int", "<Q", 8, 0))
+    self.addType(
+      nescType("float", "float", "float", "type-float", alignment+"f", 4, 0))
+    #define the doubles
     if platformTypes.has_key("double") and platformTypes["double"] == 8 :
       self.addType(
-        nescType("double", "double", "float", "type-float", "d", 8, 0))
+        nescType("double", "double", "float", "type-float", alignment+"d", 8, 0))
     else : #double is 4 bytes (the default)
       self.addType(
-        nescType("double", "double", "float", "type-float", "f", 4, 0))
+        nescType("double", "double", "float", "type-float", alignment+"f", 4, 0))
     self.addType(
       nescType("char", "char", "str", "type-int", "c", 1, '\x00'))
     self.addType(

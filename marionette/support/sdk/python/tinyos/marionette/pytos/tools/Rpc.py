@@ -199,7 +199,7 @@ class RpcResponseListener( ):
       if msg.errorCode == self.app.enums.RPC_SUCCESS :
         response = deepcopy(self.responseMsg)
         response.setBytes( msg.data.getBytes() )
-        response.parentMsg = msg
+        response.parentMsg = deepcopy(msg) 
         response.nescType = "".join( [self.rpcName,
                                       ",  nodeID=%d"%response.parentMsg.sourceAddress] )
         self.listener.messageReceived( addr, response )

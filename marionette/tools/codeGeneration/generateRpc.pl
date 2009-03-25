@@ -510,7 +510,8 @@ $rpc_return_elems
     /*fill in the response message headers*/
     responseMsg->transactionID = msg->transactionID;
     responseMsg->commandID = msg->commandID;
-    responseMsg->sourceAddress = call AMPacket.address();
+    responseMsg->sourceAddress = TOS_NODE_ID;
+    //responseMsg->sourceAddress = call AMPacket.address();
     //responseMsg->sourceAddress = TOS_LOCAL_ADDRESS;
     responseMsg->errorCode = RPC_SUCCESS;
     responseMsg->dataLength = 0;
@@ -687,18 +688,27 @@ $s = sprintf "%s
 #endif // !RPC_NO_DRIP
   */
   event message_t* Receive.receive(message_t* pMsg, void* payload, uint8_t len) {
-    //store the message for later processing
-    //dbg(DBG_USR2, \"received local command message, len=%s\\n\",pMsg->length);
-    memmove(cmdStore.data, payload, len);
-    cmdStoreLength = len;
-    if (post processCommand() == SUCCESS){
-      //dbg(DBG_USR2, \"posted task\\n\");
-    } 
-    else{
-      //dbg(DBG_USR2, \"failed to post task\\n\");
+    //dbg(DBG_USR2, \"received local command message, len=%d\\n\",pMsg->length);
+
+    //if it is destined to us, post a task to process it
+    RpcCommandMsg* msg = (RpcCommandMsg*)payload;
+    if (msg->address == TOS_NODE_ID || msg->address == AM_BROADCAST_ADDR ) {
+      //store the message for later processing
+      memmove(cmdStore.data, payload, len);
+      cmdStoreLength = len;
+      if (post processCommand() == SUCCESS){
+	//dbg(DBG_USR2, \"posted task\\n\");
+      } 
+      else{
+	//dbg(DBG_USR2, \"failed to post task\\n\");
+      }
+    }
+    else {
+      //dbg(DBG_USR2, \"not posting task because not for me\\n\");
     }
     return pMsg;
   }
+
 
   /*#ifndef RPC_NO_DRIP
   event error_t CommandDrip.rebroadcastRequest(TOS_MsgPtr msg, void *payload) {

@@ -57,24 +57,24 @@ enum rpcErrorCodes {
 };
 
 typedef struct RpcCommandMsg {
-  nx_uint8_t     transactionID;   /*the id of the complete transaction*/
+  nxle_uint8_t     transactionID;   /*the id of the complete transaction*/
 //uint16_t     msgSeqNo;       /*the number of this message within this transaction*/
-  nx_uint8_t     commandID;       /*the command that should be run*/
-  nx_uint16_t     address;        /*the address that this msg should be received by*/
-  nx_uint16_t     returnAddress;  /*the address that the return val should be sent to*/
-  nx_uint8_t      responseDesired;/*whether the node should send a response or not*/
-  nx_uint8_t      dataLength;
-  nx_uint8_t      data[0];
+  nxle_uint8_t     commandID;       /*the command that should be run*/
+  nxle_uint16_t     address;        /*the address that this msg should be received by*/
+  nxle_uint16_t     returnAddress;  /*the address that the return val should be sent to*/
+  nxle_uint8_t      responseDesired;/*whether the node should send a response or not*/
+  nxle_uint8_t      dataLength;
+  nxle_uint8_t      data[0];
 } __attribute__ ((packed)) RpcCommandMsg;
 
 typedef struct RpcResponseMsg {
-  nx_uint8_t     transactionID;  /*the id of the complete transaction*/
+  nxle_uint8_t     transactionID;  /*the id of the complete transaction*/
 //uint16_t     msgSeqNo;      /*the number of this message within this transaction*/
-  nx_uint8_t     commandID;      /*the command that should be run*/
-  nx_uint16_t     sourceAddress; /*the address that the return val came from*/
-  nx_uint8_t      errorCode;     /*see error codes above*/
-  nx_uint8_t      dataLength;
-  nx_uint8_t      data[0];
+  nxle_uint8_t     commandID;      /*the command that should be run*/
+  nxle_uint16_t     sourceAddress; /*the address that the return val came from*/
+  nxle_uint8_t      errorCode;     /*see error codes above*/
+  nxle_uint8_t      dataLength;
+  nxle_uint8_t      data[0];
 } __attribute__ ((packed)) RpcResponseMsg;
 
 

@@ -1,7 +1,11 @@
 #-*-Makefile-*- vim:syntax=make
 
 
-PROGRAM = jtagicemkII
+ifeq ($(JTAGICEMKII),)
+$(error JTAGICEMKII must be defined, try "make $(TARGETS) help")
+endif
+
+PROGRAM = jtagicemkii
 
 ifeq ($(PROGRAMMER),avrdude)
     ifdef BOOTLOADER_IMG
@@ -9,7 +13,7 @@ ifeq ($(PROGRAMMER),avrdude)
         BOOTLOADER_IMG := $(shell cygpath -m $(BOOTLOADER_IMG))
       endif
     endif
-    PROGRAMMER_FLAGS = -c jtag2fast -P usb -U hfuse:w:$(AVR_FUSE_H):m -U lfuse:w:$(AVR_FUSE_L):m $(PROGRAMMER_PART) $(PROGRAMMER_EXTRA_FLAGS)
+    PROGRAMMER_FLAGS = -c jtag2fast -P $(JTAGICEMKII) -U hfuse:w:$(AVR_FUSE_H):m -U lfuse:w:$(AVR_FUSE_L):m $(PROGRAMMER_PART) $(PROGRAMMER_EXTRA_FLAGS)
     PROGRAMMER_INSTALL_SREC_FLAGS = -U flash:w:$(INSTALL_SREC):a
     PROGRAMMER_INSTALL_BOOTLOADER_FLAGS = -D -U flash:w:$(BOOTLOADER_IMG):a
 endif
@@ -21,5 +25,4 @@ program: FORCE
 
 program_bl: FORCE
 	@echo "    installing $(PLATFORM) bootloader using AVR JTAGICE mkII"
-	@sleep 2
 	$(PROGRAMMER) $(PROGRAMMER_FLAGS) $(PROGRAMMER_INSTALL_BOOTLOADER_FLAGS)

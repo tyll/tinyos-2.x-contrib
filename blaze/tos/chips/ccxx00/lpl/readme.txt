@@ -13,8 +13,7 @@ compile time - except BOXMAC, which relies on the existence of BMAC.
 
 
 LOW POWER COMMUNICATIONS PLUG-IN STATUS
-* bmac + boxmac <-- works best for low power communications.
-* alwayson works <- works
-* bmac works <- works
+* bmac works
+* alwayson works
 * WoR has reliability and range issues and is no longer ccxx00 stack compatible.
 

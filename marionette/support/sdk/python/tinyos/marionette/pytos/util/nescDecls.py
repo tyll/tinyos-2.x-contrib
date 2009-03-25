@@ -124,7 +124,6 @@ class nescType( object ) :
       #check if this is a network type and matches
       if xmlDefinition.hasAttribute("network"):
         if xmlDefinition.getAttribute("network") == self.nescType :
-          print "Got a network type%s"%self.nescType
           return 1
         else:
           return 0

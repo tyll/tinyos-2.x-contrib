@@ -193,8 +193,8 @@ class RamSymbol( RoutingMessages.RoutingMessage ) :
     #create the response message depending on if was rpc error or not
     if msg.nescType == "RpcResponseMsg":
       response = nescDecls.Message(self.memAddress, "PeekErrorMsg",
-                                  ("value", self.parent.app.types.result_t))
-      response.value=0
+                                  ("value", self.parent.app.types.error_t))
+      response.value=app.enums.FAIL
       addr = msg.sourceAddress
     else:
       #choose the type depending on if the ramSymbol is the entire symbol or element of array

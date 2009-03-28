@@ -724,6 +724,7 @@ class Message ( nescStruct ) :
       return self.amType
 
     def dataGet(self):
+      #print repr(self.getBytes()) #uncomment this line to view hex bytes each time you send a msg out to the network
       return self.getBytes()
 
 

@@ -122,7 +122,7 @@ class RamSymbol( RoutingMessages.RoutingMessage ) :
     if func.symbol.length > self.parent.app.types.ramSymbol_t.data.size :
       raise Exception("Ram symbol size too large for msg buffer")
     if value != None :
-      self._assignParam(newValue, value, "value")
+      newValue = self._assignParam(newValue, value, "value")
     newBytes = newValue.getBytes()
     oldBytes = func.symbol.data.getBytes()
     newBytes = oldBytes.replace(oldBytes[:func.symbol.length], newBytes, 1)
@@ -183,7 +183,7 @@ class RamSymbol( RoutingMessages.RoutingMessage ) :
       func.memAddress = self.memAddress
       func.length = self.size
     if func.length > self.parent.app.types.ramSymbol_t.data.size :
-      raise Exception("Ram symbol size too large for msg buffer")
+      raise Exception("Ram symbol size of %d too large for msg buffer of size %d; change in RamSymbols.h" % (func.length,self.parent.app.types.ramSymbol_t.data.size))
     func.dereference = dereference
     result = func(**nameArgs)
     if result != None :

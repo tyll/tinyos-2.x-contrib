@@ -51,12 +51,13 @@ class RoutingMessage( nescDecls.Message ) :
        type(param) == float or type(param) == str or
        type(param) == unicode ) :
       field.value = param
-    elif type(field) == type(param) :
+    elif type(field) == type(param): #FIX: check other types here, eg.: field.nescType == param.nescType:
       field = param
     else :
       raise Exception("Illegal parameter type for param #%s.  Requires type %s." % (
         str(paramId), str(type(field))) )
-    
+    return field
+  
   def _send(self, address, *posArgs, **nameArgs) :
     commArgs = ()
     
@@ -65,7 +66,7 @@ class RoutingMessage( nescDecls.Message ) :
     #create a temporary RoutingMessage to hold the call-time parameters
     thisCall = deepcopy(self)
     for i in range(len(posArgs)) :
-      thisCall._assignParam(thisCall.value[thisCall.fields[i+1]["name"]], posArgs[i], i)
+      thisCall.value[thisCall.fields[i+1]["name"]]=thisCall._assignParam(thisCall.value[thisCall.fields[i+1]["name"]], posArgs[i], i)
     for key in nameArgs.keys() :
       if not thisCall.value.has_key(key) :
         raise Exception("parameter name %s non-existent" % key)

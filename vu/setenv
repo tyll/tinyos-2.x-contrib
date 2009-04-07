@@ -1,0 +1,26 @@
+export VUTOSROOT=`pwd`
+export VUTOSDIR="$VUTOSROOT/tos"
+export VUMAKERULES="$VUTOSROOT/support/make/Makerules"
+
+function add_to_classpath {
+  if [ -f /bin/cygwin1.dll ]; then
+    export CLASSPATH="$CLASSPATH;`cygpath -w $1`"
+  else
+    export CLASSPATH="$CLASSPATH:$1"
+  fi
+}
+
+function add_glob_to_classpath {
+  for j in $1; do
+    # bash 'nullglob' behaviour emulation
+    if [[ $j != "$1" ]]
+    then
+        add_to_classpath "$j"
+    fi
+  done
+}
+
+
+add_to_classpath "$VUTOSROOT/support/sdk/java"
+add_glob_to_classpath "$VUTOSROOT/support/sdk/java/*.jar"
+add_glob_to_classpath "$VUTOSROOT/support/sdk/java/lib/*.jar" 

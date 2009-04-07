@@ -1,0 +1,11 @@
+ifeq ($(PLATFORM),iris)
+  # include all dirs under tos/chips/atm1281
+	PFLAGS := $(patsubst $(VUTOSDIR)/%, -I$(VUTOSDIR)/%, $(shell find $(VUTOSDIR)/chips/atm1281 -type d)) $(PFLAGS)
+	# include all dirs under tos/platform/iris
+	PFLAGS := $(patsubst $(VUTOSDIR)/%, -I$(VUTOSDIR)/%, $(shell find $(VUTOSDIR)/platforms/iris -type d)) $(PFLAGS)
+	# include tos/lib/serial
+  PFLAGS := -I$(VUTOSDIR)/lib/serial $(PFLAGS)
+endif
+
+# debug
+#$(warning $(PFLAGS))

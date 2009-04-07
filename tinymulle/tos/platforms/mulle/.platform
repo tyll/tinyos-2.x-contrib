@@ -1,0 +1,19 @@
+push( @includes, qw(
+  %T/platforms/mulle/softwarei2c
+  %T/platforms/mulle/softwarespi
+  %T/platforms/mulle/chips/rv8564
+  %T/chips/m16c62p
+  %T/chips/m16c62p/pins
+  %T/chips/m16c62p/timer
+  %T/chips/m16c62p/uart
+  %T/chips/ds2745
+  %T/lib/power
+  %T/lib/timer
+  %T/lib/serial
+) );
+
+@opts = qw(
+  -gcc=m32c-elf-gcc
+  -mcpu=m16c
+);
+

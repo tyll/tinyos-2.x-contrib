@@ -1,0 +1,164 @@
+#-#-Makefile-#- vim:syntax=make
+##
+# File: m16c62.target
+# Version: 1.0
+# Description: m16c62 make rules
+# 
+# Author:   Henrik MÃ¤kitaavola
+# Contact:  Laurynas Rilikis
+# E-mail:   Laurynas.Riliskis@ltu.se
+# Date:     February 23, 2009
+#
+# Copyright notice
+#
+# Copyright (c) Communication Networks, Lulea University of Technology.
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+# 1. Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+# 2. Redistributions in binary form must reproduce the above copyright
+#    notice, this list of conditions and the following disclaimer in the
+#    documentation and/or other materials provided with the distribution.
+# 3. All advertising materials mentioning features or use of this software
+#    must display the following acknowledgement:
+#	This product includes software developed by the Communication Networks
+#   Group at Lulea University of Technology.
+# 4. Neither the name of the University nor of the group may be used
+#    to endorse or promote products derived from this software without
+#    specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+# OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+# OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+# SUCH DAMAGE.
+#
+# TODO(henrik): Check how the AT45DB flash works.
+# TODO(henrik): Clean up an implement more features if needed.
+define M16C62P_HELP
+
+ M16C/62P extras:
+
+   debug    : compile with minimal optimization and debug symbols
+   debugopt : compile with debug symbols
+
+ Programmer options:
+
+   sm16cf : use SM16CF programmer on port '/dev/ttyUSB0'.
+   sm16cf,<dev> : use SM16CF programmer on port <dev>.
+
+endef
+HELP += $(M16C62P_HELP)
+THIS_FOLDER = m16c62p
+
+#ifdef MAKE_DEPUTY_FLAG
+#        NCC_SAFE_TINYOS_FLAGS = -DSAFE_TINYOS -fnesc-deputy -fnesc-deputy-args='-I$(TOSDIR)/lib/safe/include --FLIDs=build/$(PLATFORM)/flids.txt --envmachine -DSAFE_TINYOS --nolib ' $(TOSDIR)/lib/safe/avr/fail.c 
+#else
+#        NCC_SAFE_TINYOS_FLAGS =
+#endif
+
+OBJCOPY = m32c-elf-objcopy
+OBJDUMP = m32c-elf-objdump
+SET_ID = tos-set-symbols
+NCC = ncc
+LIBS = -lm -lc -lgcc
+
+AMADDR = _ActiveMessageAddressC\$$addr
+# Uncomment the next two lines if you have a toolchain without the dollar sign
+# patch. This needs nesc 1.2.8 or newer (1.2.9 is recommended).
+#PFLAGS += -fnesc-separator=__
+#AMADDR = ActiveMessageAddressC__addr
+BUILDDIR ?= build/$(PLATFORM)
+MAIN_EXE = $(BUILDDIR)/main.exe
+MAIN_SREC = $(BUILDDIR)/main.srec
+MAIN_IHEX = $(BUILDDIR)/main.ihex
+INSTALL_SREC = $(MAIN_SREC).out$(if $(NODEID),-$(NODEID),)
+#VOLUMEFILE = volumes-at45db.xml
+#VOLUME_ALLOCATOR ?= tos-storage-at45db
+#VOLUME_ALLOCATOR_FLAGS ?=
+
+PFLAGS += -Wall -Wshadow $(NESC_FLAGS)
+PFLAGS += -target=$(PLATFORM) -fnesc-cfile=$(BUILDDIR)/app.c -board=$(SENSORBOARD)
+ifdef MSG_SIZE
+PFLAGS += -DTOSH_DATA_LENGTH=$(MSG_SIZE)
+endif
+ifdef DEFAULT_LOCAL_GROUP
+PFLAGS += -DDEFINED_TOS_AM_GROUP=$(DEFAULT_LOCAL_GROUP)
+endif
+
+LDFLAGS += -nostartfiles -T$(TINYOS_MAKE_PATH)/$(THIS_FOLDER)/m16c.x  $(TINYOS_MAKE_PATH)/$(THIS_FOLDER)/crt.S
+
+DEFAULT_PROGRAM ?= sm16cf
+
+# Use the 'if' function instead of the 'ifdef' construct because ifdef freaks
+# out with call in there.  I don't know why.
+$(if $(PROGRAM),,$(call TOSMake_include,$(THIS_FOLDER)/$(DEFAULT_PROGRAM).extra))
+
+# Build storage file if volumes.xml present
+ifneq ($(wildcard $(VOLUMEFILE)), )
+build_storage: $(BUILDDIR)/StorageVolumes.h
+
+exe0: build_storage
+
+VOLUME_ALLOCATOR_FLAGS ?= 
+$(BUILDDIR)/StorageVolumes.h: $(VOLUMEFILE)
+	$(VOLUME_ALLOCATOR) $(VOLUME_ALLOCATOR_FLAGS) $(PLATFORMDIR) <$(VOLUMEFILE) >$@ || rm -f $@
+
+PFLAGS += -I$(BUILDDIR)
+else
+
+build_storage:
+
+endif
+
+ifndef BUILD_DEPS
+  ifeq ($(filter $(BUILDLESS_DEPS),$(GOALS)),)
+    BUILD_DEPS = srec bytes tosimage $(POST_BUILD_EXTRA_DEPS)
+  endif
+endif
+
+setid: FORCE
+	@cmd () { echo "$$@"; $$@; }; if [ x = x$(NODEID) ]; then cmd cp $(MAIN_SREC) $(INSTALL_SREC); else cmd $(SET_ID) $(MAIN_SREC) $(INSTALL_SREC) _TOS_NODE_ID=$(NODEID) $(AMADDR)=$(NODEID) ; fi
+
+delsetid: FORCE
+	rm -f $(subst .srec.,.exe.,$(INSTALL_SREC)) $(INSTALL_SREC) 
+
+srec: exe FORCE
+	$(OBJCOPY) --output-target=srec $(MAIN_EXE) $(MAIN_SREC)
+
+tos_buildinfo: ihex build_buildinfo FORCE
+  @:
+  
+tosimage: ihex build_tosimage FORCE
+	@:
+
+ihex: exe FORCE
+	$(OBJCOPY) --output-target=ihex $(MAIN_EXE) $(MAIN_IHEX)
+
+exe: exe0 FORCE bytes
+	@:
+
+
+exe0: builddir $(BUILD_EXTRA_DEPS) FORCE
+	@echo "    compiling $(COMPONENT) to a $(PLATFORM) binary"
+	$(NCC) -o $(MAIN_EXE) $(NCC_SAFE_TINYOS_FLAGS) $(OPTFLAGS) $(PFLAGS) $(CFLAGS) $(WIRING_CHECK_FLAGS) $(COMPONENT).nc $(LIBS) $(LDFLAGS)
+ifdef WIRING_CHECK_FILE
+	@nescc-wiring $(WIRING_CHECK_FILE)
+endif
+	@echo "    compiled $(COMPONENT) to $(MAIN_EXE)"
+
+builddir: FORCE
+	mkdir -p $(BUILDDIR)
+# bug fix 2009-3-11 by ZHF, here display the ROM and RAM consumption information.
+bytes: FORCE
+	@$(OBJDUMP) -h $(MAIN_EXE) | perl -ne '$$b{$$1}=hex $$2 if /^\s*\d+\s*\.(text|data|bss)\s+(\S+)/; END { printf("%16d bytes in ROM\n%16d bytes in RAM\n",$$b{text}+$$b{data},$$b{data}+$$b{bss}); }'
+

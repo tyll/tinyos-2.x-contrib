@@ -1,0 +1,15 @@
+ifeq ($(SM16CF), )
+#$(error SM16CF must be defined, try "make $(TARGETS) help")
+SM16CF = /dev/ttyUSB0
+endif
+
+PROGRAM = sm16cf
+PROGRAMMER = sm16cf
+
+program: FORCE
+	@echo "    installing $(PLATFORM) using sm16cf"
+	$(PROGRAMMER) --device=$(SM16CF) --input-file=$(INSTALL_SREC) --flash-program
+
+# TODO(henrik): Implement bootloader programming if needed.
+program_bl: FORCE
+	@echo " jaha"

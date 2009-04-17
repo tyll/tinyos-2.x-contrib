@@ -171,7 +171,7 @@ implementation
         transition();  // Use this function to adjust the baut rate of I2C bus
 
         call I2CClk.set(); //Set SCL2 high to inform slave of receiving sth.
-        transition();      // Greater than 4Â¦Ãs
+        transition();      // Greater than 4¦Ìs
         call I2CClk.clr();
       }
 
@@ -185,7 +185,7 @@ implementation
 
       // ...Check the ACK from the receiver....  
 
-      //  if(SDA2==1){ACK=0;} /* ACK receivedÂ£Â¿*/    
+      //  if(SDA2==1){ACK=0;} /* ACK received£¿*/    
       //  else  ACK= 1;
 
       //  SCL2 = LOW;

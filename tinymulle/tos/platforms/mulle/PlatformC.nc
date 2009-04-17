@@ -12,6 +12,7 @@ configuration PlatformC
   provides interface RV8564 as RTC;
   provides interface HplDS2745 as BM;
   provides interface Resource;
+  uses interface Init as SubInit;
 }
 implementation
 {
@@ -27,6 +28,7 @@ implementation
     new HplDS2745LogicP(0x68) as BMP;
 
   Init = PlatformP;
+  SubInit = PlatformP.SubInit;
   PlatformP.M16c62pClockCtrl -> M16c62pClockCtrlC;
   PlatformP.RTC -> RV8564C;
 

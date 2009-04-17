@@ -1,0 +1,107 @@
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/public/tinyOS_Mulle/!svn/ver/40/trunk/tos/chips/m16c62p/adc
+END
+M16c62pAdcMultiple.nc
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/public/tinyOS_Mulle/!svn/ver/40/trunk/tos/chips/m16c62p/adc/M16c62pAdcMultiple.nc
+END
+AdcStreamP.nc
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/public/tinyOS_Mulle/!svn/ver/40/trunk/tos/chips/m16c62p/adc/AdcStreamP.nc
+END
+AdcReadClientC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/public/tinyOS_Mulle/!svn/ver/40/trunk/tos/chips/m16c62p/adc/AdcReadClientC.nc
+END
+M16c62pAdcP.nc
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/public/tinyOS_Mulle/!svn/ver/40/trunk/tos/chips/m16c62p/adc/M16c62pAdcP.nc
+END
+HplM16c62pAdcP.nc
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/public/tinyOS_Mulle/!svn/ver/40/trunk/tos/chips/m16c62p/adc/HplM16c62pAdcP.nc
+END
+M16c62pAdcConfig.nc
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/public/tinyOS_Mulle/!svn/ver/40/trunk/tos/chips/m16c62p/adc/M16c62pAdcConfig.nc
+END
+M16c62pAdc.h
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/public/tinyOS_Mulle/!svn/ver/40/trunk/tos/chips/m16c62p/adc/M16c62pAdc.h
+END
+WireAdcP.nc
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/public/tinyOS_Mulle/!svn/ver/40/trunk/tos/chips/m16c62p/adc/WireAdcP.nc
+END
+AdcReadStreamClientC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/public/tinyOS_Mulle/!svn/ver/40/trunk/tos/chips/m16c62p/adc/AdcReadStreamClientC.nc
+END
+AdcP.nc
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/public/tinyOS_Mulle/!svn/ver/40/trunk/tos/chips/m16c62p/adc/AdcP.nc
+END
+M16c62pAdcSingle.nc
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/public/tinyOS_Mulle/!svn/ver/40/trunk/tos/chips/m16c62p/adc/M16c62pAdcSingle.nc
+END
+M16c62pAdcC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/public/tinyOS_Mulle/!svn/ver/40/trunk/tos/chips/m16c62p/adc/M16c62pAdcC.nc
+END
+AdcReadNowClientC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/public/tinyOS_Mulle/!svn/ver/40/trunk/tos/chips/m16c62p/adc/AdcReadNowClientC.nc
+END
+HplM16c62pAdc.nc
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/public/tinyOS_Mulle/!svn/ver/40/trunk/tos/chips/m16c62p/adc/HplM16c62pAdc.nc
+END
+WireAdcStreamP.nc
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/public/tinyOS_Mulle/!svn/ver/40/trunk/tos/chips/m16c62p/adc/WireAdcStreamP.nc
+END
+HplM16c62pAdcC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/public/tinyOS_Mulle/!svn/ver/40/trunk/tos/chips/m16c62p/adc/HplM16c62pAdcC.nc
+END
+Adc.h
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/public/tinyOS_Mulle/!svn/ver/40/trunk/tos/chips/m16c62p/adc/Adc.h
+END

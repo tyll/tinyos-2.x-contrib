@@ -1,7 +1,45 @@
+/*
+ *  IMPORTANT: READ BEFORE DOWNLOADING, COPYING, INSTALLING OR USING.  By
+ *  downloading, copying, installing or using the software you agree to
+ *  this license.  If you do not agree to this license, do not download,
+ *  install, copy or use the software.
+ *
+ *  Copyright (c) 2004-2005 Crossbow Technology, Inc.
+ *  Copyright (c) 2002-2003 Intel Corporation.
+ *  Copyright (c) 2000-2003 The Regents of the University  of California.
+ *  All rights reserved.
+ *
+ *  Permission to use, copy, modify, and distribute this software and its
+ *  documentation for any purpose, without fee, and without written
+ *  agreement is hereby granted, provided that the above copyright
+ *  notice, the (updated) modification history and the author appear in
+ *  all copies of this source code.
+ *
+ *  Permission is also granted to distribute this software under the
+ *  standard BSD license as contained in the TinyOS distribution.
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ *  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+ *  PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE INTEL OR ITS
+ *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ *  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ *  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ *  PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ *  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+/**
+ *  @author Jason Hill, Philip Levis, Nelson Lee, David Gay
+ *  @author Martin Turon <mturon@xbow.com>
+ */
+
 /**
  * Some M16c/62p needed macros and defines.
  *
  * @author Henrik Makitaavola
+ * @author Fan Zhang <fanzha@ltu.se>
  */
 
 #ifndef __M16C62PHARDWARE_H__
@@ -45,11 +83,16 @@ enum {
   M16C62P_POWER_EXT_STANDBY = 2,	// no use
   M16C62P_POWER_SAVE        = 3,	// no use
   M16C62P_POWER_WAIT        = 4,
-  M16C62P_POWER_STOP        = 5, 
+  M16C62P_POWER_STOP        = 5,
 };
 // added at 2009-01-27 Fan Zhang
 inline void __nesc_enable_interrupt(void) @safe() { asm("fset i"); }
 inline void __nesc_disable_interrupt(void) @safe() { asm("fclr i"); }
+
+/* added at 2009-02-11 by Fan Zhang. Macro to create union casting functions. */
+#define DEFINE_UNION_CAST(func_name, from_type, to_type) \
+  to_type func_name(from_type x_type) { \
+    union {from_type f_type; to_type t_type;} c_type = {f_type:x_type}; return c_type.t_type; }
 
 typedef uint16_t __nesc_atomic_t;
 

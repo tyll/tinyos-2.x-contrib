@@ -71,7 +71,7 @@ union st_cm0 {               /* union CM0    	   					*/
 union st_cm1 {               /* union CM1    	   					*/
   struct {             		 /* Bit  Access 		   			*/
 	 unsigned char 	CM1_0:1; /* All clock stop control bit 			*/
-	 unsigned char 		 :1; /* Reserved bit always set to 0		*/
+	 unsigned char 	CM1_1:1; /* Reserved bit always set to 0		*/
 	 unsigned char 	 	 :1; /* Reserved bit always set to 0		*/
 	 unsigned char 		 :1; /* Reserved bit always set to 0		*/
 	 unsigned char 		 :1; /* Reserved bit always set to 0		*/

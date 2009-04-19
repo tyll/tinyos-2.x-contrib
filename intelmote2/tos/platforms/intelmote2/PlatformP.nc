@@ -32,7 +32,7 @@
  */
 
 #include "hardware.h"
-#include "memsetup-pxa.h"
+#include "mmu.h"
 
 module PlatformP {
   provides interface Init;

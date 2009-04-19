@@ -413,12 +413,12 @@ MMUTable:
 
 	@.ALIGN		0x200			@// this should get us to 0x5400
 	.align	9
-	.word 0x0						@insert a word so the next align goes to 0x5600
+	.word        0x50000002			@ cif registers at 0x5000
 	@.ALIGN		0x200			@ (0x5600=0x4000+0x580*4)
 	.align	9
 								@// this should get us to 0x5600
 
-	.word		   0x58000002		@ internal SRAM control registers
+	.word		0x58000002		@ internal SRAM control registers
 
 	@.ALIGN		0x100			@ (0x5700=0x4000+0x5C0*4)
 	.align	8
@@ -869,7 +869,7 @@ MMUTable:
 
 	@.ALIGN		0x200			@// this should get us to 0x5400
 	.align	9
-	.word 0x0						@insert a word so the next align goes to 0x5600
+	.word        0x50000002			@ cif registers at 0x5000
 	@.ALIGN		0x200			@ (0x5600=0x4000+0x580*4)
 	.align	9
 								@// this should get us to 0x5600

@@ -1,13 +1,11 @@
-#-*-Makefile-*- vim:syntax=make
 /**
-* File: mulle_rf230.target
+* File: MotionSensorC.nc
 * Version: 1.0
-* Description: cMAC layer
+* Description:  Interface for motion sensor
 * 
-* Author:   Henrik Mäkitaavola
-* Contact:  Laurynas Rilikis
-* E-mail:   Laurynas.Riliskis@ltu.se
-* Date:     February 23, 2009
+* Author: Laurynas Riliskis
+* E-mail: Laurynas.Riliskis@ltu.se
+* Date:   March 12, 2009
 *
 * Copyright notice
 *
@@ -43,5 +41,31 @@
 * SUCH DAMAGE.
 */
 
-OPTFLAGS = -O1 -g -fnesc-no-inline
+#include "hardware.h"
 
+configuration MotionSensorC{
+
+    provides {
+        interface MotionSensor;
+        interface ReadNow<uint16_t> as ReadNow;
+        interface SplitControl as ReadControl;
+        interface Leds as MotionLeds;
+    }
+}
+
+implementation {
+    components MainC, MotionSensorP as App, MotionLedsC;
+    components new MotionNowC();
+    components new AlarmMicro32C();
+    
+    MotionLeds = MotionLedsC;
+    MotionSensor = App;
+    ReadNow = App;
+    ReadControl = App;
+    
+    App.ReadNowResource -> MotionNowC;
+    App.MotionReadNow -> MotionNowC;
+    App.Alarm -> AlarmMicro32C;
+    
+    
+}

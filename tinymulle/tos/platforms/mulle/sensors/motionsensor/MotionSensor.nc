@@ -1,13 +1,11 @@
-#-*-Makefile-*- vim:syntax=make
 /**
-* File: mulle_rf230.target
+* File: MotionSensor.nc
 * Version: 1.0
-* Description: cMAC layer
+* Description:  Interface for motion sensor
 * 
-* Author:   Henrik Mäkitaavola
-* Contact:  Laurynas Rilikis
-* E-mail:   Laurynas.Riliskis@ltu.se
-* Date:     February 23, 2009
+* Author: Laurynas Riliskis
+* E-mail: Laurynas.Riliskis@ltu.se
+* Date:   March 12, 2009
 *
 * Copyright notice
 *
@@ -43,5 +41,21 @@
 * SUCH DAMAGE.
 */
 
-OPTFLAGS = -O1 -g -fnesc-no-inline
+interface MotionSensor {
 
+    /**
+     * Set the rate of sampling for motion sensor.
+     *
+     * @return SUCCESS if a readDone() event will eventually come back.
+     */ 
+    async command error_t setSampleFrequency(uint32_t fr);
+
+    /**
+     * Set the threshold value for the motion sensor.
+     *
+     * @return SUCCESS if a readDone() event will eventually come back.
+     */
+    async command error_t setThreshold(uint16_t thr);
+
+
+}

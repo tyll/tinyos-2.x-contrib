@@ -3,7 +3,7 @@
 * Version: 1.0
 * Description: cMAC layer
 * 
-* Author:   Henrik MÃ¤kitaavola
+* Author:   Henrik Mäkitaavola
 * Contact:  Laurynas Rilikis
 * E-mail:   Laurynas.Riliskis@ltu.se
 * Date:     February 23, 2009

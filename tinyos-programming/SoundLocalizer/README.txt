@@ -63,10 +63,10 @@ in the AsyncStdControl.start command (around line 90), replace
 
 with
 
-#ifndef ATM128_EXTERNAL_PULLDOWN
-#define ATM128_EXTERNAL_PULLDOWN FALSE
+#ifndef ATM128_I2C_EXTERNAL_PULLDOWN
+#define ATM128_I2C_EXTERNAL_PULLDOWN FALSE
 #endif
-	call I2C.init(ATM128_EXTERNAL_PULLDOWN);
+	call I2C.init(ATM128_I2C_EXTERNAL_PULLDOWN);
 
 - Better time synchronization would produce more reliable "closest to the
 sound" detection...

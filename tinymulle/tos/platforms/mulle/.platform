@@ -1,18 +1,16 @@
 push( @includes, qw(
   %T/platforms/mulle
+  %T/platforms/mulle/chips/rf230
+  %T/chips/rf2xx/rf230
+  %T/chips/rf2xx/layers
+  %T/chips/rf2xx/util
   %T/platforms/mulle/softwarei2c
   %T/platforms/mulle/softwarespi
   %T/platforms/mulle/chips/rv8564
-  %T/platforms/mulle/chips/rf230
   %T/platforms/mulle/debug
   %T/platforms/mulle/sensors/motionsensor
   %T/platforms/mulle/sensors/expansionboard
   %T/platforms/mulle/sensors/IRsensor
-  %T/platforms/mulle/softwarespi
-  %T/platforms/mulle/system
-  %T/chips/rf2xx/rf230
-  %T/chips/rf2xx/util
-  %T/chips/rf2xx/layers
   %T/chips/m16c62p
   %T/chips/m16c62p/adc
   %T/chips/m16c62p/pins

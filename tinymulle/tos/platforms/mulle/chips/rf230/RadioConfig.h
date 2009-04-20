@@ -25,7 +25,7 @@
 #define __RADIOCONFIG_H__
 
  //#include <MicaTimer.h>
-#include <RF230.h>
+#include <RF230DriverLayer.h>
 
 
 enum
@@ -48,16 +48,19 @@ enum
 	 */
 	RF230_CCA_THRES_VALUE = 0xC7,
 };
-
-/* This is the default value of the TX_PWR field of the PHY_TX_PWR register. */
+#ifndef RF230_SLOW_SPI
+#define RF230_SLOW_SPI 1
+#endif
+/* This is the default value of the TX_PWR field of the PHY_TX_PWR register. 0-15*/
 #ifndef RF230_DEF_RFPOWER
 #define RF230_DEF_RFPOWER	0
 #endif
 
-/* This is the default value of the CHANNEL field of the PHY_CC_CCA register. */
+/* This is the default value of the CHANNEL field of the PHY_CC_CCA register. 11-26*/
 #ifndef RF230_DEF_CHANNEL
 #define RF230_DEF_CHANNEL	11
 #endif
+
 
 /*
  * This is the command used to calculate the CRC for the RF230 chip. 

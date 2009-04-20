@@ -25,39 +25,41 @@
 
 configuration HplRF230C
 {
-	provides
-	{
-		interface GeneralIO as SELN;
-		interface Resource as SpiResource;
+    provides
+    {
+        interface GeneralIO as SELN;
+        interface Resource as SpiResource;
         interface SpiByte;
-		interface FastSpiByte;
+        interface FastSpiByte;
 
-		interface GeneralIO as SLP_TR;
-		interface GeneralIO as RSTN;
+        interface GeneralIO as SLP_TR;
+        interface GeneralIO as RSTN;
 
-		interface GpioCapture as IRQ;
-		interface Alarm<TRadio, uint16_t> as Alarm;
-	}
+        interface GpioCapture as IRQ;
+        interface Alarm<TRadio, uint16_t> as Alarm;
+        interface LocalTime<TRadio> as LocalTimeRadio;
+ 
+    }
 
 }
 
 implementation
 {
 
-    
-	components HplRF230P;
-	IRQ = HplRF230P.IRQ;
 
-    
-   	components new SoftSpiRF230C() as Spi;
+    components HplRF230P;
+    IRQ = HplRF230P.IRQ;
+
+
+    components new SoftSpiRF230C() as Spi;
     HplRF230P.Spi -> Spi;
-	SpiResource = Spi;
+    SpiResource = Spi;
     SpiByte = Spi;
-	FastSpiByte = HplRF230P.FastSpiByte;
+    FastSpiByte = HplRF230P.FastSpiByte;
 
-	components HplM16c62pGeneralIOC as IOs;
+    components HplM16c62pGeneralIOC as IOs;
     HplRF230P.PortVCC -> IOs.PortP77;
-	HplRF230P.PortIRQ -> IOs.PortP83;
+    HplRF230P.PortIRQ -> IOs.PortP83;
     SLP_TR = IOs.PortP07;
     RSTN = IOs.PortP43;
     SELN = IOs.PortP35;
@@ -66,17 +68,21 @@ implementation
                 new M16c62pInterruptC() as Irq;
     HplRF230P.GIRQ -> Irq;
     Irq -> Irqs.Int1;
-    
+
     components
 #ifdef ENABLE_STOP_MODE
-      AlarmRF23016C as AlarmRF230;
+        AlarmRF23016C as AlarmRF230;
 #else
-      AlarmMicro16C as AlarmRF230;
+    AlarmMicro16C as AlarmRF230;
 #endif
-    
-	HplRF230P.Alarm -> AlarmRF230;
-	Alarm = AlarmRF230;
 
-	components RealMainP;
-	RealMainP.PlatformInit -> HplRF230P.PlatformInit;
+    HplRF230P.Alarm -> AlarmRF230;
+    Alarm = AlarmRF230;
+
+    components RealMainP;
+    RealMainP.PlatformInit -> HplRF230P.PlatformInit;
+    
+   	components LocalTimeMicroC;
+  	LocalTimeRadio = LocalTimeMicroC;
+
 }

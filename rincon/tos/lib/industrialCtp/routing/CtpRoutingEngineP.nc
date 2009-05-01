@@ -170,8 +170,6 @@ implementation {
   task void updateRouteTask();
   task void sendBeaconTask();
   
-  error_t routingTableUpdateEntry(am_addr_t, am_addr_t , uint16_t);
-  error_t routingTableEvict(am_addr_t neighbor);
   void chooseAdvertiseTime();
   void resetInterval();
   void decayInterval();
@@ -769,17 +767,16 @@ implementation {
 
   error_t routingTableUpdateEntry(am_addr_t from, am_addr_t parent, uint16_t etx)  {
     uint8_t idx;
-    uint16_t  linkEtx;
+    uint16_t linkEtx;
+    
     linkEtx = evaluateEtx(call LinkEstimator.getLinkQuality(from));
 
     idx = routingTableFind(from);
     
     if (idx == NEIGHBOR_TABLE_SIZE) {
-      //not found and table is full
-      //if (passLinkEtxThreshold(linkEtx))
-        // TODO: add replacement here, replace the worst
-      //}
-      dbg("TreeRouting", "%s FAIL, table full\n", __FUNCTION__);
+      // Not found and table is full.  This probably should never happen
+      // if the LinkEstimator thinks this neighbor is worthy enough to be
+      // in our routing table anyway.
       return FAIL;
       
     } else if (idx == routingTableActive) {
@@ -805,7 +802,7 @@ implementation {
     }
     return SUCCESS;
   }
-
+  
   /**
    * If this gets expensive, introduce indirection through an array of pointers 
    */

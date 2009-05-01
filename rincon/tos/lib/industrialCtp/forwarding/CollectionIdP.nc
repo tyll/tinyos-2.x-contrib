@@ -1,4 +1,4 @@
-/* $Id$ */
+
 /*
  * Copyright (c) 2006 Massachusetts Institute of Technology (MIT).
  * All rights reserved.

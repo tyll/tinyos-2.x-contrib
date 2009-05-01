@@ -1,4 +1,4 @@
-/* $Id$ */
+
 /*
  * Copyright (c) 2006 Stanford University.
  * All rights reserved.

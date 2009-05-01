@@ -1,4 +1,4 @@
-/* $Id$ */
+
 /*
  * "Copyright (c) 2006 The Regents of the University  of California.  
  * All rights reserved.
@@ -32,9 +32,9 @@
  * DAMAGE.
  */
 
-/** Controls whether the current node is a root of the tree
- *  @author Rodrigo Fonseca
- *  @date   $Date$
+/** 
+ * Controls whether the current node is a root of the tree
+ * @author Rodrigo Fonseca
  */
 
 interface RootControl {

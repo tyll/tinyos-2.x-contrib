@@ -12,7 +12,9 @@ configuration PlatformC
   provides interface RV8564 as RTC;
   provides interface HplDS2745 as BM;
   provides interface Resource;
-  uses interface Init as SubInit;
+  uses {
+    interface Init as SubInit;
+  }
 }
 implementation
 {
@@ -48,6 +50,7 @@ implementation
   Resource = I2CMaster.Resource;
   BM=BMP;
   BMP.I2CPacket ->I2CMaster.I2CPacket;
+  PlatformP.PortAVCC -> IOs.PortP76;
   
 }
 

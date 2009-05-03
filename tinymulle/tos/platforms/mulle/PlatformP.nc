@@ -13,6 +13,7 @@ module PlatformP
   uses interface Init as SubInit;
   uses interface RV8564 as RTC;
   uses interface M16c62pClockCtrl;
+  uses interface GeneralIO as PortAVCC;
 }
 
 implementation
@@ -28,6 +29,8 @@ implementation
     // Activate the RTC and set it to output 1024 tics on the CLKOUT pin.
     call RTC.on();
     call RTC.writeRegister(RV8564_CLKF, 0x81);
+    call PortAVCC.makeOutput(); // supply power for sensors on MulleZ
+    call PortAVCC.set();
 
     return SUCCESS;
   }

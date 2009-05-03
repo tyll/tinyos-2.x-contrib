@@ -8,6 +8,7 @@ push( @includes, qw(
   %T/platforms/mulle/softwarespi
   %T/platforms/mulle/chips/rv8564
   %T/platforms/mulle/debug
+  %T/platforms/mulle/system
   %T/platforms/mulle/sensors/motionsensor
   %T/platforms/mulle/sensors/expansionboard
   %T/platforms/mulle/sensors/IRsensor

@@ -41,96 +41,214 @@
 * SUCH DAMAGE.
 */
 
-/**
- * Potentiometer Voltage. The returned value represents the potentiometer voltage 
- * on the expansion board. The Vref is 1.3V and AVcc is 3.3V. The formula to convert
- * it to mV is: Vout=value * 1309 / 1023. the temperature is: (Vout-509)/6.45
- *
- * @author Fan Zhang <fanzha@ltu.se>
- */
-
-#include "hardware.h"
-
 module MotionSensorP {
 
     provides {
-    	interface MotionSensor;
-    	interface ReadNow<uint16_t> as ReadNow;
-    	interface SplitControl as ReadControl;
+        interface MotionSensor;
+        interface SplitControl as MotionControl;
+        interface Init;
     }
     uses {
-    	interface Alarm<TMicro, uint32_t>;
-    	interface ReadNow<uint16_t> as MotionReadNow;
-    	interface Resource as ReadNowResource;
+        interface Timer<TMilli> as MilliTimer;
+        interface ReadNow<uint16_t> as MotionReadNow;
+        interface Resource as ReadNowResource;
+
+        interface GeneralIO as PortIRQ;
+        interface GpioInterrupt as GIRQ;
+
     }
 }
 implementation {
-	#define BUF_SIZE 1
-	uint16_t buf[BUF_SIZE];
-	uint32_t usFr;
-	uint16_t threshold;
-	bool swAlarm;
-	
-    
-    async command error_t ReadNow.read() {
-    	atomic{
-	    	if(buf[0] > threshold){
-	    		signal ReadNow.readDone(SUCCESS, buf[0]);
-	    	}
-	    	else{
-	    		signal ReadNow.readDone(FAIL, 0);
-	    	}	
-    	}
-    	return SUCCESS;
-    }
-    //default async event void ReadNow.readDone(error_t e, uint16_t d) { }
-    
-    command error_t ReadControl.start(){
-    	atomic call Alarm.start(usFr);
-    	atomic swAlarm = TRUE;
-    	signal ReadControl.startDone(SUCCESS);
-    	return SUCCESS;
-    }
-    command error_t ReadControl.stop(){
-    	atomic swAlarm = FALSE;
-    	signal ReadControl.stopDone(SUCCESS);
-    	return SUCCESS;
-    }
-    
-/*------------------ Alarm timer interrupt -------------------*/	
-	async event void Alarm.fired() {
-    	call ReadNowResource.request();
-    	if(swAlarm == TRUE)
-    		call Alarm.startAt(call Alarm.getNow(), usFr);
-    }
-	
-/*----------------- interface MotionReadNow -----------------*/	
-	
-	
-	event void ReadNowResource.granted()
-    {
-    	call MotionReadNow.read();
-    }
   
+    enum{
+      STATE_STARTED,
+      STATE_STARTING,
+      STATE_IDLE,
+      STATE_MOTION,
+      STATE_SAMPLING,
+      STATE_NO_MOTION,
+      STATE_STOPING,
+      STATE_STOPED
+    };
+
+    
+      uint8_t cState;
+      uint16_t rawData = 0;
+      uint8_t msInterval = 10;
+      uint16_t threshold = 50;
+    
+
+    task void stateChanged();
+
+    command error_t Init.init()
+    {
+      atomic cState = STATE_STOPED;
+      return SUCCESS;
+    }
+
+    async event void GIRQ.fired()
+    {
+        atomic cState = STATE_MOTION;
+        post stateChanged();   
+    }
+
+    task void startDone()
+    {
+      call PortIRQ.makeInput();
+      call PortIRQ.clr();
+      call GIRQ.enableRisingEdge();
+      signal MotionControl.startDone(SUCCESS);
+      atomic cState = STATE_STARTED;
+    }
+      
+    command error_t MotionControl.start(){
+      error_t error = SUCCESS;
+      atomic {
+        if( cState == STATE_STOPED ) {
+          cState = STATE_STARTING;         
+        } else {
+          error = EBUSY;
+        } 
+      }
+      if(!error)
+        post startDone();
+      return error;
+    }
+
+    task void stopDone()
+    {
+      call PortIRQ.makeOutput();
+      call PortIRQ.clr();
+      call GIRQ.disable();
+      atomic cState = STATE_STOPED;
+      signal MotionControl.stopDone(SUCCESS);
+
+    }
+
+    command error_t MotionControl.stop()
+    {
+      error_t error = SUCCESS;
+      atomic{
+        if(cState == STATE_STARTED){
+          cState=STATE_STOPING;
+        } else {
+            error = EBUSY;
+        }
+      }
+      if(!error)
+        post stopDone();
+      return error;
+    }
+
+    task void samplingTask()
+    {
+      call MotionReadNow.read();
+    }
+
+    event void MilliTimer.fired() 
+    {
+      post samplingTask();
+    }
+
+
+
+    event void ReadNowResource.granted()
+    {
+       call MilliTimer.startPeriodic(msInterval);
+    }
+    
+    /**
+      *Algorithm for proccessing data from the ad read
+      *
+      */
+    task void proccessDataTask()
+    {
+      uint16_t tmp;
+      uint8_t nextState;
+      uint8_t cst;
+      atomic{
+        tmp  = rawData;
+        cst = cState;
+      }
+              //here can be some cleave calculations performed
+      if(tmp < threshold){
+          nextState = STATE_NO_MOTION;
+          
+       } else if (tmp >= threshold && cst == STATE_MOTION) {
+          nextState = STATE_SAMPLING;
+          
+          
+        } 
+        if(nextState != cst){
+            atomic cState= nextState;
+            post stateChanged();
+          }
+        
+          
+        
+      }
+     
+
     async event void MotionReadNow.readDone(error_t result, uint16_t data)
     {
-	    if (result == SUCCESS)
-	      atomic buf[0] = data; 
-	    
-	    call ReadNowResource.release();
+       if (result == SUCCESS)
+       {
+          atomic{
+            rawData = data;
+          }
+          post proccessDataTask();
+       } else {
+          post samplingTask();
+        }
+
     }
-/*----------------- interface MotionSensor -----------------*/
-      
-      async command error_t MotionSensor.setSampleFrequency(uint32_t fr)
-	  {
-	    atomic usFr = fr;
-	    return SUCCESS;
-	  }
-	
-	  async command error_t MotionSensor.setThreshold(uint16_t thr)
-	  {
-	    atomic threshold = thr;
-	    return SUCCESS;
-	  }
+    
+
+    /**
+      * state masine for motion sensor
+      */
+    task void stateChanged() { 
+      uint8_t state;
+      atomic state =cState;
+      switch(state){
+        case STATE_MOTION:
+          call GIRQ.disable();    // stop interupt
+          call ReadNowResource.request();
+
+        break;
+        case STATE_SAMPLING:
+              signal MotionSensor.isMotion();
+          
+        break;
+        case STATE_NO_MOTION:
+          call ReadNowResource.release();
+          call GIRQ.enableRisingEdge();
+          call MilliTimer.stop();
+          signal MotionSensor.noMotion();
+          atomic cState = STATE_STARTED;
+        break;
+
+        default:
+        break;
+
+      }
+
+
+          
+    }
+
+    /*----------------- interface MotionSensor -----------------*/
+
+    async command error_t MotionSensor.setSampleFrequency(uint8_t fr)
+    {
+        atomic msInterval = fr;
+        return SUCCESS;
+    }
+
+    async command error_t MotionSensor.setThreshold(uint16_t thr)
+    {
+        atomic threshold = thr;
+        return SUCCESS;
+    }
 
 }

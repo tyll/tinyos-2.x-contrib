@@ -48,7 +48,7 @@ interface MotionSensor {
      *
      * @return SUCCESS if a readDone() event will eventually come back.
      */ 
-    async command error_t setSampleFrequency(uint32_t fr);
+    async command error_t setSampleFrequency(uint8_t fr);
 
     /**
      * Set the threshold value for the motion sensor.
@@ -56,6 +56,16 @@ interface MotionSensor {
      * @return SUCCESS if a readDone() event will eventually come back.
      */
     async command error_t setThreshold(uint16_t thr);
-
-
+    /**
+     * Get the notification for the motion.
+     *
+     * @no return
+     */
+    async event void isMotion();
+    /**
+     * Get the notification from the motion sensor, maybe notification.
+     *
+     * @no return
+     */
+    async event void noMotion();
 }

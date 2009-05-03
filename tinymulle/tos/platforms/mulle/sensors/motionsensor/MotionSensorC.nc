@@ -40,32 +40,48 @@
 * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 * SUCH DAMAGE.
 */
-
+/**
+ * IR sensor detect motion. The component provides the interface MotionSensor and 
+ * interface StdControl as MotionControl. Through filter, recgnise the motion of pepole. 
+ * The IR sensor board has 3 LED. RED, GREEN, and BLUE. 
+ *
+ * @author Fan Zhang <fanzha@ltu.se>
+ */
 #include "hardware.h"
 
 configuration MotionSensorC{
 
     provides {
         interface MotionSensor;
-        interface ReadNow<uint16_t> as ReadNow;
-        interface SplitControl as ReadControl;
+        interface SplitControl as MotionControl;
         interface Leds as MotionLeds;
+        interface Init;
     }
+    
 }
 
 implementation {
-    components MainC, MotionSensorP as App, MotionLedsC;
-    components new MotionNowC();
-    components new AlarmMicro32C();
-    
-    MotionLeds = MotionLedsC;
+    components MainC, MotionSensorP as App, LedsC, IRsensorLedsC;
+    components new TimerMilliC();
+    components new IRsensorC();
+
+    MotionLeds = IRsensorLedsC;
     MotionSensor = App;
-    ReadNow = App;
-    ReadControl = App;
+    MotionControl = App;
     
-    App.ReadNowResource -> MotionNowC;
-    App.MotionReadNow -> MotionNowC;
-    App.Alarm -> AlarmMicro32C;
+    App.Init = Init;
+    App.ReadNowResource -> IRsensorC;
+    App.MotionReadNow -> IRsensorC;
+    App.MilliTimer -> TimerMilliC;
+    /***************************************/
+    components HplM16c62pGeneralIOC as IOs,
+             HplM16c62pInterruptC as Irqs,
+             new M16c62pInterruptC() as Irq;
+             
     
+    App.PortIRQ -> IOs.PortP16;
+    App.GIRQ -> Irq;  // HIL wire to HAL
+    Irq -> Irqs.Int4; // HAL wire to HIL
+
     
 }

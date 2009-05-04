@@ -23,52 +23,37 @@
 
 #include <RadioConfig.h>
 
-configuration HplRF230C
+configuration TimeSyncMessageC
 {
 	provides
 	{
-		interface GeneralIO as SELN;
-		interface Resource as SpiResource;
-		interface FastSpiByte;
+		interface SplitControl;
 
-		interface GeneralIO as SLP_TR;
-		interface GeneralIO as RSTN;
+		interface Receive[uint8_t id];
+		interface Receive as Snoop[am_id_t id];
+		interface Packet;
+		interface AMPacket;
 
-		interface GpioCapture as IRQ;
-		interface Alarm<TRadio, uint16_t> as Alarm;
-		interface LocalTime<TRadio> as LocalTimeRadio;
+		interface TimeSyncAMSend<TRadio, uint32_t> as TimeSyncAMSendRadio[am_id_t id];
+		interface TimeSyncPacket<TRadio, uint32_t> as TimeSyncPacketRadio;
+
+		interface TimeSyncAMSend<TMilli, uint32_t> as TimeSyncAMSendMilli[am_id_t id];
+		interface TimeSyncPacket<TMilli, uint32_t> as TimeSyncPacketMilli;
 	}
 }
 
 implementation
 {
-	components HplRF230P;
-	IRQ = HplRF230P.IRQ;
+	components RF212TimeSyncMessageC as MAC;
+  
+	SplitControl	= MAC;
+  	Receive		= MAC.Receive;
+	Snoop		= MAC.Snoop;
+	Packet		= MAC;
+	AMPacket	= MAC;
 
-	HplRF230P.PortCLKM -> IO.PortB5;
-	HplRF230P.PortIRQ -> IO.PortE5;
-	
-	components Atm128SpiC as SpiC;
-	SpiResource = SpiC.Resource[unique("Atm128SpiC.Resource")];
-	FastSpiByte = SpiC;
-
-	components HplAtm128GeneralIOC as IO;
-	SLP_TR = IO.PortB4;
-	RSTN = IO.PortA7;
-	SELN = IO.PortB0;
-
-	components HplAtm128InterruptC;
-    HplRF230P.Interrupt -> HplAtm128InterruptC.Int5;
-
-	components HplAtm128Timer1C as TimerC;
-	HplRF230P.Timer -> TimerC;
-
-	components new AlarmOne16C() as AlarmC;
-	Alarm = AlarmC;
-
-	components RealMainP;
-	RealMainP.PlatformInit -> HplRF230P.PlatformInit;
-
-	components LocalTimeMicroC;
-	LocalTimeRadio = LocalTimeMicroC;
+	TimeSyncAMSendRadio	= MAC;
+	TimeSyncPacketRadio	= MAC;
+	TimeSyncAMSendMilli	= MAC;
+	TimeSyncPacketMilli	= MAC;
 }

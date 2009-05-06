@@ -1,5 +1,13 @@
 ifeq ($(PLATFORM),intelmote2)
 
+	PFLAGS := -I$(INTELMOTE2_CONTRIB_DIR)/tos/chips/ov7670 $(PFLAGS)
+	PFLAGS := -I$(INTELMOTE2_CONTRIB_DIR)/tos/chips/ov7649 $(PFLAGS)
+	PFLAGS := -I$(INTELMOTE2_CONTRIB_DIR)/tos/chips/pxa27x $(PFLAGS)
+	PFLAGS := -I$(INTELMOTE2_CONTRIB_DIR)/tos/platforms/intelmote2 $(PFLAGS)
+	PFLAGS := -I$(INTELMOTE2_CONTRIB_DIR)/tos/platforms/intelmote2/chips/da9030 $(PFLAGS)
+	PFLAGS := -I$(INTELMOTE2_CONTRIB_DIR)/tos/sensorboards/xbow_cb $(PFLAGS)
+	PFLAGS := -I$(INTELMOTE2_CONTRIB_DIR)/tos/sensorboards/im2cb $(PFLAGS)
+
 
 # Boot Loader changes are moved in to the default compile, however it
 # is easier to have a way to eliminate the boot loader changes if required.

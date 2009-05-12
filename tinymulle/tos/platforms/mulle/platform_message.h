@@ -3,7 +3,6 @@
  */
 #ifndef PLATFORM_MESSAGE_H
 #define PLATFORM_MESSAGE_H
-
 #include "Serial.h"
 #include <RF230ActiveMessage.h>
 
@@ -19,6 +18,5 @@ typedef union message_footer {
 typedef union message_metadata {
 	rf230packet_metadata_t rf230;
 } message_metadata_t;
-
 
 #endif  // PLATFORM_MESSAGE_H

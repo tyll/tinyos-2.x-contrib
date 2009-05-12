@@ -21,6 +21,7 @@ push( @includes, qw(
   %T/lib/power
   %T/lib/timer
   %T/lib/serial
+  %T/lib/diagmsg
 ) );
 
 @opts = qw(

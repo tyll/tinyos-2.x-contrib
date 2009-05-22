@@ -1,0 +1,7 @@
+TOSSDR Readme
+-------------
+Author: Markus Becker
+
+TOSSDR adds another make target to TinyOS for the Software Defined Radio GNUradio/USRP.
+
+Installation and usage instructions are in INSTALL

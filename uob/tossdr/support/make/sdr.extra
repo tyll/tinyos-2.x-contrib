@@ -1,0 +1,103 @@
+#-*-Makefile-*- vim:syntax=make
+#$Id$
+
+GCC=gcc
+GPP=g++
+OPTFLAGS = -g -O0
+LIBS = -lm -lstdc++
+PFLAGS += -tossdr -fnesc-nido-tosnodes=1000 -fnesc-simulate -fnesc-nido-motenumber=sim_node\(\)
+WFLAGS = -Wno-nesc-data-race
+PYTHON_VERSION=2.5
+
+BUILDDIR   = sdrbuild/$(PLATFORM)
+
+CFILE    = $(BUILDDIR)/tossdr-tinyos.c
+OBJFILE    = $(BUILDDIR)/tossdr-tinyos.o
+
+CXXFILE    = $(TOSDIR)/lib/tossdr/tossdr.c
+CXXOBJFILE = $(BUILDDIR)/tossdr.o
+
+SDRIFILE    = $(TOSDIR)/lib/tossdr/sdr_interface.c
+SDRIOBJFILE = $(BUILDDIR)/sdr_interface.o
+
+HASHFILE    = $(TOSDIR)/lib/tossdr/hashtable.c
+HASHOBJFILE = $(BUILDDIR)/c-support.o
+
+PYFILE     = $(TOSDIR)/lib/tossdr/tossdr_wrap.cxx
+PYOBJFILE  = $(BUILDDIR)/pytossdr.o
+
+#THROTTLEFILE    = $(TOSDIR)/lib/tossdr/Throttle.cpp
+#THROTTLEOBJFILE = $(BUILDDIR)/throttle.o
+
+TOSSYNCFILE    = $(TOSDIR)/lib/tossdr/tossim_sync.cxx
+TOSSYNCOBJFILE = $(BUILDDIR)/tossim_sync.o
+
+TOSSYNCIMPLFILE    = $(TOSDIR)/lib/tossdr/tossim_sync_impl.c
+TOSSYNCIMPLOBJFILE = $(BUILDDIR)/tossim_sync_impl.o
+
+PYDIR      = $(shell python$(PYTHON_VERSION)-config --prefix)/include/python$(PYTHON_VERSION)
+SIMDIR     =$(TOSDIR)/lib/tossdr
+XML        = app.xml
+DUMPTYPES = -fnesc-dump=components -fnesc-dump=variables -fnesc-dump=constants -fnesc-dump=typedefs -fnesc-dump=interfacedefs -fnesc-dump=tags
+
+ifeq ($(findstring cygwin, $(OSTYPE)),cygwin)
+  PLATFORM_FLAGS=-DUSE_DL_IMPORT -fpic
+  SHARED_OBJECT=_TOSSDR.dll
+  PLATFORM_BUILD_FLAGS= -fpic -W1,--enabled-auto-image-base
+  PLATFORM_LIB_FLAGS = -L/usr/lib/python$(PYTHON_VERSION)/config -L/$(PYDIR)/config -lstdc++ -lpython$(PYTHON_VERSION)
+else
+ifeq ($(OS), Windows_NT) # Some TinyOS installs are like this
+  PLATFORM_FLAGS=-DUSE_DL_IMPORT -fpic
+  SHARED_OBJECT=_TOSSDR.dll
+  PLATFORM_BUILD_FLAGS= -fpic -W1,--enabled-auto-image-base
+  PLATFORM_LIB_FLAGS =-shared -L/usr/lib/python$(PYTHON_VERSION)/config -L/$(PYDIR)/config -lstdc++ -lpython$(PYTHON_VERSION)
+else
+ifeq ($(findstring darwin, $(OSTYPE)), darwin)
+  SIM_DARWIN=TRUE
+else
+ifeq ($(findstring Darwin, $(shell uname)), Darwin)
+  SIM_DARWIN = TRUE
+else # linux
+  PLATFORM_FLAGS=-shared -fPIC
+  SHARED_OBJECT=_TOSSDRmodule.so
+  PLATFORM_LIB_FLAGS = -lstdc++
+  PLATFORM_BUILD_FLAGS= -shared -fPIC
+endif
+endif
+endif
+endif
+ifdef SIM_DARWIN
+  PLATFORM_FLAGS=-fPIC
+  PLATFORM_CC_FLAGS=-bundle
+  SHARED_OBJECT=_TOSSDRmodule.so
+  PLATFORM_BUILD_FLAGS=-flat_namespace -undefined suppress
+  PLATFORM_LIB_FLAGS = -lstdc++
+endif
+
+BUILD_DEPS = sdr-exe
+
+# lib/tossdr has to come at the end in order to ensure basic TOSSDR
+# implementations are the last resort, so put it directly in the call
+
+sdr-exe: builddir $(BUILD_EXTRA_DEPS) FORCE
+	@echo "  placing object files in $(BUILDDIR)"
+	@echo "  writing XML schema to $(XML)"
+	@echo "  compiling $(COMPONENT) to object file tossdr-tinyos.o"
+	$(NCC) -c $(PLATFORM_FLAGS) -o $(OBJFILE) $(OPTFLAGS) $(PFLAGS) $(CFLAGS) $(WFLAGS) $(COMPONENT).nc $(LDFLAGS)  $(DUMPTYPES) -fnesc-dumpfile=$(XML)
+
+	@echo "  compiling Python support and C libraries into pytossdr.o, tossdr.o, and c-support.o"
+	$(GPP) -c $(PLATFORM_CC_FLAGS) $(PLATFORM_FLAGS) -o $(PYOBJFILE) $(OPTFLAGS) $(CFLAGS) $(PYFILE) -I$(PYDIR) -I$(SIMDIR) -DHAVE_CONFIG_H
+	$(GPP) -c $(PLATFORM_CC_FLAGS) $(PLATFORM_FLAGS) -o $(CXXOBJFILE) $(OPTFLAGS) $(CFLAGS) $(CXXFILE) -I$(PYDIR) -I$(SIMDIR)
+	$(GPP) -c $(PLATFORM_CC_FLAGS) $(PLATFORM_FLAGS) -o $(SDRIOBJFILE) $(OPTFLAGS) $(CFLAGS) $(SDRIFILE) -I$(PYDIR) -I$(SIMDIR)
+	$(GPP) -c $(PLATFORM_CC_FLAGS) $(PLATFORM_FLAGS) -o $(HASHOBJFILE) $(OPTFLAGS) $(CFLAGS) $(HASHFILE) -I$(PYDIR) -I$(SIMDIR)
+	$(GPP) -c $(PLATFORM_CC_FLAGS) $(PLATFORM_FLAGS) -o $(TOSSYNCOBJFILE) $(OPTFLAGS) $(CFLAGS) $(TOSSYNCFILE) -I$(PYDIR) -I$(SIMDIR)
+	$(GPP) -c $(PLATFORM_CC_FLAGS) $(PLATFORM_FLAGS) -o $(TOSSYNCIMPLOBJFILE) $(OPTFLAGS) $(CFLAGS) $(TOSSYNCIMPLFILE) -I$(PYDIR) -I$(SIMDIR)
+
+	@echo "  linking into shared object ./$(SHARED_OBJECT)"
+	$(GPP) $(PLATFORM_BUILD_FLAGS) $(PLATFORM_CC_FLAGS) $(PYOBJFILE) $(OBJFILE) $(CXXOBJFILE) $(SDRIOBJFILE) $(HASHOBJFILE) $(TOSSYNCOBJFILE) $(TOSSYNCIMPLOBJFILE) $(PLATFORM_LIB_FLAGS) -o $(SHARED_OBJECT)
+
+	@echo "  copying Python script interface TOSSDR.py from lib/tossdr to local directory"
+	@cp $(TOSDIR)/lib/tossdr/TOSSDR.py .
+	@echo " "
+	@echo "*** Successfully built $(PLATFORM) TOSSDR library. "
+

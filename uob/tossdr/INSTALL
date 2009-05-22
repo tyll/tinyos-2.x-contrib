@@ -1,0 +1,22 @@
+TOSSDR Installation instructions
+--------------------------------
+Author: Markus Becker
+--------------------------------
+
+# install GNUradio trunk according to the installation instructions
+
+# install modified UCLA IEEE 802.15.4 SDR code in ucla/ according to the instructions
+
+# copy the make target, SDR components and hardware files into the $TOSROOT.
+
+chmod +x ./installIntoTree.sh
+./installIntoTree.sh
+
+# go to the application you want to compile for the SDR
+cd $(TOSROOT)/apps/test/TestAM/
+make micaz sdr
+
+# run the SDR
+cp $(TOSCONTRIB)/uob/tossdr/sdr2tos.py .
+cp $(TOSCONTRIB)/uob/tossdr/sdr_handling.py .
+python sdr2tos.py

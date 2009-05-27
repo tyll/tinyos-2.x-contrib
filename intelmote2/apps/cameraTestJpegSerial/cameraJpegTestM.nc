@@ -30,6 +30,9 @@
 */ 
 /**
  * @author Brano Kusy (branislav.kusy@gmail.com)
+ *
+ * @bug-report-acknowledgements:
+ *   - (Lun Jiang) wormite@gmail.com
  */ 
 #include "xbowCam.h"
 #include "cameraJpegTest.h"
@@ -179,8 +182,7 @@ implementation
 
 	async event void XbowCam.acquireDone()
 	{
-	  post fixAcqBuffer(); //
-	  post startProcessing();
+	  post fixAcqBuffer();
 	}
 
 	task void acquireTask() {

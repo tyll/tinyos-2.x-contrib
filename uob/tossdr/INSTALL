@@ -26,6 +26,6 @@ make micaz sdr
 
 # 6) run the application on the SDR:
 
-cp $(TOSCONTRIB)/uob/tossdr/sdr2tos.py .
-cp $(TOSCONTRIB)/uob/tossdr/sdr_handling.py .
+cp $(TOSCONTRIB)/uob/tossdr/python/sdr2tos.py .
+cp $(TOSCONTRIB)/uob/tossdr/python/sdr_handling.py .
 python sdr2tos.py

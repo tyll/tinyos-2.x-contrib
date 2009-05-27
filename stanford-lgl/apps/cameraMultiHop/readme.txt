@@ -1,0 +1,1 @@
+this application has moved to tinyos-2.x-contrib/intelmote2

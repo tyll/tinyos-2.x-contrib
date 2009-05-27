@@ -26,6 +26,9 @@ cp /opt/tinyos-2.x/tos/chips/cc2420/transmit/sdr/*.nc tos/chips/cc2420/transmit/
 mkdir -p tos/lib/tossdr
 cp $TOSROOT/tos/lib/tossdr/* tos/lib/tossdr/
 
+mkdir -p tos/chips/atm128/sdr
+cp $TOSROOT/tos/chips/atm128/sdr/* tos/chips/atm128/sdr/
+
 # copy SDR target from tree
 mkdir -p support/make/
 cp /opt/tinyos-2.x/support/make/sdr.extra support/make/

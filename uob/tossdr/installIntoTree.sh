@@ -25,6 +25,9 @@ cp tos/chips/cc2420/transmit/sdr/*.nc $TOSROOT/tos/chips/cc2420/transmit/sdr/
 mkdir -p $TOSROOT/tos/lib/tossdr
 cp tos/lib/tossdr/* $TOSROOT/tos/lib/tossdr/
 
+mkdir -p $TOSROOT/tos/chips/atm128/sdr
+cp tos/chips/atm128/sdr/* $TOSROOT/tos/chips/atm128/sdr/
+
 mkdir -p $TOSROOT/support/make/
 cp support/make/sdr.extra $TOSROOT/support/make/
 

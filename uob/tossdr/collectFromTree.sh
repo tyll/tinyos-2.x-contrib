@@ -33,3 +33,6 @@ cp /opt/tinyos-2.x/apps/tests/TestAM/sdr_handling.py python/
 
 # copy modified UCLA code
 cp -r /home/mab/src/external/cgran/orig/gnuradio-802.15.4-demodulation/ ucla/
+
+# copy modified ncc
+cp /usr/bin/ncc tools/tinyos/

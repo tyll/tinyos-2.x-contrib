@@ -15,12 +15,16 @@ Author: Markus Becker
 chmod +x ./installIntoTree.sh
 ./installIntoTree.sh
 
-# 4) go to the application directory you want to compile for the SDR
+# 4) diff the modified ncc against the installed ncc (/usr/bin/ncc)
+sudo meld /usr/bin/ncc tools/tinyos/ncc
+
+# 5) go to the application directory you want to compile for the SDR
 #    and compile it:
 
-cd $(TOSROOT)/apps/test/TestAM/ make micaz sdr
+cd $(TOSROOT)/apps/test/TestAM/
+make micaz sdr
 
-# 5) run the application on the SDR:
+# 6) run the application on the SDR:
 
 cp $(TOSCONTRIB)/uob/tossdr/sdr2tos.py .
 cp $(TOSCONTRIB)/uob/tossdr/sdr_handling.py .

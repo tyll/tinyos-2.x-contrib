@@ -16,29 +16,35 @@ cd ..
 
 cd ucla/gnuradio-802.15.4-demodulation/
 ./bootstrap && ./configure --prefix=/opt/gnuradio/current && make && make install
-
+cd ../..
 
 # 3) modify PYTHON_VERSION=2.5 in support/make/sdr.extra to meet your
 #    python's version
 
-# 4) copy the make target, SDR components and hardware files into the
+# 4) set your PYTHONPATH (either on commandline or in .bashrc)
+
+export PYTHONPATH=$PYTHONPATH:$TOSROOT/support/sdk/python
+
+# 5) copy the make target, SDR components and hardware files into the
 #    $TOSROOT with installIntoTree.sh:
 
 chmod +x ./installIntoTree.sh
 ./installIntoTree.sh
 
-# 5) diff the modified ncc against the installed ncc (/usr/bin/ncc)
+# 6) diff the modified ncc against the installed ncc (/usr/bin/ncc)
 #    and apply the relevant changes sudo meld /usr/bin/ncc
 #    tools/tinyos/ncc
 
-# 6) go to the application directory you want to compile for the SDR
+# 7) go to the application directory you want to compile for the SDR
 #    and compile it:
 
 cd $(TOSROOT)/apps/test/TestAM/
 make micaz sdr
 
-# 7) run the application on the SDR:
+# 8) run the application on the SDR:
 
 cp $(TOSCONTRIB)/uob/tossdr/python/sdr2tos.py .
 cp $(TOSCONTRIB)/uob/tossdr/python/sdr_handling.py .
 python sdr2tos.py
+
+(you need another shell to kill sdr2tos.py, it won't react to Ctrl-c)

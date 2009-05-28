@@ -3,28 +3,41 @@ TOSSDR Installation instructions
 Author: Markus Becker
 --------------------------------
 
-# 1) install GNUradio r11020 from SVN (later versions might work)
-#    according to its installation instructions
+# 1) install GNUradio r11020 from SVN (later versions might or might
+#    not work)
+
+svn co -r11020 http://gnuradio.org/svn/gnuradio/trunk gnuradio_r11020
+cd gnuradio_r11020 (change the prefix to meet your needs)
+./bootstrap && ./configure --prefix=/opt/gnuradio/current && make && make install
+cd ..
 
 # 2) install the modified UCLA IEEE 802.15.4 SDR code in ucla/
-#    according to the instructions
+#    (change the prefix to meet your needs)
 
-# 3) copy the make target, SDR components and hardware files into the
+cd ucla/gnuradio-802.15.4-demodulation/
+./bootstrap && ./configure --prefix=/opt/gnuradio/current && make && make install
+
+
+# 3) modify PYTHON_VERSION=2.5 in support/make/sdr.extra to meet your
+#    python's version
+
+# 4) copy the make target, SDR components and hardware files into the
 #    $TOSROOT with installIntoTree.sh:
 
 chmod +x ./installIntoTree.sh
 ./installIntoTree.sh
 
-# 4) diff the modified ncc against the installed ncc (/usr/bin/ncc)
-sudo meld /usr/bin/ncc tools/tinyos/ncc
+# 5) diff the modified ncc against the installed ncc (/usr/bin/ncc)
+#    and apply the relevant changes sudo meld /usr/bin/ncc
+#    tools/tinyos/ncc
 
-# 5) go to the application directory you want to compile for the SDR
+# 6) go to the application directory you want to compile for the SDR
 #    and compile it:
 
 cd $(TOSROOT)/apps/test/TestAM/
 make micaz sdr
 
-# 6) run the application on the SDR:
+# 7) run the application on the SDR:
 
 cp $(TOSCONTRIB)/uob/tossdr/python/sdr2tos.py .
 cp $(TOSCONTRIB)/uob/tossdr/python/sdr_handling.py .

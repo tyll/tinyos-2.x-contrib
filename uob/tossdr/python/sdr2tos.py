@@ -199,16 +199,16 @@ def main ():
 
         print "Setting debugging channels..."
         # Set debugging channels
-        tos.addChannel("SimMainP", sys.stdout)
-        tos.addChannel("SimMoteP", sys.stdout)
+        #tos.addChannel("SimMainP", sys.stdout)
+        #tos.addChannel("SimMoteP", sys.stdout)
         #tos.addChannel("Packet", sys.stdout)
-        tos.addChannel("Tossdr", sys.stdout)
+        #tos.addChannel("Tossdr", sys.stdout)
         tos.addChannel("AM", sys.stdout)
         #tos.addChannel("Test", sys.stdout)
         #tos.addChannel("Boot", sys.stdout)
         #tos.addChannel("BaseStation", sys.stdout)
-        tos.addChannel("Scheduler", sys.stdout)
-        tos.addChannel("Queue", sys.stdout)
+        #tos.addChannel("Scheduler", sys.stdout)
+        #tos.addChannel("Queue", sys.stdout)
         tos.addChannel("Leds", sys.stdout)
 
     # FIXME? needed?

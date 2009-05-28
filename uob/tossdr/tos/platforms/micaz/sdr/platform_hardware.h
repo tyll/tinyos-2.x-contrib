@@ -47,7 +47,7 @@
 // A/D constants (channels, etc)
 enum {
 //  CHANNEL_RSSI       = ATM128_ADC_SNGL_ADC0,
-  CHANNEL_THERMISTOR = ATM128_ADC_SNGL_ADC1,    // normally unpopulated
+//  CHANNEL_THERMISTOR = ATM128_ADC_SNGL_ADC1,    // normally unpopulated
 //  CHANNEL_BATTERY    = ATM128_ADC_SNGL_ADC7,
 //  CHANNEL_BANDGAP    = 30,
 //  CHANNEL_GND        = 31,

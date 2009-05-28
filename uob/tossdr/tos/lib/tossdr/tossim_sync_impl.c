@@ -101,9 +101,9 @@ bool sim_wait_until_next_event() {
   if (sim_queue_is_empty())
     return 0;
   evt = sim_queue_pop();
-  fprintf(stderr, "sync_impl %x\n", evt), fflush(stderr);
+  //fprintf(stderr, "sync_impl %x\n", evt), fflush(stderr);
   sim_queue_insert(evt);
-  fprintf(stderr, "wait until %d\n", evt->time), fflush(stderr);
+  //fprintf(stderr, "wait until %d\n", evt->time), fflush(stderr);
   sim_wait_until_real_time(evt->time);
   return 1;
 }

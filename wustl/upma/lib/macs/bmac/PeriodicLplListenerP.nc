@@ -53,16 +53,6 @@ implementation
 	event void RadioPowerControl.startDone(error_t error) { }
 	event void RadioPowerControl.stopDone(error_t error) { }
 	
-	async command void * Receive.getPayload(message_t * msg, uint8_t * len)
-	{
-		return call SubReceive.getPayload(msg, len);
-	}
-
-	async command uint8_t Receive.payloadLength(message_t * msg)
-	{
-		return call SubReceive.payloadLength(msg);
-	}
-	
 	command void Receive.updateBuffer(message_t * msg)
 	{
 		call SubReceive.updateBuffer(msg);

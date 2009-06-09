@@ -70,10 +70,12 @@ configuration CC2420ActiveMessageC {
     interface Receive as Snoop[am_id_t id];
     interface AMPacket;
     interface Packet;
+    interface CC2420Packet;
     interface PacketAcknowledgements;
     interface PacketLink;
-    interface CcaControl[am_id_t amId];
-    interface CC2420Packet;
+	interface LinkPacketMetadata;
+	interface CcaControl[am_id_t amId];
+	interface SendNotifier[am_id_t amId];
   }
 }
 implementation {
@@ -89,7 +91,7 @@ implementation {
   components AsyncAdapterC;
   components PowerCycleC;
   components MacC;
-
+  
 #if defined(PACKET_LINK)
   components PacketLinkC as LinkC;
 #else
@@ -99,18 +101,19 @@ implementation {
   
   Packet = AM;
   AMSend = AM;
+  SendNotifier = AM;
   Receive = AM.Receive;
   Snoop = AM.Snoop;
   AMPacket = AM;
   PacketLink = LinkC;
-  PacketAcknowledgements = CC2420PacketC;
   CC2420Packet = CC2420PacketC;
-  
-
+  PacketAcknowledgements = CC2420PacketC;
+  LinkPacketMetadata = CC2420PacketC;
   
   // SplitControl Layers
   SplitControl = MacC;
-  CcaControl = MacC;
+  CcaControl = AM;
+  AM.SubCcaControl -> MacC;
   
   // Send Layers
   AM.SubSend -> UniqueSendC;
@@ -127,14 +130,13 @@ implementation {
   AsyncAdapterC.AsyncReceive -> MacC;
   MacC.SubReceive -> CsmaC;
   
-  MacC.RadioPowerControl -> CsmaC;
-  MacC.Resend -> CsmaC;
   MacC.PacketAcknowledgements -> CC2420PacketC;
   MacC.ChannelMonitor -> PowerCycleC;
+  MacC.RadioPowerControl -> CsmaC;
+  MacC.Resend -> CsmaC;
   MacC.AMPacket -> AM;
-  
+
   AM.ActiveMessageAddress -> ActiveMessageAddressC;
   AM.CC2420PacketBody -> CC2420PacketC;
   AM.CC2420Config -> CC2420ControlC;
-  
 }

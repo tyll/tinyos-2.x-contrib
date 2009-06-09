@@ -21,13 +21,10 @@
  */
  
 /**
-/**                                             
- *
  * @author Greg Hackmann
  * @version $Revision$
  * @date $Date$
  */
-
 module FixedSleepLplListenerP
 {
 	provides interface AsyncReceive as Receive;
@@ -107,16 +104,6 @@ implementation
 		call PollerControl.start();
 		// Now that the radio's off, resume the LPL checks
 #endif
-	}
-	
-	async command void * Receive.getPayload(message_t * msg, uint8_t * len)
-	{
-		return call SubReceive.getPayload(msg, len);
-	}
-
-	async command uint8_t Receive.payloadLength(message_t * msg)
-	{
-		return call SubReceive.payloadLength(msg);
 	}
 	
 	command void Receive.updateBuffer(message_t * msg)

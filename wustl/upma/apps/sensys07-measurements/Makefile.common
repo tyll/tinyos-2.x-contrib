@@ -1,23 +1,16 @@
 CFLAGS += -I../.. \
 	-I$(TOSDIR)/lib/printf \
 	-DPREAMBLE_LENGTH=100
-PFLAGS = -DCC2420_DEF_CHANNEL=11
-
+PFLAGS = -DCC2420_DEF_CHANNEL=25
 ifeq ($(UPMA),1)
-	include $(UPMA_DIR)/chips/cc2420/Makefile.cc2420
-	CFLAGS += -I$(UPMA_DIR)/lib/alarm \
-		-I$(UPMA_DIR)/lib/serial \
-		-I$(UPMA_DIR)/platforms/$(PLATFORM) \
-		-I$(UPMA_DIR)/system \
-		-I$(UPMA_DIR)/interfaces \
-		-I$(UPMA_DIR)/types \
-		-DUPMA
+	include $(UPMA_DIR)/Makefile.include
+	CFLAGS += -DUPMA=1
+	
 	ifeq ($(NEWCCA),0)
 		CFLAGS += -DOLDCCA \
 			-DMAX_LPL_CCA_CHECKS=$(MAX_LPL_CCA_CHECKS)
 	endif
 else
-	CFLAGS += -I$(UPMA_DIR)/chips/cc2420_lpl 
 	ifeq ($(NEWCCA),1)
 		CFLAGS += -DNEWCCA \
 			-I$(UPMA_DIR)/system \

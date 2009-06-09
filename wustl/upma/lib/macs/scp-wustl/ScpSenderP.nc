@@ -50,8 +50,6 @@ module ScpSenderP
 	uses interface AMPacket;
 	uses interface Random;
 	uses interface CcaControl as SubCcaControl[am_id_t amId];
-
-	uses interface Leds;
 }
 implementation
 {
@@ -115,8 +113,10 @@ implementation
 		{
 			uint8_t state = call SendState.getState();
 			
-			if(state == S_STOPPED || state == S_BOOTING)
+			if(state == S_STOPPED)
 				return EOFF;
+			if(state == S_BOOTING)
+				return ERETRY;
 			// Make sure the radio isn't off, and that we're not busy
 			// bootstrapping SCP
 			if(state != S_IDLE)
@@ -126,7 +126,6 @@ implementation
 			call AMPacket.setType(&preamble, AM_PREAMBLEPACKET);
 			call AMPacket.setSource(&preamble, TOS_NODE_ID);
 			call AMPacket.setDestination(&preamble, call AMPacket.destination(msg));
-			call AMPacket.setGroup(&preamble, call AMPacket.localGroup());
 			preambleLen = call AMPacket.headerSize();
 			// Construct a preamble packet containing just the header
 
@@ -153,14 +152,14 @@ implementation
 			return;
 		// If there's nothing buffered, we're done
 		
-		call AdaptiveAlarm.start(HI_RATE_POLL_PERIOD);
+		call AdaptiveAlarm.start(HI_RATE_POLL_PERIOD + MAX_UCAST_TIME);
 		if(waitFirstSlot)
 		{
 			waitFirstSlot = FALSE;
-			adaptiveSlotsLeft = SCP_NUM_HI_RATE_POLL;
+			atomic adaptiveSlotsLeft = SCP_NUM_HI_RATE_POLL;
 			return;
 		}
-		adaptiveSlotsLeft = 0;
+		atomic adaptiveSlotsLeft = 0;
 		// Start the adaptive send timer and reset the number of adaptive slots
 		
 		call SendState.forceState(S_STARTING);			
@@ -170,9 +169,12 @@ implementation
 	
 	async event void AdaptiveAlarm.fired()
 	{
-		if(adaptiveSlotsLeft == 0)
-			return;
-		adaptiveSlotsLeft--;
+		atomic
+		{
+			if(adaptiveSlotsLeft == 0)
+				return;
+			adaptiveSlotsLeft--;
+		}
 		// Mark another slot as used, and make sure we've got slots left
 		
 		call AdaptiveAlarm.start(HI_RATE_POLL_PERIOD);
@@ -200,7 +202,7 @@ implementation
 	{
 		uint16_t preambleTime;
 		preambleBackoff = (call Random.rand16() % SCP_TONE_CONT_WIN) + 1;
-    	preambleTime = SCP_TONE_CONT_WIN + MIN_TONE_LEN + 1 - preambleBackoff;
+		preambleTime = SCP_TONE_CONT_WIN + MIN_TONE_LEN / 1000 + 1 - preambleBackoff / 8;
 		// Calculate the preamble length
 
 		if(call SendState.getState() != S_STARTING)
@@ -222,13 +224,14 @@ implementation
 	{	
 		if(err != SUCCESS)
 		{
+			message_t * payload;
+			atomic payload = msg_;
 			call SendState.toIdle();
 			post doStop();
-			signal Send.sendDone(msg_, err);
+			signal Send.sendDone(payload, err);
 			return;
 		}
 		// If it didn't work, then shut down the radio and signal failure
-		
 
 		packetBackoff = (call Random.rand16() % SCP_PKT_CONT_WIN) + 1;
 		// Calculate a backoff between the preamble and payload
@@ -272,7 +275,7 @@ implementation
 		// Make sure this event is for us
 		if(call SendState.getState() == S_PACKET)
 		{
-			adaptiveSlotsLeft = SCP_NUM_HI_RATE_POLL;
+			atomic adaptiveSlotsLeft = SCP_NUM_HI_RATE_POLL;
 
 			call SendState.toIdle();
 			post doStop();
@@ -307,9 +310,9 @@ implementation
 		return call SubSend.maxPayloadLength();
 	}
 	
-	async command void * Send.getPayload(message_t * msg)
+	async command void * Send.getPayload(message_t * msg, uint8_t len)
 	{
-		return call SubSend.getPayload(msg);
+		return call SubSend.getPayload(msg, len);
 	}
 	
 	command error_t StdControl.start()
@@ -346,9 +349,10 @@ implementation
 		switch(call SendState.getState())
 		{
 		case S_PREAMBLE:
-			return preambleBackoff * 32;
+			return preambleBackoff * 32 / 8;
 		case S_PACKET:
-			return packetBackoff * 32;
+			return packetBackoff * 32 / 8;
+		// Backoffs are calculated in 8 KHz ticks, so convert to 32 KHz ticks
 		default:
 			return signal CcaControl.getInitialBackoff[amId](msg, defaultBackoff);
 		}

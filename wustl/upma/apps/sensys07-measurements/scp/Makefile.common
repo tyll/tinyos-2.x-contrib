@@ -1,8 +1,0 @@
-CFLAGS += -I$(UPMA_DIR)/lib/macs/scp-wustl \
-	  -I$(UPMA_DIR)/lib/macs/xmac \
-	  -I$(UPMA_DIR)/lib/macs/bmac \
-	  -DFOOTER_SIZE=2 \
-	  -DSCP
-UPMA = 1
-
-include ../../Makefile.common

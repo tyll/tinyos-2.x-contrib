@@ -36,7 +36,6 @@
  * @date $Date$
  */
  
- //TODO: rename as GenericTDMASlotSenderP
 generic module GenericSlotSenderP(uint16_t offset, uint16_t backoff, bool cca)  {
 	provides interface Init;
 	provides interface AsyncSend as Send;
@@ -48,7 +47,6 @@ generic module GenericSlotSenderP(uint16_t offset, uint16_t backoff, bool cca)  
 	uses interface Leds;
 	
 	uses interface Boot;
-//	uses interface HplMsp430GeneralIO as Pin;
 		
 } implementation {
 	enum {
@@ -64,7 +62,6 @@ generic module GenericSlotSenderP(uint16_t offset, uint16_t backoff, bool cca)  
 
 	event void Boot.booted()
 	{
-		//call Pin.makeOutput();
 	}
 	
 		
@@ -135,21 +132,19 @@ generic module GenericSlotSenderP(uint16_t offset, uint16_t backoff, bool cca)  
   	
   	
 	async event void SubSend.sendDone(message_t * msg, error_t error) {
-		//call Leds.led0Toggle();
 		if (toSend == msg) {
 			atomic state = S_END;
 			atomic toSend = NULL;
 			signal Send.sendDone(msg,error);
 		}
-		//call Pin.clr();
 	}
 	
  	async command error_t Send.cancel(message_t *msg) { 
  		return FAIL;
  	}
  	
- 	async command void *Send.getPayload(message_t *msg) { 
-		return call SubSend.getPayload(msg); 
+	async command void *Send.getPayload(message_t * msg, uint8_t len) {
+		return call SubSend.getPayload(msg, len); 
 	}
 	
 	async command uint8_t Send.maxPayloadLength() {
@@ -157,7 +152,6 @@ generic module GenericSlotSenderP(uint16_t offset, uint16_t backoff, bool cca)  
 	}
  	
 	async event uint16_t SubCcaControl.getInitialBackoff(message_t * msg, uint16_t defaultbackoff) {
-		//call Leds.led0Toggle();
 		return backoff;
 	}
 	

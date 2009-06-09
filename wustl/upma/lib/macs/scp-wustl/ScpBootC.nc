@@ -21,12 +21,10 @@
  */
  
 /**
- *
  * @author Greg Hackmann
  * @version $Revision$
  * @date $Date$
  */
-
 configuration ScpBootC
 {
 	provides interface AsyncSend as Send;

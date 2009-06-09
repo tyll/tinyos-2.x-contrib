@@ -21,14 +21,12 @@
  */
  
 /**
-/**                                             
- *
  * @author Greg Hackmann
  * @version $Revision$
  * @date $Date$
  */
 
-#define DUTY_CYCLE_BENCHMARK
+#define DUTY_CYCLE
 
 uint32_t vDutyCycle = 0;
 uint32_t oscDutyCycle = 0;
@@ -61,8 +59,6 @@ implementation
 	App.AMSender -> AMSender;
 	App.AMReceiver -> AMReceiver;
 	App.Leds -> LedsC;
-	App.PrintfFlush -> PrintfC;
-	App.PrintfControl -> PrintfC;
 	App.SendTimer -> BenchmarkTimer;
 
 #ifdef SCP

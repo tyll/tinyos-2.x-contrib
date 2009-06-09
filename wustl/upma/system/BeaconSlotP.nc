@@ -80,7 +80,7 @@ module BeaconSlotP {
 		error_t status;
 		uint32_t remaining;
 		
-		payload = call SubSend.getPayload(&syncPkt);
+		payload = call SubSend.getPayload(&syncPkt, len);
  		
  		remaining = call SlotterControl.getRemaining();
  		write_timestamp(payload, remaining);
@@ -98,8 +98,8 @@ module BeaconSlotP {
  		return FAIL;
  	}
  	
- 	async command void *Send.getPayload(message_t *msg) { 
-		return call SubSend.getPayload(msg); 
+ 	async command void *Send.getPayload(message_t *msg, uint8_t len) { 
+		return call SubSend.getPayload(msg, len); 
 	}
 	
 	async command uint8_t Send.maxPayloadLength() {
@@ -137,13 +137,6 @@ module BeaconSlotP {
 		call SlotterControl.synchronize(1);
 	}
 	
-	
-	async command void *Receive.getPayload(message_t *msg, uint8_t *len) { 
-		return call SubReceive.getPayload(msg, len); 
-	}
-	async command uint8_t Receive.payloadLength(message_t *msg) { 
-		return call SubReceive.payloadLength(msg);
-	}	
 	command void Receive.updateBuffer(message_t * msg) { return call SubReceive.updateBuffer(msg); }
 	
 	

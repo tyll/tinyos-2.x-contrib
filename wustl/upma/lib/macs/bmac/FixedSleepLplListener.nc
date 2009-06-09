@@ -21,13 +21,10 @@
  */
  
 /**
-/**                                             
- *
  * @author Greg Hackmann
  * @version $Revision$
  * @date $Date$
  */
-
 interface FixedSleepLplListener
 {
 	async command void startTimeout();

@@ -85,7 +85,7 @@ implementation
 		uint8_t * nodeId;
 		call LowPowerListening.setLocalSleepInterval(interval);
 			
-		nodeId = (uint8_t *)call Packet.getPayload(&packet, NULL);
+		nodeId = (uint8_t *)call Packet.getPayload(&packet, sizeof(uint8_t));
 		*nodeId = TOS_NODE_ID;
 
 		call SendTimer.startPeriodic(8000);

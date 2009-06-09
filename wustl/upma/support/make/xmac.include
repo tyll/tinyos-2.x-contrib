@@ -1,0 +1,3 @@
+
+CFLAGS += -I$(UPMA_DIR)/lib/macs/xmac
+CFLAGS += -I$(UPMA_DIR)/lib/macs/bmac

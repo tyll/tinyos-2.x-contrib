@@ -31,8 +31,6 @@
 
 module TestLocalTimeC {
   uses interface LocalTimeExtended<T32khz, local_time16_t> as LocalTime;
-  uses interface PrintfFlush;
-  uses interface SplitControl as PrintfControl;
   uses interface Boot;
   uses interface Timer<TMilli>;
 }
@@ -42,15 +40,8 @@ implementation
 
   event void Boot.booted()
   {
-  	call PrintfControl.start();
-  }
-  
-  event void PrintfControl.startDone(error_t error) {
   	t1 = call LocalTime.getNow();
     call Timer.startOneShot( 5120 );
-  }
-  
-  event void PrintfControl.stopDone(error_t error) {
   }
 
   event void Timer.fired()
@@ -63,12 +54,9 @@ implementation
   	printf("Time mticks: %lu\n", t2.mticks);
   	printf("Time sticks: %u\n", t3.sticks);
   	printf("Time mticks: %lu\n\n", t3.mticks);
-  	call PrintfFlush.flush();
-  }
-  
-  event void PrintfFlush.flushDone(error_t error) {
-    	t1 = call LocalTime.getNow();
-    call Timer.startOneShot( 5120 );
+  	printfflush();
+  	t1 = call LocalTime.getNow();
+    call Timer.startOneShot( 5120 );  	
   }
 }
 

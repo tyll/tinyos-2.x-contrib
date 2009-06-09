@@ -55,7 +55,7 @@ implementation
 		S_STOPPED = 3,
 	};
 
-	message_t * msg_;
+	message_t * ONE_NOK msg_;
 	uint8_t len_;
 
 	task void doStart()
@@ -124,9 +124,9 @@ implementation
 		return call SubSend.maxPayloadLength();
 	}
 
-	async command void * Send.getPayload(message_t * msg)
+	async command void * Send.getPayload(message_t * msg, uint8_t len)
 	{
-		return call SubSend.getPayload(msg);
+		return call SubSend.getPayload(msg, len);
 	}
 	
 	async event void SubSend.sendDone(message_t * msg, error_t error)

@@ -2,8 +2,7 @@ CFLAGS += -DFOOTER_SIZE=0
 MAX_LPL_CCA_CHECKS=500
 
 ifeq ($(UPMA),1)
-	CFLAGS += -I$(UPMA_DIR)/lib/macs/xmac \
-		-I$(UPMA_DIR)/lib/macs/bmac
+	UPMA_MAC = xmac
 else
 	CFLAGS += -DACK_LOW_POWER_LISTENING
 endif

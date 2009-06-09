@@ -46,8 +46,6 @@ module LatencyBenchmarkC
 //	uses interface Timer<TMilli> as LedTimer;
 	
 	uses interface Counter<TMilli, uint32_t>;
-	uses interface SplitControl as PrintfControl;
-	uses interface PrintfFlush;
 }
 implementation
 {
@@ -82,7 +80,8 @@ implementation
 		if(i < MAX_SAMPLES)
 		{
 			printf("%u,", samples[i++]);
-			call PrintfFlush.flush();
+			printfflush();
+			post sendResults();
 		}
 		else if(i == MAX_SAMPLES)
 		{
@@ -91,7 +90,7 @@ implementation
 			printf("%lu\t", benchmarkRadioDuty);
 			printf("%lu\n", benchmarkEnd - benchmarkStart);
 			i++;
-			call PrintfFlush.flush();
+			printfflush();
 		}
 	}
 	
@@ -180,7 +179,7 @@ implementation
 #else
 		call LowPowerListening.setRxSleepInterval(&packet, PREAMBLE_LENGTH);
 #endif
-		call PrintfControl.start();
+		call SplitControl.start();
 	}
 	
 	event message_t * AMReceiver.receive(message_t * message, void * payload, uint8_t length)
@@ -199,16 +198,9 @@ implementation
 	{
 	}
 	
-	event void PrintfControl.startDone(error_t err)
-	{
-		call SplitControl.start();
-	}
-	
-	event void PrintfControl.stopDone(error_t err) { }
-	
 	event void SplitControl.startDone(error_t err)
 	{
-		memset(call Packet.getPayload(&packet, NULL), TOS_NODE_ID, PACKET_LENGTH);
+		memset(call Packet.getPayload(&packet, PACKET_LENGTH), TOS_NODE_ID, PACKET_LENGTH);
 		call LowPowerListening.setLocalSleepInterval(PREAMBLE_LENGTH);
 		benchmarkStart = call Counter.get();
 
@@ -226,10 +218,5 @@ implementation
 
 	event void SplitControl.stopDone(error_t err)
 	{
-	}
-	
-	event void PrintfFlush.flushDone(error_t err)
-	{
-		post sendResults();
 	}
 }

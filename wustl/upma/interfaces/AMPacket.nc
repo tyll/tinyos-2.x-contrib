@@ -1,25 +1,5 @@
+// $Id$
 /*
- * "Copyright (c) 2007 Washington University in St. Louis.
- * All rights reserved.
- *
- * Permission to use, copy, modify, and distribute this software and its
- * documentation for any purpose, without fee, and without written agreement is
- * hereby granted, provided that the above copyright notice, the following
- * two paragraphs and the author appear in all copies of this software.
- *
- * IN NO EVENT SHALL WASHINGTON UNIVERSITY IN ST. LOUIS BE LIABLE TO ANY PARTY
- * FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING
- * OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF WASHINGTON
- * UNIVERSITY IN ST. LOUIS HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * WASHINGTON UNIVERSITY IN ST. LOUIS SPECIFICALLY DISCLAIMS ANY WARRANTIES,
- * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
- * AND FITNESS FOR A PARTICULAR PURPOSE.  THE SOFTWARE PROVIDED HEREUNDER IS
- * ON AN "AS IS" BASIS, AND WASHINGTON UNIVERSITY IN ST. LOUIS HAS NO
- * OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
- * MODIFICATIONS."
- */
-/*									tab:4
  * "Copyright (c) 2004-5 The Regents of the University  of California.  
  * All rights reserved.
  *
@@ -56,7 +36,7 @@
   * destinations are defined by the corresponding multihop protocol (if any).
   * Also see the Packet interface.
   *
-  * @author Philip Levis
+  * @author Philip Levis 
   * @date   January 18 2005
   * @see    Packet
   * @see    AMSend
@@ -80,7 +60,7 @@ interface AMPacket {
    * Return the AM address of the destination of the AM packet.
    * If <tt>amsg</tt> is not an AM packet, the results of this command
    * are undefined.
-   * @param amsg    the packet
+   * @param 'message_t* ONE amsg'    the packet
    * @return        the destination address of the packet.
    */
   
@@ -90,7 +70,7 @@ interface AMPacket {
    * Return the AM address of the source of the AM packet.
    * If <tt>amsg</tt> is not an AM packet, the results of this command
    * are undefined.
-   * @param amsg  the packet
+   * @param 'message_t* ONE amsg'  the packet
    * @return      the source address of the packet.
    */
    
@@ -105,7 +85,7 @@ interface AMPacket {
    * and then recover it when actually sending. If <tt>amsg</tt> is
    * not an AM packet, the results of this command are undefined.
    *
-   * @param  amsg   the packet
+   * @param  'message_t* ONE amsg'   the packet
    * @param  addr   the address
    */
 
@@ -123,7 +103,7 @@ interface AMPacket {
    * layer (e.g., a protocol bridge). If <tt>amsg</tt> is
    * not an AM packet, the results of this command are undefined.
    *
-   * @param  amsg   the packet
+   * @param  'message_t* ONE amsg'   the packet
    * @param  addr   the address
    */
 
@@ -139,7 +119,7 @@ interface AMPacket {
    * the mote's local address. If <tt>amsg</tt> is not an AM packet,
    * the results of this command are undefined.
    *
-   * @param  amsg   the packet
+   * @param  'message_t* ONE amsg'   the packet
    * @return        whether the packet is addressed to this AM stack
    */
   async command bool isForMe(message_t* amsg);
@@ -149,7 +129,7 @@ interface AMPacket {
    * If <tt>amsg</tt> is not an AM packet, the results of this command
    * are undefined.
    *
-   * @param  amsg   the packet
+   * @param  'message_t* ONE amsg'   the packet
    * @return        the AM type
    */
   
@@ -164,7 +144,7 @@ interface AMPacket {
    * sending. If <tt>amsg</tt> is not an AM packet, the results of
    * this command are undefined.
    * 
-   * @param  amsg    the packet
+   * @param  'message_t* ONE amsg'    the packet
    * @param  t       the AM type
    */
   
@@ -186,7 +166,7 @@ interface AMPacket {
    * nodes only receive packets whose AM group field matches their
    * own.
    *
-   * @param amsg the packet
+   * @param 'message_t* ONE amsg' the packet
    * @return the AM group of this packet
    */
   
@@ -197,7 +177,7 @@ interface AMPacket {
    * stacks will set this field automatically on a send request, which
    * may overwrite changes made with this command.
    *
-   * @param amsg the packet
+   * @param 'message_t* ONE amsg' the packet
    * @param group the packet's new AM group value
    */
   async command void setGroup(message_t* amsg, am_group_t grp);

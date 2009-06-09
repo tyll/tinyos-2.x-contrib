@@ -40,10 +40,8 @@ implementation
 	components new AMReceiverC(240) as AMReceiver;
 
 	components LedsC as LedsC;
-	components PrintfC;
 	components new TimerMilliC() as BenchmarkTimer;
 	components new TimerMilliC() as StartTimer;
-	
 	
 	App.Boot -> MainC;
 	App.Packet -> CC2420ActiveMessageC;
@@ -52,8 +50,6 @@ implementation
 	App.AMSender -> AMSender;
 	App.AMReceiver -> AMReceiver;
 	App.Leds -> LedsC;
-	App.PrintfFlush -> PrintfC;
-	App.PrintfControl -> PrintfC;
 	App.BenchmarkTimer -> BenchmarkTimer;
 	App.StartTimer -> StartTimer;
 

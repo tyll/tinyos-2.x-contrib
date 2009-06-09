@@ -34,8 +34,8 @@ interface AsyncReceive
 	 * A packet was received over the radio.  After it is processed,
 	 * <tt>updateBuffer</tt> should be called.
 	 *
-	 * @param msg the packet that was received
-	 * @param payload the packet's payload
+	 * @param 'message_t * ONE msg' the packet that was received
+	 * @param 'void * COUNT(len) payload' the packet's payload
 	 * @param len the packet's length
 	 */
 	async event void receive(message_t * msg, void * payload, uint8_t len);
@@ -46,26 +46,8 @@ interface AsyncReceive
 	 * the radio stack may do additional radio-specific event handling
 	 * here.
 	 *
-	 * @param msg the new message buffer to provide to the radio stack
+	 * @param 'message_t * ONE msg' the new message buffer to provide to the radio stack
 	 * (possibly the same one passed up from the <tt>receive</tt> event)
 	 */
 	command void updateBuffer(message_t * msg);
-
-	/**
-	 * Gets the packet's payload.  If <tt>len</tt> is not NULL, then it
-	 * will be overwritten with payload's length.
-	 *
-	 * @param msg the packet
-	 * @param len the location to store the packet's payload length
-	 * @return the packet's payload
-	 */
-	async command void * getPayload(message_t * msg, uint8_t * len);
-	
-	/**
-	 * Gets the packet's payload length.
-	 *
-	 * @param msg the packet
-	 * @return its payload length, in bytes
-	 */
-	async command uint8_t payloadLength(message_t * msg);
 }

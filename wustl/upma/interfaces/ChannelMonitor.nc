@@ -60,9 +60,9 @@ interface ChannelMonitor
   /**
    * Set the length of CCA checks.
    *
-   * @param ms the length of CCA checks, in 32 KHz increments
+   * @param length the length of CCA checks, in 32 KHz increments
    */
-  async command void setCheckLength(uint16_t ms);
+  async command void setCheckLength(uint16_t length);
 
   /**
    * Get the length of CCA checks.

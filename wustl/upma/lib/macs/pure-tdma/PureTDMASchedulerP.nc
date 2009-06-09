@@ -259,8 +259,8 @@ implementation {
 	/**
 	 * MISC functions
 	 */
-	async command void *Send.getPayload(message_t *msg) { 
-		return call SubSend.getPayload(msg); 
+	async command void *Send.getPayload(message_t * msg, uint8_t len) {
+		return call SubSend.getPayload(msg, len); 
 	}
 	
 	async command uint8_t Send.maxPayloadLength() {
@@ -268,12 +268,6 @@ implementation {
 	}
 	
 	//provide the receive interface
-	async command void *Receive.getPayload(message_t *msg, uint8_t *len) { 
-		return call SubReceive.getPayload(msg, len); 
-	}
-	async command uint8_t Receive.payloadLength(message_t *msg) { 
-		return call SubReceive.payloadLength(msg);
-	}	
 	command void Receive.updateBuffer(message_t * msg) { return call SubReceive.updateBuffer(msg); }
 	
 	default async event uint16_t CcaControl.getInitialBackoff[am_id_t id](message_t * msg, uint16_t defaultbackoff) {

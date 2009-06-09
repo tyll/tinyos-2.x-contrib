@@ -33,7 +33,7 @@
  */
 generic configuration VirtualizedAlarm32khz16C()
 {
-	provides interface Alarm<T32khz, uint16_t>;
+	provides interface Alarm<T32Khz, uint16_t>;
 }
 implementation
 {

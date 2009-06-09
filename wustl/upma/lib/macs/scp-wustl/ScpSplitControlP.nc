@@ -82,10 +82,12 @@ implementation
 	
 	event void RadioPowerControl.stopDone(error_t err)
 	{
+		// If we're busy powering everything down
 		if(call State.getState() == S_STOPPING)
 		{
 			call State.forceState(S_STOPPED);
 			signal SplitControl.stopDone(SUCCESS);
+			// Signal success
 		}
 	}
 }

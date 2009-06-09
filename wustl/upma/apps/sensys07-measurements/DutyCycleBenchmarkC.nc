@@ -21,13 +21,10 @@
  */
  
 /**
-/**                                             
- *
  * @author Greg Hackmann
  * @version $Revision$
  * @date $Date$
- */
- 
+ */ 
 module DutyCycleBenchmarkC
 {
 	uses interface Boot;
@@ -38,8 +35,6 @@ module DutyCycleBenchmarkC
 	uses interface CC2420Packet;
 	uses interface SplitControl;
 	uses interface LowPowerListening;
-	uses interface PrintfFlush;
-	uses interface SplitControl as PrintfControl;
 #ifdef SCP
 	uses interface Interval as SyncInterval;
 #endif
@@ -89,14 +84,9 @@ implementation
 		call SplitControl.start();
 	}
 	
-	event void SplitControl.startDone(error_t err)
-	{
-		call PrintfControl.start();
-	}
-
 	event void AMSender.sendDone(message_t * msg, error_t err)
 	{
-		uint8_t * payload = (uint8_t *)call Packet.getPayload(&packet, NULL);
+		uint8_t * payload = (uint8_t *)call Packet.getPayload(&packet, PACKET_LENGTH);
 		if(err == SUCCESS)
 		{
 			packetCount++;
@@ -111,9 +101,9 @@ implementation
 //			send();
 	}
 	
-	event void PrintfControl.startDone(error_t err)
+	event void SplitControl.startDone(error_t err)
 	{
-		memset(call Packet.getPayload(&packet, NULL), TOS_NODE_ID, PACKET_LENGTH);
+		memset(call Packet.getPayload(&packet, PACKET_LENGTH), TOS_NODE_ID, PACKET_LENGTH);
 		call CC2420Packet.setPower(&packet, 0);
 
 #ifdef SCP
@@ -140,7 +130,6 @@ implementation
 		return msg;
 	}
 
-	event void PrintfControl.stopDone(error_t err) { }
 	event void SplitControl.stopDone(error_t err) { }
 	
 //	message_t result;
@@ -152,12 +141,6 @@ implementation
 		printf("%lu\n", oscDutyCycle);
 		printf("%lu\n", radioDutyCycle);
 		printf("%lu\n%lu\n", radioStartCount, radioStopCount);
-		call PrintfFlush.flush();
-	}
-	
-	event void PrintfFlush.flushDone(error_t err)
-	{
-		if(err != SUCCESS)
-			post sendResult();
+		printfflush();
 	}
 }

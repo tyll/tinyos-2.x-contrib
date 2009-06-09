@@ -21,12 +21,10 @@
  */
  
 /**
- *
  * @author Greg Hackmann
  * @version $Revision$
  * @date $Date$
  */
-
 interface ScpSyncSender
 {
 	async command void sendSyncPacket();

@@ -21,7 +21,6 @@
  */
  
 /**
-/**                                             
  *
  * @author Octav Chipara
  * @version $Revision$

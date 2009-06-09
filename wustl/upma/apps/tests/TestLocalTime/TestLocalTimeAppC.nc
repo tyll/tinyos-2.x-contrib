@@ -37,8 +37,6 @@ implementation {
 
     App.Boot -> MainC;
     App.LocalTime -> LocalTimeC;
-	App.PrintfControl -> PrintfC;
-	App.PrintfFlush -> PrintfC;
 	App.Timer -> TimerMilliC;
 }
 

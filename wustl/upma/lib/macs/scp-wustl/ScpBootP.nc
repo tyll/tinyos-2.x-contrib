@@ -21,12 +21,10 @@
  */
  
 /**
- *
  * @author Greg Hackmann
  * @version $Revision$
  * @date $Date$
  */
-
 module ScpBootP
 {
 	provides interface AsyncSend as Send;
@@ -60,7 +58,6 @@ implementation
 		call AMPacket.setType(&boot, AM_SCPBOOTMSG);
 		call AMPacket.setSource(&boot, TOS_NODE_ID);
 		call AMPacket.setDestination(&boot, AM_BROADCAST_ADDR);
-		call AMPacket.setGroup(&boot, call AMPacket.localGroup());
 
 		call BootAlarm.start(call LowPowerListening.getLocalSleepInterval() * 2);
 		send();
@@ -123,9 +120,9 @@ implementation
 			signal Send.sendDone(msg, error);
 	}
 
-	async command void * Send.getPayload(message_t * msg)
+	async command void * Send.getPayload(message_t * msg, uint8_t len)
 	{
-		return call SubSend.getPayload(msg);
+		return call SubSend.getPayload(msg, len);
 	}
 	
 	async command uint8_t Send.maxPayloadLength()

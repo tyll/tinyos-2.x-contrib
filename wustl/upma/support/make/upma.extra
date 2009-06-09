@@ -1,0 +1,24 @@
+UPMA_RADIO ?= cc2420
+UPMA_MAC ?= nullmac
+UPMA_TOPOLOGY ?= nulltopology
+UPMA_LINK_ESTIMATOR ?= nullle
+
+UPMA_SUBCOMPONENTS := interfaces \
+	lib/alarm \
+	lib/linkEstimator \
+	lib/neighborTable \
+	lib/net/ctp \
+	lib/serial \
+	types \
+	system \
+	platforms/$(PLATFORM) \
+	chips/$(UPMA_RADIO) \
+	lib/topologies/$(UPMA_TOPOLOGY) \
+	lib/linkEstimator/$(UPMA_LINK_ESTIMATOR) \
+
+TOS_SUBCOMPONENTS = net net/ctp le
+
+CFLAGS += $(foreach i,$(UPMA_SUBCOMPONENTS), -I$(UPMA_DIR)/$(i))
+CFLAGS += $(foreach i,$(TOS_SUBCOMPONENTS), -I$(TOSROOT)/tos/lib/$(i))
+
+include $(UPMA_DIR)/support/make/$(UPMA_MAC).include

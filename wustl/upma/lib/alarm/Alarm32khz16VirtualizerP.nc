@@ -30,7 +30,7 @@
  */
 configuration Alarm32khz16VirtualizerP
 {
-	provides interface Alarm<T32khz, uint16_t>[uint8_t id];
+	provides interface Alarm<T32Khz, uint16_t>[uint8_t id];
 }
 implementation
 {
@@ -40,7 +40,7 @@ implementation
 	};
 	components new Alarm32khz16C();
 	
-	components new VirtualizeAlarmC(T32khz, uint16_t, COUNT) as Alarms;
+	components new VirtualizeAlarmC(T32Khz, uint16_t, COUNT) as Alarms;
 	Alarm = Alarms.Alarm;
 	Alarms.AlarmFrom -> Alarm32khz16C;
 }

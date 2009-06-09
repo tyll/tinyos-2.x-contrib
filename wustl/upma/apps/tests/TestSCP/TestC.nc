@@ -66,7 +66,7 @@ implementation
 	{
 		if(sends)
 		{
-			TestMsg * payload = (TestMsg *)call AMSend.getPayload(&msg);
+			TestMsg * payload = (TestMsg *)call AMSend.getPayload(&msg, sizeof(TestMsg));
 			payload->payload[0] = 'T';
 			payload->payload[1] = 'e';
 			payload->payload[2] = 's';

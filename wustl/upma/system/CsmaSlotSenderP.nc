@@ -21,7 +21,6 @@
  */
  
 /**
-/** 
  * The generic slot sender implements a generic slot as follows:
  * 
  *      start
@@ -158,8 +157,8 @@ generic module CsmaSlotSenderP(uint16_t offset, uint16_t backoff, uint16_t check
  		return call SubSend.cancel(msg);
  	}
  	
- 	async command void *Send.getPayload(message_t *msg) { 
-		return call SubSend.getPayload(msg); 
+ 	async command void *Send.getPayload(message_t *msg, uint8_t len) { 
+		return call SubSend.getPayload(msg, len); 
 	}
 	
 	async command uint8_t Send.maxPayloadLength() {

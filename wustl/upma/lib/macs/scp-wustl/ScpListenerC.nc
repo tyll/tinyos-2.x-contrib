@@ -21,12 +21,10 @@
  */
  
 /**
- *
  * @author Greg Hackmann
  * @version $Revision$
  * @date $Date$
  */
-
 configuration ScpListenerC
 {
 	provides interface AsyncReceive as Receive;

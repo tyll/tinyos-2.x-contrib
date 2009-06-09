@@ -46,8 +46,12 @@ generic module SerialActiveMessageP () {
 }
 implementation {
 
-  serial_header_t* getHeader(message_t* msg) {
-    return (serial_header_t*)(msg->data - sizeof(serial_header_t));
+   serial_header_t* ONE getHeader(message_t* ONE msg) {
+    return TCAST(serial_header_t* ONE, (uint8_t*)msg + offsetof(message_t, data) - sizeof(serial_header_t));
+  }
+
+  serial_metadata_t* getMetadata(message_t* msg) {
+    return (serial_metadata_t*)(msg->metadata);
   }
   
   command error_t AMSend.send[am_id_t id](am_addr_t dest,
@@ -74,8 +78,8 @@ implementation {
     return call Packet.maxPayloadLength();
   }
 
-  command void* AMSend.getPayload[am_id_t id](message_t* m) {
-    return call Packet.getPayload(m, NULL);
+  command void* AMSend.getPayload[am_id_t id](message_t* m, uint8_t len) {
+    return call Packet.getPayload(m, len);
   }
   
   event void SubSend.sendDone(message_t* msg, error_t result) {
@@ -89,21 +93,13 @@ implementation {
  default event message_t* Receive.receive[uint8_t id](message_t* msg, void* payload, uint8_t len) {
    return msg;
  }
- 
-  
-  command void* Receive.getPayload[am_id_t id](message_t* m, uint8_t* len) {
-    return call Packet.getPayload(m, len);
-  }
-
-  command uint8_t Receive.payloadLength[am_id_t id](message_t* m) {
-    return call Packet.payloadLength(m);
-  }
   
   event message_t* SubReceive.receive(message_t* msg, void* payload, uint8_t len) {
     return signal Receive.receive[call AMPacket.type(msg)](msg, msg->data, len);
   }
 
   command void Packet.clear(message_t* msg) {
+    memset(getHeader(msg), 0, sizeof(serial_header_t));
     return;
   }
 
@@ -120,11 +116,13 @@ implementation {
     return TOSH_DATA_LENGTH;
   }
   
-  command void* Packet.getPayload(message_t* msg, uint8_t* len) {
-    if (len != NULL) { 
-      *len = call Packet.payloadLength(msg);
+  command void* Packet.getPayload(message_t* msg, uint8_t len) {
+    if (len > call Packet.maxPayloadLength()) { 
+      return NULL;
     }
-    return msg->data;
+    else {
+      return (void * COUNT_NOK(len))msg->data;
+    }
   }
 
   async command am_addr_t AMPacket.address() {

@@ -1,0 +1,2 @@
+TOSMAKE_PATH += $(UPMA_DIR)/support/make
+GOALS += upma

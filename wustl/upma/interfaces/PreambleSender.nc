@@ -33,7 +33,7 @@ interface PreambleSender
 	/**
 	 * Sends a preamble.
 	 *
-	 * @param msg the packet to use for the preamble
+	 * @param 'message_t * ONE msg' the packet to use for the preamble
 	 * @param len the length of the preamble packet
 	 * @param ms how long to send the preamble, in milliseconds
 	 * @param useCca whether to use a CCA check before sending the preamble
@@ -43,7 +43,7 @@ interface PreambleSender
 	/**
 	 * The preamble is complete.
 	 *
-	 * @param msg the packet used for the preamble
+	 * @param 'message_t * ONE msg' the packet used for the preamble
 	 * @param err whether the send was successful
 	 */
 	async event void preambleDone(message_t * msg, error_t err);
@@ -51,7 +51,7 @@ interface PreambleSender
 	/**
 	 * The next preamble packet is about to be sent.
 	 *
-	 * @param msg the packet used for the preamble
+	 * @param 'message_t * ONE msg' the packet used for the preamble
 	 * @return <tt>DO_NOT_RESEND</tt> (cancel the preamble),
 	 * <tt>RESEND_WITH_CCA</tt> (send the next packet with a CCA check),
 	 * or <tt>RESEND_WITHOUT_CCA</tt> (send the next packet without a CCA check)

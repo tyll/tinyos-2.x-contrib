@@ -42,8 +42,6 @@ generic module SendingC(uint16_t interval, bool sends)
 		interface Timer<TMilli> as StartTimer;
 		interface Counter<T32khz, uint32_t> as Counter;
 		interface SplitControl;
-		interface SplitControl as PrintfSplitControl;
-		interface PrintfFlush;
 
 		interface HplMsp430GeneralIO as Pin;
 		interface HplMsp430GeneralIO as RcvPin;
@@ -88,15 +86,8 @@ implementation
 		packetsReceived  = 0;
 		latency = 0;
 		post sendTask();
-		call PrintfSplitControl.start();
-	}
-	
-	event void PrintfSplitControl.startDone(error_t error) {
 		call FlushTimer.startPeriodic(250);
 		call SplitControl.start();
-	}
-	
-	event void PrintfSplitControl.stopDone(error_t error) {
 	}
 	
 	
@@ -116,15 +107,19 @@ implementation
 			post sendTask();
 		}
 	}
+	
+	task void flush() {
+		printfflush();
+	}
 
 	async event void Counter.overflow() {
 		printf("Overflow");
-		call PrintfFlush.flush();	
+		post flush();
 	}
 	
 	event void FlushTimer.fired() {
 		//call Leds.led2Toggle();
-		call PrintfFlush.flush();
+		printfflush();
 	}
 	
 	event void SendTimer.fired()
@@ -141,7 +136,7 @@ implementation
 	
 	event void SplitControl.startDone(error_t err)
 	{	
-		nodeId = (uint8_t *)call Packet.getPayload(&packet, NULL);
+		nodeId = (uint8_t *)call Packet.getPayload(&packet, sizeof(uint8_t));
 		*nodeId = TOS_NODE_ID;
 
 		//printf("starting");
@@ -154,9 +149,6 @@ implementation
 
 	event void SplitControl.stopDone(error_t err)
 	{
-	}
-	
-	event void PrintfFlush.flushDone(error_t error) {
 	}
 	
 	event void StartTimer.fired()
@@ -173,7 +165,7 @@ implementation
 		packetsSent = 0;
 		packetsReceived  = 0;
 		latency = 0;
-		call PrintfFlush.flush();		
+		printfflush();
 	}
 	
 }

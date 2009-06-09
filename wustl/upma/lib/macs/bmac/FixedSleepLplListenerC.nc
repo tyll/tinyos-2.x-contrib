@@ -21,13 +21,10 @@
  */
  
 /**
-/**                                             
- *
  * @author Greg Hackmann
  * @version $Revision$
  * @date $Date$
  */
-
 configuration FixedSleepLplListenerC
 {
 	provides interface AsyncReceive as Receive;

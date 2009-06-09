@@ -145,7 +145,7 @@ implementation {
 		signal SplitControl.stopDone(error);
 		//call Leds.led2Off();
 	}
- 	
+	
  	/****************************
  	 *   Implements the schedule
  	 */ 	
@@ -304,21 +304,15 @@ implementation {
 	/**
 	 * MISC functions
 	 */
-	async command void *Send.getPayload(message_t *msg) { 
-		return call SubSend_TDMA.getPayload(msg); 
+	async command void *Send.getPayload(message_t *msg, uint8_t len) { 
+		return call SubSend_TDMA.getPayload(msg, len); 
 	}
 	
 	async command uint8_t Send.maxPayloadLength() {
 		return call SubSend_TDMA.maxPayloadLength();
 	}
 	
-	//provide the receive interface
-	async command void *Receive.getPayload(message_t *msg, uint8_t *len) { 
-		return call SubReceive.getPayload(msg, len); 
-	}
-	async command uint8_t Receive.payloadLength(message_t *msg) { 
-		return call SubReceive.payloadLength(msg);
-	}	
+	//provide the receive interface	
 	command void Receive.updateBuffer(message_t * msg) { return call SubReceive.updateBuffer(msg); }
 	
 	default async event uint16_t CcaControl.getInitialBackoff[am_id_t id](message_t * msg, uint16_t defaultbackoff) {

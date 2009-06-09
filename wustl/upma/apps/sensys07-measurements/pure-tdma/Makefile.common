@@ -1,6 +1,5 @@
-CFLAGS += -I$(UPMA_DIR)/lib/macs/pure-tdma \
-	  -DFOOTER_SIZE=0 \
-	  -DTDMA
+CFLAGS += -DFOOTER_SIZE=0 -DTDMA
+UPMA_MAC = pure-tdma
 UPMA = 1
 
 include ../../Makefile.common

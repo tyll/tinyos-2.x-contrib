@@ -85,8 +85,8 @@ module SenderDispatcherP {
  		return FAIL;
  	}
  	
- 	async command void *Send.getPayload[uint8_t slotType](message_t *msg) { 
-		return call SubSend.getPayload(msg); 
+ 	async command void *Send.getPayload[uint8_t slotType](message_t *msg, uint8_t len) { 
+		return call SubSend.getPayload(msg, len); 
 	}
 	
 	async command uint8_t Send.maxPayloadLength[uint8_t slotType]() {

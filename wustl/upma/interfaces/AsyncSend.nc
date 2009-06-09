@@ -31,7 +31,7 @@ interface AsyncSend
 	/**
 	 * Sends a packet over the radio, in split-control fashion.
 	 *
-	 * @param msg the packet to send
+	 * @param 'message_t * ONE msg' the packet to send
 	 * @param len the packet's length
 	 * @return <tt>SUCCESS</tt> if the packet was buffered;
 	 * <tt>EOFF</tt> if the radio is off; or <tt>FAIL</tt> if the request could
@@ -41,7 +41,7 @@ interface AsyncSend
 	/**
 	 * The packet sending operation has completed.
 	 *
-	 * @param msg the packet that has been completely processed
+	 * @param 'message_t * ONE msg' the packet that has been completely processed
 	 * @param error <tt>SUCCESS</tt> if the packet was successfully
 	 * sent over the radio, or <tt>FAIL</tt> otherwise
 	 */
@@ -50,7 +50,7 @@ interface AsyncSend
 	/**
 	 * Attempts to cancel a packet transmission.
 	 *
-	 * @param msg the packet to cancel
+	 * @param 'message_t * ONE msg' the packet to cancel
 	 * @return whether the cancellation succeeded
 	 */
 	async command error_t cancel(message_t * msg);
@@ -65,8 +65,8 @@ interface AsyncSend
 	/**
 	 * Gets the packet payload.
 	 *
-	 * @param msg the packet
-	 * @return the packet's payload
+	 * @param 'message_t * ONE msg' the packet
+	 * @return 'void * COUNT_NOK(len)' the packet's payload
 	 */
-	async command void * getPayload(message_t * msg);
+	async command void * getPayload(message_t * msg, uint8_t len);
 }

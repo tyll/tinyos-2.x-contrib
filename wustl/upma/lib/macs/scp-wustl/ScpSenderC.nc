@@ -48,7 +48,6 @@ implementation
 {
 	components ScpSenderP;
 	components PreambleSenderC as Sender; 
-	components LedsC;
 	components RandomC;
 	components new VirtualizedAlarmMilli16C() as PreambleAlarm;
 	components new VirtualizedAlarmMilli16C() as AdaptiveAlarm;
@@ -63,7 +62,6 @@ implementation
 	ScpSenderP.SendState = SendState;
 	ScpSenderP.SendAlarm = SendAlarm;
 	ScpSenderP.AdaptiveAlarm -> AdaptiveAlarm;
-	ScpSenderP.Leds -> LedsC;
 	ScpSenderP.AMPacket = AMPacket;
 	ScpSenderP.SubLpl = SubLpl;
 	ScpSenderP.Random -> RandomC;

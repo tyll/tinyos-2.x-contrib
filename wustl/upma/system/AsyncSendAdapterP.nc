@@ -26,14 +26,14 @@
  *
  * @author Greg Hackmann
  */
-module AsyncSendAdapterP
+module AsyncSendAdapterP @safe()
 {
 	provides interface Send;
 	uses interface AsyncSend;
 }
 implementation
 {
-	message_t * msg_;
+	message_t * ONE_NOK msg_;
 	uint8_t len_;
 	
 	task void sendDone_task();
@@ -79,8 +79,8 @@ implementation
 		return call AsyncSend.maxPayloadLength();
 	}
 	
-	command void * Send.getPayload(message_t * msg)
+	command void * Send.getPayload(message_t * msg, uint8_t len)
 	{
-		return call AsyncSend.getPayload(msg);
+		return call AsyncSend.getPayload(msg, len);
 	}
 }

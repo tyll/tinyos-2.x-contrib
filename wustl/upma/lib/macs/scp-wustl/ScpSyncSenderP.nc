@@ -70,7 +70,7 @@ implementation
 
 	void addSyncFooter(message_t * msg, uint8_t len)
 	{
-		ScpSyncMsg * syncMsg = (ScpSyncMsg *)(call SubSend.getPayload(msg) + len);
+		ScpSyncMsg * syncMsg = (ScpSyncMsg *)(call SubSend.getPayload(msg, len + sizeof(ScpSyncMsg)) + len);
 		// Point to the sync message at the end of the payload
 		uint16_t timeLeft = call LplAlarm.getAlarm(), now = call LplAlarm.getNow();
 		// Get the alarm's contents
@@ -92,9 +92,9 @@ implementation
 		// Apply the sync footer and send the message
 	}
 
-	async command void * Send.getPayload(message_t * msg)
+	async command void * Send.getPayload(message_t * msg, uint8_t len)
 	{
-		return call SubSend.getPayload(msg);
+		return call SubSend.getPayload(msg, len);
 	}
 	
 	async command error_t Send.cancel(message_t * msg)
@@ -112,7 +112,6 @@ implementation
 		call AMPacket.setType(&sync, AM_SCPSYNCMSG);
 		call AMPacket.setSource(&sync, TOS_NODE_ID);
 		call AMPacket.setDestination(&sync, AM_BROADCAST_ADDR);
-		call AMPacket.setGroup(&sync, call AMPacket.localGroup());
 		call Send.send(&sync, call AMPacket.headerSize());
 		// Create an explicit sync message with no payload, and pass
 		// it through our normal sending routines

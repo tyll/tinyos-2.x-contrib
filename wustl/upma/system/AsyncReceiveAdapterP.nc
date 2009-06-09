@@ -68,14 +68,4 @@ implementation
 		// Tell the upper layer the message is here, then tell the lower layer
 		// about the new buffer
 	}
-	
-	command void * Receive.getPayload(message_t * msg, uint8_t * len)
-	{
-		return call AsyncReceive.getPayload(msg, len);
-	}
-	
-	command uint8_t Receive.payloadLength(message_t * msg)
-	{
-		return call AsyncReceive.payloadLength(msg);
-	}
 }

@@ -55,8 +55,6 @@ implementation
 	App.Boot -> MainC;
 	
 	App.FlushTimer -> FlushTimerC;
-	App.PrintfFlush ->PrintfC;
-	App.PrintfSplitControl -> PrintfC;
 	App.Boot -> MainC;
 	App.Leds -> LedsC;
 	App.AMSender -> AMSender;

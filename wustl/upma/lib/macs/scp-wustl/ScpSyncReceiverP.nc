@@ -31,6 +31,7 @@
 module ScpSyncReceiverP
 {
 	provides interface AsyncReceive as Receive;
+	provides interface Packet;
 	
 	uses interface ScpSyncSender;
 	uses interface State as SendState;
@@ -38,6 +39,7 @@ module ScpSyncReceiverP
 	uses interface Alarm<TMilli, uint16_t> as LplAlarm;
 	uses interface Alarm<TMilli, uint16_t> as SendAlarm;
 	uses interface AMPacket;
+	uses interface Packet as SubPacket;
 	uses interface AsyncStdControl as ScpBoot;
 }
 implementation
@@ -111,24 +113,41 @@ implementation
 		// For all non-sync messages, push the event (minus the footer) up to
 		// the upper layer
 	}
-	
-	async command void * Receive.getPayload(message_t * msg, uint8_t * len)
-	{
-		return call SubReceive.getPayload(msg, len);
-	}
-	
-	async command uint8_t Receive.payloadLength(message_t * msg)
-	{
-		if(call AMPacket.type(msg) == AM_PREAMBLEPACKET)
-			return call SubReceive.payloadLength(msg);
 		
-		return call SubReceive.payloadLength(msg) - sizeof(ScpSyncMsg);
-		// Ignore the footer when calculating the payload size
-	}
-	
 	command void Receive.updateBuffer(message_t * msg)
 	{
 		call SubReceive.updateBuffer(msg);
+	}
+	
+	command void * Packet.getPayload(message_t * msg, uint8_t len)
+	{
+		return call Packet.getPayload(msg, len);
+	}
+
+	command void Packet.clear(message_t * msg)
+	{
+		call SubPacket.clear(msg);
+	}
+
+	command uint8_t Packet.payloadLength(message_t * msg)
+	{
+		if(call AMPacket.type(msg) == AM_PREAMBLEPACKET)
+			return call SubPacket.payloadLength(msg);
+		
+		return call SubPacket.payloadLength(msg) - sizeof(ScpSyncMsg);
+	}
+
+	command void Packet.setPayloadLength(message_t * msg, uint8_t len)
+	{
+		if(call AMPacket.type(msg) == AM_PREAMBLEPACKET)
+			call SubPacket.setPayloadLength(msg, len);
+		else
+			call SubPacket.setPayloadLength(msg, len + sizeof(ScpSyncMsg));
+	}
+	
+	command uint8_t Packet.maxPayloadLength()
+	{
+		return call SubPacket.maxPayloadLength() - sizeof(ScpSyncMsg);
 	}
 	
 	async event void LplAlarm.fired()

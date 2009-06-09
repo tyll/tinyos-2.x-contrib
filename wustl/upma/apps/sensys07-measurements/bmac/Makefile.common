@@ -1,7 +1,6 @@
 CFLAGS += -DFOOTER_SIZE=0
 MAX_LPL_CCA_CHECKS=80
-
-CFLAGS += -I$(UPMA_DIR)/lib/macs/bmac
-UPMA=1
+UPMA_MAC = bmac
+UPMA = 1
 
 include ../../Makefile.common

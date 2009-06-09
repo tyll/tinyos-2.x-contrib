@@ -21,12 +21,10 @@
  */
  
 /**
- *
  * @author Greg Hackmann
  * @version $Revision$
  * @date $Date$
  */
-
 module BmacListenerQueueP
 {
 	provides interface AsyncReceive as Receive;
@@ -35,6 +33,7 @@ module BmacListenerQueueP
 	uses interface AsyncReceive as SubReceive;
 	uses interface RadioPowerControl;
 	uses interface State as SendState;
+	uses interface Packet;
 	uses interface AMPacket;
 	uses interface ChannelMonitor;
 }
@@ -47,17 +46,9 @@ implementation
 	
 	bool msgQueued;
 	message_t queuedMsg;
+	void * ONE_NOK queuedPayload;
+	uint8_t queuedLength;
 	uint16_t invalidMessages = 0;
-	
-	async command void * Receive.getPayload(message_t * msg, uint8_t * len)
-	{
-		return call SubReceive.getPayload(msg, len);
-	}
-
-	async command uint8_t Receive.payloadLength(message_t * msg)
-	{
-		return call SubReceive.payloadLength(msg);
-	}
 	
 	command void Receive.updateBuffer(message_t * msg)
 	{
@@ -74,8 +65,11 @@ implementation
 		atomic queued = msgQueued;
 		if(queued)
 		{
-			payload = call SubReceive.getPayload(&queuedMsg, NULL);
-			length = call SubReceive.payloadLength(&queuedMsg);
+			atomic
+			{
+				payload = queuedPayload;
+				length = queuedLength;
+			}
 			signal Receive.receive(&queuedMsg, payload, length);
 			atomic msgQueued = FALSE;
 		}
@@ -104,7 +98,7 @@ implementation
 		post detectReceiveDone();
 	}
 	
-	message_t * msg_;
+	message_t * ONE_NOK msg_;
 	
 	task void updateBuffer()
 	{
@@ -138,6 +132,8 @@ implementation
 			if(!msgQueued)
 			{
 				memcpy(&queuedMsg, msg, sizeof(message_t));
+				queuedPayload = payload;
+				queuedLength = len;
 				msgQueued = TRUE;
 			}
 		}

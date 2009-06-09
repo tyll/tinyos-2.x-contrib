@@ -65,10 +65,6 @@ implementation
 	App.StartTimer -> StartTimer;
 //	App.LedTimer -> LedTimer;
 	
-	components PrintfC;
-	App.PrintfControl -> PrintfC;
-	App.PrintfFlush -> PrintfC;
-	
 	App.Counter -> Counter;
 	
 #ifdef UPMA

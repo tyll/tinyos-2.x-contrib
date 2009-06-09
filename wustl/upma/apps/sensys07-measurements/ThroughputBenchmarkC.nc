@@ -37,8 +37,6 @@ module ThroughputBenchmarkC
 	uses interface CC2420Packet;
 	uses interface SplitControl;
 	uses interface LowPowerListening;
-	uses interface PrintfFlush;
-	uses interface SplitControl as PrintfControl;
 #ifdef SCP
 	uses interface Interval as SyncInterval;
 #endif
@@ -85,14 +83,9 @@ implementation
 		call SplitControl.start();
 	}
 	
-	event void SplitControl.startDone(error_t err)
-	{
-		call PrintfControl.start();
-	}
-
 	event void AMSender.sendDone(message_t * msg, error_t err)
 	{
-		uint8_t * payload = (uint8_t *)call Packet.getPayload(&packet, NULL);
+		uint8_t * payload = (uint8_t *)call Packet.getPayload(&packet, PACKET_LENGTH);
 		if(err == SUCCESS)
 		{
 			packetCount++;
@@ -107,9 +100,9 @@ implementation
 //			post sendResult();
 	}
 	
-	event void PrintfControl.startDone(error_t err)
+	event void SplitControl.startDone(error_t err)
 	{
-		memset(call Packet.getPayload(&packet, NULL), TOS_NODE_ID, PACKET_LENGTH);
+		memset(call Packet.getPayload(&packet, PACKET_LENGTH), TOS_NODE_ID, PACKET_LENGTH);
 		call CC2420Packet.setPower(&packet, 0);
 
 #ifdef SCP
@@ -133,7 +126,6 @@ implementation
 		return msg;
 	}
 
-	event void PrintfControl.stopDone(error_t err) { }
 	event void SplitControl.stopDone(error_t err) { }
 	
 //	message_t result;
@@ -142,20 +134,12 @@ implementation
 	{
 		call Leds.led0On();
 		printf("%u\n", packetCount);
-//		call SerialDebug.print("Done", packetCount);
-		call PrintfFlush.flush();
-//		call SerialDebug.flush();
+		printfflush();
 	}
 	
 	event void BenchmarkTimer.fired()
 	{
 		if(TOS_NODE_ID == RECEIVER)
-			post sendResult();
-	}
-	
-	event void PrintfFlush.flushDone(error_t err)
-	{
-		if(err != SUCCESS)
 			post sendResult();
 	}
 }

@@ -59,13 +59,15 @@
  
 #include "CC2420.h"
 
-module CC2420ActiveMessageP {
+module CC2420ActiveMessageP @safe() {
   provides {
     interface AMSend[am_id_t id];
     interface Receive[am_id_t id];
     interface Receive as Snoop[am_id_t id];
     interface AMPacket;
     interface Packet;
+    interface CcaControl[am_id_t id];
+    interface SendNotifier[am_id_t id];
   }
   uses {
     interface Send as SubSend;
@@ -74,13 +76,10 @@ module CC2420ActiveMessageP {
     interface CC2420PacketBody;
     interface CC2420Config;
     interface ActiveMessageAddress;
+    interface CcaControl as SubCcaControl[am_id_t id];
   }
 }
 implementation {
-
-  enum {
-    CC2420_SIZE = MAC_HEADER_SIZE + MAC_FOOTER_SIZE,
-  };
   
   /***************** AMSend Commands ****************/
   command error_t AMSend.send[am_id_t id](am_addr_t addr,
@@ -90,8 +89,11 @@ implementation {
     header->type = id;
     header->dest = addr;
     header->destpan = call CC2420Config.getPanAddr();
+    header->src = call AMPacket.address();
     
-    return call SubSend.send( msg, len + CC2420_SIZE );
+    signal SendNotifier.aboutToSend[id](addr, msg);
+    
+    return call SubSend.send( msg, len );
   }
 
   command error_t AMSend.cancel[am_id_t id](message_t* msg) {
@@ -102,26 +104,8 @@ implementation {
     return call Packet.maxPayloadLength();
   }
 
-  command void* AMSend.getPayload[am_id_t id](message_t* m) {
-    return call Packet.getPayload(m, NULL);
-  }
-
-  /***************** Receive Commands ****************/
-  command void* Receive.getPayload[am_id_t id](message_t* m, uint8_t* len) {
+  command void* AMSend.getPayload[am_id_t id](message_t* m, uint8_t len) {
     return call Packet.getPayload(m, len);
-  }
-
-  command uint8_t Receive.payloadLength[am_id_t id](message_t* m) {
-    return call Packet.payloadLength(m);
-  }
-  
-  /***************** Snoop Commands ****************/
-  command void* Snoop.getPayload[am_id_t id](message_t* m, uint8_t* len) {
-    return call Packet.getPayload(m, len);
-  }
-
-  command uint8_t Snoop.payloadLength[am_id_t id](message_t* m) {
-    return call Packet.payloadLength(m);
   }
 
   /***************** AMPacket Commands ****************/
@@ -178,11 +162,13 @@ implementation {
   }
   
   async command uint8_t AMPacket.headerSize() {
-    return sizeof(cc2420_header_t);
+    return CC2420_SIZE;
   }
 
   /***************** Packet Commands ****************/
   command void Packet.clear(message_t* msg) {
+    memset(call CC2420PacketBody.getHeader(msg), 0x0, sizeof(cc2420_header_t));
+    memset(call CC2420PacketBody.getMetadata(msg), 0x0, sizeof(cc2420_metadata_t));
   }
   
   command uint8_t Packet.payloadLength(message_t* msg) {
@@ -197,11 +183,8 @@ implementation {
     return TOSH_DATA_LENGTH;
   }
   
-  command void* Packet.getPayload(message_t* msg, uint8_t* len) {
-    if (len != NULL) {
-      *len = call Packet.payloadLength(msg);
-    }
-    return msg->data;
+  command void* Packet.getPayload(message_t* msg, uint8_t len) {
+    return call SubSend.getPayload(msg, len);
   }
 
   
@@ -213,14 +196,33 @@ implementation {
   
   /***************** SubReceive Events ****************/
   event message_t* SubReceive.receive(message_t* msg, void* payload, uint8_t len) {
+    
+    if(!(call CC2420PacketBody.getMetadata(msg))->crc) {
+      return msg;
+    }
+    
     if (call AMPacket.isForMe(msg)) {
-      return signal Receive.receive[call AMPacket.type(msg)](msg, payload, len - CC2420_SIZE);
+      return signal Receive.receive[call AMPacket.type(msg)](msg, payload, len);
     }
     else {
-      return signal Snoop.receive[call AMPacket.type(msg)](msg, payload, len - CC2420_SIZE);
+      return signal Snoop.receive[call AMPacket.type(msg)](msg, payload, len);
     }
   }
   
+  /***************** CcaControl Events ****************/
+  async event uint16_t SubCcaControl.getInitialBackoff[am_id_t amId](message_t * msg, uint16_t defaultBackoff) {
+  	return signal CcaControl.getInitialBackoff[(TCAST(cc2420_header_t* ONE,
+        (uint8_t*)msg + offsetof(message_t, data) - sizeof(cc2420_header_t)))->type](msg, defaultBackoff);
+  }
+  
+  async event uint16_t SubCcaControl.getCongestionBackoff[am_id_t amId](message_t * msg, uint16_t defaultBackoff) {
+  	return signal CcaControl.getCongestionBackoff[(TCAST(cc2420_header_t* ONE,
+        (uint8_t*)msg + offsetof(message_t, data) - sizeof(cc2420_header_t)))->type](msg, defaultBackoff);
+  }
+  
+  async event bool SubCcaControl.getCca[am_id_t amId](message_t * msg, bool defaultValue) {
+  	return signal CcaControl.getCca[amId](msg, defaultValue);
+  }
 
   /***************** ActiveMessageAddress Events ****************/
   async event void ActiveMessageAddress.changed() {
@@ -240,7 +242,21 @@ implementation {
   }
 
   default event void AMSend.sendDone[uint8_t id](message_t* msg, error_t err) {
-    return;
   }
 
+  default event void SendNotifier.aboutToSend[am_id_t amId](am_addr_t addr, message_t *msg) {
+  }
+
+  default async event uint16_t CcaControl.getInitialBackoff[am_id_t amId](message_t * msg, uint16_t defaultBackoff) {
+  	return defaultBackoff;
+  }
+  
+  default async event uint16_t CcaControl.getCongestionBackoff[am_id_t amId](message_t * msg, uint16_t defaultBackoff) {
+  	return defaultBackoff;
+  }
+  
+  default async event bool CcaControl.getCca[am_id_t amId](message_t * msg, bool defaultValue) {
+  	return defaultValue;
+  }
+  
 }

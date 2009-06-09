@@ -153,9 +153,9 @@ implementation
 		return call SubSend.maxPayloadLength();
 	}
 	
-	async command void * Send.getPayload(message_t * msg)
+	async command void * Send.getPayload(message_t * msg, uint8_t len)
 	{
-		return call SubSend.getPayload(msg);
+		return call SubSend.getPayload(msg, len);
 	}
 	
 	void signalPreambleDone(message_t * msg, error_t err)
@@ -172,9 +172,10 @@ implementation
 	{
 		uint8_t state;
 		uint16_t ms;
+		bool running;
 		
 		state = call PreambleState.getState();
-		ms = ms_;
+		atomic ms = ms_;
 		
 		switch(state)
 		{
@@ -186,7 +187,8 @@ implementation
 			// case.
 		case S_LPL_SENDING:
 			// If we're still supposed to send preambles
-			if(call PreambleAlarm.isRunning())
+			atomic running = call PreambleAlarm.isRunning();
+			if(running)
 			{
 				resend_result_t result = signal PreambleSender.resendPreamble(msg);
 				if(result == DO_NOT_RESEND)

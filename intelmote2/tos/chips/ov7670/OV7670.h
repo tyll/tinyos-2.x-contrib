@@ -23,6 +23,9 @@
 #define QCIF_WIDTH      176
 #define QCIF_HEIGHT     144
 
+#define SIZE_VGA      0
+#define SIZE_QVGA     1
+
 #define ENABLE	1
 #define DISABLE	0
 /*

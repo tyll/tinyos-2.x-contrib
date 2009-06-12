@@ -50,32 +50,32 @@ public class CameraGUI implements MessageListener, Messenger {
     JTextField fieldInterval;	// The requested check interval
 
     /* The checkboxes for the requested settings */
-    JCheckBox clearAfterSave, isColor, isCompression;
+    JCheckBox clearAfterSave, isColor, isVga, isCompression;
 
     public CameraGUI(boolean connect) {
-		try {
-	    	guiInit();
-		}
-		catch(Exception e) {
-		    e.printStackTrace();
-		    System.exit(2);
-		}
-		if (!connect)
-			return;
-		
-		try {
-		    /* Setup communication with the mote and request a messageReceived
-		       callback when an AlertMsg is received */
-		    System.out.print("connecting to serial forwarder: failed");
-		    mote = new MoteIF(this);
-			System.out.println("\b\b\b\b\b\bok    ");
-		    mote.registerListener(new Bigmsg_frame_partMsg(), this);
-		    mote.registerListener(new ImgStatMsg(), this);
-		}
-		catch(Exception e) {
-		    e.printStackTrace();
-		    System.exit(2);
-		}
+	try {
+	    guiInit();
+	}
+	catch(Exception e) {
+	    e.printStackTrace();
+	    System.exit(2);
+	}
+	if (!connect)
+	    return;
+
+	try {
+	    /* Setup communication with the mote and request a messageReceived
+	       callback when an AlertMsg is received */
+	    System.out.print("connecting to serial forwarder: failed");
+	    mote = new MoteIF(this);
+	    System.out.println("\b\b\b\b\b\bok    ");
+	    mote.registerListener(new Bigmsg_frame_partMsg(), this);
+	    mote.registerListener(new ImgStatMsg(), this);
+	}
+	catch(Exception e) {
+	    e.printStackTrace();
+	    System.exit(2);
+	}
     }
 
     /* Build up the GUI using Swing magic. Nothing very exciting here - the
@@ -101,6 +101,9 @@ public class CameraGUI implements MessageListener, Messenger {
 	c.fill = GridBagConstraints.HORIZONTAL;
 	c.gridwidth = GridBagConstraints.REMAINDER;
 	isColor = buttonPanel.makeCheckBox("Color Image", false);
+	c.fill = GridBagConstraints.HORIZONTAL;
+	c.gridwidth = GridBagConstraints.REMAINDER;
+	isVga = buttonPanel.makeCheckBox("VGA", false);
 	c.fill = GridBagConstraints.HORIZONTAL;
 	c.gridwidth = GridBagConstraints.REMAINDER;
 	isCompression = buttonPanel.makeCheckBox("Jpeg", false);
@@ -153,136 +156,133 @@ public class CameraGUI implements MessageListener, Messenger {
 				      JOptionPane.ERROR_MESSAGE);
     }
 
-    final static int MAX_X = 320;
-    final static int MAX_Y = 240;
+    int max_x;
+    int max_y;
     
     ArrayList<short[]> data = new ArrayList<short[]>();
     
     long currentTime;
     
-    public void getImage() { 
-    	currentTime=System.currentTimeMillis();
-		CmdMsg smsg = new CmdMsg();
+    public void getImage() {
+    	currentTime = System.currentTimeMillis();
+	CmdMsg smsg = new CmdMsg();
+	int cs = 0;
 	
-		/* Build and send command message */
-		if (     !isColor.isSelected() && !isCompression.isSelected())
-		    smsg.set_cmd((short)0);
-		else if ( isColor.isSelected() && !isCompression.isSelected())
-		    smsg.set_cmd((short)1);
-		else if (!isColor.isSelected() && isCompression.isSelected())
-		    smsg.set_cmd((short)2);
-		else if ( isColor.isSelected() && isCompression.isSelected())
-		    smsg.set_cmd((short)3);
-		try {
-		    mote.send(MoteIF.TOS_BCAST_ADDR, smsg);
-		}
-		catch (IOException e) {
-		    error("Cannot send message to mote");
-		}
+	/* Build and send command message */
+	if (isColor.isSelected()) {
+	    cs = cs | 0x01;
+	}
+	if (isVga.isSelected()) {
+	    cs = cs | 0x02;
+	    max_x = 640;
+	    max_y = 480;
+	} else {
+	    max_x = 320;
+	    max_y = 240;
+	}
+	if (isCompression.isSelected()) {
+	    cs = cs | 0x04;
+	}
+	smsg.set_cmd((short)cs);
+	try {
+	    mote.send(MoteIF.TOS_BCAST_ADDR, smsg);
+	}
+	catch (IOException e) {
+	    error("Cannot send message to mote");
+	}
     }
 
-    public void save(){
-    	try{
-	    	String file_name;
-			file_name = fieldInterval.getText()+"picture_" + System.currentTimeMillis();
-	    	if (isCompression.isSelected())
-	    		file_name += ".bytes";
-	    	else if (!isColor.isSelected())
-				file_name += ".pgm";
-	    	else
-	    		file_name += ".ppm";
-		    FileOutputStream fostr=null;
-			try{
-				fostr=new FileOutputStream(file_name);
-			}
-			catch (Exception e){
-				message("Can't write "+file_name+" file!\nMake sure the dir exists!\n");
-				return;
-			};
-				
-			
-    		DataOutputStream stream = null;
-    		OutputStreamWriter writer = null;
-	    	String pgmHeader =  "P2\r\n" +
-	    						MAX_X+" "+MAX_Y+"\r\n"+
-	        					"255\r\n";
-	    	String ppmHeader =  "P3\r\n" +
-	    						MAX_X+" "+MAX_Y+"\r\n"+
-								"63\r\n";
+    public void save() {
+    	try {
+	    String file_name;
+	    file_name = fieldInterval.getText() + "picture_" + System.currentTimeMillis();
+	    if (isCompression.isSelected())
+		file_name += ".bytes";
+	    else if (!isColor.isSelected())
+		file_name += ".pgm";
+	    else
+		file_name += ".ppm";
+	    FileOutputStream fostr = null;
+	    try {
+		fostr = new FileOutputStream(file_name);
+	    }
+	    catch (Exception e){
+		message("Can't write " + file_name + " file!\nMake sure the dir exists!\n");
+		return;
+	    };		
+	
+	    DataOutputStream stream = null;
+	    OutputStreamWriter writer = null;
+	    String pgmHeader =  "P2\r\n" + max_x + " " + max_y + "\r\n" + "255\r\n";
+	    String ppmHeader =  "P3\r\n" + max_x + " " + max_y + "\r\n" + "255\r\n";
 	    		
-	    	if (isCompression.isSelected())
-	    		stream = new DataOutputStream(fostr);
-	    	else
-	    	{
-	    		writer = new OutputStreamWriter(fostr);
-		    	if (!isColor.isSelected())
-		    		writer.write(pgmHeader);
-		    	else
-		    		writer.write(ppmHeader);
-	    	}
-	    	
-	        int cnt_row=1;
-	        int red_byte=0;
-	        int blue_byte = 0;
-	        int green_byte = 0;
-	        
+	    if (isCompression.isSelected()) {
+		stream = new DataOutputStream(fostr);
+	    } else {
+		writer = new OutputStreamWriter(fostr);
+		if (!isColor.isSelected())
+		    writer.write(pgmHeader);
+		else
+		    writer.write(ppmHeader);
+	    }
+
+	    int cnt_row = 1;
+	    int red_byte = 0;
+	    int blue_byte = 0;
+	    int green_byte = 0;
+	    int green_lo = 0;
+	    int green_hi = 0;
+
 	        boolean is_first_byte = true;
-	        for (int i=0; i<data.size(); i++)
-	        	for (int j=0; j<64; j++){
-	        		int curr_byte = 0;
-	        		
-	        		if (j<data.get(i).length)
-	        			curr_byte=(data.get(i)[j]&0xFF);
-	        		else if ( i==data.size()-1 )
-	        			break;
-	        		
-	    	    	if (isCompression.isSelected()){
-	    	    		stream.writeByte(curr_byte);
-	    	    	}
-	    	    	else if (!isColor.isSelected()){
-        				writer.write((curr_byte&0xFF)+" ");
-		        		if (++cnt_row >= MAX_X){
-		        			cnt_row = 0;
-		        			writer.write("\r\n");
-		        		}
-        			}
-        			else
-        			{
-		        		if (is_first_byte){
-		        			is_first_byte = false;
-		        			blue_byte = (curr_byte & 0x1F);
-		        			green_byte = (curr_byte & 0xE0);
-		        			green_byte = (green_byte >> 5);
-		        		}
-		        		else{
-		        			red_byte = (curr_byte >> 3);
-		        			int green_byte_tmp = (curr_byte & 0x7);
-		        			green_byte_tmp <<= 3;
-		        			green_byte |= green_byte_tmp;
-		        			
-		        			//red_byte <<=1;
-		        			//blue_byte <<=1;
-		        			green_byte >>= 1;
-        					writer.write((red_byte&0xFF)+" "+(green_byte&0xFF)+" "+(blue_byte&0xFF)+" ");
-	        				if (++cnt_row >= MAX_X){
-			        			cnt_row = 0;
-			        			writer.write("\r\n");
-			        		}
-			        		is_first_byte = true;
-		        		}
-        			}
-	        	}
-	        
+	        for (int i = 0; i < data.size(); i++) {
+		    for (int j = 0; j < 64; j++) {
+			int curr_byte = 0;
+
+			if (j < data.get(i).length)
+			    curr_byte = (data.get(i)[j] & 0xFF);
+			else if (i == data.size() - 1)
+			    break;
+	    	    	if (isCompression.isSelected()) {
+			    stream.writeByte(curr_byte);
+	    	    	} else if (!isColor.isSelected()) {
+			    writer.write((curr_byte & 0xFF) + " ");
+			    if (++cnt_row >= max_x){
+				cnt_row = 0;
+				writer.write("\r\n");
+			    }
+			} else {
+			    if (is_first_byte) {
+				is_first_byte = false;
+				red_byte = (curr_byte & 0x1F);
+				green_lo = (curr_byte & 0xE0);
+				green_lo = ((green_lo >> 5) & 0x07);
+			    } else {
+				blue_byte = ((curr_byte >> 3) & 0x1F);
+				green_hi = (curr_byte & 0x07);
+				green_hi = (green_hi << 3);
+				green_byte = (green_lo | green_hi);
+
+				red_byte <<= 3;
+				blue_byte <<= 3;
+				green_byte <<= 2;
+				writer.write((red_byte & 0xFF) + " " + (green_byte&0xFF) + " " + (blue_byte&0xFF) + " ");
+				if (++cnt_row >= max_x) {
+				    cnt_row = 0;
+				    writer.write("\r\n");
+				}
+				is_first_byte = true;
+			    }
+			}
+		    }
+		}
 	    	if (isCompression.isSelected()){
-	    		stream.flush();
-	    		stream.close();
+		    stream.flush();
+		    stream.close();
+	    	} else {
+		    writer.flush();
+		    writer.close();
 	    	}
-	    	else
-	    	{
-	    		writer.flush();
-	    		writer.close();
-	    	}
-			message("Saved "+file_name+"file and cleared data structures.\nReady for the next img.");
+		message("Saved " + file_name + "file and cleared data structures.\nReady for the next img.");
     	}
     	catch(Exception e){System.out.println(e);}
     	
@@ -294,9 +294,8 @@ public class CameraGUI implements MessageListener, Messenger {
     /* Message received from mote network. Update message area if it's
        a theft message. */
     
-    short []getMsgBuf(Bigmsg_frame_partMsg msg)
-    {
-    	int length =	msg.dataLength()-Bigmsg_frame_partMsg.offset_buf(0);
+    short []getMsgBuf(Bigmsg_frame_partMsg msg) {
+    	int length = msg.dataLength() - Bigmsg_frame_partMsg.offset_buf(0);
         short[] tmp = new short[length];
         for (int index0 = 0; index0 < length; index0++)
             tmp[index0] = msg.getElement_buf(index0);
@@ -304,70 +303,60 @@ public class CameraGUI implements MessageListener, Messenger {
     }
     
     public void messageReceived(int dest_addr, Message msg) {
-		if (msg instanceof Bigmsg_frame_partMsg) {
-			Bigmsg_frame_partMsg fpMsg = (Bigmsg_frame_partMsg)msg;
-		    if (fpMsg.get_part_id()%50==0)
-		    	message("Msg ID " + fpMsg.get_part_id());
-		    while (fpMsg.get_part_id()>=data.size())
-		    	data.add(data.size(),new short[0]);
-		    data.set(fpMsg.get_part_id(), getMsgBuf(fpMsg));
-		}
-		else if (msg instanceof ImgStatMsg) 
-		{
-			ImgStatMsg isMsg = (ImgStatMsg)msg;
-			message("Image capture stats:");
-			message("  timeAcq: "+isMsg.get_timeAcq()+
-					"\t timeProc: "+isMsg.get_timeProc());
-			message("  img type: "+isMsg.get_type());
-			message("  img width: "+isMsg.get_width());
-			message("  img height: "+isMsg.get_height());
-			message("  img size: "+isMsg.get_data_size());
-			message("time total: "+(isMsg.get_timeAcq()+isMsg.get_timeProc()));
-			message("time java: "+(System.currentTimeMillis()-currentTime)+"\n");
-		}
+	if (msg instanceof Bigmsg_frame_partMsg) {
+	    Bigmsg_frame_partMsg fpMsg = (Bigmsg_frame_partMsg)msg;
+	    if (fpMsg.get_part_id() % 50 == 0)
+		message("Msg ID " + fpMsg.get_part_id());
+	    while (fpMsg.get_part_id() >= data.size())
+		data.add(data.size(),new short[0]);
+	    data.set(fpMsg.get_part_id(), getMsgBuf(fpMsg));
+	} else if (msg instanceof ImgStatMsg) {
+	    ImgStatMsg isMsg = (ImgStatMsg)msg;
+	    message("Image capture stats:");
+	    message("  img type: " + isMsg.get_type());
+	    message("  img width: " + isMsg.get_width());
+	    message("  img height: " + isMsg.get_height());
+	    message("  img size: " + isMsg.get_data_size());
+	}
     }
     
-    public void load(String filename){
-    	try{
-    		BufferedReader r = new BufferedReader(new FileReader(filename));
-    		String line = r.readLine();//header line 1
-    		line = r.readLine();//header line 2
-    		line = r.readLine();//header line 3
-    		line = r.readLine();//header line 4
-    		line = r.readLine();
-			int i=0, j=0;
-			short[] values = new short[64];
-    		while (line != null) 
-    		{
-    			java.util.StringTokenizer t = new java.util.StringTokenizer(line);
-    			while (t.hasMoreTokens())
-    			{
-        			String id_str = t.nextToken();
-	    			if (id_str.length() != 0)
-	    			{
-	    				values[i++]=Short.parseShort(id_str);
-	    				if (i==64)
-	    				{
-	    					Bigmsg_frame_partMsg fpMsg = new Bigmsg_frame_partMsg();
-						    fpMsg.set_part_id(j);
-						    fpMsg.set_buf(values);
-						    this.messageReceived(0, fpMsg);
-							i=0;
-							j++;
-							values = new short[64];
-	    				}
-	    			}
-    			}
-	    		line = r.readLine();
-    		}
-    	}catch(Exception e){System.out.println("CameraGUI.load():"+e.toString());}
-    	
+    public void load(String filename) {
+    	try {
+	    BufferedReader r = new BufferedReader(new FileReader(filename));
+	    String line = r.readLine();//header line 1
+	    line = r.readLine(); //header line 2
+	    line = r.readLine(); //header line 3
+	    line = r.readLine(); //header line 4
+	    line = r.readLine();
+	    int i = 0, j = 0;
+	    short[] values = new short[64];
+	    while (line != null) {
+		java.util.StringTokenizer t = new java.util.StringTokenizer(line);
+		while (t.hasMoreTokens()) {
+		    String id_str = t.nextToken();
+		    if (id_str.length() != 0) {
+			values[i++] = Short.parseShort(id_str);
+			if (i == 64) {
+			    Bigmsg_frame_partMsg fpMsg = new Bigmsg_frame_partMsg();
+			    fpMsg.set_part_id(j);
+			    fpMsg.set_buf(values);
+			    this.messageReceived(0, fpMsg);
+			    i = 0;
+			    j++;
+			    values = new short[64];
+			}
+		    }
+		}
+		line = r.readLine();
+	    }
+    	}
+	catch(Exception e) {
+	    System.out.println("CameraGUI.load():" + e.toString());
+	}
     }
 
     /* Just start the app... */
     public static void main(String[] args) {
     	CameraGUI me = new CameraGUI(true);
-    	//me.load("c:\\cygwin\\tmp\\results\\captured_bytes.ppm");
-    	//me.load("c:\\cygwin\\tmp\\c.ppm");
     }
 }

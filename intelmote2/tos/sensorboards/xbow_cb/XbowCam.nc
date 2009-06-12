@@ -52,7 +52,8 @@
 #include "xbowCam.h"
 interface XbowCam
 {
-    command frame_t *acquire(uint8_t color, void* address, void *subSampBuf, uint8_t output_type);
+    //command frame_t *acquire(uint8_t color, void* address, void *subSampBuf, uint8_t output_type);
+    command frame_t *acquire(uint8_t color, void* address, uint8_t size, uint8_t output_type);
     async event void acquireDone();
     command void  cancel();
 

@@ -1,0 +1,35 @@
+MoteClockC and TelosSerialP are replacements for stuff in the
+.platform directory.
+
+Msp430ClockC, Msp430ClockP, and Msp430DcoSpec.h are replacements
+for what's in chips/msp430/timer.
+
+You should put all this someplace that gets included before the
+default code.
+
+Build-time #defines:
+
+  ENABLE_SPI0_DMA -- if defined, run the CPU at 4 MHz and use
+                     DMA for SPI; otherwise, run the CPU at
+                     8 MHz and do software SPI. This requires
+                     the latest TinyOS chips/msp430/usart code,
+                     but the clock setting here works regardless.
+
+                     Used in Msp430DcoSpec.h. This file can define
+                     MHZ_8 which is used in Msp430ClockP.nc
+
+  HAVE_ROSC_P2_5  -- if defined, use the external ROSC resistor
+                     on P2.5; otherwise, use the internal DCO
+                     resistor.
+
+                     Used in Msp430ClockP.nc
+
+  FAST_SMCLK      -- if defined, run the peripherals at 4 MHz;
+                     otherwise, run the peripherals at 1 MHz,
+                     the TinyOS default. These rates are indep-
+                     endent of the the ENABLE_SPI0_DMA setting.
+
+                     Used in Msp430ClockP.nc and TelosSerialP.nc
+
+--Mark
+

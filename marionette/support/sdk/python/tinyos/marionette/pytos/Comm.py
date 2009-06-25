@@ -182,6 +182,9 @@ class MessageQueue( Queue ) :
     Queue.__init__(self,maxsize)
     self.semaphore = threading.Semaphore()
     
+  def receive( self , addr , msg ) :
+    self.messageReceived(addr, msg)
+    
   def messageReceived( self , addr , msg ) :
     self.semaphore.acquire()
     if self.full() :

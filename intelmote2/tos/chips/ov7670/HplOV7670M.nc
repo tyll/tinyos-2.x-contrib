@@ -252,6 +252,7 @@ uint8_t init_array_vga[][2] = {
 			else 
 				call HplOV7670.config_yuv(size);
 		}
+		TOSH_uwait(100000); // wait to settle...
 		return SUCCESS;
 	}
 	

@@ -43,19 +43,34 @@
  * The camera module is a very basic module that utilizes the camera
  * interface to take a picture.
  */
+
  /**
  * Modified and ported to tinyos-2.x.
  *
  * @author Brano Kusy (branislav.kusy@gmail.com)
  * @version October 25, 2007
  */
+
+/*
+  Modified by RMK, Crossbow Technology
+*/
+
 #ifndef _XBOW_CB_H
 #define _XBOW_CB_H
-
-#define MAX_HEIGHT          240
-#define MAX_WIDTH           320
+/*
+#define IMG_VGA 1
+#ifdef IMG_VGA
+#define IMG_H 640
+#define IMG_V 480
+#else // QVGA
+#define IMG_H 320
+#define IMG_V 240
+#endif
+*/
+#define MAX_HEIGHT          640
+#define MAX_WIDTH           480
 #define BYTES_PER_PIXEL     2
-#define FRAME_BUF_SIZE      MAX_HEIGHT*MAX_WIDTH*BYTES_PER_PIXEL    // 16-bit color
+#define MAX_FRAME_BUF_SIZE      MAX_HEIGHT * MAX_WIDTH * BYTES_PER_PIXEL    // 16-bit color
 #define FRAME_SIZE          sizeof(frame_t)
 
 #define WINDOW_HZERO    0x11 // 0x1A
@@ -73,10 +88,10 @@ typedef struct {
 } __attribute__ ((packed)) frame_header_t;
 
 enum {
-    BUF_TYPE_GRAY_1BYTE=0,
-    BUF_TYPE_GRAY_2BYTES=1,   //UYVY
-    BUF_TYPE_RGB_2BYTES=2,    //RGB565
-    BUF_TYPE_RGB_3BYTES=3,
+    BUF_TYPE_GRAY_1BYTE = 0,
+    BUF_TYPE_GRAY_2BYTES = 1,   //UYVY
+    BUF_TYPE_RGB_2BYTES = 2,    //RGB565
+    BUF_TYPE_RGB_3BYTES = 3,
 };
 
 typedef struct {

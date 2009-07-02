@@ -76,8 +76,12 @@
 #include "arm_defs.h"
 #include "pxa27x_registers.h"
 
+
 #define _pxa27x_perf_clear() {asm volatile ("mcr p14,0,%0,c0,c1,0\n\t"::"r" (0x5));}
-#define _pxa27x_perf_get(_x) {asm volatile ("mrc p14,0,%0,c1,c1,0":"=r" (_x));}
+// External utility functions
+extern void enableICache();
+extern void enableDCache();
+
 
 inline uint32_t _pxa27x_clzui(uint32_t i) {
   uint32_t count;

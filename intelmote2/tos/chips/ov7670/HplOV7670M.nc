@@ -181,7 +181,7 @@ uint8_t init_array_vga[][2] = {
 	/**
 	 * (Busy) wait <code>usec</code> microseconds
 	 */
-	inline void TOSH_uwait(uint16_t usec)
+	inline void TOSH_uwait(uint32_t usec)
 	{
 	  uint32_t start,mark = usec;
 	
@@ -252,7 +252,7 @@ uint8_t init_array_vga[][2] = {
 			else 
 				call HplOV7670.config_yuv(size);
 		}
-		TOSH_uwait(100000); // wait to settle...
+		TOSH_uwait(300000); // wait to settle...
 		return SUCCESS;
 	}
 	

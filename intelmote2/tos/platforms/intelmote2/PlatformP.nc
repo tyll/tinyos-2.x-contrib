@@ -69,16 +69,16 @@ implementation {
     // Enable access to Intel WMMX enhancements
     asm volatile ("mcr p15,0,%0,c15,c1,0\n\t": : "r" (0x43));
 
-#ifndef PXA27X_FREQ
-    //FREQUENCEY CAN NOT BE GREATER THAN 104 without changing the core voltage using the PMIC
-#define PXA27X_FREQ 13
+#ifndef SYSTEM_CORE_FREQUENCY
+    //FREQUENCY CAN NOT BE GREATER THAN 104 without changing the core voltage using the PMIC
+#define SYSTEM_CORE_FREQUENCY 13
 #endif
     
-#if defined(PXA27X_FREQ) && PXA27X_FREQ!=13 && PXA27X_FREQ!=104 && PXA27X_FREQ!=208
+#if defined(SYSTEM_CORE_FREQUENCY) && SYSTEM_CORE_FREQUENCY!=13 && SYSTEM_CORE_FREQUENCY!=104 && SYSTEM_CORE_FREQUENCY!=208
     !@$% unsupported frequency
 #endif
       
-#if defined(PXA27X_FREQ) && (PXA27X_FREQ==13)
+#if defined(SYSTEM_CORE_FREQUENCY) && (SYSTEM_CORE_FREQUENCY==13)
       {
 	// Place PXA27X into 13M w/ PPLL enabled...
 	// other bits are ignored...but might be useful later
@@ -90,7 +90,7 @@ implementation {
 		      );
       }
 #endif
-#if defined(PXA27X_FREQ) && (PXA27X_FREQ==104)
+#if defined(SYSTEM_CORE_FREQUENCY) && (SYSTEM_CORE_FREQUENCY==104)
     {
       // Place PXA27x into 104/104 MHz mode
       CCCR = CCCR_L(8) | CCCR_2N(2) | CCCR_A; 
@@ -101,7 +101,7 @@ implementation {
 		    );
     }
 #endif
-#if defined(PXA27X_FREQ) && (PXA27X_FREQ==208)
+#if defined(SYSTEM_CORE_FREQUENCY) && (SYSTEM_CORE_FREQUENCY==208)
     {
       // Place PXA27x into 208/208 MHz mode
       CCCR = CCCR_L(16) | CCCR_2N(2) | CCCR_A;

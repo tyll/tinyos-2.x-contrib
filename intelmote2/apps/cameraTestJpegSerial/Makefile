@@ -12,6 +12,8 @@ PFLAGS += -I$(INTELMOTE2_CONTRIB_DIR)/tos/platforms/intelmote2
 PFLAGS += -I$(INTELMOTE2_CONTRIB_DIR)/../intelmote2/tos/sensorboards/xbow_cb
 PFLAGS += -I$(INTELMOTE2_CONTRIB_DIR)/../intelmote2/support/sdk/c/compress
 #
-CFLAGS += -DPXA27X_FREQ=208
+SYSTEM_CORE_FREQUENCY := 104
+SYSTEM_BUS_FREQUENCY := 104
+
 #CFLAGS += -Wcast-align -Wpadded -Wpacked
 include ../Makerules

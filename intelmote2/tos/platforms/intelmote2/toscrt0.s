@@ -299,11 +299,11 @@ TXloop:
 	mov pc, r13			@ branch to downloaded address.
 @ scratch memory space used by the invalidate IC line function above.
 
-.ifdef BOOTLOADER
+@.ifdef BOOTLOADER
 .section	.tosstart
 .align 5 @ make sure it starts at a cache line
 .word 0
-.endif
+@.endif
 reset_handler_start:
 @ reset handler should first check whether this is a debug exception
 @ or a real RESET event.

@@ -45,7 +45,6 @@ implementation
 	components HplRF212P;
 	IRQ = HplRF212P.IRQ;
 
-	HplRF212P.PortCLKM -> IO.PortB5;
 	HplRF212P.PortIRQ -> IO.PortE5;
 	
 	components Atm128SpiC as SpiC;

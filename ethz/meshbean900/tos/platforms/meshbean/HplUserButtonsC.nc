@@ -35,13 +35,13 @@
 
 configuration HplUserButtonsC
 {
-	provides interface GeneralIO as GeneralIOUB1;
-  	provides interface GpioInterrupt as GpioInterruptUB1;
+	provides interface GeneralIO as GeneralIOButton1;
+  	provides interface GpioInterrupt as GpioInterruptButton1;
   	
-  	provides interface GeneralIO as GeneralIOUB2;
-  	provides interface GpioInterrupt as GpioInterruptUB2;
+  	provides interface GeneralIO as GeneralIOButton2;
+  	provides interface GpioInterrupt as GpioInterruptButton2;
 
-	provides interface Init;
+	provides interface Init as PlatformInit;
 
 }
 implementation
@@ -51,24 +51,23 @@ implementation
 	components HplAtm128InterruptC as InterruptC;
 	
 	// GeneralIO
-	GeneralIOUB1 = GeneralIOC.PortE6;
-	GeneralIOUB2 = GeneralIOC.PortE7;
+	GeneralIOButton1 = GeneralIOC.PortE6;
+	GeneralIOButton2 = GeneralIOC.PortE7;
 	
 	// Interrupt UB1
 	components new Atm128GpioInterruptC() as InterruptUserButton1C;
 	InterruptUserButton1C.Atm128Interrupt -> InterruptC.Int6;
-	GpioInterruptUB1 = InterruptUserButton1C.Interrupt;
+	GpioInterruptButton1 = InterruptUserButton1C.Interrupt;
 	
 	// Interrupt UB2
 	components new Atm128GpioInterruptC() as InterruptUserButton2C;
 	InterruptUserButton2C.Atm128Interrupt -> InterruptC.Int7;
-	GpioInterruptUB2 = InterruptUserButton2C.Interrupt;
+	GpioInterruptButton2 = InterruptUserButton2C.Interrupt;
 	
 	// Init
 	components HplUserButtonsP;
-	Init = HplUserButtonsP;
-	HplUserButtonsP.GeneralIOUB1 -> GeneralIOUB1;
-	HplUserButtonsP.GeneralIOUB2 -> GeneralIOUB2;
-
+	PlatformInit = HplUserButtonsP;
+	HplUserButtonsP.GeneralIOButton1 -> GeneralIOC.PortE6;
+	HplUserButtonsP.GeneralIOButton2 -> GeneralIOC.PortE7;
 
 }

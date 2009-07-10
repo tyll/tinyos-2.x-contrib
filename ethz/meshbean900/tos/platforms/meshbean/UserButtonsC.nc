@@ -33,45 +33,39 @@
 */
 
 
-
-
 #include "UserButton.h"
 
 configuration UserButtonsC
 {
-	// User button 1
-	provides interface Get<button_state_t> as UB1Get;
-  	provides interface Notify<button_state_t> as UB1Notify;
+	// Button 1
+	provides interface Get<button_state_t> as Button1Get;
+  	provides interface Notify<button_state_t> as Button1Notify;
   	
-  	// User button 2
-  	provides interface Get<button_state_t> as UB2Get;
-  	provides interface Notify<button_state_t> as UB2Notify;
+  	// Button 2
+  	provides interface Get<button_state_t> as Button2Get;
+  	provides interface Notify<button_state_t> as Button2Notify;
 }
 
 implementation
 {
 	components HplUserButtonsC;
-	
-	// Initializing user buttons (Setting internal pull-up resistors)
-	components HplUserButtonsInitC;
 
-	components PlatformP;
-	HplUserButtonsInitC.GeneralIOUB1 -> HplUserButtonsC.GeneralIOUB1;
-	HplUserButtonsInitC.GeneralIOUB2 -> HplUserButtonsC.GeneralIOUB2;
-	HplUserButtonsInitC.Init <- PlatformP.MoteInit;
-	
+	components RealMainP;
+    RealMainP.PlatformInit -> HplUserButtonsC.PlatformInit;
+
 	// SwichToggleC connects GeneralIO and Get as well as GpioInterrupt and Notify
-  	components new SwitchToggleC() as SwitchToggleUB1;
-  	SwitchToggleUB1.GpioInterrupt -> HplUserButtonsC.GpioInterruptUB1;
-  	SwitchToggleUB1.GeneralIO -> HplUserButtonsC.GeneralIOUB1;
+  	components new SwitchToggleC() as SwitchToggleButton1;
+  	SwitchToggleButton1.GpioInterrupt -> HplUserButtonsC.GpioInterruptButton1;
+  	SwitchToggleButton1.GeneralIO -> HplUserButtonsC.GeneralIOButton1;
   	
-  	components new SwitchToggleC() as SwitchToggleUB2;
-  	SwitchToggleUB2.GpioInterrupt -> HplUserButtonsC.GpioInterruptUB2;
-  	SwitchToggleUB2.GeneralIO -> HplUserButtonsC.GeneralIOUB2;
+  	components new SwitchToggleC() as SwitchToggleButton2;
+  	SwitchToggleButton2.GpioInterrupt -> HplUserButtonsC.GpioInterruptButton2;
+  	SwitchToggleButton2.GeneralIO -> HplUserButtonsC.GeneralIOButton2;
 	
-  	UB1Get = SwitchToggleUB1.Get;
-  	UB1Notify = SwitchToggleUB1.Notify;
+  	Button1Get = SwitchToggleButton1.Get;
+  	Button1Notify = SwitchToggleButton1.Notify;
   	
-	UB2Get = SwitchToggleUB2.Get;
-  	UB2Notify = SwitchToggleUB2.Notify;
+	Button2Get = SwitchToggleButton2.Get;
+  	Button2Notify = SwitchToggleButton2.Notify;
+
 }

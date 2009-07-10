@@ -15,7 +15,7 @@ endif
 
 #Setting Fusebits as default
 AVR_FUSE_H ?= 0x99
-AVR_FUSE_L ?= 0xC2
+AVR_FUSE_L ?= 0xe2
 
 ifdef RF212_CHANNEL
 PFLAGS += -DRF212_DEF_CHANNEL=$(RF212_CHANNEL)

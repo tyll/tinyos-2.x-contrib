@@ -52,6 +52,13 @@
 #include <MicaTimer.h>
 
 
+// enum so components can override power saving, 
+// as per TEP 112. 
+enum { 
+ TOS_SLEEP_NONE = ATM128_POWER_IDLE, 
+}; 
+ 
+
 enum {
   PLATFORM_BAUDRATE = 57600L
 };

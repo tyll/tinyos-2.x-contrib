@@ -77,11 +77,18 @@ typedef TOne TRadio;
  * The number of radio alarm ticks per one microsecond (0.9216). 
  * We use integers and no parentheses just to make deputy happy.
  */
-#define RADIO_ALARM_MICROSEC	(7372800UL / MHZ / 32) * (1 << MICA_DIVIDE_ONE_FOR_32KHZ_LOG2) / 1000000UL
+#define RADIO_ALARM_MICROSEC	1L
 
 /**
  * The base two logarithm of the number of radio alarm ticks per one millisecond
  */
 #define RADIO_ALARM_MILLI_EXP	(5 + MICA_DIVIDE_ONE_FOR_32KHZ_LOG2)
+
+/**
+ * The number of microseconds a sending MESHBEAN900 mote will wait for an acknowledgement 
+ */
+#ifndef SOFTWAREACK_TIMEOUT
+#define SOFTWAREACK_TIMEOUT     3000
+#endif
 
 #endif//__RADIOCONFIG_H__

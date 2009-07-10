@@ -103,6 +103,7 @@
  Roland Flury, ETH Zurich, rflury@tik.ee.ethz.ch
  Thomas Fahrni, ETH Zurich, tfahrni@ee.ethz.ch
  Richard Huber, ETH Zurich, rihuber@ee.ethz.ch
+ Lars Schor, ETH Zurich, lschor@ee.ethz.ch
 
 
 ----------------------------------------------------------------------

@@ -84,4 +84,11 @@ typedef TOne TRadio;
  */
 #define RADIO_ALARM_MILLI_EXP	(5 + MICA_DIVIDE_ONE_FOR_32KHZ_LOG2)
 
+/**
+ * The number of microseconds a sending MESHBEAN mote will wait for an acknowledgement 
+ */
+#ifndef SOFTWAREACK_TIMEOUT
+#define SOFTWAREACK_TIMEOUT     3000
+#endif
+
 #endif//__RADIOCONFIG_H__

@@ -39,6 +39,6 @@
 #ifndef USERBUTTON_H
 #define USERBUTTON_H
 
-typedef enum { BUTTON_RELEASED = 0, BUTTON_PRESSED = 1 } button_state_t;
+typedef enum { BUTTON_RELEASED = 1, BUTTON_PRESSED = 0 } button_state_t;
 
 #endif

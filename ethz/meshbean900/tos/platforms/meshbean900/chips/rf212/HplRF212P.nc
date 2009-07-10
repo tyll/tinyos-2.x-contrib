@@ -32,7 +32,6 @@ module HplRF212P
 	uses
 	{
 		interface HplAtm128Interrupt as Interrupt;
-		interface GeneralIO as PortCLKM;
 		interface GeneralIO as PortIRQ;
 		interface HplAtm128Timer<uint16_t> as Timer;
 	}
@@ -42,8 +41,6 @@ implementation
 {
 	command error_t PlatformInit.init()
 	{
-		call PortCLKM.makeInput();
-		call PortCLKM.clr();
 		call PortIRQ.makeInput();
 		call PortIRQ.clr();
 		return SUCCESS;

@@ -35,8 +35,8 @@
 
 module HplUserButtonsP
 {
-	uses interface GeneralIO as GeneralIOUB1;
-	uses interface GeneralIO as GeneralIOUB2;
+	uses interface GeneralIO as GeneralIOButton1;
+	uses interface GeneralIO as GeneralIOButton2;
 	
 	provides interface Init;
 }
@@ -47,8 +47,11 @@ implementation
 	command error_t Init.init()
 	{
 		// Setting internal pullup resistors for both user buttons
-		call GeneralIOUB1.set();
-		call GeneralIOUB2.set();
+		call GeneralIOButton1.makeInput();
+		call GeneralIOButton1.set();
+		
+		call GeneralIOButton2.makeInput();
+		call GeneralIOButton2.set();
 		
 		return SUCCESS;
 	}

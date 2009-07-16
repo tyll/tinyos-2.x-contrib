@@ -31,18 +31,27 @@
 /**
  * @author Brano Kusy (branislav.kusy@gmail.com)
  */ 
+
+/* modified for Robbie's new SDRAM section
+ * RMK
+ */
+
  
 #ifndef _SDRAM_H_
 #define _SDRAM_H_
 
-#define BASE_FRAME_ADDRESS	(0xa0000000)
-//+260k
-#define JPEG_FRAME_ADDRESS	(0xa0040000)
-//+65k
-#define BUF1_FRAME_ADDRESS	(0xa0050000)
-//+130k
-#define BUF2_FRAME_ADDRESS	(0xa0070000)
-//+130k
-#define BUF3_FRAME_ADDRESS	(0xa0090000)
+#define VGA_SIZE_RGB (640*480*3)
+
+uint32_t base_f[VGA_SIZE_RGB] __attribute__((section(".sdram")));
+uint32_t jpeg_f[VGA_SIZE_RGB] __attribute__((section(".sdram")));
+uint32_t buf1_f[VGA_SIZE_RGB] __attribute__((section(".sdram")));
+uint32_t buf2_f[VGA_SIZE_RGB] __attribute__((section(".sdram")));
+uint32_t buf3_f[VGA_SIZE_RGB] __attribute__((section(".sdram")));
+
+#define BASE_FRAME_ADDRESS	base_f
+#define JPEG_FRAME_ADDRESS	jpeg_f
+#define BUF1_FRAME_ADDRESS	buf1_f
+#define BUF2_FRAME_ADDRESS	buf2_f
+#define BUF3_FRAME_ADDRESS	buf3_f
 
 #endif //_SDRAM_H_

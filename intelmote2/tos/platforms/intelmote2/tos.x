@@ -5,6 +5,7 @@ MEMORY
 {
   FLASH   (rx)   : ORIGIN = 0, LENGTH = 64M
   SRAM   (rw!x) : ORIGIN = 0x5c000000, LENGTH = 256K
+  SDRAM   (rw!x) : ORIGIN = 0xa0000000, LENGTH = 32M
 }
 SECTIONS
 {
@@ -54,6 +55,11 @@ SECTIONS
     *(.stack)
      __stack_end = .;
   } >SRAM
+  
+  .sdram (NOLOAD) :
+  {
+   *(.sdram)
+  } >SDRAM
 
   /* Stabs debugging sections.  */
   .stab          0 : { *(.stab) }

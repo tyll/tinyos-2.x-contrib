@@ -30,7 +30,7 @@
  */
 
 /**
- * 10 kBaud Manchester
+ * 38.4 kBaud Manchester
  */
  
 /**
@@ -48,13 +48,6 @@
 #include "Blaze.h"
 
 #warning "*** INCLUDING CC1100 RADIO ***"
-
-/** SLOW THINGS DOWN FOR THIS DATA RATE */
-#define BLAZE_ACK_WAIT 2000
-#define TRANSMITTER_QUALITY_THRESHOLD 200
-#define BLAZE_MIN_INITIAL_BACKOFF 5000
-#define BLAZE_MIN_BACKOFF 500
-#define BLAZE_BACKOFF_PERIOD 100
 
 enum {
   CC1100_RADIO_ID = unique( UQ_BLAZE_RADIO ),
@@ -124,10 +117,9 @@ enum {
 #if (CC1100_MATCHING_NETWORK == CC1100_315_MHZ)
 /***************** 315 Matching Network ****************/
 
-// Default channel is at 317.996490 MHz
+// Default channel is at 314.996490 MHz
 #ifndef CC1100_DEFAULT_CHANNEL
-#warning "317 MHz non-production channel"
-#define CC1100_DEFAULT_CHANNEL 80
+#define CC1100_DEFAULT_CHANNEL 70
 #endif
 
 #ifndef CC1100_CHANNEL_MIN
@@ -154,13 +146,10 @@ enum{
   CC1100_PA_PLUS_0 = 0x60,
   CC1100_PA_MINUS_5 = 0x57,
   CC1100_PA_MINUS_10 = 0x26,
-  CC1100_PA_MINUS_15 = 0x1C,
-  CC1100_PA_MINUS_20 = 0x0D,
-  CC1100_PA_MINUS_30 = 0x12,
 };
 
 #ifndef CC1100_PA
-#define CC1100_PA CC1100_PA_PLUS_10 
+#define CC1100_PA CC1100_PA_PLUS_10
 #endif
 
 
@@ -322,9 +311,9 @@ enum CC1100_config_reg_state_enums {
   CC1100_CONFIG_FREQ1 = CC1100_DEFAULT_FREQ1,
   CC1100_CONFIG_FREQ0 = CC1100_DEFAULT_FREQ0,
   
-  CC1100_CONFIG_MDMCFG4 = 0xC8,
-  CC1100_CONFIG_MDMCFG3 = 0x93,
-  CC1100_CONFIG_MDMCFG2 = 0x1B,  // GFSK. 0x13 = no manchester / 0x1B = with manch.
+  CC1100_CONFIG_MDMCFG4 = 0xCA,
+  CC1100_CONFIG_MDMCFG3 = 0x83,
+  CC1100_CONFIG_MDMCFG2 = 0x0B,  // 0x03 = no manchester / 0x0B = with manch.
   CC1100_CONFIG_MDMCFG1 = 0x22,
   CC1100_CONFIG_MDMCFG0 = 0xF8,
   CC1100_CONFIG_DEVIATN = 0x34,

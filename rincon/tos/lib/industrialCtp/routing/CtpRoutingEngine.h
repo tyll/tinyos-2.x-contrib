@@ -39,10 +39,31 @@
 #define ECN_ON FALSE
 #endif
 
+/**
+ * Minimum routing interval
+ */
 #ifndef CTP_MIN_BEACON_INTERVAL
-#define CTP_MIN_BEACON_INTERVAL 5120U  // 5 seconds
+#define CTP_MIN_BEACON_INTERVAL 10240U 
 #endif
 
+/**
+ * The amount of time dedicated to network setup
+ * Where beacons are generated more rapidly
+ */
+#ifndef CTP_SETUP_DURATION
+#define CTP_SETUP_DURATION 3686400U  // 1 hour setup period with more beacons
+#endif
+
+/**
+ * The maximum beacon interval during the setup phase
+ */
+#ifndef CTP_SETUP_MAX_BEACON_INTERVAL
+#define CTP_SETUP_MAX_BEACON_INTERVAL 614400U  // 10 minutes
+#endif
+
+/** 
+ * The maximum beacon interval after setup
+ */
 #ifndef CTP_MAX_BEACON_INTERVAL
 #define CTP_MAX_BEACON_INTERVAL 44236800U  // 12 hours
 #endif

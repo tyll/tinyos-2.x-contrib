@@ -243,7 +243,7 @@ implementation {
       if (!tHasPassed) {
         post updateRouteTask();
         post sendBeaconTask();
-        dbg("RoutingTimer", "Beacon timer fired at %s\n", sim_time_string());
+        ////printf("RoutingTimer Beacon timer fired at %s\n\r");
         remainingInterval();
         
       } else {
@@ -270,7 +270,7 @@ implementation {
     
     // Received a beacon, but it's not from us.
     if (len != sizeof(ctp_routing_header_t)) {
-      dbg("LITest", "%s, received beacon of size %hhu, expected %i\n", __FUNCTION__, len, (int) sizeof(ctp_routing_header_t));
+      ///printf("LITest: %s, received beacon of size %hhu, expected %i\n\r", __FUNCTION__, len, (int) sizeof(ctp_routing_header_t));
       return msg;
     }
     
@@ -279,7 +279,7 @@ implementation {
     congested = call CtpRoutingPacket.getOption(msg, CTP_OPT_ECN);
     call CtpInfo.getEtx(&currentEtx);
     
-    dbg("TreeRouting","%s from: %d  [ parent: %d etx: %d ]\n", __FUNCTION__, from, receiveBeacon->parent, receiveBeacon->etx);
+    ///printf("TreeRouting: %s from: %d  [ parent: %d etx: %d ]\n\r", __FUNCTION__, from, receiveBeacon->parent, receiveBeacon->etx);
     
     // Update the neighbor table
     if (receiveBeacon->parent != INVALID_ADDR) {
@@ -297,7 +297,9 @@ implementation {
     }
     
     if (call CtpRoutingPacket.getOption(msg, CTP_OPT_PULL)) {
-      resetInterval();
+      if(routeInfo.parent != INVALID_ADDR) {
+        resetInterval();
+      }
     }
     
     return msg;
@@ -446,7 +448,7 @@ implementation {
       signal UnicastNameFreeRouting.routeFound();
     }
     
-    dbg("TreeRouting","%s I'm a root now!\n",__FUNCTION__);
+    ////printf("TreeRouting: %s I'm a root now!\n\r",__FUNCTION__);
     call CollectionDebug.logEventRoute(NET_C_TREE_NEW_PARENT, routeInfo.parent, 0, routeInfo.etx);
     return SUCCESS;
   }
@@ -457,7 +459,7 @@ implementation {
       routeInfoInit(&routeInfo);
     }
     
-    dbg("TreeRouting","%s I'm not a root now!\n",__FUNCTION__);
+    ////printf("TreeRouting: %s I'm not a root now!\n\r",__FUNCTION__);
     post updateRouteTask();
     return SUCCESS;
   }
@@ -558,7 +560,7 @@ implementation {
     /* Metric through current parent, initially infinity */
     currentEtx = MAX_METRIC;
 
-    dbg("TreeRouting", "%s\n",__FUNCTION__);
+    ///printf("TreeRouting: %s\n\r",__FUNCTION__);
 
     /* Find best path in table, other than our current */
     for (i = 0; i < routingTableActive; i++) {
@@ -566,20 +568,20 @@ implementation {
 
       // Avoid bad entries and 1-hop loops
       if (entry->info.parent == INVALID_ADDR || entry->info.parent == call AMPacket.address()) {
-        dbg("TreeRouting", "routingTable[%d]: neighbor: [id: %d parent: %d  etx: NO ROUTE]\n", i, entry->neighbor, entry->info.parent);
+        ///printf("TreeRouting: routingTable[%d]: neighbor: [id: %d parent: %d  etx: NO ROUTE]\n\r", i, entry->neighbor, entry->info.parent);
         continue;
       }
       
       // Compute this neighbor's path metric
       linkEtx = evaluateEtx(call LinkEstimator.getLinkQuality(entry->neighbor));
       
-      dbg("TreeRouting", "routingTable[%d]: neighbor: [id: %d parent: %d etx: %d]\n", i, entry->neighbor, entry->info.parent, linkEtx);
+      ///printf("TreeRouting: routingTable[%d]: neighbor: [id: %d parent: %d etx: %d]\n\r", i, entry->neighbor, entry->info.parent, linkEtx);
       
       pathEtx = linkEtx + entry->info.etx;
       
       // Operations specific to the current parent
       if (entry->neighbor == routeInfo.parent) {
-        dbg("TreeRouting", "   already parent.\n");
+        ///printf("TreeRouting:    already parent.\n\r");
         
         currentEtx = pathEtx;
         // update routeInfo with parent's current info
@@ -629,12 +631,16 @@ implementation {
          */
         parentChanges++;
 
-        dbg("TreeRouting","Changed parent. from %d to %d\n", routeInfo.parent, best->neighbor);
+        ///printf("TreeRouting: Changed parent. from %d to %d\n\r", routeInfo.parent, best->neighbor);
         call CollectionDebug.logEventDbg(NET_C_TREE_NEW_PARENT, best->neighbor, best->info.etx, minEtx);
         call LinkEstimator.unpinNeighbor(routeInfo.parent);
         call LinkEstimator.pinNeighbor(best->neighbor);
         call LinkEstimator.clearDLQ(best->neighbor);
-
+        
+        ///printf("TreeRouting: Attempting to evict %d\n\r", routeInfo.parent);
+        call LinkEstimator.evict(routeInfo.parent);
+        justEvicted = TRUE;
+         
         routeInfo.parent = best->neighbor;
         routeInfo.etx = best->info.etx;
         routeInfo.congested = best->info.congested;
@@ -643,7 +649,7 @@ implementation {
     
     /* 
      * Finally, tell people what happened:
-     * We can only loose a route to a parent if it has been evicted. If it 
+     * We can only lose a route to a parent if it has been evicted. If it 
      * hasn't been just evicted then we already did not have a route 
      */
     if (justEvicted && routeInfo.parent == INVALID_ADDR) {
@@ -683,19 +689,19 @@ implementation {
 
     } else if (routeInfo.parent == INVALID_ADDR) {
       beaconMsg->etx = routeInfo.etx;
-      beaconMsg->options |= CTP_OPT_PULL;
+      call CtpRoutingPacket.setOption(&beaconMsgBuffer, CTP_OPT_PULL);
 
     } else {
       beaconMsg->etx = routeInfo.etx + evaluateEtx(call LinkEstimator.getLinkQuality(routeInfo.parent));
     }
 
-    dbg("TreeRouting", "%s parent: %d etx: %d\n", __FUNCTION__, beaconMsg->parent, beaconMsg->etx);
+    ///printf("TreeRouting: %s parent: %d etx: %d\n\r", __FUNCTION__, beaconMsg->parent, beaconMsg->etx);
     
     call CollectionDebug.logEventRoute(NET_C_TREE_SENT_BEACON, beaconMsg->parent, 0, beaconMsg->etx);
 
     if(call BeaconSend.send(AM_BROADCAST_ADDR, &beaconMsgBuffer, sizeof(ctp_routing_header_t)) == EOFF) {
       radioOn = FALSE;
-      dbg("TreeRoutingCtl","%s running: %d radioOn: %d\n", __FUNCTION__, running, radioOn);
+      ///printf("TreeRouting: %s running: %d radioOn: %d\n\r", __FUNCTION__, running, radioOn);
     }
   }
   
@@ -717,8 +723,15 @@ implementation {
   void decayInterval() {
     currentInterval *= 2;
     
-    if (currentInterval > CTP_MAX_BEACON_INTERVAL) {
-      currentInterval = CTP_MAX_BEACON_INTERVAL;
+    if(call BeaconTimer.getNow() < CTP_SETUP_DURATION) {
+      if(currentInterval > CTP_SETUP_MAX_BEACON_INTERVAL) {
+        currentInterval = CTP_SETUP_MAX_BEACON_INTERVAL;
+      }
+
+    } else {
+      if (currentInterval > CTP_MAX_BEACON_INTERVAL) {
+        currentInterval = CTP_MAX_BEACON_INTERVAL;
+      }
     }
     
     chooseAdvertiseTime();
@@ -788,7 +801,7 @@ implementation {
         routingTable[idx].info.haveHeard = 1;
         routingTable[idx].info.congested = FALSE;
         routingTableActive++;
-        dbg("TreeRouting", "%s OK, new entry\n", __FUNCTION__);  
+        ///printf("TreeRouting: %s OK, new entry\n\r", __FUNCTION__);  
       }
       
     } else {
@@ -798,7 +811,7 @@ implementation {
       routingTable[idx].info.etx = etx;
       routingTable[idx].info.haveHeard = 1;
 
-      dbg("TreeRouting", "%s OK, updated entry\n", __FUNCTION__);
+      ///printf("TreeRouting: %s OK, updated entry, etx=%d\n\r", __FUNCTION__, etx);
     }
     return SUCCESS;
   }

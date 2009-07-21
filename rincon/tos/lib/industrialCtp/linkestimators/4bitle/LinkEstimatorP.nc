@@ -187,22 +187,21 @@ implementation {
     nidx = findIdx(neighbor);
     
     if (nidx != INVALID_RVAL) {
-      dbg("LI", "insert: Found the entry, no need to insert\n");
+      ////printf("LI: insert: Found the entry, no need to insert\n\r");
       return SUCCESS;
     }
     
     nidx = findEmptyNeighborIdx();
     
     if (nidx != INVALID_RVAL) {
-      dbg("LI", "insert: inserted into the empty slot\n");
+      ////printf("LI: insert: inserted into the empty slot\n\r");
       initNeighborIdx(nidx, neighbor);
       return SUCCESS;
       
     } else {
       nidx = findWorstNeighborIdx(BEST_EETX);
       if (nidx != INVALID_RVAL) {
-        dbg("LI", "insert: inserted by replacing an entry for neighbor: %d\n",
-            neighborTable[nidx].linkLayerAddress);
+        ////printf("LI: insert: inserted by replacing an entry for neighbor: %d\n\r", neighborTable[nidx].linkLayerAddress);
         signal LinkEstimator.evicted(neighborTable[nidx].linkLayerAddress);
         initNeighborIdx(nidx, neighbor);
         return SUCCESS;
@@ -314,6 +313,17 @@ implementation {
   }
 
 
+  command error_t LinkEstimator.evict(am_addr_t neighbor) {
+    uint8_t nidx = findIdx(neighbor);
+    
+    if (nidx == INVALID_RVAL) {
+      return FAIL;
+    }
+    
+    signal LinkEstimator.evicted(neighborTable[nidx].linkLayerAddress);
+    initNeighborIdx(nidx, neighborTable[nidx].linkLayerAddress);
+    return SUCCESS;
+  }
 
   /***************** Packet Commands ****************/
   command void Packet.clear(message_t *msg) {
@@ -376,8 +386,8 @@ implementation {
   command error_t AMSend.send(am_addr_t addr, message_t *msg, uint8_t len) {
     uint8_t newlen;
     newlen = addLinkEstHeaderAndFooter(msg, len);
-    dbg("LITest", "%s packet of length %hhu became %hhu\n", __FUNCTION__, len, newlen);
-    dbg("LI", "Sending seq: %d\n", linkEstSeq);
+    ////printf("LI: %s packet of length %hhu became %hhu\n\r", __FUNCTION__, len, newlen);
+    ////printf("LI: Sending seq: %d\n\r", linkEstSeq);
     printPacket(msg, newlen);
     
     return call SubAMSend.send(addr, msg, newlen);
@@ -411,7 +421,7 @@ implementation {
   event message_t *SubReceive.receive(message_t *msg,
                                       void *payload,
                                       uint8_t len) {
-    dbg("LI", "Received upper packet. Will signal up\n");
+    ////printf("LI: Received upper packet. Will signal up\n\r");
     processReceivedMessage(msg, payload, len);
     
     return signal Receive.receive(msg,
@@ -429,7 +439,7 @@ implementation {
     uint8_t nidx;
     uint8_t numEntries;
 
-    dbg("LI", "LI receiving packet, buf addr: %x\n", payload);
+    ////printf("LI: LI receiving packet, buf addr: %x\n\r", payload);
     printPacket(msg, len);
 
     if (call SubAMPacket.destination(msg) == AM_BROADCAST_ADDR) {
@@ -438,7 +448,7 @@ implementation {
 
       linkLayerAddress = call SubAMPacket.source(msg);
 
-      dbg("LI", "Got seq: %d from link: %d\n", hdr->seq, linkLayerAddress);
+      ///printf("LI: Got seq: %d from link: %d\n\r", hdr->seq, linkLayerAddress);
 
       numEntries = hdr->flags & NUM_ENTRIES_FLAG;
       printNeighborTable();
@@ -459,26 +469,25 @@ implementation {
       //       we can not accommodate this neighbor in the table
       nidx = findIdx(linkLayerAddress);
       if (nidx != INVALID_RVAL) {
-        dbg("LI", "Found the entry so updating\n");
+        ////printf("LI: Found the entry so updating\n\r");
         updateNeighborEntryIdx(nidx, hdr->seq);
         
       } else {
         nidx = findEmptyNeighborIdx();
         if (nidx != INVALID_RVAL) {
-          dbg("LI", "Found an empty entry\n");
+          ////printf("LI: Found an empty entry\n\r");
           initNeighborIdx(nidx, linkLayerAddress);
           updateNeighborEntryIdx(nidx, hdr->seq);
           
         } else {
           nidx = findWorstNeighborIdx(EVICT_EETX_THRESHOLD);
           if (nidx != INVALID_RVAL) {
-            dbg("LI", "Evicted neighbor %d at idx %d\n",
-                neighborTable[nidx].linkLayerAddress, nidx);
+            ////printf("LI: Evicted neighbor %d at idx %d\n\r", neighborTable[nidx].linkLayerAddress, nidx);
             signal LinkEstimator.evicted(neighborTable[nidx].linkLayerAddress);
             initNeighborIdx(nidx, linkLayerAddress);
             
           } else {
-            dbg("LI", "No room in the table\n");
+            ////printf("LI: No room in the table\n\r");
             if (call CompareBit.shouldInsert(msg, 
                                                call Packet.getPayload(msg, call Packet.payloadLength(msg)),
                                                call Packet.payloadLength(msg),
@@ -527,7 +536,7 @@ implementation {
     uint8_t maxEntries;
     uint8_t newPrevSentIdx;
     
-    dbg("LI", "newlen1 = %d\n", len);
+    ////printf("LI: newlen1 = %d\n\r", len);
     
     hdr = getHeader(msg);
     footer = getFooter(msg, len);
@@ -541,7 +550,7 @@ implementation {
       maxEntries = NUM_ENTRIES_FLAG;
     }
     
-    dbg("LI", "Max payload is: %d, maxEntries is: %d\n", call SubPacket.maxPayloadLength(), maxEntries);
+    ////printf("LI: Max payload is: %d, maxEntries is: %d\n\r", call SubPacket.maxPayloadLength(), maxEntries);
 
     j = 0;
     
@@ -565,8 +574,7 @@ implementation {
         neighborLists[j].linkLayerAddress = neighborTable[k].linkLayerAddress;
         neighborLists[j].quality = neighborTable[k].quality;
         newPrevSentIdx = k;
-        dbg("LI", "Loaded on footer: %d %d %d\n", j, neighborLists[j].linkLayerAddress,
-            neighborLists[j].quality);
+        ////printf("LI: Loaded on footer: %d %d %d\n\r", j, neighborLists[j].linkLayerAddress, neighborLists[j].quality);
         j++;
       }
     }
@@ -577,7 +585,7 @@ implementation {
     hdr->flags = 0;
     hdr->flags |= (NUM_ENTRIES_FLAG & j);
     newlen = sizeof(linkest_header_t) + len + j*sizeof(linkest_footer_t);
-    dbg("LI", "newlen2 = %d\n", newlen);
+    ////printf("LI: newlen2 = %d\n\r", newlen);
     
     return newlen;
   }
@@ -643,17 +651,17 @@ implementation {
     
     for (i = 0; i < NEIGHBOR_TABLE_SIZE; i++) {
       if (!(neighborTable[i].flags & VALID_ENTRY)) {
-        dbg("LI", "Invalid so continuing\n");
+        ////printf("LI: Invalid so continuing\n\r");
         continue;
       }
       
       if (!(neighborTable[i].flags & MATURE_ENTRY)) {
-        dbg("LI", "Not mature, so continuing\n");
+        ////printf("LI: Not mature, so continuing\n\r");
         continue;
       }
       
       if (neighborTable[i].flags & PINNED_ENTRY) {
-        dbg("LI", "Pinned entry, so continuing\n");
+        ////printf("LI: Pinned entry, so continuing\n\r");
         continue;
       }
       
@@ -724,6 +732,7 @@ implementation {
    */
   void updateEetx(neighbor_table_entry_t *ne, uint16_t newEst) {
     ne->eetx = (ALPHA * ne->eetx + (10 - ALPHA) * newEst)/10;
+    ///printf("LI: %d eetx set to %d\n\r", ne->linkLayerAddress, ne->eetx);
   }
 
 
@@ -778,7 +787,7 @@ implementation {
     uint8_t minPkt;
 
     minPkt = BLQ_PKT_WINDOW;
-    dbg("LI", "%s\n", __FUNCTION__);
+    ///printf("LI: %s\n\r", __FUNCTION__);
     for (i = 0; i < NEIGHBOR_TABLE_SIZE; i++) {
       ne = &neighborTable[i];
       if (ne->linkLayerAddress == n) {
@@ -792,10 +801,10 @@ implementation {
             ne->quality = 0;
             
           } else {
-            dbg("LI", "Making link: %d mature\n", i);
+            ///printf("LI: Making link: %d mature\n\r", i);
             ne->flags |= MATURE_ENTRY;
             totalPkt = ne->receiveCount + ne->failCount;
-            dbg("LI", "MinPkt: %d, totalPkt: %d\n", minPkt, totalPkt);
+            ///printf("LI: MinPkt: %d, totalPkt: %d\n\r", minPkt, totalPkt);
             
             if (totalPkt < minPkt) {
               totalPkt = minPkt;
@@ -805,7 +814,7 @@ implementation {
               ne->quality = (ALPHA * ne->quality) / 10;
             } else {
               newEst = (255 * ne->receiveCount) / totalPkt;
-              dbg("LI,LITest", "  %hu: %hhu -> %hhu", ne->linkLayerAddress, ne->quality, (ALPHA * ne->quality + (10-ALPHA) * newEst)/10);
+              ///printf("LI:   %hu: %hhu -> %hhu\n\r", ne->linkLayerAddress, ne->quality, (ALPHA * ne->quality + (10-ALPHA) * newEst)/10);
               ne->quality = (ALPHA * ne->quality + (10-ALPHA) * newEst)/10;
             }
             
@@ -815,7 +824,7 @@ implementation {
           updateEetx(ne, computeEetx(ne->quality));
           
         } else {
-          dbg("LI", " - entry %i is invalid.\n", (int)i);
+          ////printf("LI:  - entry %i is invalid.\n\r", (int)i);
         }
       }
     }
@@ -830,14 +839,13 @@ implementation {
     uint8_t packetGap;
 
     if (neighborTable[idx].flags & INIT_ENTRY) {
-      dbg("LI", "Init entry update\n");
+      ///printf("LI: Init entry update\n\r");
       neighborTable[idx].lastSequence = seq;
       neighborTable[idx].flags &= ~INIT_ENTRY;
     }
     
     packetGap = seq - neighborTable[idx].lastSequence;
-    dbg("LI", "updateNeighborEntryIdx: prevseq %d, curseq %d, gap %d\n",
-        neighborTable[idx].lastSequence, seq, packetGap);
+    ///printf("LI: updateNeighborEntryIdx: prevseq %d, curseq %d, gap %d\n\r", neighborTable[idx].lastSequence, seq, packetGap);
     neighborTable[idx].lastSequence = seq;
     neighborTable[idx].receiveCount++;
     neighborTable[idx].age = MAX_AGE;
@@ -864,6 +872,7 @@ implementation {
    * Print the neighbor table for debugging.
    */
   void printNeighborTable() {
+   /*
     uint8_t i;
     neighbor_table_entry_t *ne;
     
@@ -871,17 +880,19 @@ implementation {
       ne = &neighborTable[i];
       
       if (ne->flags & VALID_ENTRY) {
-        dbg("LI,LITest", "%d:%d inQ=%d, inA=%d, rcv=%d, fail=%d, Q=%d\n",
+        ///printf("LI: %d:%d inQ=%d, inA=%d, rcv=%d, fail=%d, Q=%d\n\r",
             i, ne->linkLayerAddress, ne->quality, ne->age,
             ne->receiveCount, ne->failCount, computeEetx(ne->quality));
       }
     }
+    */
   }
 
   /**
    * Print the packet for debugging.
    */
   void printPacket(message_t *msg, uint8_t len) {
+   /*
     uint8_t i;
     uint8_t* b;
 
@@ -891,7 +902,8 @@ implementation {
       dbg_clear("LI", "%x ", b[i]);
     }
     
-    dbg_clear("LI", "\n");
+    dbg_clear("LI", "\n\r");
+    */
   }
   
   

@@ -40,7 +40,7 @@ implementation {
   components CtpRoutingPacketP;
   CtpRoutingPacket = CtpRoutingPacketP;
   
-  components ActiveMessageC;
-  CtpRoutingPacketP.Packet -> ActiveMessageC;
+  components LinkEstimatorC;
+  CtpRoutingPacketP.Packet -> LinkEstimatorC;
   
 }

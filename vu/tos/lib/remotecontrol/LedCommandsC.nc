@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2003, Vanderbilt University
+ * Copyright (c) 2009, Vanderbilt University
  * All rights reserved.
  *
  * Permission to use, copy, modify, and distribute this software and its
@@ -19,8 +19,7 @@
  * PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
  *
  * Author: Miklos Maroti, Janos Sallai
- * Contact: Janos Sallai (sallai@isis.vanderbilt.edu)
- * Date last modified: 02/02/05
+ * Author: Janos Sallai (sallai@isis.vanderbilt.edu)
  */
 
 /**
@@ -28,8 +27,6 @@
  * The acknowledgment value is the current LED setting. LedCommands uses
  * the IntCommand interface with appid is 33 (0x21).
  *
- * @author Miklos Maroti, Janos Sallai
- * @modified 02/02/05
  */
 
 

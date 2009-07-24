@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2003, Vanderbilt University
+ * Copyright (c) 2009, Vanderbilt University
  * All rights reserved.
  *
  * Permission to use, copy, modify, and distribute this software and its
@@ -19,8 +19,7 @@
  * PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
  *
  * Author: Andras Nadas, Miklos Maroti, Gabor Pap
- * Contact: Janos Sallai (sallai@isis.vanderbilt.edu)
- * Date last modified: 02/02/05
+ * Author: Janos Sallai (sallai@isis.vanderbilt.edu)
  */
 
 /**
@@ -28,8 +27,6 @@
  * An uint16_t acknowledgment return value can be routed back to the base
  * station.
  *
- * @author Andras Nadas, Miklos Maroti, Gabor Pap
- * @modified 02/02/05
  */ 
 
 

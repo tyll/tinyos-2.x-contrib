@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002, Vanderbilt University
+ * Copyright (c) 2009, Vanderbilt University
  * All rights reserved.
  *
  * Permission to use, copy, modify, and distribute this software and its
@@ -19,8 +19,8 @@
  * PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
  *
  * Author: Andras Nadas, Miklos Maroti
- * Contact: Janos Sallai (sallai@isis.vanderbilt.edu)
- * Date last modified: 02/02/05
+ * Author: Janos Sallai (sallai@isis.vanderbilt.edu)
+ * 
  */
 
 
@@ -60,8 +60,6 @@
  *
  *
  *
- * @author Andras Nadas, Miklos Maroti
- * @modified 02/02/05
  */
 
 configuration RemoteControlC

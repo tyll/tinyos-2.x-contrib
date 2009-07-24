@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2003, Vanderbilt University
+ * Copyright (c) 2009, Vanderbilt University
  * All rights reserved.
  *
  * Permission to use, copy, modify, and distribute this software and its
@@ -19,7 +19,6 @@
  * PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
  *
  * Author: Miklos Maroti, Gabor Pap, Janos Sallai
- * Date last modified: 06/30/03
  */
 
 module GradientPolicyP

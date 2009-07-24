@@ -1,6 +1,4 @@
-// $Id$
-
-/*									tab:4
+/*									
  * "Copyright (c) 2000-2005 The Regents of the University  of California.
  * All rights reserved.
  *
@@ -37,6 +35,29 @@
  */
 
 /*
+ * Copyright (c) 2009, Vanderbilt University
+ * All rights reserved.
+ *
+ * Permission to use, copy, modify, and distribute this software and its
+ * documentation for any purpose, without fee, and without written agreement is
+ * hereby granted, provided that the above copyright notice, the following
+ * two paragraphs and the author appear in all copies of this software.
+ * 
+ * IN NO EVENT SHALL THE VANDERBILT UNIVERSITY BE LIABLE TO ANY PARTY FOR
+ * DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING OUT
+ * OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF THE VANDERBILT
+ * UNIVERSITY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * 
+ * THE VANDERBILT UNIVERSITY SPECIFICALLY DISCLAIMS ANY WARRANTIES,
+ * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+ * AND FITNESS FOR A PARTICULAR PURPOSE.  THE SOFTWARE PROVIDED HEREUNDER IS
+ * ON AN "AS IS" BASIS, AND THE VANDERBILT UNIVERSITY HAS NO OBLIGATION TO
+ * PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+ *
+ * Author: Janos Sallai
+ */
+
+/*
  * BaseStationP bridges packets between a serial channel and the radio.
  * Messages moving from serial to radio will be tagged with the group
  * ID compiled into the TOSBase, and messages moving from radio to
@@ -45,6 +66,7 @@
 
 #include "AM.h"
 #include "Serial.h"
+#include "Timer.h" 
 
 module BaseStationP @safe() {
   uses {
@@ -58,14 +80,20 @@ module BaseStationP @safe() {
     interface AMPacket as UartAMPacket;
 
     interface AMSend as RadioSend[am_id_t id];
-    interface LocalTime<TMilli> as LocalTimeMilli;
+
+#if defined(DFRF_32KHZ)
+    interface TimeSyncAMSend<T32khz, uint32_t> as TimeSyncRadioSend[am_id_t id];
+    interface TimeSyncPacket<T32khz, uint32_t>;
+#else
     interface TimeSyncAMSend<TMilli, uint32_t> as TimeSyncRadioSend[am_id_t id];
+    interface TimeSyncPacket<TMilli, uint32_t>;
+#endif
+   
     interface Receive as RadioReceive[am_id_t id];
     interface Receive as RadioSnoop[am_id_t id];
     interface Packet as RadioPacket;
     interface AMPacket as RadioAMPacket;
-    interface TimeSyncPacket<TMilli, uint32_t>;
-    interface Leds;
+    interface Leds;   
   }
 }
 

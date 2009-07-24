@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2003, Vanderbilt University
+ * Copyright (c) 2009, Vanderbilt University
  * All rights reserved.
  *
  * Permission to use, copy, modify, and distribute this software and its
@@ -54,6 +54,7 @@
   *
   * @author Miklos Maroti
   * @author Brano Kusy, kusy@isis.vanderbilt.edu
+  * @author Janos Sallai
   * @modified Jan05 doc fix
   */
 

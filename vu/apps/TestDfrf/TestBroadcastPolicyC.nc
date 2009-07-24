@@ -1,3 +1,26 @@
+/*
+ * Copyright (c) 2009, Vanderbilt University
+ * All rights reserved.
+ *
+ * Permission to use, copy, modify, and distribute this software and its
+ * documentation for any purpose, without fee, and without written agreement is
+ * hereby granted, provided that the above copyright notice, the following
+ * two paragraphs and the author appear in all copies of this software.
+ * 
+ * IN NO EVENT SHALL THE VANDERBILT UNIVERSITY BE LIABLE TO ANY PARTY FOR
+ * DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING OUT
+ * OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF THE VANDERBILT
+ * UNIVERSITY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * 
+ * THE VANDERBILT UNIVERSITY SPECIFICALLY DISCLAIMS ANY WARRANTIES,
+ * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+ * AND FITNESS FOR A PARTICULAR PURPOSE.  THE SOFTWARE PROVIDED HEREUNDER IS
+ * ON AN "AS IS" BASIS, AND THE VANDERBILT UNIVERSITY HAS NO OBLIGATION TO
+ * PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+ *
+ * Author: Janos Sallai
+ */
+
 module TestBroadcastPolicyC {
   uses {
     interface Boot;
@@ -6,6 +29,11 @@ module TestBroadcastPolicyC {
     interface DfrfSend<counter_packet_t>;
     interface DfrfReceive<counter_packet_t>;
     interface Timer<TMilli>;
+#if defined(DFRF_32KHZ)    
+    interface LocalTime<T32khz>;
+#else
+    interface LocalTime<TMilli>;
+#endif
     interface AMPacket;
     interface Leds;
   }
@@ -33,7 +61,7 @@ module TestBroadcastPolicyC {
 
   task void sendPacket() {
     counter_packet_t packet;
-    uint32_t timeStamp = call Timer.getNow();
+    uint32_t timeStamp = call LocalTime.get();
 
     packet.cnt = cnt;
     packet.src = call AMPacket.address() & 0xff;

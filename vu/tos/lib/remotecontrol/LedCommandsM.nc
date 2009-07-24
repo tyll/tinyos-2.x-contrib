@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2003, Vanderbilt University
+ * Copyright (c) 2009, Vanderbilt University
  * All rights reserved.
  *
  * Permission to use, copy, modify, and distribute this software and its
@@ -19,16 +19,13 @@
  * PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
  *
  * Author: Andras Nadas, Miklos Maroti, Janos Sallai
- * Contact: Janos Sallai (sallai@isis.vanderbilt.edu)
- * Date last modified: 02/02/05
+ * Author: Janos Sallai (sallai@isis.vanderbilt.edu)
  */
 
 /**
  * LedCommands allow for remotely set the LEDs via RemoteControl.
  * The acknowledgment value is the current LED setting.
  *
- * @author Andras Nadas, Miklos Maroti, Janos Sallai
- * @modified 02/02/05
  */
 
 

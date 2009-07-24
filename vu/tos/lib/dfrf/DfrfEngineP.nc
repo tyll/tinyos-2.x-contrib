@@ -1,3 +1,25 @@
+/*
+ * Copyright (c) 2009, Vanderbilt University
+ * All rights reserved.
+ *
+ * Permission to use, copy, modify, and distribute this software and its
+ * documentation for any purpose, without fee, and without written agreement is
+ * hereby granted, provided that the above copyright notice, the following
+ * two paragraphs and the author appear in all copies of this software.
+ * 
+ * IN NO EVENT SHALL THE VANDERBILT UNIVERSITY BE LIABLE TO ANY PARTY FOR
+ * DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING OUT
+ * OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF THE VANDERBILT
+ * UNIVERSITY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * 
+ * THE VANDERBILT UNIVERSITY SPECIFICALLY DISCLAIMS ANY WARRANTIES,
+ * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+ * AND FITNESS FOR A PARTICULAR PURPOSE.  THE SOFTWARE PROVIDED HEREUNDER IS
+ * ON AN "AS IS" BASIS, AND THE VANDERBILT UNIVERSITY HAS NO OBLIGATION TO
+ * PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+ *
+ */
+
 /**
  *
  * FloodRoutingSync is an implementation of the Routing Integrated Time Synchronization (RITS) protocol.
@@ -10,7 +32,7 @@
  *
  *   @author Miklos Maroti
  *   @author Brano Kusy, kusy@isis.vanderbilt.edu
- *   @modified Jan05 doc fix
+ *   @author Janos Sallai
  */
 
 #include "Dfrf.h"
@@ -45,13 +67,13 @@ module DfrfEngineP
     {
         interface DfrfPolicy[uint8_t id];
 
-        interface TimeSyncAMSend<TMilli, uint32_t>;
+        interface TimeSyncAMSend<TDfrf, uint32_t>;
         interface Receive;
-        interface PacketTimeStamp<TMilli, uint32_t>; // for the GLOBAL_TIMING-BRANO
+        interface PacketTimeStamp<TDfrf, uint32_t>; // for the GLOBAL_TIMING-BRANO
 
-        interface TimeSyncPacket<TMilli, uint32_t>;
+        interface TimeSyncPacket<TDfrf, uint32_t>;
         interface Timer<TMilli>;
-        interface LocalTime<TMilli>;
+        interface LocalTime<TDfrf>;
         interface Leds;
         interface Packet;
     }

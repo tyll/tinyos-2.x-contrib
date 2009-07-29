@@ -1,7 +1,9 @@
 
 #include <Storage.h>
 #include <Shell.h>
+#ifdef BINARY_SHELL
 #include <BinaryShell.h>
+#endif
 #include "imgNum2volumeId.h"
 #include "Deluge.h"
 #include "PrintfUART.h"

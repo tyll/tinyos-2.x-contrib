@@ -1099,8 +1099,10 @@ module IPDispatchP {
     
   fail:
     s_entry->info->failed = TRUE;
-    if (s_entry->info->policy.dest[0] != 0xffff)
+    if (s_entry->info->policy.dest[0] != 0xffff) {
+      stats.tx_drop++;
       dbg("Drops", "drops: sendDone: frag was not delivered\n");
+    }
 
   done:
     s_entry->info->policy.actRetries = call PacketLink.getRetries(msg);

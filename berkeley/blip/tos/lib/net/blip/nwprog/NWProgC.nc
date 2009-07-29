@@ -1,5 +1,7 @@
 
+#ifdef BINARY_SHELL
 #include <BinaryShell.h>
+#endif
 #include "StorageVolumes.h"
 #include "Deluge.h"
 

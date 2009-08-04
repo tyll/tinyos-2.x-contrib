@@ -90,8 +90,18 @@ implementation {
   }
   
   /**************** LinkPacketMetadata Commands **************/
+  /** 
+   * From the CC1101 Datasheet:
+   * LQI is best used as a relative measurement of the link quality (a low 
+   * value indicates a better link than what a high value does), since the value 
+   * is dependent on the modulation format.
+   */
   async command bool LinkPacketMetadata.highChannelQuality(message_t* msg) {
-    return call BlazePacket.getLqi(msg) > 105; // Taken from the CC2420 stack
+    // Measured experimentally probably using MSK modulation, 0 dBm TX power.
+    // After the LQI went up above it's good value of 12-13, it reached into 
+    // the 20's and the packet reception rate went way down.
+    return call BlazePacket.getLqi(msg) < 16;
   }
+
 
 }

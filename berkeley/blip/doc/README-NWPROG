@@ -46,7 +46,7 @@ networking is working, you should have no problem following the rest
 of the instructions.
 
 Interactions with the motes happen using the 'nwprog' tool in a shell.
-Connect the shell with `nc6 -u 2001:470:1f04:56d::65 2000`.
+Connect the shell with `nc6 -u fec0::65 2000`.
 It has three commands:
  `nwprog list`: examine the flash and print out information on volumes
         containing images believed to be valid
@@ -58,9 +58,9 @@ In order to upload new images, use the tos-nwprog tool, located in
 $LOWPAN_ROOT/tools/tinyos/misc.  This tool provides minimal
 functionality; only erasing and uploading are supported.
 
- `./tos-nwprog 2001:470:1f04:56d::65 -e 0`: erase image 0 from the
+ `./tos-nwprog -e 0 fec0::65`: erase image 0 from the
         mote at the given IP address.
- `./tos-nwprog 2001:470:1f04:56d::65 -u 0 tos_image.xml`: upload the
+ `./tos-nwprog -u 0 -f tos_image.xml fec0::65`: upload the
         image in tos_image.xml to volume 0 on the mote at the IP
         address.  This will erase the volume before uploading it.
 

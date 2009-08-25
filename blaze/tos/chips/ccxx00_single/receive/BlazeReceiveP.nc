@@ -49,6 +49,7 @@ module BlazeReceiveP {
     interface SplitControl;
     interface Receive;
     interface AckReceive;
+    interface AckSendNotifier[am_addr_t destination];
   }
   
   uses {
@@ -83,9 +84,6 @@ module BlazeReceiveP {
 }
 
 implementation {
-  
-  /** Pointer to a message buffer, used for double buffering */
-  norace message_t* m_msg;
   
   /** Acknowledgement frame */
   blaze_ack_t acknowledgement;
@@ -134,11 +132,7 @@ implementation {
   
   /***************** Init Commands ****************/
   command error_t Init.init() {
-    atomic {
-      m_msg = &myMsg;
-      acknowledgement.length = ACK_FRAME_LENGTH;
-      acknowledgement.fcf = FRAME_TYPE_ACK;
-    }
+    acknowledgement.length = ACK_FRAME_LENGTH;
     
     state = S_OFF;
     
@@ -222,7 +216,7 @@ implementation {
   async event void RXFIFO.readDone( uint8_t* rx_buf, uint8_t rx_len,
                                     error_t error ) {
     
-    blaze_header_t *header = call BlazePacketBody.getHeader( (message_t *) m_msg );
+    blaze_header_t *header = call BlazePacketBody.getHeader( &myMsg );
     
     //toggle csn to show done reading
     call Csn.set();
@@ -251,7 +245,7 @@ implementation {
         // This is a valid ACK packet.
         // Note that ACK packets aren't currently undergoing a CRC check,
         // and BlazeTransmitP isn't appending a CRC for ack packets.
-        signal AckReceive.receive( header->src, header->dest, header->dsn );
+        signal AckReceive.receive( (blaze_ack_t *) &myMsg );
         
         /** Fall through and cleanUp() */
         
@@ -264,9 +258,12 @@ implementation {
               if(shouldAck(header)) {
                 // Send an ack and then receive the packet in AckSend.sendDone()
                 atomic {
+                  acknowledgement.fcf = FRAME_TYPE_ACK;
                   acknowledgement.dest = header->src;
                   acknowledgement.dsn = header->dsn;
                   acknowledgement.src = call ActiveMessageAddress.amAddress();
+                  
+                  signal AckSendNotifier.aboutToSend[header->dest](&acknowledgement);
                 }
                 
                 call Csn.clr();
@@ -336,11 +333,10 @@ implementation {
   
   /***************** Tasks ****************/
   task void receiveDone() {
-    blaze_metadata_t *metadata = call BlazePacketBody.getMetadata( m_msg );
-    uint8_t *buf = (uint8_t *) call BlazePacketBody.getHeader( m_msg );
+    blaze_metadata_t *metadata = call BlazePacketBody.getMetadata( &myMsg );
+    uint8_t *buf = (uint8_t *) call BlazePacketBody.getHeader( &myMsg );
     uint8_t myRssi;
     uint8_t myLqi;
-    message_t *atomicMsg;
     
     // Remove the CRC bit from the LQI byte (0x80)
     myRssi = buf[ *buf + 1 ];
@@ -349,13 +345,7 @@ implementation {
     metadata->lqi = myLqi;
     metadata->rssi = myRssi;
     
-    atomicMsg = signal Receive.receive( m_msg, m_msg->data, *buf );
-    
-    if(atomicMsg != NULL) {
-      atomic m_msg = atomicMsg;
-    } else {
-      atomic m_msg = &myMsg;
-    }
+    signal Receive.receive( &myMsg, (&myMsg)->data, *buf );
     
     cleanUp();
   }
@@ -377,7 +367,7 @@ implementation {
     call Csn.clr();
     
     // Read in the length byte
-    call RXFIFO.beginRead((uint8_t *) m_msg, 1);
+    call RXFIFO.beginRead((uint8_t *) &myMsg, 1);
   }
   
   void failReceive() {
@@ -472,6 +462,7 @@ implementation {
   
   
   /***************** Defaults ****************/
+  default async event void AckSendNotifier.aboutToSend[am_addr_t destination](blaze_ack_t *ack) { }
   
 }
 

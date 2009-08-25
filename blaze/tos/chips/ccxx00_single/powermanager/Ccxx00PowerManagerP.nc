@@ -79,8 +79,8 @@ implementation {
   };
   
   /***************** Prototypes ****************/
-  task void startRadios();
-  task void stopRadios();
+  void startRadios();
+  void stopRadios();
 
   /***************** Init Commands ****************/
   command error_t Init.init() {
@@ -99,7 +99,7 @@ implementation {
     }
     
     myState = S_START_BEGIN;
-    post startRadios();
+    startRadios();
     return SUCCESS;
   }
   
@@ -113,40 +113,40 @@ implementation {
     }
     
     myState = S_STOP_BEGIN;
-    post stopRadios();
+    stopRadios();
     return SUCCESS;
   }
   
   
   /***************** CsmaSplitControl Events ****************/
   event void CsmaSplitControl.startDone(error_t error) {
-    post startRadios();
+    startRadios();
   }
     
   event void CsmaSplitControl.stopDone(error_t error) {
-    post stopRadios();
+    stopRadios();
   }
   
   /***************** ReceiveSplitControl Events ****************/
   event void ReceiveSplitControl.startDone(error_t error) {
-    post startRadios();
+    startRadios();
   }
     
   event void ReceiveSplitControl.stopDone(error_t error) {
-    post stopRadios();
+    stopRadios();
   }
   
   /***************** InitSplitControl Events ****************/  
   event void InitSplitControl.startDone(error_t error) {
-    post startRadios();
+    startRadios();
   }
     
   event void InitSplitControl.stopDone(error_t error) {
-    post stopRadios();
+    stopRadios();
   }
 
   /***************** Tasks ****************/  
-  task void startRadios() {
+  void startRadios() {
     myState++;
     switch(myState) {      
       case S_START_RECEIVE:
@@ -166,7 +166,7 @@ implementation {
     }
   }
   
-  task void stopRadios() {
+  void stopRadios() {
     myState++;
     switch(myState) {
       case S_STOP_CSMA:

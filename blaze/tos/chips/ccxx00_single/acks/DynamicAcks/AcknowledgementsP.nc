@@ -51,6 +51,7 @@ module AcknowledgementsP {
   provides {
     interface Send;
     interface PacketAcknowledgements;
+    interface AckReceive;
   }
   
   uses {
@@ -58,7 +59,7 @@ module AcknowledgementsP {
     interface Send as SubSend;
     interface ChipSpiResource;
     interface Alarm<T32khz,uint16_t> as AckWaitTimer;
-    interface AckReceive;
+    interface AckReceive as SubAckReceive;
     
     interface Leds;
   }
@@ -187,22 +188,19 @@ implementation {
     }
   }
   
-  /***************** AckReceive Events ****************/
-  async event void AckReceive.receive( am_addr_t source, am_addr_t destination, uint8_t dsn ) {
-    message_t *atomicMsg;
-    blaze_header_t *header;
-    uint8_t myState;
+  /***************** SubAckReceive Events ****************/
+  async event void SubAckReceive.receive( blaze_ack_t *ack ) {
+    blaze_header_t *header = call BlazePacketBody.getHeader(RADIO_STACK_PACKET);
     
-    header = call BlazePacketBody.getHeader(atomicMsg);
-    atomic myState = state;
-    
-    if(myState == S_ACK_WAIT) {
-      if((source == header->dest || header->dest == AM_BROADCAST_ADDR) &&
-          destination == header->src &&
-              dsn == header->dsn) {
+    if(state == S_ACK_WAIT) {
+      if((ack->dest == header->src || ack->dest == AM_BROADCAST_ADDR) &&
+          ack->src == header->dest &&
+              ack->dsn == header->dsn) {
                 
         // This is our acknowledgement
         setAck(atomicMsg, TRUE);
+        
+        signal AckReceive.receive(ack);
         
         /**
          * The rest of this would speed up the amount of time it takes to send
@@ -216,6 +214,7 @@ implementation {
         call ChipSpiResource.attemptRelease();
         post sendDone();
          */
+         
       }
     }
   }
@@ -275,5 +274,7 @@ implementation {
  
   default event void Send.sendDone(message_t *msg, error_t error) {
   }
+  
+  default async event void AckReceive.receive( blaze_ack_t *ack) { }
    
 }

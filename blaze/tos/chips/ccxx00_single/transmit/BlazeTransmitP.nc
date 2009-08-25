@@ -304,7 +304,13 @@ implementation {
     }
     
     // CCA Passed
-    post startTimer();
+    if(transmitDelay > 0) {
+      post startTimer();
+      
+    } else {
+      call TXFIFO.write(myMsg, (call BlazePacketBody.getHeader(myMsg))->length + 1);
+    }
+    
     return SUCCESS;
   }  
   

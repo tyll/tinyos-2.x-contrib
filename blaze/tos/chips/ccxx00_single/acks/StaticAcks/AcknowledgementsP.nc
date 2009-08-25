@@ -52,6 +52,7 @@ module AcknowledgementsP {
   provides {
     interface Send;
     interface PacketAcknowledgements;
+    interface AckReceive;
   }
   
   uses {
@@ -59,7 +60,7 @@ module AcknowledgementsP {
     interface Send as SubSend;
     interface ChipSpiResource;
     interface Alarm<T32khz,uint16_t> as AckWaitTimer;
-    interface AckReceive;
+    interface AckReceive as SubAckReceive;
     
     interface Leds;
   }
@@ -146,6 +147,11 @@ implementation {
   async event void AckWaitTimer.fired() {
     // Our ack wait period expired with no luck...
     atomic state = S_SEND_DONE;
+
+#if BLAZE_ENABLE_TIMING_LEDS
+    call Leds.led1Off();
+#endif
+    
     call ChipSpiResource.attemptRelease();
     post sendDone();
   }
@@ -154,22 +160,33 @@ implementation {
   /***************** SubSend Events ****************/
   event void SubSend.sendDone(message_t *msg, error_t error) {
     atomic state = S_ACK_WAIT;
+
+#if BLAZE_ENABLE_TIMING_LEDS
+    call Leds.led1On();
+#endif
+
     call AckWaitTimer.start(BLAZE_ACK_WAIT);
   }
   
-  /***************** AckReceive Events ****************/
-  async event void AckReceive.receive( am_addr_t source, am_addr_t destination, uint8_t dsn ) {
-    blaze_header_t *header;
-    
-    header = call BlazePacketBody.getHeader(RADIO_STACK_PACKET);
+  /***************** SubAckReceive Events ****************/
+  async event void SubAckReceive.receive( blaze_ack_t *ack ) {
+    blaze_header_t *header = call BlazePacketBody.getHeader(RADIO_STACK_PACKET);
     
     if(state == S_ACK_WAIT) {
-      if((source == header->dest || header->dest == AM_BROADCAST_ADDR) &&
-          destination == header->src &&
-              dsn == header->dsn) {
+      if((ack->dest == header->src || ack->dest == AM_BROADCAST_ADDR) &&
+          ack->src == header->dest &&
+              ack->dsn == header->dsn) {
         
         // This is our acknowledgement
         wasAcked = TRUE;
+        
+        signal AckReceive.receive(ack);
+        
+#if BLAZE_ENABLE_TIMING_LEDS
+    call Leds.led1Toggle();
+    call Leds.led1Toggle();
+#endif
+
       }
     }
   }
@@ -196,5 +213,5 @@ implementation {
   
   
   /***************** Defaults ****************/
-   
+  default async event void AckReceive.receive( blaze_ack_t *ack) { }
 }

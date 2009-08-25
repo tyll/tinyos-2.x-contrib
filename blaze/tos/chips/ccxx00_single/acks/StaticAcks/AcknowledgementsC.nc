@@ -32,7 +32,7 @@
 #include "Blaze.h"
 
 /**
- * This layer combines the Send command with the AckReceive event
+ * This layer combines the Send command with the SubAckReceive event
  * from the asynchronous portion of the receive stack.  It also provides
  * the PacketAcknowledgement interface
  *
@@ -50,6 +50,7 @@ configuration AcknowledgementsC {
   provides {
     interface Send;
     interface PacketAcknowledgements;
+    interface AckReceive;
   }
   
   uses {
@@ -63,6 +64,7 @@ implementation {
   Send = AcknowledgementsP;
   PacketAcknowledgements = AcknowledgementsP;
   SubSend = AcknowledgementsP;
+  AckReceive = AcknowledgementsP;
   
   components BlazeSpiC;
   AcknowledgementsP.ChipSpiResource -> BlazeSpiC;
@@ -74,7 +76,7 @@ implementation {
   AcknowledgementsP.AckWaitTimer -> AlarmMultiplexC;
   
   components BlazeReceiveC;
-  AcknowledgementsP.AckReceive -> BlazeReceiveC;
+  AcknowledgementsP.SubAckReceive -> BlazeReceiveC;
   
   components LedsC;
   AcknowledgementsP.Leds -> LedsC;

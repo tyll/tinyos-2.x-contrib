@@ -29,56 +29,53 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE
  */
 
-#include "Blaze.h"
-
 /**
- * This layer combines the Send command with the SubAckReceive event
- * from the asynchronous portion of the receive stack.  It also provides
- * the PacketAcknowledgement interface
- *
- * Above this layer, nothing should be asynchronous context
- * Below this layer should be CSMA
- *
- * 'Acknowledgment' is how it's spelled in the U.S.
- * 'Acknowledgement' is British. 
- * Since TinyOS has a PacketAcknowledgement interface, this will be the
- * Acknowledgement component to keep things consistent.
- * 
  * @author David Moss
  */
-configuration AcknowledgementsC {
+ 
+#include "Blaze.h"
+#include "message.h"
+
+configuration LplC {
   provides {
+    interface LowPowerListening;
+    interface SystemLowPowerListening;
     interface Send;
-    interface PacketAcknowledgements;
-    interface AckReceive;
+    interface Receive;
+    interface SplitControl;
   }
   
-  uses {
+  uses { 
     interface Send as SubSend;
+    interface Receive as SubReceive;
+    interface SplitControl as SubControl;
   }
 }
 
 implementation {
 
-  components AcknowledgementsP;
-  Send = AcknowledgementsP;
-  PacketAcknowledgements = AcknowledgementsP;
-  SubSend = AcknowledgementsP;
-  AckReceive = AcknowledgementsP;
+  components LplP;
+  Send = LplP.Send;
+  Receive = LplP.Receive;
+  SplitControl = LplP.SplitControl;
+  LowPowerListening = LplP.LowPowerListening;
+  SystemLowPowerListening = LplP.SystemLowPowerListening;
   
-  components BlazeSpiC;
-  AcknowledgementsP.ChipSpiResource -> BlazeSpiC;
+  LplP.SubSend = SubSend;
+  LplP.SubReceive = SubReceive;
+  LplP.SubControl = SubControl;
+  
+  components new TimerMilliC();
+  LplP.Timer -> TimerMilliC;
   
   components BlazePacketC;
-  AcknowledgementsP.BlazePacketBody -> BlazePacketC;
+  LplP.BlazePacket -> BlazePacketC;
+  LplP.BlazePacketBody -> BlazePacketC;
   
-  components new AlarmMultiplexC();
-  AcknowledgementsP.AckWaitTimer -> AlarmMultiplexC;
-  
-  components BlazeReceiveC;
-  AcknowledgementsP.SubAckReceive -> BlazeReceiveC;
+  components AcknowledgementsC;
+  LplP.AckReceive -> AcknowledgementsC;
   
   components LedsC;
-  AcknowledgementsP.Leds -> LedsC;
+  LplP.Leds -> LedsC;
   
 }

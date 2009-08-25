@@ -45,6 +45,7 @@ configuration BlazeReceiveC {
   provides {
     interface Receive;
     interface AckReceive;
+    interface AckSendNotifier[am_addr_t destination];
     interface SplitControl;
   }
 }
@@ -55,6 +56,7 @@ implementation {
   Receive = BlazeReceiveP.Receive;
   AckReceive = BlazeReceiveP;
   SplitControl = BlazeReceiveP.SplitControl;
+  AckSendNotifier = BlazeReceiveP.AckSendNotifier;
     
   components BlazeCentralWiringC;
   BlazeReceiveP.Csn -> BlazeCentralWiringC.Csn;

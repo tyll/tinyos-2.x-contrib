@@ -55,11 +55,9 @@ implementation {
 
   /** State of all the radios compiled into our system */
   uint8_t radioState;
-
-  enum {
-    NO_FOCUSED_RADIO = 0xFF,
-  };
   
+  /** TRUE if we're waiting for the radio to turn on before we send */
+  bool delayedSend;
   
   /***************** SplitControl Commands ****************/
   /**
@@ -94,7 +92,8 @@ implementation {
   /***************** Send Commands ****************/
   command error_t Send.send(message_t* msg, uint8_t len) {
     if(radioState != CCXX00_ON) {
-      return EOFF;
+      return call SplitControl.start();
+      
     } else {
       return call SubSend.send(msg, len);
     }
@@ -132,6 +131,13 @@ implementation {
   event void SubControl.startDone(error_t error) {
     radioState = CCXX00_ON;
     signal SplitControl.startDone(error);
+    
+    if(delayedSend) {
+      delayedSend = FALSE;
+      if(call SubSend.send(RADIO_STACK_PACKET, 0) != SUCCESS) {
+        signal Send.sendDone(RADIO_STACK_PACKET, FAIL);
+      }
+    }
   }
   
   event void SubControl.stopDone(error_t error) {
@@ -142,6 +148,7 @@ implementation {
 
   /***************** SubSend Events ****************/
   event void SubSend.sendDone(message_t *msg, error_t error) {
+    delayedSend = FALSE;
     signal Send.sendDone(msg, error);
   }
   

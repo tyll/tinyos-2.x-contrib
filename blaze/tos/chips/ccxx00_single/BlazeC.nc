@@ -93,6 +93,9 @@ configuration BlazeC {
     /** CTP Required Interface */
     interface LinkPacketMetadata;
     
+    /** AckSendNotifier Interface to change the ack being sent */
+    interface AckSendNotifier[am_addr_t destination];
+    
     
     /***************** Multiple Radio Options ****************/
     /** Multiple Radio Split Control */
@@ -136,14 +139,14 @@ implementation {
   InitialBackoff = CsmaC.InitialBackoff;
   CongestionBackoff = CsmaC.CongestionBackoff;
   
+  components BlazeReceiveC;
+  AckSendNotifier = BlazeReceiveC.AckSendNotifier;
+  
   components SplitControlManagerC;
   components Ccxx00PowerManagerC;
   components UniqueReceiveC;
-
-  components BlazeReceiveC;
   components BlazeInitC;
   components BlazeTransmitC;
-  
   components Ccxx00PlatformInitC;
   
   /***************** Send Layers ****************/

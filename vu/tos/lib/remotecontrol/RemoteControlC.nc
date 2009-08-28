@@ -77,7 +77,7 @@ implementation
 	components
 	    new AutoStartC(),
 	    RemoteControlM,
-	    ActiveMessageC as AM, new TimerMilliC() as TimerC, RandomC, HilTimerMilliC;
+	    ActiveMessageC as AM, new TimerMilliC() as TimerC, RandomC;
 
 #ifdef LEAF_NODE
 	components	GradientLeafPolicyC as GradientPolicyC;
@@ -103,7 +103,16 @@ implementation
 	RemoteControlM.Timer -> TimerC;
 	RemoteControlM.Random -> RandomC;
 	RemoteControlM.RandomInit -> RandomC.SeedInit;
-	RemoteControlM.LocalTime -> HilTimerMilliC;
+
+#if defined(DFRF_32KHZ)
+  components LocalTime32khzC as LocalTimeProviderC;
+  RemoteControlM.LocalTime -> LocalTimeProviderC;
+#else
+  components HilTimerMilliC;
+  RemoteControlM.LocalTime -> HilTimerMilliC;
+#endif
+
+
 
 	RemoteControlM.DfrfControl-> DfrfService.StdControl;
 	RemoteControlM.DfrfSend -> DfrfService;

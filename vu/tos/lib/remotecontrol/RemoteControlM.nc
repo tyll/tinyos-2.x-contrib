@@ -56,7 +56,13 @@ module RemoteControlM
         interface ParameterInit<uint16_t> as RandomInit;
         interface DfrfSend<reply_t>;
         interface StdControl as DfrfControl;
+        
+#if defined(DFRF_32KHZ)
+        interface LocalTime<T32khz>;
+#else
         interface LocalTime<TMilli>;
+#endif
+        
     }
 }
 

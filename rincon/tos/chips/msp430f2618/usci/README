@@ -1,0 +1,9 @@
+mhh 20071024
+
+this entire directory should be completely redone to
+support the pair of usci's on the f2618.
+
+for now, i'm just trying to hack something together
+that (a) works, and (b) walks+talks like the f1611.
+sue me.
+

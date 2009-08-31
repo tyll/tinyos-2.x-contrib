@@ -1,0 +1,14 @@
+#!/bin/sh
+
+echo "Press ENTER at the prompt to exit"
+while true; do
+  echo -n "Serial number: "
+  read ser
+  case "$ser" in
+    "") echo "bye!"; exit 0;;
+    [0-9][0-9]*) ser="NODE$ser";;
+  esac
+  echo "Programming FT232R with serial number [$ser]"
+  /opt/tinyos-2.x-contrib/rincon/tools/ft232r/winexe/bin/tos-bsl.exe -c 0 --rincon-usb --ftdi-eeprog="description:mote;serialnumber:${ser};manufacturer:RRC;manufacturerid:RI;maxpower:500;pnp:1;selfpowered:0;remotewakeup:1;sernumenabler:1;cbus0:3;cbus1:2;cbus2:10;cbus3:10"
+done
+

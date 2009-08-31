@@ -43,6 +43,10 @@ configuration BlazeInitC {
     interface BlazeCommit;
     interface PowerNotifier;
   }
+  
+  uses {
+    interface StdControl as RadioBootstrapStdControl;
+  }
 }
 
 implementation {
@@ -57,6 +61,7 @@ implementation {
   SplitControl = BlazeInitP;
   BlazeCommit = BlazeInitP;
   PowerNotifier = BlazeInitP;
+  RadioBootstrapStdControl = BlazeInitP;
 
   BlazeInitP.Csn -> BlazeCentralWiringC.Csn;
   BlazeInitP.Gdo0_io -> BlazeCentralWiringC.Gdo0_io;

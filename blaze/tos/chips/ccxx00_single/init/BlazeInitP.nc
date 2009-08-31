@@ -58,6 +58,8 @@ module BlazeInitP {
   }
   
   uses {
+    interface StdControl as RadioBootstrapStdControl;
+    
     interface Resource as InitResource;
     interface Resource as DeepSleepResource;
 
@@ -110,6 +112,8 @@ implementation {
   command error_t SplitControl.start() {
     atomic currentOperation = S_STARTING;
     
+    call RadioBootstrapStdControl.start();
+    
     call InitResource.request();
     
     return SUCCESS;
@@ -129,6 +133,8 @@ implementation {
     } else {
       deepSleep();
     }
+    
+    call RadioBootstrapStdControl.stop();
     
     return SUCCESS;
   }
@@ -298,5 +304,8 @@ implementation {
   
   default event void PowerNotifier.on() {}
   default event void PowerNotifier.off() {}
+  
+  default command error_t RadioBootstrapStdControl.start() {}
+  default command error_t RadioBootstrapStdControl.stop() {} 
   
 }

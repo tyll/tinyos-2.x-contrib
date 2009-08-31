@@ -30,7 +30,7 @@
  */
 
 /**
- * 10 kBaud FCC Compliant (TI design note DN006)
+ * 10 kBaud Manchester
  */
  
 /**
@@ -47,17 +47,14 @@
 
 #include "Blaze.h"
 
-enum {
-  CC1100_RADIO_ID = unique( UQ_BLAZE_RADIO ),
-};
-
 #warning "*** INCLUDING CC1100 RADIO ***"
 
 /** SLOW THINGS DOWN FOR THIS DATA RATE */
-#define BLAZE_ACK_WAIT 1000
+#define BLAZE_ACK_WAIT 2000
 #define TRANSMITTER_QUALITY_THRESHOLD 200
-#define BLAZE_MIN_INITIAL_BACKOFF 1500
-#define BLAZE_MIN_BACKOFF 200
+#define BLAZE_MIN_INITIAL_BACKOFF 5000
+#define BLAZE_MIN_BACKOFF 500
+#define BLAZE_BACKOFF_PERIOD 100
 
 
 /** 
@@ -75,8 +72,8 @@ enum {
  * You can change the matching network at compile time
  */
 #ifndef CC1100_MATCHING_NETWORK
-#warning "Using CC1100 default matching network at 915 MHz"
-#define CC1100_MATCHING_NETWORK CC1100_915_MHZ
+#warning "Using CC1100 default matching network at 315 MHz"
+#define CC1100_MATCHING_NETWORK CC1100_315_MHZ
 #endif
 
 
@@ -121,8 +118,124 @@ enum {
  */
  
  
-#if (CC1100_MATCHING_NETWORK == CC1100_915_MHZ)
+#if (CC1100_MATCHING_NETWORK == CC1100_315_MHZ)
+/***************** 315 Matching Network ****************/
 
+// Default channel is at 914.996796 MHz
+#ifndef CC1100_DEFAULT_CHANNEL
+#define CC1100_DEFAULT_CHANNEL 65
+#endif
+
+#ifndef CC1100_CHANNEL_MIN
+#define CC1100_CHANNEL_MIN 0
+#endif
+
+#ifndef CC1100_CHANNEL_MAX
+#define CC1100_CHANNEL_MAX 135
+#endif
+
+enum {
+  CC1100_LOWEST_FREQ = 901998, 
+  CC1100_DEFAULT_FREQ2 = 0x22,
+  CC1100_DEFAULT_FREQ1 = 0xB1,
+  CC1100_DEFAULT_FREQ0 = 0x3B,
+};  
+
+/** 
+ * These values calculated using TI smart RF studio
+ */
+enum{
+  CC1100_PA_PLUS_10 = 0xC0,
+  CC1100_PA_PLUS_5 = 0x85,
+  CC1100_PA_PLUS_0 = 0x8E,
+  CC1100_PA_MINUS_5 = 0x57,
+  CC1100_PA_MINUS_10 = 0x26,	
+};
+
+#ifndef CC1100_PA
+#define CC1100_PA CC1100_PA_PLUS_10
+#endif
+
+
+#elif (CC1100_MATCHING_NETWORK == CC1100_433_MHZ)
+/***************** 433 MHz Matching Network ****************/
+
+// Default channel is at 433.191833 MHz
+#ifndef CC1100_DEFAULT_CHANNEL
+#define CC1100_DEFAULT_CHANNEL 161
+#endif
+
+#ifndef CC1100_CHANNEL_MIN
+#define CC1100_CHANNEL_MIN 0
+#endif
+
+#ifndef CC1100_CHANNEL_MAX
+#define CC1100_CHANNEL_MAX 255
+#endif
+
+enum {  
+  CC1100_LOWEST_FREQ = 400998, 
+  CC1100_DEFAULT_FREQ2 = 0x0F,
+  CC1100_DEFAULT_FREQ1 = 0x6C,
+  CC1100_DEFAULT_FREQ0 = 0x4E,
+};  
+
+/** 
+ * These values calculated using TI smart RF studio
+ */
+enum{
+  CC1100_PA_PLUS_10 = 0xC0,
+  CC1100_PA_PLUS_5 = 0x85,
+  CC1100_PA_PLUS_0 = 0x60,
+  CC1100_PA_MINUS_5 = 0x57,
+  CC1100_PA_MINUS_10 = 0x26,	
+};
+
+#ifndef CC1100_PA
+#define CC1100_PA CC1100_PA_PLUS_10
+#endif
+
+
+#elif (CC1100_MATCHING_NETWORK == CC1100_868_MHZ)
+/***************** 868 MHz Matching Network ****************/
+
+// Default channel is at 868.192749 MHz
+#ifndef CC1100_DEFAULT_CHANNEL
+#define CC1100_DEFAULT_CHANNEL 141
+#endif
+
+#ifndef CC1100_CHANNEL_MIN
+#define CC1100_CHANNEL_MIN 0
+#endif
+
+#ifndef CC1100_CHANNEL_MAX
+#define CC1100_CHANNEL_MAX 255
+#endif
+
+enum {
+  CC1100_LOWEST_FREQ = 839998, 
+  CC1100_DEFAULT_FREQ2 = 0x20,
+  CC1100_DEFAULT_FREQ1 = 0x4E,
+  CC1100_DEFAULT_FREQ0 = 0xC4,
+};  
+
+/** 
+ * These values calculated using TI smart RF studio
+ */
+enum{
+  CC1100_PA_PLUS_10 = 0xC3,
+  CC1100_PA_PLUS_5 = 0x85,
+  CC1100_PA_PLUS_0 = 0x8E,
+  CC1100_PA_MINUS_5 = 0x57,
+  CC1100_PA_MINUS_10 = 0x34,	
+};
+
+#ifndef CC1100_PA
+#define CC1100_PA CC1100_PA_PLUS_10
+#endif
+
+
+#else
 /***************** 915 MHz Matching Network ****************/
 
 // Default channel is at 914.996796 MHz
@@ -175,10 +288,12 @@ enum CC1100_config_reg_state_enums {
   /** GDO1 is High Impedance */
   CC1100_CONFIG_IOCFG1 = 0x2E,
   
-  /** GDO0 asserts when there is data in the RX FIFO */
+  /** GDO0 asserts at the end of a received packet */
   CC1100_CONFIG_IOCFG0 = 0x01, 
   
+  /** FIFO Threshold is maxed so we don't try downloading incomplete pkts */
   CC1100_CONFIG_FIFOTHR = 0x0F,
+  
   CC1100_CONFIG_SYNC1 = 0xD3,
   CC1100_CONFIG_SYNC0 = 0x91,
   
@@ -202,12 +317,12 @@ enum CC1100_config_reg_state_enums {
   CC1100_CONFIG_FREQ1 = CC1100_DEFAULT_FREQ1,
   CC1100_CONFIG_FREQ0 = CC1100_DEFAULT_FREQ0,
   
-  CC1100_CONFIG_MDMCFG4 = 0xC7,
-  CC1100_CONFIG_MDMCFG3 = 0x83,
-  CC1100_CONFIG_MDMCFG2 = 0x13,  // 0x03 = no manchester
+  CC1100_CONFIG_MDMCFG4 = 0xFA,
+  CC1100_CONFIG_MDMCFG3 = 0x06,
+  CC1100_CONFIG_MDMCFG2 = 0x73,
   CC1100_CONFIG_MDMCFG1 = 0x22,
   CC1100_CONFIG_MDMCFG0 = 0xF8,
-  CC1100_CONFIG_DEVIATN = 0x40,
+  CC1100_CONFIG_DEVIATN = 0x00,
   CC1100_CONFIG_MCSM2 = 0x07,
   
   /** TX on CCA; Stay in Rx after Rx and Tx */
@@ -218,7 +333,7 @@ enum CC1100_config_reg_state_enums {
   
   CC1100_CONFIG_FOCCFG = 0x16,
   CC1100_CONFIG_BSCFG = 0x6C,
-  CC1100_CONFIG_AGCTRL2 = 0x43,   // If no Tx, lower LNA's (look at AGC)
+  CC1100_CONFIG_AGCTRL2 = 0x03,   // If no Tx, lower LNA's (look at AGC)
   CC1100_CONFIG_AGCTRL1 = 0x40,   // CCA thresholds
   CC1100_CONFIG_AGCTRL0 = 0x91, 
   

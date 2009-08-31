@@ -103,13 +103,13 @@ implementation {
       addr += IFLASH_SIZE;
       newPtr += IFLASH_SIZE;
     }
-
-    atomic {
-      FCTL2 = FWKEY + FSSEL1 + FN2;
-      FCTL3 = FWKEY;
-      FCTL1 = FWKEY + ERASE;
-      *newPtr = 0;
-      FCTL1 = FWKEY + WRT;
+    
+    atomic {                         // Disable interrupts
+      FCTL2 = FWKEY + FSSEL1 + FN2;  // SMCLK/2
+      FCTL3 = FWKEY;                 // Clear LOCK
+      FCTL1 = FWKEY + ERASE;         // Enable segment erase
+      *newPtr = 0;                   // Dummy write, erase the selected segment
+      FCTL1 = FWKEY + WRT;           // Enable write
 
       for ( i = 0; i < IFLASH_SIZE-1; i++, newPtr++, oldPtr++ ) {
         if ((uint16_t)newPtr < (uint16_t)addr || (uint16_t)addr + len <= (uint16_t)newPtr) {

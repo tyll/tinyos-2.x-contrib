@@ -49,6 +49,13 @@ module Msp430DirectStorageP {
 
 implementation {
 
+#ifndef FLASH_TIMING
+#warning "Flash timing generator presumes 4MHz MCLK"
+  // 1<<22 MCLK divided by 12 -> 350 kHz
+  // FCTL2 gets divisor minus one -> 11
+#define FLASH_TIMING (FSSEL0 | FN3 | FN1 | FN0)
+#endif
+
   enum {
     FLASH_OFFSET = 0x1000,
   };
@@ -93,7 +100,7 @@ implementation {
     addressPtr += FLASH_OFFSET;
 
     atomic {
-      FCTL2 = FWKEY + FSSEL1 + FN2;
+      FCTL2 = FWKEY + FLASH_TIMING;
       FCTL3 = FWKEY;      
       FCTL1 = FWKEY + WRT;
       memcpy(addressPtr, buf, len);
@@ -119,7 +126,7 @@ implementation {
     addressPtr = (uint16_t *) (FLASH_OFFSET + ((uint16_t) call VolumeSettings.getEraseUnitSize() * (uint16_t) eraseUnitIndex));
 
     atomic {
-      FCTL2 = FWKEY + FSSEL1 + FN2;
+      FCTL2 = FWKEY + FLASH_TIMING;
       FCTL3 = FWKEY;
       FCTL1 = FWKEY + ERASE;
       *addressPtr = 0;

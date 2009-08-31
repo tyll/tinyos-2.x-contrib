@@ -29,12 +29,18 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE
  */
  
-configuration DawgC { }
+configuration DawgC {
+  provides {
+    interface StdControl;
+  }
+}
 
 implementation {
-  components DawgP, MainC, new TimerMilliC();
+  components DawgP,  
+      new TimerMilliC();
 
-  MainC.SoftwareInit -> DawgP.Init;
-  DawgP.Timer        -> TimerMilliC;
+  StdControl  = DawgP.StdControl;
+  DawgP.Timer -> TimerMilliC;
+  
 }
 

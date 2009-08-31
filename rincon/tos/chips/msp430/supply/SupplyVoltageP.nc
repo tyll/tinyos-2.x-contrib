@@ -36,9 +36,10 @@
  *
  * @author Mark Siner
  */
- 
+
 #define SUPPLY_AUTOSAMPLE_MILLIS 61440U
 #define SVSFG_MASK 0x01
+#define LOW_VOLTAGE_LEVEL VLD_265V
 
 module SupplyVoltageP {
   provides {
@@ -52,6 +53,8 @@ module SupplyVoltageP {
 }
 
 implementation {
+
+  uint16_t translateToVoltage( uint8_t svsVolt );
 
   uint8_t lastVoltage = 0;
   
@@ -78,6 +81,53 @@ implementation {
    * @return the supply voltage times 100. So, 3.10 volts = 310.
    */
   command uint16_t SupplyVoltage.getVoltage() {
+    return translateToVoltage( lastVoltage );
+  }
+  
+  command bool SupplyVoltage.isBatteryLow() {
+    return (SVSCTL & SVSFG_MASK);
+  }
+  
+  command void SupplyVoltage.sample() {
+    uint8_t vld = VLD_37V;
+    
+    //Step down through the thresholds
+    for(; vld > 0; vld -= 0x10 ) {
+
+      SVSCTL = vld;
+      call BusyWait.wait( 24 );    
+
+      if( !(SVSCTL & SVSFG_MASK) ) {
+        if( vld < LOW_VOLTAGE_LEVEL ) {
+#ifdef SUPPLY_VOLTAGE_PRINTF
+          printf("VOLTAGE LOW\n\r");
+#endif
+          signal SupplyVoltage.batteryLow();
+        }
+        lastVoltage = vld + 0x10;
+        break;
+      }
+    }
+    SVSCTL = LOW_VOLTAGE_LEVEL;
+#ifdef SUPPLY_VOLTAGE_PRINTF
+    printf("VOLTAGE=%d\n\r", translateToVoltage( lastVoltage ) );
+#endif
+  }
+  
+  command void SupplyVoltage.automaticSampling(bool on) {
+    if(on) {
+      call Timer.startPeriodic(SUPPLY_AUTOSAMPLE_MILLIS);
+    } else {
+      call Timer.stop();
+    }
+  }
+  
+  /***************** Timer Events ****************/
+  event void Timer.fired() {
+    call SupplyVoltage.sample();
+  }
+  
+  uint16_t translateToVoltage( uint8_t svsVolt ) {
     switch( lastVoltage ) {
       case VLD_SVSOFF:
         return 0; 
@@ -111,44 +161,6 @@ implementation {
         return 370;
     }
     return lastVoltage;
-  }
-  
-  command bool SupplyVoltage.isBatteryLow() {
-    return (SVSCTL & SVSFG_MASK);
-  }
-  
-  command void SupplyVoltage.sample() {
-    uint8_t vld = VLD_37V;
-    
-    //Step down through the thresholds
-    for(; vld > 0; vld -= 0x10 ) {
-
-      SVSCTL = vld;
-      call BusyWait.wait( 24 );    
-
-      if( !(SVSCTL & SVSFG_MASK) ) {
-        if( vld < VLD_28V ) {
-          signal SupplyVoltage.batteryLow();
-        }
-        lastVoltage = vld + 0x10;
-        break;
-      }
-    }
-    SVSCTL = VLD_28V;
-    
-  }
-  
-  command void SupplyVoltage.automaticSampling(bool on) {
-    if(on) {
-      call Timer.startPeriodic(SUPPLY_AUTOSAMPLE_MILLIS);
-    } else {
-      call Timer.stop();
-    }
-  }
-  
-  /***************** Timer Events ****************/
-  event void Timer.fired() {
-    call SupplyVoltage.sample();
   }
   
   /***************** Defaults ****************/

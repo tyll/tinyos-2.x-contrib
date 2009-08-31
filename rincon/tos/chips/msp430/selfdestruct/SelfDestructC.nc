@@ -19,7 +19,7 @@
  * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
  * FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE
- * ARCHED ROCK OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * RINCON RESEARCH OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
  * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
@@ -28,35 +28,24 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE
  */
-
-module DawgP {
+ 
+/**
+ * @author David Moss
+ */
+ 
+configuration SelfDestructC {
   provides {
-    interface StdControl;
-  }
-  uses {
-    interface Timer<TMilli> as Timer;
+    interface SelfDestruct;
   }
 }
 
 implementation {
 
-  command error_t StdControl.start() {
-    call Timer.startPeriodic(512);
-    // enable wdt with ACLK/32768 (1 second)
-    WDTCTL = WDTPW |
-             ((WDTCTL & (WDTNMIES | WDTNMI)) |
-	      (WDTCNTCL | WDTSSEL) | 0x0);
-    return SUCCESS;
-  }
+  components SelfDestructP;
+  SelfDestruct = SelfDestructP;
+ 
+  components LedsC;
+  SelfDestructP.Leds -> LedsC;
   
-  command error_t StdControl.stop() {
-    call Timer.stop();
-    WDTCTL = WDTPW | WDTHOLD;
-    return SUCCESS;
-  }
-
-  event void Timer.fired() {
-    WDTCTL = WDTPW | ((WDTCTL & 0xFF) | WDTCNTCL);
-  }
 }
 

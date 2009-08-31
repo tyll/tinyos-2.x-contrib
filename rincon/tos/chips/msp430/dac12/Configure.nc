@@ -19,7 +19,7 @@
  * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
  * FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE
- * ARCHED ROCK OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * RINCON RESEARCH OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
  * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
@@ -29,34 +29,22 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE
  */
 
-module DawgP {
-  provides {
-    interface StdControl;
-  }
-  uses {
-    interface Timer<TMilli> as Timer;
-  }
+/**
+ * @author Jan Hauer
+ * @author David Moss
+ */
+ 
+interface Configure<config_t> {
+
+  /** 
+   * Returns the configuration of a client.  <code>config_t</code> is
+   * a hardware specific data type that contains all information necessary to
+   * configure the respective hardware for the client. A client MUST always
+   * return the same configuration and, if configuration data is passed as a
+   * pointer, the subsystem (HIL component) MUST NOT reference it after the
+   * return of this command.
+   *  
+   * @return chip specific configuration.
+   */
+  async command config_t getConfiguration(); 
 }
-
-implementation {
-
-  command error_t StdControl.start() {
-    call Timer.startPeriodic(512);
-    // enable wdt with ACLK/32768 (1 second)
-    WDTCTL = WDTPW |
-             ((WDTCTL & (WDTNMIES | WDTNMI)) |
-	      (WDTCNTCL | WDTSSEL) | 0x0);
-    return SUCCESS;
-  }
-  
-  command error_t StdControl.stop() {
-    call Timer.stop();
-    WDTCTL = WDTPW | WDTHOLD;
-    return SUCCESS;
-  }
-
-  event void Timer.fired() {
-    WDTCTL = WDTPW | ((WDTCTL & 0xFF) | WDTCNTCL);
-  }
-}
-

@@ -1,0 +1,28 @@
+#!/bin/sh
+PATH="/cygdrive/c/Python25:$PATH"
+export PATH
+
+PYTHON="`which python`"
+export PYTHON
+
+### goofs up svn
+#rm -rf bin
+
+cd ..
+(cd d2xx && make buildit)
+sed -e 's,@tinyoslibdir@,.,g' < tos-bsl.in > tos-bsl
+E=`(cd d2xx/build/lib.* && pwd)`
+E=`cygpath -w $E`
+echo $E
+D=`pwd`
+S=`cygpath -w $D/winexe/setup.py`
+D=`cygpath -w $D`
+export PYTHONPATH="$D;$E"
+echo $S
+$PYTHON $S py2exe
+### new build will live in ./bin
+#mv bin winexe/bin
+(tar cf - bin) | (cd winexe && tar xf -)
+rm -rf build
+
+(cd d2xx && make clean)

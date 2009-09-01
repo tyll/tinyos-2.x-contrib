@@ -32,10 +32,7 @@
 #include "Blaze.h"
 
 /**
- * This is not pulled into the radio stack by default because it is no part
- * of the radio stack is dependent upon this functionality. Therefore,
- * in order to use it, you have to tap directly into this configuration
- * from your application layer.
+ * This optional add-on layer will provide ambient RSSI readings.
  * 
  * @author David Moss
  */

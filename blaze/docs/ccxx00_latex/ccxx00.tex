@@ -863,7 +863,7 @@ with a DSN incremented by one. Receiving nodes then filter out packets from the 
 only accepting the attacker's packets.
 
 To prevent this kind of simple attack, the CCxx00 stack uses a random DSN for each outbound packet.
-This is more unpredictable and can help prevent an attacker from capture the channel. 
+This is more unpredictable and can help prevent an attacker from controlling communications. 
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1080,6 +1080,13 @@ The errata is thick \cite{cc1101errata}.  For these reasons and others, the radi
 We may have put in a little bit extra ROM trying to work around some of these issues, but 
 it turned out not to be too bad after a few revisions.
 
+
+\section{Acknowledgments}
+Special thanks to everyone who helped out with the development of this radio stack, whether it was 
+contributing code or sending back bug reports. This includes Rincon Research Corporation for funding 
+the development, Rob Muir, Jared Hill, Mark Hays, Mark Siner, Jon Wyant, Lexis Mazerski, Chris Kibbey, 
+Roland Hendel, Adam Brzostowksi, Mike Claassen, WenZhan Song, Renjie Huang, Gang Lu, Miklos Maroti, 
+Gustavo Litovsky, and Shaun Lawrence.
 
 \bibliographystyle{plain}
 \bibliography{ccxx00}

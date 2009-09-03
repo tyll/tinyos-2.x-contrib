@@ -1,0 +1,21 @@
+
+unset TUNIT_BASE
+
+export PROJECTROOT=`pwd`
+export TINYOSROOT=$PROJECTROOT
+export TOSROOT=$PROJECTROOT
+export TOSDIR=${TOSROOT}/tos
+
+# CLASSPATH
+export TINYOSJAVA="`cygpath -w $TINYOSROOT/support/sdk/java/tinyos.jar`"
+
+export CLASSPATH="${TINYOSJAVA};"
+
+export MAKERULES=${TOSROOT}/support/make/Makerules
+export PATH=${PATH}:/opt/msp430/bin:/opt/ant/bin:
+export PATH=${PATH}:/cygdrive/c/program\ files/softbaugh/USBP/PrgUSBP:
+export AVARICE_ARGS='--mkII --jtag usb'
+
+echo TINYOS WORKSPACE ACTIVE
+
+

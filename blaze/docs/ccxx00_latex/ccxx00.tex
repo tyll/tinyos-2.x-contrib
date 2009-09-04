@@ -573,6 +573,33 @@ implementation {
 \end{verbatim}
 
 
+\subsection{platform\_message.h}
+
+You need to modify your platform\_message.h file to include the CCxx00 radio stack headers,
+footers, etc. in the definition of message\_t.
+
+\begin{verbatim}
+#ifndef PLATFORM_MESSAGE_H
+#define PLATFORM_MESSAGE_H
+
+#include <Blaze.h>
+#include <Serial.h>
+
+typedef union message_header {
+  blaze_header_t blaze;
+  serial_header_t serial;
+} message_header_t;
+
+typedef union TOSRadioFooter {
+  blaze_footer_t blaze;
+} message_footer_t;
+
+typedef union TOSRadioMetadata {
+  blaze_metadata_t blaze;
+} message_metadata_t;
+
+#endif
+\end{verbatim}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -745,7 +772,7 @@ to interrupt an acknowledgment unless the minimum backoff settings are too low o
 \subsection{Low Power Communications}
 \label{sec:lpl}
 The always-on, BMAC, BoX-MAC, and End Device implementations were briefly 
-described in section \ref{sec:lpl}.  There are a few more things
+described in section \ref{sec:singleradiocomponents}.  There are a few more things
 to note about low power communications.  
 
 \subsubsection{BMAC}

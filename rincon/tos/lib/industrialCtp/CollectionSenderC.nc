@@ -29,6 +29,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "Ctp.h"
 
 generic configuration CollectionSenderC(collection_id_t collectId) {
   provides {

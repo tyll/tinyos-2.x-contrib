@@ -415,7 +415,7 @@ implementation {
   
   command uint16_t CtpInfo.getNeighborRouteQuality(uint8_t n) {
     if (n < routingTableActive) {
-      call LinkEstimator.getLinkQuality(routingTable[n].neighbor) + routingTable[n].info.etx;
+      return call LinkEstimator.getLinkQuality(routingTable[n].neighbor) + routingTable[n].info.etx;
     }
     
     return 0xFFFF;

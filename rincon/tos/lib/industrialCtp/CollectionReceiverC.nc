@@ -33,6 +33,9 @@
  * @author David Moss
  */
  
+ 
+#include "Ctp.h"
+
 generic configuration CollectionReceiverC(am_id_t amId) {
   provides {
     interface Receive;

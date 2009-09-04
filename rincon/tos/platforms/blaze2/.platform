@@ -1,0 +1,180 @@
+# Includes that should take precedence come first.  Platforms come before
+# chips because they may override files.  These must be specified as
+# @includes instead of -I's to @opts, otherwise the %T won't be processed
+# by ncc.
+
+push( @includes, qw(
+
+  %T/../../
+  
+  ## Hardware implementation layers
+  %T/platforms/blaze2/chips/ccxx00nbd
+  %T/platforms/blaze2
+  
+  %T/platforms/blazehw
+  %T/platforms/blazehw/chips/
+  %T/platforms/blazehw/chips/ccxx00
+  %T/platforms/blazehw/chips/msp430
+  %T/platforms/blazehw/chips/msp430/usart
+  %T/platforms/blazehw/chips/stm25p
+  %T/platforms/blazehw/chips/checkmate
+  %T/platforms/blazehw/chips/tilt
+
+  ## CCxx00 default radio stack
+  #%T/chips/ccxx00_addons/availableradios
+  #%T/chips/ccxx00_addons/dutycycle
+  #%T/chips/ccxx00_addons/packetstats
+  #%T/chips/ccxx00_addons/pendingbit
+  
+  #%T/chips/ccxx00_multiple/
+  #%T/chips/ccxx00_multiple/init
+  #%T/chips/ccxx00_multiple/interfaces
+  #%T/chips/ccxx00_multiple/select
+  #%T/chips/ccxx00_multiple/spi
+  
+  %T/chips/ccxx00_single
+  %T/chips/ccxx00_single/acks/staticacks
+  %T/chips/ccxx00_single/alarm
+  %T/chips/ccxx00_single/am
+  %T/chips/ccxx00_single/am/queue
+  %T/chips/ccxx00_single/crc
+    
+  %T/chips/ccxx00_single/radios/cc1100
+  %T/chips/ccxx00_single/radios/cc2500
+  %T/chips/ccxx00_single/radios/nbd
+  
+  %T/chips/ccxx00_single/csma/continuoussense
+  
+  %T/chips/ccxx00_single/gain
+  %T/chips/ccxx00_single/init
+  %T/chips/ccxx00_single/interfaces
+  %T/chips/ccxx00_single/link
+  
+  %T/chips/ccxx00_single/lpl
+  #%T/chips/ccxx00_single/lpl/alwayson
+  #%T/chips/ccxx00_single/lpl/bmac
+  #%T/chips/ccxx00_single/lpl/boxmac
+  %T/chips/ccxx00_single/lpl/enddevice
+  
+  %T/chips/ccxx00_single/packet
+  %T/chips/ccxx00_single/powermanager
+  %T/chips/ccxx00_single/receive
+  %T/chips/ccxx00_single/rssi
+  %T/chips/ccxx00_single/select
+  %T/chips/ccxx00_single/spi
+  %T/chips/ccxx00_single/splitcontrolmanager
+  %T/chips/ccxx00_single/transmit
+  %T/chips/ccxx00_single/unique
+    
+  ## SBD stack
+  %T/chips/sbd/
+  %T/chips/sbd/commandcenter
+  %T/chips/sbd/control
+  %T/chips/sbd/gps
+  %T/chips/sbd/interfaces
+  %T/chips/sbd/modemstring
+  %T/chips/sbd/sendstring
+  %T/chips/sbd/powermanager
+  %T/chips/sbd/receiver
+  %T/chips/sbd/sender
+  
+  ## Ghostrider supporting libraries
+  %T/interfaces
+  %T/system
+  %T/types
+  
+  %T/lib/debug/bfly
+  %T/lib/debug/governor
+  %T/lib/ghostridersystem
+  %T/lib/ghostridersystem/systemgovernor
+  %T/lib/ghostriderstack/
+  %T/lib/ghostriderstack/rfresource
+  %T/lib/ghostriderstack/sendnotifier
+  %T/lib/ghostriderstack/sbdactivemessage
+  %T/lib/ghostriderstack/sbdmsg
+  
+  %T/lib/network/industrialCtp
+  %T/lib/network/industrialCtp/cache
+  %T/lib/network/industrialCtp/debug
+  %T/lib/network/industrialCtp/forwarding
+  %T/lib/network/industrialCtp/interfaces
+  %T/lib/network/industrialCtp/linkestimators
+  %T/lib/network/industrialCtp/linkestimators/4bitle
+  %T/lib/network/industrialCtp/packet
+  %T/lib/network/industrialCtp/routing
+  
+  %T/lib/network/dissemination
+  %T/lib/network/connectivity
+  %T/lib/network/ghostriderdisseminator
+  %T/lib/network/healthupdate
+  %T/lib/network/manager
+  %T/lib/network/manager/networkgovernor
+  %T/lib/sensors/tma
+  %T/lib/sensors/tma/tmagovernor
+  %T/lib/sensors/multinbd
+  %T/lib/sensors/multinbd/nbdgovernor
+  %T/lib/sensors/tilt
+  %T/lib/sensors/tilt/tiltgovernor
+  %T/lib/sensors/dummydetector
+
+  %T/lib/utils/bittable
+  %T/lib/utils/sensortable
+  %T/lib/utils/string
+  %T/lib/utils/configurator
+  %T/lib/utils/uniquenum
+  %T/lib/utils/crc
+  %T/lib/utils/oneupcounter
+  %T/lib/utils/pools
+  %T/lib/utils/uartprintf
+  %T/lib/utils/sbdmsggenerator
+  %T/lib/utils/squelch
+  %T/lib/utils/while
+  %T/lib/utils/gpslocation
+  %T/lib/utils/sensorsuspend
+  %T/lib/utils/amsendqueue
+  
+  %T/chips/rrc_msp430
+  %T/chips/rrc_msp430/flash
+  %T/chips/rrc_msp430/dma
+  %T/chips/rrc_msp430/dawg
+  %T/chips/rrc_msp430/fastspi
+  %T/chips/rrc_msp430/timer
+  %T/chips/rrc_msp430/supply
+  %T/chips/rrc_stm25p
+  %T/types
+  
+  ## trunk/tinyos-2.x Directories
+  %T/../../tinyos-2.x/tos/interfaces
+  %T/../../tinyos-2.x/tos/system
+  %T/../../tinyos-2.x/tos/types
+
+  %T/../../tinyos-2.x/tos/lib/net/
+  %T/../../tinyos-2.x/tos/lib/net/dip
+  %T/../../tinyos-2.x/tos/lib/net/dip/interfaces
+  %T/../../tinyos-2.x/tos/lib/timer
+  %T/../../tinyos-2.x/tos/lib/serial
+  %T/../../tinyos-2.x/tos/lib/adc
+  %T/../../tinyos-2.x/tos/lib/power
+  %T/../../tinyos-2.x/tos/lib/printf
+
+  %T/../../tinyos-2.x/tos/chips/msp430
+  %T/../../tinyos-2.x/tos/chips/msp430/adc12
+  %T/../../tinyos-2.x/tos/chips/msp430/dma
+  %T/../../tinyos-2.x/tos/chips/msp430/pins
+  %T/../../tinyos-2.x/tos/chips/msp430/timer
+  %T/../../tinyos-2.x/tos/chips/msp430/usart
+  %T/../../tinyos-2.x/tos/chips/msp430/sensors
+  %T/../../tinyos-2.x/tos/chips/stm25p
+
+) );
+
+@opts = qw(
+  -gcc=msp430-gcc
+  -mmcu=msp430x1611
+  -fnesc-target=msp430
+  -fnesc-no-debug
+  -fnesc-scheduler=TinySchedulerC,TinySchedulerC.TaskBasic,TaskBasic,TaskBasic,runTask,postTask
+
+);
+
+push @opts, "-mingw-gcc" if $cygwin;

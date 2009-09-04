@@ -41,6 +41,8 @@
 #ifndef CTP_H
 #define CTP_H
 
+#warning "Using IndustrialCtp"
+
 #include "AM.h"
 
 #define UQ_CTP_CLIENT "CtpSenderC.CollectId"

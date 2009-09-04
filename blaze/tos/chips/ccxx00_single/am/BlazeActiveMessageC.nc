@@ -78,6 +78,9 @@ implementation {
   components ActiveMessageAddressC;
   BlazeActiveMessageP.ActiveMessageAddress -> ActiveMessageAddressC;
   
+  components RandomC;
+  BlazeActiveMessageP.Random -> RandomC;
+  
   components LedsC;
   BlazeActiveMessageP.Leds -> LedsC;
   

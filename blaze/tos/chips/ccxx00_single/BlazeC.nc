@@ -109,9 +109,6 @@ configuration BlazeC {
 implementation {
   
   components BlazeActiveMessageC;
-  AMSend = BlazeActiveMessageC;
-  Receive = BlazeActiveMessageC.Receive;
-  Snoop = BlazeActiveMessageC.Snoop;
   AMPacket = BlazeActiveMessageC;
   Packet = BlazeActiveMessageC;
   SendNotifier = BlazeActiveMessageC;
@@ -150,6 +147,7 @@ implementation {
   components Ccxx00PlatformInitC;
   
   /***************** Send Layers ****************/
+  AMSend = BlazeActiveMessageC;
   BlazeActiveMessageC.SubSend -> RadioSelectC.Send;
   RadioSelectC.SubSend -> SplitControlManagerC.Send;
   SplitControlManagerC.SubSend -> PacketLinkC.Send;
@@ -158,6 +156,8 @@ implementation {
   AcknowledgementsC.SubSend -> CsmaC;
   
   /***************** Receive Layers ****************/
+  Receive = BlazeActiveMessageC.Receive;
+  Snoop = BlazeActiveMessageC.Snoop;
   BlazeActiveMessageC.SubReceive -> RadioSelectC.Receive;
   RadioSelectC.SubReceive -> UniqueReceiveC.Receive;
   UniqueReceiveC.SubReceive -> LplC.Receive;

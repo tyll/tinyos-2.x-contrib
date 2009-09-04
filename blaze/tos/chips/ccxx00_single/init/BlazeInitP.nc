@@ -305,7 +305,7 @@ implementation {
   default event void PowerNotifier.on() {}
   default event void PowerNotifier.off() {}
   
-  default command error_t RadioBootstrapStdControl.start() {}
-  default command error_t RadioBootstrapStdControl.stop() {} 
+  default command error_t RadioBootstrapStdControl.start() { return SUCCESS; }
+  default command error_t RadioBootstrapStdControl.stop() { return SUCCESS; } 
   
 }

@@ -59,6 +59,7 @@ module BlazeActiveMessageP {
     interface BlazePacketBody;
     interface ActiveMessageAddress;
     interface PacketAcknowledgements;
+    interface Random;
     interface Leds;
   }
 }
@@ -68,8 +69,6 @@ implementation {
   enum {
     BLAZE_SIZE = MAC_HEADER_SIZE + MAC_FOOTER_SIZE,
   };
-  
-  uint8_t dsn;
   
   /***************** AMSend Commands ****************/
   command error_t AMSend.send[am_id_t id](am_addr_t addr,
@@ -83,7 +82,7 @@ implementation {
     header->dest = addr;
     header->destpan = call ActiveMessageAddress.amGroup();
     header->src = call ActiveMessageAddress.amAddress();
-    header->dsn = dsn++;
+    header->dsn += (call Random.rand16() % 10) + 1;
     
     signal SendNotifier.aboutToSend[id](addr, msg);
     

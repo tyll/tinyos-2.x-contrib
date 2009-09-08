@@ -1,0 +1,30 @@
+#-*-Makefile-*- vim:syntax=make
+#$Id$
+
+PLATFORM ?= blaze2
+
+MSP_MCU = msp430x1611
+CFLAGS += -DPLATFORM_BLAZE2
+CFLAGS += -DHAS_CCXX00_RADIO
+
+CFLAGS += -DENABLE_SPI0_DMA
+CFLAGS += -DHAVE_ROSC_P2_5
+CFLAGS += -DFAST_SMCLK
+CFLAGS += -DFAST_CRC32
+
+# Disable MSP430 hardware multiply because it makes MSPGCC die
+PFLAGS += -mdisable-hwmul
+OPTFLAGS += -O
+
+#FTCVPGSI
+BSL ?= UMPH
+MSP_BSL ?= ${TOSROOT}/support/bin/tos-bsl.exe
+MSP_BSL_FLAGS ?= --telosb --rincon-usb $(MSP_BSL_XFLAGS)
+
+VOLUME_FILE = volumes-stm25p.xml
+VOLUME_ALLOCATOR = tos-storage-stm25p
+
+$(call TOSMake_include_platform,msp)
+
+blaze2: $(BUILD_DEPS)
+	@:

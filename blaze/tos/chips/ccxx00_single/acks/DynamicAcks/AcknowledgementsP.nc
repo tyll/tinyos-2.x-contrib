@@ -160,6 +160,11 @@ implementation {
     //return (((call BlazePacketBody.getHeader( msg ))->fcf) >> FCF_ACK_RETRIEVED) & 0x1;
   }
   
+  async command bool PacketAcknowledgements.shouldAck(message_t *msg) {
+    blaze_header_t *header = call BlazePacketBody.getHeader(msg);
+    return ((( header->fcf >> FCF_ACK_REQ ) & 0x01) == 1) 
+        && (header->dest != AM_BROADCAST_ADDR);
+  }
   
   /***************** BackoffTimer Events ****************/
   async event void AckWaitTimer.fired() {

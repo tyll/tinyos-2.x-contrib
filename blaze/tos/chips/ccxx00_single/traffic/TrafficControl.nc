@@ -47,20 +47,18 @@ interface TrafficControl {
    * This may only be called within the requestPriority() event, otherwise
    * it has no effect.  If you do not call it, the packet will be sent with
    * default priority
-   *
-   * @param highPriority TRUE if this packet is to be sent with high priority.   
    */
-  command void setPriority(bool highPriority);
+  command void highPriority();
   
   /**
    * @param delay the amount of time the chip waits between packets by default
    */
-  command void setDefaultDelay(uint16_t delay);
+  command void setDelay(uint16_t delay);
   
   /**
    * @return The default delay between transmissions
    */
-  command uint16_t getDefaultDelay();
+  command uint16_t getDelay();
   
 }
 

@@ -41,13 +41,14 @@
 module TrafficControlP {
   provides {
     interface Send;
-    interface TrafficControl;
+    interface TrafficControl[am_id_t amId];
   }
   
   uses {
     interface Send as SubSend;
     interface Timer<TMilli>;
     interface AMPacket;
+    interface PacketAcknowledgements;
     interface Leds;
   }
 }
@@ -67,6 +68,15 @@ implementation {
     S_SENDING,
   };
   
+  enum {
+    LONGER_DELAY = 102U,  // = 80% of the shorter delay
+    SHORTER_DELAY = 128U,
+    
+    LONGEST_DELAY = 10240U,
+    SHORTEST_DELAY = 256U,
+  };
+  
+  
   /***************** TrafficControl Commands ****************/
   /** 
    * This may only be called within the requestPriority() event, otherwise
@@ -75,15 +85,15 @@ implementation {
    *
    * @param highPriority TRUE if this packet is to be sent with high priority.   
    */
-  command void TrafficControl.setPriority(bool highPriority) {
-    useHighPriority = highPriority;
+  command void TrafficControl.highPriority[am_id_t amId]() {
+    useHighPriority = TRUE;
   }
   
-  command void TrafficControl.setDefaultDelay(uint16_t delay) {
+  command void TrafficControl.setDelay[am_id_t amId](uint16_t delay) {
     timeBetweenTransmissions = delay;
   }
   
-  command uint16_t TrafficControl.getDefaultDelay() {
+  command uint16_t TrafficControl.getDelay[am_id_t amId]() {
     return timeBetweenTransmissions;
   }
   
@@ -97,7 +107,7 @@ implementation {
     state = S_QUEUED;
     
     useHighPriority = FALSE;
-    signal TrafficControl.requestPriority(call AMPacket.destination(msg), msg);
+    signal TrafficControl.requestPriority[call AMPacket.type(msg)](call AMPacket.destination(msg), msg);
     
     if(useHighPriority || !(call Timer.isRunning())) {
       // Send the packet now
@@ -131,6 +141,27 @@ implementation {
   event void SubSend.sendDone(message_t *msg, error_t error) {
     state = S_IDLE;
     signal Send.sendDone(msg, error);
+    
+    // Dynamic throttle adjustment
+    // Trying to balance capabilities with memory footprint
+    // Another possibility is to see how much traffic is on the channel
+    // per second and adjust using those metrics.  See TCP traffic control.
+    if(call PacketAcknowledgements.shouldAck(msg)) {
+      if(call PacketAcknowledgements.wasAcked(msg)) {
+        timeBetweenTransmissions -= SHORTER_DELAY;
+        if(timeBetweenTransmissions < SHORTEST_DELAY) {
+          // Back off significantly so we don't capture the channel
+          timeBetweenTransmissions = DEFAULT_TRAFFIC_CONTROL_DELAY;
+        }
+        
+      } else {
+        timeBetweenTransmissions += LONGER_DELAY;
+        if(timeBetweenTransmissions > LONGEST_DELAY) {
+          timeBetweenTransmissions = LONGEST_DELAY;
+        }
+      }
+    }
+    
     call Timer.startOneShot(timeBetweenTransmissions);
   }
   
@@ -146,5 +177,5 @@ implementation {
   }
   
   /***************** Defaults ****************/
-  default event void TrafficControl.requestPriority(am_addr_t addr, message_t *msg) { }
+  default event void TrafficControl.requestPriority[am_id_t amId](am_addr_t addr, message_t *msg) { }
 }

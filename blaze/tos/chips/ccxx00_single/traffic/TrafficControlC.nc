@@ -40,7 +40,7 @@
 configuration TrafficControlC {
   provides {
     interface Send;
-    interface TrafficControl;
+    interface TrafficControl[am_id_t amId];
   }
   
   uses {
@@ -57,6 +57,7 @@ implementation {
   
   components BlazeC;
   TrafficControlP.AMPacket -> BlazeC;
+  TrafficControlP.PacketAcknowledgements -> BlazeC;
   
   components new TimerMilliC();
   TrafficControlP.Timer -> TimerMilliC;

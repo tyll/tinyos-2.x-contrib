@@ -143,6 +143,13 @@ implementation {
   }
   
   
+  async command bool PacketAcknowledgements.shouldAck(message_t *msg) {
+    blaze_header_t *header = call BlazePacketBody.getHeader(msg);
+    return ((( header->fcf >> FCF_ACK_REQ ) & 0x01) == 1) 
+        && (header->dest != AM_BROADCAST_ADDR);
+  }
+  
+  
   /***************** BackoffTimer Events ****************/
   async event void AckWaitTimer.fired() {
     // Our ack wait period expired with no luck...

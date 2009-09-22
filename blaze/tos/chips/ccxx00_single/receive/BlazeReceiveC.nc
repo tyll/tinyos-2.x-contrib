@@ -94,6 +94,9 @@ implementation {
   components new AlarmMultiplexC();
   BlazeReceiveP.AckGap -> AlarmMultiplexC;
   
+  components BlazeC;
+  BlazeReceiveP.PacketAcknowledgements -> BlazeC;
+  
   components RandomC;
   BlazeReceiveP.Random -> RandomC;
   

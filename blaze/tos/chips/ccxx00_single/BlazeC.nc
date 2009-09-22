@@ -90,6 +90,9 @@ configuration BlazeC {
     /** Configure the system-wide low power listening settings */
     interface SystemLowPowerListening;
     
+    /** Traffic Control to avoid network congestion */
+    interface TrafficControl[am_id_t amId];
+    
     /** CTP Required Interface */
     interface LinkPacketMetadata;
     
@@ -139,6 +142,9 @@ implementation {
   components BlazeReceiveC;
   AckSendNotifier = BlazeReceiveC.AckSendNotifier;
   
+  components TrafficControlC;
+  TrafficControl = TrafficControlC;
+  
   components SplitControlManagerC;
   components Ccxx00PowerManagerC;
   components UniqueReceiveC;
@@ -148,7 +154,8 @@ implementation {
   
   /***************** Send Layers ****************/
   AMSend = BlazeActiveMessageC;
-  BlazeActiveMessageC.SubSend -> RadioSelectC.Send;
+  BlazeActiveMessageC.SubSend -> TrafficControlC.Send;
+  TrafficControlC.SubSend -> RadioSelectC.Send;
   RadioSelectC.SubSend -> SplitControlManagerC.Send;
   SplitControlManagerC.SubSend -> PacketLinkC.Send;
   PacketLinkC.SubSend -> LplC.Send;

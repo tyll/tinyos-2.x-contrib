@@ -29,42 +29,26 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE
  */
 
-#include "AM.h"
-#include "TrafficControl.h"
-
 /**
- * Traffic Control prevents too many packets from being transmitted too quickly,
- * which helps prevent congestion and improves acknowledgment success rate.
  * @author David Moss
  */
-configuration TrafficControlC {
-  provides {
-    interface Send;
-    interface TrafficControl;
-    interface TrafficPriority[am_id_t amId];
-  }
+ 
+interface TrafficPriority {
+
+  /**
+   * Users must call back using the setPriority() command within the event.
+   *  
+   * @param msg The message being sent
+   * @param destination The destination address of the message
+   */
+  event void requestPriority(am_addr_t destination, message_t *msg);
   
-  uses {
-    interface Send as SubSend;
-  }
+  /** 
+   * This may only be called within the requestPriority() event, otherwise
+   * it has no effect.  If you do not call it, the packet will be sent with
+   * default priority
+   */
+  command void highPriority();
+  
 }
 
-implementation {
-
-  components TrafficControlP;
-  Send = TrafficControlP.Send;
-  TrafficControl = TrafficControlP.TrafficControl;
-  TrafficPriority = TrafficControlP.TrafficPriority;
-  SubSend = TrafficControlP.SubSend;
-  
-  components BlazeC;
-  TrafficControlP.AMPacket -> BlazeC;
-  TrafficControlP.PacketAcknowledgements -> BlazeC;
-  
-  components new TimerMilliC();
-  TrafficControlP.Timer -> TimerMilliC;
-  
-  components LedsC;
-  TrafficControlP.Leds -> LedsC;
-  
-}

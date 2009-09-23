@@ -29,26 +29,11 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE
  */
 
-#include "TrafficControl.h"
-#include "AM.h"
-#include "message.h"
 
+/**
+ * @author David Moss
+ */
 interface TrafficControl {
-
-  /**
-   * Users must call back using the setPriority() command within the event.
-   *  
-   * @param msg The message being sent
-   * @param destination The destination address of the message
-   */
-  event void requestPriority(am_addr_t destination, message_t *msg);
-  
-  /** 
-   * This may only be called within the requestPriority() event, otherwise
-   * it has no effect.  If you do not call it, the packet will be sent with
-   * default priority
-   */
-  command void highPriority();
   
   /**
    * @param delay the amount of time the chip waits between packets by default

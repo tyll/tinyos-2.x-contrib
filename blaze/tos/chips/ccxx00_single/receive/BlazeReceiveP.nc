@@ -73,7 +73,6 @@ module BlazeReceiveP {
     interface BlazePacketBody;
     interface RadioStatus;
     interface ActiveMessageAddress;
-    interface PacketAcknowledgements;
     interface Random;
     interface Leds;
   
@@ -126,7 +125,7 @@ implementation {
   bool isAckPacket(blaze_header_t *header);
   bool passesAddressFilter(blaze_header_t *header);
   bool passesPanFilter(blaze_header_t *header);
-  bool shouldAck(message_t *msg);
+  bool shouldAck(blaze_header_t *header);
   bool passesCrcFilter(void *header);
   
   uint16_t requestAckBackoff();
@@ -256,7 +255,7 @@ implementation {
           if(passesPanFilter(header)) {
             if(passesCrcFilter(header)) {
               
-              if(shouldAck(&myMsg)) {
+              if(shouldAck(header)) {
                 // Send an ack and then receive the packet in AckSend.sendDone()
                 atomic {
                   acknowledgement.fcf = FRAME_TYPE_ACK;
@@ -439,9 +438,10 @@ implementation {
         || !(call BlazeConfig.isPanRecognitionEnabled()));
   }
   
-  bool shouldAck(message_t *msg) {
+  bool shouldAck(blaze_header_t *header) {
     return (call BlazeConfig.isAutoAckEnabled())
-        && (call PacketAcknowledgements.shouldAck(msg));
+        && ((( header->fcf >> FCF_ACK_REQ ) & 0x01) == 1)
+            && (header->dest != AM_BROADCAST_ADDR);
   }
   
   bool passesCrcFilter(void *header) {

@@ -91,7 +91,10 @@ configuration BlazeC {
     interface SystemLowPowerListening;
     
     /** Traffic Control to avoid network congestion */
-    interface TrafficControl[am_id_t amId];
+    interface TrafficControl;
+    
+    /** Traffic Priority to give some packets faster access to the channel */
+    interface TrafficPriority[am_id_t amId];
     
     /** CTP Required Interface */
     interface LinkPacketMetadata;
@@ -144,6 +147,7 @@ implementation {
   
   components TrafficControlC;
   TrafficControl = TrafficControlC;
+  TrafficPriority = TrafficControlC;
   
   components SplitControlManagerC;
   components Ccxx00PowerManagerC;

@@ -32,15 +32,29 @@
 /**
  * @author David Moss
  */
- 
+
 #ifndef TRAFFICCONTROL_H
 #define TRAFFICCONTROL_H
 
-/** 
+/**
  * Default traffic control delay is 4 seconds between transmissions
  */
 #ifndef DEFAULT_TRAFFIC_CONTROL_DELAY
-#define DEFAULT_TRAFFIC_CONTROL_DELAY 4096
+#define DEFAULT_TRAFFIC_CONTROL_DELAY 4096U
+#endif
+
+/**
+ * Longest delay between packets is 10240U
+ */
+#ifndef LONGEST_TRAFFIC_DELAY
+#define LONGEST_TRAFFIC_DELAY 10240U
+#endif
+
+/**
+ * Shortest delay between packets is 1024U
+ */
+#ifndef SHORTEST_TRAFFIC_DELAY
+#define SHORTEST_TRAFFIC_DELAY 1024U
 #endif
 
 

@@ -5,7 +5,7 @@ import re
 import sys
 import MySQLdb
 
-host = 'fec0::64'
+host = ''
 port = 7001
 
 if __name__ == '__main__':

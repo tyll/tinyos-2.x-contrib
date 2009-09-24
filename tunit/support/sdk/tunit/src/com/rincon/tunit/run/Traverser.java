@@ -36,7 +36,7 @@ import java.io.FilenameFilter;
 
 import org.apache.log4j.Logger;
 
-import com.rincon.tunit.parsers.makefile.MakefileParser;
+import com.rincon.tunit.parsers.makefileparser.MakefileParser;
 import com.rincon.tunit.parsers.suiteproperties.SuitePropertiesParser;
 import com.rincon.tunit.properties.TUnitSuiteProperties;
 import com.rincon.tunit.properties.TUnitTestRunProperties;

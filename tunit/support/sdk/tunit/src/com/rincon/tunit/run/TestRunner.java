@@ -483,27 +483,5 @@ public class TestRunner {
       e.printStackTrace();
     }
     
-    // Step 2: Create another .tunitPath file for the root directory
-    outFile = new File(TUnit.getRootDirectory(), ".tunitPath");
-    if(outFile.exists()) {
-      outFile.delete();
-    }
-
-    try {
-      out = new PrintWriter(new BufferedWriter(new FileWriter(outFile)));
-
-      String reportDirectory = TUnit.getStatsReportDirectory()
-          .getAbsolutePath()          
-          + File.separatorChar
-          + StatisticsReport.generateStatsSubDirectory("",
-              TUnit.getRootDirectory());
-
-      new File(reportDirectory).mkdirs();
-      out.write(reportDirectory + "\n");
-      out.close();
-
-    } catch (IOException e) {
-      e.printStackTrace();
-    }    
   }
 }

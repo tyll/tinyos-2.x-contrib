@@ -9,11 +9,11 @@ host = ''
 port = 7001
 
 if __name__ == '__main__':
-    conn = MySQLdb.connect (host = "mysql_ip",
-                            user = "acme_user",
-                            db = "acme_db",
-                            passwd = "acme_pass")
-	
+    conn = MySQLdb.connect (host = "ip",
+                            user = "username",
+                            db = "dbname",
+                            passwd = "pass")
+
     cursor = conn.cursor();
 
     s = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)
@@ -24,7 +24,8 @@ if __name__ == '__main__':
         if (len(data) > 0):
             rpt = ACReport.AcReport(data=data, data_length=len(data))
             myaddr = str(addr[0]).split(":")
-            moteid = int(myaddr[5],16)
+            print myaddr
+            moteid = int(myaddr[2],16)
 	    power = rpt.get_power();
 	    energy = rpt.get_energy();
 	    maxPower = rpt.get_maxPower();
@@ -69,25 +70,24 @@ if __name__ == '__main__':
             insert += ");"
 
             print insert
-
             try:
                 cursor.execute(insert)
             except cursor.Error, e:
                 # print "Data duplicate detected"
                 print "Error %d: %s" % (e.args[0], e.args[1])
 
-	    debug = "INSERT INTO debug VALUES ("
-	    debug += str(moteid) + "," + "NOW()," + str(seq) + ","
-	    debug += str(parent) + "," + str(parent_metric) + ","
-	    debug += str(parent_etx) + "," + str(hop_limit) + ","
-	    debug += "0);"
-
-	    print debug
-	    try:
-		cursor.execute(debug)
-            except cursor2.Error, e:
-                # print "Data duplicate detected"
-                print "Error %d: %s" % (e.args[0], e.args[1])
+#	    debug = "INSERT INTO debug VALUES ("
+#	    debug += str(moteid) + "," + "NOW()," + str(seq) + ","
+#	    debug += str(parent) + "," + str(parent_metric) + ","
+#	    debug += str(parent_etx) + "," + str(hop_limit) + ","
+#	    debug += "0);"
+#
+#	    print debug
+#	    try:
+#		cursor.execute(debug)
+#            except cursor2.Error, e:
+#                # print "Data duplicate detected"
+#                print "Error %d: %s" % (e.args[0], e.args[1])
 
     conn.close()
 

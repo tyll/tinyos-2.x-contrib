@@ -60,7 +60,7 @@ implementation {
   UsartResource = UartP.UsartResource;
   UsartInterrupts = UartP.UsartInterrupts;
 
-  components HplAtm1281Usart1C as UsartC;
+  components HplAtm1281Usart0C as UsartC;
   UartP.Usart -> UsartC;
 
   components CounterMicro32C as CounterC;

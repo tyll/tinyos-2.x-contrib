@@ -52,7 +52,7 @@ generic configuration Atm1281Spi1C() {
 implementation {
 
   enum {
-    CLIENT_ID = unique(ATM1281_SPIO_BUS),
+    CLIENT_ID = unique(ATM1281_SPI1_BUS),
   };
 
   components Atm1281Spi1P as SpiP;

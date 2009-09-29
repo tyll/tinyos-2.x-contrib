@@ -1,0 +1,12 @@
+<tunit>
+
+  <testrun name="1x_blaze2">
+    <mote target="blaze2" motecom="serial@COM245:tmote" installextras="bsl,UMPH0"/>
+  </testrun> 
+  
+  <testrun name="2x_blaze2">
+    <mote target="blaze2" motecom="serial@COM245:tmote" installextras="bsl,UMPH0"/>
+    <mote target="blaze2" motecom="serial@COM260:tmote" installextras="bsl,UMPH5"/>
+  </testrun>    
+   
+</tunit>

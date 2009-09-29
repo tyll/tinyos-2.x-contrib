@@ -1,0 +1,9 @@
+Not sure why it fails, but it seems that the radio doesn't ever turn off.
+
+I don't think that's really a problem, because the test was
+originally created to make sure the platform isn't locking up.
+It's definitely not locking up, but the test isn't able to 
+actually turn the radio off from what I observe.  That causes
+it to timeout.
+
+Might want to @skip this one.

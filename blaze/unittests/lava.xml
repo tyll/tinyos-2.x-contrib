@@ -1,0 +1,5 @@
+<tunit>
+  <testrun name="lavalamp">
+    <mote target="telosb" motecom="serial@COM16:tmote" installextras="bsl,COM16"/>
+  </testrun> 
+</tunit>

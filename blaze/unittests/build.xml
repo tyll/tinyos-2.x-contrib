@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="TUnit" basedir="." default="tunit">
+
+
+      <!--
+           This build.xml assumes you have sourced .tunitclasspath. 
+           Specifically, you need your $CLASSPATH pointing to all .jar 
+           files, and your TUNIT_BASE (or TUNIT_HOME, or TOSCONTRIB)
+           environment variables pointing to the tunit directory,
+           and your REPORTDIR defined so it knows where to store
+           test reports.
+        -->
+
+      <property environment="env"/>
+
+	<!-- Reports, archives, statistics, etc. locations -->
+	<property name="tunit_base.dir" value="." />
+	<property name="report.dir" value="${tunit_base.dir}/reports" />
+	<property name="xml.dir" value="${report.dir}/xml" />
+	<property name="htmlreport.dir" value="${report.dir}/html" />
+	<property name="archive.dir" value="${report.dir}/archive" />
+	<property name="stats.dir" value="${report.dir}/stats" />
+	
+
+	<target name="tunit">
+		<delete dir="${xml.dir}" />
+		<mkdir dir="${xml.dir}" />
+		<java classname="com.rincon.tunit.TUnit">
+			<arg value="-tunitxml"/>
+			<arg value="${tunit_base.dir}/tunit.xml"/>
+			<arg value="-reportdir" />		
+			<arg value="${env.REPORTDIR}" />
+			<classpath>
+				<pathelement path="${env.CLASSPATH}" />
+			</classpath>
+		</java>
+
+		<antcall target="tunitreport" />
+	</target>
+
+
+	<target name="tunitrerun">
+		<java classname="com.rincon.tunit.TUnit">
+			<arg value="-rerun" />			
+			<arg value="-reportdir" />
+			<arg value="${env.REPORTDIR}" />
+			<classpath>
+				<pathelement path="${env.CLASSPATH}" />
+			</classpath>
+		</java>
+		
+		<antcall target="tunitreport" />
+	</target>
+
+
+	<target name="tunitreport">
+		<delete dir="${htmlreport.dir}" />
+		<mkdir dir="${htmlreport.dir}" />
+		<mkdir dir="${archive.dir}" />
+
+		<junitreport todir="${xml.dir}">
+			<fileset dir="${xml.dir}" includes="TEST-*.xml" />
+			<report todir="${htmlreport.dir}" />
+		</junitreport>
+		
+		<java classname="com.rincon.tunitposthtml.PostHtmlEdit">
+			<classpath>
+				<pathelement path="${env.CLASSPATH}" />
+			</classpath>
+		</java>
+
+		<tstamp>
+			<format property="TIMESTAMP" pattern="yyyy-MM-dd_hh-mm-aa" />
+		</tstamp>
+
+		<property name="archive.prefix" value="htmlreport_${TIMESTAMP}" />
+
+            <tar destfile="${archive.dir}/${archive.prefix}.tar" longfile="gnu">
+              <tarfileset dir="${report.dir}" preserveLeadingSlashes="true">
+                <include name="html/**"/>
+                <include name="stats/**"/>
+              </tarfileset>
+            </tar>
+
+		<gzip zipfile="${archive.dir}/${archive.prefix}.tar.gz" src="${archive.dir}/${archive.prefix}.tar" />
+
+		<delete>
+			<fileset dir="${archive.dir}" includes="*.tar" />
+		</delete>
+
+	</target>
+
+	<target name="feedback">
+		<java classname="com.rincon.tunitfeedback.TUnitFeedback">
+			<classpath>
+				<pathelement path="${env.CLASSPATH}" />
+			</classpath>
+		</java>
+	</target>
+
+	<target name="clean">
+		<delete dir="${htmlreport.dir}" />
+		<delete dir="${xml.dir}" />
+	</target>
+
+	<target name="cleanstats">
+		<delete dir="${stats.dir}" />
+	</target>
+
+</project>
+

@@ -289,7 +289,8 @@ implementation {
   default command error_t ChipConfig.setChannel[radio_id_t radioId]( uint8_t chan ) { return FAIL; }
   default command uint8_t ChipConfig.getChannel[radio_id_t radioId]() { return 0; }
   
+  default event void BlazeConfig.commitDone() {}
+
+
 }
-
-
 

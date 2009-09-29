@@ -30,25 +30,37 @@
  */
 
 /**
+ * Reliable Packet Link Functionality
  * @author David Moss
+ * @author Jon Wyant
  */
- 
-interface TrafficPriority {
 
-  /**
-   * Users must call back using the setPriority() command within the event.
-   *  
-   * @param msg The message being sent
-   * @param destination The destination address of the message
-   */
-  event void requestPriority(am_addr_t destination, message_t *msg);
+configuration PacketLinkC {
+  provides {
+    interface Send;
+    interface PacketLink;
+  }
   
-  /** 
-   * This may only be called within the requestPriority() event, otherwise
-   * it has no effect.  If you do not call it, the packet will be sent with
-   * default priority
-   */
-  command void highPriority();
-  
+  uses {
+    interface Send as SubSend;
+  }
 }
 
+implementation {
+
+  components PacketLinkP,
+      BlazeC,
+      BlazePacketC,
+      RandomC,
+      new TimerMilliC() as DelayTimerC;
+  
+  PacketLink = PacketLinkP;
+  Send = PacketLinkP.Send;
+  SubSend = PacketLinkP.SubSend;
+  
+  PacketLinkP.DelayTimer -> DelayTimerC;
+  PacketLinkP.PacketAcknowledgements -> BlazeC;
+  PacketLinkP.AMPacket -> BlazeC;
+  PacketLinkP.BlazePacketBody -> BlazePacketC;
+
+}

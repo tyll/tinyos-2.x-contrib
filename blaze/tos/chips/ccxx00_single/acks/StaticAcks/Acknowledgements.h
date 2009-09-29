@@ -41,7 +41,7 @@
  * Acknowledgement success rate was found to be between 79-89%.
  */
 #ifndef BLAZE_ACK_WAIT
-#define BLAZE_ACK_WAIT 300
+#define BLAZE_ACK_WAIT 1500
 #endif
 
 #endif

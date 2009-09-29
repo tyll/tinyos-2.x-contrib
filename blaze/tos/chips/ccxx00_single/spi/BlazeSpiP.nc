@@ -372,5 +372,5 @@ implementation {
   
   default async event void Fifo.readDone[ uint8_t addr ]( uint8_t* rx_buf, uint8_t rx_len, error_t error ) {}
   default async event void Fifo.writeDone[ uint8_t addr ]( uint8_t* tx_buf, uint8_t tx_len, error_t error ) {}
-  
+  default async event void ChipSpiResource.releasing() {}
 }

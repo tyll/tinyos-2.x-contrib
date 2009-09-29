@@ -69,9 +69,9 @@ implementation {
   Send = SubSend;
   Receive = SubReceive;
   
-  components DummyRadioSelectP;
-  RadioSelect = DummyRadioSelectP;
-  BlazeSplitControl = DummyRadioSelectP;
+  components RadioSelectDummyP;
+  RadioSelect = RadioSelectDummyP;
+  BlazeSplitControl = RadioSelectDummyP;
     
 }
 

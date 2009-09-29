@@ -30,11 +30,11 @@
  */
 
 /**
- * Reliable Packet Link Functionality
+ * Dummy configuration for PacketLink Layer
  * @author David Moss
  * @author Jon Wyant
  */
-
+ 
 configuration PacketLinkC {
   provides {
     interface Send;
@@ -47,20 +47,13 @@ configuration PacketLinkC {
 }
 
 implementation {
-
-  components PacketLinkP,
-      ActiveMessageC,
-      BlazePacketC,
-      RandomC,
-      new TimerMilliC() as DelayTimerC;
+  components PacketLinkDummyP,
+      AcknowledgementsC;
   
-  PacketLink = PacketLinkP;
-  Send = PacketLinkP.Send;
-  SubSend = PacketLinkP.SubSend;
+  PacketLink = PacketLinkDummyP;
+  Send = SubSend;
   
-  PacketLinkP.DelayTimer -> DelayTimerC;
-  PacketLinkP.PacketAcknowledgements -> ActiveMessageC;
-  PacketLinkP.AMPacket -> ActiveMessageC;
-  PacketLinkP.BlazePacketBody -> BlazePacketC;
-
+  PacketLinkDummyP.PacketAcknowledgements -> AcknowledgementsC;
+  
 }
+

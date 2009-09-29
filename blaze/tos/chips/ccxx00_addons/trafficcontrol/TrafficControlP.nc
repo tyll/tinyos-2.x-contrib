@@ -49,6 +49,7 @@ module TrafficControlP {
     interface Send as SubSend;
     interface Timer<TMilli>;
     interface AMPacket;
+    interface AckDetails;
     interface PacketAcknowledgements;
     interface Leds;
   }
@@ -62,6 +63,7 @@ implementation {
   
   uint16_t timeBetweenTransmissions = DEFAULT_TRAFFIC_CONTROL_DELAY;
   
+  bool isActive = FALSE;
   
   enum {
     S_IDLE,
@@ -89,6 +91,10 @@ implementation {
   
   
   /***************** TrafficControl Commands ****************/
+  command void TrafficControl.enable(bool active) {
+    isActive = active;
+  }
+  
   command void TrafficControl.setDelay(uint16_t delay) {
     timeBetweenTransmissions = delay;
   }
@@ -106,10 +112,12 @@ implementation {
     
     state = S_QUEUED;
     
-    useHighPriority = FALSE;
-    signal TrafficPriority.requestPriority[call AMPacket.type(msg)](call AMPacket.destination(msg), msg);
+    if(isActive) {
+      useHighPriority = FALSE;
+      signal TrafficPriority.requestPriority[call AMPacket.type(msg)](call AMPacket.destination(msg), msg);
+    }
     
-    if(useHighPriority || !(call Timer.isRunning())) {
+    if(!isActive || useHighPriority || !(call Timer.isRunning())) {
       // Send the packet now
       state = S_SENDING;
       call Timer.stop();
@@ -117,11 +125,10 @@ implementation {
         state = S_IDLE;
         return FAIL;
       }
-      
-    } else {
-      // Wait for the timer to fire before sending the message
-      return SUCCESS;
     }
+    
+    // Wait for the timer to fire before sending the message
+    return SUCCESS;
   }
   
   command error_t Send.cancel(message_t* msg) {
@@ -146,7 +153,7 @@ implementation {
     // Trying to balance capabilities with memory footprint
     // Another possibility is to see how much traffic is on the channel
     // per second and adjust using those metrics.  See TCP traffic control.
-    if(call PacketAcknowledgements.shouldAck(msg)) {
+    if(call AckDetails.shouldAck(msg)) {
       if(call PacketAcknowledgements.wasAcked(msg)) {
         timeBetweenTransmissions -= SHORTER_DELAY;
 

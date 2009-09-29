@@ -30,30 +30,33 @@
  */
 
 /**
- * Dummy configuration for PacketLink Layer
  * @author David Moss
- * @author Jon Wyant
  */
  
-configuration PacketLinkDummyC {
+#warning "Stubbing out Traffic Control"
+
+module TrafficControlDummyP {
   provides {
-    interface Send;
-    interface PacketLink;
-  }
-  
-  uses {
-    interface Send as SubSend;
+    interface TrafficControl;
+    interface TrafficPriority[am_id_t amId];
   }
 }
 
 implementation {
-  components PacketLinkDummyP,
-      ActiveMessageC;
   
-  PacketLink = PacketLinkDummyP;
-  Send = SubSend;
+  /***************** TrafficControl Commands ****************/
+  command void TrafficControl.enable(bool active) {
+  }
   
-  PacketLinkDummyP.PacketAcknowledgements -> ActiveMessageC;
+  command void TrafficControl.setDelay(uint16_t delay) {
+  }
+  
+  command uint16_t TrafficControl.getDelay() {
+    return 0;
+  }
+  
+  /***************** TrafficPriority Commands ****************/
+  command void TrafficPriority.highPriority[am_id_t amId]() {
+  }
   
 }
-

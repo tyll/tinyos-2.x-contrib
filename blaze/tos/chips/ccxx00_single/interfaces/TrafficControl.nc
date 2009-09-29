@@ -28,12 +28,16 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE
  */
-
-
-/**
- * @author David Moss
- */
+ 
 interface TrafficControl {
+  
+  /**
+   * TrafficControl is disabled by default, since that's the behavior
+   * users normally expect.  This command enables Traffic Control if the
+   * layer is implemented in the radio stack.
+   * @param active TRUE to enable TrafficControl, FALSE to disable it.
+   */
+  command void enable(bool active);
   
   /**
    * @param delay the amount of time the chip waits between packets by default

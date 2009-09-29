@@ -80,9 +80,9 @@ typedef nx_struct blaze_header_t {
   nxle_uint8_t length;  
   nxle_uint16_t fcf;
   nxle_uint8_t dsn;
-  nxle_uint16_t destpan;
   nxle_uint16_t dest;
   nxle_uint16_t src;
+  nxle_uint8_t destpan;
   nxle_uint8_t type;
 } blaze_header_t;
 

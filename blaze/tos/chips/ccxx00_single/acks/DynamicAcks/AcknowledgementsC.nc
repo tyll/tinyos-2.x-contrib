@@ -49,8 +49,9 @@
 configuration AcknowledgementsC {
   provides {
     interface Send;
-    interface PacketAcknowledgements;
     interface AckReceive;
+    interface AckDetails;
+    interface PacketAcknowledgements;
   }
   
   uses {
@@ -65,6 +66,7 @@ implementation {
   PacketAcknowledgements = AcknowledgementsP;
   SubSend = AcknowledgementsP;
   AckReceive = AcknowledgementsP;
+  AckDetails = AcknowledgementsP;
   
   components BlazeSpiC;
   AcknowledgementsP.ChipSpiResource -> BlazeSpiC;

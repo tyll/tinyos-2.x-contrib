@@ -39,6 +39,7 @@
  */
  
 #include "Blaze.h"
+#include "message.h"
 #include "RadioStackPacket.h"
 
 

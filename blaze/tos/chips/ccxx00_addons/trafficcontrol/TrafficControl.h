@@ -30,64 +30,33 @@
  */
 
 /**
- * Dummy module for Packet Link layer
  * @author David Moss
- * @author Jon Wyant
  */
- 
-#warning "Stubbing out PacketLink"
 
-module PacketLinkDummyP {
-  provides {
-    interface PacketLink;
-  }
-  
-  uses {
-    interface PacketAcknowledgements;
-  }
-}
+#ifndef TRAFFICCONTROL_H
+#define TRAFFICCONTROL_H
 
-implementation {
-  
-  /***************** PacketLink Commands ***************/
-  /**
-   * Set the maximum number of times attempt message delivery
-   * Default is 0
-   * @param msg
-   * @param maxRetries the maximum number of attempts to deliver
-   *     the message
-   */
-  command void PacketLink.setRetries(message_t *msg, uint8_t maxRetries) {
-  }
+/**
+ * Default traffic control delay is 4 seconds between transmissions
+ */
+#ifndef DEFAULT_TRAFFIC_CONTROL_DELAY
+#define DEFAULT_TRAFFIC_CONTROL_DELAY 4096U
+#endif
 
-  /**
-   * Set a delay between each retry attempt
-   * @param msg
-   * @param retryDelay the delay betweeen retry attempts, in bms
-   */
-  command void PacketLink.setRetryDelay(message_t *msg, uint16_t retryDelay) {
-  }
+/**
+ * Longest delay between packets is 10240U
+ */
+#ifndef LONGEST_TRAFFIC_DELAY
+#define LONGEST_TRAFFIC_DELAY 10240U
+#endif
 
-  /** 
-   * @return the maximum number of retry attempts for this message
-   */
-  command uint8_t PacketLink.getRetries(message_t *msg) {
-    return 0;
-  }
+/**
+ * Shortest delay between packets is 1024U
+ */
+#ifndef SHORTEST_TRAFFIC_DELAY
+#define SHORTEST_TRAFFIC_DELAY 1024U
+#endif
 
-  /**
-   * @return the delay between retry attempts in bms for this message
-   */
-  command uint16_t PacketLink.getRetryDelay(message_t *msg) {
-    return 0;
-  }
 
-  /**
-   * @return TRUE if the message was delivered.
-   */
-  command bool PacketLink.wasDelivered(message_t *msg) {
-    return call PacketAcknowledgements.wasAcked(msg);
-  }
-
-}
+#endif
 

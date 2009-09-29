@@ -459,11 +459,6 @@ implementation {
     call Leds.led3On();
 #endif
     
-    // Trying to increase receive check speed by skipping this function.
-    if(splitControlState != S_ON) {
-      finishSplitControlRequests();
-    }
-    
     if(isDutyCycling() && !sending) {
       receiveCheck();
     }
@@ -475,6 +470,11 @@ implementation {
         sending = FALSE;
         signal Send.sendDone(RADIO_STACK_PACKET, error);
       }
+    }
+    
+    // Trying to increase receive check speed by skipping this function.
+    if(splitControlState != S_ON) {
+      finishSplitControlRequests();
     }
   }
   

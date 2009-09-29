@@ -29,37 +29,45 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE
  */
 
+#include "AM.h"
+#include "TrafficControl.h"
+
 /**
- * Select which radio to use for a given message, and parameterize
- * the Send and Receive interfaces below this point by radio id
- * 
+ * Traffic Control prevents too many packets from being transmitted too quickly,
+ * which helps prevent congestion and improves acknowledgment success rate.
  * @author David Moss
  */
- 
-module DummyRadioSelectP {
+configuration TrafficControlC {
   provides {
-    interface RadioSelect;
-    interface SplitControl as BlazeSplitControl[radio_id_t radioId];
+    interface Send;
+    interface TrafficControl;
+    interface TrafficPriority[am_id_t amId];
+  }
+  
+  uses {
+    interface Send as SubSend;
   }
 }
 
 implementation {
 
-  command error_t BlazeSplitControl.start[radio_id_t radioId]() {
-    return FAIL;
-  }
+  components TrafficControlP;
+  Send = TrafficControlP.Send;
+  TrafficControl = TrafficControlP.TrafficControl;
+  TrafficPriority = TrafficControlP.TrafficPriority;
+  SubSend = TrafficControlP.SubSend;
   
-  command error_t BlazeSplitControl.stop[radio_id_t radioId]() {
-    return FAIL;
-  }
+  components BlazeC;
+  TrafficControlP.AMPacket -> BlazeC;
   
-  command error_t RadioSelect.selectRadio(message_t *msg, radio_id_t radioId) {
-    return SUCCESS;
-  }
+  components AcknowledgementsC;
+  TrafficControlP.AckDetails -> AcknowledgementsC;
+  TrafficControlP.PacketAcknowledgements -> AcknowledgementsC;
+    
+  components new TimerMilliC();
+  TrafficControlP.Timer -> TimerMilliC;
   
-  command radio_id_t RadioSelect.getRadio(message_t *msg) {
-    return 0;
-  }
+  components LedsC;
+  TrafficControlP.Leds -> LedsC;
   
 }
-

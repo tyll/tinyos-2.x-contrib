@@ -50,6 +50,7 @@
 module AcknowledgementsP {
   provides {
     interface Send;
+    interface AckDetails;
     interface PacketAcknowledgements;
     interface AckReceive;
   }
@@ -85,7 +86,6 @@ implementation {
   
   /***************** Prototypes ****************/
   task void sendDone();
-  void setAck(message_t *msg, bool acked);
   
   /***************** Send Commands ****************/
   /**
@@ -115,7 +115,7 @@ implementation {
     (call BlazePacketBody.getHeader(msg))->fcf |=
         ( FRAME_TYPE_DATA << FCF_FRAME_TYPE );
     
-    setAck(RADIO_STACK_PACKET, FALSE);
+    wasAcked = FALSE;
         
     error = call SubSend.send(RADIO_STACK_PACKET, len);
     
@@ -138,7 +138,6 @@ implementation {
     return call SubSend.getPayload(msg, len);
   }
   
-  
   /***************** PacketAcknowledgements Commands ****************/
   async command error_t PacketAcknowledgements.requestAck( message_t *msg ) {
     (call BlazePacketBody.getHeader( msg ))->fcf |= 1 << FCF_ACK_REQ;
@@ -160,7 +159,8 @@ implementation {
     //return (((call BlazePacketBody.getHeader( msg ))->fcf) >> FCF_ACK_RETRIEVED) & 0x1;
   }
   
-  async command bool PacketAcknowledgements.shouldAck(message_t *msg) {
+  /***************** AckDetails Commands ***************/
+  async command bool AckDetails.shouldAck(message_t *msg) {
     blaze_header_t *header = call BlazePacketBody.getHeader(msg);
     return ((( header->fcf >> FCF_ACK_REQ ) & 0x01) == 1) 
         && (header->dest != AM_BROADCAST_ADDR);
@@ -201,9 +201,8 @@ implementation {
       if((ack->dest == header->src || ack->dest == AM_BROADCAST_ADDR) &&
           ack->src == header->dest &&
               ack->dsn == header->dsn) {
-                
-        // This is our acknowledgement
-        setAck(atomicMsg, TRUE);
+          
+        wasAcked = TRUE;
         
         signal AckReceive.receive(ack);
         
@@ -245,19 +244,6 @@ implementation {
   task void sendDone() {
     atomic state = S_IDLE;
     signal Send.sendDone(RADIO_STACK_PACKET, SUCCESS);
-  }
-  
-  
-  void setAck(message_t *msg, bool acked) {
-    wasAcked = acked;
-    
-    /*
-    if(wasAcked) {
-      ((call BlazePacketBody.getHeader( msg ))->fcf) |= (1 << FCF_ACK_RETRIEVED);
-    } else {
-      ((call BlazePacketBody.getHeader( msg ))->fcf) &= ~(1 << FCF_ACK_RETRIEVED);
-    }
-    */
   }
   
   /***************** Defaults ****************/

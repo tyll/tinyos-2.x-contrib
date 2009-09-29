@@ -51,6 +51,7 @@
 module AcknowledgementsP {
   provides {
     interface Send;
+    interface AckDetails;
     interface PacketAcknowledgements;
     interface AckReceive;
   }
@@ -127,7 +128,6 @@ implementation {
     return call SubSend.getPayload(msg, len);
   }
   
-  
   /***************** PacketAcknowledgements Commands ****************/
   async command error_t PacketAcknowledgements.requestAck( message_t *msg ) {
     (call BlazePacketBody.getHeader( msg ))->fcf |= 1 << FCF_ACK_REQ;
@@ -143,7 +143,8 @@ implementation {
   }
   
   
-  async command bool PacketAcknowledgements.shouldAck(message_t *msg) {
+  /***************** AckDetails Commands ****************/
+  async command bool AckDetails.shouldAck(message_t *msg) {
     blaze_header_t *header = call BlazePacketBody.getHeader(msg);
     return ((( header->fcf >> FCF_ACK_REQ ) & 0x01) == 1) 
         && (header->dest != AM_BROADCAST_ADDR);

@@ -30,64 +30,36 @@
  */
 
 /**
- * Dummy module for Packet Link layer
+ * Select which radio to use for a given message, and parameterize
+ * the Send and Receive interfaces below this point by radio id
+ * 
  * @author David Moss
- * @author Jon Wyant
  */
  
-#warning "Stubbing out PacketLink"
-
-module PacketLinkDummyP {
+module RadioSelectDummyP {
   provides {
-    interface PacketLink;
-  }
-  
-  uses {
-    interface PacketAcknowledgements;
+    interface RadioSelect;
+    interface SplitControl as BlazeSplitControl[radio_id_t radioId];
   }
 }
 
 implementation {
+
+  command error_t BlazeSplitControl.start[radio_id_t radioId]() {
+    return FAIL;
+  }
   
-  /***************** PacketLink Commands ***************/
-  /**
-   * Set the maximum number of times attempt message delivery
-   * Default is 0
-   * @param msg
-   * @param maxRetries the maximum number of attempts to deliver
-   *     the message
-   */
-  command void PacketLink.setRetries(message_t *msg, uint8_t maxRetries) {
+  command error_t BlazeSplitControl.stop[radio_id_t radioId]() {
+    return FAIL;
   }
-
-  /**
-   * Set a delay between each retry attempt
-   * @param msg
-   * @param retryDelay the delay betweeen retry attempts, in bms
-   */
-  command void PacketLink.setRetryDelay(message_t *msg, uint16_t retryDelay) {
+  
+  command error_t RadioSelect.selectRadio(message_t *msg, radio_id_t radioId) {
+    return SUCCESS;
   }
-
-  /** 
-   * @return the maximum number of retry attempts for this message
-   */
-  command uint8_t PacketLink.getRetries(message_t *msg) {
+  
+  command radio_id_t RadioSelect.getRadio(message_t *msg) {
     return 0;
   }
-
-  /**
-   * @return the delay between retry attempts in bms for this message
-   */
-  command uint16_t PacketLink.getRetryDelay(message_t *msg) {
-    return 0;
-  }
-
-  /**
-   * @return TRUE if the message was delivered.
-   */
-  command bool PacketLink.wasDelivered(message_t *msg) {
-    return call PacketAcknowledgements.wasAcked(msg);
-  }
-
+  
 }
 

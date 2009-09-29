@@ -56,10 +56,7 @@ module CsmaP {
     interface Alarm<T32khz,uint16_t> as BackoffTimer;
     interface BlazePacket;
     interface BlazePacketBody;
-    interface BlazeRegister as PaReg;
-    interface BlazeRegSettings;
     interface Random;
-    interface State;
     interface Leds;
   }
 }
@@ -71,19 +68,13 @@ implementation {
   
   
   /** The amount of time to currently backoff initially */
-  uint16_t myInitialBackoff;
-  
-  /** The amount of time to currently backoff during congestion */
-  uint16_t myCongestionBackoff;
-  
-  /** TRUE if the current packet should use clear channel assessments */
-  bool useCca;
+  uint16_t myBackoff;
   
   /** Error to pass back in sendDone */
   error_t myError;
-  
-  /** Total number of congestion backoffs for this transmission */
-  uint16_t totalCongestionBackoffs;
+    
+  /** State of this component */
+  uint8_t state;
   
   enum { 
     MAXIMUM_PROGRESSIVE_BACKOFF = 0x400,
@@ -124,8 +115,8 @@ implementation {
    * another packet after we've shut down.
    */
   command error_t SplitControl.stop() {
-    if(!call State.isIdle()) {
-      call State.forceState(S_STOPPING);
+    if(state != S_IDLE) {
+      state = S_STOPPING;
 
     } else {
       signal SplitControl.stopDone(SUCCESS);
@@ -143,9 +134,11 @@ implementation {
    *     FAIL if you need to reevaluate your code
    */
   command error_t Send.send(message_t* msg, uint8_t len) {
-    if(call State.requestState(S_SENDING) != SUCCESS) {
+    if(state != S_IDLE) {
       return FAIL;
     }
+    
+    state = S_BACKOFF;
     
     atomic {
       myMsg = msg;
@@ -153,12 +146,11 @@ implementation {
     
     requestCca();
     
-    if(!useCca) {
-      call State.forceState(S_FORCING);
+    if(!myBackoff) {
+      state = S_FORCING;
       call Resource.request();
             
     } else {
-      call State.forceState(S_BACKOFF);
       initialBackoff();
     }
     
@@ -169,8 +161,8 @@ implementation {
     message_t *atomicMsg;
     atomic atomicMsg = myMsg;
     
-    if(!call State.isIdle() && (msg == atomicMsg)) {
-      call State.forceState(S_CANCEL);
+    if(state != S_IDLE && (msg == atomicMsg)) {
+      state = S_CANCEL;
       return SUCCESS;
     }
    
@@ -191,11 +183,7 @@ implementation {
   
   /***************** Resource Events ****************/
   event void Resource.granted() {
-    if(call State.isState(S_BACKOFF)) {
-      if(call BlazePacket.getPower(myMsg) > 0) {
-        // This packet has custom PA settings
-        call PaReg.write(call BlazePacket.getPower(myMsg));
-      }
+    if(state == S_BACKOFF) {
     
 #if BLAZE_CSMA_LEDS
       call Leds.led2On();
@@ -207,23 +195,14 @@ implementation {
       call Leds.led2Off();
 #endif
       
-        if(call BlazePacket.getPower(myMsg) > 0) {
-          // Set the PA back to default for whatever ack's are taking place
-          call PaReg.write(call BlazeRegSettings.getPa());
-        }
-                
         call Resource.release();
         congestionBackoff();
       }
     
-    } else if(call State.isState(S_FORCING)) {
-      if(call BlazePacket.getPower(myMsg) > 0) {
-        // This packet has custom PA settings
-        call PaReg.write(call BlazePacket.getPower(myMsg));
-      }
+    } else if(state == S_FORCING) {
       post forceSend();
       
-    } else if(call State.isState(S_CANCEL) || call State.isState(S_STOPPING)) {
+    } else if(state == S_CANCEL || state == S_STOPPING) {
       atomic myError = ECANCEL;
       post sendDone();
     }
@@ -250,7 +229,7 @@ implementation {
    * @param backoffTime the amount of time in some unspecified units to backoff
    */
   async command void InitialBackoff.setBackoff[am_id_t amId](uint16_t backoffTime) {
-    atomic myInitialBackoff = backoffTime + 1;
+    atomic myBackoff = backoffTime + 1;
   }
   
   /**
@@ -258,7 +237,7 @@ implementation {
    * @param backoffTime the amount of time in some unspecified units to backoff
    */
   async command void CongestionBackoff.setBackoff[am_id_t amId](uint16_t backoffTime) {
-    atomic myCongestionBackoff = backoffTime + 1;
+    atomic myBackoff = backoffTime + 1;
   }
   
   /***************** CSMA Commands ****************/
@@ -267,7 +246,7 @@ implementation {
    * @param cca TRUE to use cca for the outbound packet, FALSE to not use CCA
    */
   async command void Csma.setCca[am_id_t amId](bool cca) {
-    atomic useCca = cca;
+    atomic myBackoff = cca;
   }
   
 
@@ -275,21 +254,21 @@ implementation {
   async event void BackoffTimer.fired() {
   
 #if BLAZE_CSMA_LEDS
-    if(call State.isState(S_CANCEL) 
-        || call State.isState(S_STOPPING) 
-        || call State.isState(S_BACKOFF)) {
+    if((state == S_CANCEL)
+        || (state == S_STOPPING) 
+        || (state == S_BACKOFF)) {
       call Leds.led0Off();
       call Leds.led1Off();
     }
 #endif
 
-    if(call State.isState(S_CANCEL) || call State.isState(S_STOPPING)) {
+    if((state == S_CANCEL) || (state == S_STOPPING)) {
       atomic myError = ECANCEL;
       post sendDone();
       return;
     }
     
-    if(!call State.isState(S_BACKOFF)) {
+    if(!(state == S_BACKOFF)) {
       // not my event to handle
       return;
     }
@@ -311,7 +290,7 @@ implementation {
    */
   task void forceSend() {
     if(call AsyncSend.send(myMsg, TRUE, (call BlazePacketBody.getMetadata(myMsg))->rxInterval) != SUCCESS) {
-      if(call State.isState(S_CANCEL) || call State.isState(S_STOPPING)) {
+      if((state == S_CANCEL) || (state == S_STOPPING)) {
         atomic myError = ECANCEL;
         post sendDone();
         
@@ -324,40 +303,35 @@ implementation {
   task void sendDone() {
     error_t atomicError;
     atomic atomicError = myError;
-    
-    if(call BlazePacket.getPower(myMsg) > 0) {
-      // Set the radio back to default PA settings
-      call PaReg.write(call BlazeRegSettings.getPa());
-    }
-    
+       
     call Resource.release();
     
-    if(call State.isState(S_STOPPING)) {
+    if((state == S_STOPPING)) {
       signal SplitControl.stopDone(SUCCESS);
     }
     
-    call State.toIdle();
+    state = S_IDLE;
     signal Send.sendDone(myMsg, atomicError);
   }
   
   
   /**
    * Decide whether or not to use CCA for this transmission.
-   * When complete, the useCca variable will read TRUE to use CCA and FALSE
+   * When complete, the myBackoff variable will read TRUE to use CCA and FALSE
    * to not use software CCA. 
    */
   void requestCca() {
-    atomic useCca = TRUE;
+    atomic myBackoff = TRUE;
     signal Csma.requestCca[(call BlazePacketBody.getHeader(myMsg))->type](myMsg);
   }
   
   /**
    * Obtain an inital backoff amount.
-   * When complete, the variable myInitialBackoff will be filled with the
+   * When complete, the variable myBackoff will be filled with the
    * correct amount of initial backoff time to use
    */
   void requestInitialBackoff() {
-    atomic myInitialBackoff = ( call Random.rand16() % 
+    atomic myBackoff = ( call Random.rand16() % 
         (0x1F * BLAZE_BACKOFF_PERIOD) + BLAZE_MIN_BACKOFF);
         
     signal InitialBackoff.requestBackoff[(call BlazePacketBody.getHeader(myMsg))->type](myMsg);
@@ -365,11 +339,11 @@ implementation {
   
   /**
    * Obtain a congestion backoff amount
-   * When complete, the variable myCongestionBackoff will be filled with the
+   * When complete, the variable myBackoff will be filled with the
    * correct amount of congestion backoff time to use.
    */
   void requestCongestionBackoff() {
-    atomic myCongestionBackoff = ( call Random.rand16() % 
+    atomic myBackoff = ( call Random.rand16() % 
         (0x7 * BLAZE_BACKOFF_PERIOD) + BLAZE_MIN_BACKOFF);
         
     signal CongestionBackoff.requestBackoff[(call BlazePacketBody.getHeader(myMsg))->type](myMsg);
@@ -382,8 +356,7 @@ implementation {
   void initialBackoff() {
     uint16_t atomicBackoff;
     requestInitialBackoff();
-    totalCongestionBackoffs = 0;
-    atomic atomicBackoff = myInitialBackoff;
+    atomic atomicBackoff = myBackoff;
     
 #if BLAZE_CSMA_LEDS
     call Leds.led0On();
@@ -397,13 +370,9 @@ implementation {
    */
   void congestionBackoff() {
     uint16_t atomicBackoff;
-    totalCongestionBackoffs++;
-    if(totalCongestionBackoffs > 1024) {
-      totalCongestionBackoffs = 1024;
-    }
-    
+
     requestCongestionBackoff();
-    atomic atomicBackoff = myCongestionBackoff;
+    atomic atomicBackoff = myBackoff;
 
 #if BLAZE_CSMA_LEDS
     call Leds.led1On();
@@ -424,10 +393,7 @@ implementation {
   
   default event void SplitControl.startDone(error_t error) { }
   default event void SplitControl.stopDone(error_t error) { }
-  
-  default command blaze_init_t *BlazeRegSettings.getDefaultRegisters() { return NULL; }
-  default command uint8_t BlazeRegSettings.getPa() { return 0xC0; }
-  
+    
 }
 
 

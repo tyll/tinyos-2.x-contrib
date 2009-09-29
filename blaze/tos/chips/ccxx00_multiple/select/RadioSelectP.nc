@@ -66,7 +66,7 @@ implementation {
   command error_t SplitControl.start[radio_id_t radioId]() {
     error_t error;
     if(currentRadio != NO_RADIO) {
-      return FAIL;
+      return EALREADY;
     }
     
     currentRadio = radioId;
@@ -82,7 +82,7 @@ implementation {
   
   command error_t SplitControl.stop[radio_id_t radioId]() {
     if(currentRadio != radioId) {
-      return FAIL;
+      return EALREADY;
     }
     
     return call SubControl.stop();

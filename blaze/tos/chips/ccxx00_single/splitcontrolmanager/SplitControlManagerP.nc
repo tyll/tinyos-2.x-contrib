@@ -36,6 +36,7 @@
 
 #include "SplitControlManager.h"
 #include "Blaze.h"
+#include "RadioStackPacket.h"
 
 module SplitControlManagerP {
   provides {

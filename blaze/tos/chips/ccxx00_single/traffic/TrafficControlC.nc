@@ -30,7 +30,6 @@
  */
 
 #include "AM.h"
-#include "TrafficControl.h"
 
 /**
  * Traffic Control prevents too many packets from being transmitted too quickly,
@@ -51,20 +50,10 @@ configuration TrafficControlC {
 
 implementation {
 
-  components TrafficControlP;
-  Send = TrafficControlP.Send;
-  TrafficControl = TrafficControlP.TrafficControl;
-  TrafficPriority = TrafficControlP.TrafficPriority;
-  SubSend = TrafficControlP.SubSend;
+  components TrafficControlDummyP;
+  TrafficControl = TrafficControlDummyP.TrafficControl;
+  TrafficPriority = TrafficControlDummyP.TrafficPriority;
   
-  components BlazeC;
-  TrafficControlP.AMPacket -> BlazeC;
-  TrafficControlP.PacketAcknowledgements -> BlazeC;
-  
-  components new TimerMilliC();
-  TrafficControlP.Timer -> TimerMilliC;
-  
-  components LedsC;
-  TrafficControlP.Leds -> LedsC;
+  Send = SubSend;
   
 }

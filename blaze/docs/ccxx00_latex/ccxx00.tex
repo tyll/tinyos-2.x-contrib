@@ -102,6 +102,8 @@ There are many components of functionality, some with more than one behavior imp
 	strobe commands.
 	\item \emph{splitcontrolmanager} : Manages the SplitControl interface, preventing
 	the radio from turning off when a packet is being sent anywhere in the stack.
+	\item \emph{traffic} : Traffic control layer, dynamically limits the throughput of your local
+	node to increase acknowledgment success rates for the entire network.
 	\item \emph{transmit} : Low-level transmit module. This provides separate interfaces 
 	for packet transmission and ack transmission, the difference is how aggressive it 
 	tries to transmit. It also physically creates the long preambles for BMAC / BoX-MAC 
@@ -139,6 +141,7 @@ like this:
   %T/chips/ccxx00_single/select
   %T/chips/ccxx00_single/spi
   %T/chips/ccxx00_single/splitcontrolmanager
+  %T/chips/ccxx00_single/traffic
   %T/chips/ccxx00_single/transmit
   %T/chips/ccxx00_single/unique
   
@@ -216,9 +219,15 @@ At the time of this writing, the CCxx00 radio stack had the following add-ons av
 	platform.
 	
 	\item \emph{dutycycle} : Keeps track of the amount of time the radio has been in some active state vs. how long the platform has been enabled. This is extremely useful for energy consumption estimates.
+	\item \emph{packetlink} : This is the Packet Link implementation,
+	replacing the stubbed out version in the ccxx00\_single main radio 
+	stack.
 	\item \emph{packetstats} : Keeps track of the number of packets sent, received, and overheard. As of the time of this writing, we have yet to implement another statistics interface to provide the number of missed acknowledgments.
 	\item \emph{pendingbit} : This layer watches out for a pending bit enabled in the FCF word of the packet and will activate the radio for a period of time if a pending bit is ever seen. This could be used in conjunction with any low power communication profile except always-on, where it wouldn't make sense because the radio is always active.	
-	\item \emph{packetstats} : Keeps track of the number of packets sent, received, and overheard. As of the time of this writing, we have yet to implement another statistics interface to provide the number of missed acknowledgments.
+	\item \emph{rssi} : Ambient RSSI gathering component, where you can
+	read the RSSI value without having received a packet.
+	\item \emph{trafficcontrol} : Traffic Control implementation, replacing
+	the stubbed out version in the ccxx00\_single main radio stack.
 \end{itemize}
 
 
@@ -230,9 +239,11 @@ out of the top of ActiveMessageC.
 \begin{verbatim}
   %T/chips/ccxx00_addons/availableradios
   %T/chips/ccxx00_addons/dutycycle
+  %T/chips/ccxx00_addons/packetlink
   %T/chips/ccxx00_addons/packetstats
   %T/chips/ccxx00_addons/pendingbit
   %T/chips/ccxx00_addons/rssi
+  %T/chips/ccxx00_addons/trafficcontrol
 \end{verbatim}
 
 \subsection{Layer Wiring}
@@ -252,9 +263,10 @@ The order of these layers is very important to forming a fully functional radio 
 		  \hline
       ActiveMessageC \\ \hline \hline
       SplitControlManager \\ \hline
+      Traffic Control Add-on \\ \hline
       RadioSelect \\ \hline
       UniqueReceive \\ \hline
-      PacketLink \\ \hline
+      Packet Link Add-on \\ \hline
       Low Power Communications \\ \hline
       Acknowledgments \\ \hline
       CSMA \\ \hline \hline
@@ -276,7 +288,8 @@ The order of these layers is very important to forming a fully functional radio 
 \begin{verbatim}  
   /***************** Send Layers ****************/
   AMSend = BlazeActiveMessageC;
-  BlazeActiveMessageC.SubSend -> RadioSelectC.Send;
+  BlazeActiveMessageC.SubSend -> TrafficControlC.Send;
+  TrafficControlC.SubSend -> RadioSelectC.Send;
   RadioSelectC.SubSend -> SplitControlManagerC.Send;
   SplitControlManagerC.SubSend -> PacketLinkC.Send;
   PacketLinkC.SubSend -> LplC.Send;
@@ -379,6 +392,27 @@ radio stacks.  This includes commands to look at LQI, RSSI, and the Packet Pendi
 \subsection{Extended Interfaces}
 \label{sec:extendedinterfaces}
 
+\subsubsection{TrafficControl / TrafficPriority}
+Networks with high traffic rates perform poorly in terms of acknowledgment success rate
+than a network that has built in traffic control mechanisms. Although
+some mesh networking libraries, such as CTP, have a traffic control implementation
+built in, we've taken it a step further and applied it to the radio stack as a whole.
+This way, one rogue element of your system won't clobber the other nodes in the area.
+Network acknowledgmenet success rate goes up, and general energy consumption goes down.
+The Traffic Control delays can also be configured to your radio's data rate and CSMA settings.
+
+Traffic Control will dynamically adjust the time between packet transmissions from your local
+node. By default, it initializes to a long delay between packets (4 seconds).  If acknowledgments are succeeding,
+the delay decreases.  If acknowledgments fail, the delay increases.  If the delay between
+packets reaches the minimum or maximum amounts, the delay will reset to 4 seconds. This is
+similar behavior to TCP traffic control.
+
+If you need a packet to get through quickly, the TrafficPriority interface can configure an outbound packet 
+to be sent very quickly, bypassing the traffic control delays.
+
+The Traffic Control layer is available as an add-on implementation that must be pulled in at compile time to override
+the ccxx00\_single\\traffic dummy implementation.
+
 \subsubsection{PacketLink}
 Packet Link allows you to configure a packet to be retried for a set number of times before
 the radio stack gives up sending it. Acknowledgments are automatically set when Packet Link
@@ -386,8 +420,8 @@ is enabled. In the case where a packet is received by the destination node, but 
 is dropped, the follow on duplicate packets will automatically be filtered out by the receiving 
 radio stack's UniqueReceive filter.
 
-It is possible to remove the Packet Link layer from the radio stack if that functionality
-is not going to be used.
+The Packet Link layer is available as an add-on implementation that must be pulled in at compile time to
+override the ccxx00\_single\\packetlink dummy implementation.
 
 See TEP 127 \cite{tep127} for more details.
 
@@ -1022,24 +1056,23 @@ are better. The tribulations people experienced with the CC1000 radio seemed to 
 the wireless sensor network community to shy away from sub-GHz comms.
 
 Your operating frequency is mutually exclusive of your data rate, which is another 
-common misconception I hear quite often. To prove my point, the CC1100 radio has twice the 
-data rate as the 2.4 GHz 802.15.4 radios, and it operates down to 300 MHz. Case closed.
+common misconception I hear quite often. To prove my point, the CC1101 radio has twice the 
+data rate as the 2.4 GHz 802.15.4 radios, and the CC1101 operates down to 300 MHz. Case closed.
 
 The downsides to 2.4 GHz communication should be obvious. WiFi interference is everywhere. Portable
-phones moved away from 900 MHz to 2.4 GHz, and continue to move to other bands. 2.4 GHz is in the
-microwave band which allows those signals to be absorbed by water (your body) very easily. 2.4 GHz is absorbed
-by the ground and walls.  It does not propagate well, and therefore is not a good choice for 
-wireless sensor networks in general.
+phones moved away from 900 MHz to 2.4 GHz, and continue to move to other bands. 2.4 GHz is where
+your microwave ovens sit. 2.4 GHz is absorbed by the ground and walls.  It does not propagate well, 
+and therefore is not a good choice for wireless sensor networks in general.
 
 If you can think of any more reasons why 2.4 GHz would make sense for any given system, please email me. 
 
 \subsection{Dual-radio platforms}
-We started getting requirements in to have a dual-radio platform.  This obviously couldn't be purchased off-the-shelf,
-so we had to spin our own. One radio should continue to operate at 2.4 GHz because of the small antenna size, 
-while the other radio would operate the network at a much lower frequency.  The CC1100 / CC2500 radios 
+We started getting requirements in to have a dual-radio platform.  Dual-radio platforms couldn't be purchased off-the-shelf,
+so we had to spin our own. One radio continued to operate at 2.4 GHz because of the small antenna size, 
+while the other radio operated the network at a much lower frequency.  The CC1100 / CC2500 radios 
 were selected for this platform because they are pin and chip compatible and only require one radio driver to operate.
 
-We ported TinyOS to SoftBaugh development boards and built a basic radio stack to facilitate testing
+We ported TinyOS to SoftBaugh \cite{softbaugh} development boards and built a basic radio stack to facilitate testing
 of our custom hardware after assembly.  The directory for this basic, non-fully functional stack was labeled 'ccxx00'.
 The hardware platforms being developed were dubbed 'blaze', and we needed a place to store a fully functional
 dual-radio platform stack. It seemed logical to call the dual-radio stack 'blaze' to match up with the hardware
@@ -1104,15 +1137,13 @@ the state sometimes refuses to change. Another issue is with the wake-on radio i
 it sometimes just stops working.  The radio sometimes registers a busy channel while doing a clear
 channel assessment, even though the channel is definitely shown to be clear on the spectrum analyzer.
 The errata is thick \cite{cc1101errata}.  For these reasons and others, the radio stack took a long time to develop.  
-We may have put in a little bit extra ROM trying to work around some of these issues, but 
-it turned out not to be too bad after a few revisions.
-
+Everything turned out solid.
 
 \section{Acknowledgments}
 Special thanks to everyone who helped out with the development of this radio stack, whether it was 
 contributing code or sending back bug reports. This includes Rincon Research Corporation for funding 
 the development, Rob Muir, Jared Hill, Mark Hays, Mark Siner, Jon Wyant, Lexis Mazerski, Chris Kibbey, 
-Roland Hendel, Adam Brzostowksi, Mike Claassen, WenZhan Song, Renjie Huang, Gang Lu, Miklos Maroti, 
+Peter Bigot, Roland Hendel, Adam Brzostowksi, Mike Claassen, WenZhan Song, Renjie Huang, Gang Lu, Miklos Maroti, 
 Gustavo Litovsky, and Shaun Lawrence.
 
 \bibliographystyle{plain}

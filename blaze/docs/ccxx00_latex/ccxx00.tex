@@ -441,7 +441,7 @@ a packet. The interface is parameterized by AM ID out the top of the CCxx00 stac
 This is useful because it allows other areas of your system to modify outbound packets. 
 For example, the Collection Tree Protocol connects directly into the radio stack and will not allow you
 to configure outbound packets to be delivered to low power receivers. Instead of modifying
-the CTP code to do the configuration there, you can add a module into the system that will
+the CTP \cite{ctp} code to do the configuration there, you can add a module into the system that will
 look for outbound CTP packets and configure them to be delivered to a low power receiver.
 
 If you do not implement the SendNotifier interface anywhere, it should be removed by the

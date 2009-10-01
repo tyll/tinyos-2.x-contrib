@@ -191,7 +191,9 @@ typedef union {
      
 Atm1281UartUnionConfig_t atm1281_uart_default_config = {{
 #if MHZ == 8
-  #if PLATFORM_BAUDRATE == 57600L
+  #if PLATFORM_BAUDRATE == 115200L
+  ubr : ATM1281_115200_BAUD_8MHZ_2X,
+  #elif PLATFORM_BAUDRATE == 57600L
   ubr : ATM1281_57600_BAUD_8MHZ_2X,
   #elif PLATFORM_BAUDRATE == 38400L
   ubr : ATM1281_38400_BAUD_8MHZ_2X,

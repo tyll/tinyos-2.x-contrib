@@ -46,9 +46,13 @@ interface TrafficPriority {
   /** 
    * This may only be called within the requestPriority() event, otherwise
    * it has no effect.  If you do not call it, the packet will be sent with
-   * default priority
+   * default low priority, which is 0.  The highest priority is 5.
+   * In most cases, 0 represents a normal packet and anything above 0 represents
+   * the highest priority packet.
+   * @param priority The priority of the packet between 0 (lowest) and 5 
+   *     (highest)
    */
-  command void highPriority();
+  command void setPriority(uint8_t priority);
   
 }
 

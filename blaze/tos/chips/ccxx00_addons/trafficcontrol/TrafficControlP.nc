@@ -78,15 +78,14 @@ implementation {
   
   
   /***************** TrafficPriority Commands ****************/
-  /** 
-   * This may only be called within the requestPriority() event, otherwise
-   * it has no effect.  If you do not call it, the packet will be sent with
-   * default priority
+  /**
+   * This command allows an individual packet to be sent with a high priority
    *
-   * @param highPriority TRUE if this packet is to be sent with high priority.   
+   * @param priority The priority of the packet. 0 = default (low); greater
+   *     than 0 is highest priority.
    */
-  command void TrafficPriority.highPriority[am_id_t amId]() {
-    useHighPriority = TRUE;
+  command void TrafficPriority.setPriority[am_id_t amId](uint8_t priority) {
+    useHighPriority = priority;
   }
   
   

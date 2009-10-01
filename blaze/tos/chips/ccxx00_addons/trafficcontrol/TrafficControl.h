@@ -37,6 +37,14 @@
 #define TRAFFICCONTROL_H
 
 /**
+ * Priority levels for the TrafficPriority interface
+ */
+enum {
+  TRAFFICPRIORITY_LOWEST = 0,
+  TRAFFICPRIORITY_HIGHEST = 5,
+};
+
+/**
  * Default traffic control delay is 4 seconds between transmissions
  */
 #ifndef DEFAULT_TRAFFIC_CONTROL_DELAY
@@ -44,14 +52,14 @@
 #endif
 
 /**
- * Longest delay between packets is 10240U
+ * Longest delay between packets defaults to 10 seconds
  */
 #ifndef LONGEST_TRAFFIC_DELAY
 #define LONGEST_TRAFFIC_DELAY 10240U
 #endif
 
 /**
- * Shortest delay between packets is 1024U
+ * Shortest delay between packets defaults to 1 second
  */
 #ifndef SHORTEST_TRAFFIC_DELAY
 #define SHORTEST_TRAFFIC_DELAY 1024U

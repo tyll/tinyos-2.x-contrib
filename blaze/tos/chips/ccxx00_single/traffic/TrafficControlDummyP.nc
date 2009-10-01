@@ -56,7 +56,7 @@ implementation {
   }
   
   /***************** TrafficPriority Commands ****************/
-  command void TrafficPriority.highPriority[am_id_t amId]() {
+  command void TrafficPriority.setPriority[am_id_t amId](uint8_t priority) {
   }
   
 }

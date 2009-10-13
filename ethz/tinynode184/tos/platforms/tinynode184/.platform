@@ -10,9 +10,6 @@ push( @includes, qw(
   %T/platforms/tinynode184/chips/mm74hc595
   %T/platforms/tinynode184/chips/stm25p40
 
-  %T/../../tinyos-2.x-contrib/rincon/tos/chips/msp430/flash 
-  %T/../../tinyos-2.x-contrib/rincon/tos/interfaces
-
   %T/platforms/tinynode184/tinynodeSEB	
 
   %T/chips/sx1211/interfaces

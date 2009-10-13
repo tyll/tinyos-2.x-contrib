@@ -1,0 +1,30 @@
+/* $Id$
+ * Copyright (c) 2006 Intel Corporation
+ * All rights reserved.
+ *
+ * This file is distributed under the terms in the attached INTEL-LICENSE     
+ * file. If you do not find these files, copies can be found by writing to
+ * Intel Research Berkeley, 2150 Shattuck Avenue, Suite 1300, Berkeley, CA, 
+ * 94704.  Attention:  Intel License Inquiry.
+ */
+/**
+ * Internal component for basicsb photodiode. Arbitrates access to the photo
+ * diode and automatically turns it on or off based on user requests.
+ * 
+ * @author David Gay
+ */
+
+#include "tinynodeSEB.h"
+
+module PhotoDeviceP {
+  provides {
+      interface Init;
+  }
+
+}
+implementation {
+
+    command error_t Init.init() {
+	return SUCCESS;
+    }
+}

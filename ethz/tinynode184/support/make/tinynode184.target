@@ -1,0 +1,56 @@
+#-*-Makefile-*- 
+#$Id$
+
+PLATFORM = tinynode184
+
+ifndef TOSDIR
+TOSDIR := $(shell ncc -print-tosdir)
+endif
+
+PFLAGS += -I../../tos/platforms/tinynode184
+PFLAGS += -I../../tos/platforms/tinynode184/chips/sx1211
+PFLAGS += -I../../tos/platforms/tinynode184/chips/mm74hc595
+PFLAGS += -I../../tos/platforms/tinynode184/chips/stm25p40
+PFLAGS += -I../../tos/platforms/tinynode184/tinynodeSEB
+PFLAGS += -I../../tos/chips/sx1211/conf
+PFLAGS += -I../../tos/chips/sx1211/phy
+PFLAGS += -I../../tos/chips/sx1211/interfaces
+PFLAGS += -I../../tos/chips/sx1211/packet
+PFLAGS += -I../../tos/chips/sx1211/LowPowerListening
+PFLAGS += -I../../tos/chips/sx1211
+PFLAGS += -I../../tos/chips/msp430
+PFLAGS += -I../../tos/chips/msp430/adc12
+PFLAGS += -I../../tos/chips/msp430/dma
+PFLAGS += -I../../tos/chips/msp430/pins
+PFLAGS += -I../../tos/chips/msp430/timer
+PFLAGS += -I../../tos/chips/msp430/usart
+PFLAGS += -I../../tos/chips/msp430/sensors
+PFLAGS += -I../../tos/chips/stm25p
+PFLAGS += -I../../tos/system
+PFLAGS += -I../../tos/lib/timer
+PFLAGS += -I../../tos/lib/net/Deluge/extra/msp430
+
+# with old msp430-gcc
+#MSP_BSL ?= tos-bsl
+#OPTFLAGS = -Os
+
+# with code>64k msp430-gcc
+MSP_BSL ?= msp430-bsl
+OPTFLAGS += -Os -mdata-64k
+# -mcode-64k -mdata-64k
+
+MSP_BSL_FLAGS += --speed=38400
+
+#Flash Config
+VOLUME_FILE = volumes-stm25p40.xml
+VOLUME_ALLOCATOR = tos-storage-stm25p40
+
+# Disable MSP430 hardware multiply because it makes MSPGCC die
+PFLAGS += -mdisable-hwmul
+
+$(call TOSMake_include_platform,tinynode)
+$(call TOSMake_include_platform,msp)
+
+tinynode184: $(BUILD_DEPS)
+	@:
+

@@ -38,13 +38,17 @@ configuration UDPEchoC {
   components IPDispatchC;
 
   UDPEchoP.RadioControl -> IPDispatchC;
-  components new UdpSocketC() as Echo,
-    new UdpSocketC() as Status;
-  UDPEchoP.Echo -> Echo;
+  components
+    new UdpSocketC() as Echo,
+    new UdpSocketC() as Status,
+    new UdpSocketC() as Measurements;
 
+  UDPEchoP.Echo -> Echo;
   UDPEchoP.Status -> Status;
+  UDPEchoP.Measurements -> Measurements;
 
   UDPEchoP.StatusTimer -> TimerMilliC;
+  UDPEchoP.MeasurementTimer -> TimerMilliC;
 
   components UdpC;
   UDPEchoP.IPStats -> IPDispatchC.IPStats;
@@ -57,8 +61,14 @@ configuration UDPEchoC {
 
   components UDPShellC;
 
-  components new ShellCommandC("id");
-  UDPEchoP.ShellCommand -> ShellCommandC;
+  components new ShellCommandC("id") as Id;
+  UDPEchoP.IdShellCommand -> Id;
+  components new ShellCommandC("measure") as Meas;
+  UDPEchoP.MeasShellCommand -> Meas;
+
+  components MeasurementCollectorC;
+  UDPEchoP.MeasCollector -> MeasurementCollectorC;
+  MeasurementCollectorC.Leds -> LedsC;
 
 #ifdef SIM
   components BaseStationC;

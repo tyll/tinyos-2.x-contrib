@@ -31,6 +31,7 @@
 #include "MoteIdDb.h"
 
 #define REPORT_PERIOD 75L
+#define MEASUREMENT_PERIOD 4L
 
 module UDPEchoP {
   uses {
@@ -39,10 +40,14 @@ module UDPEchoP {
 
     interface UDP as Echo;
     interface UDP as Status;
+    interface UDP as Measurements;
 
     interface Leds;
 
     interface Timer<TMilli> as StatusTimer;
+    interface Timer<TMilli> as MeasurementTimer;
+
+    interface MeasurementCollector as MeasCollector;
 
     interface Statistics<ip_statistics_t> as IPStats;
     interface Statistics<udp_statistics_t> as UDPStats;
@@ -51,7 +56,8 @@ module UDPEchoP {
 
     interface Random;
 
-    interface ShellCommand;
+    interface ShellCommand as IdShellCommand;
+    interface ShellCommand as MeasShellCommand;
 
 #if defined(PLATFORM_TELOSB)
     interface ReadId48 as SerialId;
@@ -65,9 +71,13 @@ module UDPEchoP {
 } implementation {
 
   bool timerStarted;
+  bool measToggle;
 
   nx_struct udp_report stats;
   struct sockaddr_in6 route_dest;
+
+  nx_struct udp_measurement meas;
+  struct sockaddr_in6 meas_dest;
 
   uint8_t serial[6] = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0};
   char usbid[USB_ID_SIZE] = "00000000";
@@ -76,6 +86,7 @@ module UDPEchoP {
   event void Boot.booted() {
     call RadioControl.start();
     timerStarted = FALSE;
+    measToggle = FALSE;
 
     call IPStats.clear();
     call RouteStats.clear();
@@ -87,6 +98,9 @@ module UDPEchoP {
     inet_pton6(REPORT_DEST, &route_dest.sin6_addr);
     call StatusTimer.startOneShot(call Random.rand16() % (1024 * REPORT_PERIOD));
 #endif
+
+    meas_dest.sin6_port = hton16(7000);
+    inet_pton6("fec0::66", &meas_dest.sin6_addr); // FIXME: hardcoded IP
 
     dbg("Boot", "booted: %i\n", TOS_NODE_ID);
 
@@ -129,9 +143,8 @@ module UDPEchoP {
   }
 
   char *id_string = "\t[serialID: %x:%x:%x:%x:%x:%x]\n\t[usbID: %c%c%c%c%c%c%c%c]\n\t[addr: 0x%x]\n";
-
-  event char *ShellCommand.eval(int argc, char **argv) {
-    char *ret = call ShellCommand.getBuffer(50);
+  event char *IdShellCommand.eval(int argc, char **argv) {
+    char *ret = call IdShellCommand.getBuffer(50);
 
     if (ret != NULL) {
       snprintf(ret, strlen(id_string), id_string,
@@ -140,6 +153,27 @@ module UDPEchoP {
 	       usbid[0], usbid[1], usbid[2], usbid[3],
 	       usbid[4], usbid[5], usbid[6], usbid[7],
 	       tosnodeid);
+    }
+
+    return ret;
+  }
+
+  char *meas_string = "\t[measure: %d]\n";
+  event char *MeasShellCommand.eval(int argc, char **argv) {
+    char *ret = call MeasShellCommand.getBuffer(50);
+
+    if (ret != NULL) {
+
+      if (measToggle == FALSE) {
+	measToggle = TRUE;
+	call MeasurementTimer.startPeriodic(1024 * MEASUREMENT_PERIOD);
+      } else {
+	measToggle = FALSE;
+	call MeasurementTimer.stop();
+      }
+
+      snprintf(ret, strlen(meas_string), meas_string,
+	       measToggle);
     }
 
     return ret;
@@ -162,4 +196,34 @@ module UDPEchoP {
 
     call Status.sendto(&route_dest, &stats, sizeof(stats));
   }
+
+  event void Measurements.recvfrom(struct sockaddr_in6 *from, void *data,
+				   uint16_t len, struct ip_metadata *meta) {
+
+  }
+
+  event void MeasurementTimer.fired() {
+    call MeasCollector.readAllSensors();
+  }
+
+  event void MeasCollector.allMeasurementsDone(uint16_t temp,
+					       uint16_t hum,
+					       uint16_t volt,
+					       uint16_t tsr,
+					       uint16_t par,
+					       uint8_t valid) {
+    meas.seqno++;
+    meas.sender = TOS_NODE_ID;
+
+    meas.temp = temp;
+    meas.hum  = hum;
+    meas.volt = volt;
+    meas.tsr  = tsr;
+    meas.par  = par;
+
+    meas.valid = valid;
+
+    call Measurements.sendto(&meas_dest, &meas, sizeof(meas));
+  }
+
 }

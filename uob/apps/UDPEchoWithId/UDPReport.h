@@ -33,4 +33,17 @@ nx_struct udp_report {
   route_statistics_t route;
 } ;
 
+nx_struct udp_measurement {
+  nx_uint16_t seqno;
+  nx_uint16_t sender;
+
+  nx_uint16_t temp;
+  nx_uint16_t hum;
+  nx_uint16_t volt;
+  nx_uint16_t tsr;
+  nx_uint16_t par;
+
+  nx_uint8_t valid;
+} ;
+
 #endif

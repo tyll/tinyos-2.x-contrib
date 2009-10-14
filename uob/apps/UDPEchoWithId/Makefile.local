@@ -27,6 +27,7 @@ clean:
 %.o: %.c
 	$(CC) -c -fPIC -o $@ $<
 
-msg:	
+msg:
 	mig -DMIG -I$(LOWPAN_ROOT)/tos/lib/net/blip -I$(TOSROOT)/tos/chips/cc2420 -I$(LOWPAN_ROOT)/support/sdk/c/blip/include  python -python-classname=UdpReport UDPReport.h udp_report -o util/UdpReport.py
+	mig -DMIG -I$(LOWPAN_ROOT)/tos/lib/net/blip -I$(TOSROOT)/tos/chips/cc2420 -I$(LOWPAN_ROOT)/support/sdk/c/blip/include  python -python-classname=UdpMeasurement UDPReport.h udp_measurement -o util/UdpMeasurement.py
 	mig -DMIG -I$(LOWPAN_ROOT)/tos/lib/net/blip -I$(TOSROOT)/tos/chips/cc2420 -I$(LOWPAN_ROOT)/support/sdk/c/blip/include  python -python-classname=TestDriverMsg TestDriver.h testdriver_msg -o util/TestDriverMsg.py

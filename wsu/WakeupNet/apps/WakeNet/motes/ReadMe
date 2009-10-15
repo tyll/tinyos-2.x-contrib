@@ -1,0 +1,13 @@
+Interface configuration
+Accelerometer:
+command error_t read<acc_t>
+event void readDone( error_t res, acc_t val);
+async event void int1();
+async event void int2();
+
+Sht11:
+in SensirionSht11.nc
+
+EnergyMeter:
+in EneryMeter.nc
+

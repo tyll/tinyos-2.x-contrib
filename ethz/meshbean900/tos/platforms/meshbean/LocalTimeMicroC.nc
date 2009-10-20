@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, Vanderbilt University
+ * Copyright (c) 2008, Vanderbilt University
  * All rights reserved.
  *
  * Permission to use, copy, modify, and distribute this software and its
@@ -21,53 +21,20 @@
  * Author: Miklos Maroti
  */
 
-#include <RadioConfig.h>
+#include "Timer.h"
 
-configuration HplRF212C
+configuration LocalTimeMicroC
 {
-	provides
-	{
-		interface GeneralIO as SELN;
-		interface Resource as SpiResource;
-		interface FastSpiByte;
-
-		interface GeneralIO as SLP_TR;
-		interface GeneralIO as RSTN;
-
-		interface GpioCapture as IRQ;
-		interface Alarm<TRadio, uint16_t> as Alarm;
-		interface LocalTime<TRadio> as LocalTimeRadio;
-	}
+	provides interface LocalTime<TMicro>;
 }
 
 implementation
 {
-	components HplRF212P;
-	IRQ = HplRF212P.IRQ;
+	components CounterThree16C;
+	components new TransformCounterC(TMicro, uint32_t, TMicro, uint16_t, 0, uint32_t);
+	components new CounterToLocalTimeC(TMicro);
 
-	HplRF212P.PortIRQ -> IO.PortE5;
-	
-	components Atm128SpiC as SpiC;
-	SpiResource = SpiC.Resource[unique("Atm128SpiC.Resource")];
-	FastSpiByte = SpiC;
-
-	components HplAtm128GeneralIOC as IO;
-	SLP_TR = IO.PortB4;
-	RSTN = IO.PortA7;
-	SELN = IO.PortB0;
-
-	components HplAtm128InterruptC;
-    HplRF212P.Interrupt -> HplAtm128InterruptC.Int5;
-
-	components HplAtm128Timer3C as TimerC;
-	HplRF212P.Timer -> TimerC;
-
-	components new AlarmThree16C() as AlarmC;
-	Alarm = AlarmC;
-
-	components RealMainP;
-	RealMainP.PlatformInit -> HplRF212P.PlatformInit;
-
-	components LocalTimeMicroC;
-	LocalTimeRadio = LocalTimeMicroC;
+	LocalTime = CounterToLocalTimeC;
+	CounterToLocalTimeC.Counter -> TransformCounterC;
+	TransformCounterC.CounterFrom -> CounterThree16C;
 }

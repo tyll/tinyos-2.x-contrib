@@ -51,7 +51,7 @@ enum
 
 /* This is the default value of the TX_PWR field of the PHY_TX_PWR register. */
 #ifndef RF212_DEF_RFPOWER
-#define RF212_DEF_RFPOWER	0
+#define RF212_DEF_RFPOWER	0x65
 #endif
 
 /* This is the default value of the CHANNEL field of the PHY_CC_CCA register. */
@@ -71,18 +71,17 @@ inline uint16_t RF212_CRCBYTE_COMMAND(uint16_t crc, uint8_t data)
 /**
  * This is the timer type of the radio alarm interface
  */
-typedef TOne TRadio;
+typedef TThree TRadio;
 
 /**
- * The number of radio alarm ticks per one microsecond (0.9216). 
- * We use integers and no parentheses just to make deputy happy.
+ * The number of radio alarm ticks per one microsecond
  */
 #define RADIO_ALARM_MICROSEC	1L
 
 /**
  * The base two logarithm of the number of radio alarm ticks per one millisecond
  */
-#define RADIO_ALARM_MILLI_EXP	(5 + MICA_DIVIDE_ONE_FOR_32KHZ_LOG2)
+#define RADIO_ALARM_MILLI_EXP	10
 
 /**
  * The number of microseconds a sending MESHBEAN900 mote will wait for an acknowledgement 

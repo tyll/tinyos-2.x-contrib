@@ -23,7 +23,7 @@
 #ifndef PLATFORM_MESSAGE_H
 #define PLATFORM_MESSAGE_H
 
-#include <RF212ActiveMessage.h>
+#include <RF212Radio.h>
 #include <Serial.h>
 
 typedef union message_header {

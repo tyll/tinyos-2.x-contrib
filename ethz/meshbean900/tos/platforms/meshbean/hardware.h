@@ -59,8 +59,6 @@ enum {
 }; 
  
 
-enum {
-  PLATFORM_BAUDRATE = 57600L
-};
+#define PLATFORM_BAUDRATE 57600L
 
 #endif //HARDWARE_H

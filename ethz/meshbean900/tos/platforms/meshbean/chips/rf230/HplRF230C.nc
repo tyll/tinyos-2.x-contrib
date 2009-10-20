@@ -57,12 +57,12 @@ implementation
 	SELN = IO.PortB0;
 
 	components HplAtm128InterruptC;
-    HplRF230P.Interrupt -> HplAtm128InterruptC.Int5;
+	HplRF230P.Interrupt -> HplAtm128InterruptC.Int5;
 
 	components HplAtm128Timer1C as TimerC;
 	HplRF230P.Timer -> TimerC;
 
-	components new AlarmOne16C() as AlarmC;
+	components new AlarmThree16C() as AlarmC;
 	Alarm = AlarmC;
 
 	components RealMainP;

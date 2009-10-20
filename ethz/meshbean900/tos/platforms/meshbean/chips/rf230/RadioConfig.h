@@ -71,18 +71,17 @@ inline uint16_t RF230_CRCBYTE_COMMAND(uint16_t crc, uint8_t data)
 /**
  * This is the timer type of the radio alarm interface
  */
-typedef TOne TRadio;
+typedef TThree TRadio;
 
 /**
- * The number of radio alarm ticks per one microsecond (0.9216). 
- * We use integers and no parentheses just to make deputy happy.
+ * The number of radio alarm ticks per one microsecond 
  */
-#define RADIO_ALARM_MICROSEC	(7372800UL / MHZ / 32) * (1 << MICA_DIVIDE_ONE_FOR_32KHZ_LOG2) / 1000000UL
+#define RADIO_ALARM_MICROSEC	1L
 
 /**
  * The base two logarithm of the number of radio alarm ticks per one millisecond
  */
-#define RADIO_ALARM_MILLI_EXP	(5 + MICA_DIVIDE_ONE_FOR_32KHZ_LOG2)
+#define RADIO_ALARM_MILLI_EXP	10
 
 /**
  * The number of microseconds a sending MESHBEAN mote will wait for an acknowledgement 

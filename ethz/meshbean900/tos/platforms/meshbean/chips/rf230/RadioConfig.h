@@ -59,6 +59,11 @@ enum
 #define RF230_DEF_CHANNEL	11
 #endif
 
+/* The number of microseconds a sending MESHBEAN mote will wait for an acknowledgement */
+#ifndef SOFTWAREACK_TIMEOUT
+#define SOFTWAREACK_TIMEOUT	800
+#endif
+
 /*
  * This is the command used to calculate the CRC for the RF230 chip. 
  * TODO: Check why the default crcByte implementation is in a different endianness
@@ -84,10 +89,10 @@ typedef TThree TRadio;
 #define RADIO_ALARM_MILLI_EXP	10
 
 /**
- * The number of microseconds a sending MESHBEAN mote will wait for an acknowledgement 
+ * Make PACKET_LINK automaticaly enabled for Ieee154MessageC
  */
-#ifndef SOFTWAREACK_TIMEOUT
-#define SOFTWAREACK_TIMEOUT     3000
+#if !defined(TFRAMES_ENABLED) && !defined(PACKET_LINK)
+#define PACKET_LINK
 #endif
 
 #endif//__RADIOCONFIG_H__

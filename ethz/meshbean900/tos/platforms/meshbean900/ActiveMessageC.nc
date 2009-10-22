@@ -21,6 +21,8 @@
  * Author: Miklos Maroti
  */
 
+#include <RadioConfig.h>
+
 configuration ActiveMessageC
 {
 	provides
@@ -30,6 +32,8 @@ configuration ActiveMessageC
 		interface AMSend[uint8_t id];
 		interface Receive[uint8_t id];
 		interface Receive as Snoop[uint8_t id];
+		interface SendNotifier[am_id_t id];
+
 		interface Packet;
 		interface AMPacket;
 
@@ -46,19 +50,24 @@ configuration ActiveMessageC
 
 implementation
 {
-	components RF212ActiveMessageC as MAC;
+	components RF212ActiveMessageC as MessageC;
 
-	SplitControl = MAC;
-	AMSend       = MAC;
-	Receive      = MAC.Receive;
-	Snoop        = MAC.Snoop;
-	Packet       = MAC;
-	AMPacket     = MAC;
+	SplitControl = MessageC;
+
+	AMSend = MessageC;
+	Receive = MessageC.Receive;
+	Snoop = MessageC.Snoop;
+	SendNotifier = MessageC;
+
+	Packet = MessageC;
+	AMPacket = MessageC;
+
+	PacketAcknowledgements = MessageC;
+	LowPowerListening = MessageC;
 #ifdef PACKET_LINK
-	PacketLink	= MAC;
+	PacketLink = MessageC;
 #endif
-	PacketAcknowledgements	= MAC;
-	LowPowerListening		= MAC;
-	PacketTimeStampMilli	= MAC;
-	PacketTimeStampMicro	= MAC;
+
+	PacketTimeStampMilli = MessageC;
+	PacketTimeStampMicro = MessageC;
 }

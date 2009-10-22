@@ -8,8 +8,44 @@
 
 <h1>TinyOS Contribution from Aarhus University</h1>
 
+Below you will find a list of maintained projects from Aarhus University.
+For any questions or comments please contact: mth at cs dot au dot dk.
+
+<h2> Misc </h2>
+
 <p>
-To be done!
+This project contains miscellaneous libraries that can be used in different projects
+</p>
+
+<h3>Generic Neighbor Table</h3>
+<i> misc/tos/lib/neighbortable </i>
+
+<p>
+A generic neighbor table that can be extended by creating new components.  See an example of how to extend it in neighbortable/example.
+</p>
+
+
+<h3>Time Measures</h3>
+<i> misc/tos/lib/timemeasures </i>
+
+<p>
+A library for supporting various time measures in TinyOS.  This can be
+used in protocol or implementation evaluations.
+</p>
+
+<p>
+Quick empirical time measured can be done by using the Quicktime
+components which can be controlled by calls to time_start(),
+time_stop(), and time_get().
+</p>
+
+<h3>Random Back-off Timer</h3>
+<i> misc/tos/lib/timer </i>
+
+<p>
+A TimerTMilliC with a random back-off.  The timer keeps its period, but
+always fires with [period/2, period].  This can be used to avoid
+timers on different motes firing at the same time.
 </p>
 
 </body>

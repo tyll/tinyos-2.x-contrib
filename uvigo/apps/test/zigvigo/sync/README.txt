@@ -1,39 +1,40 @@
-README para sync
+README for sync
 
-Descripción:
+Description:
 
-En esta aplicación uno de los nodos toma el rol de coordinador ZigBee. Nada más
-activarse realiza un reseteo de la capa de red ZigBee, después intenta crear
-una nueva red en el canal 26 (2480 MHz) y activa su radio de para aceptar
-peticiones de conexión a su PAN.
-Cada vez que un dispositivo intenta asociarse, el coordinador ZigBee se lo
-permite y le asigna una nueva dirección de red. Después comienza a transmitir
-de forma indirecta (el router se especificará
-CapabilityInformation.ReceiverOnWhenIdle == 0 al conectarse a la red) una trama
-cada segundo al router de forma indefinida.
+In this application one node takes the role of ZigBee coordinator. As soon as it
+is active it resets the ZigBee network layer, then it tries to create a new
+network in the 26th channel (2480 MHz) and it activates its radio for accepting
+incoming association requests. Finally, the ZigBee coordinator remains awaiting
+for incoming association requests.
 
-Un segundo nodo actúa como router ZigBee con
-CapabilityInformation.ReceiverOnWhenIdle == 0; resetea su capa de red, e
-intentará conectarse a la red de PANId 0xFFEEDDCCBBAA0099LL mediante el
-procedimiento de red (RejoinNetwork = 0x02). Una vez conectado, sondeará a su
-nodo padre cada segundo en espera de paquetes de datos para él.
+Once a node tries to join, the coordinator will let it join and it will assign
+a new network address to it. After that the coordinator will start to send
+packets in an indirect way (when joining to the network the router specifies
+CapabilityInformation.ReceiverOnWhenIdle == 0) every second.
 
-El significado de los LEDs es el siguiente:
-COORDINADOR:
-(ROJO)     LED0 ON     => NLME_JOIN.indication
-(VERDE)    LED1 TOGGLE => NLDE_DATA.confirm [Status == NWK_SUCCESS]
+A second node acts as ZigBee router with
+CapabilityInformation.ReceiverOnWhenIdle == 0; it resets its network layer and
+it tries to join to the network with PANId equal to 0xFFEEDDCCBBAA0099LL through
+the network procedure (RejoinNetwork = 0x02). Once joined, it will poll the
+coordinator every second awaiting new data packets.
+
+Meaning of the LEDs:
+COORDINATOR:
+(RED)    LED0 ON     => NLME_JOIN.indication
+(GREEN)  LED1 TOGGLE => NLDE_DATA.confirm [Status == NWK_SUCCESS]
 
 ROUTER
-(ROJO)     LED0 ON     => NLME_JOIN.confirm  [Status == NWK_SUCCESS]
-(VERDE)    LED1 TOGGLE => NLDE_DATA.indication
-(AMARILLO) LED2 TOGGLE => NLME_SYNC.confirm [Status == NWK_SUCCESS]
+(RED)    LED0 ON     => NLME_JOIN.confirm [Status == NWK_SUCCESS]
+(GREEN)  LED1 TOGGLE => NLDE_DATA.indication
+(YELLOW) LED2 TOGGLE => NLME_SYNC.confirm [Status == NWK_SUCCESS]
 
-Uso:
+Usage:
 
-1. Instalación del coordinador:
+1. Install the coordinator:
 
-    $ cd coordinator; makeiz
+    $ cd coordinator; make <platform> install
 
-2. Instalación del router:
+2. Install the router:
 
-    $ cd router; makeiz
+    $ cd router; make <platform> install

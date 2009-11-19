@@ -1,47 +1,46 @@
-README para coord+Router+Device
+README for coord+Router+Device
 
-Descripción:
+Description:
 
-En esta aplicación se probará a conectar un dispositivo final a un router
-diferente del coordinador, esto es, una conexión con un router que ya se
-encuentre conectado al coordinador. Primero hay que cargar la aplicación en el
-router y después, en un mismo nodo cargar el coordinador que permita asociarse
-al router y finalmente cargar el código del device.
+This application tests a second level join to the network, i.e., an end device
+joining to a router already joined to the coordinator. The first step is to
+install the router application in one node, then a second node will act first
+as coordinator for letting the router to join the network and next it will act
+as a device trying to associate.
 
-El coordinador inicia la red y queda a la espera de nuevas conexiones a las que
-asignar direcciones de red.
+The coordinator starts the network and remains awaiting for new connections.
 
-El router se conecta al coordinador y también se quedará a la espera de
-conexiones.
+The router joins to the coordinator and it also remains awaiting for new
+connections.
 
-Un tercer nodo hará una búsqueda de las redes disponibles, y al encontrar al
-router (entonces ya se habrá apagado el coordinador) intentará asociarse a
-través de él.
+The end device will scan for available networks. It will only receive the
+router's beacons (the coordinator has already disappeared) and it will try to
+join the network  by means of it.
 
-El significado de los LEDs es el siguiente:
-COORDINADOR:
-(ROJO)     LED0 ON     => NLME_PERMIT_JOINING.confirm [Status == NWK_SUCCESS]
-(VERDE)    LED1 ON     => NLDE_JOIN.indication
+Meaning of the LEDs:
+COORDINATOR:
+(RED)    LED0 ON     => NLME_PERMIT_JOINING.confirm [Status == NWK_SUCCESS]
+(GREEN)  LED1 ON     => NLDE_JOIN.indication
 
 ROUTER
-(ROJO)     LED0 ON     => NLME_JOIN.confirm  [Status == NWK_SUCCESS]
-(VERDE)    LED1 ON     => NLDE_JOIN.indication
-(AMARILLO) LED2 ON     => NLME_PERMIT_JOINING.confirm [Status == NWK_SUCCESS]
+(RED)    LED0 ON     => NLME_JOIN.confirm  [Status == NWK_SUCCESS]
+(GREEN)  LED1 ON     => NLDE_JOIN.indication
+(YELLOW) LED2 ON     => NLME_PERMIT_JOINING.confirm [Status == NWK_SUCCESS]
 
 DEVICE
-(ROJO)     LED0 ON     => NLME_JOIN.confirm  [Status == NWK_SUCCESS]
+(RED)    LED0 ON     => NLME_JOIN.confirm  [Status == NWK_SUCCESS]
 
 
-Uso:
+Usage:
 
-1. Instalación del router:
+1. Install the router:
 
-    $ cd router; makeiz
+    $ cd router; make <platform> install
 
-2. Instalación del coordinador:
+2. Install the coordinator:
 
-    $ cd coordinador; makeiz
+    $ cd coordinator; make <platform> install
 
-2. Instalación del device:
+3. Install the device:
 
-    $ cd device; makeiz
+    $ cd device; make <platform> install

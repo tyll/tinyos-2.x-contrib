@@ -38,7 +38,9 @@
 * ========================================================================
 */
 
-/* NOTA: el hacer los envios de las tramas como tasks soluciona un problema que no tengo claro si es de sobrecargar el nodo con demasiado trabajo o por usar message_t definidos dentro de una función (no como variables globales) */
+/* NOTE: sending packets in separate tasks solves a problem I have not clear
+   where it comes from. It is possible it is associated to send "message_t"s
+   defined inside functions (not as global variables) */
 
 module NwkDataP {
   provides {

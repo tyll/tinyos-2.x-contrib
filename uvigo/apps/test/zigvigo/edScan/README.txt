@@ -1,33 +1,31 @@
-README para edScan
+README for edScan
 
-Descripción:
+Description:
 
-En esta aplicación uno de los nodos actúa como un dispositivo final ZigBee.
-Nada más activarse realiza un reseteo de la capa de red ZigBee y después
-realiza escaneos de energía (NLME_ED_SCAN) de forma periódica en todos los
-canales de la banda de 2,4 GHz. En cuanto se reciben los resultados de un
-barrido se envían mediante "printf" por el puerto serie y después se vuelve
-a solicitar otro escaneo.
+In this application one node acts as ZigBee end device. As soon as it is active
+it will reset the network layer and it will start to do periodic energy scans
+(NLME_ED_SCAN) in every channel of the 2.4 GHz band. Once the results are
+notified, it uses "printf" for displaying them and then it will start another
+scan.
 
-Un nodo secundario puede actuar como inyector de energía en el canal 26. La
-tarea del nodo consistirá en estar enviando mensajes continuamente al canal.
-Cada vez que se confirma el envío de uno de estos mensajes, el LED1 cambiará
-su estado.
+A second node can act as "energy injector" in the 26th channel. It will use the
+txThroughput application for continuously send messages to the channel. LED1
+will toggle with every sent message.
 
-El significado de los LEDs es el siguiente:
+Meaning of the LEDs:
 device:
-(ROJO)     LED0 TOGGLE => NLME_ED_SCAN.confirm
+(RED)     LED0 TOGGLE => NLME_ED_SCAN.confirm
 
 txThroughput:
-(VERDE)    LED1 TOGGLE => Paquete transmitido
+(GREEN)   LED1 TOGGLE => Packet sent
 
 
-Uso:
+Usage:
 
-1. Instalación del dispositivo:
+1. Install the device:
 
-    $ cd device; makeiz
+    $ cd device; make <platform> install
 
-2. Instalación del inyector:
+2. Install the "injector":
 
-    $ cd txThroughput; makeiz
+    $ cd txThroughput; make <platform> install

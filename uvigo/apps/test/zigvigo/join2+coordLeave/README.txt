@@ -1,39 +1,39 @@
-README para join2+coordLeave
+README for join2+coordLeave
 
-Descripción:
+Description:
 
-En esta aplicación uno de los nodos toma el rol de coordinador ZigBee. Nada más
-activarse realiza un reseteo de la capa de red ZigBee, después intenta crear
-una nueva red en el canal 26 (2480 MHz) y activa su radio de para aceptar
-peticiones de conexión a su PAN.
-Cada vez que un dispositivo intenta asociarse, el coordinador ZigBee se lo
-permite y le asigna una nueva dirección de red. Después comienza a transmitir
-una trama cada segundo al router que se acaba de conectar hasta un total de
-nueve. Finalmente le enviará una petición de desconexión al router para que
-abandone definitivamente la red.
+In this application one node takes the role of ZigBee coordinator. As soon as it
+is active it resets the ZigBee network layer, then it tries to create a new
+network in the 26th channel (2480 MHz) and it activates its radio for accepting
+incoming association requests.
 
-Un segundo nodo actúa como router ZigBee; resetea su capa de red, realiza una
-búsqueda en el canal 26 de redes en su área de cobertura e intentará conectarse
-al coordinador ZigBee (PAN Id extendida 0xFFEEDDCCBBAA0099) mediante el
-procedimiento de red (RejoinNetwork = 0x02).
+Once a node tries to join, the coordinator will let it join and it will
+allocate a new network address for it. After that the coordinator will start to
+send packets every second up to a total of nine. Finally, the coordinator will
+send a leave request to the router for leaving the network.
 
-El significado de los LEDs es el siguiente:
-COORDINADOR:
-(ROJO)     LED0 ON     => NLME_JOIN.indication
-(VERDE)    LED1 TOGGLE => NLDE_DATA.confirm [Status == NWK_SUCCESS]
-(AMARILLO) LED2 ON     => NLME_LEAVE.confirm [Status == NWK_SUCCESS]
+A second node acts as ZigBee router; it resets its network layer, scans the 26th
+channel for active networks in its range and it will try to join to the network
+with extended PANId equal to 0xFFEEDDCCBBAA0099 through the network procedure
+(RejoinNetwork = 0x02).
+
+Meaning of the LEDs:
+COORDINATOR:
+(RED)    LED0 ON     => NLME_JOIN.indication
+(GREEN)  LED1 TOGGLE => NLDE_DATA.confirm  [Status == NWK_SUCCESS]
+(YELLOW) LED2 ON     => NLME_LEAVE.confirm [Status == NWK_SUCCESS]
 
 ROUTER
-(ROJO)     LED0 ON     => NLME_JOIN.confirm  [Status == NWK_SUCCESS]
-(VERDE)    LED1 TOGGLE => NLDE_DATA.indication
-(AMARILLO) LED2 ON     => NLME_LEAVE.indication
+(RED)    LED0 ON     => NLME_JOIN.confirm  [Status == NWK_SUCCESS]
+(GREEN)  LED1 TOGGLE => NLDE_DATA.indication
+(YELLOW) LED2 ON     => NLME_LEAVE.indication
 
-Uso:
+Usage:
 
-1. Instalación del coordinador:
+1. Install the coordinator:
 
-    $ cd coordinator; makeiz
+    $ cd coordinator; make <platform> install
 
-2. Instalación del router:
+2. Install the router:
 
-    $ cd router; makeiz
+    $ cd router; make <platform> install

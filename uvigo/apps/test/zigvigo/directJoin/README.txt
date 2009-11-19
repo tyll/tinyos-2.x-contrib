@@ -1,29 +1,29 @@
-README para directJoin
+README for directJoin
 
-Descripción:
+Description:
 
-En esta aplicación uno de los nodos toma el rol de coordinador ZigBee. Nada más
-activarse realiza un reseteo de la capa de red ZigBee, después intenta crear
-una nueva red en el canal 26 (2480 MHz). Tras esto asociará de manera directa
-al router de dirección IEEE extendida 0x1122334455667788.
+In this application one node takes the role of ZigBee coordinator. As soon as it
+is active it resets the ZigBee network layer and it tries to create a new
+network in the 26th channel (2480 MHz). After that it will try to join directly
+a router with 0x1122334455667788 as IEEE extended address.
 
-Un segundo nodo actúa como router ZigBee; resetea su capa de red y tratará de
-conectarse de forma directa (RejoinNetwork = 0x01) a la red.
+A second node acts as ZigBee router; it resets its network layer and it will try
+to join to the network using RejoinNetwork == 0x01 (direct join).
 
-El significado de los LEDs es el siguiente:
-COORDINADOR:
-(ROJO)     LED0 ON  => NLME_DIRECT_JOIN.confirm [Status == NWK_SUCCESS]
-(VERDE)    LED1 ON  => NLME_JOIN.indication
+Meaning of the LEDs:
+COORDINATOR:
+(RED)     LED0 ON  => NLME_DIRECT_JOIN.confirm [Status == NWK_SUCCESS]
+(GREEN)   LED1 ON  => NLME_JOIN.indication
 
 ROUTER
-(ROJO)     LED0 ON     => NLME_JOIN.confirm  [Status == NWK_SUCCESS]
+(RED)     LED0 ON  => NLME_JOIN.confirm  [Status == NWK_SUCCESS]
 
-Uso:
+Usage:
 
-1. Instalación del coordinador:
+1. Install the coordinator:
 
-    $ cd coordinator; makeiz
+    $ cd coordinator; make <platform> install
 
-2. Instalación del router:
+2. Install the router:
 
-    $ cd router; makeiz
+    $ cd router; make <platform> install

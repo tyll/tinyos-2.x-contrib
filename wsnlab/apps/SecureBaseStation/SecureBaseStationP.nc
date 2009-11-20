@@ -34,6 +34,9 @@
  * @author Gilman Tolle
  * @author David Gay
  * Revision:	$Id$
+ *
+ * Security Integration by Philip Kuryloski (implementation from http://hinrg.cs.jhu.edu/git/?p=jgko/tinyos-2.x.git)
+ *
  */
   
 /* 
@@ -200,7 +203,7 @@ implementation
     return ret;
   }
 
-  uint8_t tmpLen;
+  uint8_t tmpLen = TOSH_DATA_LENGTH;    
   
   task void uartSendTask() {
     uint8_t len = uartSendTask_len;
@@ -238,7 +241,7 @@ implementation
     call UartPacket.clear(msg);
     call UartAMPacket.setSource(msg, src);
 
-    if (call UartSend.send[id](addr, uartQueue[uartOut], len) == SUCCESS)
+    if (call UartSend.send[id](addr, uartQueue[uartOut], tmpLen) == SUCCESS)
       call Leds.led1Toggle();
     else
       {
@@ -326,7 +329,7 @@ implementation
 		
         call SecRadioPacket.clear(msg);  // this in fact passes through to ActiveMessageC
         call RadioAMPacket.setSource(msg, source);
-        call CC2420SecurityMode.setCcm(0, 0, MIC_LENGTH);
+        call CC2420SecurityMode.setCcm(msg, 0, 0, MIC_LENGTH);
         result = call SecSender.send(addr, msg, len);
     } else {
         call RadioPacket.clear(msg);

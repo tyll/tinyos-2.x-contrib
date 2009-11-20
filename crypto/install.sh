@@ -1,6 +1,6 @@
 TOSCONTRIB=/opt/tinyos-2.x-contrib
-INTERFACES=`ls $TOSCONTRIB/crypto/tos/interfaces`
-SYSTEM=`ls $TOSCONTRIB/crypto/tos/system`
+INTERFACES=`ls $TOSCONTRIB/crypto/tos/interfaces | grep -v "^CVS"`
+SYSTEM=`ls $TOSCONTRIB/crypto/tos/system | grep -v "^CVS"`
 
 
 for i in $INTERFACES

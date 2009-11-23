@@ -1,0 +1,23 @@
+Installation:
+
+All the interfaces and system files of this directory can be added to the 
+TinyOS tree with the install.sh script. First, execution permission needs to
+be added to the script with the command
+
+chmod +x intall.sh
+
+If this directory was download in /opt/tinyos-2.x-contrib/ then the script
+can be simply launched with:
+
+./install.sh
+
+All the interfaces will be copied in the tree. If this directory was downloaded
+somewhere else, the install.sh script needs to be modified. In the first line, the
+variable TOSCONTRIB must be changed to the path where this contribution was
+downloaded.
+
+Uninstallation:
+
+All the interfaces and system files of this directory can be removed 
+from the TinyOS tree with the uninstall.sh script. The usage of this script is
+the same as the previous one.

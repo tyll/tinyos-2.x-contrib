@@ -12,13 +12,22 @@
 
 </div>
 <p>
-The aim of this project is to provide Cryptography algorithms in TinyOS 2.x.
+The aim of this project is to provide Cryptography algorithms in TinyOS 2.x. All contributions are welcomed.
 </p>
 <h2> Implementation done:</h2>
-
+<h3> Trivium </h3>
+The Trivium stream cipher is now implemented as a TinyOS interface for 8-bit and 16-bit microcontroller. This implementation follows the original implementation available
+in the <a href="http://www.ecrypt.eu.org/stream/svn/viewcvs.cgi/ecrypt/trunk/submissions/trivium/">eSTREAM repository</a>. Some application using this interface are available in the <i>apps</i> folder. 
+For more information consult the cipher <a href="http://www.ecrypt.eu.org/stream/triviumpf.html">webpage</a>.
 <h2> Download </h2>
-The CVS directory can be browsed at the <a href="http://tinyos.cvs.sourceforge.net/viewvc/tinyos/tinyos-2.x-contrib/crypto/">address</a>.
+The CVS directory can be browsed at the <a href="http://tinyos.cvs.sourceforge.net/viewvc/tinyos/tinyos-2.x-contrib/crypto/">address</a>.<br>
+The directory can be dowloaded with the CVS command:<br>
+<b>cvs -z3 -d:pserver:anonymous@tinyos.cvs.sourceforge.net:/cvsroot/tinyos checkout -P tinyos-2.x-contrib/crypto/</b><br>
 <h2> Installation </h2>
-
+To install or remove all the interfaces provided by this directory in the TinyOS tree, the scripts <b>install.sh</b> and <b>uninstall.sh</b> can be used. They must have execution permission with the command:<br>
+<b>chmod +x install.sh uninstall.ch</b><br>
+Then the command:<br>
+<b>./install.sh</b><br>
+copies all the files in the TinyOS tree.
 </body>
 </html>

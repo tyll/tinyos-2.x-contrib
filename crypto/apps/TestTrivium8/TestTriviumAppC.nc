@@ -33,3 +33,21 @@
 * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 * OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+/*
+ * Example of usage of the trivium interface for 8-bit microcontroller.
+ * 
+ * This program simply initialises two internal states, encrypt and then decrypt a
+ * message.
+ */
+
+configuration TestTriviumAppC{
+}
+
+implementation{
+	components TestTriviumC, MainC;
+	components triviumC;
+	
+	TestTriviumC.Boot -> MainC.Boot;
+	TestTriviumC.trivium -> triviumC;
+}

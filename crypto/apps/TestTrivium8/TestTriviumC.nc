@@ -33,3 +33,80 @@
 * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 * OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+/*
+ *	Implementation of TestTrivium8.
+*/
+
+#define MSG_LEN 12
+
+module TestTriviumC{
+	uses interface Boot;
+	uses interface trivium;
+}
+
+implementation{
+	
+	/*
+	 * 	Transmitter internal state.
+	 */
+	uint8_t s1[12],s2[11],s3[14];
+	
+	/*
+	 * Receiver internal state.
+	 */
+	uint8_t s12[12],s22[11],s32[14];
+	
+	/*
+	 * Secret key
+	 */
+	uint8_t K[10] =  {0x0f,0x62,0xB5,0x08,0x5B,0xAE,0x01,0x54,0xA7,0xFA};
+	
+	/*
+	 * Initialization vector
+	 */
+	uint8_t IV[10] = {0x28,0x8F,0xF6,0x5D,0xC4,0x2B,0x92,0xF9,0x60,0xC7};
+	
+	uint8_t out[MSG_LEN];
+	uint8_t msg1[MSG_LEN];
+	uint8_t i;
+	
+	event void Boot.booted()
+	{
+		/*
+		 * Message
+		 */
+		msg1[0] = 'H';msg1[1] = 'e';msg1[2] = 'l';msg1[3] = 'l';msg1[4] = 'o';msg1[5] = ' ';
+		msg1[6] = 'w';msg1[7] = 'o';msg1[8] = 'r';msg1[9] = 'l';msg1[10] = 'd';msg1[11] = '\0';
+		
+		/*
+		 * 	Key initialisation for the transmitter.
+		 */
+		call trivium.key_init(s1,s2,s3, K, IV);
+		dbg("Boot", "Key init done @ Time: %s\n", sim_time_string());
+		
+		dbg("Boot", "Message: %s\n", msg1);
+		
+		/*
+		 * Encryption of the message.
+		 */
+		call trivium.process_bytes(s1,s2,s3,msg1,out,MSG_LEN);
+		
+		dbg("Boot", "Encryption (hexadecimal): ");
+		for(i=0;i<MSG_LEN;i++){
+			dbg_clear("Boot", "%02x", out[i]);
+		}
+		dbg_clear("Boot", "\n");
+		
+		/*
+		 * 	Key initialisation for the receiver.
+		 */
+		call trivium.key_init(s12,s22,s32, K, IV);
+		dbg("Boot", "Key init done @ Time: %s\n", sim_time_string());
+		/*
+		 * Decryption of the message.
+		 */
+		call trivium.process_bytes(s12,s22,s32,out,msg1,MSG_LEN);
+		dbg("Boot", "Message decryted : %s\n", msg1);
+	}
+}

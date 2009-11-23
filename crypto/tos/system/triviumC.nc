@@ -5,7 +5,7 @@
 
 #include "trivium.h"
 
-module triviumM{
+module triviumC{
 	provides interface trivium;
 }
 
@@ -379,7 +379,7 @@ implementation{
 
         for(i=0;(length-=8) > 0;i+=8)
         {
-            gen_keystream(s1,s2,s3,z);
+            call trivium.gen_keystream(s1,s2,s3,z);
 
             #ifdef EIGHT_BIT_MICROCONTROLLER
             output[i  ] = XOR(input[i],z[0]);
@@ -406,7 +406,7 @@ implementation{
         }
 
         if(length != 0){
-            gen_keystream(s1,s2,s3,z);
+            call trivium.gen_keystream(s1,s2,s3,z);
 
             #ifdef EIGHT_BIT_MICROCONTROLLER
             for(j=0,length+=8;length>0;i++,j++,length--)

@@ -1,0 +1,11 @@
+Interfaces of cryptographic algorithms.
+
+Copyright:
+2009 EPFL - Ecole Polytechnique Fédérale de Lausanne and 
+IISC - Indian Institute of Science
+
+Author:
+Sylvain Pelissier <sylvain.pelissier@gmail.com>
+
+Description:
+trivium.nc:		Interface for the Trivium stream cipher. Webpage of the cipher at http://www.ecrypt.eu.org/stream/triviumpf.html

@@ -1,5 +1,11 @@
 README for TestTrivium8
-Author/Contact: sylvain.pelissier@gmail.com
+
+Copyright:
+2009 EPFL - Ecole Polytechnique Fédérale de Lausanne and 
+IISC - Indian Institute of Science
+
+Author:
+Sylvain Pelissier <sylvain.pelissier@gmail.com>
 
 Description:
 TestTrivium8 is a TinyOS application which shows how the trivium interface can be used

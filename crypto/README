@@ -15,9 +15,7 @@ Description:
 
 Each of the following subdirectories has its own README file:
 
-apps: Sample TinyOS 2.x applications using the algorithms implemented.
-
-docs: Documentation.
+apps: Simple TinyOS 2.x applications using the algorithms.
 
 tos: The sources of the algorithms.
 

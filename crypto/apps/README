@@ -1,0 +1,13 @@
+Example applications.
+
+Copyright:
+2009 EPFL - Ecole Polytechnique Fédérale de Lausanne and 
+IISC - Indian Institute of Science
+
+Author:
+Sylvain Pelissier <sylvain.pelissier@gmail.com>
+
+Description:
+
+TestTrivium8:	Application using Trivium with 8-bit microcontroller.
+

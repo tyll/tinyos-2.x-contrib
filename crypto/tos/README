@@ -8,10 +8,7 @@ IISC - Indian Institute of Science
 Author:
 Sylvain Pelissier <sylvain.pelissier@gmail.com>
 
-License:
-Can be found in the accompanying License file.
-
 Description:
-The folder interfaces contains the interfaces of each implementations
+interfaces:		 contains the interfaces of each implementations
 for TinyOS 2.x.
-The folder system contains the implementations of each algorithms.
+system:			 contains the implementations of each algorithms.

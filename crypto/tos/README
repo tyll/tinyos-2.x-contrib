@@ -1,0 +1,17 @@
+This directory contains implementations of cryptographic 
+algorithms for TinyOS 2.x.
+
+Copyright:
+2009 EPFL - Ecole Polytechnique Fédérale de Lausanne and 
+IISC - Indian Institute of Science
+
+Author:
+Sylvain Pelissier <sylvain.pelissier@gmail.com>
+
+License:
+Can be found in the accompanying License file.
+
+Description:
+The folder interfaces contains the interfaces of each implementations
+for TinyOS 2.x.
+The folder system contains the implementations of each algorithms.

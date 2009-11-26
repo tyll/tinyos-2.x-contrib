@@ -1,0 +1,126 @@
+<html>
+  <head>
+    <LINK rel="stylesheet" href="nesdoc.css" type="text/css" media="screen"><title>Interface: tos.interfaces.trivium</title>
+  </head>
+  <body>
+    <h2>Interface: tos.interfaces.trivium</h2>
+    <b>interface trivium</b><p>
+ 	Interface for the Trivium Stream cipher in TinyOS.
+  
+    <p>
+    <dl>
+      <dt><b>Author:</b>
+      <dd>
+        Sylvain Pelissier &lt;sylvain.pelissier@gmail.com&gt;
+
+      </dd>
+    </dl>
+    <p><p><div id=heading>Commands</div><div id=funcsig><span id=funcnameshort>command void <a href="#gen_keystream">gen_keystream</a>(uint_t *s1, uint_t *s2, uint_t *s3, uint_t *z)
+      </span><menu>
+	Generation of  bytes of random data which can be XORed with the plaintext or ciphertext.<br>
+   
+      </menu>
+    </div><div id=funcsig><span id=funcnameshort>command void <a href="#key_init">key_init</a>(uint_t *s1, uint_t *s2, uint_t *s3, uint8_t *K, uint8_t *IV)
+      </span><menu>
+ 	Initialisation of the states from the key and the IV.
+      </menu>
+    </div><div id=funcsig><span id=funcnameshort>command void <a href="#process_bytes">process_bytes</a>(uint_t *s1, uint_t *s2, uint_t *s3, uint8_t *input, uint8_t *output, int32_t length)
+      </span><menu>
+   Encryption or decryption of a message.
+      </menu>
+    </div><p><div id=heading>Commands - Details</div>
+    <a name="gen_keystream"></a>
+    <h4>gen_keystream
+    </h4>
+    <span id=funcnameshort>command void <b>gen_keystream</b>(uint_t *s1, uint_t *s2, uint_t *s3, uint_t *z)
+    </span>
+    <p>
+    <menu>
+      
+	Generation of  bytes of random data which can be XORed with the plaintext or ciphertext.<br>
+   
+      <p>
+      <dl>
+        <dt><b>Parameters:</b>
+        <dd>
+          <code>z</code> -  8 bytes of keystream.
+
+        </dd>
+      </dl>
+    </menu>
+    <hr>
+    <a name="key_init"></a>
+    <h4>key_init
+    </h4>
+    <span id=funcnameshort>command void <b>key_init</b>(uint_t *s1, uint_t *s2, uint_t *s3, uint8_t *K, uint8_t *IV)
+    </span>
+    <p>
+    <menu>
+      
+ 	Initialisation of the states from the key and the IV. It needs to be performed once when the node boots.
+   <br>
+	
+      <p>
+      <dl>
+        <dt><b>Parameters:</b>
+        <dd>
+          <code>s1</code> -  The state of the algorithm. Represent s[1] to s[93] of the original specification. If EIGHT_BIT_MICROCONTROLLER
+   is defined, s1 must be an array of 12 elements. If SIXTEEN_BIT_MICROCONTROLLER
+   is defined, s1 must be an array of 6 elements.
+   <br><br>
+	
+        </dd>
+        <dd>
+          <code>s2</code> -  The state of the algorithm. Represent s[94] to s[177] of the original specification. If EIGHT_BIT_MICROCONTROLLER
+   is defined, s2 must be an array of 11 elements. If SIXTEEN_BIT_MICROCONTROLLER
+   is defined, s2 must be an array of 6 elements.
+   <br><br>
+   
+        </dd>
+        <dd>
+          <code>s3</code> -  The state of the algorithm. Represent s[178] to s[288] of the original specification. If EIGHT_BIT_MICROCONTROLLER
+   is defined, s3 must be an array of 14 elements. If SIXTEEN_BIT_MICROCONTROLLER
+   is defined, s3 must be an array of 7 elements.
+   <br><br>
+	
+        </dd>
+        <dd>
+          <code>IV</code> -  the initialization vector, 10 bytes.
+	
+        </dd>
+        <dd>
+          <code>K</code> -   the secret key, 10 bytes.
+
+        </dd>
+      </dl>
+    </menu>
+    <hr>
+    <a name="process_bytes"></a>
+    <h4>process_bytes
+    </h4>
+    <span id=funcnameshort>command void <b>process_bytes</b>(uint_t *s1, uint_t *s2, uint_t *s3, uint8_t *input, uint8_t *output, int32_t length)
+    </span>
+    <p>
+    <menu>
+      
+   Encryption or decryption of a message.
+   
+      <p>
+      <dl>
+        <dt><b>Parameters:</b>
+        <dd>
+          <code>input</code> -  message to be encrypted or decrypted.
+   
+        </dd>
+        <dd>
+          <code>output</code> -  the output of the algorithms.
+   
+        </dd>
+        <dd>
+          <code>length</code> -  the length of the message.
+
+        </dd>
+      </dl>
+    </menu>
+  </body>
+</html>

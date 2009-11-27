@@ -1,0 +1,32 @@
+README for TestTrivium8
+
+Copyright:
+2009 EPFL - Ecole Polytechnique Fédérale de Lausanne and 
+IISC - Indian Institute of Science
+
+Author:
+Sylvain Pelissier <sylvain.pelissier@gmail.com>
+
+Description:
+TestTrivium16 is a TinyOS application which shows how the trivium interface can be used
+for 16-bit microcontroller.
+The programm creates two internal states which represents the states of a transmitter and
+a receiver. A message is encrypted with the transmitter state and then decrypted with the
+receiver state.
+
+TestTrivum16AppC.nc :	The configuration file.
+
+TestTrivium16C.nc :		The module file.
+
+
+Installation:
+
+If the tivium interface is installed in the TinyOS tree then this program can be compiled with
+the command:
+
+make [mote_name]
+
+where [mote_name] is the name of the mote use, for example telosb.
+Known bugs/limitations:
+
+None.

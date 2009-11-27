@@ -10,4 +10,5 @@ Sylvain Pelissier <sylvain.pelissier@gmail.com>
 Description:
 
 TestTrivium8:	Application using Trivium with 8-bit microcontroller.
+TestTrivium16:	Application using Trivium with 16-bit microcontroller.
 

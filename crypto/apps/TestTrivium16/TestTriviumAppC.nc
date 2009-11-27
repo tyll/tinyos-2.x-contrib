@@ -34,7 +34,7 @@
 * OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/*
+/**
  * Example of usage of the trivium interface for 16-bit microcontroller.
  *
  * This program simply initialises two internal states, encrypt and then decrypt a

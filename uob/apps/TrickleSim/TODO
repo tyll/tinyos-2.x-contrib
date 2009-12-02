@@ -1,0 +1,5 @@
+* Implement packet loss rate
+* Compare connectivities
+* Compare with analytical calculations (OpenOffice document)
+* Calculate metric normalized on interval
+* More....

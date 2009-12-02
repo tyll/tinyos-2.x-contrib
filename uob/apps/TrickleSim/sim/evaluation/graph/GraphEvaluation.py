@@ -1,6 +1,7 @@
 
 from sim.evaluation.graph.packet.PacketGraph import *
 from sim.evaluation.graph.contour.ContourGraph import *
+from sim.evaluation.graph.hist.HistGraph import *
 
 from sim.utils.helper import *
 
@@ -41,6 +42,15 @@ class GraphEvaluation:
 
         cg = ContourGraph()
         cg.execute(sqr_nodes,
+                   connectivity,
+                   randomize_boot,
+                   sec_before_inject,
+                   sec_after_inject,
+                   inject_node,
+                   filenamebase)
+
+        hg = HistGraph()
+        hg.execute(sqr_nodes,
                    connectivity,
                    randomize_boot,
                    sec_before_inject,

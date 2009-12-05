@@ -1,0 +1,76 @@
+# Includes that should take precedence come first.  Platforms come before
+# chips because they may override files.  These must be specified as
+# @includes instead of -I's to @opts, otherwise the %T won't be processed
+# by ncc.
+
+push( @includes, qw(
+
+  ## telosw Platform
+  %T/platforms/telosw
+  %T/platforms/telosw/chips/ccxx00
+
+  ## Rincon CCxx00 Dual Radio Stack
+  %T/chips/ccxx00
+  %T/chips/ccxx00/acks
+  %T/chips/ccxx00/alarm
+  %T/chips/ccxx00/am
+  %T/chips/ccxx00/radios/cc1100
+  %T/chips/ccxx00/radios/cc2500
+  %T/chips/ccxx00/csma
+  %T/chips/ccxx00/init
+  %T/chips/ccxx00/interfaces
+  %T/chips/ccxx00/link
+  %T/chips/ccxx00/lpl
+##%T/chips/ccxx00/lpl/alwayson
+  %T/chips/ccxx00/packet
+  %T/chips/ccxx00/powermanager
+  %T/chips/ccxx00/receive
+  %T/chips/ccxx00/select
+  %T/chips/ccxx00/spi
+  %T/chips/ccxx00/splitcontrolmanager
+  %T/chips/ccxx00/transmit
+  %T/chips/ccxx00/unique
+  %T/lib/crcx
+  %T/chips/ccxx00/crc
+  %T/chips/ccxx00/csma/continuoussense
+
+
+  ## Rincon Additions to TinyOS chips
+  %T/chips/rrc_stm25p
+  %T/chips/rrc_msp430/flash
+  %T/chips/rrc_msp430/dma
+
+  ## TinyOS Default Chips
+  %T/platforms/telosb
+  %T/platforms/telosa
+  %T/platforms/telosw/chips/sht11
+  %T/platforms/telosa/chips/s1087
+  %T/platforms/telosa/chips/s10871
+  %T/platforms/telosb/chips/stm25p
+  %T/chips/msp430
+  %T/chips/msp430/adc12
+  %T/chips/msp430/dma
+  %T/chips/msp430/pins
+  %T/chips/msp430/timer
+  %T/chips/msp430/usart
+  %T/chips/msp430/sensors
+  %T/chips/stm25p
+# %T/chips/sht11
+  %T/lib/timer
+  %T/lib/serial
+  %T/lib/adc
+  %T/lib/power
+
+) );
+
+@opts = qw(
+  -gcc=msp430-gcc
+  -mmcu=msp430x1611
+  -fnesc-target=msp430
+  -fnesc-no-debug
+  -fnesc-scheduler=TinySchedulerC,TinySchedulerC.TaskBasic,TaskBasic,TaskBasic,runTask,postTask
+
+);
+
+push @opts, "-mingw-gcc" if $cygwin;
+

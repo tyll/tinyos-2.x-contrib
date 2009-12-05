@@ -1,0 +1,22 @@
+# normal Makefile
+include Makefile
+
+# Set TOSSIM_SIMX flag
+CFLAGS += -DTOSSIM_SIMX=1
+
+# Install act startup script
+include $(SIMXLIB)/act/Makefile.tos
+
+# include SimX components
+
+# Pushback required for Sensor
+include $(SIMXLIB)/pushback/Makefile.tos
+
+# Enable SimxSensorC
+include $(SIMXLIB)/sensor/Makefile.tos
+
+# Advanced time syncronization
+include $(SIMXLIB)/sync/Makefile.tos
+
+# Probe (inspect and modify) Tossim variables
+include $(SIMXLIB)/probe/Makefile.tos

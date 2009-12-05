@@ -1,0 +1,383 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>simx.sensor.streamer</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        Package&nbsp;simx ::
+        <a href="simx.sensor-module.html">Package&nbsp;sensor</a> ::
+        Module&nbsp;streamer
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="simx.sensor.streamer-pysrc.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<h1 class="epydoc">Source Code for <a href="simx.sensor.streamer-module.html">Module simx.sensor.streamer</a></h1>
+<pre class="py-src">
+<a name="L1"></a><tt class="py-lineno">  1</tt>  <tt class="py-line"><tt class="py-docstring">"""</tt> </tt>
+<a name="L2"></a><tt class="py-lineno">  2</tt>  <tt class="py-line"><tt class="py-docstring">Streamers are designed to process streams read from file objects. They</tt> </tt>
+<a name="L3"></a><tt class="py-lineno">  3</tt>  <tt class="py-line"><tt class="py-docstring">do this by generating a function that returns the next value on each</tt> </tt>
+<a name="L4"></a><tt class="py-lineno">  4</tt>  <tt class="py-line"><tt class="py-docstring">invocation. The methods in this class all accept a filename or file</tt> </tt>
+<a name="L5"></a><tt class="py-lineno">  5</tt>  <tt class="py-line"><tt class="py-docstring">object as the source; see as_file.</tt> </tt>
+<a name="L6"></a><tt class="py-lineno">  6</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L7"></a><tt class="py-lineno">  7</tt>  <tt class="py-line"><tt class="py-docstring">Since the streamer-generated functions accept (ignore) any parameters</tt> </tt>
+<a name="L8"></a><tt class="py-lineno">  8</tt>  <tt class="py-line"><tt class="py-docstring">they may be used as SimxSensor functions directly.</tt> </tt>
+<a name="L9"></a><tt class="py-lineno">  9</tt>  <tt class="py-line"><tt class="py-docstring">"""</tt> </tt>
+<a name="L10"></a><tt class="py-lineno"> 10</tt>  <tt class="py-line"> </tt>
+<a name="L11"></a><tt class="py-lineno"> 11</tt>  <tt class="py-line"><tt class="py-keyword">import</tt> <tt class="py-name">struct</tt> </tt>
+<a name="L12"></a><tt class="py-lineno"> 12</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-op">.</tt><tt id="link-0" class="py-name" targets="Module simx.sensor.reader=simx.sensor.reader-module.html"><a title="simx.sensor.reader" class="py-name" href="#" onclick="return doclink('link-0', 'reader', 'link-0');">reader</a></tt> <tt class="py-keyword">import</tt> <tt id="link-1" class="py-name" targets="Class simx.sensor.reader.Reader=simx.sensor.reader.Reader-class.html"><a title="simx.sensor.reader.Reader" class="py-name" href="#" onclick="return doclink('link-1', 'Reader', 'link-1');">Reader</a></tt> </tt>
+<a name="Streamer"></a><div id="Streamer-def"><a name="L13"></a><tt class="py-lineno"> 13</tt>  <tt class="py-line"> </tt>
+<a name="L14"></a><tt class="py-lineno"> 14</tt>  <tt class="py-line"> </tt>
+<a name="L15"></a><tt class="py-lineno"> 15</tt> <a class="py-toggle" href="#" id="Streamer-toggle" onclick="return toggle('Streamer');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="simx.sensor.streamer.Streamer-class.html">Streamer</a><tt class="py-op">(</tt><tt class="py-base-class">object</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Streamer-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="Streamer-expanded"><a name="L16"></a><tt class="py-lineno"> 16</tt>  <tt class="py-line"> </tt>
+<a name="Streamer.__init__"></a><div id="Streamer.__init__-def"><a name="L17"></a><tt class="py-lineno"> 17</tt> <a class="py-toggle" href="#" id="Streamer.__init__-toggle" onclick="return toggle('Streamer.__init__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.sensor.streamer.Streamer-class.html#__init__">__init__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">open_mode</tt><tt class="py-op">=</tt><tt class="py-string">"r"</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Streamer.__init__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Streamer.__init__-expanded"><a name="L18"></a><tt class="py-lineno"> 18</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">open_mode</tt> <tt class="py-op">=</tt> <tt class="py-name">open_mode</tt> </tt>
+</div><a name="L19"></a><tt class="py-lineno"> 19</tt>  <tt class="py-line"> </tt>
+<a name="L20"></a><tt class="py-lineno"> 20</tt>  <tt class="py-line">    <tt class="py-decorator">@</tt><tt class="py-decorator">staticmethod</tt> </tt>
+<a name="Streamer.as_file"></a><div id="Streamer.as_file-def"><a name="L21"></a><tt class="py-lineno"> 21</tt> <a class="py-toggle" href="#" id="Streamer.as_file-toggle" onclick="return toggle('Streamer.as_file');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.sensor.streamer.Streamer-class.html#as_file">as_file</a><tt class="py-op">(</tt><tt class="py-param">source</tt><tt class="py-op">,</tt> <tt class="py-param">mode</tt><tt class="py-op">=</tt><tt class="py-string">"r"</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Streamer.as_file-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Streamer.as_file-expanded"><a name="L22"></a><tt class="py-lineno"> 22</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L23"></a><tt class="py-lineno"> 23</tt>  <tt class="py-line"><tt class="py-docstring">        Normalize source to a file object.</tt> </tt>
+<a name="L24"></a><tt class="py-lineno"> 24</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L25"></a><tt class="py-lineno"> 25</tt>  <tt class="py-line"><tt class="py-docstring">        If source is not a file object, assume it is a string and open</tt> </tt>
+<a name="L26"></a><tt class="py-lineno"> 26</tt>  <tt class="py-line"><tt class="py-docstring">        it according to mode (all the usual exceptions apply). If</tt> </tt>
+<a name="L27"></a><tt class="py-lineno"> 27</tt>  <tt class="py-line"><tt class="py-docstring">        source is a file object, it is returned directly.</tt> </tt>
+<a name="L28"></a><tt class="py-lineno"> 28</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L29"></a><tt class="py-lineno"> 29</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">isinstance</tt><tt class="py-op">(</tt><tt class="py-name">source</tt><tt class="py-op">,</tt> <tt class="py-name">file</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L30"></a><tt class="py-lineno"> 30</tt>  <tt class="py-line">            <tt class="py-keyword">return</tt> <tt class="py-name">source</tt> </tt>
+<a name="L31"></a><tt class="py-lineno"> 31</tt>  <tt class="py-line">        <tt class="py-keyword">else</tt><tt class="py-op">:</tt> </tt>
+<a name="L32"></a><tt class="py-lineno"> 32</tt>  <tt class="py-line">            <tt class="py-keyword">return</tt> <tt class="py-name">open</tt><tt class="py-op">(</tt><tt class="py-name">source</tt><tt class="py-op">,</tt> <tt class="py-name">mode</tt><tt class="py-op">)</tt> </tt>
+</div></div><a name="L33"></a><tt class="py-lineno"> 33</tt>  <tt class="py-line"> </tt>
+<a name="BinaryStreamer"></a><div id="BinaryStreamer-def"><a name="L34"></a><tt class="py-lineno"> 34</tt>  <tt class="py-line"> </tt>
+<a name="L35"></a><tt class="py-lineno"> 35</tt> <a class="py-toggle" href="#" id="BinaryStreamer-toggle" onclick="return toggle('BinaryStreamer');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="simx.sensor.streamer.BinaryStreamer-class.html">BinaryStreamer</a><tt class="py-op">(</tt><tt class="py-base-class">Streamer</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="BinaryStreamer-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="BinaryStreamer-expanded"><a name="L36"></a><tt class="py-lineno"> 36</tt>  <tt class="py-line">    <tt class="py-docstring">"""</tt> </tt>
+<a name="L37"></a><tt class="py-lineno"> 37</tt>  <tt class="py-line"><tt class="py-docstring">    For streaming binary files in a fixed format.</tt> </tt>
+<a name="L38"></a><tt class="py-lineno"> 38</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="L39"></a><tt class="py-lineno"> 39</tt>  <tt class="py-line"> </tt>
+<a name="BinaryStreamer.__init__"></a><div id="BinaryStreamer.__init__-def"><a name="L40"></a><tt class="py-lineno"> 40</tt> <a class="py-toggle" href="#" id="BinaryStreamer.__init__-toggle" onclick="return toggle('BinaryStreamer.__init__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.sensor.streamer.BinaryStreamer-class.html#__init__">__init__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">source</tt><tt class="py-op">,</tt> <tt class="py-param">format</tt><tt class="py-op">=</tt><tt class="py-name">None</tt><tt class="py-op">,</tt> <tt class="py-param">reset_on_eof</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">,</tt> <tt class="py-param">eof_return</tt><tt class="py-op">=</tt><tt class="py-op">-</tt><tt class="py-number">1</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="BinaryStreamer.__init__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="BinaryStreamer.__init__-expanded"><a name="L41"></a><tt class="py-lineno"> 41</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L42"></a><tt class="py-lineno"> 42</tt>  <tt class="py-line"><tt class="py-docstring">        Source is handled according to as_file. The data is unpacked</tt> </tt>
+<a name="L43"></a><tt class="py-lineno"> 43</tt>  <tt class="py-line"><tt class="py-docstring">        by format; see the python struct module.</tt> </tt>
+<a name="L44"></a><tt class="py-lineno"> 44</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L45"></a><tt class="py-lineno"> 45</tt>  <tt class="py-line">        <tt id="link-2" class="py-name" targets="Class simx.sensor.streamer.Streamer=simx.sensor.streamer.Streamer-class.html"><a title="simx.sensor.streamer.Streamer" class="py-name" href="#" onclick="return doclink('link-2', 'Streamer', 'link-2');">Streamer</a></tt><tt class="py-op">.</tt><tt id="link-3" class="py-name" targets="Method simx.base.channel.ChannelBridge.__init__()=simx.base.channel.ChannelBridge-class.html#__init__,Method simx.base.extension.Extension.__init__()=simx.base.extension.Extension-class.html#__init__,Method simx.base.node.Node.__init__()=simx.base.node.Node-class.html#__init__,Method simx.base.radio.RadioRedirect.__init__()=simx.base.radio.RadioRedirect-class.html#__init__,Method simx.base.tossim.TossimBase.__init__()=simx.base.tossim.TossimBase-class.html#__init__,Method simx.dyntopo.Link.BasicLinkModel.__init__()=simx.dyntopo.Link.BasicLinkModel-class.html#__init__,Method simx.dyntopo.Topo.GenericTopo.__init__()=simx.dyntopo.Topo.GenericTopo-class.html#__init__,Method simx.event.event.Manager.__init__()=simx.event.event.Manager-class.html#__init__,Method simx.event.event.PriorityQueue.__init__()=simx.event.event.PriorityQueue-class.html#__init__,Method simx.inject.inject.Inject.__init__()=simx.inject.inject.Inject-class.html#__init__,Method simx.inject.inject.InvalidVersionWarning.__init__()=simx.inject.inject.InvalidVersionWarning-class.html#__init__,Method simx.inject.queue.FifoQueue.__init__()=simx.inject.queue.FifoQueue-class.html#__init__,Method simx.inject.queue.QueueFullWarning.__init__()=simx.inject.queue.QueueFullWarning-class.html#__init__,Method simx.inject.wiretap.InjectDownstream.__init__()=simx.inject.wiretap.InjectDownstream-class.html#__init__,Method simx.inject.wiretap.InjectPacketSock.__init__()=simx.inject.wiretap.InjectPacketSock-class.html#__init__,Method simx.inject.wiretap.InjectSock.__init__()=simx.inject.wiretap.InjectSock-class.html#__init__,Method simx.inject.wiretap.InjectTrigger.__init__()=simx.inject.wiretap.InjectTrigger-class.html#__init__,Method simx.inject.wiretap.InjectUpstream.__init__()=simx.inject.wiretap.InjectUpstream-class.html#__init__,Method simx.probe.parse.LookupError.__init__()=simx.probe.parse.LookupError-class.html#__init__,Method simx.probe.parse.ProbeLink.__init__()=simx.probe.parse.ProbeLink-class.html#__init__,Method simx.probe.parse.ProbeLoader.__init__()=simx.probe.parse.ProbeLoader-class.html#__init__,Method simx.probe.parse.ReplacementError.__init__()=simx.probe.parse.ReplacementError-class.html#__init__,Method simx.probe.probe.CachingProber.__init__()=simx.probe.probe.CachingProber-class.html#__init__,Method simx.probe.probe.Probe.__init__()=simx.probe.probe.Probe-class.html#__init__,Method simx.probe.probe.ProbeArray.__init__()=simx.probe.probe.ProbeArray-class.html#__init__,Method simx.probe.probe.ProbeStruct.__init__()=simx.probe.probe.ProbeStruct-class.html#__init__,Method simx.probe.probedef.Array.__init__()=simx.probe.probedef.Array-class.html#__init__,Method simx.probe.probedef.Definition.__init__()=simx.probe.probedef.Definition-class.html#__init__,Method simx.probe.probedef.Link.__init__()=simx.probe.probedef.Link-class.html#__init__,Method simx.probe.probedef.Primitive.__init__()=simx.probe.probedef.Primitive-class.html#__init__,Method simx.probe.probedef.Struct.__init__()=simx.probe.probedef.Struct-class.html#__init__,Method simx.sensor.extension.SensorExtension.__init__()=simx.sensor.extension.SensorExtension-class.html#__init__,Method simx.sensor.sensor.SensorControl.__init__()=simx.sensor.sensor.SensorControl-class.html#__init__,Method simx.sensor.sensor.SensorError.__init__()=simx.sensor.sensor.SensorError-class.html#__init__,Method simx.sensor.streamer.BinaryStreamer.__init__()=simx.sensor.streamer.BinaryStreamer-class.html#__init__,Method simx.sensor.streamer.SacStreamer.__init__()=simx.sensor.streamer.SacStreamer-class.html#__init__,Method simx.sensor.streamer.Streamer.__init__()=simx.sensor.streamer.Streamer-class.html#__init__,Method simx.sensor.streamer.TextStreamer.__init__()=simx.sensor.streamer.TextStreamer-class.html#__init__,Method simx.sync.time_control.TimeControl.__init__()=simx.sync.time_control.TimeControl-class.html#__init__"><a title="simx.base.channel.ChannelBridge.__init__
+simx.base.extension.Extension.__init__
+simx.base.node.Node.__init__
+simx.base.radio.RadioRedirect.__init__
+simx.base.tossim.TossimBase.__init__
+simx.dyntopo.Link.BasicLinkModel.__init__
+simx.dyntopo.Topo.GenericTopo.__init__
+simx.event.event.Manager.__init__
+simx.event.event.PriorityQueue.__init__
+simx.inject.inject.Inject.__init__
+simx.inject.inject.InvalidVersionWarning.__init__
+simx.inject.queue.FifoQueue.__init__
+simx.inject.queue.QueueFullWarning.__init__
+simx.inject.wiretap.InjectDownstream.__init__
+simx.inject.wiretap.InjectPacketSock.__init__
+simx.inject.wiretap.InjectSock.__init__
+simx.inject.wiretap.InjectTrigger.__init__
+simx.inject.wiretap.InjectUpstream.__init__
+simx.probe.parse.LookupError.__init__
+simx.probe.parse.ProbeLink.__init__
+simx.probe.parse.ProbeLoader.__init__
+simx.probe.parse.ReplacementError.__init__
+simx.probe.probe.CachingProber.__init__
+simx.probe.probe.Probe.__init__
+simx.probe.probe.ProbeArray.__init__
+simx.probe.probe.ProbeStruct.__init__
+simx.probe.probedef.Array.__init__
+simx.probe.probedef.Definition.__init__
+simx.probe.probedef.Link.__init__
+simx.probe.probedef.Primitive.__init__
+simx.probe.probedef.Struct.__init__
+simx.sensor.extension.SensorExtension.__init__
+simx.sensor.sensor.SensorControl.__init__
+simx.sensor.sensor.SensorError.__init__
+simx.sensor.streamer.BinaryStreamer.__init__
+simx.sensor.streamer.SacStreamer.__init__
+simx.sensor.streamer.Streamer.__init__
+simx.sensor.streamer.TextStreamer.__init__
+simx.sync.time_control.TimeControl.__init__" class="py-name" href="#" onclick="return doclink('link-3', '__init__', 'link-3');">__init__</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">,</tt> <tt class="py-string">"rb"</tt><tt class="py-op">)</tt> </tt>
+<a name="L46"></a><tt class="py-lineno"> 46</tt>  <tt class="py-line">        <tt class="py-keyword">assert</tt> <tt class="py-name">format</tt> </tt>
+<a name="L47"></a><tt class="py-lineno"> 47</tt>  <tt class="py-line"> </tt>
+<a name="L48"></a><tt class="py-lineno"> 48</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">source</tt> <tt class="py-op">=</tt> <tt id="link-4" class="py-name"><a title="simx.sensor.streamer.Streamer" class="py-name" href="#" onclick="return doclink('link-4', 'Streamer', 'link-2');">Streamer</a></tt><tt class="py-op">.</tt><tt id="link-5" class="py-name" targets="Static Method simx.sensor.streamer.Streamer.as_file()=simx.sensor.streamer.Streamer-class.html#as_file"><a title="simx.sensor.streamer.Streamer.as_file" class="py-name" href="#" onclick="return doclink('link-5', 'as_file', 'link-5');">as_file</a></tt><tt class="py-op">(</tt><tt class="py-name">source</tt><tt class="py-op">,</tt> <tt class="py-string">"rb"</tt><tt class="py-op">)</tt> </tt>
+<a name="L49"></a><tt class="py-lineno"> 49</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">source</tt><tt class="py-op">.</tt><tt class="py-name">mode</tt><tt class="py-op">.</tt><tt class="py-name">find</tt><tt class="py-op">(</tt><tt class="py-string">"b"</tt><tt class="py-op">)</tt> <tt class="py-op">&lt;</tt> <tt class="py-number">0</tt><tt class="py-op">:</tt> </tt>
+<a name="L50"></a><tt class="py-lineno"> 50</tt>  <tt class="py-line">            <tt class="py-keyword">raise</tt> <tt class="py-name">ValueError</tt><tt class="py-op">(</tt><tt class="py-string">"Not opened in binary mode: %s"</tt> <tt class="py-op">%</tt> <tt class="py-name">source</tt><tt class="py-op">.</tt><tt class="py-name">name</tt><tt class="py-op">)</tt> </tt>
+<a name="L51"></a><tt class="py-lineno"> 51</tt>  <tt class="py-line"> </tt>
+<a name="L52"></a><tt class="py-lineno"> 52</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">format</tt> <tt class="py-op">=</tt> <tt class="py-name">format</tt> </tt>
+<a name="L53"></a><tt class="py-lineno"> 53</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">reset_on_eof</tt> <tt class="py-op">=</tt> <tt class="py-name">reset_on_eof</tt> </tt>
+<a name="L54"></a><tt class="py-lineno"> 54</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">eof_return</tt> <tt class="py-op">=</tt> <tt class="py-name">eof_return</tt> </tt>
+</div><a name="L55"></a><tt class="py-lineno"> 55</tt>  <tt class="py-line"> </tt>
+<a name="L56"></a><tt class="py-lineno"> 56</tt>  <tt class="py-line"> </tt>
+<a name="BinaryStreamer.generator"></a><div id="BinaryStreamer.generator-def"><a name="L57"></a><tt class="py-lineno"> 57</tt> <a class="py-toggle" href="#" id="BinaryStreamer.generator-toggle" onclick="return toggle('BinaryStreamer.generator');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.sensor.streamer.BinaryStreamer-class.html#generator">generator</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="BinaryStreamer.generator-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="BinaryStreamer.generator-expanded"><a name="L58"></a><tt class="py-lineno"> 58</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L59"></a><tt class="py-lineno"> 59</tt>  <tt class="py-line"><tt class="py-docstring">        Return the generator.</tt> </tt>
+<a name="L60"></a><tt class="py-lineno"> 60</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L61"></a><tt class="py-lineno"> 61</tt>  <tt class="py-line"> </tt>
+<a name="L62"></a><tt class="py-lineno"> 62</tt>  <tt class="py-line">        <tt id="link-6" class="py-name" targets="Variable simx.probe.probe.Probe.size=simx.probe.probe.Probe-class.html#size"><a title="simx.probe.probe.Probe.size" class="py-name" href="#" onclick="return doclink('link-6', 'size', 'link-6');">size</a></tt> <tt class="py-op">=</tt> <tt class="py-name">struct</tt><tt class="py-op">.</tt><tt class="py-name">calcsize</tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">format</tt><tt class="py-op">)</tt> </tt>
+<a name="L63"></a><tt class="py-lineno"> 63</tt>  <tt class="py-line"> </tt>
+<a name="L64"></a><tt class="py-lineno"> 64</tt>  <tt class="py-line">        <tt class="py-keyword">def</tt> <tt class="py-def-name">reader</tt><tt class="py-op">(</tt><tt class="py-op">*</tt><tt class="py-param">ignore</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L65"></a><tt class="py-lineno"> 65</tt>  <tt class="py-line">            <tt class="py-keyword">try</tt><tt class="py-op">:</tt> </tt>
+<a name="L66"></a><tt class="py-lineno"> 66</tt>  <tt class="py-line">                <tt class="py-keyword">return</tt> <tt id="link-7" class="py-name"><a title="simx.sensor.reader.Reader" class="py-name" href="#" onclick="return doclink('link-7', 'Reader', 'link-1');">Reader</a></tt><tt class="py-op">.</tt><tt id="link-8" class="py-name" targets="Static Method simx.sensor.reader.Reader.unpacked()=simx.sensor.reader.Reader-class.html#unpacked"><a title="simx.sensor.reader.Reader.unpacked" class="py-name" href="#" onclick="return doclink('link-8', 'unpacked', 'link-8');">unpacked</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">source</tt><tt class="py-op">,</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">format</tt><tt class="py-op">,</tt> <tt id="link-9" class="py-name"><a title="simx.probe.probe.Probe.size" class="py-name" href="#" onclick="return doclink('link-9', 'size', 'link-6');">size</a></tt><tt class="py-op">)</tt> </tt>
+<a name="L67"></a><tt class="py-lineno"> 67</tt>  <tt class="py-line">            <tt class="py-keyword">except</tt> <tt class="py-name">EOFError</tt><tt class="py-op">:</tt> </tt>
+<a name="L68"></a><tt class="py-lineno"> 68</tt>  <tt class="py-line">                <tt class="py-keyword">if</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">reset_on_eof</tt><tt class="py-op">:</tt> </tt>
+<a name="L69"></a><tt class="py-lineno"> 69</tt>  <tt class="py-line">                    <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">source</tt><tt class="py-op">.</tt><tt class="py-name">seek</tt><tt class="py-op">(</tt><tt class="py-number">0</tt><tt class="py-op">,</tt> <tt class="py-number">0</tt><tt class="py-op">)</tt> </tt>
+<a name="L70"></a><tt class="py-lineno"> 70</tt>  <tt class="py-line">                    <tt class="py-comment"># rather throw an EOF than get caught in a cycle</tt> </tt>
+<a name="L71"></a><tt class="py-lineno"> 71</tt>  <tt class="py-line"><tt class="py-comment"></tt>                    <tt class="py-keyword">return</tt> <tt id="link-10" class="py-name"><a title="simx.sensor.reader.Reader" class="py-name" href="#" onclick="return doclink('link-10', 'Reader', 'link-1');">Reader</a></tt><tt class="py-op">.</tt><tt id="link-11" class="py-name"><a title="simx.sensor.reader.Reader.unpacked" class="py-name" href="#" onclick="return doclink('link-11', 'unpacked', 'link-8');">unpacked</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">source</tt><tt class="py-op">,</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">format</tt><tt class="py-op">,</tt> <tt id="link-12" class="py-name"><a title="simx.probe.probe.Probe.size" class="py-name" href="#" onclick="return doclink('link-12', 'size', 'link-6');">size</a></tt><tt class="py-op">)</tt> </tt>
+<a name="L72"></a><tt class="py-lineno"> 72</tt>  <tt class="py-line">                <tt class="py-keyword">else</tt><tt class="py-op">:</tt> </tt>
+<a name="L73"></a><tt class="py-lineno"> 73</tt>  <tt class="py-line">                    <tt class="py-keyword">return</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">eof_return</tt> </tt>
+</div><a name="L74"></a><tt class="py-lineno"> 74</tt>  <tt class="py-line"> </tt>
+<a name="L75"></a><tt class="py-lineno"> 75</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt id="link-13" class="py-name"><a title="simx.sensor.reader" class="py-name" href="#" onclick="return doclink('link-13', 'reader', 'link-0');">reader</a></tt> </tt>
+</div></div><a name="L76"></a><tt class="py-lineno"> 76</tt>  <tt class="py-line"> </tt>
+<a name="SacStreamer"></a><div id="SacStreamer-def"><a name="L77"></a><tt class="py-lineno"> 77</tt>  <tt class="py-line"> </tt>
+<a name="L78"></a><tt class="py-lineno"> 78</tt>  <tt class="py-line"><tt class="py-comment">## PST- not updated</tt> </tt>
+<a name="L79"></a><tt class="py-lineno"> 79</tt> <a class="py-toggle" href="#" id="SacStreamer-toggle" onclick="return toggle('SacStreamer');">-</a><tt class="py-line"><tt class="py-comment"></tt><tt class="py-keyword">class</tt> <a class="py-def-name" href="simx.sensor.streamer.SacStreamer-class.html">SacStreamer</a><tt class="py-op">(</tt><tt class="py-base-class">Streamer</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="SacStreamer-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="SacStreamer-expanded"><a name="L80"></a><tt class="py-lineno"> 80</tt>  <tt class="py-line">    <tt class="py-docstring">"""</tt> </tt>
+<a name="L81"></a><tt class="py-lineno"> 81</tt>  <tt class="py-line"><tt class="py-docstring">    For streaming SAC streams.</tt> </tt>
+<a name="L82"></a><tt class="py-lineno"> 82</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="L83"></a><tt class="py-lineno"> 83</tt>  <tt class="py-line"> </tt>
+<a name="SacStreamer.__init__"></a><div id="SacStreamer.__init__-def"><a name="L84"></a><tt class="py-lineno"> 84</tt> <a class="py-toggle" href="#" id="SacStreamer.__init__-toggle" onclick="return toggle('SacStreamer.__init__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.sensor.streamer.SacStreamer-class.html#__init__">__init__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="SacStreamer.__init__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="SacStreamer.__init__-expanded"><a name="L85"></a><tt class="py-lineno"> 85</tt>  <tt class="py-line">        <tt id="link-14" class="py-name"><a title="simx.sensor.streamer.Streamer" class="py-name" href="#" onclick="return doclink('link-14', 'Streamer', 'link-2');">Streamer</a></tt><tt class="py-op">.</tt><tt id="link-15" class="py-name"><a title="simx.base.channel.ChannelBridge.__init__
+simx.base.extension.Extension.__init__
+simx.base.node.Node.__init__
+simx.base.radio.RadioRedirect.__init__
+simx.base.tossim.TossimBase.__init__
+simx.dyntopo.Link.BasicLinkModel.__init__
+simx.dyntopo.Topo.GenericTopo.__init__
+simx.event.event.Manager.__init__
+simx.event.event.PriorityQueue.__init__
+simx.inject.inject.Inject.__init__
+simx.inject.inject.InvalidVersionWarning.__init__
+simx.inject.queue.FifoQueue.__init__
+simx.inject.queue.QueueFullWarning.__init__
+simx.inject.wiretap.InjectDownstream.__init__
+simx.inject.wiretap.InjectPacketSock.__init__
+simx.inject.wiretap.InjectSock.__init__
+simx.inject.wiretap.InjectTrigger.__init__
+simx.inject.wiretap.InjectUpstream.__init__
+simx.probe.parse.LookupError.__init__
+simx.probe.parse.ProbeLink.__init__
+simx.probe.parse.ProbeLoader.__init__
+simx.probe.parse.ReplacementError.__init__
+simx.probe.probe.CachingProber.__init__
+simx.probe.probe.Probe.__init__
+simx.probe.probe.ProbeArray.__init__
+simx.probe.probe.ProbeStruct.__init__
+simx.probe.probedef.Array.__init__
+simx.probe.probedef.Definition.__init__
+simx.probe.probedef.Link.__init__
+simx.probe.probedef.Primitive.__init__
+simx.probe.probedef.Struct.__init__
+simx.sensor.extension.SensorExtension.__init__
+simx.sensor.sensor.SensorControl.__init__
+simx.sensor.sensor.SensorError.__init__
+simx.sensor.streamer.BinaryStreamer.__init__
+simx.sensor.streamer.SacStreamer.__init__
+simx.sensor.streamer.Streamer.__init__
+simx.sensor.streamer.TextStreamer.__init__
+simx.sync.time_control.TimeControl.__init__" class="py-name" href="#" onclick="return doclink('link-15', '__init__', 'link-3');">__init__</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">,</tt> <tt class="py-string">"rb"</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L86"></a><tt class="py-lineno"> 86</tt>  <tt class="py-line"> </tt>
+<a name="SacStreamer.generate"></a><div id="SacStreamer.generate-def"><a name="L87"></a><tt class="py-lineno"> 87</tt> <a class="py-toggle" href="#" id="SacStreamer.generate-toggle" onclick="return toggle('SacStreamer.generate');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.sensor.streamer.SacStreamer-class.html#generate">generate</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">source</tt><tt class="py-op">,</tt> <tt class="py-param">sac_module</tt><tt class="py-op">=</tt><tt class="py-name">None</tt><tt class="py-op">,</tt> </tt>
+<a name="L88"></a><tt class="py-lineno"> 88</tt>  <tt class="py-line">                 <tt class="py-param">reset_on_eof</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">,</tt> <tt class="py-param">eof_return</tt><tt class="py-op">=</tt><tt class="py-op">-</tt><tt class="py-number">1</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="SacStreamer.generate-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="SacStreamer.generate-expanded"><a name="L89"></a><tt class="py-lineno"> 89</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L90"></a><tt class="py-lineno"> 90</tt>  <tt class="py-line"><tt class="py-docstring">        Returns a SimxSensor callback to read from a SAC file.</tt> </tt>
+<a name="L91"></a><tt class="py-lineno"> 91</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L92"></a><tt class="py-lineno"> 92</tt>  <tt class="py-line"><tt class="py-docstring">        This will not work correctly with SAC files with a second data</tt> </tt>
+<a name="L93"></a><tt class="py-lineno"> 93</tt>  <tt class="py-line"><tt class="py-docstring">        section.  See simx/extra/sac.</tt> </tt>
+<a name="L94"></a><tt class="py-lineno"> 94</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L95"></a><tt class="py-lineno"> 95</tt>  <tt class="py-line">        <tt class="py-keyword">assert</tt> <tt class="py-name">sac_module</tt> </tt>
+<a name="L96"></a><tt class="py-lineno"> 96</tt>  <tt class="py-line"> </tt>
+<a name="L97"></a><tt class="py-lineno"> 97</tt>  <tt class="py-line">        <tt class="py-name">source</tt> <tt class="py-op">=</tt> <tt id="link-16" class="py-name"><a title="simx.sensor.streamer.Streamer" class="py-name" href="#" onclick="return doclink('link-16', 'Streamer', 'link-2');">Streamer</a></tt><tt class="py-op">.</tt><tt id="link-17" class="py-name"><a title="simx.sensor.streamer.Streamer.as_file" class="py-name" href="#" onclick="return doclink('link-17', 'as_file', 'link-5');">as_file</a></tt><tt class="py-op">(</tt><tt class="py-name">source</tt><tt class="py-op">,</tt> <tt class="py-string">"rb"</tt><tt class="py-op">)</tt> </tt>
+<a name="L98"></a><tt class="py-lineno"> 98</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">source</tt><tt class="py-op">.</tt><tt class="py-name">mode</tt><tt class="py-op">.</tt><tt class="py-name">find</tt><tt class="py-op">(</tt><tt class="py-string">"b"</tt><tt class="py-op">)</tt> <tt class="py-op">&lt;</tt> <tt class="py-number">0</tt><tt class="py-op">:</tt> </tt>
+<a name="L99"></a><tt class="py-lineno"> 99</tt>  <tt class="py-line">            <tt class="py-keyword">raise</tt> <tt class="py-name">ValueError</tt><tt class="py-op">(</tt><tt class="py-string">"Not opened in binary mode: %s"</tt> <tt class="py-op">%</tt> <tt class="py-name">source</tt><tt class="py-op">.</tt><tt class="py-name">name</tt><tt class="py-op">)</tt> </tt>
+<a name="L100"></a><tt class="py-lineno">100</tt>  <tt class="py-line"> </tt>
+<a name="L101"></a><tt class="py-lineno">101</tt>  <tt class="py-line">        <tt class="py-name">sac</tt> <tt class="py-op">=</tt> <tt class="py-name">sac_module</tt><tt class="py-op">.</tt><tt id="link-18" class="py-name"><a title="simx.sensor.reader.Reader" class="py-name" href="#" onclick="return doclink('link-18', 'Reader', 'link-1');">Reader</a></tt><tt class="py-op">(</tt><tt class="py-name">source</tt><tt class="py-op">)</tt> </tt>
+<a name="L102"></a><tt class="py-lineno">102</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">sac</tt><tt class="py-op">.</tt><tt class="py-name">header</tt><tt class="py-op">.</tt><tt class="py-name">big_endian</tt><tt class="py-op">:</tt> </tt>
+<a name="L103"></a><tt class="py-lineno">103</tt>  <tt class="py-line">            <tt class="py-comment"># header is in big_endian, but data is in le? I don't get it...</tt> </tt>
+<a name="L104"></a><tt class="py-lineno">104</tt>  <tt class="py-line"><tt class="py-comment"></tt>            <tt class="py-name">format</tt> <tt class="py-op">=</tt> <tt class="py-string">"&lt;i"</tt> </tt>
+<a name="L105"></a><tt class="py-lineno">105</tt>  <tt class="py-line">        <tt class="py-keyword">else</tt><tt class="py-op">:</tt> </tt>
+<a name="L106"></a><tt class="py-lineno">106</tt>  <tt class="py-line">            <tt class="py-name">format</tt> <tt class="py-op">=</tt> <tt class="py-string">"&lt;i"</tt> </tt>
+<a name="L107"></a><tt class="py-lineno">107</tt>  <tt class="py-line">         </tt>
+<a name="L108"></a><tt class="py-lineno">108</tt>  <tt class="py-line">        <tt class="py-name">source</tt><tt class="py-op">.</tt><tt class="py-name">seek</tt><tt class="py-op">(</tt><tt class="py-name">sac_module</tt><tt class="py-op">.</tt><tt class="py-name">HEADER_SIZE</tt><tt class="py-op">)</tt> </tt>
+<a name="L109"></a><tt class="py-lineno">109</tt>  <tt class="py-line"> </tt>
+<a name="L110"></a><tt class="py-lineno">110</tt>  <tt class="py-line">        <tt class="py-keyword">def</tt> <tt class="py-def-name">reader</tt><tt class="py-op">(</tt><tt class="py-op">*</tt><tt class="py-param">ignore</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L111"></a><tt class="py-lineno">111</tt>  <tt class="py-line">            <tt class="py-comment"># really should just read from sac.data1 ... no need for IO</tt> </tt>
+<a name="L112"></a><tt class="py-lineno">112</tt>  <tt class="py-line"><tt class="py-comment"></tt>            <tt class="py-keyword">try</tt><tt class="py-op">:</tt> </tt>
+<a name="L113"></a><tt class="py-lineno">113</tt>  <tt class="py-line">                <tt class="py-keyword">return</tt> <tt id="link-19" class="py-name"><a title="simx.sensor.reader.Reader" class="py-name" href="#" onclick="return doclink('link-19', 'Reader', 'link-1');">Reader</a></tt><tt class="py-op">.</tt><tt id="link-20" class="py-name"><a title="simx.sensor.reader.Reader.unpacked" class="py-name" href="#" onclick="return doclink('link-20', 'unpacked', 'link-8');">unpacked</a></tt><tt class="py-op">(</tt><tt class="py-name">source</tt><tt class="py-op">,</tt> <tt class="py-name">format</tt><tt class="py-op">,</tt> <tt class="py-number">4</tt><tt class="py-op">)</tt> </tt>
+<a name="L114"></a><tt class="py-lineno">114</tt>  <tt class="py-line">            <tt class="py-keyword">except</tt> <tt class="py-name">EOFError</tt><tt class="py-op">:</tt> </tt>
+<a name="L115"></a><tt class="py-lineno">115</tt>  <tt class="py-line">                <tt class="py-keyword">if</tt> <tt class="py-name">reset_on_eof</tt><tt class="py-op">:</tt> </tt>
+<a name="L116"></a><tt class="py-lineno">116</tt>  <tt class="py-line">                    <tt class="py-name">source</tt><tt class="py-op">.</tt><tt class="py-name">seek</tt><tt class="py-op">(</tt><tt class="py-name">sac_module</tt><tt class="py-op">.</tt><tt class="py-name">HEADER_SIZE</tt><tt class="py-op">)</tt> </tt>
+<a name="L117"></a><tt class="py-lineno">117</tt>  <tt class="py-line">                    <tt class="py-comment"># rather throw an EOF than get caught in a cycle</tt> </tt>
+<a name="L118"></a><tt class="py-lineno">118</tt>  <tt class="py-line"><tt class="py-comment"></tt>                    <tt class="py-keyword">return</tt> <tt id="link-21" class="py-name"><a title="simx.sensor.reader.Reader" class="py-name" href="#" onclick="return doclink('link-21', 'Reader', 'link-1');">Reader</a></tt><tt class="py-op">.</tt><tt id="link-22" class="py-name"><a title="simx.sensor.reader.Reader.unpacked" class="py-name" href="#" onclick="return doclink('link-22', 'unpacked', 'link-8');">unpacked</a></tt><tt class="py-op">(</tt><tt class="py-name">source</tt><tt class="py-op">,</tt> <tt class="py-name">format</tt><tt class="py-op">,</tt> <tt class="py-number">4</tt><tt class="py-op">)</tt> </tt>
+<a name="L119"></a><tt class="py-lineno">119</tt>  <tt class="py-line">                <tt class="py-keyword">else</tt><tt class="py-op">:</tt> </tt>
+<a name="L120"></a><tt class="py-lineno">120</tt>  <tt class="py-line">                    <tt class="py-keyword">return</tt> <tt class="py-name">eof_return</tt> </tt>
+</div><a name="L121"></a><tt class="py-lineno">121</tt>  <tt class="py-line"> </tt>
+<a name="L122"></a><tt class="py-lineno">122</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt id="link-23" class="py-name"><a title="simx.sensor.reader" class="py-name" href="#" onclick="return doclink('link-23', 'reader', 'link-0');">reader</a></tt> </tt>
+</div></div><a name="L123"></a><tt class="py-lineno">123</tt>  <tt class="py-line"> </tt>
+<a name="TextStreamer"></a><div id="TextStreamer-def"><a name="L124"></a><tt class="py-lineno">124</tt>  <tt class="py-line"> </tt>
+<a name="L125"></a><tt class="py-lineno">125</tt> <a class="py-toggle" href="#" id="TextStreamer-toggle" onclick="return toggle('TextStreamer');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="simx.sensor.streamer.TextStreamer-class.html">TextStreamer</a><tt class="py-op">(</tt><tt class="py-base-class">Streamer</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="TextStreamer-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="TextStreamer-expanded"><a name="L126"></a><tt class="py-lineno">126</tt>  <tt class="py-line">    <tt class="py-docstring">"""</tt> </tt>
+<a name="L127"></a><tt class="py-lineno">127</tt>  <tt class="py-line"><tt class="py-docstring">    For streaming integer values as text.</tt> </tt>
+<a name="L128"></a><tt class="py-lineno">128</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="L129"></a><tt class="py-lineno">129</tt>  <tt class="py-line"> </tt>
+<a name="TextStreamer.__init__"></a><div id="TextStreamer.__init__-def"><a name="L130"></a><tt class="py-lineno">130</tt> <a class="py-toggle" href="#" id="TextStreamer.__init__-toggle" onclick="return toggle('TextStreamer.__init__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.sensor.streamer.TextStreamer-class.html#__init__">__init__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">source</tt><tt class="py-op">=</tt><tt class="py-name">None</tt><tt class="py-op">,</tt> <tt class="py-param">reset_on_eof</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">,</tt> </tt>
+<a name="L131"></a><tt class="py-lineno">131</tt>  <tt class="py-line">                 <tt class="py-param">eof_value</tt><tt class="py-op">=</tt><tt class="py-op">-</tt><tt class="py-number">1</tt><tt class="py-op">,</tt> <tt class="py-param">invalid_value</tt><tt class="py-op">=</tt><tt class="py-op">-</tt><tt class="py-number">1</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="TextStreamer.__init__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="TextStreamer.__init__-expanded"><a name="L132"></a><tt class="py-lineno">132</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L133"></a><tt class="py-lineno">133</tt>  <tt class="py-line"><tt class="py-docstring">        Streamer to read read integer-words from a text file.</tt> </tt>
+<a name="L134"></a><tt class="py-lineno">134</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L135"></a><tt class="py-lineno">135</tt>  <tt class="py-line"><tt class="py-docstring">        Source is handled according to as_file. If reset_on_eof is</tt> </tt>
+<a name="L136"></a><tt class="py-lineno">136</tt>  <tt class="py-line"><tt class="py-docstring">        true then source will be reset each time an EOF is reached.</tt> </tt>
+<a name="L137"></a><tt class="py-lineno">137</tt>  <tt class="py-line"><tt class="py-docstring">        </tt> </tt>
+<a name="L138"></a><tt class="py-lineno">138</tt>  <tt class="py-line"><tt class="py-docstring">        0 is returned for invalid input (negative number, int parse</tt> </tt>
+<a name="L139"></a><tt class="py-lineno">139</tt>  <tt class="py-line"><tt class="py-docstring">        error or EOF).</tt> </tt>
+<a name="L140"></a><tt class="py-lineno">140</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L141"></a><tt class="py-lineno">141</tt>  <tt class="py-line">        <tt id="link-24" class="py-name"><a title="simx.sensor.streamer.Streamer" class="py-name" href="#" onclick="return doclink('link-24', 'Streamer', 'link-2');">Streamer</a></tt><tt class="py-op">.</tt><tt id="link-25" class="py-name"><a title="simx.base.channel.ChannelBridge.__init__
+simx.base.extension.Extension.__init__
+simx.base.node.Node.__init__
+simx.base.radio.RadioRedirect.__init__
+simx.base.tossim.TossimBase.__init__
+simx.dyntopo.Link.BasicLinkModel.__init__
+simx.dyntopo.Topo.GenericTopo.__init__
+simx.event.event.Manager.__init__
+simx.event.event.PriorityQueue.__init__
+simx.inject.inject.Inject.__init__
+simx.inject.inject.InvalidVersionWarning.__init__
+simx.inject.queue.FifoQueue.__init__
+simx.inject.queue.QueueFullWarning.__init__
+simx.inject.wiretap.InjectDownstream.__init__
+simx.inject.wiretap.InjectPacketSock.__init__
+simx.inject.wiretap.InjectSock.__init__
+simx.inject.wiretap.InjectTrigger.__init__
+simx.inject.wiretap.InjectUpstream.__init__
+simx.probe.parse.LookupError.__init__
+simx.probe.parse.ProbeLink.__init__
+simx.probe.parse.ProbeLoader.__init__
+simx.probe.parse.ReplacementError.__init__
+simx.probe.probe.CachingProber.__init__
+simx.probe.probe.Probe.__init__
+simx.probe.probe.ProbeArray.__init__
+simx.probe.probe.ProbeStruct.__init__
+simx.probe.probedef.Array.__init__
+simx.probe.probedef.Definition.__init__
+simx.probe.probedef.Link.__init__
+simx.probe.probedef.Primitive.__init__
+simx.probe.probedef.Struct.__init__
+simx.sensor.extension.SensorExtension.__init__
+simx.sensor.sensor.SensorControl.__init__
+simx.sensor.sensor.SensorError.__init__
+simx.sensor.streamer.BinaryStreamer.__init__
+simx.sensor.streamer.SacStreamer.__init__
+simx.sensor.streamer.Streamer.__init__
+simx.sensor.streamer.TextStreamer.__init__
+simx.sync.time_control.TimeControl.__init__" class="py-name" href="#" onclick="return doclink('link-25', '__init__', 'link-3');">__init__</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">,</tt> <tt class="py-string">"r"</tt><tt class="py-op">)</tt> </tt>
+<a name="L142"></a><tt class="py-lineno">142</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">source</tt> <tt class="py-op">=</tt> <tt id="link-26" class="py-name"><a title="simx.sensor.streamer.Streamer" class="py-name" href="#" onclick="return doclink('link-26', 'Streamer', 'link-2');">Streamer</a></tt><tt class="py-op">.</tt><tt id="link-27" class="py-name"><a title="simx.sensor.streamer.Streamer.as_file" class="py-name" href="#" onclick="return doclink('link-27', 'as_file', 'link-5');">as_file</a></tt><tt class="py-op">(</tt><tt class="py-name">source</tt><tt class="py-op">)</tt> </tt>
+<a name="L143"></a><tt class="py-lineno">143</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">reset_on_eof</tt> <tt class="py-op">=</tt> <tt class="py-name">reset_on_eof</tt> </tt>
+<a name="L144"></a><tt class="py-lineno">144</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">eof_value</tt> <tt class="py-op">=</tt> <tt class="py-name">eof_value</tt> </tt>
+<a name="L145"></a><tt class="py-lineno">145</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">invalid_value</tt> <tt class="py-op">=</tt> <tt class="py-name">invalid_value</tt> </tt>
+</div><a name="L146"></a><tt class="py-lineno">146</tt>  <tt class="py-line"> </tt>
+<a name="TextStreamer.generator"></a><div id="TextStreamer.generator-def"><a name="L147"></a><tt class="py-lineno">147</tt> <a class="py-toggle" href="#" id="TextStreamer.generator-toggle" onclick="return toggle('TextStreamer.generator');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.sensor.streamer.TextStreamer-class.html#generator">generator</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="TextStreamer.generator-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="TextStreamer.generator-expanded"><a name="L148"></a><tt class="py-lineno">148</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L149"></a><tt class="py-lineno">149</tt>  <tt class="py-line"><tt class="py-docstring">        Return the generator.</tt> </tt>
+<a name="L150"></a><tt class="py-lineno">150</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L151"></a><tt class="py-lineno">151</tt>  <tt class="py-line">        <tt class="py-keyword">def</tt> <tt class="py-def-name">reader</tt><tt class="py-op">(</tt><tt class="py-op">*</tt><tt class="py-param">ignore</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L152"></a><tt class="py-lineno">152</tt>  <tt class="py-line">            <tt class="py-name">data</tt> <tt class="py-op">=</tt> <tt id="link-28" class="py-name"><a title="simx.sensor.reader.Reader" class="py-name" href="#" onclick="return doclink('link-28', 'Reader', 'link-1');">Reader</a></tt><tt class="py-op">.</tt><tt id="link-29" class="py-name" targets="Static Method simx.sensor.reader.Reader.integer()=simx.sensor.reader.Reader-class.html#integer"><a title="simx.sensor.reader.Reader.integer" class="py-name" href="#" onclick="return doclink('link-29', 'integer', 'link-29');">integer</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">source</tt><tt class="py-op">,</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">invalid_value</tt><tt class="py-op">)</tt> </tt>
+<a name="L153"></a><tt class="py-lineno">153</tt>  <tt class="py-line">            <tt class="py-keyword">if</tt> <tt class="py-name">data</tt> <tt class="py-keyword">is</tt> <tt class="py-keyword">not</tt> <tt class="py-name">None</tt><tt class="py-op">:</tt> </tt>
+<a name="L154"></a><tt class="py-lineno">154</tt>  <tt class="py-line">                <tt class="py-keyword">return</tt> <tt class="py-name">long</tt><tt class="py-op">(</tt><tt class="py-name">data</tt><tt class="py-op">)</tt> </tt>
+<a name="L155"></a><tt class="py-lineno">155</tt>  <tt class="py-line">             </tt>
+<a name="L156"></a><tt class="py-lineno">156</tt>  <tt class="py-line">            <tt class="py-comment"># data is None - at EOF</tt> </tt>
+<a name="L157"></a><tt class="py-lineno">157</tt>  <tt class="py-line"><tt class="py-comment"></tt>            <tt class="py-keyword">if</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">reset_on_eof</tt><tt class="py-op">:</tt> </tt>
+<a name="L158"></a><tt class="py-lineno">158</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">source</tt><tt class="py-op">.</tt><tt class="py-name">seek</tt><tt class="py-op">(</tt><tt class="py-number">0</tt><tt class="py-op">,</tt> <tt class="py-number">0</tt><tt class="py-op">)</tt> </tt>
+<a name="L159"></a><tt class="py-lineno">159</tt>  <tt class="py-line">                <tt class="py-keyword">return</tt> <tt class="py-name">long</tt><tt class="py-op">(</tt><tt id="link-30" class="py-name"><a title="simx.sensor.reader" class="py-name" href="#" onclick="return doclink('link-30', 'reader', 'link-0');">reader</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L160"></a><tt class="py-lineno">160</tt>  <tt class="py-line">            <tt class="py-keyword">else</tt><tt class="py-op">:</tt> </tt>
+<a name="L161"></a><tt class="py-lineno">161</tt>  <tt class="py-line">                <tt class="py-keyword">return</tt> <tt class="py-name">long</tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">eof_value</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L162"></a><tt class="py-lineno">162</tt>  <tt class="py-line"> </tt>
+<a name="L163"></a><tt class="py-lineno">163</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt id="link-31" class="py-name"><a title="simx.sensor.reader" class="py-name" href="#" onclick="return doclink('link-31', 'reader', 'link-0');">reader</a></tt> </tt>
+</div></div><a name="L164"></a><tt class="py-lineno">164</tt>  <tt class="py-line"> </tt><script type="text/javascript">
+<!--
+expandto(location.href);
+// -->
+</script>
+</pre>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Wed Aug 12 00:17:36 2009
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

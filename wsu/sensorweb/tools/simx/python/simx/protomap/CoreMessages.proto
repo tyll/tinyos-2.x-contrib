@@ -1,0 +1,27 @@
+package org.izra.protomap;
+
+option java_package = "org.izra.protomap";
+option java_outer_classname = "CoreMessages";
+
+/*
+ * Server response when a message name is unknown.
+ */
+message MessageRejected {
+  enum Reason {
+    UNMAPPED_NAME = 0x00;
+    UNMAPPED_ID = 0x01;
+    OTHER = 0xd0;
+  }
+  required int32 id = 1;
+  required Reason reason = 2;
+  optional string message = 3;
+}
+
+/*
+ * Server response when a message name is known. Clients should use
+ * the resolved ID in the future.
+ */
+message MappedName {
+  required string name = 1;
+  required int32 id = 2;
+}

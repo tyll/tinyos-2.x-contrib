@@ -1,0 +1,9 @@
+TReact is a Python interface to allow interactive (reactive) control
+with a TOSSIM/T2 environment.
+
+It works by processing messages (using SFInject) and reacting
+accordingly. The primary incoming message simply requests that a
+particular bit of python is executed. Outbound messages (generally
+containing "data") are more structured and include Node positions,
+transmission powers, and more detailed data about the simulation
+environment.

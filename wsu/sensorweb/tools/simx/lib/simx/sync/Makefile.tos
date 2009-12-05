@@ -1,0 +1,33 @@
+# This is designed to be included from a TOS application Makefile.
+#
+# Author: Paul Stickney, May 2008
+
+SIMX ?=simx
+SIMXLIB ?=$(SIMX)/lib/simx
+SIMX_SYNC_DIR ?=$(SIMXLIB)/sync
+
+BUILD=`pwd`/simbuild/simx
+
+CFLAGS +=-I$(SIMX_SYNC_DIR)
+BUILD_EXTRA_DEPS +=tossim-sync-check
+
+tossim-sync-check: FORCE
+	@if [ ! -f $(SIMX_SYNC_DIR)/tossim_sync.h ]; then \
+	echo "'$(SIMX_SYNC_DIR)' does not contain SimX/TSync source."; \
+	echo 'Please set SIMX, SIMXLIB or SIMX_SYNC_DIR correctly.'; \
+	exit 1; \
+	fi
+
+# sim and sim-sf completely ignore this POST_BUILD_EXTRA_DEPS because
+# they reset BUILD_DEPS. The following gets around this restriction.
+micaz: tossim-sync
+tossim-sync: $(BUILD_DEPS)
+	mkdir -p $(BUILD)
+	APP_ROOT="`pwd`" make -C $(SIMX_SYNC_DIR)
+
+clean: tossim-sync-clean
+tossim-sync-clean:
+	rm -f SimxSync.py SimxSync.pyc
+	rm -f _SimxSyncmodule.so _SimxSync.dll
+
+FORCE:

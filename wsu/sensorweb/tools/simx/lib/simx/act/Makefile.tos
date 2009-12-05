@@ -1,0 +1,30 @@
+# Copy simact.py into application build
+#
+# @author Paul Stickney
+
+SIMX ?=simx
+SIMXLIB ?=$(SIMX)/lib/simx
+SIMX_ACT_DIR ?=$(SIMXLIB)/act
+BUILD =simbuild
+
+BUILD_EXTRA_DEPS +=simx-act-check
+
+simx-act-check: FORCE
+	@if [ ! -f $(SIMX_ACT_DIR)/simact.py ]; then \
+		echo "'$(SIMX_ACT_DIR)' does not contain simact.py source."; \
+		echo 'Please set SIMX, SIMXLIB or SIMX_ACT_DIR correctly.'; \
+		exit 1; \
+	fi
+
+# sim and sim-sf completely ignore this POST_BUILD_EXTRA_DEPS because
+# they reset BUILD_DEPS. The following gets around this restriction.
+micaz: simx-act
+simx-act: $(BUILD_DEPS)
+	mkdir -p $(BUILD)
+	APP_ROOT=`pwd` make -C $(SIMX_ACT_DIR)
+
+clean: simx-act-clean
+simx-act-clean:
+	rm -f $(BUILD)/simact.py
+
+FORCE:

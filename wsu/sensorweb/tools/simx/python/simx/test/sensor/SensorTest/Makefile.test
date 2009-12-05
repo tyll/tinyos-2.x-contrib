@@ -1,0 +1,10 @@
+test: app.xml run-nose
+
+app.xml: *.nc Makefile*
+	make -f Makefile.simx micaz sim
+
+run-nose: FORCE
+	nosetests
+
+FORCE:
+

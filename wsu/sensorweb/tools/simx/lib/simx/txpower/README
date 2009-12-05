@@ -1,0 +1,16 @@
+OVERVIEW:
+
+The SimX/TxPower module provides a way for motes to simulate changing
+transmission power. It must be wired up in the TOSSIM simulation
+environment to a topology manager.
+
+WARNING:
+
+Unlike with the standard TinyOS 2.x CC2420Packet interface which
+allows setting the power per packet, changing the power in
+SimX/TxPower forces the network topology and link-gain information to
+be recomputed for the effected nodes. As such, setting and retrieving
+the TxPower is a GLOBAL operation: care must be taken in the TinyOS
+code to ensure that the correct power level is really used during the
+actual transmission of a particular message. One method is to use a
+radio queue/proxy.

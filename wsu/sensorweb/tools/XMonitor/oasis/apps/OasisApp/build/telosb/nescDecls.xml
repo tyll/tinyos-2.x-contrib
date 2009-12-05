@@ -1,0 +1,3469 @@
+<?xml version='1.0' standalone='yes'?>
+<nescDecls>
+  <enums>
+    <enum name="__fdlibm_ieee" value="-1" />
+    <enum name="FALSE" value="I:0" />
+    <enum name="TRUE" value="I:1" />
+    <enum name="FAIL" value="I:0" />
+    <enum name="SUCCESS" value="I:1" />
+    <enum name="NULL" value="0x0" />
+    <enum name="MSP430ADC12_FAIL" value="I:0" />
+    <enum name="MSP430ADC12_SUCCESS" value="I:1" />
+    <enum name="MSP430ADC12_DELAYED" value="I:2" />
+    <enum name="REFVOLT_LEVEL_1_5" value="I:0" />
+    <enum name="REFVOLT_LEVEL_2_5" value="I:1" />
+    <enum name="SHT_CLOCK_DIV_1" value="I:0" />
+    <enum name="SHT_CLOCK_DIV_2" value="I:1" />
+    <enum name="SHT_CLOCK_DIV_3" value="I:2" />
+    <enum name="SHT_CLOCK_DIV_4" value="I:3" />
+    <enum name="SHT_CLOCK_DIV_5" value="I:4" />
+    <enum name="SHT_CLOCK_DIV_6" value="I:5" />
+    <enum name="SHT_CLOCK_DIV_7" value="I:6" />
+    <enum name="SHT_CLOCK_DIV_8" value="I:7" />
+    <enum name="SAMPCON_CLOCK_DIV_1" value="I:0" />
+    <enum name="SAMPCON_CLOCK_DIV_2" value="I:1" />
+    <enum name="SAMPCON_CLOCK_DIV_3" value="I:2" />
+    <enum name="SAMPCON_CLOCK_DIV_4" value="I:3" />
+    <enum name="SAMPCON_SOURCE_TACLK" value="I:0" />
+    <enum name="SAMPCON_SOURCE_ACLK" value="I:1" />
+    <enum name="SAMPCON_SOURCE_SMCLK" value="I:2" />
+    <enum name="SAMPCON_SOURCE_INCLK" value="I:3" />
+    <enum name="INPUT_CHANNEL_A0" value="I:0" />
+    <enum name="INPUT_CHANNEL_A1" value="I:1" />
+    <enum name="INPUT_CHANNEL_A2" value="I:2" />
+    <enum name="INPUT_CHANNEL_A3" value="I:3" />
+    <enum name="INPUT_CHANNEL_A4" value="I:4" />
+    <enum name="INPUT_CHANNEL_A5" value="I:5" />
+    <enum name="INPUT_CHANNEL_A6" value="I:6" />
+    <enum name="INPUT_CHANNEL_A7" value="I:7" />
+    <enum name="EXTERNAL_REFERENCE_VOLTAGE" value="I:8" />
+    <enum name="REFERENCE_VOLTAGE_NEGATIVE_TERMINAL" value="I:9" />
+    <enum name="INTERNAL_TEMPERATURE" value="I:10" />
+    <enum name="INTERNAL_VOLTAGE" value="I:11" />
+    <enum name="REFERENCE_AVcc_AVss" value="I:0" />
+    <enum name="REFERENCE_VREFplus_AVss" value="I:1" />
+    <enum name="REFERENCE_VeREFplus_AVss" value="I:2" />
+    <enum name="REFERENCE_AVcc_VREFnegterm" value="I:4" />
+    <enum name="REFERENCE_VREFplus_VREFnegterm" value="I:5" />
+    <enum name="REFERENCE_VeREFplus_VREFnegterm" value="I:6" />
+    <enum name="SHT_SOURCE_ADC12OSC" value="I:0" />
+    <enum name="SHT_SOURCE_ACLK" value="I:1" />
+    <enum name="SHT_SOURCE_MCLK" value="I:2" />
+    <enum name="SHT_SOURCE_SMCLK" value="I:3" />
+    <enum name="SAMPLE_HOLD_4_CYCLES" value="I:0" />
+    <enum name="SAMPLE_HOLD_8_CYCLES" value="I:1" />
+    <enum name="SAMPLE_HOLD_16_CYCLES" value="I:2" />
+    <enum name="SAMPLE_HOLD_32_CYCLES" value="I:3" />
+    <enum name="SAMPLE_HOLD_64_CYCLES" value="I:4" />
+    <enum name="SAMPLE_HOLD_96_CYCLES" value="I:5" />
+    <enum name="SAMPLE_HOLD_123_CYCLES" value="I:6" />
+    <enum name="SAMPLE_HOLD_192_CYCLES" value="I:7" />
+    <enum name="SAMPLE_HOLD_256_CYCLES" value="I:8" />
+    <enum name="SAMPLE_HOLD_384_CYCLES" value="I:9" />
+    <enum name="SAMPLE_HOLD_512_CYCLES" value="I:10" />
+    <enum name="SAMPLE_HOLD_768_CYCLES" value="I:11" />
+    <enum name="SAMPLE_HOLD_1024_CYCLES" value="I:12" />
+    <enum name="ADC_IDLE" value="I:0" />
+    <enum name="SINGLE_CHANNEL" value="I:1" />
+    <enum name="REPEAT_SINGLE_CHANNEL" value="I:2" />
+    <enum name="SEQUENCE_OF_CHANNELS" value="I:4" />
+    <enum name="REPEAT_SEQUENCE_OF_CHANNELS" value="I:8" />
+    <enum name="TIMER_USED" value="I:16" />
+    <enum name="RESERVED" value="I:32" />
+    <enum name="VREF_WAIT" value="I:64" />
+    <enum name="CC2420_TIME_BIT" value="I:4" />
+    <enum name="CC2420_TIME_BYTE" value="CC2420_TIME_BIT &lt;&lt; 3" />
+    <enum name="CC2420_TIME_SYMBOL" value="I:16" />
+    <enum name="CC2420_MIN_CHANNEL" value="I:11" />
+    <enum name="CC2420_MAX_CHANNEL" value="I:26" />
+    <enum name="CP_MAIN" value="I:0" />
+    <enum name="TOS_BCAST_ADDR" value="0xffff" />
+    <enum name="TOS_UART_ADDR" value="0x007e" />
+    <enum name="TOS_DEFAULT_AM_GROUP" value="0x7D" />
+    <enum name="MSG_HEADER_SIZE" value="(size_t )&amp; ((struct TOS_Msg *)0)-&gt;data - 1" />
+    <enum name="MSG_FOOTER_SIZE" value="I:2" />
+    <enum name="MSG_DATA_SIZE" value="(size_t )&amp; ((struct TOS_Msg *)0)-&gt;strength + sizeof(uint16_t )" />
+    <enum name="DATA_LENGTH" value="I:74" />
+    <enum name="LENGTH_BYTE_NUMBER" value="(size_t )&amp; ((struct TOS_Msg *)0)-&gt;length + 1" />
+    <enum name="DBG_ALL" value="~0ULL" />
+    <enum name="DBG_BOOT" value="1ULL &lt;&lt; 0" />
+    <enum name="DBG_CLOCK" value="1ULL &lt;&lt; 1" />
+    <enum name="DBG_TASK" value="1ULL &lt;&lt; 2" />
+    <enum name="DBG_SCHED" value="1ULL &lt;&lt; 3" />
+    <enum name="DBG_SENSOR" value="1ULL &lt;&lt; 4" />
+    <enum name="DBG_LED" value="1ULL &lt;&lt; 5" />
+    <enum name="DBG_CRYPTO" value="1ULL &lt;&lt; 6" />
+    <enum name="DBG_ROUTE" value="1ULL &lt;&lt; 7" />
+    <enum name="DBG_AM" value="1ULL &lt;&lt; 8" />
+    <enum name="DBG_CRC" value="1ULL &lt;&lt; 9" />
+    <enum name="DBG_PACKET" value="1ULL &lt;&lt; 10" />
+    <enum name="DBG_ENCODE" value="1ULL &lt;&lt; 11" />
+    <enum name="DBG_RADIO" value="1ULL &lt;&lt; 12" />
+    <enum name="DBG_LOG" value="1ULL &lt;&lt; 13" />
+    <enum name="DBG_ADC" value="1ULL &lt;&lt; 14" />
+    <enum name="DBG_I2C" value="1ULL &lt;&lt; 15" />
+    <enum name="DBG_UART" value="1ULL &lt;&lt; 16" />
+    <enum name="DBG_PROG" value="1ULL &lt;&lt; 17" />
+    <enum name="DBG_SOUNDER" value="1ULL &lt;&lt; 18" />
+    <enum name="DBG_TIME" value="1ULL &lt;&lt; 19" />
+    <enum name="DBG_POWER" value="1ULL &lt;&lt; 20" />
+    <enum name="DBG_SIM" value="1ULL &lt;&lt; 21" />
+    <enum name="DBG_QUEUE" value="1ULL &lt;&lt; 22" />
+    <enum name="DBG_SIMRADIO" value="1ULL &lt;&lt; 23" />
+    <enum name="DBG_HARD" value="1ULL &lt;&lt; 24" />
+    <enum name="DBG_MEM" value="1ULL &lt;&lt; 25" />
+    <enum name="DBG_USR1" value="1ULL &lt;&lt; 27" />
+    <enum name="DBG_USR2" value="1ULL &lt;&lt; 28" />
+    <enum name="DBG_USR3" value="1ULL &lt;&lt; 29" />
+    <enum name="DBG_TEMP" value="1ULL &lt;&lt; 30" />
+    <enum name="DBG_ERROR" value="1ULL &lt;&lt; 31" />
+    <enum name="DBG_NONE" value="I:0" />
+    <enum name="DBG_DEFAULT" value="DBG_ALL" />
+    <enum name="DBG_ERR" value="1ULL &lt;&lt; 63" />
+    <enum name="DBG_UTIL" value="1ULL &lt;&lt; 62" />
+    <enum name="DBG_NETWORKCOMM" value="1ULL &lt;&lt; 61" />
+    <enum name="DBG_GENERICCOMMPRO" value="1ULL &lt;&lt; 61" />
+    <enum name="DBG_ROUTEMANAGE" value="1ULL &lt;&lt; 60" />
+    <enum name="DBG_SINKCAST" value="1ULL &lt;&lt; 59" />
+    <enum name="DBG_BROADCAST" value="1ULL &lt;&lt; 58" />
+    <enum name="DBG_TRANSPORTRDT" value="1ULL &lt;&lt; 57" />
+    <enum name="DBG_CAS" value="1ULL &lt;&lt; 56" />
+    <enum name="DBG_TMAC" value="1ULL &lt;&lt; 55" />
+    <enum name="DBG_TOPO" value="1ULL &lt;&lt; 54" />
+    <enum name="DBG_SNMS" value="1ULL &lt;&lt; 53" />
+    <enum name="DBG_SENSING" value="1ULL &lt;&lt; 52" />
+    <enum name="DBG_MULTIHOPENGINE" value="1ULL &lt;&lt; 51" />
+    <enum name="DBG_RDT" value="1ULL &lt;&lt; 50" />
+    <enum name="DBG_NEIGHBORMGMT" value="1ULL &lt;&lt; 49" />
+    <enum name="DBG_WF" value="1ULL &lt;&lt; 48" />
+    <enum name="DBG_DV" value="1ULL &lt;&lt; 47" />
+    <enum name="DBG_TSYNC" value="1ULL &lt;&lt; 46" />
+    <enum name="DBG_APP" value="1ULL &lt;&lt; 32" />
+    <enum name="DBG_MIDWARE" value="1ULL &lt;&lt; 36" />
+    <enum name="TOSH_MAX_TASKS" value="1 &lt;&lt; 8" />
+    <enum name="TOSH_TASK_BITMASK" value="TOSH_MAX_TASKS - 1" />
+    <enum name="IDENT_MAX_PROGRAM_NAME_LENGTH" value="I:16" />
+    <enum name="AM_NETWORKMSG" value="I:129" />
+    <enum name="AM_ROUTEBEACONMSG" value="I:130" />
+    <enum name="AM_NEIGHBORBEACONMSG" value="I:131" />
+    <enum name="AM_CASCTRLMSG" value="I:132" />
+    <enum name="AM_CASCADESMSG" value="I:133" />
+    <enum name="NW_DATA" value="I:1" />
+    <enum name="NW_SNMS" value="I:2" />
+    <enum name="NW_RPCR" value="I:3" />
+    <enum name="NW_RPCC" value="I:4" />
+    <enum name="NW_RDTACK" value="I:5" />
+    <enum name="ADDR_SINK" value="0xfd" />
+    <enum name="ADDR_MCAST" value="0xfe" />
+    <enum name="ADDR_BCAST" value="0xff" />
+    <enum name="TYPE_DATA_SEISMIC" value="I:0" />
+    <enum name="TYPE_DATA_INFRASONIC" value="I:1" />
+    <enum name="TYPE_DATA_LIGHTNING" value="I:2" />
+    <enum name="TYPE_DATA_RSAM1" value="I:3" />
+    <enum name="TYPE_DATA_RVOL" value="I:4" />
+    <enum name="TYPE_DATA_TEMP" value="I:5" />
+    <enum name="TYPE_DATA_ACCELX" value="I:6" />
+    <enum name="TYPE_DATA_ACCELY" value="I:7" />
+    <enum name="TYPE_DATA_MAGX" value="I:8" />
+    <enum name="TYPE_DATA_MAGY" value="I:9" />
+    <enum name="TYPE_DATA_MIC" value="I:10" />
+    <enum name="TYPE_DATA_RSAM2" value="I:17" />
+    <enum name="TYPE_DATA_COMPRESS" value="I:18" />
+    <enum name="TYPE_DATA_TREMOR" value="I:19" />
+    <enum name="TYPE_DATA_GPS" value="I:28" />
+    <enum name="TYPE_SNMS_EVENT" value="I:11" />
+    <enum name="TYPE_SNMS_RPCCOMMAND" value="I:12" />
+    <enum name="TYPE_SNMS_RPCRESPONSE" value="I:13" />
+    <enum name="TYPE_SNMS_CODE" value="I:14" />
+    <enum name="EVENT_TYPE_ALL" value="I:0" />
+    <enum name="EVENT_TYPE_SNMS" value="I:1" />
+    <enum name="EVENT_TYPE_SENSING" value="I:2" />
+    <enum name="EVENT_TYPE_MIDDLEWARE" value="I:3" />
+    <enum name="EVENT_TYPE_ROUTING" value="I:4" />
+    <enum name="EVENT_TYPE_MAC" value="I:5" />
+    <enum name="EVENT_TYPE_VALUE_MIN" value="I:0" />
+    <enum name="EVENT_TYPE_VALUE_MAX" value="I:5" />
+    <enum name="EVENT_LEVEL_URGENT" value="I:0" />
+    <enum name="EVENT_LEVEL_HIGH" value="I:1" />
+    <enum name="EVENT_LEVEL_MEDIUM" value="I:2" />
+    <enum name="EVENT_LEVEL_LOW" value="I:3" />
+    <enum name="EVENT_LEVEL_VALUE_MIN" value="I:0" />
+    <enum name="EVENT_LEVEL_VALUE_MAX" value="I:3" />
+    <enum name="BUFFER_FAIL" value="I:2" />
+    <enum name="FILTER_FAIL" value="I:3" />
+    <enum name="AM_BEACONMSG" value="I:250" />
+    <enum name="MSP430TIMER_CM_NONE" value="I:0" />
+    <enum name="MSP430TIMER_CM_RISING" value="I:1" />
+    <enum name="MSP430TIMER_CM_FALLING" value="I:2" />
+    <enum name="MSP430TIMER_CM_BOTH" value="I:3" />
+    <enum name="MSP430TIMER_STOP_MODE" value="I:0" />
+    <enum name="MSP430TIMER_UP_MODE" value="I:1" />
+    <enum name="MSP430TIMER_CONTINUOUS_MODE" value="I:2" />
+    <enum name="MSP430TIMER_UPDOWN_MODE" value="I:3" />
+    <enum name="MSP430TIMER_TACLK" value="I:0" />
+    <enum name="MSP430TIMER_TBCLK" value="I:0" />
+    <enum name="MSP430TIMER_ACLK" value="I:1" />
+    <enum name="MSP430TIMER_SMCLK" value="I:2" />
+    <enum name="MSP430TIMER_INCLK" value="I:3" />
+    <enum name="MSP430TIMER_CLOCKDIV_1" value="I:0" />
+    <enum name="MSP430TIMER_CLOCKDIV_2" value="I:1" />
+    <enum name="MSP430TIMER_CLOCKDIV_4" value="I:2" />
+    <enum name="MSP430TIMER_CLOCKDIV_8" value="I:3" />
+    <enum name="AM_RPCCOMMANDMSG" value="I:211" />
+    <enum name="AM_RPCRESPONSEMSG" value="I:212" />
+    <enum name="RPC_SUCCESS" value="I:0" />
+    <enum name="RPC_GARBAGE_ARGS" value="I:1" />
+    <enum name="RPC_RESPONSE_TOO_LARGE" value="I:2" />
+    <enum name="RPC_PROCEDURE_UNAVAIL" value="I:3" />
+    <enum name="RPC_SYSTEM_ERR" value="I:4" />
+    <enum name="RPC_WRONG_XML_FILE" value="I:5" />
+    <enum name="MAX_BUFFER_SIZE" value="I:56" />
+    <enum name="MEM_QUEUE_SIZE" value="I:20" />
+    <enum name="NUM_STATUS" value="I:6" />
+    <enum name="FREEMEM" value="I:0" />
+    <enum name="FILLING" value="I:1" />
+    <enum name="FILLED" value="I:2" />
+    <enum name="MEMPROCESSING" value="I:3" />
+    <enum name="MEMPENDING" value="I:4" />
+    <enum name="MEMCOMPRESSING" value="I:5" />
+    <enum name="SEISMIC_RATE" value="I:50" />
+    <enum name="INFRASONIC_RATE" value="I:50" />
+    <enum name="LIGHTNING_RATE" value="I:1" />
+    <enum name="RVOL_RATE" value="I:1" />
+    <enum name="SEISMIC_DATA_PRIORITY" value="0x2" />
+    <enum name="INFRASONIC_DATA_PRIORITY" value="0x1" />
+    <enum name="LIGHTNING_DATA_PRIORITY" value="0x6" />
+    <enum name="RVOL_DATA_PRIORITY" value="0x1" />
+    <enum name="GPS_DATA_PRIORITY" value="0x3" />
+    <enum name="RSAM1_DATA_PRIORITY" value="0x7" />
+    <enum name="RSAM2_DATA_PRIORITY" value="0x6" />
+    <enum name="MAX_SENSOR_NUM" value="I:16" />
+    <enum name="MAX_SAMPLING_RATE" value="1000UL" />
+    <enum name="MAX_DATA_WIDTH" value="I:2" />
+    <enum name="MAX_SENSING_QUEUE_SIZE" value="I:4" />
+    <enum name="MAX_RSAM_WIN_SIZE" value="I:60" />
+    <enum name="MAX_STA_PERIOD" value="I:2" />
+    <enum name="MAX_LTA_PERIOD" value="I:30" />
+    <enum name="TASK_MASK" value="0x000f" />
+    <enum name="TASK_CODE_SIZE" value="I:4" />
+    <enum name="TSTAMPOFFSET" value="I:4" />
+    <enum name="ONE_MS" value="1000UL" />
+    <enum name="BATCH_TIMER_INTERVAL" value="500UL" />
+    <enum name="VOL_TIMER_INTERVAL" value="60000UL" />
+    <enum name="GPS_CLIENT_ID" value="I:0" />
+    <enum name="RSAM1_CLIENT_ID" value="I:1" />
+    <enum name="RSAM2_CLIENT_ID" value="I:2" />
+    <enum name="COMPRESS_CLIENT_ID" value="I:7" />
+    <enum name="GPS_BLK_NUM" value="I:0" />
+    <enum name="RSAM_BLK_NUM" value="I:2" />
+    <enum name="BLANK" value="0x2fff" />
+    <enum name="WRITTEN" value="0x4fff" />
+    <enum name="IDLE" value="0xffff" />
+    <enum name="BASE_ADDR" value="0x220000" />
+    <enum name="TOS_ADC_PAR_PORT" value="0U" />
+    <enum name="TOSH_ACTUAL_ADC_PAR_PORT" value="(((REFVOLT_LEVEL_1_5 &lt;&lt; 3) + REFERENCE_VREFplus_AVss) &lt;&lt; 4) + INPUT_CHANNEL_A4" />
+    <enum name="TOS_ADC_TSR_PORT" value="1U" />
+    <enum name="TOSH_ACTUAL_ADC_TSR_PORT" value="(((REFVOLT_LEVEL_1_5 &lt;&lt; 3) + REFERENCE_VREFplus_AVss) &lt;&lt; 4) + INPUT_CHANNEL_A5" />
+    <enum name="TOS_ADC_INTERNAL_TEMP_PORT" value="2U" />
+    <enum name="TOSH_ACTUAL_ADC_INTERNAL_TEMPERATURE_PORT" value="(((REFVOLT_LEVEL_1_5 &lt;&lt; 3) + REFERENCE_VREFplus_AVss) &lt;&lt; 4) + INTERNAL_TEMPERATURE" />
+    <enum name="TOS_ADC_INTERNAL_VOLTAGE_PORT" value="3U" />
+    <enum name="TOSH_ACTUAL_ADC_INTERNAL_VOLTAGE_PORT" value="(((REFVOLT_LEVEL_1_5 &lt;&lt; 3) + REFERENCE_VREFplus_AVss) &lt;&lt; 4) + INTERNAL_VOLTAGE" />
+    <enum name="TOS_ADC_CHANNEL_A0_PORT" value="4U" />
+    <enum name="TOSH_ACTUAL_ADC_CHANNEL_A0_PORT" value="(((REFVOLT_LEVEL_1_5 &lt;&lt; 3) + REFERENCE_VREFplus_AVss) &lt;&lt; 4) + INPUT_CHANNEL_A0" />
+    <enum name="TOS_ADC_CHANNEL_A1_PORT" value="5U" />
+    <enum name="TOSH_ACTUAL_ADC_CHANNEL_A1_PORT" value="(((REFVOLT_LEVEL_1_5 &lt;&lt; 3) + REFERENCE_VREFplus_AVss) &lt;&lt; 4) + INPUT_CHANNEL_A1" />
+    <enum name="TOS_ADC_CHANNEL_A4_PORT" value="6U" />
+    <enum name="TOSH_ACTUAL_ADC_CHANNEL_A4_PORT" value="(((REFVOLT_LEVEL_1_5 &lt;&lt; 3) + REFERENCE_VREFplus_AVss) &lt;&lt; 4) + INPUT_CHANNEL_A4" />
+    <enum name="TOS_ADC_CHANNEL_A6_PORT" value="7U" />
+    <enum name="TOSH_ACTUAL_ADC_CHANNEL_A6_PORT" value="(((REFVOLT_LEVEL_1_5 &lt;&lt; 3) + REFERENCE_VREFplus_AVss) &lt;&lt; 4) + INPUT_CHANNEL_A6" />
+    <enum name="TOS_ADCSample3750ns" value="I:0" />
+    <enum name="TOS_ADCSample7500ns" value="I:1" />
+    <enum name="TOS_ADCSample15us" value="I:2" />
+    <enum name="TOS_ADCSample30us" value="I:3" />
+    <enum name="TOS_ADCSample60us" value="I:4" />
+    <enum name="TOS_ADCSample120us" value="I:5" />
+    <enum name="TOS_ADCSample240us" value="I:6" />
+    <enum name="TOS_ADCSample480us" value="I:7" />
+    <enum name="TIMER_REPEAT" value="I:0" />
+    <enum name="TIMER_ONE_SHOT" value="I:1" />
+    <enum name="NUM_TIMERS" value="12U" />
+    <enum name="MAX_NUM_CLIENT" value="I:12" />
+    <enum name="GPS_SYNC" value="I:0" />
+    <enum name="FTSP_SYNC" value="I:1" />
+    <enum name="UC_FIRE_INTERVAL" value="1000UL" />
+    <enum name="DAY_END" value="86400000UL" />
+    <enum name="HOUR_END" value="3600000UL" />
+    <enum name="DEFAULT_SYNC_MODE" value="I:1" />
+    <enum name="AM_TIMESYNCMSG" value="0xAA" />
+    <enum name="TIMESYNCMSG_LEN" value="sizeof(TimeSyncMsg ) - sizeof(uint32_t )" />
+    <enum name="TS_TIMER_MODE" value="I:0" />
+    <enum name="TS_USER_MODE" value="I:1" />
+    <enum name="TIMESYNC_LENGTH_SENDFIELDS" value="I:5" />
+    <enum name="MAX_QUEUE_SIZE" value="I:5" />
+    <enum name="NUM_OBJSTATUS" value="I:3" />
+    <enum name="FREE" value="I:0" />
+    <enum name="PENDING" value="I:1" />
+    <enum name="PROCESSING" value="I:2" />
+    <enum name="FREEBUF" value="PENDING" />
+    <enum name="BUSYBUF" value="PROCESSING" />
+    <enum name="QOS_LEVEL" value="I:7" />
+    <enum name="COMM_SEND_QUEUE_SIZE" value="I:5" />
+    <enum name="COMM_RECV_QUEUE_SIZE" value="I:5" />
+    <enum name="RADIO" value="I:1" />
+    <enum name="UART" value="I:2" />
+    <enum name="COMM_WDT_UPDATE_PERIOD" value="I:10" />
+    <enum name="COMM_WDT_UPDATE_UNIT" value="1024 * 60" />
+    <enum name="USART_NONE" value="I:0" />
+    <enum name="USART_UART" value="I:1" />
+    <enum name="USART_UART_TX" value="I:2" />
+    <enum name="USART_UART_RX" value="I:3" />
+    <enum name="USART_SPI" value="I:4" />
+    <enum name="USART_I2C" value="I:5" />
+    <enum name="UBR_ACLK_1200" value="0x001B" />
+    <enum name="UMCTL_ACLK_1200" value="0x94" />
+    <enum name="UBR_ACLK_1800" value="0x0012" />
+    <enum name="UMCTL_ACLK_1800" value="0x84" />
+    <enum name="UBR_ACLK_2400" value="0x000D" />
+    <enum name="UMCTL_ACLK_2400" value="0x6D" />
+    <enum name="UBR_ACLK_4800" value="0x0006" />
+    <enum name="UMCTL_ACLK_4800" value="0x77" />
+    <enum name="UBR_ACLK_9600" value="0x0003" />
+    <enum name="UMCTL_ACLK_9600" value="0x29" />
+    <enum name="UBR_SMCLK_1200" value="0x0369" />
+    <enum name="UMCTL_SMCLK_1200" value="0x7B" />
+    <enum name="UBR_SMCLK_1800" value="0x0246" />
+    <enum name="UMCTL_SMCLK_1800" value="0x55" />
+    <enum name="UBR_SMCLK_2400" value="0x01B4" />
+    <enum name="UMCTL_SMCLK_2400" value="0xDF" />
+    <enum name="UBR_SMCLK_4800" value="0x00DA" />
+    <enum name="UMCTL_SMCLK_4800" value="0xAA" />
+    <enum name="UBR_SMCLK_9600" value="0x006D" />
+    <enum name="UMCTL_SMCLK_9600" value="0x44" />
+    <enum name="UBR_SMCLK_19200" value="0x0036" />
+    <enum name="UMCTL_SMCLK_19200" value="0xB5" />
+    <enum name="UBR_SMCLK_38400" value="0x001B" />
+    <enum name="UMCTL_SMCLK_38400" value="0x94" />
+    <enum name="UBR_SMCLK_57600" value="0x0012" />
+    <enum name="UMCTL_SMCLK_57600" value="0x84" />
+    <enum name="UBR_SMCLK_76800" value="0x000D" />
+    <enum name="UMCTL_SMCLK_76800" value="0x6D" />
+    <enum name="UBR_SMCLK_115200" value="0x0009" />
+    <enum name="UMCTL_SMCLK_115200" value="0x10" />
+    <enum name="UBR_SMCLK_230400" value="0x0004" />
+    <enum name="UMCTL_SMCLK_230400" value="0x55" />
+    <enum name="UBR_SMCLK_262144" value="I:4" />
+    <enum name="UMCTL_SMCLK_262144" value="I:0" />
+    <enum name="AM_RAMSYMBOL_T" value="I:134" />
+    <enum name="ADC_SUCCESS" value="I:0" />
+    <enum name="ADC_FAIL" value="I:1" />
+    <enum name="MAX_CAS_BUF" value="I:1" />
+    <enum name="DEFAULT_DTCOUNT" value="I:4" />
+    <enum name="MAX_CAS_RETRY_COUNT" value="I:6" />
+    <enum name="MAX_CAS_PACKETS" value="I:64" />
+    <enum name="CAS_SEND_QUEUE_SIZE" value="I:3" />
+    <enum name="INVALID_INDEX" value="I:100" />
+    <enum name="MIN_INTERVAL" value="I:50" />
+    <enum name="MAX_NUM_CHILDREN" value="I:16" />
+    <enum name="TYPE_CASCADES_NODATA" value="I:17" />
+    <enum name="TYPE_CASCADES_ACK" value="I:18" />
+    <enum name="TYPE_CASCADES_REQ" value="I:19" />
+    <enum name="TYPE_CASCADES_CMAU" value="I:20" />
+    <enum name="NBRFLAG_VALID" value="0x01" />
+    <enum name="NBRFLAG_NEW" value="0x02" />
+    <enum name="NBRFLAG_JUST_UPDATED" value="0x04" />
+    <enum name="NBR_DIRECT_CHILD" value="0x01" />
+    <enum name="NBR_CHILD" value="0x02" />
+    <enum name="NBR_PARENT" value="0x04" />
+    <enum name="NBR_NEIGHBOR" value="0x08" />
+    <enum name="LIVELINESS" value="I:8" />
+    <enum name="CHILD_LIVELINESS" value="I:8" />
+    <enum name="ROUTE_INVALID" value="0xff" />
+    <enum name="ADDRESS_INVALID" value="0xffff" />
+    <namedEnum name="__fdlibm_version">
+      <enum name="__fdlibm_ieee" value="-1" />
+    </namedEnum>
+    <namedEnum name="refVolt2_5_enum">
+      <enum name="REFVOLT_LEVEL_1_5" value="I:0" />
+      <enum name="REFVOLT_LEVEL_2_5" value="I:1" />
+    </namedEnum>
+    <namedEnum name="clockDivSHT_enum">
+      <enum name="SHT_CLOCK_DIV_1" value="I:0" />
+      <enum name="SHT_CLOCK_DIV_2" value="I:1" />
+      <enum name="SHT_CLOCK_DIV_3" value="I:2" />
+      <enum name="SHT_CLOCK_DIV_4" value="I:3" />
+      <enum name="SHT_CLOCK_DIV_5" value="I:4" />
+      <enum name="SHT_CLOCK_DIV_6" value="I:5" />
+      <enum name="SHT_CLOCK_DIV_7" value="I:6" />
+      <enum name="SHT_CLOCK_DIV_8" value="I:7" />
+    </namedEnum>
+    <namedEnum name="clockDivSAMPCON_enum">
+      <enum name="SAMPCON_CLOCK_DIV_1" value="I:0" />
+      <enum name="SAMPCON_CLOCK_DIV_2" value="I:1" />
+      <enum name="SAMPCON_CLOCK_DIV_3" value="I:2" />
+      <enum name="SAMPCON_CLOCK_DIV_4" value="I:3" />
+    </namedEnum>
+    <namedEnum name="clockSourceSAMPCON_enum">
+      <enum name="SAMPCON_SOURCE_TACLK" value="I:0" />
+      <enum name="SAMPCON_SOURCE_ACLK" value="I:1" />
+      <enum name="SAMPCON_SOURCE_SMCLK" value="I:2" />
+      <enum name="SAMPCON_SOURCE_INCLK" value="I:3" />
+    </namedEnum>
+    <namedEnum name="inputChannel_enum">
+      <enum name="INPUT_CHANNEL_A0" value="I:0" />
+      <enum name="INPUT_CHANNEL_A1" value="I:1" />
+      <enum name="INPUT_CHANNEL_A2" value="I:2" />
+      <enum name="INPUT_CHANNEL_A3" value="I:3" />
+      <enum name="INPUT_CHANNEL_A4" value="I:4" />
+      <enum name="INPUT_CHANNEL_A5" value="I:5" />
+      <enum name="INPUT_CHANNEL_A6" value="I:6" />
+      <enum name="INPUT_CHANNEL_A7" value="I:7" />
+      <enum name="EXTERNAL_REFERENCE_VOLTAGE" value="I:8" />
+      <enum name="REFERENCE_VOLTAGE_NEGATIVE_TERMINAL" value="I:9" />
+      <enum name="INTERNAL_TEMPERATURE" value="I:10" />
+      <enum name="INTERNAL_VOLTAGE" value="I:11" />
+    </namedEnum>
+    <namedEnum name="referenceVoltage_enum">
+      <enum name="REFERENCE_AVcc_AVss" value="I:0" />
+      <enum name="REFERENCE_VREFplus_AVss" value="I:1" />
+      <enum name="REFERENCE_VeREFplus_AVss" value="I:2" />
+      <enum name="REFERENCE_AVcc_VREFnegterm" value="I:4" />
+      <enum name="REFERENCE_VREFplus_VREFnegterm" value="I:5" />
+      <enum name="REFERENCE_VeREFplus_VREFnegterm" value="I:6" />
+    </namedEnum>
+    <namedEnum name="clockSourceSHT_enum">
+      <enum name="SHT_SOURCE_ADC12OSC" value="I:0" />
+      <enum name="SHT_SOURCE_ACLK" value="I:1" />
+      <enum name="SHT_SOURCE_MCLK" value="I:2" />
+      <enum name="SHT_SOURCE_SMCLK" value="I:3" />
+    </namedEnum>
+    <namedEnum name="sampleHold_enum">
+      <enum name="SAMPLE_HOLD_4_CYCLES" value="I:0" />
+      <enum name="SAMPLE_HOLD_8_CYCLES" value="I:1" />
+      <enum name="SAMPLE_HOLD_16_CYCLES" value="I:2" />
+      <enum name="SAMPLE_HOLD_32_CYCLES" value="I:3" />
+      <enum name="SAMPLE_HOLD_64_CYCLES" value="I:4" />
+      <enum name="SAMPLE_HOLD_96_CYCLES" value="I:5" />
+      <enum name="SAMPLE_HOLD_123_CYCLES" value="I:6" />
+      <enum name="SAMPLE_HOLD_192_CYCLES" value="I:7" />
+      <enum name="SAMPLE_HOLD_256_CYCLES" value="I:8" />
+      <enum name="SAMPLE_HOLD_384_CYCLES" value="I:9" />
+      <enum name="SAMPLE_HOLD_512_CYCLES" value="I:10" />
+      <enum name="SAMPLE_HOLD_768_CYCLES" value="I:11" />
+      <enum name="SAMPLE_HOLD_1024_CYCLES" value="I:12" />
+    </namedEnum>
+    <namedEnum name="TosType">
+      <enum name="AM_NETWORKMSG" value="I:129" />
+      <enum name="AM_ROUTEBEACONMSG" value="I:130" />
+      <enum name="AM_NEIGHBORBEACONMSG" value="I:131" />
+      <enum name="AM_CASCTRLMSG" value="I:132" />
+      <enum name="AM_CASCADESMSG" value="I:133" />
+    </namedEnum>
+    <namedEnum name="NetType">
+      <enum name="NW_DATA" value="I:1" />
+      <enum name="NW_SNMS" value="I:2" />
+      <enum name="NW_RPCR" value="I:3" />
+      <enum name="NW_RPCC" value="I:4" />
+      <enum name="NW_RDTACK" value="I:5" />
+    </namedEnum>
+    <namedEnum name="AppType">
+      <enum name="TYPE_DATA_SEISMIC" value="I:0" />
+      <enum name="TYPE_DATA_INFRASONIC" value="I:1" />
+      <enum name="TYPE_DATA_LIGHTNING" value="I:2" />
+      <enum name="TYPE_DATA_RSAM1" value="I:3" />
+      <enum name="TYPE_DATA_RVOL" value="I:4" />
+      <enum name="TYPE_DATA_TEMP" value="I:5" />
+      <enum name="TYPE_DATA_ACCELX" value="I:6" />
+      <enum name="TYPE_DATA_ACCELY" value="I:7" />
+      <enum name="TYPE_DATA_MAGX" value="I:8" />
+      <enum name="TYPE_DATA_MAGY" value="I:9" />
+      <enum name="TYPE_DATA_MIC" value="I:10" />
+      <enum name="TYPE_DATA_RSAM2" value="I:17" />
+      <enum name="TYPE_DATA_COMPRESS" value="I:18" />
+      <enum name="TYPE_DATA_TREMOR" value="I:19" />
+      <enum name="TYPE_DATA_GPS" value="I:28" />
+      <enum name="TYPE_SNMS_EVENT" value="I:11" />
+      <enum name="TYPE_SNMS_RPCCOMMAND" value="I:12" />
+      <enum name="TYPE_SNMS_RPCRESPONSE" value="I:13" />
+      <enum name="TYPE_SNMS_CODE" value="I:14" />
+    </namedEnum>
+    <namedEnum name="EventType">
+      <enum name="EVENT_TYPE_ALL" value="I:0" />
+      <enum name="EVENT_TYPE_SNMS" value="I:1" />
+      <enum name="EVENT_TYPE_SENSING" value="I:2" />
+      <enum name="EVENT_TYPE_MIDDLEWARE" value="I:3" />
+      <enum name="EVENT_TYPE_ROUTING" value="I:4" />
+      <enum name="EVENT_TYPE_MAC" value="I:5" />
+    </namedEnum>
+    <namedEnum name="TypeRange">
+      <enum name="EVENT_TYPE_VALUE_MIN" value="I:0" />
+      <enum name="EVENT_TYPE_VALUE_MAX" value="I:5" />
+    </namedEnum>
+    <namedEnum name="EventLevel">
+      <enum name="EVENT_LEVEL_URGENT" value="I:0" />
+      <enum name="EVENT_LEVEL_HIGH" value="I:1" />
+      <enum name="EVENT_LEVEL_MEDIUM" value="I:2" />
+      <enum name="EVENT_LEVEL_LOW" value="I:3" />
+    </namedEnum>
+    <namedEnum name="LevelRange">
+      <enum name="EVENT_LEVEL_VALUE_MIN" value="I:0" />
+      <enum name="EVENT_LEVEL_VALUE_MAX" value="I:3" />
+    </namedEnum>
+    <namedEnum name="EventSendFailType">
+      <enum name="BUFFER_FAIL" value="I:2" />
+      <enum name="FILTER_FAIL" value="I:3" />
+    </namedEnum>
+    <namedEnum name="rpcMsgs">
+      <enum name="AM_RPCCOMMANDMSG" value="I:211" />
+      <enum name="AM_RPCRESPONSEMSG" value="I:212" />
+    </namedEnum>
+    <namedEnum name="rpcErrorCodes">
+      <enum name="RPC_SUCCESS" value="I:0" />
+      <enum name="RPC_GARBAGE_ARGS" value="I:1" />
+      <enum name="RPC_RESPONSE_TOO_LARGE" value="I:2" />
+      <enum name="RPC_PROCEDURE_UNAVAIL" value="I:3" />
+      <enum name="RPC_SYSTEM_ERR" value="I:4" />
+      <enum name="RPC_WRONG_XML_FILE" value="I:5" />
+    </namedEnum>
+    <namedEnum name="SamplingRate">
+      <enum name="SEISMIC_RATE" value="I:50" />
+      <enum name="INFRASONIC_RATE" value="I:50" />
+      <enum name="LIGHTNING_RATE" value="I:1" />
+      <enum name="RVOL_RATE" value="I:1" />
+    </namedEnum>
+    <namedEnum name="SamplingPriority">
+      <enum name="SEISMIC_DATA_PRIORITY" value="0x2" />
+      <enum name="INFRASONIC_DATA_PRIORITY" value="0x1" />
+      <enum name="LIGHTNING_DATA_PRIORITY" value="0x6" />
+      <enum name="RVOL_DATA_PRIORITY" value="0x1" />
+      <enum name="GPS_DATA_PRIORITY" value="0x3" />
+      <enum name="RSAM1_DATA_PRIORITY" value="0x7" />
+      <enum name="RSAM2_DATA_PRIORITY" value="0x6" />
+    </namedEnum>
+    <namedEnum name="SensorConfig">
+      <enum name="MAX_SENSOR_NUM" value="I:16" />
+      <enum name="MAX_SAMPLING_RATE" value="1000UL" />
+      <enum name="MAX_DATA_WIDTH" value="I:2" />
+      <enum name="MAX_SENSING_QUEUE_SIZE" value="I:4" />
+      <enum name="MAX_RSAM_WIN_SIZE" value="I:60" />
+      <enum name="MAX_STA_PERIOD" value="I:2" />
+      <enum name="MAX_LTA_PERIOD" value="I:30" />
+      <enum name="TASK_MASK" value="0x000f" />
+      <enum name="TASK_CODE_SIZE" value="I:4" />
+      <enum name="TSTAMPOFFSET" value="I:4" />
+      <enum name="ONE_MS" value="1000UL" />
+      <enum name="BATCH_TIMER_INTERVAL" value="500UL" />
+      <enum name="VOL_TIMER_INTERVAL" value="60000UL" />
+    </namedEnum>
+    <namedEnum name="Special_Sensor">
+      <enum name="GPS_CLIENT_ID" value="I:0" />
+      <enum name="RSAM1_CLIENT_ID" value="I:1" />
+      <enum name="RSAM2_CLIENT_ID" value="I:2" />
+      <enum name="COMPRESS_CLIENT_ID" value="I:7" />
+      <enum name="GPS_BLK_NUM" value="I:0" />
+      <enum name="RSAM_BLK_NUM" value="I:2" />
+    </namedEnum>
+    <namedEnum name="sensing_flash">
+      <enum name="BLANK" value="0x2fff" />
+      <enum name="WRITTEN" value="0x4fff" />
+      <enum name="IDLE" value="0xffff" />
+      <enum name="BASE_ADDR" value="0x220000" />
+    </namedEnum>
+    <namedEnum name="CascadesEnum">
+      <enum name="MAX_CAS_BUF" value="I:1" />
+      <enum name="DEFAULT_DTCOUNT" value="I:4" />
+      <enum name="MAX_CAS_RETRY_COUNT" value="I:6" />
+      <enum name="MAX_CAS_PACKETS" value="I:64" />
+      <enum name="CAS_SEND_QUEUE_SIZE" value="I:3" />
+      <enum name="INVALID_INDEX" value="I:100" />
+      <enum name="MIN_INTERVAL" value="I:50" />
+      <enum name="MAX_NUM_CHILDREN" value="I:16" />
+    </namedEnum>
+    <namedEnum name="CascadesType">
+      <enum name="TYPE_CASCADES_NODATA" value="I:17" />
+      <enum name="TYPE_CASCADES_ACK" value="I:18" />
+      <enum name="TYPE_CASCADES_REQ" value="I:19" />
+      <enum name="TYPE_CASCADES_CMAU" value="I:20" />
+    </namedEnum>
+    <namedEnum name="relation">
+      <enum name="NBR_DIRECT_CHILD" value="0x01" />
+      <enum name="NBR_CHILD" value="0x02" />
+      <enum name="NBR_PARENT" value="0x04" />
+      <enum name="NBR_NEIGHBOR" value="0x08" />
+    </namedEnum>
+  </enums>
+  <ramSymbols>
+    <ramSymbol address="4362" length="4" name="RealTimeM.timerCount">
+      <type typeClass="unknown" typeDecl="uint32_t" typeName="uint32_t" />
+    </ramSymbol>
+    <ramSymbol address="4366" length="4" name="RealTimeM.uc_fire_point">
+      <type typeClass="unknown" typeDecl="uint32_t" typeName="uint32_t" />
+    </ramSymbol>
+    <ramSymbol address="4370" length="2" name="SmartSensingM.timerInterval">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="4372" length="90" name="CascadesRouterM.RecvDataMsg">
+      <type typeClass="unknown" typeDecl="TOS_Msg" typeName="TOS_Msg" />
+    </ramSymbol>
+    <ramSymbol address="4462" length="2" name="FramerM.gTxRunningCRC">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="4464" array="true" length="360" name="DataMgmtM.buffMsg">
+      <type typeClass="unknown" typeDecl="TOS_Msg" typeName="TOS_Msg" />
+    </ramSymbol>
+    <ramSymbol address="4824" array="true" length="180" name="FramerM.gMsgRcvBuf">
+      <type typeClass="unknown" typeDecl="TOS_Msg" typeName="TOS_Msg" />
+    </ramSymbol>
+    <ramSymbol address="5004" length="1" name="CC2420RadioM.txlength">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="4358" length="1" name="sensor_num">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="5006" length="90" name="CascadesRouterM.SendCtrlMsg">
+      <type typeClass="unknown" typeDecl="TOS_Msg" typeName="TOS_Msg" />
+    </ramSymbol>
+    <ramSymbol address="5096" length="2" name="MSP430DCOCalibM.m_prev">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="5098" length="2" name="FramerM.gpTxMsg">
+      <type typeClass="unknown" typeDecl="TOS_MsgPtr" typeName="TOS_MsgPtr" />
+    </ramSymbol>
+    <ramSymbol address="5100" length="2" name="FramerM.gTxProto">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="5102" length="1" name="RealTimeM.queue_size">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="5104" array="true" length="112" name="TimerM.m_timers">
+      <type typeClass="unknown" typeDecl="TimerM" typeName="TimerM" />
+    </ramSymbol>
+    <ramSymbol address="5216" length="1" name="CascadesRouterM.ctrlMsgBusy">
+      <type typeClass="unknown" typeDecl="bool" typeName="bool" />
+    </ramSymbol>
+    <ramSymbol address="5218" array="true" length="20" name="MultiHopLQI.gRecentOriginPacketSender">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="5238" length="2" name="SmartSensingM.sensingCurBlk">
+      <type typeClass="unknown" typeDecl="SenBlkPtr" typeName="SenBlkPtr" />
+    </ramSymbol>
+    <ramSymbol address="5240" length="1" name="CascadesRouterM.sigRcvTaskBusy">
+      <type typeClass="unknown" typeDecl="bool" typeName="bool" />
+    </ramSymbol>
+    <ramSymbol address="5242" length="2" name="TimeSyncM.heartBeats">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="5244" length="1" name="CC2420RadioM.countRetry">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="5245" length="1" name="ADCM.initialized">
+      <type typeClass="unknown" typeDecl="bool" typeName="bool" />
+    </ramSymbol>
+    <ramSymbol address="5246" length="2" name="MultiHopLQI.gCurrentSeqNo">
+      <type typeClass="unknown" typeDecl="int16_t" typeName="int16_t" />
+    </ramSymbol>
+    <ramSymbol address="5248" length="1" name="MultiHopLQI.gLastHeard">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="5250" length="2" name="DataMgmtM.send_num">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="5252" length="2" name="HPLCC2420M.rxbuf">
+      <type typeClass="pointer" typeDecl="uint8_t*" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="5254" length="1" name="HPLUSART1M.l_ssel">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="5255" length="1" name="CascadesRouterM.activeRT">
+      <type typeClass="unknown" typeDecl="bool" typeName="bool" />
+    </ramSymbol>
+    <ramSymbol address="5256" length="1" name="FramerM.gTxUnknownBuf">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="5257" length="1" name="ADCM.owner">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="5258" length="1" name="HPLCC2420M.ramlen">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="5260" length="2" name="DataMgmtM.processloopCount">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="5262" length="1" name="MultiHopEngineM.beParentActive">
+      <type typeClass="unknown" typeDecl="bool" typeName="bool" />
+    </ramSymbol>
+    <ramSymbol address="5264" length="2" name="FramerM.gTxLength">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="5266" length="1" name="DataMgmtM.sysCheckCount">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="5268" length="4" name="ClockTimeStampingM.rcv_time">
+      <type typeClass="unknown" typeDecl="uint32_t" typeName="uint32_t" />
+    </ramSymbol>
+    <ramSymbol address="5272" length="2" name="TimeSyncM.tableEntries">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="5274" length="2" name="CascadesRouterM.expectingSeq">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="5276" length="1" name="NeighborMgmtM.processTaskBusy">
+      <type typeClass="unknown" typeDecl="bool" typeName="bool" />
+    </ramSymbol>
+    <ramSymbol address="5278" length="2" name="MultiHopEngineM.falseType">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="5280" length="2" name="RandomLFSR.mask">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="5282" length="2" name="DataMgmtM.sendCalled">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="5284" length="1" name="EventReportM.taskBusy">
+      <type typeClass="unknown" typeDecl="bool" typeName="bool" />
+    </ramSymbol>
+    <ramSymbol address="5285" length="1" name="GenericCommProM.recvTaskBusy">
+      <type typeClass="unknown" typeDecl="bool" typeName="bool" />
+    </ramSymbol>
+    <ramSymbol address="5286" length="1" name="CC2420RadioM.stateTimer">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="5288" length="2" name="CascadesRouterM.RTwait">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="5290" length="1" name="GenericCommProM.UARTOrRadio">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="5292" length="2" name="MultiHopEngineM.numLocalPendingPkt">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="4360" length="1" name="MultiHopLQI.fixedParent">
+      <type typeClass="unknown" typeDecl="bool" typeName="bool" />
+    </ramSymbol>
+    <ramSymbol address="5294" length="2" name="DataMgmtM.GlobaltaskCode">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="5296" length="4" name="RealTimeM.globaltime_t">
+      <type typeClass="unknown" typeDecl="uint32_t" typeName="uint32_t" />
+    </ramSymbol>
+    <ramSymbol address="5300" length="4" name="TimerJiffyAsyncM.jiffy">
+      <type typeClass="unknown" typeDecl="uint32_t" typeName="uint32_t" />
+    </ramSymbol>
+    <ramSymbol address="5304" length="2" name="FramerM.gRxByteCnt">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="5306" length="66" name="CascadesEngineM.sendQueue">
+      <type typeClass="unknown" typeDecl="Queue_t" typeName="Queue_t" />
+    </ramSymbol>
+    <ramSymbol address="5372" length="1" name="CascadesRouterM.delayTimerBusy">
+      <type typeClass="unknown" typeDecl="bool" typeName="bool" />
+    </ramSymbol>
+    <ramSymbol address="5374" length="2" name="TimeSyncM.missedReceiveStamps">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="5376" array="true" length="20" name="MultiHopLQI.gRecentPacketSender">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="5396" array="true" length="12" name="ADCM.TOSH_adc_portmap">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="5408" length="2" name="MSP430ADC12M.bufLength">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="5410" length="2" name="MultiHopLQI.gbCurrentParent">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="5412" length="2" name="MultiHopLQI.gbLinkQuality">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="5414" array="true" length="450" name="MultiHopEngineM.poolBuffer">
+      <type typeClass="unknown" typeDecl="TOS_Msg" typeName="TOS_Msg" />
+    </ramSymbol>
+    <ramSymbol address="5864" length="2" name="DataMgmtM.f_allocbuffercount">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="5866" length="1" name="MultiHopLQI.gRecentIndex">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="5868" length="2" name="TimerM.m_hinow">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="5870" length="1" name="HPLCC2420M.rxlen">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="5872" length="4" name="RealTimeM.uc_fire_interval">
+      <type typeClass="unknown" typeDecl="uint32_t" typeName="uint32_t" />
+    </ramSymbol>
+    <ramSymbol address="5876" length="4" name="RealTimeM.localTime">
+      <type typeClass="unknown" typeDecl="uint32_t" typeName="uint32_t" />
+    </ramSymbol>
+    <ramSymbol address="5880" length="2" name="MSP430ADC12M.bufOffset">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="5882" array="true" length="80" name="gTempEventBuf">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="5962" length="1" name="GenericCommProM.state">
+      <type typeClass="unknown" typeDecl="bool" typeName="bool" />
+    </ramSymbol>
+    <ramSymbol address="5964" array="true" length="15" name="MSP430ADC12M.adc12settings">
+      <type typeClass="unknown" typeDecl="adc12settings_t" typeName="adc12settings_t" />
+    </ramSymbol>
+    <ramSymbol address="5979" length="1" name="MultiHopEngineM.messageIsRetransmission">
+      <type typeClass="unknown" typeDecl="bool" typeName="bool" />
+    </ramSymbol>
+    <ramSymbol address="5980" length="1" name="RpcM.processingCommand">
+      <type typeClass="unknown" typeDecl="bool" typeName="bool" />
+    </ramSymbol>
+    <ramSymbol address="5982" length="2" name="TimeSyncM.errTimes">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="5984" length="1" name="CascadesRouterM.RequestProcessBusy">
+      <type typeClass="unknown" typeDecl="bool" typeName="bool" />
+    </ramSymbol>
+    <ramSymbol address="5986" length="2" name="TimeSyncM.mode">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="5988" length="1" name="RpcM.seqno">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="5990" array="true" length="512" name="TOSH_queue">
+      <type typeClass="unknown" typeDecl="TOSH_sched_entry_T" typeName="TOSH_sched_entry_T" />
+    </ramSymbol>
+    <ramSymbol address="6502" length="2" name="DataMgmtM.headSendQueue">
+      <type typeClass="unknown" typeDecl="TOS_MsgPtr" typeName="TOS_MsgPtr" />
+    </ramSymbol>
+    <ramSymbol address="6504" length="2" name="FramerM.gRxRunningCRC">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="6506" length="90" name="CascadesRouterM.RecvRequestMsg">
+      <type typeClass="unknown" typeDecl="TOS_Msg" typeName="TOS_Msg" />
+    </ramSymbol>
+    <ramSymbol address="6596" length="2" name="DataMgmtM.presendTaskCount">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="6598" length="66" name="DataMgmtM.sendQueue">
+      <type typeClass="unknown" typeDecl="Queue_t" typeName="Queue_t" />
+    </ramSymbol>
+    <ramSymbol address="6664" length="1" name="ADCM.readdone">
+      <type typeClass="unknown" typeDecl="bool" typeName="bool" />
+    </ramSymbol>
+    <ramSymbol address="6666" length="2" name="FramerM.gpTxBuf">
+      <type typeClass="pointer" typeDecl="uint8_t*" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="4356" length="1" name="CC2420_RFPOWER">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="6668" length="1" name="TOSH_sched_full">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="6669" length="1" name="CC2420RadioM.bPacketReceiving">
+      <type typeClass="unknown" typeDecl="bool" typeName="bool" />
+    </ramSymbol>
+    <ramSymbol address="6670" length="1" name="HPLUSART1M.l_mctl">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="6672" length="4" name="TimeSyncM.offsetAverage">
+      <type typeClass="unknown" typeDecl="int32_t" typeName="int32_t" />
+    </ramSymbol>
+    <ramSymbol address="4359" length="1" name="CC2420ControlM.state">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="6676" length="2" name="HPLUSART1M.l_br">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="6678" length="90" name="MultiHopLQI.msgBuf">
+      <type typeClass="unknown" typeDecl="TOS_Msg" typeName="TOS_Msg" />
+    </ramSymbol>
+    <ramSymbol address="6768" array="true" length="64" name="CascadesRouterM.inData">
+      <type typeClass="unknown" typeDecl="bool" typeName="bool" />
+    </ramSymbol>
+    <ramSymbol address="6832" length="4" name="RealTimeM.mState">
+      <type typeClass="unknown" typeDecl="uint32_t" typeName="uint32_t" />
+    </ramSymbol>
+    <ramSymbol address="6836" length="1" name="NeighborMgmtM.ticks">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="6837" length="1" name="CC2420RadioM.bAckEnable">
+      <type typeClass="unknown" typeDecl="bool" typeName="bool" />
+    </ramSymbol>
+    <ramSymbol address="6838" length="90" name="GenericCommProM.swapBuf">
+      <type typeClass="unknown" typeDecl="TOS_Msg" typeName="TOS_Msg" />
+    </ramSymbol>
+    <ramSymbol address="6928" length="1" name="ADCM.g_port">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="6930" array="true" length="10" name="MultiHopLQI.gRecentOriginPacketTTL">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="6940" length="2" name="HPLCC2420M.txbuf">
+      <type typeClass="pointer" typeDecl="uint8_t*" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="6942" length="2" name="HPLCC2420M.ramaddr">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="6944" length="2" name="TimeSyncM.rootid">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="6946" length="1" name="MultiHopEngineM.beRadioActive">
+      <type typeClass="unknown" typeDecl="bool" typeName="bool" />
+    </ramSymbol>
+    <ramSymbol address="6947" length="1" name="ADCM.samplingRate">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="6948" length="1" name="RealTimeM.syncMode">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="6950" length="2" name="SNMSM.rstdelayCount">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="6952" length="2" name="CascadesRouterM.nextSignalSeq">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="6954" length="1" name="EventReportM.gfSendBusy">
+      <type typeClass="unknown" typeDecl="bool" typeName="bool" />
+    </ramSymbol>
+    <ramSymbol address="6956" length="66" name="EventReportM.sendQueue">
+      <type typeClass="unknown" typeDecl="Queue_t" typeName="Queue_t" />
+    </ramSymbol>
+    <ramSymbol address="7022" length="1" name="GenericCommProM.radioSendActive">
+      <type typeClass="unknown" typeDecl="bool" typeName="bool" />
+    </ramSymbol>
+    <ramSymbol address="7024" length="2" name="MultiHopEngineM.numOfSuccessiveFailures">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="7026" length="90" name="TimeSyncM.processedMsgBuffer">
+      <type typeClass="unknown" typeDecl="TOS_Msg" typeName="TOS_Msg" />
+    </ramSymbol>
+    <ramSymbol address="7116" length="4" name="TimeSyncM.skew">
+      <type typeClass="unknown" typeDecl="float" typeName="float" />
+    </ramSymbol>
+    <ramSymbol address="7120" length="1" name="NeighborMgmtM.lqiBuf">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="7121" length="1" name="MultiHopLQI.gRecentOriginIndex">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="7122" array="true" length="120" name="RealTimeM.clientList">
+      <type typeClass="unknown" typeDecl="SyncUser_t" typeName="SyncUser_t" />
+    </ramSymbol>
+    <ramSymbol address="7242" length="1" name="MultiHopEngineM.useMhopPriority">
+      <type typeClass="unknown" typeDecl="bool" typeName="bool" />
+    </ramSymbol>
+    <ramSymbol address="7244" length="2" name="FramerM.gTxByteCnt">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="7246" array="true" length="158" name="CascadesRouterM.myBuffer">
+      <type typeClass="unknown" typeDecl="CascadesBuffer" typeName="CascadesBuffer" />
+    </ramSymbol>
+    <ramSymbol address="4352" length="2" name="TOS_LOCAL_ADDRESS">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="4361" length="1" name="MultiHopLQI.receivedBeacon">
+      <type typeClass="unknown" typeDecl="bool" typeName="bool" />
+    </ramSymbol>
+    <ramSymbol address="7404" length="2" name="NeighborMgmtM.nwMsg">
+      <type typeClass="pointer" typeDecl="NetworkMsg*" typeName="NetworkMsg" />
+    </ramSymbol>
+    <ramSymbol address="7406" length="66" name="MultiHopEngineM.buffQueue">
+      <type typeClass="unknown" typeDecl="Queue_t" typeName="Queue_t" />
+    </ramSymbol>
+    <ramSymbol address="7472" length="2" name="MultiHopLQI.gbCurrentParentCost">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="7474" length="1" name="TOSH_sched_free">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="7475" length="1" name="ADCM.busy">
+      <type typeClass="unknown" typeDecl="bool" typeName="bool" />
+    </ramSymbol>
+    <ramSymbol address="7476" length="1" name="DataMgmtM.sendTaskBusy">
+      <type typeClass="unknown" typeDecl="bool" typeName="bool" />
+    </ramSymbol>
+    <ramSymbol address="7478" length="2" name="TimeSyncM.hasGPSValid">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="7480" length="1" name="CascadesRouterM.CMAuProcessBusy">
+      <type typeClass="unknown" typeDecl="bool" typeName="bool" />
+    </ramSymbol>
+    <ramSymbol address="7482" length="2" name="DataMgmtM.processTaskCount">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="7484" length="2" name="CC2420RadioM.rxbufptr">
+      <type typeClass="unknown" typeDecl="TOS_MsgPtr" typeName="TOS_MsgPtr" />
+    </ramSymbol>
+    <ramSymbol address="7486" length="2" name="CascadesRouterM.highestSeq">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="7488" length="1" name="MultiHopEngineM.sendTaskBusy">
+      <type typeClass="unknown" typeDecl="bool" typeName="bool" />
+    </ramSymbol>
+    <ramSymbol address="7490" length="2" name="ClockTimeStampingM.rcv_message">
+      <type typeClass="unknown" typeDecl="TOS_MsgPtr" typeName="TOS_MsgPtr" />
+    </ramSymbol>
+    <ramSymbol address="7492" length="2" name="RpcM.sendMsgPtr">
+      <type typeClass="unknown" typeDecl="TOS_MsgPtr" typeName="TOS_MsgPtr" />
+    </ramSymbol>
+    <ramSymbol address="7494" array="true" length="270" name="EventReportM.eventBuffer">
+      <type typeClass="unknown" typeDecl="TOS_Msg" typeName="TOS_Msg" />
+    </ramSymbol>
+    <ramSymbol address="7764" length="2" name="TimeSyncM.alreadySetTime">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="7766" length="2" name="GenericCommProM.counter">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="7768" length="1" name="HPLCC2420M.txlen">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="7769" length="1" name="BusArbitrationM.isBusReleasedPending">
+      <type typeClass="unknown" typeDecl="bool" typeName="bool" />
+    </ramSymbol>
+    <ramSymbol address="7772" length="66" name="EventReportM.buffQueue">
+      <type typeClass="unknown" typeDecl="Queue_t" typeName="Queue_t" />
+    </ramSymbol>
+    <ramSymbol address="7838" length="1" name="CC2420RadioM.currentDSN">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="7839" length="1" name="UARTM.state">
+      <type typeClass="unknown" typeDecl="bool" typeName="bool" />
+    </ramSymbol>
+    <ramSymbol address="7840" length="1" name="MSP430ADC12M.owner">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="7842" length="2" name="TimeSyncM.state">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="7844" array="true" length="20" name="MultiHopLQI.gRecentOriginPacketSeqNo">
+      <type typeClass="unknown" typeDecl="int16_t" typeName="int16_t" />
+    </ramSymbol>
+    <ramSymbol address="4354" length="1" name="LPMode_disabled">
+      <type typeClass="unknown" typeDecl="bool" typeName="bool" />
+    </ramSymbol>
+    <ramSymbol address="7864" length="1" name="FramerM.gRxHeadIndex">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="7865" length="1" name="RealTimeM.numClients">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="7866" length="2" name="MultiHopLQI.gbCurrentCost">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="7868" array="true" length="12" name="RealTimeM.queue">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="7880" length="1" name="FramerM.gTxTokenBuf">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="7882" length="2" name="NeighborMgmtM.linkaddrBuf">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="7884" length="90" name="CascadesRouterM.RecvCMAuMsg">
+      <type typeClass="unknown" typeDecl="TOS_Msg" typeName="TOS_Msg" />
+    </ramSymbol>
+    <ramSymbol address="7974" array="true" length="50" name="MultiHopEngineM.queueEntryInfo">
+      <type typeClass="unknown" typeDecl="MultiHopEngineM" typeName="MultiHopEngineM" />
+    </ramSymbol>
+    <ramSymbol address="8024" length="1" name="RealTimeM.timerBusy">
+      <type typeClass="unknown" typeDecl="bool" typeName="bool" />
+    </ramSymbol>
+    <ramSymbol address="8026" length="90" name="RpcM.sendMsgBuf">
+      <type typeClass="unknown" typeDecl="TOS_Msg" typeName="TOS_Msg" />
+    </ramSymbol>
+    <ramSymbol address="8116" array="true" length="28" name="CC2420ControlM.gCurrentParameters">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="8144" length="1" name="FramerAckM.gTokenBuf">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="8145" length="1" name="MultiHopEngineM.numOfPktProcessing">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="8146" length="2" name="DataMgmtM.sendDoneR_num">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="8148" length="2" name="DataMgmtM.trynextSendCount">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="8150" length="1" name="CascadesRouterM.resetCount">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="8152" length="2" name="MultiHopEngineM.numberOfSendFailures">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="8154" length="1" name="GenericCommProM.toSend">
+      <type typeClass="unknown" typeDecl="bool" typeName="bool" />
+    </ramSymbol>
+    <ramSymbol address="8155" length="1" name="GenericCommProM.wdtTimerCnt">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="8156" array="true" length="12" name="FramerM.gMsgRcvTbl">
+      <type typeClass="unknown" typeDecl="FramerM" typeName="FramerM" />
+    </ramSymbol>
+    <ramSymbol address="8168" length="1" name="MultiHopLQI.gbCurrentHopCount">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="8169" length="1" name="RealTimeM.queue_head">
+      <type typeClass="unknown" typeDecl="int8_t" typeName="int8_t" />
+    </ramSymbol>
+    <ramSymbol address="8170" length="2" name="DataMgmtM.allocbuffercount">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="8172" length="1" name="CascadesRouterM.headIndex">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="8174" length="2" name="CC2420RadioM.txbufptr">
+      <type typeClass="unknown" typeDecl="TOS_MsgPtr" typeName="TOS_MsgPtr" />
+    </ramSymbol>
+    <ramSymbol address="8176" length="2" name="RandomLFSR.shiftReg">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="8178" length="1" name="DataMgmtM.sendDoneFailCheckCount">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="8179" length="1" name="RpcM.taskBusy">
+      <type typeClass="unknown" typeDecl="bool" typeName="bool" />
+    </ramSymbol>
+    <ramSymbol address="8180" length="1" name="BusArbitrationM.state">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="8181" length="1" name="EventReportM.seqno">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="8182" length="1" name="CascadesRouterM.inited">
+      <type typeClass="unknown" typeDecl="bool" typeName="bool" />
+    </ramSymbol>
+    <ramSymbol address="8183" length="1" name="DataMgmtM.presendTaskBusy">
+      <type typeClass="unknown" typeDecl="bool" typeName="bool" />
+    </ramSymbol>
+    <ramSymbol address="8184" length="2" name="HPLUSART0M.l_br">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="8186" length="1" name="FramerM.gPrevTxState">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="8188" length="90" name="RpcM.cmdStore">
+      <type typeClass="unknown" typeDecl="TOS_Msg" typeName="TOS_Msg" />
+    </ramSymbol>
+    <ramSymbol address="8278" length="1508" name="DataMgmtM.sensorMem">
+      <type typeClass="unknown" typeDecl="MemQueue_t" typeName="MemQueue_t" />
+    </ramSymbol>
+    <ramSymbol address="9786" length="1" name="MSP430ADC12M.vrefWait">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="9788" length="2" name="MultiHopEngineM.localSendFail">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="9790" length="2" name="MultiHopLQI.gbCurrentLinkEst">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="9792" array="true" length="20" name="MultiHopLQI.gRecentPacketSeqNo">
+      <type typeClass="unknown" typeDecl="int16_t" typeName="int16_t" />
+    </ramSymbol>
+    <ramSymbol address="9812" length="1" name="CC2420RadioM.stateRadio">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="9814" length="2" name="GenericCommProM.swapMsgPtr">
+      <type typeClass="unknown" typeDecl="TOS_MsgPtr" typeName="TOS_MsgPtr" />
+    </ramSymbol>
+    <ramSymbol address="9816" length="2" name="FramerM.gpRxBuf">
+      <type typeClass="pointer" typeDecl="uint8_t*" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="9818" length="1" name="RealTimeM.queue_tail">
+      <type typeClass="unknown" typeDecl="int8_t" typeName="int8_t" />
+    </ramSymbol>
+    <ramSymbol address="9820" array="true" length="6" name="EventReportM.gLevelMode">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="9826" length="66" name="MultiHopEngineM.sendQueue">
+      <type typeClass="unknown" typeDecl="Queue_t" typeName="Queue_t" />
+    </ramSymbol>
+    <ramSymbol address="9892" length="1" name="LedsC.ledsOn">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="9893" length="1" name="ADCM.continuousData">
+      <type typeClass="unknown" typeDecl="bool" typeName="bool" />
+    </ramSymbol>
+    <ramSymbol address="9894" length="1" name="TimerM.m_head_long">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="9896" length="4" name="TimeSyncM.localAverage">
+      <type typeClass="unknown" typeDecl="uint32_t" typeName="uint32_t" />
+    </ramSymbol>
+    <ramSymbol address="9900" length="1" name="BusArbitrationM.busid">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="9902" array="true" length="192" name="sensor">
+      <type typeClass="unknown" typeDecl="SensorClient_t" typeName="SensorClient_t" />
+    </ramSymbol>
+    <ramSymbol address="10094" array="true" length="56" name="TimerM.m_period">
+      <type typeClass="unknown" typeDecl="int32_t" typeName="int32_t" />
+    </ramSymbol>
+    <ramSymbol address="10150" length="2" name="HPLCC2420M.rambuf">
+      <type typeClass="pointer" typeDecl="uint8_t*" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="10152" length="2" name="SmartSensingM.defaultCode">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="10154" length="1" name="CascadesEngineM.sendTaskBusy">
+      <type typeClass="unknown" typeDecl="bool" typeName="bool" />
+    </ramSymbol>
+    <ramSymbol address="10155" length="1" name="MSP430ADC12M.cmode">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="10156" length="1" name="HPLUSART0M.l_ssel">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="10157" length="1" name="MultiHopLQI.msgBufBusy">
+      <type typeClass="unknown" typeDecl="bool" typeName="bool" />
+    </ramSymbol>
+    <ramSymbol address="10158" length="2" name="TimeSyncM.processedMsg">
+      <type typeClass="unknown" typeDecl="TOS_MsgPtr" typeName="TOS_MsgPtr" />
+    </ramSymbol>
+    <ramSymbol address="10160" length="1" name="FramerM.gRxState">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="10162" length="2" name="MultiHopEngineM.numberOfSendSuccesses">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="10164" length="1" name="SNMSM.toBeRestart">
+      <type typeClass="unknown" typeDecl="bool" typeName="bool" />
+    </ramSymbol>
+    <ramSymbol address="10165" length="1" name="CascadesRouterM.DataProcessBusy">
+      <type typeClass="unknown" typeDecl="bool" typeName="bool" />
+    </ramSymbol>
+    <ramSymbol address="10166" length="90" name="TimeSyncM.outgoingMsgBuffer">
+      <type typeClass="unknown" typeDecl="TOS_Msg" typeName="TOS_Msg" />
+    </ramSymbol>
+    <ramSymbol address="10256" length="66" name="GenericCommProM.sendQueue">
+      <type typeClass="unknown" typeDecl="Queue_t" typeName="Queue_t" />
+    </ramSymbol>
+    <ramSymbol address="10322" array="true" length="16" name="gTempScratch">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="10338" length="1" name="FramerM.gTxState">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="10339" length="1" name="RefVoltM.semaCount">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="10340" length="2" name="CC2420RadioM.LocalAddr">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="10342" length="2" name="GenericCommProM.lastCount">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="10344" length="1" name="RefVoltM.switchOff">
+      <type typeClass="unknown" typeDecl="bool" typeName="bool" />
+    </ramSymbol>
+    <ramSymbol address="10346" length="2" name="TimeSyncM.numEntries">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="10348" length="1" name="FramerM.gRxTailIndex">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="10349" length="1" name="HamamatsuM.contMode">
+      <type typeClass="unknown" typeDecl="bool" typeName="bool" />
+    </ramSymbol>
+    <ramSymbol address="10350" length="2" name="DataMgmtM.nothingtosend">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="10352" length="1" name="NeighborMgmtM.initTime">
+      <type typeClass="unknown" typeDecl="bool" typeName="bool" />
+    </ramSymbol>
+    <ramSymbol address="10354" length="2" name="DataMgmtM.batchTimerCount">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="10356" length="90" name="CC2420RadioM.RxBuf">
+      <type typeClass="unknown" typeDecl="TOS_Msg" typeName="TOS_Msg" />
+    </ramSymbol>
+    <ramSymbol address="10446" length="1" name="RealTimeM.is_synced">
+      <type typeClass="unknown" typeDecl="bool" typeName="bool" />
+    </ramSymbol>
+    <ramSymbol address="4355" length="1" name="CC2420_CHANNEL">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="10448" length="2" name="DataMgmtM.Msg_length">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="10450" length="1" name="FramerM.gTxEscByte">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="10451" length="1" name="TimerM.m_posted_checkShortTimers">
+      <type typeClass="unknown" typeDecl="bool" typeName="bool" />
+    </ramSymbol>
+    <ramSymbol address="10452" length="1" name="DataMgmtM.processTaskBusy">
+      <type typeClass="unknown" typeDecl="bool" typeName="bool" />
+    </ramSymbol>
+    <ramSymbol address="10454" length="2" name="RpcM.cmdStoreLength">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="10456" length="1" name="TimerJiffyAsyncM.bSet">
+      <type typeClass="unknown" typeDecl="bool" typeName="bool" />
+    </ramSymbol>
+    <ramSymbol address="10458" length="2" name="MSP430ADC12M.bufPtr">
+      <type typeClass="pointer" typeDecl="uint16_t*" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="4357" length="1" name="TOS_AM_GROUP">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="10460" length="1" name="MultiHopEngineM.wdtTimerCnt">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="10462" length="42" name="RamSymbolsM.symbol">
+      <type typeClass="unknown" typeDecl="ramSymbol_t" typeName="ramSymbol_t" />
+    </ramSymbol>
+    <ramSymbol address="10504" length="1" name="GenericCommProM.sendTaskBusy">
+      <type typeClass="unknown" typeDecl="bool" typeName="bool" />
+    </ramSymbol>
+    <ramSymbol address="10506" length="2" name="MultiHopLQI.gUpdateInterval">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="10508" array="true" length="40" name="GenericCommProM.bkHeader">
+      <type typeClass="unknown" typeDecl="GenericCommProM" typeName="GenericCommProM" />
+    </ramSymbol>
+    <ramSymbol address="10548" length="1" name="TimerM.m_head_short">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="10549" length="1" name="MSP430ADC12M.reserved">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="10550" length="2" name="TimeSyncM.missedSendStamps">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="10552" length="2" name="DataMgmtM.sendQueueLen">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="10554" length="1" name="NeighborMgmtM.rssiBuf">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="10555" length="1" name="MultiHopLQI.localBeSink">
+      <type typeClass="unknown" typeDecl="bool" typeName="bool" />
+    </ramSymbol>
+    <ramSymbol address="10556" length="1" name="GenericCommProM.radioRecvActive">
+      <type typeClass="unknown" typeDecl="bool" typeName="bool" />
+    </ramSymbol>
+    <ramSymbol address="10557" length="1" name="SmartSensingM.initedClock">
+      <type typeClass="unknown" typeDecl="bool" typeName="bool" />
+    </ramSymbol>
+    <ramSymbol address="10558" length="66" name="DataMgmtM.buffQueue">
+      <type typeClass="unknown" typeDecl="Queue_t" typeName="Queue_t" />
+    </ramSymbol>
+    <ramSymbol address="10624" array="true" length="24" name="ADCM.adc_count">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="10648" length="1" name="RealTimeM.taskBusy">
+      <type typeClass="unknown" typeDecl="bool" typeName="bool" />
+    </ramSymbol>
+    <ramSymbol address="10650" length="2" name="DataMgmtM.freebuffercount">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="10652" length="2" name="RandomLFSR.initSeed">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="10654" array="true" length="80" name="TimeSyncM.table">
+      <type typeClass="unknown" typeDecl="TimeSyncM" typeName="TimeSyncM" />
+    </ramSymbol>
+    <ramSymbol address="10734" length="2" name="DataMgmtM.seqno">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="10736" length="1" name="FramerM.gFlags">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+    <ramSymbol address="10738" length="2" name="RpcM.debugSequenceNo">
+      <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </ramSymbol>
+    <ramSymbol address="10740" length="1" name="CascadesRouterM.DataTimerOn">
+      <type typeClass="unknown" typeDecl="bool" typeName="bool" />
+    </ramSymbol>
+    <ramSymbol address="10742" array="true" length="256" name="NeighborMgmtM.NeighborTbl">
+      <type typeClass="unknown" typeDecl="NBRTableEntry" typeName="NBRTableEntry" />
+    </ramSymbol>
+    <ramSymbol address="10998" length="1" name="RefVoltM.state">
+      <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </ramSymbol>
+  </ramSymbols>
+  <structs>
+    <struct alignment="I:2" defined="" loc="106:/home/xu/oasis/lib/SmartSensing/Sensing.h" name="SensorClient" ref="0x40a70a70" size="I:12">
+      <field bit-offset="I:0" name="curBlkPtr" ref="0x40a6f230" size="I:2">
+        <type-pointer alignment="I:2" size="I:2">
+          <type-tag alignment="I:2" size="I:74">
+            <struct-ref name="SensorBlkMgmt_t" ref="0x40a501a0" />
+            <typename>
+              <typedef-ref name="SensorBlkMgmt_t" ref="0x40a4f010" />
+            </typename>
+          </type-tag>
+          <typename>
+            <typedef-ref name="SenBlkPtr" ref="0x40a4f208" />
+          </typename>
+        </type-pointer>
+      </field>
+      <field bit-offset="I:16" name="samplingRate" ref="0x40a6f290" size="I:2">
+        <type-int alignment="I:2" cname="unsigned int" size="I:2" unsigned="">
+          <typename>
+            <typedef-ref name="uint16_t" ref="0x401a7800" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:32" name="timerCount" ref="0x40a6f2f0" size="I:2">
+        <type-int alignment="I:2" cname="unsigned int" size="I:2" unsigned="">
+          <typename>
+            <typedef-ref name="uint16_t" ref="0x401a7800" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:48" name="channel" ref="0x40a6f350" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:56" name="type" ref="0x40a6f3b0" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:64" name="dataPriority" ref="0x40a6f410" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:72" name="nodePriority" ref="0x40a6f470" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:80" name="maxBlkNum" ref="0x40a6f4d0" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:88" name="curBlkNum" ref="0x40a6f530" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+    </struct>
+    <struct alignment="I:1" defined="" loc="153:/home/xu/oasis/system/OasisType.h" name="ApplicationMsg" packed="" ref="0x407176a8" size="I:4">
+      <field bit-offset="I:0" name="type" ref="0x40717b78" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:8" name="length" ref="0x40717bd8" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:16" name="seqno" ref="0x40717c38" size="I:2">
+        <type-int alignment="I:2" cname="unsigned int" size="I:2" unsigned="">
+          <typename>
+            <typedef-ref name="uint16_t" ref="0x401a7800" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:32" name="data" ref="0x40717c98" size="I:0">
+        <type-array alignment="I:1" elements="I:0" size="I:0">
+          <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+            <typename>
+              <typedef-ref name="uint8_t" ref="0x401a7458" />
+            </typename>
+          </type-int>
+        </type-array>
+      </field>
+    </struct>
+    <struct alignment="I:1" defined="" loc="25:/home/xu/oasis/lib/FTSP/TimeSync/TimeSyncMsg.h" name="TimeSyncMsg" packed="" ref="0x40b88230" size="I:16">
+      <field bit-offset="I:0" name="nodeID" ref="0x40b888b0" size="I:2">
+        <type-int alignment="I:2" cname="unsigned int" size="I:2" unsigned="">
+          <typename>
+            <typedef-ref name="uint16_t" ref="0x401a7800" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:16" name="rootID" ref="0x40b88910" size="I:2">
+        <type-int alignment="I:2" cname="unsigned int" size="I:2" unsigned="">
+          <typename>
+            <typedef-ref name="uint16_t" ref="0x401a7800" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:32" name="seqNum" ref="0x40b88970" size="I:2">
+        <type-int alignment="I:2" cname="unsigned int" size="I:2" unsigned="">
+          <typename>
+            <typedef-ref name="uint16_t" ref="0x401a7800" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:48" name="hasGPS" ref="0x40b889d0" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:56" name="wroteStamp" ref="0x40b88a30" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:64" name="sendingTime" ref="0x40b88a90" size="I:4">
+        <type-int alignment="I:2" cname="unsigned long" size="I:4" unsigned="">
+          <typename>
+            <typedef-ref name="uint32_t" ref="0x401a7c28" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:96" name="arrivalTime" ref="0x40b88af0" size="I:4">
+        <type-int alignment="I:2" cname="unsigned long" size="I:4" unsigned="">
+          <typename>
+            <typedef-ref name="uint32_t" ref="0x401a7c28" />
+          </typename>
+        </type-int>
+      </field>
+    </struct>
+    <struct alignment="I:1" defined="" loc="126:/usr/msp430/include/msp430/iostructures.h" name="port_simple_t" ref="0x402ec100" size="I:4">
+      <field bit-offset="I:0" name="in" ref="0x402ec4f8" size="I:1">
+        <type-tag alignment="I:1" size="I:1">
+          <typename>
+            <typedef-ref name="ioregister_t" ref="0x402ee3a0" />
+          </typename>
+          <union-ref name="port" ref="0x402e9368" />
+        </type-tag>
+      </field>
+      <field bit-offset="I:8" name="out" ref="0x402ec558" size="I:1">
+        <type-tag alignment="I:1" size="I:1">
+          <typename>
+            <typedef-ref name="ioregister_t" ref="0x402ee3a0" />
+          </typename>
+          <union-ref name="port" ref="0x402e9368" />
+        </type-tag>
+      </field>
+      <field bit-offset="I:16" name="dir" ref="0x402ec5b8" size="I:1">
+        <type-tag alignment="I:1" size="I:1">
+          <typename>
+            <typedef-ref name="ioregister_t" ref="0x402ee3a0" />
+          </typename>
+          <union-ref name="port" ref="0x402e9368" />
+        </type-tag>
+      </field>
+      <field bit-offset="I:24" name="sel" ref="0x402ec618" size="I:1">
+        <type-tag alignment="I:1" size="I:1">
+          <typename>
+            <typedef-ref name="ioregister_t" ref="0x402ee3a0" />
+          </typename>
+          <union-ref name="port" ref="0x402e9368" />
+        </type-tag>
+      </field>
+    </struct>
+    <struct alignment="I:2" defined="" loc="74:/home/xu/oasis/lib/SmartSensing/SensorMem.h" name="MemQueue_t" ref="0x40a4f398" size="I:1508">
+      <field bit-offset="I:0" name="size" ref="0x40a4f9b8" size="I:2">
+        <type-int alignment="I:2" cname="int" size="I:2">
+          <typename>
+            <typedef-ref name="int16_t" ref="0x401a7618" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:16" name="total" ref="0x40a4fa18" size="I:2">
+        <type-int alignment="I:2" cname="int" size="I:2">
+          <typename>
+            <typedef-ref name="int16_t" ref="0x401a7618" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:32" name="head" ref="0x40a4fa78" size="I:12">
+        <type-array alignment="I:2" elements="I:6" size="I:12">
+          <type-int alignment="I:2" cname="int" size="I:2">
+            <typename>
+              <typedef-ref name="int16_t" ref="0x401a7618" />
+            </typename>
+          </type-int>
+        </type-array>
+      </field>
+      <field bit-offset="I:128" name="tail" ref="0x40a4fad8" size="I:12">
+        <type-array alignment="I:2" elements="I:6" size="I:12">
+          <type-int alignment="I:2" cname="int" size="I:2">
+            <typename>
+              <typedef-ref name="int16_t" ref="0x401a7618" />
+            </typename>
+          </type-int>
+        </type-array>
+      </field>
+      <field bit-offset="I:224" name="element" ref="0x40a4fb38" size="I:1480">
+        <type-array alignment="I:2" elements="I:20" size="I:1480">
+          <type-tag alignment="I:2" size="I:74">
+            <struct-ref name="SensorBlkMgmt_t" ref="0x40a501a0" />
+            <typename>
+              <typedef-ref name="SensorBlkMgmt_t" ref="0x40a4f010" />
+            </typename>
+          </type-tag>
+        </type-array>
+      </field>
+    </struct>
+    <struct alignment="I:2" defined="" loc="28:/home/xu/oasis/system/RTClock.h" name="RTClock" ref="0x40ab8348" size="I:6">
+      <field bit-offset="I:0" name="millisecond" ref="0x40ab87f0" size="I:2">
+        <type-int alignment="I:2" cname="unsigned int" size="I:2" unsigned="">
+          <typename>
+            <typedef-ref name="uint16_t" ref="0x401a7800" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:16" name="hour" ref="0x40ab8850" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:24" name="minute" ref="0x40ab88b0" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:32" name="second" ref="0x40ab8910" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:40" name="packed" ref="0x40ab8970" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+    </struct>
+    <struct alignment="I:1" defined="" loc="61:/home/xu/oasis/lib/Cascades/Cascades.h" name="childrenList" packed="" ref="0x4155e768" size="I:4">
+      <field bit-offset="I:0" name="childID" ref="0x4155eaf0" size="I:2">
+        <type-int alignment="I:2" cname="unsigned int" size="I:2" unsigned="">
+          <typename>
+            <typedef-ref name="address_t" ref="0x405585a8" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:16" name="status" ref="0x4155eb50" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:24" name="dummy" ref="0x4155ebb0" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+    </struct>
+    <struct alignment="I:2" defined="" loc="94:/usr/msp430/include/msp430/timerb.h" name="timerb_t" ref="0x4032b648" size="I:32">
+      <field bit-offset="I:0" name="ctl" ref="0x40329380" size="I:2">
+        <type-tag alignment="I:1" size="I:2">
+          <struct-ref ref="0x40325dd8" />
+          <typename>
+            <typedef-ref name="tbctl_t" ref="0x4032c320" />
+          </typename>
+        </type-tag>
+      </field>
+      <field bit-offset="I:16" name="cctl0" ref="0x403293e0" size="I:2">
+        <type-tag alignment="I:1" size="I:2">
+          <struct-ref ref="0x4032cef8" />
+          <typename>
+            <typedef-ref name="tbcctl_t" ref="0x4032b4d8" />
+          </typename>
+        </type-tag>
+      </field>
+      <field bit-offset="I:32" name="cctl1" ref="0x40329440" size="I:2">
+        <type-tag alignment="I:1" size="I:2">
+          <struct-ref ref="0x4032cef8" />
+          <typename>
+            <typedef-ref name="tbcctl_t" ref="0x4032b4d8" />
+          </typename>
+        </type-tag>
+      </field>
+      <field bit-offset="I:48" name="cctl2" ref="0x403294a0" size="I:2">
+        <type-tag alignment="I:1" size="I:2">
+          <struct-ref ref="0x4032cef8" />
+          <typename>
+            <typedef-ref name="tbcctl_t" ref="0x4032b4d8" />
+          </typename>
+        </type-tag>
+      </field>
+      <field bit-offset="I:64" name="cctl3" ref="0x40329500" size="I:2">
+        <type-tag alignment="I:1" size="I:2">
+          <struct-ref ref="0x4032cef8" />
+          <typename>
+            <typedef-ref name="tbcctl_t" ref="0x4032b4d8" />
+          </typename>
+        </type-tag>
+      </field>
+      <field bit-offset="I:80" name="cctl4" ref="0x40329560" size="I:2">
+        <type-tag alignment="I:1" size="I:2">
+          <struct-ref ref="0x4032cef8" />
+          <typename>
+            <typedef-ref name="tbcctl_t" ref="0x4032b4d8" />
+          </typename>
+        </type-tag>
+      </field>
+      <field bit-offset="I:96" name="cctl5" ref="0x403295c0" size="I:2">
+        <type-tag alignment="I:1" size="I:2">
+          <struct-ref ref="0x4032cef8" />
+          <typename>
+            <typedef-ref name="tbcctl_t" ref="0x4032b4d8" />
+          </typename>
+        </type-tag>
+      </field>
+      <field bit-offset="I:112" name="cctl6" ref="0x40329620" size="I:2">
+        <type-tag alignment="I:1" size="I:2">
+          <struct-ref ref="0x4032cef8" />
+          <typename>
+            <typedef-ref name="tbcctl_t" ref="0x4032b4d8" />
+          </typename>
+        </type-tag>
+      </field>
+      <field bit-offset="I:128" name="tbr" ref="0x40329680" size="I:2">
+        <type-qualified volatile="">
+          <type-int alignment="I:2" cname="unsigned int" size="I:2" unsigned="" />
+        </type-qualified>
+      </field>
+      <field bit-offset="I:144" name="tbccr0" ref="0x403296e0" size="I:2">
+        <type-qualified volatile="">
+          <type-int alignment="I:2" cname="unsigned int" size="I:2" unsigned="" />
+        </type-qualified>
+      </field>
+      <field bit-offset="I:160" name="tbccr1" ref="0x40329740" size="I:2">
+        <type-qualified volatile="">
+          <type-int alignment="I:2" cname="unsigned int" size="I:2" unsigned="" />
+        </type-qualified>
+      </field>
+      <field bit-offset="I:176" name="tbccr2" ref="0x403297a0" size="I:2">
+        <type-qualified volatile="">
+          <type-int alignment="I:2" cname="unsigned int" size="I:2" unsigned="" />
+        </type-qualified>
+      </field>
+      <field bit-offset="I:192" name="tbccr3" ref="0x40329800" size="I:2">
+        <type-qualified volatile="">
+          <type-int alignment="I:2" cname="unsigned int" size="I:2" unsigned="" />
+        </type-qualified>
+      </field>
+      <field bit-offset="I:208" name="tbccr4" ref="0x403298e0" size="I:2">
+        <type-qualified volatile="">
+          <type-int alignment="I:2" cname="unsigned int" size="I:2" unsigned="" />
+        </type-qualified>
+      </field>
+      <field bit-offset="I:224" name="tbccr5" ref="0x40329940" size="I:2">
+        <type-qualified volatile="">
+          <type-int alignment="I:2" cname="unsigned int" size="I:2" unsigned="" />
+        </type-qualified>
+      </field>
+      <field bit-offset="I:240" name="tbccr6" ref="0x403299a0" size="I:2">
+        <type-qualified volatile="">
+          <type-int alignment="I:2" cname="unsigned int" size="I:2" unsigned="" />
+        </type-qualified>
+      </field>
+    </struct>
+    <struct alignment="I:1" defined="" loc="94:/home/xu/oasis/system/OasisType.h" name="NetworkMsg" packed="" ref="0x405df0c0" size="I:10">
+      <field bit-offset="I:0" name="linksource" ref="0x405dff20" size="I:2">
+        <type-int alignment="I:2" cname="unsigned int" size="I:2" unsigned="">
+          <typename>
+            <typedef-ref name="address_t" ref="0x405585a8" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:16" name="type" ref="0x405dff80" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:24" bit-size="I:5" name="ttl" ref="0x4067f010">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:29" bit-size="I:3" name="qos" ref="0x4067f070">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:32" name="dest" ref="0x4067f0d0" size="I:2">
+        <type-int alignment="I:2" cname="unsigned int" size="I:2" unsigned="">
+          <typename>
+            <typedef-ref name="address_t" ref="0x405585a8" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:48" name="source" ref="0x4067f130" size="I:2">
+        <type-int alignment="I:2" cname="unsigned int" size="I:2" unsigned="">
+          <typename>
+            <typedef-ref name="address_t" ref="0x405585a8" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:32" name="crc" ref="0x4067f190" size="I:4">
+        <type-int alignment="I:2" cname="unsigned long" size="I:4" unsigned="">
+          <typename>
+            <typedef-ref name="uint32_t" ref="0x401a7c28" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:64" name="seqno" ref="0x4067f1f0" size="I:2">
+        <type-int alignment="I:2" cname="unsigned int" size="I:2" unsigned="">
+          <typename>
+            <typedef-ref name="uint16_t" ref="0x401a7800" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:80" name="data" ref="0x4067f250" size="I:0">
+        <type-array alignment="I:1" elements="I:0" size="I:0">
+          <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+            <typename>
+              <typedef-ref name="uint8_t" ref="0x401a7458" />
+            </typename>
+          </type-int>
+        </type-array>
+      </field>
+    </struct>
+    <struct alignment="I:2" defined="" loc="46:/usr/msp430/include/sys/reent.h" name="__tm" ref="0x40292168" size="I:18">
+      <field bit-offset="I:0" name="__tm_sec" ref="0x402928b0" size="I:2">
+        <type-int alignment="I:2" cname="int" size="I:2" />
+      </field>
+      <field bit-offset="I:16" name="__tm_min" ref="0x40292910" size="I:2">
+        <type-int alignment="I:2" cname="int" size="I:2" />
+      </field>
+      <field bit-offset="I:32" name="__tm_hour" ref="0x40292970" size="I:2">
+        <type-int alignment="I:2" cname="int" size="I:2" />
+      </field>
+      <field bit-offset="I:48" name="__tm_mday" ref="0x402929d0" size="I:2">
+        <type-int alignment="I:2" cname="int" size="I:2" />
+      </field>
+      <field bit-offset="I:64" name="__tm_mon" ref="0x40292a30" size="I:2">
+        <type-int alignment="I:2" cname="int" size="I:2" />
+      </field>
+      <field bit-offset="I:80" name="__tm_year" ref="0x40292a90" size="I:2">
+        <type-int alignment="I:2" cname="int" size="I:2" />
+      </field>
+      <field bit-offset="I:96" name="__tm_wday" ref="0x40292af0" size="I:2">
+        <type-int alignment="I:2" cname="int" size="I:2" />
+      </field>
+      <field bit-offset="I:112" name="__tm_yday" ref="0x40292b50" size="I:2">
+        <type-int alignment="I:2" cname="int" size="I:2" />
+      </field>
+      <field bit-offset="I:128" name="__tm_isdst" ref="0x40292bb0" size="I:2">
+        <type-int alignment="I:2" cname="int" size="I:2" />
+      </field>
+    </struct>
+    <struct alignment="I:2" defined="" loc="57:/home/xu/oasis/system/queue.h" name="Element_t" ref="0x40c99a58" size="I:10">
+      <field bit-offset="I:0" name="next" ref="0x40c980a0" size="I:2">
+        <type-int alignment="I:2" cname="int" size="I:2">
+          <typename>
+            <typedef-ref name="int16_t" ref="0x401a7618" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:16" name="prev" ref="0x40c98100" size="I:2">
+        <type-int alignment="I:2" cname="int" size="I:2">
+          <typename>
+            <typedef-ref name="int16_t" ref="0x401a7618" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:32" name="status" ref="0x40c98160" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:40" name="retry" ref="0x40c981c0" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:48" name="priority" ref="0x40c98220" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:56" name="dummy" ref="0x40c98280" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:64" name="obj" ref="0x40c982e0" size="I:2">
+        <type-pointer alignment="I:2" size="I:2">
+          <type-tag alignment="I:1" size="I:90">
+            <struct-ref name="TOS_Msg" ref="0x405ab5e0" />
+            <typename>
+              <typedef-ref name="object_type" ref="0x40c99178" />
+            </typename>
+          </type-tag>
+        </type-pointer>
+      </field>
+    </struct>
+    <struct alignment="I:2" defined="" loc="174:/usr/msp430/include/sys/reent.h" name="_rand48" ref="0x40296b18" size="I:14">
+      <field bit-offset="I:0" name="_seed" ref="0x40299010" size="I:6">
+        <type-array alignment="I:2" elements="I:3" size="I:6">
+          <type-int alignment="I:2" cname="unsigned short" size="I:2" unsigned="" />
+        </type-array>
+      </field>
+      <field bit-offset="I:48" name="_mult" ref="0x40299070" size="I:6">
+        <type-array alignment="I:2" elements="I:3" size="I:6">
+          <type-int alignment="I:2" cname="unsigned short" size="I:2" unsigned="" />
+        </type-array>
+      </field>
+      <field bit-offset="I:96" name="_add" ref="0x402990d0" size="I:2">
+        <type-int alignment="I:2" cname="unsigned short" size="I:2" unsigned="" />
+      </field>
+    </struct>
+    <struct alignment="I:1" defined="" loc="69:/home/xu/oasis/lib/Cascades/Cascades.h" name="CascadesBuffer" packed="" ref="0x4155ee08" size="I:158">
+      <field bit-offset="I:0" name="tmsg" ref="0x4155d470" size="I:90">
+        <type-tag alignment="I:1" size="I:90">
+          <struct-ref name="TOS_Msg" ref="0x405ab5e0" />
+          <typename>
+            <typedef-ref name="TOS_Msg" ref="0x405aa7e0" />
+          </typename>
+        </type-tag>
+      </field>
+      <field bit-offset="I:720" name="childrenList" ref="0x4155d4d0" size="I:64">
+        <type-array alignment="I:1" elements="I:16" size="I:64">
+          <type-tag alignment="I:1" size="I:4">
+            <struct-ref name="childrenList" ref="0x4155e768" />
+            <typename>
+              <typedef-ref name="childrenList_t" ref="0x4155ec78" />
+            </typename>
+          </type-tag>
+        </type-array>
+      </field>
+      <field bit-offset="I:1232" name="countDT" ref="0x4155d530" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:1240" name="retry" ref="0x4155d590" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:1248" name="signalDone" ref="0x4155d5f0" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:1256" name="dummy" ref="0x4155d650" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+    </struct>
+    <struct alignment="I:1" defined="" loc="108:/usr/msp430/include/msp430/iostructures.h" name="port_full_t" ref="0x402ee770" size="I:7">
+      <field bit-offset="I:0" name="in" ref="0x402eed90" size="I:1">
+        <type-tag alignment="I:1" size="I:1">
+          <typename>
+            <typedef-ref name="ioregister_t" ref="0x402ee3a0" />
+          </typename>
+          <union-ref name="port" ref="0x402e9368" />
+        </type-tag>
+      </field>
+      <field bit-offset="I:8" name="out" ref="0x402eedf0" size="I:1">
+        <type-tag alignment="I:1" size="I:1">
+          <typename>
+            <typedef-ref name="ioregister_t" ref="0x402ee3a0" />
+          </typename>
+          <union-ref name="port" ref="0x402e9368" />
+        </type-tag>
+      </field>
+      <field bit-offset="I:16" name="dir" ref="0x402eee50" size="I:1">
+        <type-tag alignment="I:1" size="I:1">
+          <typename>
+            <typedef-ref name="ioregister_t" ref="0x402ee3a0" />
+          </typename>
+          <union-ref name="port" ref="0x402e9368" />
+        </type-tag>
+      </field>
+      <field bit-offset="I:24" name="ifg" ref="0x402eeeb0" size="I:1">
+        <type-tag alignment="I:1" size="I:1">
+          <typename>
+            <typedef-ref name="ioregister_t" ref="0x402ee3a0" />
+          </typename>
+          <union-ref name="port" ref="0x402e9368" />
+        </type-tag>
+      </field>
+      <field bit-offset="I:32" name="ies" ref="0x402eef10" size="I:1">
+        <type-tag alignment="I:1" size="I:1">
+          <typename>
+            <typedef-ref name="ioregister_t" ref="0x402ee3a0" />
+          </typename>
+          <union-ref name="port" ref="0x402e9368" />
+        </type-tag>
+      </field>
+      <field bit-offset="I:40" name="ie" ref="0x402eef70" size="I:1">
+        <type-tag alignment="I:1" size="I:1">
+          <typename>
+            <typedef-ref name="ioregister_t" ref="0x402ee3a0" />
+          </typename>
+          <union-ref name="port" ref="0x402e9368" />
+        </type-tag>
+      </field>
+      <field bit-offset="I:48" name="sel" ref="0x402ec010" size="I:1">
+        <type-tag alignment="I:1" size="I:1">
+          <typename>
+            <typedef-ref name="ioregister_t" ref="0x402ee3a0" />
+          </typename>
+          <union-ref name="port" ref="0x402e9368" />
+        </type-tag>
+      </field>
+    </struct>
+    <struct alignment="I:1" defined="" loc="54:/home/xu/oasis/lib/SNMS/Event.h" name="EventMsg" packed="" ref="0x40a1c980" size="I:3">
+      <field bit-offset="I:0" name="type" ref="0x40a1ce48" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:8" name="level" ref="0x40a1cea8" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:16" name="length" ref="0x40a1cf08" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:24" name="data" ref="0x40a1cf68" size="I:0">
+        <type-array alignment="I:1" elements="I:0" size="I:0">
+          <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+            <typename>
+              <typedef-ref name="uint8_t" ref="0x401a7458" />
+            </typename>
+          </type-int>
+        </type-array>
+      </field>
+    </struct>
+    <struct alignment="I:2" defined="" loc="188:/usr/msp430/include/sys/reent.h" name="_reent" ref="0x40296010" size="I:398">
+      <field bit-offset="I:0" name="_errno" ref="0x4029dd30" size="I:2">
+        <type-int alignment="I:2" cname="int" size="I:2" />
+      </field>
+      <field bit-offset="I:16" name="_stdin" ref="0x4029dd90" size="I:2">
+        <type-pointer alignment="I:2" size="I:2">
+          <type-tag alignment="I:2" size="I:48">
+            <struct-ref name="__sFILE" ref="0x4028f570" />
+          </type-tag>
+        </type-pointer>
+      </field>
+      <field bit-offset="I:32" name="_stdout" ref="0x4029ddf0" size="I:2">
+        <type-pointer alignment="I:2" size="I:2">
+          <type-tag alignment="I:2" size="I:48">
+            <struct-ref name="__sFILE" ref="0x4028f570" />
+          </type-tag>
+        </type-pointer>
+      </field>
+      <field bit-offset="I:48" name="_stderr" ref="0x4029de50" size="I:2">
+        <type-pointer alignment="I:2" size="I:2">
+          <type-tag alignment="I:2" size="I:48">
+            <struct-ref name="__sFILE" ref="0x4028f570" />
+          </type-tag>
+        </type-pointer>
+      </field>
+      <field bit-offset="I:64" name="_inc" ref="0x4029deb0" size="I:2">
+        <type-int alignment="I:2" cname="int" size="I:2" />
+      </field>
+      <field bit-offset="I:80" name="_emergency" ref="0x4029df10" size="I:25">
+        <type-array alignment="I:1" elements="I:25" size="I:25">
+          <type-int alignment="I:1" cname="char" size="I:1" />
+        </type-array>
+      </field>
+      <field bit-offset="I:288" name="_current_category" ref="0x4029df70" size="I:2">
+        <type-int alignment="I:2" cname="int" size="I:2" />
+      </field>
+      <field bit-offset="I:304" name="_current_locale" ref="0x4029b010" size="I:2">
+        <type-pointer alignment="I:2" size="I:2">
+          <type-qualified const="">
+            <type-int alignment="I:1" cname="char" size="I:1" />
+          </type-qualified>
+        </type-pointer>
+      </field>
+      <field bit-offset="I:320" name="__sdidinit" ref="0x4029b070" size="I:2">
+        <type-int alignment="I:2" cname="int" size="I:2" />
+      </field>
+      <field bit-offset="I:336" name="__cleanup" ref="0x4029b0d0" size="I:2">
+        <type-pointer alignment="I:2" size="I:2">
+          <type-function alignment="I:1" size="I:1">
+            <function-parameters>
+              <type-pointer alignment="I:2" size="I:2">
+                <type-tag alignment="I:2" size="I:398">
+                  <struct-ref name="_reent" ref="0x40296010" />
+                </type-tag>
+              </type-pointer>
+            </function-parameters>
+            <type-void alignment="I:1" size="I:1" />
+          </type-function>
+        </type-pointer>
+      </field>
+      <field bit-offset="I:352" name="_result" ref="0x4029b140" size="I:2">
+        <type-pointer alignment="I:2" size="I:2">
+          <type-tag alignment="I:2" size="I:14">
+            <struct-ref name="_Bigint" ref="0x4028f8d8" />
+          </type-tag>
+        </type-pointer>
+      </field>
+      <field bit-offset="I:368" name="_result_k" ref="0x4029b1a0" size="I:2">
+        <type-int alignment="I:2" cname="int" size="I:2" />
+      </field>
+      <field bit-offset="I:384" name="_p5s" ref="0x4029b200" size="I:2">
+        <type-pointer alignment="I:2" size="I:2">
+          <type-tag alignment="I:2" size="I:14">
+            <struct-ref name="_Bigint" ref="0x4028f8d8" />
+          </type-tag>
+        </type-pointer>
+      </field>
+      <field bit-offset="I:400" name="_freelist" ref="0x4029b2e0" size="I:2">
+        <type-pointer alignment="I:2" size="I:2">
+          <type-pointer alignment="I:2" size="I:2">
+            <type-tag alignment="I:2" size="I:14">
+              <struct-ref name="_Bigint" ref="0x4028f8d8" />
+            </type-tag>
+          </type-pointer>
+        </type-pointer>
+      </field>
+      <field bit-offset="I:416" name="_cvtlen" ref="0x4029b340" size="I:2">
+        <type-int alignment="I:2" cname="int" size="I:2" />
+      </field>
+      <field bit-offset="I:432" name="_cvtbuf" ref="0x4029b3a0" size="I:2">
+        <type-pointer alignment="I:2" size="I:2">
+          <type-int alignment="I:1" cname="char" size="I:1" />
+        </type-pointer>
+      </field>
+      <field bit-offset="I:448" name="_new" ref="0x4029b400" size="I:120">
+        <type-tag alignment="I:2" size="I:120">
+          <union-ref ref="0x4029d2c8" />
+        </type-tag>
+      </field>
+      <field bit-offset="I:1408" name="_atexit" ref="0x4029b460" size="I:2">
+        <type-pointer alignment="I:2" size="I:2">
+          <type-tag alignment="I:2" size="I:68">
+            <struct-ref name="_atexit" ref="0x40292c98" />
+          </type-tag>
+        </type-pointer>
+      </field>
+      <field bit-offset="I:1424" name="_atexit0" ref="0x4029b4c0" size="I:68">
+        <type-tag alignment="I:2" size="I:68">
+          <struct-ref name="_atexit" ref="0x40292c98" />
+        </type-tag>
+      </field>
+      <field bit-offset="I:1968" name="_sig_func" ref="0x4029b520" size="I:2">
+        <type-pointer alignment="I:2" size="I:2">
+          <type-pointer alignment="I:2" size="I:2">
+            <type-function alignment="I:1" size="I:1">
+              <function-parameters>
+                <type-int alignment="I:2" cname="int" size="I:2" />
+              </function-parameters>
+              <type-void alignment="I:1" size="I:1" />
+            </type-function>
+          </type-pointer>
+        </type-pointer>
+      </field>
+      <field bit-offset="I:1984" name="__sglue" ref="0x4029b590" size="I:6">
+        <type-tag alignment="I:2" size="I:6">
+          <struct-ref name="_glue" ref="0x4028f2c8" />
+        </type-tag>
+      </field>
+      <field bit-offset="I:2032" name="__sf" ref="0x4029b5f0" size="I:144">
+        <type-array alignment="I:2" elements="I:3" size="I:144">
+          <type-tag alignment="I:2" size="I:48">
+            <struct-ref name="__sFILE" ref="0x4028f570" />
+          </type-tag>
+        </type-array>
+      </field>
+    </struct>
+    <struct alignment="I:1" defined="" loc="74:/home/xu/oasis/lib/Rpc/Rpc.h" name="RpcResponseMsg" packed="" ref="0x40a33520" size="I:6">
+      <field bit-offset="I:0" name="transactionID" ref="0x40a33b78" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:8" name="commandID" ref="0x40a33bd8" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:16" name="sourceAddress" ref="0x40a33c38" size="I:2">
+        <type-int alignment="I:2" cname="unsigned int" size="I:2" unsigned="">
+          <typename>
+            <typedef-ref name="uint16_t" ref="0x401a7800" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:32" name="errorCode" ref="0x40a33c98" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:40" name="dataLength" ref="0x40a33cf8" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:48" name="data" ref="0x40a33d58" size="I:0">
+        <type-array alignment="I:1" elements="I:0" size="I:0">
+          <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+            <typename>
+              <typedef-ref name="uint8_t" ref="0x401a7458" />
+            </typename>
+          </type-int>
+        </type-array>
+      </field>
+    </struct>
+    <struct alignment="I:2" defined="" loc="70:/home/xu/oasis/system/queue.h" name="Queue_t" ref="0x40c98530" size="I:66">
+      <field bit-offset="I:0" name="size" ref="0x40c98b48" size="I:2">
+        <type-int alignment="I:2" cname="int" size="I:2">
+          <typename>
+            <typedef-ref name="int16_t" ref="0x401a7618" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:16" name="total" ref="0x40c98ba8" size="I:2">
+        <type-int alignment="I:2" cname="int" size="I:2">
+          <typename>
+            <typedef-ref name="int16_t" ref="0x401a7618" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:32" name="head" ref="0x40c98c08" size="I:6">
+        <type-array alignment="I:2" elements="I:3" size="I:6">
+          <type-int alignment="I:2" cname="int" size="I:2">
+            <typename>
+              <typedef-ref name="int16_t" ref="0x401a7618" />
+            </typename>
+          </type-int>
+        </type-array>
+      </field>
+      <field bit-offset="I:80" name="tail" ref="0x40c98c68" size="I:6">
+        <type-array alignment="I:2" elements="I:3" size="I:6">
+          <type-int alignment="I:2" cname="int" size="I:2">
+            <typename>
+              <typedef-ref name="int16_t" ref="0x401a7618" />
+            </typename>
+          </type-int>
+        </type-array>
+      </field>
+      <field bit-offset="I:128" name="element" ref="0x40c98cc8" size="I:50">
+        <type-array alignment="I:2" elements="I:5" size="I:50">
+          <type-tag alignment="I:2" size="I:10">
+            <struct-ref name="Element_t" ref="0x40c99a58" />
+            <typename>
+              <typedef-ref name="Element_t" ref="0x40c983a8" />
+            </typename>
+          </type-tag>
+        </type-array>
+      </field>
+    </struct>
+    <struct alignment="I:1" defined="" loc="77:/usr/msp430/include/msp430/adc12.h" name="adc12_t" ref="0x40331800" size="I:10">
+      <field bit-offset="I:0" name="ctl0" ref="0x40331cb0" size="I:2">
+        <type-tag alignment="I:1" size="I:2">
+          <struct-ref ref="0x40334b18" />
+          <typename>
+            <typedef-ref name="adc12ctl0_t" ref="0x40333078" />
+          </typename>
+        </type-tag>
+      </field>
+      <field bit-offset="I:16" name="ctl1" ref="0x40331d10" size="I:2">
+        <type-tag alignment="I:1" size="I:2">
+          <struct-ref ref="0x403339d0" />
+          <typename>
+            <typedef-ref name="adc12ctl1_t" ref="0x40333e40" />
+          </typename>
+        </type-tag>
+      </field>
+      <field bit-offset="I:32" name="ifg" ref="0x40331d70" size="I:2">
+        <type-tag alignment="I:1" size="I:2">
+          <struct-ref ref="0x40332e88" />
+          <typename>
+            <typedef-ref name="adc12xflg_t" ref="0x40331698" />
+          </typename>
+        </type-tag>
+      </field>
+      <field bit-offset="I:48" name="ie" ref="0x40331dd0" size="I:2">
+        <type-tag alignment="I:1" size="I:2">
+          <struct-ref ref="0x40332e88" />
+          <typename>
+            <typedef-ref name="adc12xflg_t" ref="0x40331698" />
+          </typename>
+        </type-tag>
+      </field>
+      <field bit-offset="I:64" name="iv" ref="0x40331e30" size="I:2">
+        <type-tag alignment="I:1" size="I:2">
+          <struct-ref ref="0x40332e88" />
+          <typename>
+            <typedef-ref name="adc12xflg_t" ref="0x40331698" />
+          </typename>
+        </type-tag>
+      </field>
+    </struct>
+    <struct alignment="I:2" defined="" loc="78:/usr/msp430/include/sys/reent.h" name="__sbuf" ref="0x40294418" size="I:4">
+      <field bit-offset="I:0" name="_base" ref="0x402946c0" size="I:2">
+        <type-pointer alignment="I:2" size="I:2">
+          <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="" />
+        </type-pointer>
+      </field>
+      <field bit-offset="I:16" name="_size" ref="0x40294720" size="I:2">
+        <type-int alignment="I:2" cname="int" size="I:2" />
+      </field>
+    </struct>
+    <struct alignment="I:1" defined="" loc="59:/home/xu/oasis/lib/Rpc/Rpc.h" name="RpcCommandMsg" packed="" ref="0x40a346c8" size="I:16">
+      <field bit-offset="I:0" name="transactionID" ref="0x40a34f58" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:8" name="commandID" ref="0x40a33010" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:16" name="responseDesired" ref="0x40a33070" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:24" name="dataLength" ref="0x40a330d0" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:32" name="address" ref="0x40a33130" size="I:2">
+        <type-int alignment="I:2" cname="unsigned int" size="I:2" unsigned="">
+          <typename>
+            <typedef-ref name="uint16_t" ref="0x401a7800" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:48" name="returnAddress" ref="0x40a33190" size="I:2">
+        <type-int alignment="I:2" cname="unsigned int" size="I:2" unsigned="">
+          <typename>
+            <typedef-ref name="uint16_t" ref="0x401a7800" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:64" name="unix_time" ref="0x40a331f0" size="I:4">
+        <type-int alignment="I:2" cname="unsigned long" size="I:4" unsigned="">
+          <typename>
+            <typedef-ref name="uint32_t" ref="0x401a7c28" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:96" name="user_hash" ref="0x40a33250" size="I:4">
+        <type-int alignment="I:2" cname="unsigned long" size="I:4" unsigned="">
+          <typename>
+            <typedef-ref name="uint32_t" ref="0x401a7c28" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:128" name="data" ref="0x40a332b0" size="I:0">
+        <type-array alignment="I:1" elements="I:0" size="I:0">
+          <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+            <typename>
+              <typedef-ref name="uint8_t" ref="0x401a7458" />
+            </typename>
+          </type-int>
+        </type-array>
+      </field>
+    </struct>
+    <struct alignment="I:1" defined="" loc="69:/home/xu/oasis/lib/MultiHopOasis/MultiHop.h" name="BeaconMsg" packed="" ref="0x408303b8" size="I:8">
+      <field bit-offset="I:0" name="parent" ref="0x40830818" size="I:2">
+        <type-int alignment="I:2" cname="unsigned int" size="I:2" unsigned="">
+          <typename>
+            <typedef-ref name="uint16_t" ref="0x401a7800" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:16" name="parent_dup" ref="0x40830878" size="I:2">
+        <type-int alignment="I:2" cname="unsigned int" size="I:2" unsigned="">
+          <typename>
+            <typedef-ref name="uint16_t" ref="0x401a7800" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:32" name="cost" ref="0x408308d8" size="I:2">
+        <type-int alignment="I:2" cname="unsigned int" size="I:2" unsigned="">
+          <typename>
+            <typedef-ref name="uint16_t" ref="0x401a7800" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:48" name="hopcount" ref="0x40830938" size="I:2">
+        <type-int alignment="I:2" cname="unsigned int" size="I:2" unsigned="">
+          <typename>
+            <typedef-ref name="uint16_t" ref="0x401a7800" />
+          </typename>
+        </type-int>
+      </field>
+    </struct>
+    <struct alignment="I:2" defined="" loc="5:/home/xu/oasis/lib/NeighborMgmt/NeighborMgmt.h" name="NBRTableEntry" ref="0x415e06f8" size="I:16">
+      <field bit-offset="I:0" name="id" ref="0x415df050" size="I:2">
+        <type-int alignment="I:2" cname="unsigned int" size="I:2" unsigned="">
+          <typename>
+            <typedef-ref name="uint16_t" ref="0x401a7800" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:16" name="parentCost" ref="0x415df0b0" size="I:2">
+        <type-int alignment="I:2" cname="unsigned int" size="I:2" unsigned="">
+          <typename>
+            <typedef-ref name="uint16_t" ref="0x401a7800" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:32" name="linkEst" ref="0x415df110" size="I:2">
+        <type-int alignment="I:2" cname="unsigned int" size="I:2" unsigned="">
+          <typename>
+            <typedef-ref name="uint16_t" ref="0x401a7800" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:48" name="linkEstCandidate" ref="0x415df170" size="I:2">
+        <type-int alignment="I:2" cname="unsigned int" size="I:2" unsigned="">
+          <typename>
+            <typedef-ref name="uint16_t" ref="0x401a7800" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:64" name="flags" ref="0x415df1d0" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:72" name="relation" ref="0x415df230" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:80" name="liveliness" ref="0x415df290" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:88" name="childLiveliness" ref="0x415df2f0" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:96" name="priorHop" ref="0x415df350" size="I:2">
+        <type-int alignment="I:2" cname="unsigned int" size="I:2" unsigned="">
+          <typename>
+            <typedef-ref name="uint16_t" ref="0x401a7800" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:112" name="lqi_raw" ref="0x415df3b0" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:120" name="rssi_raw" ref="0x415df410" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+    </struct>
+    <struct alignment="I:2" defined="" loc="31:/usr/msp430/include/sys/reent.h" name="_glue" ref="0x4028f2c8" size="I:6">
+      <field bit-offset="I:0" name="_next" ref="0x4028f720" size="I:2">
+        <type-pointer alignment="I:2" size="I:2">
+          <type-tag alignment="I:2" size="I:6">
+            <struct-ref name="_glue" ref="0x4028f2c8" />
+          </type-tag>
+        </type-pointer>
+      </field>
+      <field bit-offset="I:16" name="_niobs" ref="0x4028f780" size="I:2">
+        <type-int alignment="I:2" cname="int" size="I:2" />
+      </field>
+      <field bit-offset="I:32" name="_iobs" ref="0x4028f7e0" size="I:2">
+        <type-pointer alignment="I:2" size="I:2">
+          <type-tag alignment="I:2" size="I:48">
+            <struct-ref name="__sFILE" ref="0x4028f570" />
+          </type-tag>
+        </type-pointer>
+      </field>
+    </struct>
+    <struct alignment="I:2" defined="" loc="37:/home/xu/oasis/system/RTClock.h" name="SyncUser" ref="0x40ab8c38" size="I:10">
+      <field bit-offset="I:0" name="fireCount" ref="0x40ab7050" size="I:4">
+        <type-int alignment="I:2" cname="unsigned long" size="I:4" unsigned="">
+          <typename>
+            <typedef-ref name="uint32_t" ref="0x401a7c28" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:32" name="syncInterval" ref="0x40ab70b0" size="I:4">
+        <type-int alignment="I:2" cname="unsigned long" size="I:4" unsigned="">
+          <typename>
+            <typedef-ref name="uint32_t" ref="0x401a7c28" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:64" name="type" ref="0x40ab7110" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:72" name="id" ref="0x40ab7170" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+    </struct>
+    <struct alignment="I:2" defined="" loc="38:/usr/msp430/include/sys/reent.h" name="_Bigint" ref="0x4028f8d8" size="I:14">
+      <field bit-offset="I:0" name="_next" ref="0x4028fe68" size="I:2">
+        <type-pointer alignment="I:2" size="I:2">
+          <type-tag alignment="I:2" size="I:14">
+            <struct-ref name="_Bigint" ref="0x4028f8d8" />
+          </type-tag>
+        </type-pointer>
+      </field>
+      <field bit-offset="I:16" name="_k" ref="0x4028fec8" size="I:2">
+        <type-int alignment="I:2" cname="int" size="I:2" />
+      </field>
+      <field bit-offset="I:32" name="_maxwds" ref="0x4028ff28" size="I:2">
+        <type-int alignment="I:2" cname="int" size="I:2" />
+      </field>
+      <field bit-offset="I:48" name="_sign" ref="0x4028ff88" size="I:2">
+        <type-int alignment="I:2" cname="int" size="I:2" />
+      </field>
+      <field bit-offset="I:64" name="_wds" ref="0x40292010" size="I:2">
+        <type-int alignment="I:2" cname="int" size="I:2" />
+      </field>
+      <field bit-offset="I:80" name="_x" ref="0x40292070" size="I:4">
+        <type-array alignment="I:2" elements="I:1" size="I:4">
+          <type-int alignment="I:2" cname="unsigned long" size="I:4" unsigned="">
+            <typename>
+              <typedef-ref name="__ULong" ref="0x4028f150" />
+            </typename>
+          </type-int>
+        </type-array>
+      </field>
+    </struct>
+    <struct alignment="I:1" defined="" loc="52:/home/xu/oasis/lib/Cascades/Cascades.h" name="CasCtrlMsg" packed="" ref="0x41510768" size="I:8">
+      <field bit-offset="I:0" name="linkSource" ref="0x41510db0" size="I:2">
+        <type-int alignment="I:2" cname="unsigned int" size="I:2" unsigned="">
+          <typename>
+            <typedef-ref name="address_t" ref="0x405585a8" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:16" name="parent" ref="0x41510e10" size="I:2">
+        <type-int alignment="I:2" cname="unsigned int" size="I:2" unsigned="">
+          <typename>
+            <typedef-ref name="address_t" ref="0x405585a8" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:32" name="dataSeq" ref="0x41510e70" size="I:2">
+        <type-int alignment="I:2" cname="unsigned int" size="I:2" unsigned="">
+          <typename>
+            <typedef-ref name="uint16_t" ref="0x401a7800" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:48" name="type" ref="0x41510ed0" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:56" name="dummy" ref="0x41510f30" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:64" name="data" ref="0x41510f90" size="I:0">
+        <type-array alignment="I:1" elements="I:0" size="I:0">
+          <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+            <typename>
+              <typedef-ref name="uint8_t" ref="0x401a7458" />
+            </typename>
+          </type-int>
+        </type-array>
+      </field>
+    </struct>
+    <struct alignment="I:2" defined="" loc="208:/usr/msp430/include/math.h" name="exception" ref="0x402cb288" size="I:18">
+      <field bit-offset="I:0" name="type" ref="0x402cb7b0" size="I:2">
+        <type-int alignment="I:2" cname="int" size="I:2" />
+      </field>
+      <field bit-offset="I:16" name="name" ref="0x402cb810" size="I:2">
+        <type-pointer alignment="I:2" size="I:2">
+          <type-int alignment="I:1" cname="char" size="I:1" />
+        </type-pointer>
+      </field>
+      <field bit-offset="I:32" name="arg1" ref="0x402cb870" size="I:4">
+        <type-float alignment="I:2" cname="double" size="I:4" />
+      </field>
+      <field bit-offset="I:64" name="arg2" ref="0x402cb8d0" size="I:4">
+        <type-float alignment="I:2" cname="double" size="I:4" />
+      </field>
+      <field bit-offset="I:96" name="retval" ref="0x402cb930" size="I:4">
+        <type-float alignment="I:2" cname="double" size="I:4" />
+      </field>
+      <field bit-offset="I:128" name="err" ref="0x402cb990" size="I:2">
+        <type-int alignment="I:2" cname="int" size="I:2" />
+      </field>
+    </struct>
+    <struct alignment="I:1" defined="" loc="118:/home/xu/oasis/lib/SmartSensing/Sensing.h" name="TimeStamp" packed="" ref="0x40a6f788" size="I:4">
+      <field bit-offset="I:0" bit-size="I:6" name="minute" ref="0x40a6fcd8">
+        <type-int alignment="I:2" cname="unsigned long" size="I:4" unsigned="">
+          <typename>
+            <typedef-ref name="uint32_t" ref="0x401a7c28" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:6" bit-size="I:6" name="second" ref="0x40a6fd38">
+        <type-int alignment="I:2" cname="unsigned long" size="I:4" unsigned="">
+          <typename>
+            <typedef-ref name="uint32_t" ref="0x401a7c28" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:12" bit-size="I:10" name="millisec" ref="0x40a6fd98">
+        <type-int alignment="I:2" cname="unsigned long" size="I:4" unsigned="">
+          <typename>
+            <typedef-ref name="uint32_t" ref="0x401a7c28" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:22" bit-size="I:10" name="interval" ref="0x40a6fdf8">
+        <type-int alignment="I:2" cname="unsigned long" size="I:4" unsigned="">
+          <typename>
+            <typedef-ref name="uint32_t" ref="0x401a7c28" />
+          </typename>
+        </type-int>
+      </field>
+    </struct>
+    <struct alignment="I:1" defined="" loc="42:/home/xu/oasis/lib/RamSymbols/RamSymbols.h" name="ramSymbol_t" packed="" ref="0x411a2a58" size="I:42">
+      <field bit-offset="I:0" name="memAddress" ref="0x411a2f28" size="I:2">
+        <type-int alignment="I:2" cname="unsigned int" size="I:2" unsigned="">
+          <typename>
+            <typedef-ref name="uint16_t" ref="0x401a7800" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:16" name="length" ref="0x411a2f88" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:24" name="dereference" ref="0x411a1010" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="bool" ref="0x402dee68" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:32" name="data" ref="0x411a1070" size="I:38">
+        <type-array alignment="I:1" elements="I:38" size="I:38">
+          <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+            <typename>
+              <typedef-ref name="uint8_t" ref="0x401a7458" />
+            </typename>
+          </type-int>
+        </type-array>
+      </field>
+    </struct>
+    <struct alignment="I:2" defined="" loc="146:/usr/msp430/include/msp430/timera.h" name="timera_t" ref="0x4031dac8" size="I:24">
+      <field bit-offset="I:0" name="ctl" ref="0x40324358" size="I:2">
+        <type-tag alignment="I:1" size="I:2">
+          <struct-ref ref="0x4031f280" />
+          <typename>
+            <typedef-ref name="tactl_t" ref="0x4031f690" />
+          </typename>
+        </type-tag>
+      </field>
+      <field bit-offset="I:16" name="cctl0" ref="0x403243b8" size="I:2">
+        <type-tag alignment="I:1" size="I:2">
+          <struct-ref ref="0x4031d368" />
+          <typename>
+            <typedef-ref name="tacctl_t" ref="0x4031d958" />
+          </typename>
+        </type-tag>
+      </field>
+      <field bit-offset="I:32" name="cctl1" ref="0x40324418" size="I:2">
+        <type-tag alignment="I:1" size="I:2">
+          <struct-ref ref="0x4031d368" />
+          <typename>
+            <typedef-ref name="tacctl_t" ref="0x4031d958" />
+          </typename>
+        </type-tag>
+      </field>
+      <field bit-offset="I:48" name="cctl2" ref="0x40324478" size="I:2">
+        <type-tag alignment="I:1" size="I:2">
+          <struct-ref ref="0x4031d368" />
+          <typename>
+            <typedef-ref name="tacctl_t" ref="0x4031d958" />
+          </typename>
+        </type-tag>
+      </field>
+      <field bit-offset="I:64" name="dummy" ref="0x403244d8" size="I:8">
+        <type-qualified volatile="">
+          <type-array alignment="I:2" elements="I:4" size="I:8">
+            <type-qualified volatile="">
+              <type-int alignment="I:2" cname="unsigned int" size="I:2" unsigned="" />
+            </type-qualified>
+          </type-array>
+        </type-qualified>
+      </field>
+      <field bit-offset="I:128" name="tar" ref="0x40324538" size="I:2">
+        <type-qualified volatile="">
+          <type-int alignment="I:2" cname="unsigned int" size="I:2" unsigned="" />
+        </type-qualified>
+      </field>
+      <field bit-offset="I:144" name="taccr0" ref="0x40324598" size="I:2">
+        <type-qualified volatile="">
+          <type-int alignment="I:2" cname="unsigned int" size="I:2" unsigned="" />
+        </type-qualified>
+      </field>
+      <field bit-offset="I:160" name="taccr1" ref="0x403245f8" size="I:2">
+        <type-qualified volatile="">
+          <type-int alignment="I:2" cname="unsigned int" size="I:2" unsigned="" />
+        </type-qualified>
+      </field>
+      <field bit-offset="I:176" name="taccr2" ref="0x40324658" size="I:2">
+        <type-qualified volatile="">
+          <type-int alignment="I:2" cname="unsigned int" size="I:2" unsigned="" />
+        </type-qualified>
+      </field>
+    </struct>
+    <struct alignment="I:2" defined="" loc="58:/home/xu/oasis/lib/SmartSensing/SensorMem.h" name="SensorBlkMgmt_t" ref="0x40a501a0" size="I:74">
+      <field bit-offset="I:0" name="time" ref="0x40a50b10" size="I:4">
+        <type-int alignment="I:2" cname="unsigned long" size="I:4" unsigned="">
+          <typename>
+            <typedef-ref name="uint32_t" ref="0x401a7c28" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:32" name="taskCode" ref="0x40a50b70" size="I:2">
+        <type-int alignment="I:2" cname="unsigned int" size="I:2" unsigned="">
+          <typename>
+            <typedef-ref name="uint16_t" ref="0x401a7800" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:48" name="interval" ref="0x40a50bd0" size="I:2">
+        <type-int alignment="I:2" cname="unsigned int" size="I:2" unsigned="">
+          <typename>
+            <typedef-ref name="uint16_t" ref="0x401a7800" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:64" name="compressnum" ref="0x40a50c30" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:80" name="next" ref="0x40a50c90" size="I:2">
+        <type-int alignment="I:2" cname="int" size="I:2">
+          <typename>
+            <typedef-ref name="int16_t" ref="0x401a7618" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:96" name="prev" ref="0x40a50cf0" size="I:2">
+        <type-int alignment="I:2" cname="int" size="I:2">
+          <typename>
+            <typedef-ref name="int16_t" ref="0x401a7618" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:112" name="size" ref="0x40a50d50" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:120" name="priority" ref="0x40a50db0" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:128" name="status" ref="0x40a50e10" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:136" name="type" ref="0x40a50e70" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:144" name="buffer" ref="0x40a50ed0" size="I:56">
+        <type-array alignment="I:1" elements="I:56" size="I:56">
+          <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+            <typename>
+              <typedef-ref name="uint8_t" ref="0x401a7458" />
+            </typename>
+          </type-int>
+        </type-array>
+      </field>
+    </struct>
+    <struct alignment="I:1" defined="" loc="71:/opt/tinyos-1.x/tos/platform/telos/AM.h" name="TOS_Msg" packed="" ref="0x405ab5e0" size="I:90">
+      <field bit-offset="I:0" name="length" ref="0x405aa1b8" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:8" name="fcfhi" ref="0x405aa218" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:16" name="fcflo" ref="0x405aa278" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:24" name="dsn" ref="0x405aa2d8" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:32" name="destpan" ref="0x405aa338" size="I:2">
+        <type-int alignment="I:2" cname="unsigned int" size="I:2" unsigned="">
+          <typename>
+            <typedef-ref name="uint16_t" ref="0x401a7800" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:48" name="addr" ref="0x405aa398" size="I:2">
+        <type-int alignment="I:2" cname="unsigned int" size="I:2" unsigned="">
+          <typename>
+            <typedef-ref name="uint16_t" ref="0x401a7800" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:64" name="type" ref="0x405aa3f8" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:72" name="group" ref="0x405aa458" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:80" name="data" ref="0x405aa4b8" size="I:74">
+        <type-array alignment="I:1" elements="I:74" size="I:74">
+          <type-int alignment="I:1" cname="signed char" size="I:1">
+            <typename>
+              <typedef-ref name="int8_t" ref="0x401a7278" />
+            </typename>
+          </type-int>
+        </type-array>
+      </field>
+      <field bit-offset="I:672" name="strength" ref="0x405aa518" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:680" name="lqi" ref="0x405aa578" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:688" name="crc" ref="0x405aa5d8" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="bool" ref="0x402dee68" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:696" name="ack" ref="0x405aa638" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="bool" ref="0x402dee68" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:704" name="time" ref="0x405aa718" size="I:2">
+        <type-int alignment="I:2" cname="unsigned int" size="I:2" unsigned="">
+          <typename>
+            <typedef-ref name="uint16_t" ref="0x401a7800" />
+          </typename>
+        </type-int>
+      </field>
+    </struct>
+    <struct alignment="I:2" defined="" loc="65:/usr/msp430/include/sys/reent.h" name="_atexit" ref="0x40292c98" size="I:68">
+      <field bit-offset="I:0" name="_next" ref="0x40294268" size="I:2">
+        <type-pointer alignment="I:2" size="I:2">
+          <type-tag alignment="I:2" size="I:68">
+            <struct-ref name="_atexit" ref="0x40292c98" />
+          </type-tag>
+        </type-pointer>
+      </field>
+      <field bit-offset="I:16" name="_ind" ref="0x402942c8" size="I:2">
+        <type-int alignment="I:2" cname="int" size="I:2" />
+      </field>
+      <field bit-offset="I:32" name="_fns" ref="0x40294328" size="I:64">
+        <type-array alignment="I:2" elements="I:32" size="I:64">
+          <type-pointer alignment="I:2" size="I:2">
+            <type-function alignment="I:1" size="I:1">
+              <function-parameters></function-parameters>
+              <type-void alignment="I:1" size="I:1" />
+            </type-function>
+          </type-pointer>
+        </type-array>
+      </field>
+    </struct>
+    <struct alignment="I:2" defined="" loc="116:/usr/msp430/include/sys/reent.h" name="__sFILE" ref="0x4028f570" size="I:48">
+      <field bit-offset="I:0" name="_p" ref="0x402961c0" size="I:2">
+        <type-pointer alignment="I:2" size="I:2">
+          <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="" />
+        </type-pointer>
+      </field>
+      <field bit-offset="I:16" name="_r" ref="0x40296220" size="I:2">
+        <type-int alignment="I:2" cname="int" size="I:2" />
+      </field>
+      <field bit-offset="I:32" name="_w" ref="0x40296280" size="I:2">
+        <type-int alignment="I:2" cname="int" size="I:2" />
+      </field>
+      <field bit-offset="I:48" name="_flags" ref="0x402962e0" size="I:2">
+        <type-int alignment="I:2" cname="short" size="I:2" />
+      </field>
+      <field bit-offset="I:64" name="_file" ref="0x40296340" size="I:2">
+        <type-int alignment="I:2" cname="short" size="I:2" />
+      </field>
+      <field bit-offset="I:80" name="_bf" ref="0x402963a0" size="I:4">
+        <type-tag alignment="I:2" size="I:4">
+          <struct-ref name="__sbuf" ref="0x40294418" />
+        </type-tag>
+      </field>
+      <field bit-offset="I:112" name="_lbfsize" ref="0x40296400" size="I:2">
+        <type-int alignment="I:2" cname="int" size="I:2" />
+      </field>
+      <field bit-offset="I:128" name="_cookie" ref="0x40296460" size="I:2">
+        <type-pointer alignment="I:2" size="I:2">
+          <type-void alignment="I:1" size="I:1" />
+        </type-pointer>
+      </field>
+      <field bit-offset="I:144" name="_read" ref="0x402964c0" size="I:2">
+        <type-pointer alignment="I:2" size="I:2">
+          <type-function alignment="I:1" size="I:1">
+            <function-parameters>
+              <type-int alignment="I:2" cname="int" size="I:2" />
+              <type-pointer alignment="I:2" size="I:2">
+                <type-void alignment="I:1" size="I:1" />
+              </type-pointer>
+              <type-pointer alignment="I:2" size="I:2">
+                <type-int alignment="I:1" cname="char" size="I:1" />
+              </type-pointer>
+            </function-parameters>
+            <type-int alignment="I:2" cname="int" size="I:2" />
+          </type-function>
+        </type-pointer>
+      </field>
+      <field bit-offset="I:160" name="_write" ref="0x40296540" size="I:2">
+        <type-pointer alignment="I:2" size="I:2">
+          <type-function alignment="I:1" size="I:1">
+            <function-parameters>
+              <type-int alignment="I:2" cname="int" size="I:2" />
+              <type-pointer alignment="I:2" size="I:2">
+                <type-void alignment="I:1" size="I:1" />
+              </type-pointer>
+              <type-pointer alignment="I:2" size="I:2">
+                <type-qualified const="">
+                  <type-int alignment="I:1" cname="char" size="I:1" />
+                </type-qualified>
+              </type-pointer>
+            </function-parameters>
+            <type-int alignment="I:2" cname="int" size="I:2" />
+          </type-function>
+        </type-pointer>
+      </field>
+      <field bit-offset="I:176" name="_seek" ref="0x402965c0" size="I:2">
+        <type-pointer alignment="I:2" size="I:2">
+          <type-function alignment="I:1" size="I:1">
+            <function-parameters>
+              <type-int alignment="I:2" cname="long" size="I:4">
+                <typename>
+                  <typedef-ref name="_fpos_t" ref="0x40294860" />
+                </typename>
+              </type-int>
+              <type-int alignment="I:2" cname="int" size="I:2" />
+              <type-pointer alignment="I:2" size="I:2">
+                <type-void alignment="I:1" size="I:1" />
+              </type-pointer>
+            </function-parameters>
+            <type-int alignment="I:2" cname="long" size="I:4">
+              <typename>
+                <typedef-ref name="_fpos_t" ref="0x40294860" />
+              </typename>
+            </type-int>
+          </type-function>
+        </type-pointer>
+      </field>
+      <field bit-offset="I:192" name="_close" ref="0x40296640" size="I:2">
+        <type-pointer alignment="I:2" size="I:2">
+          <type-function alignment="I:1" size="I:1">
+            <function-parameters>
+              <type-pointer alignment="I:2" size="I:2">
+                <type-void alignment="I:1" size="I:1" />
+              </type-pointer>
+            </function-parameters>
+            <type-int alignment="I:2" cname="int" size="I:2" />
+          </type-function>
+        </type-pointer>
+      </field>
+      <field bit-offset="I:208" name="_ub" ref="0x402966b0" size="I:4">
+        <type-tag alignment="I:2" size="I:4">
+          <struct-ref name="__sbuf" ref="0x40294418" />
+        </type-tag>
+      </field>
+      <field bit-offset="I:240" name="_up" ref="0x40296790" size="I:2">
+        <type-pointer alignment="I:2" size="I:2">
+          <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="" />
+        </type-pointer>
+      </field>
+      <field bit-offset="I:256" name="_ur" ref="0x402967f0" size="I:2">
+        <type-int alignment="I:2" cname="int" size="I:2" />
+      </field>
+      <field bit-offset="I:272" name="_ubuf" ref="0x40296850" size="I:3">
+        <type-array alignment="I:1" elements="I:3" size="I:3">
+          <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="" />
+        </type-array>
+      </field>
+      <field bit-offset="I:296" name="_nbuf" ref="0x402968b0" size="I:1">
+        <type-array alignment="I:1" elements="I:1" size="I:1">
+          <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="" />
+        </type-array>
+      </field>
+      <field bit-offset="I:304" name="_lb" ref="0x40296910" size="I:4">
+        <type-tag alignment="I:2" size="I:4">
+          <struct-ref name="__sbuf" ref="0x40294418" />
+        </type-tag>
+      </field>
+      <field bit-offset="I:336" name="_blksize" ref="0x40296970" size="I:2">
+        <type-int alignment="I:2" cname="int" size="I:2" />
+      </field>
+      <field bit-offset="I:352" name="_offset" ref="0x402969d0" size="I:2">
+        <type-int alignment="I:2" cname="int" size="I:2" />
+      </field>
+      <field bit-offset="I:368" name="_data" ref="0x40296a30" size="I:2">
+        <type-pointer alignment="I:2" size="I:2">
+          <type-tag alignment="I:2" size="I:398">
+            <struct-ref name="_reent" ref="0x40296010" />
+          </type-tag>
+        </type-pointer>
+      </field>
+    </struct>
+    <struct alignment="I:2" defined="" loc="144:/home/xu/oasis/lib/FTSP/TimeSync/TimeSyncM.nc" name="TableItem" ref="0x40bcfa50" scoped="" size="I:10">
+      <component-ref qname="TimeSyncM" />
+      <field bit-offset="I:0" name="state" ref="0x40bcfda8" size="I:2">
+        <type-int alignment="I:2" cname="unsigned int" size="I:2" unsigned="">
+          <typename>
+            <typedef-ref name="uint16_t" ref="0x401a7800" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:16" name="localTime" ref="0x40bcfe08" size="I:4">
+        <type-int alignment="I:2" cname="unsigned long" size="I:4" unsigned="">
+          <typename>
+            <typedef-ref name="uint32_t" ref="0x401a7c28" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:48" name="timeOffset" ref="0x40bcfe68" size="I:4">
+        <type-int alignment="I:2" cname="long" size="I:4">
+          <typename>
+            <typedef-ref name="int32_t" ref="0x401a7a40" />
+          </typename>
+        </type-int>
+      </field>
+    </struct>
+    <struct alignment="I:2" defined="" loc="54:/opt/tinyos-1.x/tos/platform/msp430/TimerM.nc" name="Timer_s" ref="0x40c40930" scoped="" size="I:8">
+      <component-ref qname="TimerM" />
+      <field bit-offset="I:0" name="alarm" ref="0x40c6b138" size="I:4">
+        <type-int alignment="I:2" cname="unsigned long" size="I:4" unsigned="">
+          <typename>
+            <typedef-ref name="uint32_t" ref="0x401a7c28" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:32" name="next" ref="0x40c6b198" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:40" bit-size="I:1" name="isperiodic" ref="0x40c6b1f8">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="bool" ref="0x402dee68" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:41" bit-size="I:1" name="isset" ref="0x40c6b258">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="bool" ref="0x402dee68" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:42" bit-size="I:1" name="isqueued" ref="0x40c6b2b8">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="bool" ref="0x402dee68" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:43" bit-size="I:5" name="_reserved_flags" ref="0x40c6b318">
+        <type-int alignment="I:2" cname="int" size="I:2" />
+      </field>
+      <field bit-offset="I:48" name="_reserved_byte" ref="0x40c6b378" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+    </struct>
+    <struct alignment="I:2" defined="" loc="122:/home/xu/oasis/lib/GenericCommPro/GenericCommProM.nc" name="backupHeader" ref="0x40d10f00" scoped="" size="I:8">
+      <component-ref qname="GenericCommProM" />
+      <field bit-offset="I:0" name="valid" ref="0x40d0f470" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:8" name="length" ref="0x40d0f4d0" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:16" name="type" ref="0x40d0f530" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:24" name="group" ref="0x40d0f590" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:32" name="msgPtr" ref="0x40d0f5f0" size="I:2">
+        <type-pointer alignment="I:2" size="I:2">
+          <type-tag alignment="I:1" size="I:90">
+            <struct-ref name="TOS_Msg" ref="0x405ab5e0" />
+            <typename>
+              <typedef-ref name="TOS_Msg" ref="0x405aa7e0" />
+            </typename>
+          </type-tag>
+          <typename>
+            <typedef-ref name="TOS_MsgPtr" ref="0x405b9010" />
+          </typename>
+        </type-pointer>
+      </field>
+      <field bit-offset="I:48" name="addr" ref="0x40d0f650" size="I:2">
+        <type-int alignment="I:2" cname="unsigned int" size="I:2" unsigned="">
+          <typename>
+            <typedef-ref name="address_t" ref="0x405585a8" />
+          </typename>
+        </type-int>
+      </field>
+    </struct>
+    <struct alignment="I:2" defined="" loc="121:/opt/tinyos-1.x/tos/system/FramerM.nc" name="_MsgRcvEntry" ref="0x4106b880" scoped="" size="I:6">
+      <component-ref qname="FramerM" />
+      <field bit-offset="I:0" name="Proto" ref="0x4106bc78" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:8" name="Token" ref="0x4106bcd8" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:16" name="Length" ref="0x4106bd38" size="I:2">
+        <type-int alignment="I:2" cname="unsigned int" size="I:2" unsigned="">
+          <typename>
+            <typedef-ref name="uint16_t" ref="0x401a7800" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:32" name="pMsg" ref="0x4106bd98" size="I:2">
+        <type-pointer alignment="I:2" size="I:2">
+          <type-tag alignment="I:1" size="I:90">
+            <struct-ref name="TOS_Msg" ref="0x405ab5e0" />
+            <typename>
+              <typedef-ref name="TOS_Msg" ref="0x405aa7e0" />
+            </typename>
+          </type-tag>
+          <typename>
+            <typedef-ref name="TOS_MsgPtr" ref="0x405b9010" />
+          </typename>
+        </type-pointer>
+      </field>
+    </struct>
+    <struct alignment="I:2" defined="" loc="47:/home/xu/oasis/lib/MultiHopOasis/MultiHopEngineM.nc" name="SendQueueEntryInfo" ref="0x414db7e8" scoped="" size="I:10">
+      <component-ref qname="MultiHopEngineM" />
+      <field bit-offset="I:0" name="valid" ref="0x414dbd58" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:8" name="AMID" ref="0x414dbdb8" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:16" name="resend" ref="0x414dbe18" size="I:1">
+        <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+          <typename>
+            <typedef-ref name="uint8_t" ref="0x401a7458" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:32" name="length" ref="0x414dbe78" size="I:2">
+        <type-int alignment="I:2" cname="unsigned int" size="I:2" unsigned="">
+          <typename>
+            <typedef-ref name="uint16_t" ref="0x401a7800" />
+          </typename>
+        </type-int>
+      </field>
+      <field bit-offset="I:48" name="msgPtr" ref="0x414dbed8" size="I:2">
+        <type-pointer alignment="I:2" size="I:2">
+          <type-tag alignment="I:1" size="I:90">
+            <struct-ref name="TOS_Msg" ref="0x405ab5e0" />
+            <typename>
+              <typedef-ref name="TOS_Msg" ref="0x405aa7e0" />
+            </typename>
+          </type-tag>
+          <typename>
+            <typedef-ref name="TOS_MsgPtr" ref="0x405b9010" />
+          </typename>
+        </type-pointer>
+      </field>
+      <field bit-offset="I:64" name="originalTOSPtr" ref="0x414dbf38" size="I:2">
+        <type-pointer alignment="I:2" size="I:2">
+          <type-tag alignment="I:1" size="I:90">
+            <struct-ref name="TOS_Msg" ref="0x405ab5e0" />
+            <typename>
+              <typedef-ref name="TOS_Msg" ref="0x405aa7e0" />
+            </typename>
+          </type-tag>
+          <typename>
+            <typedef-ref name="TOS_MsgPtr" ref="0x405b9010" />
+          </typename>
+        </type-pointer>
+      </field>
+    </struct>
+  </structs>
+  <typedefs>
+    <typedef name="int8_t" value="signed char" />
+    <typedef name="uint8_t" value="unsigned char" />
+    <typedef name="int16_t" value="int" />
+    <typedef name="uint16_t" value="unsigned int" />
+    <typedef name="int32_t" value="long" />
+    <typedef name="uint32_t" value="unsigned long" />
+    <typedef name="int64_t" value="long long" />
+    <typedef name="uint64_t" value="unsigned long long" />
+    <typedef name="intptr_t" value="int16_t" />
+    <typedef name="uintptr_t" value="uint16_t" />
+    <typedef name="__nesc_nxbase_nx_int8_t" value="int8_t" />
+    <typedef name="__nesc_nxbase_nx_int16_t" value="int16_t" />
+    <typedef name="__nesc_nxbase_nx_int32_t" value="int32_t" />
+    <typedef name="__nesc_nxbase_nx_int64_t" value="int64_t" />
+    <typedef name="__nesc_nxbase_nx_uint8_t" value="uint8_t" />
+    <typedef name="__nesc_nxbase_nx_uint16_t" value="uint16_t" />
+    <typedef name="__nesc_nxbase_nx_uint32_t" value="uint32_t" />
+    <typedef name="__nesc_nxbase_nx_uint64_t" value="uint64_t" />
+    <typedef name="__nesc_nxbase_nxle_int8_t" value="int8_t" />
+    <typedef name="__nesc_nxbase_nxle_int16_t" value="int16_t" />
+    <typedef name="__nesc_nxbase_nxle_int32_t" value="int32_t" />
+    <typedef name="__nesc_nxbase_nxle_int64_t" value="int64_t" />
+    <typedef name="__nesc_nxbase_nxle_uint8_t" value="uint8_t" />
+    <typedef name="__nesc_nxbase_nxle_uint16_t" value="uint16_t" />
+    <typedef name="__nesc_nxbase_nxle_uint32_t" value="uint32_t" />
+    <typedef name="__nesc_nxbase_nxle_uint64_t" value="uint64_t" />
+    <typedef name="ptrdiff_t" value="int" />
+    <typedef name="size_t" value="unsigned int" />
+    <typedef name="wchar_t" value="int" />
+    <typedef name="u_char" value="unsigned char" />
+    <typedef name="u_short" value="unsigned short" />
+    <typedef name="u_int" value="unsigned int" />
+    <typedef name="u_long" value="unsigned long" />
+    <typedef name="ushort" value="unsigned short" />
+    <typedef name="uint" value="unsigned int" />
+    <typedef name="u_int8_t" value="uint8_t" />
+    <typedef name="u_int16_t" value="uint16_t" />
+    <typedef name="u_int32_t" value="uint32_t" />
+    <typedef name="u_int64_t" value="uint64_t" />
+    <typedef name="u_quad_t" value="u_int64_t" />
+    <typedef name="quad_t" value="int64_t" />
+    <typedef name="fixpt_t" value="u_int32_t" />
+    <typedef name="gid_t" value="u_int32_t" />
+    <typedef name="in_addr_t" value="u_int32_t" />
+    <typedef name="in_port_t" value="u_int16_t" />
+    <typedef name="ino_t" value="u_int32_t" />
+    <typedef name="key_t" value="long" />
+    <typedef name="mode_t" value="u_int16_t" />
+    <typedef name="nlink_t" value="u_int16_t" />
+    <typedef name="rlim_t" value="quad_t" />
+    <typedef name="segsz_t" value="int32_t" />
+    <typedef name="swblk_t" value="int32_t" />
+    <typedef name="ufs_daddr_t" value="int32_t" />
+    <typedef name="ufs_time_t" value="int32_t" />
+    <typedef name="uid_t" value="u_int32_t" />
+    <typedef name="__int32_t" value="long int" />
+    <typedef name="__uint32_t" value="unsigned long int" />
+    <typedef name="_off_t" value="long" />
+    <typedef name="_ssize_t" value="long" />
+    <typedef name="__ULong" value="__uint32_t" />
+    <typedef name="_fpos_t" value="long" />
+    <typedef name="bool" value="unsigned char" />
+    <typedef name="result_t" value="uint8_t" />
+    <typedef name="__nesc_atomic_t" value="bool" />
+    <typedef name="TOS_dbg_mode" value="long long" />
+    <typedef name="address_t" value="uint16_t" />
+    <typedef name="__gnuc_va_list" value="__builtin_va_list" />
+    <typedef name="va_list" value="__gnuc_va_list" />
+    <typedef name="object_type" value="TOS_Msg" />
+    <typedef name="TOS_Msg" value="TOS_Msg" />
+    <typedef name="NetworkMsg" value="NetworkMsg" />
+    <typedef name="ApplicationMsg" value="ApplicationMsg" />
+    <typedef name="BeaconMsg" value="BeaconMsg" />
+    <typedef name="EventMsg" value="EventMsg" />
+    <typedef name="RpcCommandMsg" value="RpcCommandMsg" />
+    <typedef name="RpcResponseMsg" value="RpcResponseMsg" />
+    <typedef name="SensorBlkMgmt_t" value="SensorBlkMgmt_t" />
+    <typedef name="MemQueue_t" value="MemQueue_t" />
+    <typedef name="SensorClient_t" value="SensorClient" />
+    <typedef name="TimeStamp_t" value="TimeStamp" />
+    <typedef name="RTClock_t" value="RTClock" />
+    <typedef name="SyncUser_t" value="SyncUser" />
+    <typedef name="TimeSyncMsg" value="TimeSyncMsg" />
+    <typedef name="Element_t" value="Element_t" />
+    <typedef name="Queue_t" value="Queue_t" />
+    <typedef name="ramSymbol_t" value="ramSymbol_t" />
+    <typedef name="CasCtrlMsg" value="CasCtrlMsg" />
+    <typedef name="childrenList_t" value="childrenList" />
+    <typedef name="CascadesBuffer" value="CascadesBuffer" />
+    <typedef name="NBRTableEntry" value="NBRTableEntry" />
+  </typedefs>
+</nescDecls>

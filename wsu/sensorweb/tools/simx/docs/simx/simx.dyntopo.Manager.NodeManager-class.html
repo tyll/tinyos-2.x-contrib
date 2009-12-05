@@ -1,0 +1,656 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>simx.dyntopo.Manager.NodeManager</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        Package&nbsp;simx ::
+        <a href="simx.dyntopo-module.html">Package&nbsp;dyntopo</a> ::
+        <a href="simx.dyntopo.Manager-module.html">Module&nbsp;Manager</a> ::
+        Class&nbsp;NodeManager
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="simx.dyntopo.Manager.NodeManager-class.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<!-- ==================== CLASS DESCRIPTION ==================== -->
+<h1 class="epydoc">Class NodeManager</h1><p class="nomargin-top"><span class="codelink"><a href="simx.dyntopo.Manager-pysrc.html#NodeManager">source&nbsp;code</a></span></p>
+<pre class="base-tree">
+object --+
+         |
+        <strong class="uidshort">NodeManager</strong>
+</pre>
+
+<dl><dt>Known Subclasses:</dt>
+<dd>
+      <ul class="subclass-list">
+<li><a href="simx.dyntopo.Topo.GenericTopo-class.html">Topo.GenericTopo</a></li>  </ul>
+</dd></dl>
+
+<hr />
+<p>Generic support for basic item management.</p>
+  <p>Most of the methods are simply for convenience. Some methods are 
+  abstract and must be implemented by a subclass.</p>
+
+<!-- ==================== INSTANCE METHODS ==================== -->
+<a name="section-InstanceMethods"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Instance Methods</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-InstanceMethods"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="simx.dyntopo.Manager.NodeManager-class.html#__getitem__" class="summary-sig-name">__getitem__</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">i</span>)</span><br />
+      Combines getNode and getNodes properties depending on i.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="simx.dyntopo.Manager-pysrc.html#NodeManager.__getitem__">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="simx.dyntopo.Manager.NodeManager-class.html#gain" class="summary-sig-name">gain</a>(<span class="summary-sig-arg">src</span>,
+        <span class="summary-sig-arg">dest</span>)</span><br />
+      Returns the *applied* gain between two nodes.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="simx.dyntopo.Manager-pysrc.html#NodeManager.gain">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="getNode"></a><span class="summary-sig-name">getNode</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">iter</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="simx.dyntopo.Manager-pysrc.html#NodeManager.getNode">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="simx.dyntopo.Manager.NodeManager-class.html#getNodes" class="summary-sig-name">getNodes</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">iter</span>)</span><br />
+      Get one (or many) nodes at once.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="simx.dyntopo.Manager-pysrc.html#NodeManager.getNodes">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="linkAllNodes"></a><span class="summary-sig-name">linkAllNodes</span>(<span class="summary-sig-arg">self</span>)</span><br />
+      Touch links between all nodes.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="simx.dyntopo.Manager-pysrc.html#NodeManager.linkAllNodes">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="linkNodes"></a><span class="summary-sig-name">linkNodes</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">*nodes</span>)</span><br />
+      Touch links between the specified nodes (that is, create a link from 
+      every specified node to every other specified node).</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="simx.dyntopo.Manager-pysrc.html#NodeManager.linkNodes">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="maxNodes"></a><span class="summary-sig-name">maxNodes</span>(<span class="summary-sig-arg">self</span>)</span><br />
+      Returns the maximum number of supported nodes.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="simx.dyntopo.Manager-pysrc.html#NodeManager.maxNodes">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="simx.dyntopo.Manager.NodeManager-class.html#nodes" class="summary-sig-name">nodes</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Returns a list of all nodes that have been looked up.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="simx.dyntopo.Manager-pysrc.html#NodeManager.nodes">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="simx.dyntopo.Manager.NodeManager-class.html#readGain" class="summary-sig-name">readGain</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">stream</span>)</span><br />
+      Read a link-gain model from stream.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="simx.dyntopo.Manager-pysrc.html#NodeManager.readGain">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="simx.dyntopo.Manager.NodeManager-class.html#readTopo" class="summary-sig-name">readTopo</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">stream</span>)</span><br />
+      Read topology specified the stream.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="simx.dyntopo.Manager-pysrc.html#NodeManager.readTopo">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="unlinkAllNodes"></a><span class="summary-sig-name">unlinkAllNodes</span>(<span class="summary-sig-arg">self</span>)</span><br />
+      Remove all links between all nodes.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="simx.dyntopo.Manager-pysrc.html#NodeManager.unlinkAllNodes">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="simx.dyntopo.Manager.NodeManager-class.html#unlinkIf" class="summary-sig-name">unlinkIf</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">cond</span>)</span><br />
+      Remove all nodes that specify the given condition.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="simx.dyntopo.Manager-pysrc.html#NodeManager.unlinkIf">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="simx.dyntopo.Manager.NodeManager-class.html#writeGain" class="summary-sig-name">writeGain</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">stream</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">format</span>=<span class="summary-sig-default"><code class="variable-quote">'</code><code class="variable-string">gain %(src)d %(dest)d %(gain)f</code><code class="variable-quote">'</code></span>)</span><br />
+      Write the gain information to a stream.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="simx.dyntopo.Manager-pysrc.html#NodeManager.writeGain">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="simx.dyntopo.Manager.NodeManager-class.html#writeTopo" class="summary-sig-name">writeTopo</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">stream</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">format</span>=<span class="summary-sig-default"><code class="variable-quote">'</code><code class="variable-string">%(id)02i %(x)7.02f %(y)7.02f</code><code class="variable-quote">'</code></span>)</span><br />
+      Write a topology to a stream.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="simx.dyntopo.Manager-pysrc.html#NodeManager.writeTopo">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
+      <code>__delattr__</code>,
+      <code>__getattribute__</code>,
+      <code>__hash__</code>,
+      <code>__init__</code>,
+      <code>__new__</code>,
+      <code>__reduce__</code>,
+      <code>__reduce_ex__</code>,
+      <code>__repr__</code>,
+      <code>__setattr__</code>,
+      <code>__str__</code>
+      </p>
+    </td>
+  </tr>
+</table>
+<!-- ==================== PROPERTIES ==================== -->
+<a name="section-Properties"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Properties</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-Properties"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
+      <code>__class__</code>
+      </p>
+    </td>
+  </tr>
+</table>
+<!-- ==================== METHOD DETAILS ==================== -->
+<a name="section-MethodDetails"></a>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Method Details</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-MethodDetails"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+</table>
+<a name="__getitem__"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">__getitem__</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">i</span>)</span>
+    <br /><em class="fname">(Indexing operator)</em>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="simx.dyntopo.Manager-pysrc.html#NodeManager.__getitem__">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Combines getNode and getNodes properties depending on i.</p>
+  <p>Allows slices to be used as well.</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="gain"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">gain</span>(<span class="sig-arg">src</span>,
+        <span class="sig-arg">dest</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="simx.dyntopo.Manager-pysrc.html#NodeManager.gain">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Returns the *applied* gain between two nodes.</p>
+  <p>None is returned if the nodes, src and dest, are not connected.</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="getNodes"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">getNodes</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">iter</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="simx.dyntopo.Manager-pysrc.html#NodeManager.getNodes">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Get one (or many) nodes at once.</p>
+  <p>Returns a list of the results (which may be empty).</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="nodes"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">nodes</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="simx.dyntopo.Manager-pysrc.html#NodeManager.nodes">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Returns a list of all nodes that have been looked up.</p>
+  <p>The list may contain nodes which have no been powered on or do not 
+  have valid link-gain properties, etc.</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="readGain"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">readGain</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">stream</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="simx.dyntopo.Manager-pysrc.html#NodeManager.readGain">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Read a link-gain model from stream.</p>
+  <p>Returns the number of nodes read from the input on success and raises 
+  an error on bad input. If the operation does not complete succesfully due
+  to bad input, no node link-gain information is adjusted. (Errors which 
+  occur during the link-gain processing have undefined behavior.)</p>
+  <p>The format understood is the same format that is generated by the 
+  default-format writeTopo (similar formats may also work). In addition, 
+  blank lines, or lines that begin with a '#' are ignored. Using StringIO 
+  to generate a stream from a string may be useful.</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="readTopo"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">readTopo</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">stream</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="simx.dyntopo.Manager-pysrc.html#NodeManager.readTopo">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Read topology specified the stream.</p>
+  <p>Returns the number of nodes read from the input on success and raises 
+  an error on bad input. If the operation does not complete succesfully due
+  to bad input, no nodes are positioned. (If an error occurs during 
+  assinging a position to a node, some nodes may be positioned while others
+  are not.)</p>
+  <p>The format understood is the same format that is generated by the 
+  default-format writeTopo (similar formats may also work). In addition, 
+  blank lines, or lines that begin with a '#' are ignored. Using StringIO 
+  to generate a stream from a string may be useful.</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="unlinkIf"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">unlinkIf</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">cond</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="simx.dyntopo.Manager-pysrc.html#NodeManager.unlinkIf">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Remove all nodes that specify the given condition. cond is passed the 
+  current node, the test-neighbor, and the gain between the two.</p>
+  <p>Useful to remove all nodes with a gain less than or larger than some 
+  value.</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="writeGain"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">writeGain</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">stream</span>=<span class="sig-default">None</span>,
+        <span class="sig-arg">format</span>=<span class="sig-default"><code class="variable-quote">'</code><code class="variable-string">gain %(src)d %(dest)d %(gain)f</code><code class="variable-quote">'</code></span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="simx.dyntopo.Manager-pysrc.html#NodeManager.writeGain">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Write the gain information to a stream.</p>
+  <p>The valid format identifiers are src (integer), dest (integer), gain 
+  (float).</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="writeTopo"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">writeTopo</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">stream</span>=<span class="sig-default">None</span>,
+        <span class="sig-arg">format</span>=<span class="sig-default"><code class="variable-quote">'</code><code class="variable-string">%(id)02i %(x)7.02f %(y)7.02f</code><code class="variable-quote">'</code></span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="simx.dyntopo.Manager-pysrc.html#NodeManager.writeTopo">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Write a topology to a stream.</p>
+  <p>The valid format identifiers are id (integer), x (float) and y 
+  (float). See the Python API on how to create the format string.</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Wed Aug 12 00:17:36 2009
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

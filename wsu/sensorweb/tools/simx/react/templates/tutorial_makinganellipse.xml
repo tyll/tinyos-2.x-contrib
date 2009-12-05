@@ -1,0 +1,1 @@
+<template description="Making an ellipse" category="tutorial"><line>#@verify</line><line></line><line># Requires: TossimTopo, TopoGen</line><line></line><line>nodes = T[0:8]</line><line>TopoGen.ellipse(nodes, axis=(10,10))</line></template>

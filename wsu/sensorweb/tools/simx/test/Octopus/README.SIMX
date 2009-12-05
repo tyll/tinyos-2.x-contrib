@@ -1,0 +1,10 @@
+This directory (and subdirectories) was fetched from the TinyOS 2.x
+CVS on 10-Oct-2008. This checkout has been modified to work with
+Tossim and demonstrate various SimX components.
+
+LPL is not supported in Tossim and has been disabled. Additionally,
+some problems with the checkout have fixed; the extension *.orig* has
+been appended as appropriate.
+
+See motes/README.SIMX for specific changes to enable building under
+Tossim/Simx.

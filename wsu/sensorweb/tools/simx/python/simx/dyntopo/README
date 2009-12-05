@@ -1,0 +1,15 @@
+DynTopo
+
+DynTopo is a dynamic Topology manager for TOSSIM/T2 that allows not
+only dynamic topologies, but also includes a TOSSIM/T2 nesC interface
+to set the transmit power.
+
+DynTopo essentially incorporates a modified version of the
+LinkLayerModel generator from USC in a Python interface with TinyOS
+bridge.
+
+Because there is random variance in creating the models, and the
+models themselves may be modified over time, DynTopo should not be
+used as the source of running repeatable tests. For information
+setting up a realistic simulation environment, look at the TOSSIM Live
+thesis by Chad Metcalf.

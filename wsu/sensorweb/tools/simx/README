@@ -1,0 +1,55 @@
+SimX v1.0 Installation Instructions
+Last updated: September 5th, 2009
+This document describes how to install SimX on your system. 
+Supported system: Linux
+Required Software:
+Before you install SimX, TinyOS-2.1.0, scala, java and python must be installed on your system. If not, please 
+
+sudo apt-get install java-6-sun
+sudo apt-get install scala
+sudo apt-get install python
+
+For the source code, if you want to compile them, swig and mig must be installed on your system, If not, please
+
+sudo apt-get install mig
+sudo apt-get install swig
+
+Required Environment:
+You need to setup environment for simx running, you can download the environment tinyos.sh file, or set following environment variables.
+
+export TOSROOT="/opt/tinyos-2.1.0"
+export TOSDIR="$TOSROOT/tos"
+export CLASSPATH=$CLASSPATH:$TOSROOT/support/sdk/java/tinyos.jar:.
+export MAKERULES="$TOSROOT/support/make/Makerules"
+export PATH=$PATH:/opt/msp430/bin:
+export SIMX="<where you put the simx codes>"
+export PYTHONPATH=.:$SIMX/python:$TOSROOT/support/sdk/python:
+export SIMXLIB=$SIMX/lib/simx
+
+Compile and make it run:
+cd react
+make
+cd ../test/Octopus/motes
+. run.sh
+
+add nodes
+set input
+
+Then this is the first runtime instance of SimX.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

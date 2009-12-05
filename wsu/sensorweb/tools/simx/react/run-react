@@ -1,0 +1,9 @@
+#! /bin/sh
+
+CP=.:build/classes/:bin/:lib/commons-lang-2.4.jar:lib/ezmorph-1.0.5.jar:lib/piccolo.jar:lib/piccolox.jar:lib/json-lib-2.2.2-jdk15.jar:lib/scala-library.jar:lib/tinyos.jar
+
+java -classpath $CP simx.react.Boot
+#cd dist
+#java -classpath $CP -jar  simx.jar
+
+

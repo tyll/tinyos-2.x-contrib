@@ -1,5 +1,6 @@
 
 from sim.evaluation.graph.packet.PacketGraph import *
+from sim.evaluation.graph.trickle.TrickleGraph import *
 from sim.evaluation.graph.contour.ContourGraph import *
 from sim.evaluation.graph.hist.HistGraph import *
 
@@ -33,6 +34,15 @@ class GraphEvaluation:
 
         pg = PacketGraph()
         pg.execute(sqr_nodes,
+                   connectivity,
+                   randomize_boot,
+                   sec_before_inject,
+                   sec_after_inject,
+                   inject_node,
+                   filenamebase)
+
+        tg = TrickleGraph()
+        tg.execute(sqr_nodes,
                    connectivity,
                    randomize_boot,
                    sec_before_inject,

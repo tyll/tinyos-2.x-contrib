@@ -3,6 +3,7 @@
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
+import scipy.stats as stats
 import re
 
 from sim.utils.helper import *
@@ -56,21 +57,34 @@ class HistGraph:
 
         f.close()
 
+        LOW_TIME = 0
+        HIGH_TIME = 50
+        BINS = 100
+
+        #print consist.flatten()
+        cdf = stats.cumfreq(consist.flatten(), BINS, (LOW_TIME, HIGH_TIME))
+        #print cdf #, max(cdf[0]), cdf[0]/max(cdf[0])
+        #print floatRange(LOW_TIME, HIGH_TIME, cdf[2])
+
         plt.figure(figsize=(10, 8))
-        plt.hist(consist.flatten(),
-                 bins = 100,
-                 cumulative=True,
-                 normed=True,
-                 histtype='step')
+
+        plt.plot(floatRange(LOW_TIME, HIGH_TIME, cdf[2]),
+                 cdf[0]/max(cdf[0]),
+                 ls='steps')
+        # plt.hist(consist.flatten(),
+        #          bins = 100,
+        #          cumulative=True,
+        #          normed=True,
+        #          histtype='step')
         plt.grid()
-        plt.title('Time to consistency (cdf)')
+        plt.title('Model Time to Consistency (cdf)')
 
         plt.ylim(0,
                  1)
-        plt.xlim(0,
-                 50)
+        #plt.xlim(0,
+        #         50)
 
-        plt.xlabel("Time [s]")
+        plt.xlabel("Model Time [s]")
         plt.ylabel("Nodes consistent [%]")
 
         plt.savefig(filenamebase+"_hist.png")

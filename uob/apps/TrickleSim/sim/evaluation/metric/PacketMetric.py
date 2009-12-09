@@ -28,7 +28,8 @@ class PacketMetric:
         time_re = '(\d+):(\d+):(\d+.\d+)'
         time_re_c = re.compile(time_re)
 
-        packets = np.zeros((sqr_nodes*sqr_nodes+1))
+        #packets = np.zeros((sqr_nodes*sqr_nodes+1))
+        packets = np.zeros((sqr_nodes, sqr_nodes))
 
         f = open(filenamebase+".log", "r")
         for line in f:
@@ -49,15 +50,25 @@ class PacketMetric:
                 (x, y) = id2xy(node, sqr_nodes)
                 #print "->", x, y
 
-                packets[node] += 1
+                #packets[node] += 1
+                packets[x][y] += 1
 
         f.close()
         of = open(filenamebase+"_packet.txt", "w")
 
+        print >> of, "Total number of Packets"
+        print >> of, np.sum(packets)
+
         print >> of, "Packets per Node"
         print >> of, packets
 
-        print >> of, "\n\nAverage Packets per Node"
+        print >> of, "\nAverage Packets per Node"
         print >> of, np.mean(packets)
+
+        print >> of, "\n\nPackets per Inner Node"
+        print >> of, packets[connectivity:-connectivity,connectivity:-connectivity]
+
+        print >> of, "\nAverage Packets per Inner Nodes"
+        print >> of, np.mean(packets[connectivity:-connectivity,connectivity:-connectivity])
 
         of.close()

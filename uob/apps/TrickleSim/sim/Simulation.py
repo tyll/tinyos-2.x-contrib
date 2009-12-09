@@ -12,10 +12,16 @@ class SimulationSuite:
         self.sec_after_inject  = 300
         self.inject_node       = 1
         #self.sqr_nodes_list    = [2, 3, 4, 5, 6, 7, 8, 9, 10]
-        self.sqr_nodes_list    = [2, 5, 10, 20]
+        #self.sqr_nodes_list    = [2, 5, 10, 20]
         #self.sqr_nodes_list    = [2, 5]
-        self.connectivity_list = [1, 2]
+        self.sqr_nodes_list    = [2]
+        #self.sqr_nodes_list    = [5]
+        #self.sqr_nodes_list    = [20]
+        self.connectivity_list = [1, 2, 3]
+        #self.connectivity_list = [1, 1.5, 2, 3]
+        #self.connectivity_list = [1, 1.5, 2, 3, 4, 5, 6]
         self.randomize_boot    = True
+        self.randomize_seed    = True
 
     def createfilenamebase(self,
                            sqr_nodes,
@@ -37,6 +43,7 @@ class SimulationSuite:
                 sr.execute(sqr_nodes,
                            connectivity,
                            self.randomize_boot,
+                           self.randomize_seed,
                            self.sec_before_inject,
                            self.sec_after_inject,
                            self.inject_node,

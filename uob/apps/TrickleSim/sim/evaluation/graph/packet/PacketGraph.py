@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
@@ -80,12 +78,20 @@ class PacketGraph:
                 #print "->", x, y
 
                 if line.find("inconsistent") >= 0:
-                    packs.append(
-                        Line2D([t.in_second(), t.in_second()],
-                               [node+.3, node+.7],
-                               color='r',
-                               linewidth=2)
-                        )
+                    if line.find("inconsistent newer") >= 0:
+                        packs.append(
+                            Line2D([t.in_second(), t.in_second()],
+                                   [node+.3, node+.7],
+                                   color='r',
+                                   linewidth=2)
+                            )
+                    elif line.find("inconsistent older") >= 0:
+                        packs.append(
+                            Line2D([t.in_second(), t.in_second()],
+                                   [node+.3, node+.7],
+                                   color='y',
+                                   linewidth=2)
+                            )
                 else:
                      packs.append(
                          Line2D([t.in_second(), t.in_second()],
@@ -120,7 +126,7 @@ class PacketGraph:
 
         f.close()
 
-        fig = plt.figure()
+        fig = plt.figure(figsize=(10, 8))
         ax = fig.add_subplot(111)
 
         for p in packs:
@@ -147,10 +153,14 @@ class PacketGraph:
                            color='b',
                            linewidth=2)
 
-        incons_line = Line2D([0, 1],
-                             [0, 1],
-                             color='r',
-                             linewidth=2)
+        incons_new_line = Line2D([0, 1],
+                                 [0, 1],
+                                 color='r',
+                                 linewidth=2)
+        incons_old_line = Line2D([0, 1],
+                                 [0, 1],
+                                 color='y',
+                                 linewidth=2)
 
         cons_line = Line2D([0, 1],
                            [0, 1],
@@ -162,8 +172,8 @@ class PacketGraph:
                              color='k',
                              linewidth=2)
 
-        plt.figlegend( (boot_line, incons_line, cons_line, packet_line),
-                       ('Boot', 'Inconsistency', 'Consistency', 'Packet Sent'),
+        plt.figlegend( (boot_line, incons_new_line, incons_old_line, cons_line, packet_line),
+                       ('Boot', 'Inconsistency (New)', 'Inconsistency (Old)', 'Consistency', 'Packet Sent'),
                        'upper right' )
 
         plt.savefig(filenamebase+"_packet.png")

@@ -1,7 +1,7 @@
-#!/usr/bin/env python
-
 import matplotlib
 import matplotlib.pyplot as plt
+import matplotlib.cm as cm
+import matplotlib.colors as col
 import numpy as np
 import re
 
@@ -35,7 +35,7 @@ class ContourGraph:
         f = open(filenamebase+".log", "r")
         for line in f:
             #print line,
-            if line.find("inconsistent") >= 0:
+            if line.find("inconsistent newer") >= 0:
                 #print line,
 
                 node_obj = node_re_c.search(line)
@@ -52,26 +52,58 @@ class ContourGraph:
                 (x, y) = id2xy(node, sqr_nodes)
                 #print "->", x, y
 
-                consist[x][y] = t.in_second()
+                consist[x][y] = t.in_second() - sec_before_inject
 
         f.close()
 
-        plt.figure(figsize=(10, 8))
-        #CS = plt.contour(consist, 20)
-        #CS = plt.contour(consist, sqr_nodes)
-        CS = plt.contourf(consist, sqr_nodes)
-        #plt.clabel(CS, inline=1, fontsize=10)
-        plt.colorbar()
-        plt.grid()
-        plt.title('Time to consistency [s]')
-        if sqr_nodes < 10:
-            plt.yticks(range(sqr_nodes))
-            plt.xticks(range(sqr_nodes))
-        else:
-            plt.yticks(range(0, sqr_nodes, 2))
-            plt.xticks(range(0, sqr_nodes, 2))
+        f = plt.figure(figsize=(10, 8))
+
+        print "! Max. Time to Consistency:", np.max(consist)
+        print "! Min. Time to Consistency:", np.min(consist)
+
+        LOW_LEVEL = 0
+        HIGH_LEVEL = 3*sqr_nodes
+
+        levels = floatRange(LOW_LEVEL,
+                            HIGH_LEVEL,
+                            .5)
+        #print levels
+
+        my_cm = cm.jet
+        my_cm.set_over('k')
+
+        my_norm = col.Normalize(LOW_LEVEL,
+                                HIGH_LEVEL,
+                                clip=False)
+
+        CS = plt.contourf(consist, levels,
+                          cmap = my_cm, norm = my_norm,
+                          extend='max')
+        CS.set_clim(CS.cvalues[0], CS.cvalues[-2])
+
+        plt.colorbar(CS)
+
+        plt.grid(markevery=1)
+        plt.title('Model Time to Consistency [s]')
+        #if sqr_nodes <= 10:
+        plt.yticks(range(sqr_nodes))
+        plt.xticks(range(sqr_nodes))
+        #else:
+        #    plt.yticks(range(0, sqr_nodes, 2))
+        #    plt.xticks(range(0, sqr_nodes, 2))
+
+        plt.xlim(0, sqr_nodes-1)
+        plt.ylim(0, sqr_nodes-1)
 
         plt.xlabel("x")
         plt.ylabel("y")
+
+        conn_circ = matplotlib.patches.Circle((0, 0),
+                                             connectivity+.02,
+                                             ls='dotted',
+                                             lw=2,
+                                             ec='w',
+                                             fill=False)
+        f.gca().add_artist(conn_circ)
 
         plt.savefig(filenamebase+"_contour.png")

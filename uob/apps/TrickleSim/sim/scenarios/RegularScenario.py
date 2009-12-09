@@ -1,4 +1,4 @@
-import random
+import random, math
 
 from sim.utils.helper import *
 
@@ -8,38 +8,31 @@ class Scenario():
         self.size = size
         self.r = self.t.radio()
 
+        self.max_neigh = 0
+
     def connect_neighbor(self, x, y, x2, y2):
-        #print "\tConnecting " + \
-        #    str(x) + "/" + str(y) + " (" + str(xy2id(x, y, self.size)) + ") and " + \
-        #    str(x2) + "/" + str(y2) + " (" + str(xy2id(x2, y2, self.size)) + ")"
+        # print "\tConnecting " + \
+        #     str(x) + "/" + str(y) + " (" + str(xy2id(x, y, self.size)) + ") and " + \
+        #     str(x2) + "/" + str(y2) + " (" + str(xy2id(x2, y2, self.size)) + ")"
         self.r.add(xy2id(x, y, self.size), xy2id(x2, y2, self.size), -50)
 
+    def should_connect(self, x, y, x2, y2, connectivity):
+        distance = math.sqrt((x-x2)**2 + (y-y2)**2)
+        if distance <= connectivity:
+            return True
+        else:
+            return False
+
     def connect_neighbors(self, x, y, connectivity):
+        for x2 in range(0, self.size):
+            for y2 in range(0, self.size):
+                if x == x2 and y == y2:
+                    continue
 
-        for i in range(1, connectivity+1):
-            #print "!!!!", i
-            if y-i >= 0:
-                self.connect_neighbor(x, y, x, y-i)
-            if y+i < self.size:
-                self.connect_neighbor(x, y, x, y+i)
-
-            if x-i >= 0:
-                self.connect_neighbor(x, y, x-i, y)
-            if x+i < self.size:
-                self.connect_neighbor(x, y, x+i, y)
-
-            #FIXME: also diagonal connections?
-
-        # if y-1 >= 0:
-        #     self.connect_neighbor(x, y, x, y-1)
-        # if y+1 < self.size:
-        #     self.connect_neighbor(x, y, x, y+1)
-
-        # if x-1 >= 0:
-        #     self.connect_neighbor(x, y, x-1, y)
-        # if x+1 < self.size:
-        #     self.connect_neighbor(x, y, x+1, y)
-
+                if self.should_connect(x, y, x2, y2, connectivity):
+                    if x == 10 and y == 10:
+                        self.max_neigh += 1
+                    self.connect_neighbor(x, y, x2, y2)
 
     def setup_radio(self, connectivity):
         for x in range(0, self.size):
@@ -59,7 +52,7 @@ class Scenario():
                 #print "Creating noise model for ", xy2id(x, y, self.size)
                 self.t.getNode(xy2id(x, y, self.size)).createNoiseModel()
 
-    def setup_boot(self, randomize=False):
+    def setup_boot(self, randomize=False, randomseed=False):
         for x in range(0, self.size):
             for y in range(0, self.size):
 
@@ -67,8 +60,10 @@ class Scenario():
                     boottime = 1*self.t.ticksPerSecond() \
                         + xy2id(x, y, self.size)*10
                 else:
+                    if randomseed:
+                        random.seed()
                     boottime = 1*self.t.ticksPerSecond() \
-                        + int(1000*random.random())
+                        + int(9*random.random()*self.t.ticksPerSecond())
 
                 #print "Setting boot time for", \
                 #    x, y, xy2id(x, y, self.size), boottime

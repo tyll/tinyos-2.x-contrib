@@ -14,7 +14,8 @@ class SimulationRun:
         self.t.init()
         print "time", self.t.timeStr()
 
-    def execute(self, sqr_nodes, connectivity, randomize_boot,
+    def execute(self, sqr_nodes, connectivity,
+                randomize_boot, randomize_seed,
                 sec_before_inject, sec_after_inject,
                 inject_node,
                 filenamebase):
@@ -49,7 +50,10 @@ class SimulationRun:
         #scenario setup
         s = Scenario(self.t, sqr_nodes)
         s.setup_radio(connectivity)
-        s.setup_boot(randomize=randomize_boot)
+        s.setup_boot(randomize=randomize_boot, randomseed=randomize_seed)
+
+        print "Max. Neighbors", s.max_neigh
+        #print "Ticks per Seconds", self.t.ticksPerSecond()
 
         #run
         while True:

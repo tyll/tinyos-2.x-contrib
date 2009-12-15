@@ -11,9 +11,9 @@ class Scenario():
         self.max_neigh = 0
 
     def connect_neighbor(self, x, y, x2, y2):
-        # print "\tConnecting " + \
-        #     str(x) + "/" + str(y) + " (" + str(xy2id(x, y, self.size)) + ") and " + \
-        #     str(x2) + "/" + str(y2) + " (" + str(xy2id(x2, y2, self.size)) + ")"
+        #print "\tConnecting " + \
+        #    str(x) + "/" + str(y) + " (" + str(xy2id(x, y, self.size)) + ") and " + \
+        #    str(x2) + "/" + str(y2) + " (" + str(xy2id(x2, y2, self.size)) + ")"
         self.r.add(xy2id(x, y, self.size), xy2id(x2, y2, self.size), -50)
 
     def should_connect(self, x, y, x2, y2, connectivity):
@@ -67,5 +67,7 @@ class Scenario():
 
                 #print "Setting boot time for", \
                 #    x, y, xy2id(x, y, self.size), boottime
-                self.t.getNode(xy2id(x, y, self.size)).bootAtTime(boottime)
+                n = self.t.getNode(xy2id(x, y, self.size))
 
+                # set the boottime
+                n.bootAtTime(boottime)

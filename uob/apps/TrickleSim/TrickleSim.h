@@ -1,12 +1,18 @@
 #ifndef TRICKLE_SIM_H
 #define TRICKLE_SIM_H
 
-//#define TAU_LOW (1024L)
-//#define TAU_HIGH (65535L)
+//   2 * 1024
+#define UOB_TAU_LOW (2048L)
+// 128 * 1024
+#define UOB_TAU_HIGH (131072L)
 
-#define TAU_LOW (2L)
-#define TAU_HIGH (128L)
-#define K 1
+//#define UOB_K 1
+#define UOB_K 2
+
+#define PUSH 1
+
+//  40 * 1024 -> same cycle count
+#define UOB_PUSH (40960L)
 
 typedef nx_struct trickle_sim_msg {
   nx_uint16_t counter;

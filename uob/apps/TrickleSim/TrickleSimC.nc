@@ -9,7 +9,8 @@ module TrickleSimC @safe() {
     interface AMSend;
     interface SplitControl as AMControl;
     interface Packet;
-    interface TrickleTimer;
+    //interface TrickleTimer;
+    interface UobTrickleTimer;
   }
 }
 implementation {
@@ -18,17 +19,29 @@ implementation {
 
   bool locked;
   uint16_t counter = 0;
+  uint32_t windowSize;
 
   event void Boot.booted() {
     dbg("Boot",
 	"%s\tTrickleSimC: booted\n",
 	sim_time_string());
+
+#ifdef PUSH
+    dbg("Boot",
+	"%s\tTrickleSimC: ***** PUSH ***** (TAU: %u)\n",
+	sim_time_string(), UOB_PUSH);
+#else
+    dbg("Boot",
+	"%s\tTrickleSimC: ***** TRICKLE ***** (TAU_L: %u, TAU_H: %u, K: %u)\n",
+	sim_time_string(), UOB_TAU_LOW, UOB_TAU_HIGH, UOB_K);
+#endif
+    windowSize = UOB_TAU_HIGH;
     call AMControl.start();
   }
 
   event void AMControl.startDone(error_t err) {
     if (err == SUCCESS) {
-      call TrickleTimer.start();
+      call UobTrickleTimer.start();
     }
     else {
       call AMControl.start();
@@ -36,10 +49,10 @@ implementation {
   }
 
   event void AMControl.stopDone(error_t err) {
-    call TrickleTimer.stop();
+    call UobTrickleTimer.stop();
   }
 
-  event void TrickleTimer.fired() {
+  event void UobTrickleTimer.fired() {
     //counter++;
     if (locked) {
       return;
@@ -86,7 +99,7 @@ implementation {
 	    "%s\tTrickleSimC: consistent data. %hu %hu\n",
 	    sim_time_string(),
 	    counter, tsm->counter);
-	call TrickleTimer.incrementCounter();
+	call UobTrickleTimer.incrementCounter();
       } else {
 	// inconsistent data detected
 	// only update with newer data
@@ -96,18 +109,30 @@ implementation {
 	      "%s\tTrickleSimC: inconsistent newer data. %hu %hu\n",
 	      sim_time_string(),
 	      counter, tsm->counter);
-
 	} else {
 	  dbg("TrickleSimC",
 	      "%s\tTrickleSimC: inconsistent older data. %hu %hu\n",
 	      sim_time_string(),
 	      counter, tsm->counter);
 	}
-	call TrickleTimer.reset();
+	call UobTrickleTimer.reset();
       }
       return bufPtr;
     }
   }
+
+  /*
+  event uint32_t UobTrickleTimer.requestWindowSize() {
+
+    windowSize = windowSize << 1;
+    if(windowSize > UOB_TAU_HIGH) {
+      windowSize = UOB_TAU_HIGH;
+    }
+
+    dbg("TrickleSimC", "Window size requested, give %u\n", windowSize);
+    return windowSize;
+  }
+  */
 
   event void AMSend.sendDone(message_t* bufPtr, error_t error) {
     if (&packet == bufPtr) {

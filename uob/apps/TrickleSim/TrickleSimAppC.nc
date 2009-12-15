@@ -7,8 +7,11 @@ implementation {
   components new AMReceiverC(AM_TRICKLE_SIM_MSG);
   components ActiveMessageC;
 
-  components new TrickleTimerMilliC(TAU_LOW, TAU_HIGH, K, 1);
-
+#ifndef PUSH
+  components UobTrickleMilliC as TimerC;
+#else
+  components UobPushMilliC as TimerC;
+#endif
   App.Boot -> MainC.Boot;
 
   App.Receive -> AMReceiverC;
@@ -16,5 +19,6 @@ implementation {
   App.AMControl -> ActiveMessageC;
   App.Leds -> LedsC;
   App.Packet -> AMSenderC;
-  App.TrickleTimer -> TrickleTimerMilliC.TrickleTimer[0];
+
+  App.UobTrickleTimer -> TimerC.TrickleTimer;
 }

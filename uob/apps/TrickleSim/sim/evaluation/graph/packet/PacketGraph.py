@@ -17,6 +17,7 @@ class PacketGraph:
                 sec_before_inject,
                 sec_after_inject,
                 inject_node,
+                k,
                 filenamebase):
 
         print "="*40
@@ -147,6 +148,14 @@ class PacketGraph:
         ax.set_ylabel('Node ID')
 
         plt.title('Packet Scatter')
+        text = str(sqr_nodes) + "x" + str(sqr_nodes) + "\n" + \
+            "Connectivity: " + str(connectivity) + "\n" + \
+            "K: " + str(k)
+        plt.text(.5, .1, text,
+                 horizontalalignment='center',
+                 verticalalignment='center',
+                 transform = ax.transAxes,
+                 bbox=dict(facecolor='red', alpha=0.2))
 
         boot_line = Line2D([0, 1],
                            [0, 1],

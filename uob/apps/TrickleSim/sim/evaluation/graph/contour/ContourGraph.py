@@ -18,6 +18,7 @@ class ContourGraph:
                 sec_before_inject,
                 sec_after_inject,
                 inject_node,
+                k,
                 filenamebase):
 
         print "="*40
@@ -56,7 +57,8 @@ class ContourGraph:
 
         f.close()
 
-        f = plt.figure(figsize=(10, 8))
+        fig = plt.figure(figsize=(10, 8))
+        ax = fig.add_subplot(111)
 
         print "! Max. Time to Consistency:", np.max(consist)
         print "! Min. Time to Consistency:", np.min(consist)
@@ -85,6 +87,16 @@ class ContourGraph:
 
         plt.grid(markevery=1)
         plt.title('Model Time to Consistency [s]')
+
+        text = str(sqr_nodes) + "x" + str(sqr_nodes) + "\n" + \
+            "Connectivity: " + str(connectivity) + "\n" + \
+            "K: " + str(k)
+        plt.text(.5, .1, text,
+                 horizontalalignment='center',
+                 verticalalignment='center',
+                 transform = ax.transAxes,
+                 bbox=dict(facecolor='red', alpha=0.2))
+
         #if sqr_nodes <= 10:
         plt.yticks(range(sqr_nodes))
         plt.xticks(range(sqr_nodes))
@@ -104,6 +116,6 @@ class ContourGraph:
                                              lw=2,
                                              ec='w',
                                              fill=False)
-        f.gca().add_artist(conn_circ)
+        fig.gca().add_artist(conn_circ)
 
         plt.savefig(filenamebase+"_contour.png")

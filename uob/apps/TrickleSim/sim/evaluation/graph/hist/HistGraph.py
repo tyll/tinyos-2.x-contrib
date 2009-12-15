@@ -19,6 +19,7 @@ class HistGraph:
                 sec_before_inject,
                 sec_after_inject,
                 inject_node,
+                k,
                 filenamebase):
 
         print "="*40
@@ -66,7 +67,8 @@ class HistGraph:
         #print cdf #, max(cdf[0]), cdf[0]/max(cdf[0])
         #print floatRange(LOW_TIME, HIGH_TIME, cdf[2])
 
-        plt.figure(figsize=(10, 8))
+        fig = plt.figure(figsize=(10, 8))
+        ax = fig.add_subplot(111)
 
         plt.plot(floatRange(LOW_TIME, HIGH_TIME, cdf[2]),
                  cdf[0]/max(cdf[0]),
@@ -78,6 +80,14 @@ class HistGraph:
         #          histtype='step')
         plt.grid()
         plt.title('Model Time to Consistency (cdf)')
+        text = str(sqr_nodes) + "x" + str(sqr_nodes) + "\n" + \
+            "Connectivity: " + str(connectivity) + "\n" + \
+            "K: " + str(k)
+        plt.text(.5, .1, text,
+                 horizontalalignment='center',
+                 verticalalignment='center',
+                 transform = ax.transAxes,
+                 bbox=dict(facecolor='red', alpha=0.2))
 
         plt.ylim(0,
                  1)

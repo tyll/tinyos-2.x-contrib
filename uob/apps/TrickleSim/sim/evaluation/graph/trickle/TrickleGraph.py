@@ -17,6 +17,7 @@ class TrickleGraph:
                 sec_before_inject,
                 sec_after_inject,
                 inject_node,
+                k,
                 filenamebase):
 
         print "="*40
@@ -29,7 +30,8 @@ class TrickleGraph:
         time_re = '(\d+):(\d+):(\d+.\d+)'
         time_re_c = re.compile(time_re)
 
-        period_re = 'with period (\d+) \((\d+)\) is (\d+) '
+        #period_re = 'with period (\d+) \((\d+)\) is (\d+) '
+        period_re = 'Scheduling Trickle event in (\d+) \(period (\d+)\)'
         period_re_c = re.compile(period_re)
 
         trickle_period = np.zeros(sqr_nodes*sqr_nodes + 1)
@@ -39,7 +41,7 @@ class TrickleGraph:
         f = open(filenamebase+".log", "r")
         for line in f:
             #print line,
-            if line.find("Generated time for 0") >= 0:
+            if line.find("Scheduling Trickle event in") >= 0:
                 #print line,
 
                 node_obj = node_re_c.search(line)
@@ -59,10 +61,14 @@ class TrickleGraph:
                 TMILLI = 1024
 
                 period_obj = period_re_c.search(line)
-                period_s     = int(period_obj.group(1))
-                period_ticks = int(period_obj.group(2))
-                timer_ticks  = int(period_obj.group(3))
-                timer_s      = timer_ticks/TMILLI
+                # period_s     = int(period_obj.group(1))
+                # period_ticks = int(period_obj.group(2))
+                # timer_ms     = int(period_obj.group(3))
+                # timer_s      = timer_ms/TMILLI
+                timer_ms     = int(period_obj.group(1))
+                period_ms    = int(period_obj.group(2))
+                timer_s      = timer_ms/TMILLI
+                period_s      = period_ms/TMILLI
 
                 trickle_period[node] += 1
 
@@ -119,7 +125,9 @@ class TrickleGraph:
                            color='k',
                            marker='^',
                            markeredgewidth=0,
-                           linewidth=1)
+                           markersize=5,
+                           linewidth=1,
+                           alpha=0.5)
                     )
 
             if line.find("consistent") >= 0:
@@ -147,7 +155,9 @@ class TrickleGraph:
                                    color='r',
                                    marker='v',
                                    markeredgewidth=0,
-                                   linewidth=2)
+                                   markersize=5,
+                                   linewidth=2,
+                                   alpha=0.5)
                             )
                     elif line.find("inconsistent older") >= 0:
                         packs.append(
@@ -156,7 +166,9 @@ class TrickleGraph:
                                    color='y',
                                    marker='v',
                                    markeredgewidth=0,
-                                   linewidth=2)
+                                   markersize=5,
+                                   linewidth=2,
+                                   alpha=0.5)
                             )
                 else: #consistent
                      packs.append(
@@ -164,8 +176,10 @@ class TrickleGraph:
                                 [node+.8, node+.8],
                                 color='g',
                                 marker='v',
+                                markersize=5,
                                 markeredgewidth=0,
-                                linewidth=2)
+                                linewidth=2,
+                                alpha=0.5)
                          )
 
         f.close()
@@ -191,6 +205,14 @@ class TrickleGraph:
         ax.set_ylabel('Node ID')
 
         plt.title('Trickle Scatter')
+        text = str(sqr_nodes) + "x" + str(sqr_nodes) + "\n" + \
+            "Connectivity: " + str(connectivity) + "\n" + \
+            "K: " + str(k)
+        plt.text(.5, .1, text,
+                 horizontalalignment='center',
+                 verticalalignment='center',
+                 transform = ax.transAxes,
+                 bbox=dict(facecolor='red', alpha=0.2))
 
         listenp_line = Line2D([0, 1],
                               [0, 1],
@@ -214,28 +236,32 @@ class TrickleGraph:
                            color='k',
                            marker='^',
                            markeredgewidth=0,
-                           linewidth=1)
+                           linewidth=1,
+                           alpha=0.5)
 
         rec_incons_new_line = Line2D([0, 1],
                                     [0, 1],
                                     color='r',
                                     marker='v',
                                     markeredgewidth=0,
-                                    linewidth=2)
+                                    linewidth=2,
+                                     alpha=0.5)
 
         rec_incons_old_line = Line2D([0, 1],
                                     [0, 1],
                                     color='y',
                                     marker='v',
                                     markeredgewidth=0,
-                                    linewidth=2)
+                                    linewidth=2,
+                                     alpha=0.5)
 
         cons_line = Line2D([0, 1],
                            [0, 1],
                            color='g',
                            marker='v',
                            markeredgewidth=0,
-                           linewidth=2)
+                           linewidth=2,
+                           alpha=0.5)
 
         plt.figlegend( (listenp_line,
                         sendp_line,

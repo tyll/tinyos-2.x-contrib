@@ -17,6 +17,7 @@ class GraphEvaluation:
                 sec_before_inject,
                 sec_after_inject,
                 inject_node,
+                k,
                 filenamebase):
 
         logfilename = filenamebase + ".log"
@@ -28,18 +29,21 @@ class GraphEvaluation:
         print "sec_before_inject\t", sec_before_inject
         print "sec_after_inject\t", sec_after_inject
         print "inject_node\t\t", inject_node
+        print "k\t\t\t", k
         print "logfilename\t\t", logfilename
         print "="*40
 
 
-        pg = PacketGraph()
-        pg.execute(sqr_nodes,
-                   connectivity,
-                   randomize_boot,
-                   sec_before_inject,
-                   sec_after_inject,
-                   inject_node,
-                   filenamebase)
+        # TrickleGraph shows it better
+        # pg = PacketGraph()
+        # pg.execute(sqr_nodes,
+        #            connectivity,
+        #            randomize_boot,
+        #            sec_before_inject,
+        #            sec_after_inject,
+        #            inject_node,
+        #            k,
+        #            filenamebase)
 
         tg = TrickleGraph()
         tg.execute(sqr_nodes,
@@ -48,6 +52,7 @@ class GraphEvaluation:
                    sec_before_inject,
                    sec_after_inject,
                    inject_node,
+                   k,
                    filenamebase)
 
         cg = ContourGraph()
@@ -57,6 +62,7 @@ class GraphEvaluation:
                    sec_before_inject,
                    sec_after_inject,
                    inject_node,
+                   k,
                    filenamebase)
 
         hg = HistGraph()
@@ -66,4 +72,5 @@ class GraphEvaluation:
                    sec_before_inject,
                    sec_after_inject,
                    inject_node,
+                   k,
                    filenamebase)

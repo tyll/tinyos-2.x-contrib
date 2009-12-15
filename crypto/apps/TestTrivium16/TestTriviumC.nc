@@ -106,6 +106,7 @@ implementation{
 		/*
 		 * Decryption of the message.
 		 */
+
 		call trivium.process_bytes(s12,s22,s32,out,msg1,MSG_LEN);
 		dbg("Boot", "Message decryted : %s\n", msg1);
 	}

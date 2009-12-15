@@ -323,8 +323,4 @@ typedef int8_t int_t;
 
 #endif
 
-void key_init(uint_t *s1,uint_t *s2, uint_t *s3, const uint8_t *K, uint8_t *IV);
-void gen_keystream(uint_t *s1,uint_t *s2, uint_t *s3,uint_t *z);
-void process_bytes(uint_t *s1,uint_t *s2, uint_t *s3,uint8_t *input, uint8_t *output, int32_t length);
-
 #endif

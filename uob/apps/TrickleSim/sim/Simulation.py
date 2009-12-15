@@ -1,5 +1,7 @@
 #! /usr/bin/python
 
+import os
+
 from optparse import OptionParser
 
 from sim.run.SimulationRun import *
@@ -11,17 +13,22 @@ class SimulationSuite:
         self.sec_before_inject = 10
         self.sec_after_inject  = 300
         self.inject_node       = 1
-        #self.sqr_nodes_list    = [2, 3, 4, 5, 6, 7, 8, 9, 10]
-        #self.sqr_nodes_list    = [2, 5, 10, 20]
+
         #self.sqr_nodes_list    = [2, 5]
-        self.sqr_nodes_list    = [2]
+        #self.sqr_nodes_list    = [2]
         #self.sqr_nodes_list    = [5]
         #self.sqr_nodes_list    = [20]
-        self.connectivity_list = [1, 2, 3]
+        #self.sqr_nodes_list    = [2, 3, 4, 5, 6, 7, 8, 9, 10]
+        self.sqr_nodes_list    = [2, 5, 10, 20]
+
+        #self.connectivity_list = [1]
+        #self.connectivity_list = [1, 2, 3]
         #self.connectivity_list = [1, 1.5, 2, 3]
-        #self.connectivity_list = [1, 1.5, 2, 3, 4, 5, 6]
+        self.connectivity_list = [1, 1.5, 2, 3, 4, 5, 6]
+
         self.randomize_boot    = True
         self.randomize_seed    = True
+        self.k                 = 0 # NEEDS to BE SETTED MANUALLY
 
     def createfilenamebase(self,
                            sqr_nodes,
@@ -38,24 +45,50 @@ class SimulationSuite:
     def execute(self):
         for sqr_nodes in self.sqr_nodes_list:
             for connectivity in self.connectivity_list:
-                # FIXME: use connectivity to show scaling with denseness
-                sr = SimulationRun()
-                sr.execute(sqr_nodes,
-                           connectivity,
-                           self.randomize_boot,
-                           self.randomize_seed,
-                           self.sec_before_inject,
-                           self.sec_after_inject,
-                           self.inject_node,
-                           self.createfilenamebase(sqr_nodes,
-                                                   connectivity,
-                                                   self.randomize_boot,
-                                                   self.sec_before_inject,
-                                                   self.sec_after_inject,
-                                                   self.inject_node))
 
-                del(sr)
+                cmd = "python sim/run/SimulationRun.py" + \
+                    " -s " + str(sqr_nodes) + \
+                    " -c " + str(connectivity)
 
+                if self.randomize_boot:
+                    cmd = cmd + " -b"
+
+                if self.randomize_seed:
+                    cmd = cmd + " -r"
+
+                cmd = cmd + \
+                    " -i " + str(self.sec_before_inject) + \
+                    " -a " + str(self.sec_after_inject) + \
+                    " -n " + str(self.inject_node) + \
+                    " -f " + self.createfilenamebase(sqr_nodes,
+                                                     connectivity,
+                                                     self.randomize_boot,
+                                                     self.sec_before_inject,
+                                                     self.sec_after_inject,
+                                                     self.inject_node)
+                print "Executing:", cmd
+                os.system(cmd)
+
+                #FIXME: repeated simulation runs result in weird
+                #results
+                # sr = SimulationRun()
+                # sr.execute(sqr_nodes,
+                #            connectivity,
+                #            self.randomize_boot,
+                #            self.randomize_seed,
+                #            self.sec_before_inject,
+                #            self.sec_after_inject,
+                #            self.inject_node,
+                #            self.createfilenamebase(sqr_nodes,
+                #                                    connectivity,
+                #                                    self.randomize_boot,
+                #                                    self.sec_before_inject,
+                #                                    self.sec_after_inject,
+                #                                    self.inject_node))
+
+                # del(sr)
+
+    #FIXME: evaluate could run in another thread
     def evaluate(self):
         for sqr_nodes in self.sqr_nodes_list:
             for connectivity in self.connectivity_list:
@@ -66,7 +99,7 @@ class SimulationSuite:
                            self.randomize_boot,
                            self.sec_before_inject,
                            self.sec_after_inject,
-                           self.inject_node,
+                           self.inject_node, # FIXME: add self.k
                            self.createfilenamebase(sqr_nodes,
                                                    connectivity,
                                                    self.randomize_boot,
@@ -81,6 +114,7 @@ class SimulationSuite:
                            self.sec_before_inject,
                            self.sec_after_inject,
                            self.inject_node,
+                           self.k,
                            self.createfilenamebase(sqr_nodes,
                                                    connectivity,
                                                    self.randomize_boot,

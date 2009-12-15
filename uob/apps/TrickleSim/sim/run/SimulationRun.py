@@ -1,6 +1,11 @@
+#! /usr/bin/python
+
+from optparse import OptionParser
+
 import sys
 
 from TOSSIM import *
+from tinyos.tossim.TossimApp import *
 
 from sim.TrickleSimMsg import *
 from sim.scenarios.RegularScenario import Scenario
@@ -88,3 +93,67 @@ class SimulationRun:
 #        print "Deleting TOSSIM object 2"
 #        del(self.t)
 #        print "Deleting TOSSIM object 3"
+
+if __name__ == "__main__":
+    optparser = OptionParser()
+
+    optparser.add_option("-s",
+                         "--sqr_nodes",
+                         type="int",
+                         default=2,
+                         help="Number of nodes in 1 dimension (Square root of 2D)")
+
+    optparser.add_option("-c",
+                         "--connectivity",
+                         type="float",
+                         default=1,
+                         help="Maximum Distance to connect to neighbors.")
+
+    optparser.add_option("-b",
+                         "--randomize_boot",
+                         action="store_true",
+                         help="Randomize the boot sequence.")
+
+    optparser.add_option("-r",
+                         "--randomize_seed",
+                         action="store_true",
+                         help="Randomize the seed sequence.")
+
+    optparser.add_option("-i",
+                         "--before-inject",
+                         type="float",
+                         default=10,
+                         help="Seconds to wait before injecting the update.")
+
+    optparser.add_option("-a",
+                         "--after-inject",
+                         type="float",
+                         default=300,
+                         help="Seconds to wait after injecting the update.")
+
+    optparser.add_option("-n",
+                         "--node",
+                         type="int",
+                         default=1,
+                         help="The node to inject the message at.")
+
+    optparser.add_option("-f",
+                         "--filenamebase",
+                         action="store",
+                         help="The prefix for the output files.")
+
+    (optionsp, argsp) = optparser.parse_args()
+
+    if not optionsp.filenamebase:
+        optparser.print_help()
+        sys.exit(-1)
+
+    sr = SimulationRun()
+    sr.execute(optionsp.sqr_nodes,
+               optionsp.connectivity,
+               optionsp.randomize_boot,
+               optionsp.randomize_seed,
+               optionsp.before_inject,
+               optionsp.after_inject,
+               optionsp.node,
+               optionsp.filenamebase)

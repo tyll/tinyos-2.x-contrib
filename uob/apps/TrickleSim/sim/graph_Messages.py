@@ -5,17 +5,27 @@ import matplotlib.pyplot as plt
 
 import numpy as np
 
-# #messages for k=1, trickle, 300s after inject
-nodes_5_5 = [76, 37, 25, 16, 12, 8]
-nodes_10_10 = [313, 130, 68, 49, 33, 27]
-nodes_20_20 = [1212, 428, 226, 156, 100, 77]
-K = 1
-
-# #messages for k=2, trickle, 300s after inject
-#nodes_5_5 = [102, 60, 41, 29, 19, 15]
-#nodes_10_10 = [389, 206, 119, 86, 59, 50]
-#nodes_20_20 = [1465, 720, 401, 266, 178, 137]
+K = 0
+#K = 1
 #K = 2
+
+if K == 1:
+# #messages for k=1, trickle, 300s after inject
+    nodes_5_5 = [76, 37, 25, 16, 12, 8]
+    nodes_10_10 = [313, 130, 68, 49, 33, 27]
+    nodes_20_20 = [1212, 428, 226, 156, 100, 77]
+
+if K == 2:
+# #messages for k=2, trickle, 300s after inject
+    nodes_5_5 = [102, 60, 41, 29, 19, 15]
+    nodes_10_10 = [389, 206, 119, 86, 59, 50]
+    nodes_20_20 = [1465, 720, 401, 266, 178, 137]
+
+if K == 0:
+# #messages for k=0, PUSH, 300s after inject
+    nodes_5_5 = [175, 175, 175, 175, 175, 175]
+    nodes_10_10 = [700, 700, 700, 700, 700, 700]
+    nodes_20_20 = [2800, 2800, 2800, 2800, 2800, 2800]
 
 factor = K*1.5
 
@@ -71,7 +81,7 @@ plt.plot(conn, nodes_10_10, marker='.', ls='None', markerfacecolor='g', markered
 plt.plot(conn, nodes_20_20, marker='.', ls='None', markerfacecolor='b', markeredgecolor='None', markersize=10, label='20x20 simulated')
 
 plt.xlim(conn[0]-1, conn[-1]+1)
-plt.ylim(0, 1600)
+plt.ylim(0, 3000)
 
 plt.legend()
 
@@ -111,11 +121,12 @@ nodes_20_20_poly_model_inv = [ (nodes_20_20_model[0] * 1/x + nodes_20_20_model[1
 #print nodes_10_10_poly_model_inv
 #print nodes_20_20_poly_model_inv
 
-plt.plot(neighbors_all, nodes_5_5_poly_model_inv,   ls='-', color='r', label=' 5x5 model')
-plt.plot(neighbors_all, nodes_10_10_poly_model_inv, ls='-', color='g', label='10x10 model')
-plt.plot(neighbors_all, nodes_20_20_poly_model_inv, ls='-', color='b', label='20x20 model')
+if K != 0:
+    plt.plot(neighbors_all, nodes_5_5_poly_model_inv,   ls='-', color='r', label=' 5x5 model')
+    plt.plot(neighbors_all, nodes_10_10_poly_model_inv, ls='-', color='g', label='10x10 model')
+    plt.plot(neighbors_all, nodes_20_20_poly_model_inv, ls='-', color='b', label='20x20 model')
 
-plt.ylim(0, 1600)
+plt.ylim(0, 3000)
 
 plt.legend()
 plt.text(.5, .9,
@@ -142,12 +153,13 @@ plt.plot(xp, nodes_5_5_poly(xp),   ls=':', color='r', label=' 5x5 linear fit')
 plt.plot(xp, nodes_10_10_poly(xp), ls=':', color='g', label='10x10 linear fit')
 plt.plot(xp, nodes_20_20_poly(xp), ls=':', color='b', label='20x20 linear fit')
 
-plt.plot(xp, nodes_5_5_poly_model(xp),   ls='-', color='r', label=' 5x5 model')
-plt.plot(xp, nodes_10_10_poly_model(xp), ls='-', color='g', label='10x10 model')
-plt.plot(xp, nodes_20_20_poly_model(xp), ls='-', color='b', label='20x20 model')
+if K != 0:
+    plt.plot(xp, nodes_5_5_poly_model(xp),   ls='-', color='r', label=' 5x5 model')
+    plt.plot(xp, nodes_10_10_poly_model(xp), ls='-', color='g', label='10x10 model')
+    plt.plot(xp, nodes_20_20_poly_model(xp), ls='-', color='b', label='20x20 model')
 
 plt.legend(loc='upper left')
-plt.ylim(0, 2500)
+plt.ylim(0, 3000)
 
 plt.text(.5, .9,
           "K: " + str(K),

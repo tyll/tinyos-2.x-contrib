@@ -621,27 +621,26 @@ implementation{
 
         }
 
-        if(length != 0){
-            call trivium.gen_keystream(s1,s2,s3,z);
+        call trivium.gen_keystream(s1,s2,s3,z);
 
-            #ifdef EIGHT_BIT_MICROCONTROLLER
-            for(j=0,length+=8;length>0;i++,j++,length--)
-            {
-                output[i] = XOR(input[i],z[j]);
-            }
-            #endif
+        #ifdef EIGHT_BIT_MICROCONTROLLER
+        for(j=0,length+=8;length>0;i++,j++,length--)
+        {
+         	output[i] = XOR(input[i],z[j]);
+		}
+		#endif
 
-            #ifdef SIXTEEN_BIT_MICROCONTROLLER
-            for(j=0,length+=8;length>1;i+=2,j++,length-=2)
-            {
+		#ifdef SIXTEEN_BIT_MICROCONTROLLER
+		for(j=0,length+=8;length>1;i+=2,j++,length-=2)
+		{
 
-                output[i] = XOR(input[i],(uint8_t)z[j]);
-                output[i+1] = XOR(input[i+1],(uint8_t)(z[j]>>8));
-            }
+			output[i] = XOR(input[i],(uint8_t)z[j]);
+			output[i+1] = XOR(input[i+1],(uint8_t)(z[j]>>8));
+		}
 
-            if(length){
-                output[i] = XOR(input[i],(uint8_t)z[j]);
-            }
+		if(length){
+			output[i] = XOR(input[i],(uint8_t)z[j]);
+		}
 
             #endif
         }

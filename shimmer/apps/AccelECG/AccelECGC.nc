@@ -1,0 +1,587 @@
+/*
+ * Copyright (c) 2007, Intel Corporation
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ * 
+ * Redistributions of source code must retain the above copyright notice, 
+ * this list of conditions and the following disclaimer. 
+ *
+ * Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution. 
+ *
+ * Neither the name of the Intel Corporation nor the names of its contributors
+ * may be used to endorse or promote products derived from this software 
+ * without specific prior written permission. 
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE 
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Author: Adrian Burns
+ *         November, 2007
+ */
+
+ /***********************************************************************************
+
+   This app uses Bluetooth to stream 3 Accelerometer channels and 2 ECG channels 
+   of data to a BioMOBIUS PC application. 
+   Tested on SHIMMER Base Board Rev 1.3, SHIMMER ECG board Rev 1.1.
+   
+   LOW_BATTERY_INDICATION if defined stops the app streaming data just after the 
+   battery voltage drops below the regulator value of 3V.
+
+   Default Sample Frequency: 100 hz
+   
+   Packet Format:
+         BOF| Sensor ID | Data Type | Seq No. | TimeStamp | Len | Acc | Acc  | Acc  | ECG   | ECG  | Dummy|  CRC | EOF
+   Byte:  1 |    2      |     3     |    4    |     5-6   |  7  | 8-9 | 10-11| 12-13| 14-15 | 16-17| 18-19| 20-21| 22
+
+ ***********************************************************************************/
+/*
+ * @author Adrian Burns
+ * @date November, 2007
+ *
+ * @author Mike Healy
+ * @date May 13, 2009 - ported to TinyOS 2.x 
+ */
+
+#include "Timer.h"
+#include "Mma7260.h"
+#include "AccelECG.h"
+#include "crc.h"
+#include "RovingNetworks.h"
+
+module AccelECGC {
+   uses {
+      interface Boot;
+      interface Init as BluetoothInit;
+      interface Init as AccelInit;
+      interface Leds;
+      interface Timer<TMilli> as SetupTimer;
+      interface Timer<TMilli> as ActivityTimer;
+      interface Timer<TMilli> as SampleTimer;
+      interface LocalTime<T32khz>;
+      interface Mma7260 as Accel;
+      interface StdControl as BTStdControl;
+      interface Bluetooth;
+      interface HplAdc12;
+      interface Msp430DmaControl;
+      interface Msp430DmaChannel;
+#ifdef USE_8MHZ_CRYSTAL
+      interface BusyWait<TMicro, uint16_t>;
+#endif
+   }
+} 
+
+implementation {
+   extern int sprintf(char *str, const char *format, ...) __attribute__ ((C));
+
+#ifdef LOW_BATTERY_INDICATION
+   //#define DEBUG_LOW_BATTERY_INDICATION
+   /* during testing of the the (AVcc-AVss)/2 value from the ADC on various SHIMMERS, to get a reliable cut off point 
+      to recharge the battery it is important to find the baseline (AVcc-AVss)/2 value coming from the ADC as it varies 
+      from SHIMMER to SHIMMER, however the range of fluctuation is pretty constant and (AVcc-AVss)/2 provides an accurate 
+      battery low indication that prevents getting any voltage skewed data from the accelerometer or add-on board sensors */
+#define TOTAL_BASELINE_BATT_VOLT_SAMPLES_TO_RECORD 1000
+#define BATTERY_LOW_INDICATION_OFFSET 20 /* (AVcc - AVss)/2 = Approx 3V-0V/2 = 1.5V, 12 bit ADC with 2.5V REF,
+                                              4096/2500 = 1mV=1.6384 units */ 
+   bool need_baseline_voltage, linkDisconnecting;
+   uint16_t num_baseline_voltage_samples, baseline_voltage;
+   uint32_t sum_batt_volt_samples;
+
+#ifdef DEBUG_LOW_BATTERY_INDICATION
+   #error "were going for debug mode yea?, comment me out then"
+   uint16_t debug_counter;
+#endif /* DEBUG_LOW_BATTERY_INDICATION */
+
+#endif /* LOW_BATTERY_INDICATION */
+
+#define FIXED_PACKET_SIZE 22
+#define FIXED_PAYLOAD_SIZE 12
+   uint8_t tx_packet[(FIXED_PACKET_SIZE*2)+1]; /* (*2)twice size because of byte stuffing */
+                                               /* (+1)MSP430 CPU can only read/write 16-bit values at even addresses, */ 
+                                               /* so use an empty byte to even up the memory locations for 16-bit values */
+   const uint8_t personality[17] = {
+      0,1,2,3,4,5,0xFF,0xFF,
+      SAMPLING_50HZ,SAMPLING_50HZ,SAMPLING_50HZ,SAMPLING_50HZ,
+      SAMPLING_50HZ,SAMPLING_50HZ,SAMPLING_0HZ_OFF,SAMPLING_0HZ_OFF,FRAMING_EOF
+   };
+
+   norace uint8_t current_buffer = 0;
+   uint16_t sbuf0[6], sbuf1[6], timestamp0, timestamp1;
+   bool enable_sending, command_mode_complete, activity_led_on;
+
+/* default sample frequency every time the sensor boots up */
+   uint16_t sample_freq = SAMPLING_200HZ;
+   enum { NBR_ADC_CHANS = 6 };
+   uint8_t ADC_CHANS[NBR_ADC_CHANS] = {5,    //Accel X
+                                       4,    //Accel Y
+                                       3,    //Accel Z
+                                       1,    //ECG_LALL
+                                       2,    //ECG_RALL
+                                       11};  //(AVcc-AVss)/2 to monitor battery voltage
+   
+   void resetADC12Registers();
+   void stopConversion();
+   void setupDMA(uint16_t *destAddr);
+  
+   /* Internal function to calculate 16 bit CRC */
+   uint16_t calc_crc(uint8_t *ptr, uint8_t count) {
+      uint16_t crc;
+      crc = 0;
+      while (count-- > 0)
+         crc = crcByte(crc, *ptr++);
+
+      return crc;
+   }
+
+   void sampleADC() {
+      resetADC12Registers();
+      setupDMA(sbuf0);
+   }
+
+   void init() {
+#ifdef USE_8MHZ_CRYSTAL
+      register uint8_t i;
+      /* 
+       * set up 8mhz clock to max out 
+       * msp430 throughput 
+       */
+
+      atomic CLR_FLAG(BCSCTL1, XT2OFF); // basic clock system control reg, turn off XT2 osc
+
+      call Leds.led0On();
+      do{
+         CLR_FLAG(IFG1, OFIFG);
+         for(i = 0; i < 0xff; i++);
+      }
+      while(READ_FLAG(IFG1, OFIFG));
+
+      call Leds.led0Off();
+
+      call Leds.led1On();
+      TOSH_uwait(50000UL);
+      //call BusyWait.wait(50000UL);
+
+      atomic{ 
+         BCSCTL2 = 0; 
+         SET_FLAG(BCSCTL2, SELM_2); /* select master clock source, XT2CLK when XT2 oscillator present */
+      }                            /*on-chip. LFXT1CLK when XT2 oscillator not present on-chip. */
+
+      call Leds.led1Off();
+
+      atomic{
+         SET_FLAG(BCSCTL2, SELS);  // smclk from xt2
+         SET_FLAG(BCSCTL2, DIVS_3);  // divide it by 8
+      }
+      /* 
+       * end clock set up 
+       */
+#endif /* USE_8MHZ_CRYSTAL */
+
+      call BluetoothInit.init();
+      call AccelInit.init();
+      TOSH_MAKE_ADC_1_INPUT();   // ECG_LALL
+      TOSH_MAKE_ADC_2_INPUT();   // ECG_RALL
+
+      TOSH_SEL_ADC_1_MODFUNC();
+      TOSH_SEL_ADC_2_MODFUNC();
+    
+      atomic {
+         memset(tx_packet, 0, (FIXED_PACKET_SIZE*2));
+         enable_sending = FALSE;
+         command_mode_complete = FALSE;
+         activity_led_on = FALSE;
+      }
+
+      call Bluetooth.disableRemoteConfig(TRUE);
+   }
+
+   event void Boot.booted() {
+      init();
+      call BTStdControl.start();
+      /* so that the clinicians know the sensor is on */
+      call Leds.led0On();
+#ifdef LOW_BATTERY_INDICATION
+      /* initialise baseline voltage measurement stuff */ 
+      need_baseline_voltage = TRUE;
+      num_baseline_voltage_samples = baseline_voltage = sum_batt_volt_samples = 0;
+      call Leds.led0On();
+#ifdef DEBUG_LOW_BATTERY_INDICATION
+      debug_counter = 0;
+#endif /* DEBUG_LOW_BATTERY_INDICATION */
+#endif /* LOW_BATTERY_INDICATION */
+   }
+
+#ifdef LOW_BATTERY_INDICATION
+   task void sendBatteryLowIndication() {
+      uint16_t crc;
+      char batt_low_str[] = "BATTERY LOW!";
+
+      /* stop all sensing - battery is below the threshold */
+      call SetupTimer.stop();
+      call ActivityTimer.stop();
+      stopConversion();
+      call Msp430DmaChannel.stopTransfer();
+      call Accel.wake(FALSE);
+      call Leds.led1Off();
+
+      /* send the battery low indication packet to BioMOBIUS */
+      tx_packet[1] = FRAMING_BOF;
+      tx_packet[2] = SHIMMER_REV1;
+      tx_packet[3] = STRING_DATA_TYPE;
+      tx_packet[4]++; /* increment sequence number */ 
+      atomic tx_packet[5] = timestamp0 & 0xff;
+      atomic tx_packet[6] = (timestamp0 >> 8) & 0xff;
+      tx_packet[7] = FIXED_PAYLOAD_SIZE;
+      memcpy(&tx_packet[8], &batt_low_str[0], 12);
+
+#ifdef DEBUG_LOW_BATTERY_INDICATION
+      tx_packet[8] = (baseline_voltage) & 0xff;
+      tx_packet[9] = ((baseline_voltage) >> 8) & 0xff;
+#endif /* DEBUG_LOW_BATTERY_INDICATION */
+    
+      crc = calc_crc(&tx_packet[2], (FIXED_PACKET_SIZE-FRAMING_SIZE));
+      tx_packet[FIXED_PACKET_SIZE - 2] = crc & 0xff;
+      tx_packet[FIXED_PACKET_SIZE - 1] = (crc >> 8) & 0xff;
+      tx_packet[FIXED_PACKET_SIZE] = FRAMING_EOF;
+
+      call Bluetooth.write(&tx_packet[1], FIXED_PACKET_SIZE);
+      atomic enable_sending = FALSE;
+
+      /* initialise baseline voltage measurement stuff */
+      need_baseline_voltage = TRUE;
+      num_baseline_voltage_samples = baseline_voltage = sum_batt_volt_samples = 0;
+      call Leds.led0On();
+   }
+
+   /* all samples are got so set the baseline voltage for this SHIMMER hardware */
+   void setBattVoltageBaseline() {
+      baseline_voltage = (sum_batt_volt_samples / TOTAL_BASELINE_BATT_VOLT_SAMPLES_TO_RECORD);
+   }
+
+   /* check voltage level and if it is low then stop sampling, send message and disconnect */
+   void checkBattVoltageLevel(uint16_t battery_voltage) {
+#ifndef DEBUG_LOW_BATTERY_INDICATION
+      if(battery_voltage < (baseline_voltage-BATTERY_LOW_INDICATION_OFFSET)) {
+#else
+      if(debug_counter++ == 2500) {
+#endif /* DEBUG_LOW_BATTERY_INDICATION */
+         linkDisconnecting = TRUE;
+      }
+   }
+
+   /* keep checking the voltage level of the battery until it drops below the offset */
+   void monitorBattery() {
+      uint16_t battery_voltage;
+      if(current_buffer == 1) {
+         battery_voltage = sbuf0[5];
+      }
+      else {
+         battery_voltage = sbuf1[5];
+      }
+      if(need_baseline_voltage) {
+         num_baseline_voltage_samples++;      
+         if(num_baseline_voltage_samples <= TOTAL_BASELINE_BATT_VOLT_SAMPLES_TO_RECORD) {
+            /* add this sample to the total so that an average baseline can be obtained */
+            sum_batt_volt_samples += battery_voltage;
+         }
+         else {
+            setBattVoltageBaseline();
+            need_baseline_voltage = FALSE;
+            call Leds.led0Off();
+         }
+      }
+      else {
+         checkBattVoltageLevel(battery_voltage);
+      }
+   }
+#endif /* LOW_BATTERY_INDICATION */
+
+
+   /* The MSP430 CPU is byte addressed and little endian */
+   /* packets are sent little endian so the word 0xABCD will be sent as bytes 0xCD 0xAB */
+   void preparePacket() {
+      uint16_t *p_packet, *p_ADCsamples, crc;
+    
+      tx_packet[1] = FRAMING_BOF;
+      tx_packet[2] = SHIMMER_REV1;
+      tx_packet[3] = PROPRIETARY_DATA_TYPE;
+      tx_packet[4]++; /* increment sequence number */ 
+
+      tx_packet[7] = FIXED_PAYLOAD_SIZE;
+
+      p_packet = (uint16_t *)&tx_packet[8];
+      
+      if(current_buffer == 1) {
+         p_ADCsamples = &sbuf0[0];
+         tx_packet[5] = timestamp0 & 0xff;
+         tx_packet[6] = (timestamp0 >> 8) & 0xff;
+      }
+      else {
+         p_ADCsamples = &sbuf1[0];
+         tx_packet[5] = timestamp1 & 0xff;
+         tx_packet[6] = (timestamp1 >> 8) & 0xff;
+      }
+      /* copy all the data samples into the outgoing packet */
+      *p_packet++ = *p_ADCsamples++; //tx_packet[8]
+      *p_packet++ = *p_ADCsamples++; //tx_packet[10]
+      *p_packet++ = *p_ADCsamples++; //tx_packet[12]
+      *p_packet++ = *p_ADCsamples++; //tx_packet[14]
+      *p_packet = *p_ADCsamples; //tx_packet[16]
+
+      /* spare room in the packet so send the battery voltage data */
+      if(current_buffer == 1) {
+         tx_packet[18] = (sbuf0[5]) & 0xff;
+         tx_packet[19] = ((sbuf0[5]) >> 8) & 0xff;
+      }
+      else {
+         tx_packet[18] = (sbuf1[5]) & 0xff;
+         tx_packet[19] = ((sbuf1[5]) >> 8) & 0xff;
+      }
+
+      crc = calc_crc(&tx_packet[2], (FIXED_PACKET_SIZE-FRAMING_SIZE));
+      tx_packet[FIXED_PACKET_SIZE - 2] = crc & 0xff;
+      tx_packet[FIXED_PACKET_SIZE - 1] = (crc >> 8) & 0xff;
+      tx_packet[FIXED_PACKET_SIZE] = FRAMING_EOF;
+   }
+
+   task void sendSensorData() {
+#ifdef LOW_BATTERY_INDICATION
+      monitorBattery();
+#endif /* LOW_BATTERY_INDICATION */
+
+      atomic if(enable_sending) {
+         preparePacket();
+
+         /* send data over the air */
+         call Bluetooth.write(&tx_packet[1], FIXED_PACKET_SIZE);
+         atomic enable_sending = FALSE;
+      }
+   }
+
+   task void startSensing() {
+      call ActivityTimer.startPeriodic(1000);
+      call Accel.setSensitivity(RANGE_4_0G);
+      call Accel.wake(TRUE);
+
+      call SampleTimer.startPeriodic(sample_freq);
+
+      sampleADC();
+   }
+
+   task void sendPersonality() {
+      atomic if(enable_sending) {
+         /* send data over the air */
+         call Bluetooth.write(&personality[0], 17);
+         atomic enable_sending = FALSE;
+      }
+   }
+
+   task void stopSensing() {
+      call SetupTimer.stop();
+      call SampleTimer.stop();
+      call ActivityTimer.stop();
+      stopConversion();
+      call Msp430DmaChannel.stopTransfer();
+      call Accel.wake(FALSE);
+      call Leds.led1Off();
+   }
+
+   async event void Bluetooth.connectionMade(uint8_t status) { 
+      atomic enable_sending = TRUE;
+      call Leds.led2On();
+   }
+
+   async event void Bluetooth.commandModeEnded() { 
+      atomic command_mode_complete = TRUE;
+   }
+    
+   async event void Bluetooth.connectionClosed(uint8_t reason){
+      atomic enable_sending = FALSE;    
+      call Leds.led2Off();
+      post stopSensing();
+   }
+
+   task void startConfigTimer() {
+      call SetupTimer.startPeriodic(5000);
+   }
+
+   async event void Bluetooth.dataAvailable(uint8_t data){
+      /* start capturing on ^G */
+      if(7 == data) {
+         atomic if(command_mode_complete) {
+            post startSensing();
+         }
+         else {
+            /* give config a chance, wait 5 secs */
+            post startConfigTimer();
+         }
+      }
+      else if (data == 1) {
+         post sendPersonality();
+      }
+
+      /* stop capturing on spacebar */
+      else if (data == 32) {
+         post stopSensing();
+      }
+      else { /* were done */ }
+   }
+
+   event void Bluetooth.writeDone(){
+      atomic enable_sending = TRUE;
+
+#ifdef LOW_BATTERY_INDICATION
+      if(linkDisconnecting) {
+         linkDisconnecting = FALSE;
+         /* signal battery low to master and let the master disconnect the link */
+         post sendBatteryLowIndication();
+      }
+#endif /* LOW_BATTERY_INDICATION */
+   }
+
+   event void SetupTimer.fired() {
+      atomic if(command_mode_complete){
+         call ActivityTimer.stop();
+         post startSensing();
+      }
+   }
+
+   event void ActivityTimer.fired() {
+      atomic {
+         /* toggle activity led every second */
+         if(activity_led_on) {
+            call Leds.led1On();
+            activity_led_on = FALSE;
+         }
+         else {
+            call Leds.led1Off();
+            activity_led_on = TRUE;
+         }
+      }
+   }
+
+   event void SampleTimer.fired() {
+      call HplAdc12.startConversion();
+   }
+
+   async event void Msp430DmaChannel.transferDone(error_t success) {
+      if(current_buffer == 0){
+         call Msp430DmaChannel.repeatTransfer((void*)ADC12MEM0_, (void*)sbuf1, NBR_ADC_CHANS);
+         atomic timestamp1 = call LocalTime.get();
+	      current_buffer = 1;
+      }
+      else { 
+         call Msp430DmaChannel.repeatTransfer((void*)ADC12MEM0_, (void*)sbuf0, NBR_ADC_CHANS);
+         atomic timestamp0 = call LocalTime.get();
+	      current_buffer = 0;
+      }
+      post sendSensorData();      
+   }
+
+  /*******************************ADC12 and DMA drivers*******************************/
+   void initADC12CTL0()
+   {
+      adc12ctl0_t ctl0 = {
+         adc12sc:0,                      // start conversion: 0 = no sample-and-conversion-start
+         enc:0,                          // enable conversion: 0 = ADC12 disabled
+         adc12tovie:0,                   // conversion-time-overflow-interrupt: 0 = interrupt dissabled
+         adc12ovie:0,                    // ADC12MEMx overflow-interrupt: 0 = dissabled
+         adc12on:1,                      // ADC12 on: 1 = on
+#ifdef USE_AVCC_REF 
+         refon:0,                        // reference generator: 0 = off
+#else
+         refon:1,                        // reference generator: 0 = off
+#endif
+         r2_5v:1,                        // reference generator voltage: 1 = 2.5V
+         msc:1,                          // multiple sample and conversion: 1 = conversions performed ASAP
+         sht0:SAMPLE_HOLD_4_CYCLES,      // sample-and-hold-time for  ADC12MEM0 to ADC12MEM7  
+         sht1:SAMPLE_HOLD_4_CYCLES};     // sample-and-hold-time for  ADC12MEM8 to ADC12MEM15  
+
+        call HplAdc12.setCtl0(ctl0);
+   }
+
+   void initADC12CTL1()
+   {
+      adc12ctl1_t ctl1 = {
+         adc12busy:0,                    // no operation is active
+         conseq:1,                       // conversion mode: sequence of chans
+         adc12ssel:SHT_SOURCE_SMCLK,     // SHT_SOURCE_SMCLK=3; ADC12 clocl source
+         adc12div:SHT_CLOCK_DIV_8,       // SHT_CLOCK_DIV_8=7; ADC12 clock div 1
+         issh:0,                         // sample-input signal not inverted
+         shp:1,                          // Sample-and-hold pulse-mode select: SAMPCON signal is sourced from the sampling timer
+         shs:0,                          // Sample-and-hold source select= ADC12SC bit
+         cstartadd:0};                   // conversion start addres ADC12MEM0
+
+      call HplAdc12.setCtl1(ctl1);
+   }
+
+   void initADC12MEMCTLx()
+   {
+      adc12memctl_t memctl = {
+         inch: 0,                        // input channel: ADC0
+#ifdef USE_AVCC_REF 
+         sref: REFERENCE_AVcc_AVss,      // reference voltage: 
+#else
+         sref: REFERENCE_VREFplus_AVss,
+#endif
+         eos: 1 };                       // end of sequence flag: 1 indicates last conversion
+
+      uint8_t i = 0;
+
+      for (i = 0; i < NBR_ADC_CHANS; ++i) {
+         memctl.inch = ADC_CHANS[i];
+         if (i < NBR_ADC_CHANS-1)
+            memctl.eos = 0;
+         else 
+            memctl.eos = 1;                   // eos=1 indicates last conversion in sequence
+         call HplAdc12.setMCtl(i, memctl);
+      }
+   }
+
+   void resetADC12Registers()
+   {
+      initADC12CTL0();
+      initADC12CTL1();
+      initADC12MEMCTLx();
+   }
+
+   void stopConversion()
+   {
+      call HplAdc12.stopConversion();
+      call HplAdc12.setIEFlags(0);
+      call HplAdc12.resetIFGs();
+   }                                            
+        
+   async event void HplAdc12.conversionDone(uint16_t iv) {
+   }
+
+   void setupDMA(uint16_t *destAddr) {
+      call Msp430DmaControl.init();
+      call Msp430DmaControl.setFlags(FALSE, FALSE, FALSE);              // sets DMACTL1
+      call Msp430DmaChannel.setupTransfer(DMA_BLOCK_TRANSFER,           //dma_transfer_mode_t transfer_mode, 
+                                          DMA_TRIGGER_ADC12IFGx,        //dma_trigger_t trigger, 
+                                          DMA_EDGE_SENSITIVE,           //dma_level_t level,
+                                          (void*)ADC12MEM0_,            //void *src_addr, 
+                                          (void*)destAddr,              //void *dst_addr, 
+                                          NBR_ADC_CHANS,                //uint16_t size,
+                                          DMA_WORD,                     //dma_byte_t src_byte, 
+                                          DMA_WORD,                     //dma_byte_t dst_byte,
+                                          DMA_ADDRESS_INCREMENTED,      //dma_incr_t src_incr, 
+                                          DMA_ADDRESS_INCREMENTED);     //dma_incr_t dst_incr
+      call Msp430DmaChannel.startTransfer();
+   }
+}
+

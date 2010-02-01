@@ -74,8 +74,8 @@ implementation {
       return call BottomSendMsg.cancel[id](msg);
   }
     
-  command void* AMSend.getPayload[uint8_t id]( message_t* msg){
-      return call BottomSendMsg.getPayload[id](msg);
+  command void* AMSend.getPayload[uint8_t id]( message_t* msg, uint8_t len){
+    return call BottomSendMsg.getPayload[id](msg, len);
   }
     
   command uint8_t AMSend.maxPayloadLength[uint8_t id]( ){
@@ -99,14 +99,6 @@ implementation {
     return msg;
   }
   
-  command void* Receive.getPayload[ uint8_t am ]( message_t* msg,  uint8_t* len)  {
-      return call Packet.getPayload(msg, len);
-  }
-    
-  command uint8_t Receive.payloadLength[ uint8_t am ]( message_t* msg)  {
-      return call Packet.payloadLength(msg);
-  }
-
 #ifdef SERIAL_LOGGING  
   event void SerialAMSend.sendDone( message_t* msg, error_t success )  {
       return;

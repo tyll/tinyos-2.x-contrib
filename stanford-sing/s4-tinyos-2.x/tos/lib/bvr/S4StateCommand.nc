@@ -19,7 +19,7 @@ interface S4StateCommand {
     command error_t startRootBeacon();
     command error_t stopRootBeacon();
     
-    #ifdef FW_ROOTBEACON CMD  
+    #ifdef FW_ROOTBEACON CMD
     ///////////// *******Qasim
     
     command error_t setRootBeacon(uint8_t n);

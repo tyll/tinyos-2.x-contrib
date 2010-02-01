@@ -88,8 +88,8 @@ implementation {
     return call BottomSendMsg.cancel[ am ]( msg );
   }
   
-  command void* AMSend.getPayload[ uint8_t am ]( message_t* msg )  {
-    return call BottomSendMsg.getPayload[ am ]( msg );
+  command void* AMSend.getPayload[ uint8_t am ]( message_t* msg, uint8_t len )  {
+    return call BottomSendMsg.getPayload[ am ]( msg, len );
   }
   
   command uint8_t AMSend.maxPayloadLength[ uint8_t am ](  )  {
@@ -122,14 +122,5 @@ implementation {
   default event message_t* Receive.receive[ uint8_t am ]( message_t* msg, void* payload, uint8_t len)  {
     return msg;
   }
-  
-  command void* Receive.getPayload[ uint8_t am ]( message_t* msg,  uint8_t* len)  {
-    return call Packet.getPayload(msg, len);
-  }
-  
-  command uint8_t Receive.payloadLength[ uint8_t am ]( message_t* msg)  {
-    return call Packet.payloadLength(msg);
-  }
-
 
 } //end of implementation  

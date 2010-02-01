@@ -1,7 +1,8 @@
 #include <tossim.h>
 #include <stdio.h>
-#include <fstream.h>
+#include <fstream>
 #include <iostream>
+using namespace::std;
 
 #include <vector>
 
@@ -18,8 +19,11 @@ int main() {
  t->addChannel("S4Router", stdout);
 //  t->addChannel("S4-beacon", stdout);
 // t->addChannel("S4-state-func", stdout); 
+
  fstream filestr;
+
  char nextLine[1024];
+
  std::vector<int> v;
 
  fstream filestr_noise;

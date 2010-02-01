@@ -83,7 +83,7 @@ implementation {
     return call S4Packet.maxPayloadLength();
   }
 
-  command void* Packet.getPayload(message_t *msg, uint8_t *len){
+  command void* Packet.getPayload(message_t *msg, uint8_t len){
     return call S4Packet.getPayload(msg, len);
   }
 

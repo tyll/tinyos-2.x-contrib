@@ -436,8 +436,8 @@ implementation {
     return call AirSendMsg.cancel[id](msg);
   }
   
-  command void* QueueSendMsg.getPayload[uint8_t id]( message_t* msg){
-    return call AirSendMsg.getPayload[id](msg);
+  command void* QueueSendMsg.getPayload[uint8_t id]( message_t* msg, uint8_t len){
+    return call AirSendMsg.getPayload[id](msg, len);
   }
   
   command uint8_t QueueSendMsg.maxPayloadLength[uint8_t id]( ){

@@ -220,24 +220,21 @@ public class AppCParser {
   
   
   @SuppressWarnings("unchecked")
-  private void extractModuleName(String line, String module_name) {
-	Pattern testcase_pattern = Pattern.compile("enum /\\*(.*)\\*/" + module_name + "[^0-9]*([0-9]+)____nesc_unnamed[0-9]*");
-	Matcher testcase_matcher  = testcase_pattern.matcher(line);
-	  
-	if (testcase_matcher.find()) {
-     String testName = testcase_matcher.group(1);
-   
-     int testId;
+  private void extractModuleName(String line, String moduleName) {
+    Pattern moduleNamePattern = Pattern.compile("enum /\\*(.*)\\*/" + moduleName + "[^0-9]*([0-9]+)____nesc_unnamed[0-9]*");
+    Matcher moduleNameMatcher  = moduleNamePattern.matcher(line);
+    if (moduleNameMatcher.find()) {
+      String testName = moduleNameMatcher.group(1);
+      int testId;
   
-     try {
-        testId = Integer.decode(testcase_matcher.group(2)).intValue();
-        log.debug(module_name + " ID " + testId + " is associated with test " + testName);
+      try {
+        testId = Integer.decode(moduleNameMatcher.group(2)).intValue();
+        log.debug(moduleName + " ID " + testId + " is associated with test " + testName);
         testMap.put(new Integer(testId), testName);
         
       } catch (NumberFormatException e) {
-    	  result.error("NumberFormatException", "NumberFormatException in " + module_name + "app.c parser");
+    	result.error("NumberFormatException", "NumberFormatException in " + moduleName + "app.c parser");
       }
     }
   }
-  
 }

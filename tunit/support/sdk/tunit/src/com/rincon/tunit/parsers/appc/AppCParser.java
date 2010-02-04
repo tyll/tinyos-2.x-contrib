@@ -37,7 +37,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.StringTokenizer;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 import org.apache.log4j.Logger;
 
@@ -47,7 +48,7 @@ import com.rincon.tunit.report.TestResult;
  * Parse an app.c file to extract test name information
  * 
  * @author David Moss
- * 
+ * @author Till Maas
  */
 public class AppCParser {
 
@@ -119,9 +120,10 @@ public class AppCParser {
    * 
    * enum \\*[TestName]*\\TestCaseC$[ID]$__nesc_unnamedWXYZ {
    * 
-   * Where \\'s are actually /'s. Anyway, we can map a test ID number from a
-   * parameterized interface to the test's name. Automatically, but externally.
-   * At least it doesn't impact footprint size.
+   * Where \\'s are actually /'s and the $ are the nesc-separator, which is
+   * currently "__". Anyway, we can map a test ID number from a parameterized
+   * interface to the test's name. Automatically, but externally.  At least it
+   * doesn't impact footprint size.
    */
   @SuppressWarnings("unchecked")
   public TestResult parse() {
@@ -140,9 +142,8 @@ public class AppCParser {
       while ((line = in.readLine()) != null) {
         extractOriginalFileAndLineNumber(line);
         extractAssertionId(line);
-        extractTestCaseName(line);
-        extractStatisticsName(line);
-        
+        extractModuleName(line, "TestCaseC");
+        extractModuleName(line, "StatisticsC");
       }
       
       in.close();
@@ -186,7 +187,7 @@ public class AppCParser {
       // This line contains a line number mapping. Simply remove the #.
       // #line 17 ==> "line 17"
       currentSourceCodeLineNumber = line.replace("#","");
-    }
+    } 
     
   }
   
@@ -219,72 +220,24 @@ public class AppCParser {
   
   
   @SuppressWarnings("unchecked")
-  private void extractTestCaseName(String line) {
-    if (line.contains("enum") && line.contains("/TestCaseC$")
-        && line.contains("$__nesc_unnamed")) {
-
-      // This is probably a line we're looking for. Let's parse it.
-      // Right now it looks like
-      // enum /*TestStateC.Test1C*/TestCaseC$0$__nesc_unnamed4286 {
-      
-      line = line.replace("$", " ");
-      line = line.replace("enum", " ");
-      line = line.replace("/*", " ");
-      line = line.replace("*/", " ");
-      line = line.replace("{", " ");
-
-      // Now our line looks like:
-      // [TestName] TestCaseC [ID] __nesc_unnamedWXYZ
-      // TestStateC.Test1C TestCaseC 0 __nesc_unnamed4286
-      
-      StringTokenizer tokenizer = new StringTokenizer(line);
-      String testName = tokenizer.nextToken();
-      int testId;
-
-      try {
-        tokenizer.nextToken();
-        testId = Integer.decode(tokenizer.nextToken()).intValue();
-        log.debug("Test ID " + testId + " is associated with test " + testName);
+  private void extractModuleName(String line, String module_name) {
+	Pattern testcase_pattern = Pattern.compile("enum /\\*(.*)\\*/" + module_name + "[^0-9]*([0-9]+)____nesc_unnamed[0-9]*");
+	Matcher testcase_matcher  = testcase_pattern.matcher(line);
+	  
+	if (testcase_matcher.find()) {
+     String testName = testcase_matcher.group(1);
+   
+     int testId;
+  
+     try {
+        testId = Integer.decode(testcase_matcher.group(2)).intValue();
+        log.debug(module_name + " ID " + testId + " is associated with test " + testName);
         testMap.put(new Integer(testId), testName);
         
       } catch (NumberFormatException e) {
-        result.error("NumberFormatException", "NumberFormatException in TestCase app.c parser");
+    	  result.error("NumberFormatException", "NumberFormatException in " + module_name + "app.c parser");
       }
     }
   }
   
-  
-  @SuppressWarnings("unchecked")
-  private void extractStatisticsName(String line) {
-    if (line.contains("enum") && line.contains("/StatisticsC$")
-        && line.contains("$__nesc_unnamed")) {
-
-      // This is probably a line we're looking for. Let's parse it.
-      // Right now it looks like
-      // enum /*TestTunitC.AckSuccessStatsC*/StatisticsC$0$__nesc_unnamed4302 {
-      
-      line = line.replace("$", " ");
-      line = line.replace("enum", " ");
-      line = line.replace("/*", " ");
-      line = line.replace("*/", " ");
-      line = line.replace("{", " ");
-
-      // Now our line looks like:
-      // TestTunitC.AckSuccessStatsC StatisticsC 0 __nesc_unnamed4302
-      
-      StringTokenizer tokenizer = new StringTokenizer(line);
-      String testName = tokenizer.nextToken();
-      int statsId;
-
-      try {
-        tokenizer.nextToken();
-        statsId = Integer.decode(tokenizer.nextToken()).intValue();
-        log.debug("Statistics ID " + statsId + " is associated with test " + testName);
-        statsMap.put(new Integer(statsId), testName);
-        
-      } catch (NumberFormatException e) {
-        result.error("NumberFormatException", "NumberFormatException in Statistics app.c parser");
-      }
-    }
-  }
 }

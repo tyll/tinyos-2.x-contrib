@@ -79,7 +79,7 @@ module AccelGyroC {
       interface Msp430DmaControl;
       interface Msp430DmaChannel;
 #ifdef USE_8MHZ_CRYSTAL
-      interface BusyWait<TMicro, uint16_t>;
+      //      interface BusyWait<TMicro, uint16_t>;
 #endif
    }
 } 
@@ -169,16 +169,16 @@ implementation {
 
       call Leds.led0Off();
 
-      call Leds.led2On();
-      //TOSH_uwait(50000UL);
-      call BusyWait.wait(50000UL);
+      call Leds.led1On();
+      TOSH_uwait(50000UL);
+      //      call BusyWait.wait(50000UL);
 
       atomic{ 
          BCSCTL2 = 0; 
          SET_FLAG(BCSCTL2, SELM_2); /* select master clock source, XT2CLK when XT2 oscillator present */
       }                            /*on-chip. LFXT1CLK when XT2 oscillator not present on-chip. */
 
-      call Leds.led2Off();
+      call Leds.led1Off();
 
       atomic{
          SET_FLAG(BCSCTL2, SELS);  // smclk from xt2
@@ -214,12 +214,11 @@ implementation {
       init();
       call BTStdControl.start();
       /* so that the clinicians know the sensor is on */
-      call Leds.led0On();
 #ifdef LOW_BATTERY_INDICATION
       /* initialise baseline voltage measurement stuff */ 
       need_baseline_voltage = TRUE;
       num_baseline_voltage_samples = baseline_voltage = sum_batt_volt_samples = 0;
-      call Leds.led1On();
+      call Leds.led0On();
 #ifdef DEBUG_LOW_BATTERY_INDICATION
       debug_counter = 0;
 #endif /* DEBUG_LOW_BATTERY_INDICATION */
@@ -237,7 +236,7 @@ implementation {
       stopConversion();
       call Msp430DmaChannel.stopTransfer();
       call Accel.wake(FALSE);
-      call Leds.led2Off();
+      call Leds.led1Off();
       TOSH_SET_PROG_OUT_PIN();   // disable gyro
 
       /* send the battery low indication packet to BioMOBIUS */
@@ -266,7 +265,7 @@ implementation {
       /* initialise baseline voltage measurement stuff */
       need_baseline_voltage = TRUE;
       num_baseline_voltage_samples = baseline_voltage = sum_batt_volt_samples = 0;
-      call Leds.led1On();
+      call Leds.led0On();
    }
 
    /* all samples are got so set the baseline voltage for this SHIMMER hardware */
@@ -304,7 +303,7 @@ implementation {
          else {
             setBattVoltageBaseline();
             need_baseline_voltage = FALSE;
-         call Leds.led1Off();
+         call Leds.led0Off();
          }
       }
       else {
@@ -403,13 +402,13 @@ implementation {
       stopConversion();
       call Msp430DmaChannel.stopTransfer();
       call Accel.wake(FALSE);
-      call Leds.led2Off();
+      call Leds.led1Off();
       TOSH_SET_PROG_OUT_PIN();   // disable gyro
    }
 
    async event void Bluetooth.connectionMade(uint8_t status) { 
       atomic enable_sending = TRUE;
-      call Leds.led3On();
+      call Leds.led2On();
    }
 
    async event void Bluetooth.commandModeEnded() { 
@@ -418,7 +417,7 @@ implementation {
     
    async event void Bluetooth.connectionClosed(uint8_t reason){
       atomic enable_sending = FALSE;    
-      call Leds.led3Off();
+      call Leds.led2Off();
       post stopSensing();
    }
 
@@ -470,11 +469,11 @@ implementation {
       atomic {
          /* toggle activity led every second */
          if(activity_led_on) {
-            call Leds.led2On();
+            call Leds.led1On();
             activity_led_on = FALSE;
          }
          else {
-            call Leds.led2Off();
+            call Leds.led1Off();
             activity_led_on = TRUE;
          }
       }

@@ -86,8 +86,8 @@ implementation {
    AccelGyroC.Msp430DmaChannel -> Msp430DmaC.Channel0;
    
 #ifdef USE_8MHZ_CRYSTAL
-   components BusyWaitMicroC;
-   AccelGyroC.BusyWait -> BusyWaitMicroC;
+   //   components BusyWaitMicroC;
+   //   AccelGyroC.BusyWait -> BusyWaitMicroC;
 #endif
 }
 

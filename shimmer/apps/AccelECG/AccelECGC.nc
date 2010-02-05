@@ -79,7 +79,7 @@ module AccelECGC {
       interface Msp430DmaControl;
       interface Msp430DmaChannel;
 #ifdef USE_8MHZ_CRYSTAL
-      interface BusyWait<TMicro, uint16_t>;
+      //      interface BusyWait<TMicro, uint16_t>;
 #endif
    }
 } 

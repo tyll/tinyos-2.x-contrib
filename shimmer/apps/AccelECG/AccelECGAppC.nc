@@ -83,8 +83,8 @@ components MainC, AccelECGC;
    AccelECGC.Msp430DmaChannel -> Msp430DmaC.Channel0;
    
 #ifdef USE_8MHZ_CRYSTAL
-   components BusyWaitMicroC;
-   AccelECGC.BusyWait -> BusyWaitMicroC;
+   //   components BusyWaitMicroC;
+   //   AccelECGC.BusyWait -> BusyWaitMicroC;
 #endif
 }
 

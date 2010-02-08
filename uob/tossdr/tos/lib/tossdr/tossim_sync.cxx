@@ -1,6 +1,6 @@
-#include "tossim_sync.h"
-
 #include <Python.h>
+
+#include "tossim_sync.h"
 
 extern "C" {
   bool sim_run_next_event();

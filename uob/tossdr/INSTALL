@@ -38,7 +38,7 @@ chmod +x ./installIntoTree.sh
 # 7) go to the application directory you want to compile for the SDR
 #    and compile it:
 
-cd $(TOSROOT)/apps/test/TestAM/
+cd $(TOSROOT)/apps/tests/TestAM/
 make micaz sdr
 
 # 8) run the application on the SDR:

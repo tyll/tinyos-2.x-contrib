@@ -41,6 +41,7 @@
 #include <stdexcept>
 #include <gr_count_bits.h>
 #include <cstring>
+#include <stdio.h>
 
 /*
  * Create a new instance of cc1k_correlator_cb and return

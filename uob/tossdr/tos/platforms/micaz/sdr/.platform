@@ -27,6 +27,7 @@ push( @includes, qw(
   %T/chips/cc2420/spi
   %T/chips/cc2420/transmit
   %T/chips/cc2420/unique
+  %T/chips/cc2420/security
   %T/chips/atm128
   %T/chips/atm128/adc
   %T/chips/atm128/pins

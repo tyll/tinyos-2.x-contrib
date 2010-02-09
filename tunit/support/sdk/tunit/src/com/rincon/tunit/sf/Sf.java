@@ -124,9 +124,9 @@ public class Sf implements SerialForwarder, Messenger, PhoenixError {
   
   public void connect() {
     synchronized(this) {
-      log.trace("Pausing 5 seconds before connect...");
+      log.trace("Pausing 1 second before connect...");
       try {
-        wait(5000);
+        wait(1000);
       } catch(InterruptedException e) {
         e.printStackTrace();
       }

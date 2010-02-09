@@ -56,8 +56,6 @@ import com.rincon.tunit.run.TestRunManager;
 /**
  * Main entry point to TUnit TinyOS Embedded testing.
  * 
- * TODO: > Add command line input to choose a tunit.xml file
- * 
  * @author David Moss
  * 
  */
@@ -87,6 +85,9 @@ public class TUnit {
   /** True if we want to enable the @cmd flags in suite.properties files */
   private static boolean cmdFlagEnabled = false;
   
+  /** True if this was run from the command line and can exit when finished */
+  private static boolean runFromCommandLine = false;
+  
   /**
    * The directory from which all other packages are relative Also the directory
    * where build.xml is located, or the root of the file system
@@ -105,11 +106,19 @@ public class TUnit {
    * @param args
    */
   public static void main(String[] args) {
+    runFromCommandLine = true;
     org.apache.log4j.BasicConfigurator.configure();
     Logger.getRootLogger().setLevel((Level) Level.DEBUG);
     new TUnit(args).runTunit();
   }
 
+  private void exit(int errorCode) {
+    if(runFromCommandLine) {
+      System.exit(errorCode);
+    }
+  }
+  
+  
   /**
    * Constructor
    * 
@@ -131,7 +140,7 @@ public class TUnit {
         }
         
         tunitBase = args[i];
-
+        
         File tunitBaseAttempt = new File(tunitBase);
         if (!tunitBaseAttempt.exists()) {
           System.out.println("Invalid TUnit Base Directory: "
@@ -139,7 +148,7 @@ public class TUnit {
           syntax();
           System.exit(1);
         }
-
+        
         log.debug("Using TUnit at: " + tunitBase);
 
       } else if (args[i].equalsIgnoreCase("-testdir") && args.length > i + 1) {
@@ -278,7 +287,6 @@ public class TUnit {
     }
 
     log = Logger.getLogger(getClass());
-    startTime = System.currentTimeMillis();
 
     // Run this in case the base package wasn't defined above
     getBasePackageDirectory();
@@ -292,9 +300,10 @@ public class TUnit {
    * 
    * @param args
    */
-  public void runTunit() {
+  public int runTunit() {
+    startTime = System.currentTimeMillis();
     System.out.println("Running TUnit from " + rootDirectory.getAbsolutePath());
-
+    
     // 0. You should have already instantiated TUnit and passed in arguments.
     
     // 1. Locate the tunit.xml file from the TUNIT_BASE directory
@@ -318,10 +327,17 @@ public class TUnit {
     // external programs. We could detect this error code outside and
     // do something useful?
     if (TestReport.getAllTunitProblems().size() > 0) {
-      System.exit(6);
+
+      if(runFromCommandLine) {
+        exit(6);
+      }
     }
 
-    System.exit(0);
+    if(runFromCommandLine) {
+      exit(0);
+    }
+    
+    return TestReport.getTotalTunitErrors();
   }
 
   /**
@@ -438,7 +454,7 @@ public class TUnit {
             "\n  4) export TOSCONTRIB=/path/to/tinyos-2.x-contrib" +
             "\nAlso ensure you are using absolute paths. For windows/cygwin," +
             "\nthis means \"export TOSCONTRIB=c:/cygwin/opt/tinyos-2.x-contrib\"");
-        System.exit(1);
+        exit(1);
       }
 
     }
@@ -450,13 +466,13 @@ public class TUnit {
       log.fatal("Please set your TOSCONTRIB directory properly.\n"
           + "Make sure it's an absolute path. If you're in cygwin, this\n"
           + "means it must start with something like C:/cygwin/...\n");
-      System.exit(2);
+      exit(2);
     }
 
     if (!tunitDirectory.isDirectory()) {
       log.fatal(tunitBase + " is not a directory.");
       log.fatal("Please set your TOSCONTRIB directory properly");
-      System.exit(3);
+      exit(3);
     }
     
     log.debug("Found TUnit! " + tunitDirectory);
@@ -531,7 +547,7 @@ public class TUnit {
     if (!tunitXmlFile.exists()) {
       log.fatal("Cannot locate " + tunitXmlFile.getAbsolutePath());
       log.fatal("Does " + tunitXmlFile.getAbsolutePath() + " exist?");
-      System.exit(4);
+      exit(4);
     }
 
     // 5. Process the tunit.xml file
@@ -543,7 +559,7 @@ public class TUnit {
       log.debug(tunitXmlFile.getAbsoluteFile() + " processed successfully");
     } else {
       log.fatal(parseResult.getFailMsg());
-      System.exit(5);
+      exit(5);
     }
     
     testRuns = tunitParser.getAllTestRuns();

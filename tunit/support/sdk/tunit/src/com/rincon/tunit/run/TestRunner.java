@@ -233,6 +233,12 @@ public class TestRunner {
         log.debug("Build properties differ for nodes using target "
             + focusedTarget.getTargetName());
         for (int nodeIndex = 0; nodeIndex < focusedTarget.totalNodes(); nodeIndex++) {
+          
+          if(focusedTarget.getTargetName().equalsIgnoreCase("")) {
+            // Nothing to compile or install for this node
+            continue;
+          }
+          
           log.debug("Cleaning");
           focusedResult = make.clean(buildDirectory);
           if (!focusedResult.isSuccess()) {
@@ -307,8 +313,13 @@ public class TestRunner {
         }
 
         log.debug("Total nodes to install: " + focusedTarget.totalNodes());
+        
         String reinstallExtras;
         for (int nodeIndex = focusedTarget.totalNodes() - 1; nodeIndex >= 0; nodeIndex--) {
+          if(focusedTarget.getTargetName().equalsIgnoreCase("")) {
+            continue;
+          }
+          
           focusedNode = focusedTarget.getNode(nodeIndex);
           reinstallExtras = " reinstall." + focusedNode.getId() + " ";
           reinstallExtras += focusedNode.getInstallExtras();
@@ -399,6 +410,10 @@ public class TestRunner {
    * @return true if we need to compile.
    */
   private boolean needsCompile(String focusedTargetName) {
+    if(focusedTargetName.equalsIgnoreCase("")) {
+      return false;
+    }
+    
     if (suiteProperties.getCompileOption() == TUnitSuiteProperties.COMPILE_ALWAYS
         || suiteProperties.getCompileOption() == TUnitSuiteProperties.COMPILE_DEFAULT_ALWAYS) {
       log.debug("Compile recommended");
@@ -425,6 +440,10 @@ public class TestRunner {
    * @return true if the test firmware image exists. We look for the app.c file.
    */
   private boolean doesBuildExist(String focusedTargetName) {
+    if(focusedTargetName.equalsIgnoreCase("")) {
+      return true;
+    }
+    
     log.debug("Checking "
         + new File(buildDirectory, "build/" + focusedTargetName + "/app.c")
             .getAbsolutePath());
@@ -482,6 +501,5 @@ public class TestRunner {
     } catch (IOException e) {
       e.printStackTrace();
     }
-    
   }
 }

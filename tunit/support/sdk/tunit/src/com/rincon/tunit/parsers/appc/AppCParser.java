@@ -221,7 +221,7 @@ public class AppCParser {
   
   @SuppressWarnings("unchecked")
   private void extractModuleName(String line, String moduleName) {
-    Pattern moduleNamePattern = Pattern.compile("enum /\\*(.*)\\*/" + moduleName + "[^0-9]*([0-9]+)____nesc_unnamed[0-9]*");
+    Pattern moduleNamePattern = Pattern.compile("enum /\\*(.*)\\*/" + moduleName + "[^0-9]*([0-9]+)[^0-9]*__nesc_unnamed[0-9]*");
     Matcher moduleNameMatcher  = moduleNamePattern.matcher(line);
     if (moduleNameMatcher.find()) {
       String testName = moduleNameMatcher.group(1);

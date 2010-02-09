@@ -80,7 +80,7 @@ public class TestReport {
   private static int totalTunitErrors = 0;
 
   /** TestResult's of all problems encountered by this entire system */
-  private static List allTunitProblems = new ArrayList();
+  private static List allTunitProblems;
 
   /** Creation time of this object in milliseconds */
   private long lastTime;
@@ -111,10 +111,15 @@ public class TestReport {
     totalDuration = 0;
     totalFailures = 0;
     totalErrors = 0;
+    totalTunitTests = 0;
+    totalTunitDurations = 0;
+    totalTunitFailures = 0;
+    totalTunitErrors = 0;
     rerunLogged = false;
     systemOut = "";
     systemErr = "";
     results = new ArrayList();
+    allTunitProblems = new ArrayList();
     lastTime = System.currentTimeMillis();
   }
 

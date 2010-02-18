@@ -1,0 +1,3 @@
+COMPONENT=TestTiltSwitchAppC
+include $(MAKERULES)
+

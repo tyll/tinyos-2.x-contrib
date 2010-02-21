@@ -42,6 +42,8 @@ import java.util.List;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.apache.log4j.xml.DOMConfigurator;
+import org.w3c.dom.Element;
 
 import com.rincon.tunit.parsers.tunitproperties.TUnitPropertiesParser;
 import com.rincon.tunit.properties.TUnitTestRunProperties;
@@ -562,6 +564,14 @@ public class TUnit {
     } else {
       log.fatal(parseResult.getFailMsg());
       exit(5);
+    }
+    
+    
+    System.out.println("Looking for log4j.xml in " + tunitXmlFile.getAbsolutePath() + "...");
+    
+    if(new File(tunitXmlFile.getParent(), "log4j.xml").exists()) {
+      System.out.println("Applying your log4j.xml file now");
+      DOMConfigurator.configure(new File(tunitXmlFile.getParent(), "log4j.xml").getAbsolutePath());
     }
     
     testRuns = tunitParser.getAllTestRuns();

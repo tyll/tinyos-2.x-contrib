@@ -62,9 +62,12 @@ public class OverviewFrameEdit {
 
       while ((line = in.readLine()) != null) {
         if(line.contains("Home</a>")) {
-          line += "<br><br>"
-            + "<a href=\"http://www.lavalampmotemasters.com\" target=\"classFrame\">TUnit Home</a><br>"
-            + "<a href=\"http://www.lavalampmotemasters.com/reports/archive/\" target=\"classFrame\">Online Archives</a>";
+          line += "<br><br>";
+          line += "<a href=\"http://docs.tinyos.net/index.php/TUnit\" target=\"classFrame\">TUnit Documentation</a><br>";
+          
+          if(ArchivesLink.getArchivesLink() != null) {
+            line += "<a href=\"" + ArchivesLink.getArchivesLink() + "\" target=\"classFrame\">Test Archives</a>";
+          }
         }
         
         fileContents += line + "\n";        

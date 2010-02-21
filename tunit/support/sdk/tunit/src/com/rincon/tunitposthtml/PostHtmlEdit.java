@@ -49,7 +49,8 @@ public class PostHtmlEdit {
    *
    */
   public PostHtmlEdit(String[] args) {
-    System.out.println("Post-editing HTML reports");
+    System.out.println("Post-editing HTML reports...");
+    ArchivesLink.parseArgs(args);
     TUnit tunit = new TUnit(args);
     new TraverseHtml(new File(TUnit.getBaseReportDirectory(), "/html"));
     System.out.println("TUnit Post HTML Edit Done");

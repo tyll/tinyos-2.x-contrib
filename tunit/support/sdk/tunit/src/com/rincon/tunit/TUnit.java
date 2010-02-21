@@ -438,25 +438,27 @@ public class TUnit {
           
         }
         
-      } else {
-        log.fatal("" +
-            "\nTOSCONTRIB environment variable not defined." +
-            "\nTOSCONTRIB should define where the tinyos-2.x-contrib directory exists." +
-            "\nPlace your tunit.xml file in the tinyos-2.x-contrib/tunit directory." +
-            "\nThere are four different methods for setting this directory: " +
-            "\n  1) Don't define any environment variable and run TUnit from" +
-            "\n     tinyos-2.x-contrib/tunit containing build.xml" +
-            "\n       -OR-" +
-            "\n  2) export TUNIT_BASE=/path/to/tinyos-2.x-contrib/tunit" +
-            "\n       -OR-" +
-            "\n  3) export TUNIT_HOME=/path/to/tinyos-2.x-contrib/tunit" +
-            "\n       -OR-" +
-            "\n  4) export TOSCONTRIB=/path/to/tinyos-2.x-contrib" +
-            "\nAlso ensure you are using absolute paths. For windows/cygwin," +
-            "\nthis means \"export TOSCONTRIB=c:/cygwin/opt/tinyos-2.x-contrib\"");
-        exit(1);
       }
-
+    }
+    
+    // Still undefined?
+    if(tunitBase == null) {
+      log.fatal("" +
+          "\nTOSCONTRIB environment variable not defined." +
+          "\nTOSCONTRIB should define where the tinyos-2.x-contrib directory exists." +
+          "\nPlace your tunit.xml file in the tinyos-2.x-contrib/tunit directory." +
+          "\nThere are four different methods for setting this directory: " +
+          "\n  1) Don't define any environment variable and run TUnit from" +
+          "\n     tinyos-2.x-contrib/tunit containing build.xml" +
+          "\n       -OR-" +
+          "\n  2) export TUNIT_BASE=/path/to/tinyos-2.x-contrib/tunit" +
+          "\n       -OR-" +
+          "\n  3) export TUNIT_HOME=/path/to/tinyos-2.x-contrib/tunit" +
+          "\n       -OR-" +
+          "\n  4) export TOSCONTRIB=/path/to/tinyos-2.x-contrib" +
+          "\nAlso ensure you are using absolute paths. For windows/cygwin," +
+          "\nthis means \"export TOSCONTRIB=c:/cygwin/opt/tinyos-2.x-contrib\"");
+      exit(1);
     }
 
     // 2. Verify it is a valid, existing directory

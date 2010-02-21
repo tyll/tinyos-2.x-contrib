@@ -100,13 +100,13 @@ public class Make implements BuildInterface {
           + buildArgs, env);
 
       largeOutput = "";
-      // int exitVal = CmdExec.lastExitVal;
+      int exitVal = CmdExec.lastExitVal;
       boolean compileSuccessful = false;
 
       if (extras.contains("reinstall")) {
         // Assume the reinstall was successful.. Is that a valid assumption?
         // Or, how can we test to see if it wasn't?
-        compileSuccessful = true;
+        compileSuccessful = (exitVal == 0);
         result = new TestResult("__Reinstall " + target + " " + extras);
         for (int i = 0; i < display.length; i++) {
           largeOutput += display[i] + "\n";
@@ -142,7 +142,7 @@ public class Make implements BuildInterface {
       }
 
       if (!compileSuccessful) {
-        result.error("Compile Error", largeOutput);
+        result.error("Make Error", largeOutput);
       }
 
     } catch (IOException e) {

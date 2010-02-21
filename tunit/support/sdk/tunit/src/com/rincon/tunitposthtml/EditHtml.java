@@ -86,7 +86,7 @@ public class EditHtml {
 			// We won't get all the pages, but that's ok.
 			while ((line = in.readLine()) != null) {
 				line = line.replace("Designed for use with",
-					"Designed for use with <a href=\"http://www.lavalampmotemasters.com\">TUnit</a>,");
+					"Designed for use with <a href=\"http://docs.tinyos.net/index.php/TUnit\">TUnit</a>,");
 				if (!line.contains("</body>") && !line.contains("</html>")) {
 					fileContents += line + "\n";
 				}

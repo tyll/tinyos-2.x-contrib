@@ -162,7 +162,7 @@ implementation {
 			return call ADE7753.getReg(ADE7753_LAENERGY, 4);	
 		} else if (energyMode==LAENERGY) {
 			energyMode=LVAENERGY;
-			return call ADE7753.getReg(ADE7753_LVAENERGY, 4);	
+			return call ADE7753.getReg(ADE7753_RVAENERGY, 4);	
 		} else if (energyMode==LVAENERGY) {
 			energyMode=LVARENERGY;
 			return call ADE7753.getReg(ADE7753_LVARENERGY, 4);	
@@ -210,8 +210,10 @@ implementation {
 		case INIT:
 			return;
 		case SET_MODE:
-			atomic stage = SET_LINECYC;
-            post setRegLinecyc();
+//			atomic stage = SET_LINECYC;
+			atomic stage = SET_GAIN;	
+//            post setRegLinecyc();
+			post setRegGain();
 			return;
 		case SET_LINECYC:
 			atomic stage = SET_GAIN;

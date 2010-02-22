@@ -50,14 +50,14 @@
 // Gain for CH2 is 2 and CH1 is 16 at 0.5 scale
 // #define ADE7753_GAIN_VAL        0x24
 // Try 0011 for CH1 gain
-#define ADE7753_GAIN_VAL        0x22
+#define ADE7753_GAIN_VAL        0x04
 //#define ADE7753_GAIN_VAL        0x24
 
 
 // MSB enabled for no-creep
-// #define ADE7753_MODE_VAL        0x800C
+#define ADE7753_MODE_VAL        0x800C
 // Set MODE to line cycle accumulation mode CYCMODE
-#define ADE7753_MODE_VAL        0x008C
+//#define ADE7753_MODE_VAL        0x008C
 // #define ADE7753_MODE_VAL        0x000C
 
 #define ADE7753_LINECYC_VAL        0x000A

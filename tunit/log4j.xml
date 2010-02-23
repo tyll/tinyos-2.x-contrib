@@ -5,7 +5,7 @@
 		<layout class="org.apache.log4j.SimpleLayout"></layout>
 	</appender>
 	<root>
-		<priority value="error"></priority>
+		<priority value="debug"></priority>
 		<appender-ref ref="stdout"/>
 	</root>
 </log4j:configuration>

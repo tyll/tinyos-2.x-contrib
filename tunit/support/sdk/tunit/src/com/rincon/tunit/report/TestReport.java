@@ -111,16 +111,19 @@ public class TestReport {
     totalDuration = 0;
     totalFailures = 0;
     totalErrors = 0;
-    totalTunitTests = 0;
-    totalTunitDurations = 0;
-    totalTunitFailures = 0;
-    totalTunitErrors = 0;
     rerunLogged = false;
     systemOut = "";
     systemErr = "";
     results = new ArrayList();
     allTunitProblems = new ArrayList();
     lastTime = System.currentTimeMillis();
+  }
+  
+  public static void clear() {
+    totalTunitTests = 0;
+    totalTunitDurations = 0;
+    totalTunitFailures = 0;
+    totalTunitErrors = 0;
   }
 
   @SuppressWarnings("unchecked")

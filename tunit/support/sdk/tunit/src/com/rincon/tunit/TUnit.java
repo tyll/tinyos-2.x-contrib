@@ -128,6 +128,7 @@ public class TUnit {
   public TUnit(String[] args) {
     rootDirectory = new File(System.getProperty("user.dir"));
     File packageDirectoryAttempt = null;
+    TestReport.clear();
     
     rerunRegistry = new RerunRegistry();
     

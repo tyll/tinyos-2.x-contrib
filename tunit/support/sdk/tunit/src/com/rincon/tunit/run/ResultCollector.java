@@ -278,9 +278,7 @@ public class ResultCollector extends Thread implements Messenger,
                 + "; (couldn't extract test name)");
           }
 
-          result
-              .error(
-                  "Timeout",
+          result.error("Timeout",
                   "Timeout occured!\nIf this is incorrect, add a \"@timeout [minutes]\" definition to your suite.properties file for this test.");
           report.addResult(result);
           allDone = true;

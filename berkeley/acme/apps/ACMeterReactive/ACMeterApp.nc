@@ -27,7 +27,7 @@
 
 
 #include "EnergyMsg.h"
-#define INTERVAL 256
+#define INTERVAL 1024
 
 module ACMeterApp {
 	uses interface Boot;
@@ -38,6 +38,7 @@ module ACMeterApp {
 	uses interface SplitControl as MeterControl;
 	uses interface SplitControl as AMControl;
 	uses interface ACMeter;
+        uses interface LocalIeeeEui64;
 }
 
 implementation {
@@ -47,21 +48,26 @@ implementation {
 	uint32_t energy, laenergy, lvaenergy, lvarenergy;
 
 	task void SendVal() {
-		energymsg = (EnergyMsg_t*) call Packet.getPayload(&pkt, sizeof(energymsg));
-		atomic energymsg->energy = energy;
-		atomic energymsg->laenergy = laenergy;
-		atomic energymsg->lvaenergy = lvaenergy;
-		atomic energymsg->lvarenergy = lvarenergy;
-		
-		if (call AMSend.send(AM_BROADCAST_ADDR, &pkt, sizeof(EnergyMsg_t)) == SUCCESS) {
-//				call Leds.led1Toggle();
-		}		
-		return;
+          ieee_eui64_t eui;
+          eui = call LocalIeeeEui64.getId();
+          energymsg = (EnergyMsg_t*) call Packet.getPayload(&pkt, sizeof(energymsg));
+          memcpy(energymsg->eui64, eui.data, IEEE_EUI64_LENGTH);
+          energymsg->src = TOS_NODE_ID;
+          energymsg->energy = energy;
+          energymsg->laenergy = laenergy;
+          energymsg->lvaenergy = lvaenergy;
+          energymsg->lvarenergy = lvarenergy;
+          
+          if (call AMSend.send(AM_BROADCAST_ADDR, &pkt, sizeof(EnergyMsg_t)) == SUCCESS) {
+            //				call Leds.led1Toggle();
+          }		
+          return;
 	}
 		
 	event void Boot.booted() {
-		atomic energy = 0;
-		call AMControl.start();
+          atomic energy = 0;
+                
+          call AMControl.start();
 	}
 
 	event void MeterControl.startDone(error_t err) {

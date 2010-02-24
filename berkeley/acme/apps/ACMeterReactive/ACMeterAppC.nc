@@ -33,6 +33,7 @@ implementation {
 	components new AMSenderC(AM_ENERGYMSG) as AMSenderC;
 	components new AMReceiverC(AM_SWITCHMSG) as AMReceiverC;
 	components ActiveMessageC as ActiveMessageC;
+        components LocalIeeeEui64C;
 
 	ACMeterApp.Boot -> MainC.Boot;
 	ACMeterApp.AMSend -> AMSenderC;
@@ -42,4 +43,5 @@ implementation {
 	ACMeterApp.MeterControl -> ACMeterC.SplitControl;
 	ACMeterApp.AMControl -> ActiveMessageC;
 	ACMeterApp.ACMeter -> ACMeterC.ACMeter;
+        ACMeterApp.LocalIeeeEui64 -> LocalIeeeEui64C;
 }

@@ -35,19 +35,92 @@
 */
 
 /**
- * 	Interface for the Poly32 universal hash function family in TinyOS.
- *	This Interface must not be used alone. It needs a block cipher or a stream
- *	cipher to construct a Wegman-Carter authenticatior.
- *  @author Sylvain Pelissier <sylvain.pelissier@gmail.com>
- */
+*	Implementation of the Poly32 interface.
+*/
 
-interface Polyp32{
-	/**
-    *   Hash of a message.
-    *   @param message message to be hashed.
-    *   @param key the authentication key. It needs to be 32-bit long.
-    *   @param l the lentgh of the message.
-	*	@return The hash of the message.
-    */
-	command uint32_t hash(uint32_t *message, uint32_t key, uint16_t l);
+module Poly32C{
+
+	provides interface polyp32;
+
+}
+
+implementation{
+
+    uint32_t p = 0xfffffffb;
+    uint32_t marker = 0xfffffffa;
+
+	command uint32_t Poly32.hash(uint32_t *m, uint32_t key, uint16_t l)
+	{
+	    uint16_t i;
+        uint64_t z;
+        uint32_t a,b,y;
+
+        /*
+         *   Pad with one.
+         */
+        y=1;
+
+        for(i=0;i<l;i++)
+        {
+            if(m[i] >= p-1)
+            {
+                z = (uint64_t)key*y;
+                b = (uint32_t)z;
+                a = (uint32_t)(z>>32);
+                y = 5*a;
+                y += b;
+
+                if(y < b)
+                {
+                    y += 5;
+                }
+
+                y += marker;
+                if(y < marker)
+                {
+                    y += 5;
+                }
+
+                z = (uint64_t)key*y;
+                b = (uint32_t)z;
+                a = (uint32_t)(z>>32);
+                y = 5*a;
+                y += b;
+
+                if(y < b)
+                {
+                    y += 5;
+                }
+
+                y += (m[i]-5);
+                if(y < (m[i]-5))
+                {
+                    y += 5;
+                }
+
+            }
+            else
+            {
+                z = (uint64_t)key*y;
+                b = (uint32_t)z;
+                a = (uint32_t)(z>>32);
+                y = 5*a;
+                y += b;
+
+                if(y < b)
+                {
+                    y += 5;
+                }
+
+                y += m[i];
+                if(y < m[i])
+                {
+                    y += 5;
+                }
+            }
+
+        }
+		return y;
+	}
+
 }

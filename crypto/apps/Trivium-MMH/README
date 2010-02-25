@@ -1,4 +1,4 @@
-README for TriviumMMH
+README for the Trivium-MMH application
 
 Copyright 2010:
 EPFL - Ecole Polytechnique Fédérale de Lausanne and 
@@ -8,7 +8,7 @@ Author:
 Sylvain Pelissier <sylvain.pelissier@gmail.com>
 
 Description:
-TriviumMMH is a TinyOS application which shows how the trivium and the MMH interfaces can be used
+Trivium-MMH is a TinyOS application which shows how the trivium and the MMH interfaces can be used
 to construct a Wegman-Carter authentication algorithm.
 
 TriviumMMHAppC.nc :	The configuration file.

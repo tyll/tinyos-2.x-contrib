@@ -34,93 +34,65 @@
 * OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/**
-*	Implementation of the Poly32 interface.
+/*
+ *	Implementation of Trivium-Poly32.
 */
 
-module Poly32C{
-
-	provides interface Poly32;
-
+module TriviumPoly32C{
+	uses interface Boot;
+	uses interface Poly32;
+	uses interface trivium;
 }
 
 implementation{
 
-    uint32_t p = 0xfffffffb;
-    uint32_t marker = 0xfffffffa;
+	uint32_t h,tag;
+	uint8_t s1[12],s2[11],s3[14];
+	uint8_t z[8];
+	
+	/*
+		Message.
+	*/
+    uint8_t m[16]  = 		{'h','e','l','l','o',' ','w','o','r','l','d',' ','!',0,0,0};
 
-	command uint32_t Poly32.hash(uint32_t *m, uint32_t key, uint16_t l)
+	/*
+		Authentication key.
+	*/
+	uint32_t auth_key = 	26843145;
+
+	/*
+		Trivium key.
+	*/
+	uint8_t K[10] =  		{0x0f,0x62,0xB5,0x08,0x5B,0xAE,0x01,0x54,0xA7,0xFA};
+
+	/*
+		Trivium initialisation vector.
+	*/
+	uint8_t IV[10] = 		{0x28,0x8F,0xF6,0x5D,0xC4,0x2B,0x92,0xF9,0x60,0xC7};
+	
+	uint32_t *p1 = (uint32_t *)m;
+	uint32_t *p2 = (uint32_t *)z;
+    
+	event void Boot.booted()
 	{
-	    uint16_t i;
-        uint64_t z;
-        uint32_t a,b,y;
+		/*
+			Trivium initialisation.
+		*/
+		call trivium.key_init(s1,s2,s3, K, IV);
 
-        /*
-         *   Pad with one.
-         */
-        y=1;
+		/*
+			Message hashing.
+		*/
+        h = call Poly32.hash(p1, auth_key,4);
+		dbg("Boot", "Message hash: %x\n", h);
+		call trivium.gen_keystream(s1,s2,s3,z);
+		dbg("Boot", "Trivium key stream: %x\n", p2[0]);
 
-        for(i=0;i<l;i++)
-        {
-            if(m[i] >= p-1)
-            {
-                z = (uint64_t)key*y;
-                b = (uint32_t)z;
-                a = (uint32_t)(z>>32);
-                y = 5*a;
-                y += b;
-
-                if(y < b)
-                {
-                    y += 5;
-                }
-
-                y += marker;
-                if(y < marker)
-                {
-                    y += 5;
-                }
-
-                z = (uint64_t)key*y;
-                b = (uint32_t)z;
-                a = (uint32_t)(z>>32);
-                y = 5*a;
-                y += b;
-
-                if(y < b)
-                {
-                    y += 5;
-                }
-
-                y += (m[i]-5);
-                if(y < (m[i]-5))
-                {
-                    y += 5;
-                }
-
-            }
-            else
-            {
-                z = (uint64_t)key*y;
-                b = (uint32_t)z;
-                a = (uint32_t)(z>>32);
-                y = 5*a;
-                y += b;
-
-                if(y < b)
-                {
-                    y += 5;
-                }
-
-                y += m[i];
-                if(y < m[i])
-                {
-                    y += 5;
-                }
-            }
-
-        }
-		return y;
+		/*
+			Authentication tag creation
+		*/
+		tag = p2[0] ^ h;
+		dbg("Boot", "Authenticator: %x\n", tag);
+		
 	}
-
 }

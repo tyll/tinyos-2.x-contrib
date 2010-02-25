@@ -1,6 +1,6 @@
 /*
 * Copyright (c) 2010 Centre for Electronics Design and Technology (CEDT),
-*  Indian Institute of Science (IISc) and Laboratory for Cryptologic
+*  Indian Institute of Science (IISc) and Laboratory for Cryptologic 
 *  Algorithms (LACAL), Ecole Polytechnique Federale de Lausanne (EPFL).
 *
 * Author: Sylvain Pelissier <sylvain.pelissier@gmail.com>
@@ -34,93 +34,19 @@
 * OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/**
-*	Implementation of the Poly32 interface.
-*/
+/*
+ * Example of usage of the trivium and Poly32 interfaces for message authentication.
+ * 
+ */
 
-module Poly32C{
-
-	provides interface Poly32;
-
+configuration TriviumPoly32AppC{
 }
 
 implementation{
-
-    uint32_t p = 0xfffffffb;
-    uint32_t marker = 0xfffffffa;
-
-	command uint32_t Poly32.hash(uint32_t *m, uint32_t key, uint16_t l)
-	{
-	    uint16_t i;
-        uint64_t z;
-        uint32_t a,b,y;
-
-        /*
-         *   Pad with one.
-         */
-        y=1;
-
-        for(i=0;i<l;i++)
-        {
-            if(m[i] >= p-1)
-            {
-                z = (uint64_t)key*y;
-                b = (uint32_t)z;
-                a = (uint32_t)(z>>32);
-                y = 5*a;
-                y += b;
-
-                if(y < b)
-                {
-                    y += 5;
-                }
-
-                y += marker;
-                if(y < marker)
-                {
-                    y += 5;
-                }
-
-                z = (uint64_t)key*y;
-                b = (uint32_t)z;
-                a = (uint32_t)(z>>32);
-                y = 5*a;
-                y += b;
-
-                if(y < b)
-                {
-                    y += 5;
-                }
-
-                y += (m[i]-5);
-                if(y < (m[i]-5))
-                {
-                    y += 5;
-                }
-
-            }
-            else
-            {
-                z = (uint64_t)key*y;
-                b = (uint32_t)z;
-                a = (uint32_t)(z>>32);
-                y = 5*a;
-                y += b;
-
-                if(y < b)
-                {
-                    y += 5;
-                }
-
-                y += m[i];
-                if(y < m[i])
-                {
-                    y += 5;
-                }
-            }
-
-        }
-		return y;
-	}
-
+	components TriviumPoly32C, MainC;
+	components Poly32C, triviumC;
+	
+	TriviumPoly32C.Boot -> MainC.Boot;
+	TriviumPoly32C.Poly32 -> Poly32C;
+	TriviumPoly32C.trivium -> triviumC;
 }

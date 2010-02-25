@@ -11,4 +11,4 @@ Description:
 
 TestTrivium8:	Application using Trivium with 8-bit microcontroller.
 TestTrivium16:	Application using Trivium with 16-bit microcontroller.
-
+Trivium-MMH:	Application showing how to construct a Wegman-Cartner authenticator with Trivium and MMH. 

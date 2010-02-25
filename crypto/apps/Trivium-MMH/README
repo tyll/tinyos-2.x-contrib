@@ -1,0 +1,37 @@
+README for TriviumMMH
+
+Copyright 2010:
+EPFL - Ecole Polytechnique Fédérale de Lausanne and 
+IISC - Indian Institute of Science
+
+Author:
+Sylvain Pelissier <sylvain.pelissier@gmail.com>
+
+Description:
+TriviumMMH is a TinyOS application which shows how the trivium and the MMH interfaces can be used
+to construct a Wegman-Carter authentication algorithm.
+
+TriviumMMHAppC.nc :	The configuration file.
+
+TriviumMMHC.nc :	The module file.
+
+
+Installation:
+
+If the tivium and the MMH interfaces are installed in the TinyOS tree then this program can be compiled with
+the command:
+
+make [mote_name]
+
+where [mote_name] is the name of the mote use, for example mica2 or micaz. To used this program
+with TOSSIM you can compile the program with the command:
+
+make [mote_name] sim
+
+And then the simualtion is launched with:
+
+pythom sim.py
+
+Known bugs/limitations:
+
+None.

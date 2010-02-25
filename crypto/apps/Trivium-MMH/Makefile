@@ -1,0 +1,6 @@
+COMPONENT=TriviumMMHAppC
+
+#  8-bit microcontroller
+CFLAGS+=-DEIGHT_BIT_MICROCONTROLLER
+
+include $(MAKERULES)

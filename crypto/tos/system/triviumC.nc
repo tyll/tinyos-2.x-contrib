@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009 Centre for Electronics Design and Technology (CEDT),
+* Copyright (c) 2010 Centre for Electronics Design and Technology (CEDT),
 *  Indian Institute of Science (IISc) and Laboratory for Cryptologic
 *  Algorithms (LACAL), Ecole Polytechnique Federale de Lausanne (EPFL).
 *

@@ -9,3 +9,4 @@ Sylvain Pelissier <sylvain.pelissier@gmail.com>
 
 Description:
 trivium.nc:		Interface for the Trivium stream cipher. Webpage of the cipher at http://www.ecrypt.eu.org/stream/triviumpf.html
+MMH.nc:			Interface for the MMH universal hash function family.

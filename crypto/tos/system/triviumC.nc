@@ -642,7 +642,6 @@ implementation{
 			output[i] = XOR(input[i],(uint8_t)z[j]);
 		}
 
-            #endif
-        }
+        #endif
     }
 }

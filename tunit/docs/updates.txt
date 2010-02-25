@@ -1,1 +1,0 @@
-6.6.07: Fixed a statistics logger problem, where the stats logger wasn't closing.

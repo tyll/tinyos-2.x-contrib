@@ -35,38 +35,19 @@
 */
 
 /**
-*	Implementation of the MMH interface.
-*/
+ * 	Interface for the Poly32 universal hash function family in TinyOS.
+ *	This Interface must not be used alone. It needs a block cipher or a stream
+ *	cipher to construct a Wegman-Carter authenticatior.
+ *  @author Sylvain Pelissier <sylvain.pelissier@gmail.com>
+ */
 
-module MMHC{
-
-	provides interface MMH;
-
-}
-
-implementation{
-
-	command uint32_t MMH.hash(uint32_t *m, uint32_t *key, uint16_t l)
-	{
-	    uint16_t i;
-        uint64_t sum,utmp;
-        uint32_t y;
-		int64_t stmp;
-	
-		sum = 0;
-        for(i=0;i<l;i++)
-        {
-           sum += (uint64_t)m[i] * key[i];
-        }
-		stmp = (sum  & 0xffffffff) - 15*(sum  >> 32);
-		utmp = (stmp & 0xffffffff) - 15*(stmp >> 32);
-		
-		y = (uint32_t)utmp;
-		if (utmp > 0x10000000fLL) 
-		{
-			y -= 15;
-		}
-		return y;
-	}
-
+interface Polyp32{
+	/**
+    *   Hash of a message.
+    *   @param message message to be hashed.
+    *   @param key the authentication key. It needs to be 32-bit long.
+    *   @param l the lentgh of the message.
+	*	@return The hash of the message.
+    */
+	command uint32_t hash(uint32_t *message, uint32_t key, uint16_t l);
 }

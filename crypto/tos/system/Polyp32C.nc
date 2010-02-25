@@ -35,37 +35,91 @@
 */
 
 /**
-*	Implementation of the MMH interface.
+*	Implementation of the Poly32 interface.
 */
 
-module MMHC{
+module Polyp32C{
 
-	provides interface MMH;
+	provides interface polyp32;
 
 }
 
 implementation{
 
-	command uint32_t MMH.hash(uint32_t *m, uint32_t *key, uint16_t l)
+    uint32_t p = 0xfffffffb;
+    uint32_t marker = 0xfffffffa;
+
+	command uint32_t polyp32.hash(uint32_t *m, uint32_t key, uint16_t l)
 	{
 	    uint16_t i;
-        uint64_t sum,utmp;
-        uint32_t y;
-		int64_t stmp;
-	
-		sum = 0;
+        uint64_t z;
+        uint32_t a,b,y;
+
+        /*
+         *   Pad with one.
+         */
+        y=1;
+
         for(i=0;i<l;i++)
         {
-           sum += (uint64_t)m[i] * key[i];
+            if(m[i] >= p-1)
+            {
+                z = (uint64_t)key*y;
+                b = (uint32_t)z;
+                a = (uint32_t)(z>>32);
+                y = 5*a;
+                y += b;
+
+                if(y < b)
+                {
+                    y += 5;
+                }
+
+                y += marker;
+                if(y < marker)
+                {
+                    y += 5;
+                }
+
+                z = (uint64_t)key*y;
+                b = (uint32_t)z;
+                a = (uint32_t)(z>>32);
+                y = 5*a;
+                y += b;
+
+                if(y < b)
+                {
+                    y += 5;
+                }
+
+                y += (m[i]-5);
+                if(y < (m[i]-5))
+                {
+                    y += 5;
+                }
+
+            }
+            else
+            {
+                z = (uint64_t)key*y;
+                b = (uint32_t)z;
+                a = (uint32_t)(z>>32);
+                y = 5*a;
+                y += b;
+
+                if(y < b)
+                {
+                    y += 5;
+                }
+
+                y += m[i];
+                if(y < m[i])
+                {
+                    y += 5;
+                }
+            }
+
         }
-		stmp = (sum  & 0xffffffff) - 15*(sum  >> 32);
-		utmp = (stmp & 0xffffffff) - 15*(stmp >> 32);
-		
-		y = (uint32_t)utmp;
-		if (utmp > 0x10000000fLL) 
-		{
-			y -= 15;
-		}
 		return y;
 	}
 

@@ -1,0 +1,58 @@
+<html>
+  <head>
+    <LINK rel="stylesheet" href="nesdoc.css" type="text/css" media="screen"><title>Interface: tos.interfaces.MMH</title>
+  </head>
+  <body>
+    <h2>Interface: tos.interfaces.MMH</h2>
+    <b>interface MMH</b><p>
+ 	Interface for the MMH universal hash function family in TinyOS.
+	This Interface must not be used alone. It needs a block cipher or a stream
+	cipher to construct a Wegman-Carter authenticatior.
+  
+    <p>
+    <dl>
+      <dt><b>Author:</b>
+      <dd>
+        Sylvain Pelissier &lt;sylvain.pelissier@gmail.com&gt;
+
+      </dd>
+    </dl>
+    <p><p><div id=heading>Commands</div><div id=funcsig><span id=funcnameshort>command uint32_t <a href="#hash">hash</a>(uint32_t *message, uint32_t *key, uint16_t l)
+      </span><menu>
+   Hash of a message.
+      </menu>
+    </div><p><div id=heading>Commands - Details</div>
+    <a name="hash"></a>
+    <h4>hash
+    </h4>
+    <span id=funcnameshort>command uint32_t <b>hash</b>(uint32_t *message, uint32_t *key, uint16_t l)
+    </span>
+    <p>
+    <menu>
+      
+   Hash of a message.
+   
+      <p>
+      <dl>
+        <dt><b>Parameters:</b>
+        <dd>
+          <code>message</code> -  message to be hashed.
+   
+        </dd>
+        <dd>
+          <code>key</code> -  the authentication key. It needs to have the same length as the message.
+   
+        </dd>
+        <dd>
+          <code>l</code> -  the lentgh of the message.
+	
+        </dd>
+        <dt><b>Returns:</b>
+        <dd>
+          The hash of the message.
+
+        </dd>
+      </dl>
+    </menu>
+  </body>
+</html>

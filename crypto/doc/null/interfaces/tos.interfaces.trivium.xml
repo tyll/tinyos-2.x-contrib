@@ -7,7 +7,7 @@
   @author Sylvain Pelissier &lt;sylvain.pelissier@gmail.com&gt;
 </long>
       </documentation>
-      <function command="" loc="78:/opt/tinyos-2.1.0/tos/interfaces/trivium.nc" name="process_bytes" provided="0" ref="0xb7b0c010">
+      <function command="" loc="78:/opt/tinyos-2.1.0/tos/interfaces/trivium.nc" name="process_bytes" provided="0" ref="0xb7b30010">
         <documentation loc="72:/opt/tinyos-2.1.0/tos/interfaces/trivium.nc">
           <short>
    Encryption or decryption of a message.</short>
@@ -24,78 +24,78 @@
           <function-parameters>
             <type-pointer alignment="I:4" size="I:4">
               <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
-                <typename><typedef-ref name="uint_t" ref="0xb7b1c0c8"/></typename>
+                <typename><typedef-ref name="uint_t" ref="0xb7b3ab30"/></typename>
               </type-int>
             </type-pointer>
             <type-pointer alignment="I:4" size="I:4">
               <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
-                <typename><typedef-ref name="uint_t" ref="0xb7b1c0c8"/></typename>
+                <typename><typedef-ref name="uint_t" ref="0xb7b3ab30"/></typename>
               </type-int>
             </type-pointer>
             <type-pointer alignment="I:4" size="I:4">
               <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
-                <typename><typedef-ref name="uint_t" ref="0xb7b1c0c8"/></typename>
+                <typename><typedef-ref name="uint_t" ref="0xb7b3ab30"/></typename>
               </type-int>
             </type-pointer>
             <type-pointer alignment="I:4" size="I:4">
               <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
-                <typename><typedef-ref name="uint8_t" ref="0xb7d78d68"/></typename>
+                <typename><typedef-ref name="uint8_t" ref="0xb7d9dd68"/></typename>
               </type-int>
             </type-pointer>
             <type-pointer alignment="I:4" size="I:4">
               <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
-                <typename><typedef-ref name="uint8_t" ref="0xb7d78d68"/></typename>
+                <typename><typedef-ref name="uint8_t" ref="0xb7d9dd68"/></typename>
               </type-int>
             </type-pointer>
             <type-int alignment="I:4" cname="int" size="I:4">
-              <typename><typedef-ref name="int32_t" ref="0xb7d788e8"/></typename>
+              <typename><typedef-ref name="int32_t" ref="0xb7d9d8e8"/></typename>
             </type-int>
           </function-parameters>
         </type-function>
         <parameters>
-          <variable loc="78:/opt/tinyos-2.1.0/tos/interfaces/trivium.nc" name="s1" ref="0xb7b0e3c8">
+          <variable loc="78:/opt/tinyos-2.1.0/tos/interfaces/trivium.nc" name="s1" ref="0xb7b313c8">
             <type-pointer alignment="I:4" size="I:4">
               <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
-                <typename><typedef-ref name="uint_t" ref="0xb7b1c0c8"/></typename>
+                <typename><typedef-ref name="uint_t" ref="0xb7b3ab30"/></typename>
               </type-int>
             </type-pointer>
           </variable>
-          <variable loc="78:/opt/tinyos-2.1.0/tos/interfaces/trivium.nc" name="s2" ref="0xb7b0e5b8">
+          <variable loc="78:/opt/tinyos-2.1.0/tos/interfaces/trivium.nc" name="s2" ref="0xb7b315b8">
             <type-pointer alignment="I:4" size="I:4">
               <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
-                <typename><typedef-ref name="uint_t" ref="0xb7b1c0c8"/></typename>
+                <typename><typedef-ref name="uint_t" ref="0xb7b3ab30"/></typename>
               </type-int>
             </type-pointer>
           </variable>
-          <variable loc="78:/opt/tinyos-2.1.0/tos/interfaces/trivium.nc" name="s3" ref="0xb7b0e7a8">
+          <variable loc="78:/opt/tinyos-2.1.0/tos/interfaces/trivium.nc" name="s3" ref="0xb7b317a8">
             <type-pointer alignment="I:4" size="I:4">
               <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
-                <typename><typedef-ref name="uint_t" ref="0xb7b1c0c8"/></typename>
+                <typename><typedef-ref name="uint_t" ref="0xb7b3ab30"/></typename>
               </type-int>
             </type-pointer>
           </variable>
-          <variable loc="78:/opt/tinyos-2.1.0/tos/interfaces/trivium.nc" name="input" ref="0xb7b0e9c0">
+          <variable loc="78:/opt/tinyos-2.1.0/tos/interfaces/trivium.nc" name="input" ref="0xb7b319c0">
             <type-pointer alignment="I:4" size="I:4">
               <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
-                <typename><typedef-ref name="uint8_t" ref="0xb7d78d68"/></typename>
+                <typename><typedef-ref name="uint8_t" ref="0xb7d9dd68"/></typename>
               </type-int>
             </type-pointer>
           </variable>
-          <variable loc="78:/opt/tinyos-2.1.0/tos/interfaces/trivium.nc" name="output" ref="0xb7b0ebe0">
+          <variable loc="78:/opt/tinyos-2.1.0/tos/interfaces/trivium.nc" name="output" ref="0xb7b31be0">
             <type-pointer alignment="I:4" size="I:4">
               <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
-                <typename><typedef-ref name="uint8_t" ref="0xb7d78d68"/></typename>
+                <typename><typedef-ref name="uint8_t" ref="0xb7d9dd68"/></typename>
               </type-int>
             </type-pointer>
           </variable>
-          <variable loc="78:/opt/tinyos-2.1.0/tos/interfaces/trivium.nc" name="length" ref="0xb7b0ede0">
+          <variable loc="78:/opt/tinyos-2.1.0/tos/interfaces/trivium.nc" name="length" ref="0xb7b31de0">
             <type-int alignment="I:4" cname="int" size="I:4">
-              <typename><typedef-ref name="int32_t" ref="0xb7d788e8"/></typename>
+              <typename><typedef-ref name="int32_t" ref="0xb7d9d8e8"/></typename>
             </type-int>
           </variable>
         </parameters>
       </function>
-      <function command="" loc="70:/opt/tinyos-2.1.0/tos/interfaces/trivium.nc" name="gen_keystream" provided="0" ref="0xb7b0fe70">
+      <function command="" loc="70:/opt/tinyos-2.1.0/tos/interfaces/trivium.nc" name="gen_keystream" provided="0" ref="0xb7b33e70">
         <documentation loc="66:/opt/tinyos-2.1.0/tos/interfaces/trivium.nc">
           <short>
 	Generation of  bytes of random data which can be XORed with the plaintext or ciphertext.&lt;br&gt;
@@ -111,58 +111,58 @@
           <function-parameters>
             <type-pointer alignment="I:4" size="I:4">
               <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
-                <typename><typedef-ref name="uint_t" ref="0xb7b1c0c8"/></typename>
+                <typename><typedef-ref name="uint_t" ref="0xb7b3ab30"/></typename>
               </type-int>
             </type-pointer>
             <type-pointer alignment="I:4" size="I:4">
               <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
-                <typename><typedef-ref name="uint_t" ref="0xb7b1c0c8"/></typename>
+                <typename><typedef-ref name="uint_t" ref="0xb7b3ab30"/></typename>
               </type-int>
             </type-pointer>
             <type-pointer alignment="I:4" size="I:4">
               <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
-                <typename><typedef-ref name="uint_t" ref="0xb7b1c0c8"/></typename>
+                <typename><typedef-ref name="uint_t" ref="0xb7b3ab30"/></typename>
               </type-int>
             </type-pointer>
             <type-pointer alignment="I:4" size="I:4">
               <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
-                <typename><typedef-ref name="uint_t" ref="0xb7b1c0c8"/></typename>
+                <typename><typedef-ref name="uint_t" ref="0xb7b3ab30"/></typename>
               </type-int>
             </type-pointer>
           </function-parameters>
         </type-function>
         <parameters>
-          <variable loc="70:/opt/tinyos-2.1.0/tos/interfaces/trivium.nc" name="s1" ref="0xb7b0f738">
+          <variable loc="70:/opt/tinyos-2.1.0/tos/interfaces/trivium.nc" name="s1" ref="0xb7b33738">
             <type-pointer alignment="I:4" size="I:4">
               <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
-                <typename><typedef-ref name="uint_t" ref="0xb7b1c0c8"/></typename>
+                <typename><typedef-ref name="uint_t" ref="0xb7b3ab30"/></typename>
               </type-int>
             </type-pointer>
           </variable>
-          <variable loc="70:/opt/tinyos-2.1.0/tos/interfaces/trivium.nc" name="s2" ref="0xb7b0f928">
+          <variable loc="70:/opt/tinyos-2.1.0/tos/interfaces/trivium.nc" name="s2" ref="0xb7b33928">
             <type-pointer alignment="I:4" size="I:4">
               <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
-                <typename><typedef-ref name="uint_t" ref="0xb7b1c0c8"/></typename>
+                <typename><typedef-ref name="uint_t" ref="0xb7b3ab30"/></typename>
               </type-int>
             </type-pointer>
           </variable>
-          <variable loc="70:/opt/tinyos-2.1.0/tos/interfaces/trivium.nc" name="s3" ref="0xb7b0fb18">
+          <variable loc="70:/opt/tinyos-2.1.0/tos/interfaces/trivium.nc" name="s3" ref="0xb7b33b18">
             <type-pointer alignment="I:4" size="I:4">
               <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
-                <typename><typedef-ref name="uint_t" ref="0xb7b1c0c8"/></typename>
+                <typename><typedef-ref name="uint_t" ref="0xb7b3ab30"/></typename>
               </type-int>
             </type-pointer>
           </variable>
-          <variable loc="70:/opt/tinyos-2.1.0/tos/interfaces/trivium.nc" name="z" ref="0xb7b0fd00">
+          <variable loc="70:/opt/tinyos-2.1.0/tos/interfaces/trivium.nc" name="z" ref="0xb7b33d00">
             <type-pointer alignment="I:4" size="I:4">
               <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
-                <typename><typedef-ref name="uint_t" ref="0xb7b1c0c8"/></typename>
+                <typename><typedef-ref name="uint_t" ref="0xb7b3ab30"/></typename>
               </type-int>
             </type-pointer>
           </variable>
         </parameters>
       </function>
-      <function command="" loc="63:/opt/tinyos-2.1.0/tos/interfaces/trivium.nc" name="key_init" provided="0" ref="0xb7b10d68">
+      <function command="" loc="63:/opt/tinyos-2.1.0/tos/interfaces/trivium.nc" name="key_init" provided="0" ref="0xb7b37bf0">
         <documentation loc="45:/opt/tinyos-2.1.0/tos/interfaces/trivium.nc">
           <short>
  	Initialisation of the states from the key and the IV.</short>
@@ -191,64 +191,64 @@
           <function-parameters>
             <type-pointer alignment="I:4" size="I:4">
               <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
-                <typename><typedef-ref name="uint_t" ref="0xb7b1c0c8"/></typename>
+                <typename><typedef-ref name="uint_t" ref="0xb7b3ab30"/></typename>
               </type-int>
             </type-pointer>
             <type-pointer alignment="I:4" size="I:4">
               <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
-                <typename><typedef-ref name="uint_t" ref="0xb7b1c0c8"/></typename>
+                <typename><typedef-ref name="uint_t" ref="0xb7b3ab30"/></typename>
               </type-int>
             </type-pointer>
             <type-pointer alignment="I:4" size="I:4">
               <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
-                <typename><typedef-ref name="uint_t" ref="0xb7b1c0c8"/></typename>
+                <typename><typedef-ref name="uint_t" ref="0xb7b3ab30"/></typename>
               </type-int>
             </type-pointer>
             <type-pointer alignment="I:4" size="I:4">
               <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
-                <typename><typedef-ref name="uint8_t" ref="0xb7d78d68"/></typename>
+                <typename><typedef-ref name="uint8_t" ref="0xb7d9dd68"/></typename>
               </type-int>
             </type-pointer>
             <type-pointer alignment="I:4" size="I:4">
               <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
-                <typename><typedef-ref name="uint8_t" ref="0xb7d78d68"/></typename>
+                <typename><typedef-ref name="uint8_t" ref="0xb7d9dd68"/></typename>
               </type-int>
             </type-pointer>
           </function-parameters>
         </type-function>
         <parameters>
-          <variable loc="63:/opt/tinyos-2.1.0/tos/interfaces/trivium.nc" name="s1" ref="0xb7b10428">
+          <variable loc="63:/opt/tinyos-2.1.0/tos/interfaces/trivium.nc" name="s1" ref="0xb7b372b0">
             <type-pointer alignment="I:4" size="I:4">
               <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
-                <typename><typedef-ref name="uint_t" ref="0xb7b1c0c8"/></typename>
+                <typename><typedef-ref name="uint_t" ref="0xb7b3ab30"/></typename>
               </type-int>
             </type-pointer>
           </variable>
-          <variable loc="63:/opt/tinyos-2.1.0/tos/interfaces/trivium.nc" name="s2" ref="0xb7b10618">
+          <variable loc="63:/opt/tinyos-2.1.0/tos/interfaces/trivium.nc" name="s2" ref="0xb7b374a0">
             <type-pointer alignment="I:4" size="I:4">
               <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
-                <typename><typedef-ref name="uint_t" ref="0xb7b1c0c8"/></typename>
+                <typename><typedef-ref name="uint_t" ref="0xb7b3ab30"/></typename>
               </type-int>
             </type-pointer>
           </variable>
-          <variable loc="63:/opt/tinyos-2.1.0/tos/interfaces/trivium.nc" name="s3" ref="0xb7b10808">
+          <variable loc="63:/opt/tinyos-2.1.0/tos/interfaces/trivium.nc" name="s3" ref="0xb7b37690">
             <type-pointer alignment="I:4" size="I:4">
               <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
-                <typename><typedef-ref name="uint_t" ref="0xb7b1c0c8"/></typename>
+                <typename><typedef-ref name="uint_t" ref="0xb7b3ab30"/></typename>
               </type-int>
             </type-pointer>
           </variable>
-          <variable loc="63:/opt/tinyos-2.1.0/tos/interfaces/trivium.nc" name="K" ref="0xb7b109f8">
+          <variable loc="63:/opt/tinyos-2.1.0/tos/interfaces/trivium.nc" name="K" ref="0xb7b37880">
             <type-pointer alignment="I:4" size="I:4">
               <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
-                <typename><typedef-ref name="uint8_t" ref="0xb7d78d68"/></typename>
+                <typename><typedef-ref name="uint8_t" ref="0xb7d9dd68"/></typename>
               </type-int>
             </type-pointer>
           </variable>
-          <variable loc="63:/opt/tinyos-2.1.0/tos/interfaces/trivium.nc" name="IV" ref="0xb7b10bf0">
+          <variable loc="63:/opt/tinyos-2.1.0/tos/interfaces/trivium.nc" name="IV" ref="0xb7b37a78">
             <type-pointer alignment="I:4" size="I:4">
               <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
-                <typename><typedef-ref name="uint8_t" ref="0xb7d78d68"/></typename>
+                <typename><typedef-ref name="uint8_t" ref="0xb7d9dd68"/></typename>
               </type-int>
             </type-pointer>
           </variable>

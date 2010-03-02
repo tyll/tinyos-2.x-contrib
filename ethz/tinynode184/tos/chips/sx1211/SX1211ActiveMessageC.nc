@@ -78,5 +78,4 @@ implementation {
   SX1211ActiveMessageP.amAddress -> ActiveMessageAddressC;  
 
   components SX1211IrqConfC, SX1211PatternConfC, SX1211PhyRssiConfC;
-  components DSNC;
 }

@@ -85,11 +85,11 @@ implementation
   
   TOSH_SIGNAL(USCIAB0RX_VECTOR) {
   	  uint8_t temp;
-  	  if (IFG2 & UCA0RXIFG) {
+  	  if ((IFG2 & UCA0RXIFG) && (IE2 & UCA0RXIE)) {
   		  temp = UCA0RXBUF;
   		  signal InterruptsA.rxDone(temp);
   	  }
-  	  if (IFG2 & UCB0RXIFG) {
+  	  if ((IFG2 & UCB0RXIFG) && (IE2 & UCB0RXIE)) {
   		  temp = UCB0RXBUF;
   	  	  signal InterruptsB.rxDone(temp);
   	  }      

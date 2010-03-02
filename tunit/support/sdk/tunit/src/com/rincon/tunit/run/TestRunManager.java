@@ -104,9 +104,20 @@ public class TestRunManager implements PhoenixError, Messenger {
     sfError = false;
     
     for (int i = 0; i < runProperties.totalNodes(); i++) {
-      log.debug("Creating serial forwarder " + runProperties.getNode(i).getMotecom());
-      serialForwarders.add(new Sf(runProperties.getNode(i).getMotecom(),
-          BASE_PORT + i, this, this));
+      // If the motecom isn't defined for this node and the node isn't the
+      // drive node #0, then it might be intentional that we don't connect
+      // to the node with the serial forwarder.  Driving nodes (node 0) must
+      // always have a serial forwarder connection, or else there's no way
+      // to collect test results.
+      if(runProperties.getNode(i).getMotecom().isEmpty() && i > 0) {
+        log.debug("Skipping the serial connection to node " + i + "(" 
+            + runProperties.getNode(i).getTarget() + ") because its motecom isn't defined");
+        
+      } else {
+        log.debug("Creating serial forwarder " + runProperties.getNode(i).getMotecom());
+        serialForwarders.add(new Sf(runProperties.getNode(i).getMotecom(),
+            BASE_PORT + i, this, this));
+      }
     }
 
     /*

@@ -234,7 +234,7 @@ public class TestRunner {
             + focusedTarget.getTargetName());
         for (int nodeIndex = 0; nodeIndex < focusedTarget.totalNodes(); nodeIndex++) {
           
-          if(focusedTarget.getTargetName().equalsIgnoreCase("")) {
+          if(focusedTarget.getTargetName().isEmpty()) {
             // Nothing to compile or install for this node
             continue;
           }
@@ -410,7 +410,8 @@ public class TestRunner {
    * @return true if we need to compile.
    */
   private boolean needsCompile(String focusedTargetName) {
-    if(focusedTargetName.equalsIgnoreCase("")) {
+    if(focusedTargetName.isEmpty()) {
+      log.debug("The target name is empty; nothing to compile");
       return false;
     }
     
@@ -418,7 +419,7 @@ public class TestRunner {
         || suiteProperties.getCompileOption() == TUnitSuiteProperties.COMPILE_DEFAULT_ALWAYS) {
       log.debug("Compile recommended");
       return true;
-
+ 
     } else if (suiteProperties.getCompileOption() == TUnitSuiteProperties.COMPILE_ONCE) {
       if (doesBuildExist(focusedTargetName)) {
         log.debug("Recommend no compile since build already exists.");

@@ -50,8 +50,7 @@ module SX1211SendReceiveP {
     uses interface SX1211PhyRssi;
     uses interface SplitControl as PhySplitControl;
     uses interface SX1211PacketBody;
-    
-    uses interface DsnSend;
+
 }
 implementation {
 
@@ -80,7 +79,6 @@ typedef  enum {
 
     norace preamble_t prbl;          // pattern to send before buffer
 
-    bool warmUp=FALSE;
     bool sendAcks=TRUE;
 
     task void signalPacketReceived();
@@ -174,24 +172,11 @@ typedef  enum {
 
     }
 
-    async event void SX1211PhyRxTx.wakeUpTxDone() {
-	atomic {
-		if(txMsgPtr==NULL || sendRadioOn(PKT_CODE)!=SUCCESS)
-			post sendDoneFailTask(); 
-		warmUp=FALSE;
-	}
-    }
-
     event void PhySplitControl.startDone(error_t error) {
 	atomic {
 	    if (txMsgPtr!=NULL) {
 	    	sendRadioOn(PKT_CODE);
-	    } else {
-	    	if (warmUp==TRUE) {
-				post sendDoneFailTask();
-	    	}
 	    }
-	    warmUp=FALSE;
 	    signal SplitControl.startDone(error);
 	}
     }
@@ -282,17 +267,7 @@ typedef  enum {
 	    if (call SX1211PhyRxTx.busy()==TRUE){ return EBUSY;}
 
 	    if (call SX1211PhyRxTx.off()) {
-	    	return EOFF;/*
-	    	txMsgPtr = (message_t*)buff;
-	    	_len = len;
-	    	if(call PhySplitControl.start()==SUCCESS) {
-	    		warmUp=TRUE;
-	    		return SUCCESS;
-	    	} else {
-	    		txMsgPtr=NULL;
-	    		return EOFF;
-	    	}
-	    	*/
+	    	return EOFF;
 	    }
 	    txMsgPtr = (message_t*)buff;
 	    _len = len;
@@ -305,19 +280,8 @@ typedef  enum {
 	    if (txMsgPtr){ return EBUSY;}
 	    if (msg==NULL) { return FAIL;}
 	    if (call SX1211PhyRxTx.busy()==TRUE){return EBUSY;}
-	    if (call SX1211PhyRxTx.off()) {
 		txMsgPtr = msg;
-		_len = len;
-		if(call SX1211PhyRxTx.wakeUpTx()==SUCCESS) {
-		    warmUp=TRUE;
-		    return SUCCESS;
-		} else {
-		    txMsgPtr=NULL;
-		    return EOFF;
-		}
-	    }
-	    txMsgPtr = msg;
-	    _len = len;
+		_len = len;    
 	}
 	return  sendRadioOn(PKT_CODE);
     }
@@ -448,7 +412,6 @@ typedef  enum {
  async command bool PacketAcknowledgements.wasAcked(message_t* msg) {
      return (call SX1211PacketBody.getHeader(msg))-> ack & 0x01;
  }
-
 
 }
 

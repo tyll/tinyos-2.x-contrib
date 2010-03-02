@@ -44,7 +44,10 @@ configuration SX1211PhyRssiConfC {
   provides interface SX1211PhyConf;
   provides interface SX1211RssiConf;
   provides interface SX1211PhySwitch;
- 
+  
+  provides interface Get<uint32_t> as GetTxTime;
+  provides interface Get<uint32_t> as GetRxTime;
+
 }
 
 implementation {
@@ -66,7 +69,9 @@ implementation {
   SX1211PhyConf = SX1211PhyRssiConfP;
   SX1211RssiConf = SX1211PhyRssiConfP;
   SX1211PhySwitch = SX1211PhyRssiConfP;
-
+  GetTxTime = SX1211PhyRssiConfP.GetTxTime;
+  GetRxTime = SX1211PhyRssiConfP.GetRxTime;
+  
   components HplSX1211PinsC;
   SX1211PhyRssiConfP.DataPin       -> HplSX1211PinsC.DataPin;
   SX1211PhyRssiConfP.Irq0Pin       -> HplSX1211PinsC.Irq0Pin;

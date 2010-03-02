@@ -63,8 +63,6 @@ implementation {
   
   components SX1211PacketC;
   SX1211SendReceiveP.SX1211PacketBody -> SX1211PacketC;
-  
-  components DSNC;
-  SX1211SendReceiveP.DsnSend -> DSNC;
+
 }
 

@@ -119,6 +119,4 @@ interface SX1211PhyRxTx {
 
   async command void enableAck(bool onOff);
 
-  command error_t wakeUpTx();
-  async event void wakeUpTxDone();
 }

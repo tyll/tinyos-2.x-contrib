@@ -47,6 +47,9 @@ module SX1211PhyRssiConfP {
     provides interface SX1211PhySwitch;
 
     provides interface Init @atleastonce();
+    
+    provides interface Get<uint32_t> as GetTxTime;
+    provides interface Get<uint32_t> as GetRxTime;
 
     uses interface Resource as SpiResource;
     uses interface SX1211Register as MCParam;
@@ -69,7 +72,7 @@ module SX1211PhyRssiConfP {
 implementation {
 #include "sx1211debug.h"
 
-    /* 
+	/* 
      * Default settings for initial parameters. 
      */ 
 #ifndef SX1211_CHANNEL_DEFAULT
@@ -108,9 +111,9 @@ implementation {
     /*
      * var for dutyCycle
      */
-    uint32_t rxTime;
-    uint32_t txTime;
-    uint32_t iTime;
+    uint32_t rxTime = 0;
+    uint32_t txTime = 0;
+    uint32_t iTime = 0;
 
     uint16_t sTime;
 
@@ -312,16 +315,10 @@ implementation {
 	uint32_t tmpTime;
 	tmpTime = call LocalTime.get();
 	if((mcParam0 & 0xE0) == MC1_TRANSMITTER) {	  
-	    if (tmpTime > iTime)
 		txTime+=(tmpTime - iTime);
-	    else
-		txTime+=(0xFFFFFFFF - iTime + tmpTime +1);
 	} 
 	if((mcParam0 & 0xE0) == MC1_RECEIVER) {
-	    if (tmpTime > iTime)
 		rxTime+=(tmpTime - iTime);
-	    else
-		rxTime+=(0xFFFFFFFF - iTime + tmpTime +1);
 	}
 	mcParam0 &= 0x1F;
 	mcParam0 |= MC1_SLEEP;
@@ -330,6 +327,9 @@ implementation {
 	call Irq1Pin.makeOutput();
 	call DataPin.makeOutput();
 	call PllLockPin.makeOutput();
+#ifdef DEBUGGING_PIN_RADIO_OFF	 
+	    DEBUGGING_PIN_RADIO_OFF;
+#endif  	
 	lState = MC1_SLEEP;
     }
     
@@ -350,20 +350,14 @@ implementation {
 	call DataPin.makeInput();
 	call PllLockPin.makeInput();
 
+    tmpTime = call LocalTime.get();
+
 	if((mcParam0 & 0xE0) == MC1_TRANSMITTER) {
-	    tmpTime = call LocalTime.get();
-	    if (tmpTime > iTime)
 		txTime+=(tmpTime - iTime);
-	    else
-		txTime+=(0xFFFFFFFF - iTime + tmpTime +1);
 	}
 	
 	if((mcParam0 & 0xE0) == MC1_RECEIVER) {
-	    tmpTime = call LocalTime.get();
-	    if (tmpTime > iTime)
 		rxTime+=(tmpTime - iTime);
-	    else
-		rxTime+=(0xFFFFFFFF - iTime + tmpTime +1);
 	}
 
 	lState = MC1_RECEIVER;
@@ -396,6 +390,9 @@ implementation {
 	    mcParam0 &= 0x1F;
 	    mcParam0 |= MC1_RECEIVER;
 	    iTime = call LocalTime.get();
+#ifdef DEBUGGING_PIN_RADIO_ON	 
+	    DEBUGGING_PIN_RADIO_ON;
+#endif  	    
 	    signal SX1211PhySwitch.rxModeEnable();
 	    return;
 	    call MCParam.write(REG_MCPARAM1, mcParam0);
@@ -423,10 +420,7 @@ implementation {
 	
 	if((mcParam0 & 0xE0) == MC1_RECEIVER) {
 	    tmpTime = call LocalTime.get();
-	    if (tmpTime > iTime)
 		rxTime+=(tmpTime - iTime);
-	    else
-		rxTime+=(0xFFFFFFFF - iTime + tmpTime +1);
 	}
 
 	lState = MC1_TRANSMITTER;
@@ -463,6 +457,9 @@ implementation {
 	case MC1_TRANSMITTER:
 	    call PllInterrupt.disable();
 	    iTime = call LocalTime.get();
+#ifdef DEBUGGING_PIN_RADIO_ON	 
+	    DEBUGGING_PIN_RADIO_ON;
+#endif  	    
 	    signal SX1211PhySwitch.txModeEnable();
 	    return;
 	    mcParam0 &= 0x1F;
@@ -491,7 +488,7 @@ implementation {
 	    mcParam0 |= MC1_SYNTHESIZER;
 	    call MCParam.write(REG_MCPARAM1, mcParam0);
 	    call PllInterrupt.enableRisingEdge();
-	    atomic sTime = 2*TS_FS;
+	    atomic sTime = TS_FS;
 	    break;
 
 	case MC1_SYNTHESIZER:
@@ -514,6 +511,9 @@ implementation {
 	case MC1_RECEIVER:
 	    call PllInterrupt.disable();
 	    iTime = call LocalTime.get();
+#ifdef DEBUGGING_PIN_RADIO_ON	 
+	    DEBUGGING_PIN_RADIO_ON;
+#endif  	    
 	    signal SX1211PhySwitch.rxModeEnable();
 	    return;
 
@@ -521,13 +521,43 @@ implementation {
 	case MC1_TRANSMITTER:
 	    iTime = call LocalTime.get();
 	    call PllInterrupt.disable();
+#ifdef DEBUGGING_PIN_RADIO_ON	 
+	    DEBUGGING_PIN_RADIO_ON;
+#endif    	
 	    signal SX1211PhySwitch.txModeEnable();
 	    return;
 	}
 	startSwitchTimer();
     }
 
-
+   command uint32_t GetTxTime.get() {
+	   uint32_t tmp, tmpTime;
+	   atomic {
+		   if((mcParam0 & 0xE0) == MC1_TRANSMITTER) {
+			   tmpTime = call LocalTime.get();
+			   txTime+=(tmpTime - iTime);
+			   iTime = tmpTime;
+		   }
+		   tmp = txTime;
+		   txTime = 0;
+	   }
+	   return tmp;
+   }
+   
+   command uint32_t GetRxTime.get() {
+	   uint32_t tmp, tmpTime;
+	   atomic {
+		   if((mcParam0 & 0xE0) == MC1_RECEIVER) {
+			   tmpTime = call LocalTime.get();
+			   rxTime+=(tmpTime - iTime);
+			   iTime = tmpTime;
+		   }
+		   tmp = rxTime;
+		   rxTime = 0;
+	   }
+	   return tmp;
+   }
+   
    async command uint32_t SX1211PhySwitch.getDutyCycle(bool _Mode) {
        atomic {
        if(_Mode == FALSE)

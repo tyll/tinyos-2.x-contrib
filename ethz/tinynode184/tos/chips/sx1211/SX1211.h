@@ -564,8 +564,8 @@ typedef enum {
     freq_869_025 = 13,
     freq_869_175 = 14,
     freq_869_324 = 15,
-    freq_869_474 = 16,
-    freq_869_625 = 17,
+    freq_869_474 = 16, // 500mW ISM
+    freq_869_625 = 17, // 500mW ISM
     freq_869_777 = 18,
     freq_869_924 = 19,
 } sx1211_freq_t;

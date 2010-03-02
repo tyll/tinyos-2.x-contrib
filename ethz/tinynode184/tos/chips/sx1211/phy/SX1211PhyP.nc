@@ -134,8 +134,6 @@ implementation {
 
     event void SpiResourceTX.granted() {  }
     
-    uint8_t toggle;
-    
     event void SpiResourceRX.granted() {
     	atomic {
     		if (state == RADIO_RX_PACKET_DEFERRED)
@@ -144,12 +142,6 @@ implementation {
     			readPacket();
     		}
     		else if (state == RADIO_RX_PACKET_DEFERRED_OVERRUN) {
-    	    	if (!toggle)
-    	    		TOSH_SET_RED_LED_PIN();
-    	    	else
-    	    		TOSH_CLR_RED_LED_PIN();
-    	    	toggle = (toggle + 1) % 2;
-
     			call SX1211PatternConf.loadDataPatternHasBus();
     			armPatternDetect(); 
     			call SpiResourceRX.release();
@@ -196,14 +188,12 @@ implementation {
 	  case RADIO_TX:
 		atomic {
 			if (enableAck==FALSE) {
-				// call SX1211PatternConf.loadDataPatternHasBus();
 				armPatternDetect();
 				call SpiResourceTX.release();
 				state = RADIO_LISTEN;
 	    		call Interrupt0.enableRisingEdge();
 				signal SX1211PhyRxTx.sendFrameDone(txtimestamp, SUCCESS);
 			} else {
-				// call SX1211PatternConf.loadAckPatternHasBus();
 				armPatternDetect();
 				call SpiResourceTX.release();
 				state = RADIO_RX_ACK;
@@ -215,31 +205,19 @@ implementation {
 	    break;
 	  }
     }
-
-    error_t wakeTx(bool rxMode) {
-	atomic {
-	    if (state == RADIO_LISTEN){ post startDone(); return SUCCESS;}
-	    if (state != RADIO_SLEEP) return EBUSY;	    
-	    if ( call SpiResourceConfig.immediateRequest() == SUCCESS) {
-		state = RADIO_STARTING;
-		if (rxMode == TRUE)
-		    call SX1211PhySwitch.rxMode();
-		else 
-		    call SX1211PhySwitch.txMode();
-		return SUCCESS;
-	    } else {
-		atomic state = RADIO_SLEEP;
-		return FAIL;
-	    }
-	}
-    }
-
-    command error_t SX1211PhyRxTx.wakeUpTx() {
-	return wakeTx(FALSE);
-    }
+   
     command error_t SplitControl.start() {
-	return wakeTx(TRUE);
-
+    	atomic {
+    	    if (state == RADIO_LISTEN){ post startDone(); return SUCCESS;}
+    	    if (state != RADIO_SLEEP) return EBUSY;	    
+    	    if ( call SpiResourceConfig.immediateRequest() == SUCCESS) {
+    	    	state = RADIO_STARTING;
+   	    		call SX1211PhySwitch.rxMode();
+    	    	return SUCCESS;
+    	    } else {
+    	    	return FAIL;
+    	    }
+    	}
     }
 
     command error_t SplitControl.stop() {
@@ -333,9 +311,7 @@ implementation {
  async command error_t SX1211PhyRxTx.sendFrame(char* data, uint8_t _frameLen, pattern_t preamble)  __attribute__ ((noinline)) 
  {
      error_t status;
-     
      atomic {
-	 if (state == RADIO_SLEEP) return EOFF;
 	 if (call SX1211PhyRxTx.busy()) return EBUSY;
 	 if (_frameLen < 6 || _frameLen > sx1211_mtu + 7) return EINVAL; // 7 = 4 preamble + 3 sync
       
@@ -358,16 +334,18 @@ implementation {
  async event void SX1211PhySwitch.txModeEnable() {
    
      atomic {
-	 if (state==RADIO_STARTING) {
-	     call SpiResourceConfig.release();
-	     state=RADIO_LISTEN; // sad hack..
-	     signal SX1211PhyRxTx.wakeUpTxDone();
-	 } else {
-	     call Interrupt0.disable(); 
-	     call Interrupt1.enableRisingEdge();
-	     txtimestamp = call Alarm32khz16.getNow() + usecs_to_jiffies(7 * call SX1211PhyConf.getByteTime_us()); // first byte is sent after sync + preamble
-	     call SX1211Fifo.write(frame, frameLen);
-	 }
+    	 switch (state) {
+    	 case RADIO_TX:
+    		 call Interrupt0.disable(); 
+    		 call Interrupt1.enableRisingEdge();
+    		 txtimestamp = call Alarm32khz16.getNow() + usecs_to_jiffies(7 * call SX1211PhyConf.getByteTime_us()); // first byte is sent after sync + preamble
+#ifdef DEBUGGING_PIN_RADIO_TX_SET
+    		 DEBUGGING_PIN_RADIO_TX_SET;
+#endif    		 
+    		 call SX1211Fifo.write(frame, frameLen);
+    		 break;
+    	 default:
+    	 }
      }
  }
 
@@ -488,6 +466,9 @@ implementation {
 	     return;
 	     
 	 case RADIO_TX:
+#ifdef	DEBUGGING_PIN_RADIO_TX_CLR	 
+		 DEBUGGING_PIN_RADIO_TX_CLR;
+#endif
 	     call Interrupt1.disable();
 	     call SX1211PhySwitch.rxMode();
 	     if (enableAck==TRUE)
@@ -523,45 +504,19 @@ implementation {
 	     call Interrupt0.enableRisingEdge();
 	 }	 
 	 return;
- 
-     case RADIO_TX:
 
-	 if (enableAck==FALSE) {
-	     call SX1211PatternConf.loadDataPatternHasBus();
-	     armPatternDetect();
-	     call SX1211PhySwitch.rxMode();
-	     signal SX1211PhyRxTx.sendFrameDone(txtimestamp, SUCCESS);
-	     atomic {
-		 call Interrupt0.enableRisingEdge();
-		 state = RADIO_LISTEN;
-	     }
-	 } else {
-
-	     call SX1211PatternConf.loadAckPatternHasBus();
-	     armPatternDetect();
-	     call SpiResourceTX.release();
-	     
-	     call Alarm32khz16.start(usecs_to_jiffies(2000));
-	     atomic {
-		 state = RADIO_RX_ACK;
-		 call Interrupt0.enableRisingEdge();
-
-	     }
-	 }
-	 return;
-
-    case RADIO_RX_ACK: // ack timeout or crc failed
-	atomic {
-	    call SpiResourceRX.immediateRequest(); // EBUSY -> crc failed
-	    signal SX1211PhyRxTx.sendFrameDone(txtimestamp, SUCCESS);
-	    enableAck = FALSE;
-	    call SX1211PatternConf.loadDataPatternHasBus();
-	    armPatternDetect();
-	    call SpiResourceRX.release();
-	    state = RADIO_LISTEN;
-	    call Interrupt0.enableRisingEdge();
-	}
-	return;
+     case RADIO_RX_ACK: // ack timeout or crc failed
+    	atomic {
+    		call SpiResourceRX.immediateRequest(); // EBUSY -> crc failed
+    		signal SX1211PhyRxTx.sendFrameDone(txtimestamp, SUCCESS);
+    		enableAck = FALSE;
+    		call SX1211PatternConf.loadDataPatternHasBus();
+    		armPatternDetect();
+    		call SpiResourceRX.release();
+    		state = RADIO_LISTEN;
+    		call Interrupt0.enableRisingEdge();
+    	}
+     return;
 
      default:
 	 return;
@@ -571,7 +526,6 @@ implementation {
  
  default async event void SX1211PhyRxTx.sendFrameDone(uint16_t _timestamp, error_t err) {}; 
  default async event message_t * SX1211PhyRxTx.rxFrameEnd(message_t* data, uint8_t len, uint16_t _timestamp, error_t status) {return data;}
- default async event void SX1211PhyRxTx.wakeUpTxDone() {}
 }
 
 

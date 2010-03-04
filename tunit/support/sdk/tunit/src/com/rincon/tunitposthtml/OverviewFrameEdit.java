@@ -40,6 +40,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import com.rincon.tunit.TUnit;
+
 /**
  * Add some TUnit links to the overview-frame.html stuff.
  * 
@@ -48,6 +50,7 @@ import java.io.PrintWriter;
  */
 public class OverviewFrameEdit {
 
+  
   /**
    * This is just a hack, and nothing more.
    * 
@@ -59,6 +62,7 @@ public class OverviewFrameEdit {
     try {
       BufferedReader in = new BufferedReader(new FileReader(htmlFile));
       String line;
+      String logo = "";
 
       while ((line = in.readLine()) != null) {
         if(line.contains("Home</a>")) {
@@ -68,6 +72,22 @@ public class OverviewFrameEdit {
           if(ArchivesLink.getArchivesLink() != null) {
             line += "<a href=\"" + ArchivesLink.getArchivesLink() + "\" target=\"classFrame\">Test Archives</a>";
           }
+          
+          // Undocumented features. Congrats on reading the code. 
+          // Use this trick to skin your HTML reports.
+          // Drop a file called "logo.jpg" into the /reports directory
+          // before running the PostHtmlEdit app to generate the HTML for those
+          // reports.
+          if(new File(TUnit.getBaseReportDirectory(), "logo.jpg").exists()) {
+            // Prepend the logo so it's at the top.
+            line = "<center>"
+              + "<a href=\"overview-summary.html\" target=\"classFrame\">" 
+              + "<img src=\"./../logo.jpg\" BORDER=0>" 
+              + "</a>"
+              + "</center><br>" 
+              + line;
+          }
+          
         }
         
         fileContents += line + "\n";        

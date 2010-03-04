@@ -330,9 +330,8 @@ public class TUnit {
     // external programs. We could detect this error code outside and
     // do something useful?
     if (TestReport.getAllTunitProblems().size() > 0) {
-
       if(runFromCommandLine) {
-        exit(6);
+        exit(1);
       }
     }
 

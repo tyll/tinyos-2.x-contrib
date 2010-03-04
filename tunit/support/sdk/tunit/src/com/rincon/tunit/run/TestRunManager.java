@@ -232,6 +232,7 @@ public class TestRunManager implements PhoenixError, Messenger {
     sfError = false;
 
     for (Iterator it = serialForwarders.iterator(); it.hasNext();) {
+      log.debug("Connecting...");
       ((Sf) it.next()).connect();
     }    
 
@@ -240,11 +241,13 @@ public class TestRunManager implements PhoenixError, Messenger {
      */
     for(Iterator it = serialForwarders.iterator(); it.hasNext(); ) {
       if(!((Sf) it.next()).isConnected()) {
+        log.debug("Not all serial forwarders connected properly.");
         sfError = true;
         return false;
       }
     }
     
+    log.debug("All serial forwarders connected properly.");
     return true;
   }
   

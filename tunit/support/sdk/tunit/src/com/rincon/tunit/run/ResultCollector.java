@@ -145,6 +145,11 @@ public class ResultCollector extends Thread implements Messenger,
     MoteIF focusedMoteIf;
     PhoenixSource focusedSource;
     for (int i = 0; i < runProperties.totalNodes(); i++) {
+      if(runProperties.getNode(i).getMotecom().isEmpty()) {
+        log.debug("Node " + i + "'s motecom is empty; skipping connection.");
+        continue;
+      }
+      
       String source = "sf@localhost:" + (TestRunManager.BASE_PORT + i);
       focusedSource = BuildSource.makePhoenix(source, this);
       focusedSource.setPacketErrorHandler(this);

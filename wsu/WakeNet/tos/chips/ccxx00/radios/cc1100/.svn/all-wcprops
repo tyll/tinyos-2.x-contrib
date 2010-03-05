@@ -1,0 +1,47 @@
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/tinyos-svn/!svn/ver/1134/sensorweb/apps/WakeNet/motes/ccxx00/radios/cc1100
+END
+config_CC1100.h
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/tinyos-svn/!svn/ver/1134/sensorweb/apps/WakeNet/motes/ccxx00/radios/cc1100/config_CC1100.h
+END
+CC1100_250kBaud_manchester.h
+K 25
+svn:wc:ra_dav:version-url
+V 108
+/svn/tinyos-svn/!svn/ver/1134/sensorweb/apps/WakeNet/motes/ccxx00/radios/cc1100/CC1100_250kBaud_manchester.h
+END
+CC1100_915MHz_10kBaud_FccCompliant.h
+K 25
+svn:wc:ra_dav:version-url
+V 116
+/svn/tinyos-svn/!svn/ver/1134/sensorweb/apps/WakeNet/motes/ccxx00/radios/cc1100/CC1100_915MHz_10kBaud_FccCompliant.h
+END
+CC1100ControlP.nc
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/svn/tinyos-svn/!svn/ver/1134/sensorweb/apps/WakeNet/motes/ccxx00/radios/cc1100/CC1100ControlP.nc
+END
+CC1100_500kBaud.h
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/svn/tinyos-svn/!svn/ver/1134/sensorweb/apps/WakeNet/motes/ccxx00/radios/cc1100/CC1100_500kBaud.h
+END
+CC1100ControlC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/svn/tinyos-svn/!svn/ver/1134/sensorweb/apps/WakeNet/motes/ccxx00/radios/cc1100/CC1100ControlC.nc
+END
+CC1100.h
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/tinyos-svn/!svn/ver/1134/sensorweb/apps/WakeNet/motes/ccxx00/radios/cc1100/CC1100.h
+END

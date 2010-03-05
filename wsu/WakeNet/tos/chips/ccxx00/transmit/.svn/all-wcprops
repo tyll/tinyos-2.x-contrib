@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/tinyos-svn/!svn/ver/1212/sensorweb/apps/WakeNet/motes/ccxx00/transmit
+END
+BlazeTransmitC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/tinyos-svn/!svn/ver/1134/sensorweb/apps/WakeNet/motes/ccxx00/transmit/BlazeTransmitC.nc
+END
+BlazeTransmit.h
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/tinyos-svn/!svn/ver/1134/sensorweb/apps/WakeNet/motes/ccxx00/transmit/BlazeTransmit.h
+END
+BlazeTransmitP.nc
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/tinyos-svn/!svn/ver/1212/sensorweb/apps/WakeNet/motes/ccxx00/transmit/BlazeTransmitP.nc
+END

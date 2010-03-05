@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/tinyos-svn/!svn/ver/1212/sensorweb/apps/WakeNet/motes/ccxx00/csma/continuoussense
+END
+CsmaP.nc
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/tinyos-svn/!svn/ver/1212/sensorweb/apps/WakeNet/motes/ccxx00/csma/continuoussense/CsmaP.nc
+END
+CsmaC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/tinyos-svn/!svn/ver/1134/sensorweb/apps/WakeNet/motes/ccxx00/csma/continuoussense/CsmaC.nc
+END
+Csma.h
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/tinyos-svn/!svn/ver/1134/sensorweb/apps/WakeNet/motes/ccxx00/csma/continuoussense/Csma.h
+END

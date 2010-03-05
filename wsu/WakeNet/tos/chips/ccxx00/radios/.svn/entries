@@ -1,0 +1,34 @@
+9
+
+dir
+1239
+https://sensorweb.vancouver.wsu.edu/svn/tinyos-svn/sensorweb/apps/WakeNet/motes/ccxx00/radios
+https://sensorweb.vancouver.wsu.edu/svn/tinyos-svn
+
+
+
+2009-10-20T23:12:32.495647Z
+1134
+lugang
+
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+71be81bb-8916-4e8f-bb90-10bc8f9fc1e3
+
+cc1100
+dir
+
+cc2500
+dir
+

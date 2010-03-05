@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/tinyos-svn/!svn/ver/1134/sensorweb/apps/WakeNet/motes/ccxx00/init
+END
+BlazeInitP.nc
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/tinyos-svn/!svn/ver/1134/sensorweb/apps/WakeNet/motes/ccxx00/init/BlazeInitP.nc
+END
+Ccxx00PlatformInitC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/tinyos-svn/!svn/ver/1134/sensorweb/apps/WakeNet/motes/ccxx00/init/Ccxx00PlatformInitC.nc
+END
+BlazeInitC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/tinyos-svn/!svn/ver/1134/sensorweb/apps/WakeNet/motes/ccxx00/init/BlazeInitC.nc
+END
+ReceiveMode.nc
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/tinyos-svn/!svn/ver/1134/sensorweb/apps/WakeNet/motes/ccxx00/init/ReceiveMode.nc
+END
+BlazeInit.h
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/tinyos-svn/!svn/ver/1134/sensorweb/apps/WakeNet/motes/ccxx00/init/BlazeInit.h
+END
+ReceiveModeC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/tinyos-svn/!svn/ver/1134/sensorweb/apps/WakeNet/motes/ccxx00/init/ReceiveModeC.nc
+END
+Ccxx00PlatformInitP.nc
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/tinyos-svn/!svn/ver/1134/sensorweb/apps/WakeNet/motes/ccxx00/init/Ccxx00PlatformInitP.nc
+END
+ReceiveMode.h
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/tinyos-svn/!svn/ver/1134/sensorweb/apps/WakeNet/motes/ccxx00/init/ReceiveMode.h
+END

@@ -1,0 +1,71 @@
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/tinyos-svn/!svn/ver/1134/sensorweb/apps/WakeNet/motes/ccxx00/spi
+END
+InterruptStateC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/tinyos-svn/!svn/ver/1134/sensorweb/apps/WakeNet/motes/ccxx00/spi/InterruptStateC.nc
+END
+RealFifoThrottleC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/tinyos-svn/!svn/ver/1134/sensorweb/apps/WakeNet/motes/ccxx00/spi/RealFifoThrottleC.nc
+END
+BlazeSpiWireC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/tinyos-svn/!svn/ver/1134/sensorweb/apps/WakeNet/motes/ccxx00/spi/BlazeSpiWireC.nc
+END
+BlazeSpiResourceC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/tinyos-svn/!svn/ver/1134/sensorweb/apps/WakeNet/motes/ccxx00/spi/BlazeSpiResourceC.nc
+END
+InterruptState.h
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/tinyos-svn/!svn/ver/1134/sensorweb/apps/WakeNet/motes/ccxx00/spi/InterruptState.h
+END
+BlazeSpiResource.h
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/tinyos-svn/!svn/ver/1134/sensorweb/apps/WakeNet/motes/ccxx00/spi/BlazeSpiResource.h
+END
+BlazeCentralWiringC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/tinyos-svn/!svn/ver/1134/sensorweb/apps/WakeNet/motes/ccxx00/spi/BlazeCentralWiringC.nc
+END
+BlazeSpiP.nc
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/tinyos-svn/!svn/ver/1134/sensorweb/apps/WakeNet/motes/ccxx00/spi/BlazeSpiP.nc
+END
+FifoThrottleP.nc
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/tinyos-svn/!svn/ver/1134/sensorweb/apps/WakeNet/motes/ccxx00/spi/FifoThrottleP.nc
+END
+BlazeSpiC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/tinyos-svn/!svn/ver/1134/sensorweb/apps/WakeNet/motes/ccxx00/spi/BlazeSpiC.nc
+END
+FifoThrottleC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/tinyos-svn/!svn/ver/1134/sensorweb/apps/WakeNet/motes/ccxx00/spi/FifoThrottleC.nc
+END

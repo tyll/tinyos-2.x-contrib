@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/tinyos-svn/!svn/ver/1134/sensorweb/apps/WakeNet/motes/ccxx00/splitcontrolmanager
+END
+SplitControlManagerP.nc
+K 25
+svn:wc:ra_dav:version-url
+V 109
+/svn/tinyos-svn/!svn/ver/1134/sensorweb/apps/WakeNet/motes/ccxx00/splitcontrolmanager/SplitControlManagerP.nc
+END
+SplitControlManagerC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 109
+/svn/tinyos-svn/!svn/ver/1134/sensorweb/apps/WakeNet/motes/ccxx00/splitcontrolmanager/SplitControlManagerC.nc
+END
+SplitControlManager.h
+K 25
+svn:wc:ra_dav:version-url
+V 107
+/svn/tinyos-svn/!svn/ver/1134/sensorweb/apps/WakeNet/motes/ccxx00/splitcontrolmanager/SplitControlManager.h
+END

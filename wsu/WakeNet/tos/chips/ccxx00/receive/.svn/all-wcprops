@@ -1,0 +1,17 @@
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/tinyos-svn/!svn/ver/1212/sensorweb/apps/WakeNet/motes/ccxx00/receive
+END
+BlazeReceiveP.nc
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/tinyos-svn/!svn/ver/1212/sensorweb/apps/WakeNet/motes/ccxx00/receive/BlazeReceiveP.nc
+END
+BlazeReceiveC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/tinyos-svn/!svn/ver/1149/sensorweb/apps/WakeNet/motes/ccxx00/receive/BlazeReceiveC.nc
+END

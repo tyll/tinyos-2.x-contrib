@@ -1,1 +1,0 @@
-make micaz sim

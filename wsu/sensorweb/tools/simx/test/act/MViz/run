@@ -1,3 +1,0 @@
-make -C net
-export CLASSPATH=.:$CLASSPATH
-tos-mviz MVizMsg

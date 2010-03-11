@@ -1,2 +1,0 @@
-Copy the Octopus directory containing motes and java directory in /opt/tinyos-2.x/apps/
-follow the User documentation

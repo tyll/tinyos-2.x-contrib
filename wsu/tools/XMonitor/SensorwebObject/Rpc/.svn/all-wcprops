@@ -1,0 +1,77 @@
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/tinyos-svn/!svn/ver/1389/sensorweb/tools/XMonitor/SensorwebObject/Rpc
+END
+NescDecls.java
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/tinyos-svn/!svn/ver/565/sensorweb/tools/XMonitor/SensorwebObject/Rpc/NescDecls.java
+END
+Rpc.java
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/tinyos-svn/!svn/ver/565/sensorweb/tools/XMonitor/SensorwebObject/Rpc/Rpc.java
+END
+rpcPanel.java
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/tinyos-svn/!svn/ver/1276/sensorweb/tools/XMonitor/SensorwebObject/Rpc/rpcPanel.java
+END
+ParamEditor.java
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/tinyos-svn/!svn/ver/565/sensorweb/tools/XMonitor/SensorwebObject/Rpc/ParamEditor.java
+END
+RamSymbols.java
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/tinyos-svn/!svn/ver/565/sensorweb/tools/XMonitor/SensorwebObject/Rpc/RamSymbols.java
+END
+RpcField.java
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/tinyos-svn/!svn/ver/565/sensorweb/tools/XMonitor/SensorwebObject/Rpc/RpcField.java
+END
+NescApp.java
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/tinyos-svn/!svn/ver/565/sensorweb/tools/XMonitor/SensorwebObject/Rpc/NescApp.java
+END
+RpcSender_Object_Client.java
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svn/tinyos-svn/!svn/ver/565/sensorweb/tools/XMonitor/SensorwebObject/Rpc/RpcSender_Object_Client.java
+END
+RpcObject.java
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/tinyos-svn/!svn/ver/565/sensorweb/tools/XMonitor/SensorwebObject/Rpc/RpcObject.java
+END
+Constants.java
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/tinyos-svn/!svn/ver/565/sensorweb/tools/XMonitor/SensorwebObject/Rpc/Constants.java
+END
+NescTypes.java
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/tinyos-svn/!svn/ver/565/sensorweb/tools/XMonitor/SensorwebObject/Rpc/NescTypes.java
+END
+Util.java
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/tinyos-svn/!svn/ver/1389/sensorweb/tools/XMonitor/SensorwebObject/Rpc/Util.java
+END

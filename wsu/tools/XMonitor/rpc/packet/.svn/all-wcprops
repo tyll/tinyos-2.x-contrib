@@ -1,0 +1,125 @@
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/tinyos-svn/!svn/ver/1317/sensorweb/tools/XMonitor/rpc/packet
+END
+StreamByteSource.java
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/tinyos-svn/!svn/ver/565/sensorweb/tools/XMonitor/rpc/packet/StreamByteSource.java
+END
+Packetizer.java
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/tinyos-svn/!svn/ver/571/sensorweb/tools/XMonitor/rpc/packet/Packetizer.java
+END
+DBSource.java
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/tinyos-svn/!svn/ver/565/sensorweb/tools/XMonitor/rpc/packet/DBSource.java
+END
+DBReader.java
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/tinyos-svn/!svn/ver/565/sensorweb/tools/XMonitor/rpc/packet/DBReader.java
+END
+DummySource.java
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/tinyos-svn/!svn/ver/565/sensorweb/tools/XMonitor/rpc/packet/DummySource.java
+END
+Serial.java
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/tinyos-svn/!svn/ver/571/sensorweb/tools/XMonitor/rpc/packet/Serial.java
+END
+BuildSource.java
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/tinyos-svn/!svn/ver/571/sensorweb/tools/XMonitor/rpc/packet/BuildSource.java
+END
+SerialByteSource.java
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/tinyos-svn/!svn/ver/590/sensorweb/tools/XMonitor/rpc/packet/SerialByteSource.java
+END
+AbstractSource.java
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/tinyos-svn/!svn/ver/581/sensorweb/tools/XMonitor/rpc/packet/AbstractSource.java
+END
+ByteSource.java
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/tinyos-svn/!svn/ver/565/sensorweb/tools/XMonitor/rpc/packet/ByteSource.java
+END
+PhoenixError.java
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/tinyos-svn/!svn/ver/565/sensorweb/tools/XMonitor/rpc/packet/PhoenixError.java
+END
+Platform.java
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/tinyos-svn/!svn/ver/571/sensorweb/tools/XMonitor/rpc/packet/Platform.java
+END
+ParseArgs.java
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/tinyos-svn/!svn/ver/565/sensorweb/tools/XMonitor/rpc/packet/ParseArgs.java
+END
+SerialByteSource.java.rxtx
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/tinyos-svn/!svn/ver/571/sensorweb/tools/XMonitor/rpc/packet/SerialByteSource.java.rxtx
+END
+PacketSource.java
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/tinyos-svn/!svn/ver/565/sensorweb/tools/XMonitor/rpc/packet/PacketSource.java
+END
+SFSource.java
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/tinyos-svn/!svn/ver/565/sensorweb/tools/XMonitor/rpc/packet/SFSource.java
+END
+SFProtocol.java
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/tinyos-svn/!svn/ver/1317/sensorweb/tools/XMonitor/rpc/packet/SFProtocol.java
+END
+PhoenixSource.java
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/tinyos-svn/!svn/ver/581/sensorweb/tools/XMonitor/rpc/packet/PhoenixSource.java
+END
+PacketListenerIF.java
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/tinyos-svn/!svn/ver/565/sensorweb/tools/XMonitor/rpc/packet/PacketListenerIF.java
+END
+NetworkByteSource.java
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/tinyos-svn/!svn/ver/565/sensorweb/tools/XMonitor/rpc/packet/NetworkByteSource.java
+END

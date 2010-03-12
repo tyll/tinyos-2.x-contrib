@@ -1,0 +1,65 @@
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/tinyos-svn/!svn/ver/565/sensorweb/tools/XMonitor/oasis/apps/OasisApp/build/telosb
+END
+RpcM.nc
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/tinyos-svn/!svn/ver/565/sensorweb/tools/XMonitor/oasis/apps/OasisApp/build/telosb/RpcM.nc
+END
+main.ihex
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/tinyos-svn/!svn/ver/565/sensorweb/tools/XMonitor/oasis/apps/OasisApp/build/telosb/main.ihex
+END
+app.c
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/tinyos-svn/!svn/ver/565/sensorweb/tools/XMonitor/oasis/apps/OasisApp/build/telosb/app.c
+END
+nescDecls.xml
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/svn/tinyos-svn/!svn/ver/565/sensorweb/tools/XMonitor/oasis/apps/OasisApp/build/telosb/nescDecls.xml
+END
+main.exe
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/tinyos-svn/!svn/ver/565/sensorweb/tools/XMonitor/oasis/apps/OasisApp/build/telosb/main.exe
+END
+rpcSchema.xml
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/svn/tinyos-svn/!svn/ver/565/sensorweb/tools/XMonitor/oasis/apps/OasisApp/build/telosb/rpcSchema.xml
+END
+RpcC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/tinyos-svn/!svn/ver/565/sensorweb/tools/XMonitor/oasis/apps/OasisApp/build/telosb/RpcC.nc
+END
+tos_image.xml
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/svn/tinyos-svn/!svn/ver/565/sensorweb/tools/XMonitor/oasis/apps/OasisApp/build/telosb/tos_image.xml
+END
+nesc.xml
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/tinyos-svn/!svn/ver/565/sensorweb/tools/XMonitor/oasis/apps/OasisApp/build/telosb/nesc.xml
+END
+ident_flags.txt
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svn/tinyos-svn/!svn/ver/565/sensorweb/tools/XMonitor/oasis/apps/OasisApp/build/telosb/ident_flags.txt
+END

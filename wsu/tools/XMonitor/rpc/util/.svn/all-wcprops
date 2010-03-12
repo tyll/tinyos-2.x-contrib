@@ -1,0 +1,59 @@
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/tinyos-svn/!svn/ver/571/sensorweb/tools/XMonitor/rpc/util
+END
+PrintStreamMessenger.java
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/tinyos-svn/!svn/ver/565/sensorweb/tools/XMonitor/rpc/util/PrintStreamMessenger.java
+END
+ByteOps.java
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/tinyos-svn/!svn/ver/565/sensorweb/tools/XMonitor/rpc/util/ByteOps.java
+END
+Crc.java
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/tinyos-svn/!svn/ver/565/sensorweb/tools/XMonitor/rpc/util/Crc.java
+END
+Env.java
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/tinyos-svn/!svn/ver/571/sensorweb/tools/XMonitor/rpc/util/Env.java
+END
+GetEnv.java
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/tinyos-svn/!svn/ver/565/sensorweb/tools/XMonitor/rpc/util/GetEnv.java
+END
+Messenger.java
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/tinyos-svn/!svn/ver/565/sensorweb/tools/XMonitor/rpc/util/Messenger.java
+END
+SerialForwarderStub.java
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/tinyos-svn/!svn/ver/565/sensorweb/tools/XMonitor/rpc/util/SerialForwarderStub.java
+END
+PacketListenerIF.java
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/tinyos-svn/!svn/ver/565/sensorweb/tools/XMonitor/rpc/util/PacketListenerIF.java
+END
+SerialStub.java
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/tinyos-svn/!svn/ver/565/sensorweb/tools/XMonitor/rpc/util/SerialStub.java
+END

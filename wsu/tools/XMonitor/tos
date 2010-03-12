@@ -1,0 +1,5 @@
+#!/bin/sh
+mv ./rpc/packet/SerialByteSource.java  ./rpc/packet/SerialByteSource.java.rxtx
+mv ./rpc/packet/SerialByteSource.java.tos  ./rpc/packet/SerialByteSource.java
+
+

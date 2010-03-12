@@ -1,0 +1,225 @@
+<?xml version='1.0' standalone='yes'?>
+<rpcSchema>
+  <rpcFunctions>
+    <EventReportM.EventConfig.getReportLevel commandID="0" componentName="EventReportM" functionName="getReportLevel" functionType="command" interfaceName="EventConfig" interfaceType="EventConfig" numParams="1" provided="1" signature=" command uint8_t EventReportM.EventConfig.getReportLevel ( uint8_t type  ) ">
+      <params>
+        <param0 name="type">
+          <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+        </param0>
+      </params>
+      <returnType typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </EventReportM.EventConfig.getReportLevel>
+    <EventReportM.EventConfig.setReportLevel commandID="1" componentName="EventReportM" functionName="setReportLevel" functionType="command" interfaceName="EventConfig" interfaceType="EventConfig" numParams="2" provided="1" signature=" command result_t EventReportM.EventConfig.setReportLevel ( uint8_t type, uint8_t level  ) ">
+      <params>
+        <param0 name="type">
+          <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+        </param0>
+        <param1 name="level">
+          <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+        </param1>
+      </params>
+      <returnType typeClass="unknown" typeDecl="result_t" typeName="result_t" />
+    </EventReportM.EventConfig.setReportLevel>
+    <GenericCommProM.getRFChannel commandID="2" componentName="GenericCommProM" functionName="getRFChannel" functionType="command" numParams="0" provided="1" signature=" command uint8_t GenericCommProM.getRFChannel (  ) ">
+      <params></params>
+      <returnType typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </GenericCommProM.getRFChannel>
+    <GenericCommProM.getRFPower commandID="3" componentName="GenericCommProM" functionName="getRFPower" functionType="command" numParams="0" provided="1" signature=" command uint8_t GenericCommProM.getRFPower (  ) ">
+      <params></params>
+      <returnType typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </GenericCommProM.getRFPower>
+    <GenericCommProM.setRFChannel commandID="4" componentName="GenericCommProM" functionName="setRFChannel" functionType="command" numParams="1" provided="1" signature=" command result_t GenericCommProM.setRFChannel ( uint8_t channel  ) ">
+      <params>
+        <param0 name="channel">
+          <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+        </param0>
+      </params>
+      <returnType typeClass="unknown" typeDecl="result_t" typeName="result_t" />
+    </GenericCommProM.setRFChannel>
+    <GenericCommProM.setRFPower commandID="5" componentName="GenericCommProM" functionName="setRFPower" functionType="command" numParams="1" provided="1" signature=" command result_t GenericCommProM.setRFPower ( uint8_t level  ) ">
+      <params>
+        <param0 name="level">
+          <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+        </param0>
+      </params>
+      <returnType typeClass="unknown" typeDecl="result_t" typeName="result_t" />
+    </GenericCommProM.setRFPower>
+    <MultiHopLQI.RouteRpcCtrl.getBeaconUpdateInterval commandID="6" componentName="MultiHopLQI" functionName="getBeaconUpdateInterval" functionType="command" interfaceName="RouteRpcCtrl" interfaceType="RouteRpcCtrl" numParams="0" provided="1" signature=" command uint16_t MultiHopLQI.RouteRpcCtrl.getBeaconUpdateInterval (  ) ">
+      <params></params>
+      <returnType typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </MultiHopLQI.RouteRpcCtrl.getBeaconUpdateInterval>
+    <MultiHopLQI.RouteRpcCtrl.releaseParent commandID="7" componentName="MultiHopLQI" functionName="releaseParent" functionType="command" interfaceName="RouteRpcCtrl" interfaceType="RouteRpcCtrl" numParams="0" provided="1" signature=" command result_t MultiHopLQI.RouteRpcCtrl.releaseParent (  ) ">
+      <params></params>
+      <returnType typeClass="unknown" typeDecl="result_t" typeName="result_t" />
+    </MultiHopLQI.RouteRpcCtrl.releaseParent>
+    <MultiHopLQI.RouteRpcCtrl.setBeaconUpdateInterval commandID="8" componentName="MultiHopLQI" functionName="setBeaconUpdateInterval" functionType="command" interfaceName="RouteRpcCtrl" interfaceType="RouteRpcCtrl" numParams="1" provided="1" signature=" command result_t MultiHopLQI.RouteRpcCtrl.setBeaconUpdateInterval ( uint16_t seconds  ) ">
+      <params>
+        <param0 name="seconds">
+          <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+        </param0>
+      </params>
+      <returnType typeClass="unknown" typeDecl="result_t" typeName="result_t" />
+    </MultiHopLQI.RouteRpcCtrl.setBeaconUpdateInterval>
+    <MultiHopLQI.RouteRpcCtrl.setParent commandID="9" componentName="MultiHopLQI" functionName="setParent" functionType="command" interfaceName="RouteRpcCtrl" interfaceType="RouteRpcCtrl" numParams="1" provided="1" signature=" command result_t MultiHopLQI.RouteRpcCtrl.setParent ( uint16_t parentAddr  ) ">
+      <params>
+        <param0 name="parentAddr">
+          <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+        </param0>
+      </params>
+      <returnType typeClass="unknown" typeDecl="result_t" typeName="result_t" />
+    </MultiHopLQI.RouteRpcCtrl.setParent>
+    <MultiHopLQI.RouteRpcCtrl.setSink commandID="10" componentName="MultiHopLQI" functionName="setSink" functionType="command" interfaceName="RouteRpcCtrl" interfaceType="RouteRpcCtrl" numParams="1" provided="1" signature=" command result_t MultiHopLQI.RouteRpcCtrl.setSink ( bool enable  ) ">
+      <params>
+        <param0 name="enable">
+          <type typeClass="unknown" typeDecl="bool" typeName="bool" />
+        </param0>
+      </params>
+      <returnType typeClass="unknown" typeDecl="result_t" typeName="result_t" />
+    </MultiHopLQI.RouteRpcCtrl.setSink>
+    <RamSymbolsM.peek commandID="11" componentName="RamSymbolsM" functionName="peek" functionType="command" numParams="3" provided="1" signature=" command ramSymbol_t RamSymbolsM.peek ( unsigned int memAddress, uint8_t length, bool dereference  ) ">
+      <params>
+        <param0 name="memAddress">
+          <type typeClass="unknown" typeDecl="unsigned int" typeName="unsigned int" />
+        </param0>
+        <param1 name="length">
+          <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+        </param1>
+        <param2 name="dereference">
+          <type typeClass="unknown" typeDecl="bool" typeName="bool" />
+        </param2>
+      </params>
+      <returnType typeClass="unknown" typeDecl="ramSymbol_t" typeName="ramSymbol_t" />
+    </RamSymbolsM.peek>
+    <RamSymbolsM.poke commandID="12" componentName="RamSymbolsM" functionName="poke" functionType="command" numParams="1" provided="1" signature=" command unsigned int RamSymbolsM.poke ( ramSymbol_t* symbol  ) ">
+      <params>
+        <param0 name="symbol">
+          <type typeClass="pointer" typeDecl="ramSymbol_t*" typeName="ramSymbol_t" />
+        </param0>
+      </params>
+      <returnType typeClass="unknown" typeDecl="unsigned int" typeName="unsigned int" />
+    </RamSymbolsM.poke>
+    <SNMSM.ledsOn commandID="13" componentName="SNMSM" functionName="ledsOn" functionType="command" numParams="1" provided="1" signature=" command result_t SNMSM.ledsOn ( uint8_t ledColorParam  ) ">
+      <params>
+        <param0 name="ledColorParam">
+          <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+        </param0>
+      </params>
+      <returnType typeClass="unknown" typeDecl="result_t" typeName="result_t" />
+    </SNMSM.ledsOn>
+    <SNMSM.restart commandID="14" componentName="SNMSM" functionName="restart" functionType="command" numParams="0" provided="1" signature=" command void SNMSM.restart (  ) ">
+      <params></params>
+      <returnType typeClass="unknown" typeDecl="void" typeName="void" />
+    </SNMSM.restart>
+    <SmartSensingM.SensingConfig.getADCChannel commandID="15" componentName="SmartSensingM" functionName="getADCChannel" functionType="command" interfaceName="SensingConfig" interfaceType="SensingConfig" numParams="1" provided="1" signature=" command uint8_t SmartSensingM.SensingConfig.getADCChannel ( uint8_t type  ) ">
+      <params>
+        <param0 name="type">
+          <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+        </param0>
+      </params>
+      <returnType typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </SmartSensingM.SensingConfig.getADCChannel>
+    <SmartSensingM.SensingConfig.getDataPriority commandID="16" componentName="SmartSensingM" functionName="getDataPriority" functionType="command" interfaceName="SensingConfig" interfaceType="SensingConfig" numParams="1" provided="1" signature=" command uint8_t SmartSensingM.SensingConfig.getDataPriority ( uint8_t type  ) ">
+      <params>
+        <param0 name="type">
+          <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+        </param0>
+      </params>
+      <returnType typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </SmartSensingM.SensingConfig.getDataPriority>
+    <SmartSensingM.SensingConfig.getEventPriority commandID="17" componentName="SmartSensingM" functionName="getEventPriority" functionType="command" interfaceName="SensingConfig" interfaceType="SensingConfig" numParams="1" provided="1" signature=" command uint8_t SmartSensingM.SensingConfig.getEventPriority ( uint8_t type  ) ">
+      <params>
+        <param0 name="type">
+          <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+        </param0>
+      </params>
+      <returnType typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </SmartSensingM.SensingConfig.getEventPriority>
+    <SmartSensingM.SensingConfig.getNodePriority commandID="18" componentName="SmartSensingM" functionName="getNodePriority" functionType="command" interfaceName="SensingConfig" interfaceType="SensingConfig" numParams="0" provided="1" signature=" command uint8_t SmartSensingM.SensingConfig.getNodePriority (  ) ">
+      <params></params>
+      <returnType typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+    </SmartSensingM.SensingConfig.getNodePriority>
+    <SmartSensingM.SensingConfig.getSamplingRate commandID="19" componentName="SmartSensingM" functionName="getSamplingRate" functionType="command" interfaceName="SensingConfig" interfaceType="SensingConfig" numParams="1" provided="1" signature=" command uint16_t SmartSensingM.SensingConfig.getSamplingRate ( uint8_t type  ) ">
+      <params>
+        <param0 name="type">
+          <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+        </param0>
+      </params>
+      <returnType typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </SmartSensingM.SensingConfig.getSamplingRate>
+    <SmartSensingM.SensingConfig.getTaskSchedulingCode commandID="20" componentName="SmartSensingM" functionName="getTaskSchedulingCode" functionType="command" interfaceName="SensingConfig" interfaceType="SensingConfig" numParams="1" provided="1" signature=" command uint16_t SmartSensingM.SensingConfig.getTaskSchedulingCode ( uint8_t type  ) ">
+      <params>
+        <param0 name="type">
+          <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+        </param0>
+      </params>
+      <returnType typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+    </SmartSensingM.SensingConfig.getTaskSchedulingCode>
+    <SmartSensingM.SensingConfig.setADCChannel commandID="21" componentName="SmartSensingM" functionName="setADCChannel" functionType="command" interfaceName="SensingConfig" interfaceType="SensingConfig" numParams="2" provided="1" signature=" command result_t SmartSensingM.SensingConfig.setADCChannel ( uint8_t type, uint8_t channel  ) ">
+      <params>
+        <param0 name="type">
+          <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+        </param0>
+        <param1 name="channel">
+          <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+        </param1>
+      </params>
+      <returnType typeClass="unknown" typeDecl="result_t" typeName="result_t" />
+    </SmartSensingM.SensingConfig.setADCChannel>
+    <SmartSensingM.SensingConfig.setDataPriority commandID="22" componentName="SmartSensingM" functionName="setDataPriority" functionType="command" interfaceName="SensingConfig" interfaceType="SensingConfig" numParams="2" provided="1" signature=" command result_t SmartSensingM.SensingConfig.setDataPriority ( uint8_t type, uint8_t priority  ) ">
+      <params>
+        <param0 name="type">
+          <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+        </param0>
+        <param1 name="priority">
+          <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+        </param1>
+      </params>
+      <returnType typeClass="unknown" typeDecl="result_t" typeName="result_t" />
+    </SmartSensingM.SensingConfig.setDataPriority>
+    <SmartSensingM.SensingConfig.setEventPriority commandID="23" componentName="SmartSensingM" functionName="setEventPriority" functionType="command" interfaceName="SensingConfig" interfaceType="SensingConfig" numParams="2" provided="1" signature=" command result_t SmartSensingM.SensingConfig.setEventPriority ( uint8_t type, uint8_t priority  ) ">
+      <params>
+        <param0 name="type">
+          <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+        </param0>
+        <param1 name="priority">
+          <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+        </param1>
+      </params>
+      <returnType typeClass="unknown" typeDecl="result_t" typeName="result_t" />
+    </SmartSensingM.SensingConfig.setEventPriority>
+    <SmartSensingM.SensingConfig.setNodePriority commandID="24" componentName="SmartSensingM" functionName="setNodePriority" functionType="command" interfaceName="SensingConfig" interfaceType="SensingConfig" numParams="1" provided="1" signature=" command result_t SmartSensingM.SensingConfig.setNodePriority ( uint8_t priority  ) ">
+      <params>
+        <param0 name="priority">
+          <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+        </param0>
+      </params>
+      <returnType typeClass="unknown" typeDecl="result_t" typeName="result_t" />
+    </SmartSensingM.SensingConfig.setNodePriority>
+    <SmartSensingM.SensingConfig.setSamplingRate commandID="25" componentName="SmartSensingM" functionName="setSamplingRate" functionType="command" interfaceName="SensingConfig" interfaceType="SensingConfig" numParams="2" provided="1" signature=" command result_t SmartSensingM.SensingConfig.setSamplingRate ( uint8_t type, uint16_t samplingRate  ) ">
+      <params>
+        <param0 name="type">
+          <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+        </param0>
+        <param1 name="samplingRate">
+          <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+        </param1>
+      </params>
+      <returnType typeClass="unknown" typeDecl="result_t" typeName="result_t" />
+    </SmartSensingM.SensingConfig.setSamplingRate>
+    <SmartSensingM.SensingConfig.setTaskSchedulingCode commandID="26" componentName="SmartSensingM" functionName="setTaskSchedulingCode" functionType="command" interfaceName="SensingConfig" interfaceType="SensingConfig" numParams="2" provided="1" signature=" command result_t SmartSensingM.SensingConfig.setTaskSchedulingCode ( uint8_t type, uint16_t code  ) ">
+      <params>
+        <param0 name="type">
+          <type typeClass="unknown" typeDecl="uint8_t" typeName="uint8_t" />
+        </param0>
+        <param1 name="code">
+          <type typeClass="unknown" typeDecl="uint16_t" typeName="uint16_t" />
+        </param1>
+      </params>
+      <returnType typeClass="unknown" typeDecl="result_t" typeName="result_t" />
+    </SmartSensingM.SensingConfig.setTaskSchedulingCode>
+    <SmartSensingM.eraseFlash commandID="27" componentName="SmartSensingM" functionName="eraseFlash" functionType="command" numParams="0" provided="1" signature=" command void SmartSensingM.eraseFlash (  ) ">
+      <params></params>
+      <returnType typeClass="unknown" typeDecl="void" typeName="void" />
+    </SmartSensingM.eraseFlash>
+  </rpcFunctions>
+</rpcSchema>

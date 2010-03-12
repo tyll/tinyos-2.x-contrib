@@ -1,0 +1,59 @@
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/tinyos-svn/!svn/ver/1303/sensorweb/tools/XMonitor/monitor
+END
+MainFrame.java
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/tinyos-svn/!svn/ver/1303/sensorweb/tools/XMonitor/monitor/MainFrame.java
+END
+ControlPanelDialog.java
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/tinyos-svn/!svn/ver/1284/sensorweb/tools/XMonitor/monitor/ControlPanelDialog.java
+END
+DisplayManager.java
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/tinyos-svn/!svn/ver/565/sensorweb/tools/XMonitor/monitor/DisplayManager.java
+END
+ReportConfigDialog.java
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/tinyos-svn/!svn/ver/565/sensorweb/tools/XMonitor/monitor/ReportConfigDialog.java
+END
+TControlPanelDialog.java
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/tinyos-svn/!svn/ver/1286/sensorweb/tools/XMonitor/monitor/TControlPanelDialog.java
+END
+GraphDisplayPanel.java
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/tinyos-svn/!svn/ver/1081/sensorweb/tools/XMonitor/monitor/GraphDisplayPanel.java
+END
+MainClass.java
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/tinyos-svn/!svn/ver/1303/sensorweb/tools/XMonitor/monitor/MainClass.java
+END
+ReportPanel.java
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/tinyos-svn/!svn/ver/867/sensorweb/tools/XMonitor/monitor/ReportPanel.java
+END
+Util.java
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/tinyos-svn/!svn/ver/565/sensorweb/tools/XMonitor/monitor/Util.java
+END

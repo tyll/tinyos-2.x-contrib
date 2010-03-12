@@ -1,0 +1,47 @@
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/tinyos-svn/!svn/ver/1276/sensorweb/tools/XMonitor/xml/Parser
+END
+ExecuteParser.java
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/tinyos-svn/!svn/ver/565/sensorweb/tools/XMonitor/xml/Parser/ExecuteParser.java
+END
+MessageHierarchyParser.java
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/tinyos-svn/!svn/ver/565/sensorweb/tools/XMonitor/xml/Parser/MessageHierarchyParser.java
+END
+KeyWordParser.java
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/tinyos-svn/!svn/ver/565/sensorweb/tools/XMonitor/xml/Parser/KeyWordParser.java
+END
+XMLMessageParser.java
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/tinyos-svn/!svn/ver/1276/sensorweb/tools/XMonitor/xml/Parser/XMLMessageParser.java
+END
+ViewParser.java
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/tinyos-svn/!svn/ver/565/sensorweb/tools/XMonitor/xml/Parser/ViewParser.java
+END
+StructureParser.java
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/tinyos-svn/!svn/ver/565/sensorweb/tools/XMonitor/xml/Parser/StructureParser.java
+END
+EventParser.java
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/tinyos-svn/!svn/ver/565/sensorweb/tools/XMonitor/xml/Parser/EventParser.java
+END

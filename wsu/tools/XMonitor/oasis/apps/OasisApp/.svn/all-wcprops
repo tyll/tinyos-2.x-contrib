@@ -1,0 +1,47 @@
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/tinyos-svn/!svn/ver/565/sensorweb/tools/XMonitor/oasis/apps/OasisApp
+END
+imote2.platform
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/tinyos-svn/!svn/ver/565/sensorweb/tools/XMonitor/oasis/apps/OasisApp/imote2.platform
+END
+pc.platform
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/tinyos-svn/!svn/ver/565/sensorweb/tools/XMonitor/oasis/apps/OasisApp/pc.platform
+END
+micaz.platform
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/tinyos-svn/!svn/ver/565/sensorweb/tools/XMonitor/oasis/apps/OasisApp/micaz.platform
+END
+sim.platform
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/tinyos-svn/!svn/ver/565/sensorweb/tools/XMonitor/oasis/apps/OasisApp/sim.platform
+END
+telosb.platform
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/tinyos-svn/!svn/ver/565/sensorweb/tools/XMonitor/oasis/apps/OasisApp/telosb.platform
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/tinyos-svn/!svn/ver/565/sensorweb/tools/XMonitor/oasis/apps/OasisApp/Makefile
+END
+OasisApp.nc
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/tinyos-svn/!svn/ver/565/sensorweb/tools/XMonitor/oasis/apps/OasisApp/OasisApp.nc
+END

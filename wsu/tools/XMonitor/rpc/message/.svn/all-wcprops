@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svn/tinyos-svn/!svn/ver/1312/sensorweb/tools/XMonitor/rpc/message
+END
+Sender.java
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/tinyos-svn/!svn/ver/1147/sensorweb/tools/XMonitor/rpc/message/Sender.java
+END
+MoteIF.java
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/tinyos-svn/!svn/ver/581/sensorweb/tools/XMonitor/rpc/message/MoteIF.java
+END
+Receiver.java
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/tinyos-svn/!svn/ver/1312/sensorweb/tools/XMonitor/rpc/message/Receiver.java
+END
+Dump.java
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/tinyos-svn/!svn/ver/565/sensorweb/tools/XMonitor/rpc/message/Dump.java
+END
+MessageListener.java
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/tinyos-svn/!svn/ver/565/sensorweb/tools/XMonitor/rpc/message/MessageListener.java
+END

@@ -1,0 +1,147 @@
+<Sensorweb>
+
+<Read>
+	<data dataName="general" excuteType="oscope_table"></data>
+	<data dataName="event" excuteType="oscope_table"></data>
+	<data dataName="response" excuteType="table"></data>
+	<data dataName="location" excuteType="table"></data>
+	<data dataName="sensor" excuteType="table"></data>
+	<data dataName="object" excuteType="table"></data>
+	<data dataName="beacon" excuteType="table"></data>
+	<data dataName="timeSync" excuteType="table"></data>
+	<data dataName="rawdata" excuteType="table"></data>
+</Read>
+
+<Write>
+	
+</Write>
+
+<DataFormat>
+	<struct structName="location">
+		<field message="GeneralMsg" messageField="moteID" encode="dec" value="output"></field>
+		<field message="GeneralMsg" messageField="parentID" encode="dec" value="output"></field>
+		<field message="ApplicationMessage" messageField="seqno" encode="asc" value="output"></field>
+	</struct>
+	<struct structName="object">
+		<field message="GeneralMsg" messageField="moteID" encode="dec" value="output"></field>
+		<field message="GeneralMsg" messageField="parentID" encode="dec" value="output"></field>
+	</struct>
+	<struct structName="sensor">
+		<field message="ApplicationMessage" messageField="type" encode="dec" value="output"></field>
+		<field message="GeneralMsg" messageField="moteID" encode="dec" value="output"></field>
+		<field message="GeneralMsg" messageField="parentID" encode="dec" value="output"></field>
+		<field message="ApplicationMessage" messageField="seqno" encode="dec" value="output"></field>
+	</struct>
+	<struct structName="general">
+		<field message="DataMsg" messageField="origin" encode="dec" value="output"></field>
+		<field message="ApplicationMessage" messageField="type" encode="dec" value="output"></field>
+		<field message="ApplicationMessage" messageField="type" encode="dec" value="output"></field>
+		<field message="ApplicationMessage" messageField="seqno" encode="dec" value="output"></field>
+		<field message="GeneralMsg" messageField="timeStamp" encode="hex" value="output"></field>
+		<field message="GeneralMsg" messageField="reading" encode="dec" value="output"></field>
+		<field message="DataMsg" messageField="etx" encode="dec" value="output"></field>
+
+	</struct>
+	
+	<struct structName="response">
+	</struct>
+	
+	<struct structName="event">
+	</struct>
+
+	<struct structName="beacon">
+	</struct>
+	<struct structName="timeSync">
+	</struct>
+	<struct structName="report">
+	</struct>
+	<struct structName="rawdata">
+	</struct>
+	
+	
+	
+</DataFormat>
+<MessageHierarchy>
+<TOSMessage type="129">
+<DataMsg>
+			<ApplicationMessage type="0">
+				<GeneralMsg>
+				</GeneralMsg>
+			</ApplicationMessage>
+		</DataMsg>
+</TOSMessage>
+<TOSMessage type="129">
+<DataMsg>
+			<ApplicationMessage type="1">
+				<GeneralMsg>
+				</GeneralMsg>
+			</ApplicationMessage>
+		</DataMsg>
+</TOSMessage>
+<TOSMessage type="129">
+<DataMsg>
+			<ApplicationMessage type="2">
+				<GeneralMsg>
+				</GeneralMsg>
+			</ApplicationMessage>
+		</DataMsg>
+</TOSMessage>
+<TOSMessage type="129">
+<DataMsg>
+			<ApplicationMessage type="3">
+				<GeneralMsg>
+				</GeneralMsg>
+			</ApplicationMessage>
+		</DataMsg>
+</TOSMessage>
+<TOSMessage type="129">
+<DataMsg>
+			<ApplicationMessage type="4">
+				<GeneralMsg>
+				</GeneralMsg>
+			</ApplicationMessage>
+		</DataMsg>
+</TOSMessage>
+	
+</MessageHierarchy>
+<MessageFormat>
+		<TOSMessage bit-offset="I:0" size="I:64" name="TOSMessage">
+			<field bit-offset="I:0" name="addone" size="I:8" repeat="1"></field>
+			<field bit-offset="I:8" name="dest" size="I:16" repeat="1"></field>
+			<field bit-offset="I:24" name="src" size="I:16" repeat="1"></field>
+			<field bit-offset="I:40" name="length" size="I:8" repeat="1"></field>
+			<field bit-offset="I:48" name="group" size="I:8" repeat="1"></field>
+			<field bit-offset="I:56" name="type" size="I:8" repeat="1"></field>
+		</TOSMessage>
+		<DataMsg  bit-offset="I:64" size="I:64" name="DataMsg">
+			<field bit-offset="I:0" name="options" size="I:8" repeat="1"></field>
+			<field bit-offset="I:8" name="thl" size="I:8" repeat="1"></field>
+			<field bit-offset="I:16" name="etx" size="I:16" repeat="1"></field>
+			<field bit-offset="I:32" name="origin" size="I:16" repeat="1"></field>
+			<field bit-offset="I:48" name="originSeqNo" size="I:8" repeat="1"></field>
+			<field bit-offset="I:56" name="type" size="I:8" repeat="1"></field>
+		</DataMsg>
+		<ApplicationMessage bit-offset="I:128" size="I:32" name="ApplicationMessage">
+			<field bit-offset="I:0" name="type" size="I:8" repeat="1"></field>
+			<field bit-offset="I:8" name="length" size="I:8" repeat="1"></field>
+			<field bit-offset="I:16" name="seqno" size="I:16" repeat="1"></field>
+		</ApplicationMessage>
+		<GeneralMsg bit-offset="I:160" size="I:0" name="GeneralMsg">
+			<field bit-offset="I:0" name="timeStamp" size="I:32" repeat="1"></field>
+			<field bit-offset="I:32" name="moteID" size="I:8" repeat="1"></field>
+			<field bit-offset="I:40" name="parentID" size="I:8" repeat="1"></field>
+			<field bit-offset="I:48" name="reading" size="I:16" repeat="0"></field>
+		</GeneralMsg>
+
+
+
+
+
+
+
+	
+</MessageFormat>
+
+
+
+</Sensorweb>

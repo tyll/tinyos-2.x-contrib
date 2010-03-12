@@ -1,0 +1,71 @@
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/svn/tinyos-svn/!svn/ver/1280/sensorweb/tools/XMonitor/lib
+END
+libgetenv.so
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/tinyos-svn/!svn/ver/571/sensorweb/tools/XMonitor/lib/libgetenv.so
+END
+libgetenv-32.so
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/tinyos-svn/!svn/ver/571/sensorweb/tools/XMonitor/lib/libgetenv-32.so
+END
+libLinuxSerialParallel.so
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/tinyos-svn/!svn/ver/572/sensorweb/tools/XMonitor/lib/libLinuxSerialParallel.so
+END
+libtoscomm.so
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/tinyos-svn/!svn/ver/571/sensorweb/tools/XMonitor/lib/libtoscomm.so
+END
+librxtxParallel.so
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/tinyos-svn/!svn/ver/572/sensorweb/tools/XMonitor/lib/librxtxParallel.so
+END
+libtoscomm-32.so
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/tinyos-svn/!svn/ver/571/sensorweb/tools/XMonitor/lib/libtoscomm-32.so
+END
+activation.jar
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/tinyos-svn/!svn/ver/565/sensorweb/tools/XMonitor/lib/activation.jar
+END
+librxtxSerial.so
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/tinyos-svn/!svn/ver/572/sensorweb/tools/XMonitor/lib/librxtxSerial.so
+END
+log4j-1.2.15.jar
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/tinyos-svn/!svn/ver/1280/sensorweb/tools/XMonitor/lib/log4j-1.2.15.jar
+END
+mail.jar
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svn/tinyos-svn/!svn/ver/565/sensorweb/tools/XMonitor/lib/mail.jar
+END
+javax.comm.properties
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/tinyos-svn/!svn/ver/589/sensorweb/tools/XMonitor/lib/javax.comm.properties
+END

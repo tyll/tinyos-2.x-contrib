@@ -1,0 +1,89 @@
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/svn/tinyos-svn/!svn/ver/1312/sensorweb/tools/XMonitor/debug/rpc
+END
+RoutingMessages.java
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/tinyos-svn/!svn/ver/1279/sensorweb/tools/XMonitor/debug/rpc/RoutingMessages.java
+END
+NescDecls.java
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/tinyos-svn/!svn/ver/1279/sensorweb/tools/XMonitor/debug/rpc/NescDecls.java
+END
+Rpc.java
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/tinyos-svn/!svn/ver/1279/sensorweb/tools/XMonitor/debug/rpc/Rpc.java
+END
+rpcPanel.java
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/tinyos-svn/!svn/ver/1312/sensorweb/tools/XMonitor/debug/rpc/rpcPanel.java
+END
+rpcRecv.java
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/tinyos-svn/!svn/ver/1279/sensorweb/tools/XMonitor/debug/rpc/rpcRecv.java
+END
+rpcMessageDriver.java
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/tinyos-svn/!svn/ver/1279/sensorweb/tools/XMonitor/debug/rpc/rpcMessageDriver.java
+END
+ParamEditor.java
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/tinyos-svn/!svn/ver/1279/sensorweb/tools/XMonitor/debug/rpc/ParamEditor.java
+END
+RamSymbols.java
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/tinyos-svn/!svn/ver/1279/sensorweb/tools/XMonitor/debug/rpc/RamSymbols.java
+END
+NescApp.java
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/tinyos-svn/!svn/ver/1279/sensorweb/tools/XMonitor/debug/rpc/NescApp.java
+END
+rpcmain.java
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/tinyos-svn/!svn/ver/1279/sensorweb/tools/XMonitor/debug/rpc/rpcmain.java
+END
+rpcCascadeMsgDriver.java
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/tinyos-svn/!svn/ver/1279/sensorweb/tools/XMonitor/debug/rpc/rpcCascadeMsgDriver.java
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/tinyos-svn/!svn/ver/1279/sensorweb/tools/XMonitor/debug/rpc/Makefile
+END
+Util.java
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/tinyos-svn/!svn/ver/1279/sensorweb/tools/XMonitor/debug/rpc/Util.java
+END
+rpcSend.java
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/tinyos-svn/!svn/ver/1279/sensorweb/tools/XMonitor/debug/rpc/rpcSend.java
+END

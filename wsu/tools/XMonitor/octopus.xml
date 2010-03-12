@@ -1,0 +1,92 @@
+<Sensorweb>
+
+<Read>
+	<data dataName="general" excuteType="oscope_table"></data>
+	<data dataName="event" excuteType="oscope_table"></data>
+	<data dataName="response" excuteType="table"></data>
+	<data dataName="location" excuteType="table"></data>
+	<data dataName="sensor" excuteType="table"></data>
+	<data dataName="object" excuteType="table"></data>
+	<data dataName="beacon" excuteType="table"></data>
+	<data dataName="timeSync" excuteType="table"></data>
+	<data dataName="rawdata" excuteType="table"></data>
+</Read>
+
+<Write>
+	
+</Write>
+
+<DataFormat>
+	<struct structName="location">
+		<field message="OctopusCollectedMsg" messageField="moteId" encode="dec" value="output"></field>
+		<field message="OctopusCollectedMsg" messageField="parentId" encode="dec" value="output"></field>
+		<field message="OctopusCollectedMsg" messageField="count" encode="asc" value="output"></field>
+	</struct>
+	<struct structName="object">
+		<field message="OctopusCollectedMsg" messageField="moteId" encode="dec" value="output"></field>
+		<field message="OctopusCollectedMsg" messageField="parentId" encode="dec" value="output"></field>
+	</struct>
+	<struct structName="sensor">
+		<field message="OctopusCollectedMsg" messageField="reply" encode="dec" value="output"></field>
+		<field message="OctopusCollectedMsg" messageField="moteId" encode="dec" value="output"></field>
+		<field message="OctopusCollectedMsg" messageField="parentId" encode="dec" value="output"></field>
+		<field message="OctopusCollectedMsg" messageField="count" encode="dec" value="output"></field>
+	</struct>
+	<struct structName="general">
+		<field message="OctopusCollectedMsg" messageField="moteId" encode="dec" value="output"></field>
+		<field message="OctopusCollectedMsg" messageField="reply" encode="dec" value="output"></field>
+		<field message="OctopusCollectedMsg" messageField="reply" encode="dec" value="output"></field>
+		<field message="OctopusCollectedMsg" messageField="count" encode="dec" value="output"></field>
+		<field message="OctopusCollectedMsg" messageField="count" encode="hex" value="output"></field>
+		<field message="OctopusCollectedMsg" messageField="reading" encode="dec" value="output"></field>
+		<field message="OctopusCollectedMsg" messageField="quality" encode="dec" value="output"></field>
+
+	</struct>
+	
+	<struct structName="response">
+	</struct>
+	
+	<struct structName="event">
+	</struct>
+
+	<struct structName="beacon">
+	</struct>
+	<struct structName="timeSync">
+	</struct>
+	<struct structName="report">
+	</struct>
+	<struct structName="rawdata">
+	</struct>
+	
+	
+	
+</DataFormat>
+<MessageHierarchy>
+	<DataMsg>
+		<OctopusCollectedMsg>
+		</OctopusCollectedMsg>
+	</DataMsg>
+</MessageHierarchy>
+<MessageFormat>
+		<DataMsg  bit-offset="I:0" size="I:64" name="DataMsg">
+			<field bit-offset="I:0" name="options" size="I:8" repeat="1"></field>
+			<field bit-offset="I:8" name="thl" size="I:8" repeat="1"></field>
+			<field bit-offset="I:16" name="etx" size="I:16" repeat="1"></field>
+			<field bit-offset="I:32" name="origin" size="I:16" repeat="1"></field>
+			<field bit-offset="I:48" name="originSeqNo" size="I:8" repeat="1"></field>
+			<field bit-offset="I:56" name="type" size="I:8" repeat="1"></field>
+		</DataMsg>
+		<OctopusCollectedMsg  bit-offset="I:64" size="I:88" name="OctopusCollectedMsg">
+			<field bit-offset="I:0" name="moteId" size="I:16" repeat="1"></field>
+			<field bit-offset="I:16" name="count" size="I:16" repeat="1"></field>
+			<field bit-offset="I:32" name="reading" size="I:16" repeat="1"></field>
+			<field bit-offset="I:48" name="quality" size="I:16" repeat="1"></field>
+			<field bit-offset="I:64" name="parentId" size="I:16" repeat="1"></field>
+			<field bit-offset="I:80" name="reply" size="I:8" repeat="1"></field>
+
+		</OctopusCollectedMsg>		
+</MessageFormat>
+
+
+
+</Sensorweb>

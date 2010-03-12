@@ -1,0 +1,59 @@
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/tinyos-svn/!svn/ver/571/sensorweb/tools/XMonitor/rpc/packet/comm
+END
+TOSCommJNI.java
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/tinyos-svn/!svn/ver/571/sensorweb/tools/XMonitor/rpc/packet/comm/TOSCommJNI.java
+END
+SerialPort.java
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/tinyos-svn/!svn/ver/571/sensorweb/tools/XMonitor/rpc/packet/comm/SerialPort.java
+END
+UnsupportedCommOperationException.java
+K 25
+svn:wc:ra_dav:version-url
+V 108
+/svn/tinyos-svn/!svn/ver/571/sensorweb/tools/XMonitor/rpc/packet/comm/UnsupportedCommOperationException.java
+END
+TOSSerial.java
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/tinyos-svn/!svn/ver/571/sensorweb/tools/XMonitor/rpc/packet/comm/TOSSerial.java
+END
+NativeSerial.java
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/tinyos-svn/!svn/ver/571/sensorweb/tools/XMonitor/rpc/packet/comm/NativeSerial.java
+END
+SerialPortEvent.java
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/tinyos-svn/!svn/ver/571/sensorweb/tools/XMonitor/rpc/packet/comm/SerialPortEvent.java
+END
+ByteQueue.java
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/tinyos-svn/!svn/ver/571/sensorweb/tools/XMonitor/rpc/packet/comm/ByteQueue.java
+END
+SerialPortListener.java
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/tinyos-svn/!svn/ver/571/sensorweb/tools/XMonitor/rpc/packet/comm/SerialPortListener.java
+END
+TOSCommLibraryLoader.java
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/tinyos-svn/!svn/ver/571/sensorweb/tools/XMonitor/rpc/packet/comm/TOSCommLibraryLoader.java
+END

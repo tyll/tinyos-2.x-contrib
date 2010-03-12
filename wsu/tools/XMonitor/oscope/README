@@ -1,0 +1,19 @@
+Package: net.tinyos.oscilloscope
+Description: User application for displaying sensor reading coming
+	from the oscilloscope mote application.
+Authors: Jason Hill and Eric Heien
+
+Executables: oscilloscope.class
+
+Requires that the serial forwarder is already started on localhost, port 9000
+
+After starting the serial forwarder, run from the tools 
+directory with: "java net.tinyos.oscilloscope.oscilloscope"
+requires mote with the apps/oscilloscope application installed.
+
+Test Programs: none
+
+Classes: 
+
+oscilloscope.java: main application frame
+GraphPanel.java: Actual data display panel.  

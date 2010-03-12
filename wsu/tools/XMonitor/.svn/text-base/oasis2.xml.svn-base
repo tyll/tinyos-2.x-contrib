@@ -1,0 +1,318 @@
+<Sensorweb>
+
+<Read>
+	
+	<data dataName="general" excuteType="oscope_table"></data>
+	<data dataName="event" excuteType="oscope_table"></data>
+	<data dataName="response" excuteType="table"></data>
+	<data dataName="location" excuteType="table"></data>
+	<data dataName="sensor" excuteType="table"></data>
+	<data dataName="object" excuteType="table"></data>
+	<data dataName="beacon" excuteType="table"></data>
+	<data dataName="timeSync" excuteType="table"></data>
+</Read>
+
+<Write>
+	 <data dataName="GenericCommProM_getRFPower" excuteType="write"></data>
+	 <data dataName="GenericCommProM_setRFPower" excuteType="write"></data>
+	 <data dataName="ledsOn" excuteType="write"></data>
+	 <data dataName="ledsOnTest" excuteType="write"></data>
+</Write>
+
+<DataFormat>
+	
+	
+	<struct structName="response">
+		<field message="RpcResponseMessage" messageField="transactionID" encode="dec" value="output"></field>
+		<field message="RpcResponseMessage" messageField="commandID" encode="dec" value="output"></field>
+		<field message="RpcResponseMessage" messageField="sourceAddress" encode="dec" value="output"></field>
+		<field message="RpcResponseMessage" messageField="errorCode" encode="dec" value="output"></field>
+		<field message="RpcResponseMessage" messageField="data" encode="dec" value="output"></field>
+	</struct>
+
+	<struct structName="location">
+		<field message="NetworkMessage" messageField="source" encode="dec" value="output"></field>
+		<field message="NetworkMessage" messageField="dest" encode="dec" value="output"></field>
+		<field message="EventMessage" messageField="data" encode="asc" value="output"></field>
+	</struct>
+	<struct structName="object">
+		<field message="NetworkMessage" messageField="source" encode="dec" value="output"></field>
+		<field message="NetworkMessage" messageField="dest" encode="dec" value="output"></field>
+	</struct>
+	<struct structName="sensor">
+		<field message="NetworkMessage" messageField="type" encode="dec" value="output"></field>
+		<field message="NetworkMessage" messageField="source" encode="dec" value="output"></field>
+		<field message="NetworkMessage" messageField="dest" encode="dec" value="output"></field>
+		<field message="ApplicationMessage" messageField="seqno" encode="dec" value="output"></field>
+		<field message="GeneralMsg" messageField="reading" encode="dec" value="output"></field>
+	</struct>
+	<struct structName="report">
+		<field message="NetworkMessage" messageField="source" encode="dec" value="output"></field>
+		<field message="TOSMessage" messageField="type" encode="dec" value="output"></field>
+		<field message="NetworkMessage" messageField="type" encode="dec" value="output"></field>
+		<field message="ApplicationMessage" messageField="type" encode="dec" value="output"></field>
+		<field message="EventMessage" messageField="type" encode="dec" value="output"></field>
+		<field message="EventMessage" messageField="level" encode="dec" value="output"></field>
+		<field message="EventMessage" messageField="data" encode="dec" value="output"></field>
+	</struct>
+
+
+	<struct structName="general">
+		<field message="NetworkMessage" messageField="source" encode="dec" value="output"></field>
+		<field message="NetworkMessage" messageField="type" encode="dec" value="output"></field>
+		<field message="ApplicationMessage" messageField="type" encode="dec" value="output"></field>
+		<field message="ApplicationMessage" messageField="seqno" encode="dec" value="output"></field>
+		<field message="GeneralMsg" messageField="timeStamp" encode="hex" value="output"></field>
+		<field message="GeneralMsg" messageField="reading" encode="dec" value="output"></field>
+		<field message="NetworkMessage" messageField="linksource" encode="dec" value="output"></field>
+	</struct>
+		
+	<struct structName="event">
+		<field message="NetworkMessage" messageField="source" encode="dec" value="output"></field>
+		<field message="NetworkMessage" messageField="type" encode="dec" value="output"></field>
+		<field message="ApplicationMessage" messageField="type" encode="dec" value="output"></field>
+		<field message="ApplicationMessage" messageField="seqno" encode="dec" value="output"></field>
+		<field message="EventMessage" messageField="type" encode="dec" value="output"></field>
+		<field message="EventMessage" messageField="data" encode="dec" value="output"></field>
+	</struct>
+
+	<struct structName="beacon">
+		<field message="NetworkMessage" messageField="source" encode="dec" value="output"></field>
+		<field message="NetworkMessage" messageField="type" encode="dec" value="output"></field>
+		<field message="BeaconMsg" messageField="type" encode="dec" value="output"></field>
+	</struct>
+	<struct structName="timeSync">
+		<field message="RawTimeSyncMsg" messageField="nodeID" encode="dec" value="output"></field>
+		<field message="RawTimeSyncMsg" messageField="data" encode="dec" value="output"></field>
+	</struct>
+	
+
+    <struct structName="GenericCommProM_getRFPower">
+		<field message="TOSMessage" messageField="addr" encode="dec" value="65535"></field>
+		<field message="TOSMessage" messageField="group" encode="dec" value="125"></field>
+		<field message="RpcCommandMessage" messageField="unix_time" encode="hex" value="4a26e40b"></field>
+		<field message="RpcCommandMessage" messageField="user_hash" encode="hex" value="4c6e9f74"></field>
+		<field message="RpcCommandMessage" messageField="returnAddress" encode="dec" value="0"></field>
+		<field message="RpcCommandMessage" messageField="responseDesired" encode="dec" value="1"></field>
+		<field message="RpcCommandMessage" messageField="commandID" encode="dec" value="3"></field>
+		<field message="RpcCommandMessage" messageField="dataLength" encode="dec" value="0"></field>
+		<field message="RpcCommandMessage" messageField="address" encode="dec" value="input"></field>
+	</struct>
+	<struct structName="GenericCommProM_setRFPower">
+		<field message="TOSMessage" messageField="addr" encode="dec" value="65535"></field>
+		<field message="TOSMessage" messageField="group" encode="dec" value="125"></field>
+		<field message="RpcCommandMessage" messageField="unix_time" encode="hex" value="4a26e40b"></field>
+		<field message="RpcCommandMessage" messageField="user_hash" encode="hex" value="4c6e9f74"></field>
+		<field message="RpcCommandMessage" messageField="returnAddress" encode="dec" value="0"></field>
+		<field message="RpcCommandMessage" messageField="responseDesired" encode="dec" value="1"></field>
+		<field message="RpcCommandMessage" messageField="commandID" encode="dec" value="5"></field>
+		<field message="RpcCommandMessage" messageField="dataLength" encode="dec" value="1"></field>
+		<field message="RpcCommandMessage" messageField="address" encode="dec" value="input"></field>
+		<field message="GenericCommProM_setRFPowerMsg" messageField="level" encode="dec" value="input"></field>
+	</struct>
+
+	<struct structName="ledsOn">
+		
+		<field message="TOSMessage" messageField="dest" encode="dec" value="65535"></field>
+		<field message="TOSMessage" messageField="type" encode="dec" value="133"></field>
+		<field message="TOSMessage" messageField="length" encode="dec" value="31"></field>
+		<field message="RpcCommandMessage" messageField="unix_time" encode="hex" value="4a26e40b"></field>
+		<field message="RpcCommandMessage" messageField="user_hash" encode="hex" value="4c6e9f74"></field>
+		<field message="RpcCommandMessage" messageField="returnAddress" encode="dec" value="0"></field>
+		<field message="RpcCommandMessage" messageField="responseDesired" encode="dec" value="1"></field>
+		<field message="RpcCommandMessage" messageField="commandID" encode="dec" value="4"></field>
+		<field message="RpcCommandMessage" messageField="dataLength" encode="dec" value="1"></field>
+		<field message="RpcCommandMessage" messageField="address" encode="dec" value="10"></field>
+		<field message="ledsOnMsg" messageField="ledColorParam" encode="dec" value="1"></field>
+	</struct>
+	<struct structName="ledsOnTest">
+		<field message="TOSMessage" messageField="dest" encode="dec" value="65535"></field>
+		<field message="TOSMessage" messageField="type" encode="dec" value="135"></field>
+		<field message="TOSMessage" messageField="length" encode="dec" value="1"></field>
+		<field message="ledsOnTestMsg" messageField="ledColorParam" encode="dec" value="1"></field>
+	</struct>
+
+</DataFormat>
+<MessageHierarchy>
+	 
+	<TOSMessage type="129">
+		<NetworkMessage type="1">
+			<ApplicationMessage type="0">
+				<GeneralMsg>
+				</GeneralMsg>
+			</ApplicationMessage>
+		</NetworkMessage>
+	 </TOSMessage>
+<TOSMessage type="129">
+		<NetworkMessage type="1">
+			<ApplicationMessage type="1">
+				<GeneralMsg>
+				</GeneralMsg>
+			</ApplicationMessage>
+		</NetworkMessage>
+	 </TOSMessage>
+<TOSMessage type="129">
+		<NetworkMessage type="1">
+			<ApplicationMessage type="2">
+				<GeneralMsg>
+				</GeneralMsg>
+			</ApplicationMessage>
+		</NetworkMessage>
+	 </TOSMessage>
+<TOSMessage type="129">
+		<NetworkMessage type="1">
+			<ApplicationMessage type="3">
+				<GeneralMsg>
+				</GeneralMsg>
+			</ApplicationMessage>
+		</NetworkMessage>
+	 </TOSMessage>
+	  <TOSMessage type="133">
+		<NetworkMessage type="4">
+			<ApplicationMessage type="12">
+				<RpcCommandMessage>	
+				</RpcCommandMessage>
+			</ApplicationMessage>
+		</NetworkMessage>
+	 </TOSMessage>
+	 <TOSMessage type="133">
+		<NetworkMessage type="4">
+			<ApplicationMessage type="12">
+				<RpcCommandMessage>	
+					<GenericCommProM_setRFPowerMsg> 
+					</GenericCommProM_setRFPowerMsg>
+				</RpcCommandMessage>
+			</ApplicationMessage>
+		</NetworkMessage>
+	 </TOSMessage>
+	<TOSMessage type="133">
+		<NetworkMessage type="4">
+			<ApplicationMessage type="12">
+				<RpcCommandMessage>	
+					<ledsOnMsg> 
+					</ledsOnMsg>
+				</RpcCommandMessage>
+			</ApplicationMessage>
+		</NetworkMessage>
+	</TOSMessage>
+	<TOSMessage type="135">	
+		<ledsOnTestMsg> 
+		</ledsOnTestMsg>
+	</TOSMessage>
+	 <TOSMessage type="129">
+		<NetworkMessage type="3">
+			<ApplicationMessage type="13">
+				<RpcResponseMessage>			
+				</RpcResponseMessage>
+			</ApplicationMessage>
+		</NetworkMessage>
+	 </TOSMessage>
+	 <TOSMessage type="129">
+		<NetworkMessage type="2">
+			<ApplicationMessage type="11">
+				<EventMessage>				
+				</EventMessage>
+			</ApplicationMessage>
+		</NetworkMessage>
+	 </TOSMessage>
+	<TOSMessage type="129">
+		<NetworkMessage type="250">
+			<BeaconMsg>
+			</BeaconMsg>
+		</NetworkMessage>
+	</TOSMessage>
+	<TOSMessage type="170">
+		<RawTimeSyncMsg>
+		</RawTimeSyncMsg>
+	</TOSMessage>
+
+</MessageHierarchy>
+
+<MessageFormat>
+		<TOSMessage bit-offset="I:0" size="I:64" name="TOSMessage">
+			<field bit-offset="I:0" name="addone" size="I:8" repeat="1"></field>
+			<field bit-offset="I:8" name="dest" size="I:16" repeat="1"></field>
+			<field bit-offset="I:24" name="src" size="I:16" repeat="1"></field>
+			<field bit-offset="I:40" name="length" size="I:8" repeat="1"></field>
+			<field bit-offset="I:48" name="group" size="I:8" repeat="1"></field>
+			<field bit-offset="I:56" name="type" size="I:8" repeat="1"></field>
+		</TOSMessage>
+		<ledsOnTestMsg bit-offset="I:64" size="I:8" name="ledsOnTestMsg">
+			<field bit-offset="I:0" name="ledColorParam" size="I:8" repeat="1"></field>
+		</ledsOnTestMsg>
+		<NetworkMessage bit-offset="I:64" size="I:80" name="NetworkMessage">
+			<field bit-offset="I:0" name="linksource" size="I:16" repeat="1"></field>
+			<field bit-offset="I:16" name="type" size="I:8" repeat="1"></field>
+			<field bit-offset="I:24" name="ttl" size="I:5" repeat="1"></field>
+			<field bit-offset="I:29" name="qos" size="I:3" repeat="1"></field>
+			<field bit-offset="I:32" name="dest" size="I:16" repeat="1"></field>
+			<field bit-offset="I:48" name="source" size="I:16" repeat="1"></field>
+			<field bit-offset="I:64" name="seqno" size="I:16" repeat="1"></field>
+		</NetworkMessage>
+		<ApplicationMessage bit-offset="I:144" size="I:32" name="ApplicationMessage">
+			<field bit-offset="I:0" name="type" size="I:8" repeat="1"></field>
+			<field bit-offset="I:8" name="length" size="I:8" repeat="1"></field>
+			<field bit-offset="I:16" name="seqno" size="I:16" repeat="1"></field>
+		</ApplicationMessage>
+		<BeaconMsg bit-offset="I:144" size="I:64" name="BeaconMsg">
+			<field bit-offset="I:0" name="parent" size="I:16" repeat="1"></field>
+			<field bit-offset="I:16" name="parent_dup" size="I:16" repeat="1"></field>
+			<field bit-offset="I:32" name="cost" size="I:16" repeat="1"></field>
+			<field bit-offset="I:48" name="hopcount" size="I:16" repeat="1"></field>
+		</BeaconMsg>
+		<TimeSyncMsg bit-offset="I:64" size="I:128" name="TimeSyncMsg">
+			<field bit-offset="I:0" name="nodeID" size="I:16" repeat="1"></field>
+			<field bit-offset="I:16" name="rootID" size="I:16" repeat="1"></field>
+			<field bit-offset="I:32" name="seqNum" size="I:16" repeat="1"></field>
+			<field bit-offset="I:48" name="hasGPS" size="I:8" repeat="1"></field>
+			<field bit-offset="I:56" name="wroteStamp" size="I:8" repeat="1"></field>
+			<field bit-offset="I:64" name="sendingTime" size="I:32" repeat="1"></field>
+			<field bit-offset="I:96" name="arrivalTime" size="I:32" repeat="1"></field>
+		</TimeSyncMsg>
+		<RawTimeSyncMsg bit-offset="I:64" size="I:128" name="RawTimeSyncMsg">
+			<field bit-offset="I:0" name="nodeID" size="I:16" repeat="1"></field>
+			<field bit-offset="I:16" name="data" size="I:8" repeat="0"></field>
+		</RawTimeSyncMsg>
+		<EventMessage bit-offset="I:176" size="I:24" name="EventMessage">
+			<field bit-offset="I:0" name="type" size="I:8" repeat="1"></field>
+			<field bit-offset="I:8" name="level" size="I:8" repeat="1"></field>
+			<field bit-offset="I:16" name="length" size="I:8" repeat="1"></field>
+			<field bit-offset="I:16" name="data" size="I:8" repeat="0"></field>
+		</EventMessage>
+
+		<RpcCommandMessage bit-offset="I:176" size="I:128" name="RpcCommandMessage">
+			<field bit-offset="I:0" name="transactionID" size="I:8" repeat="1" ></field>
+			<field bit-offset="I:8" name="commandID" size="I:8" repeat="1"></field>
+			<field bit-offset="I:16" name="responseDesired" size="I:8" repeat="1"></field>
+			<field bit-offset="I:24" name="dataLength" size="I:8" repeat="1"></field>
+			<field bit-offset="I:32" name="address" size="I:16" repeat="1"></field>
+			<field bit-offset="I:48" name="returnAddress" size="I:16" repeat="1"></field>
+			<field bit-offset="I:64" name="unix_time" size="I:32" repeat="1"></field>
+			<field bit-offset="I:96" name="user_hash" size="I:32" repeat="1" value=""></field> 
+		</RpcCommandMessage>
+		<RpcResponseMessage bit-offset="I:176" size="I:48" name="RpcResponseMessage">
+			<field bit-offset="I:0" name="transactionID" size="I:8" repeat="1"></field>
+			<field bit-offset="I:8" name="commandID" size="I:8" repeat="1"></field>
+			<field bit-offset="I:16" name="sourceAddress" size="I:16" repeat="1"></field>
+			<field bit-offset="I:32" name="errorCode" size="I:8" repeat="1"></field>
+			<field bit-offset="I:40" name="dataLength" size="I:8" repeat="1"></field>
+			<field bit-offset="I:48" name="data" size="I:8" repeat="0"></field>
+		</RpcResponseMessage>
+
+		<GeneralMsg bit-offset="I:176" size="I:0" name="GeneralMsg">
+			<field bit-offset="I:0" name="timeStamp" size="I:32" repeat="1"></field>
+			<field bit-offset="I:32" name="reading" size="I:16" repeat="0"></field>
+		</GeneralMsg>
+		<GenericCommProM_setRFPowerMsg bit-offset="I:304" size="I:8" name="GenericCommProM_setRFPowerMsg">
+			<field bit-offset="I:0" name="level" size="I:8" repeat="1"></field>
+		</GenericCommProM_setRFPowerMsg>
+		<ledsOnMsg bit-offset="I:304" size="I:8" name="ledsOnMsg">
+			<field bit-offset="I:0" name="ledColorParam" size="I:8" repeat="1"></field>
+		</ledsOnMsg>
+		
+		
+  </MessageFormat>
+
+
+
+</Sensorweb>

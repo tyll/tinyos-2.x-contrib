@@ -1,0 +1,36 @@
+18 00 00 00 00 00 FF FF 12 7D	00 0B 01 00 FF FF 0A 00 00 00 00 00 00 00 0A 00 1E 00 00 00 C0 C1 C2 C3
+
+
+
+typedef struct TOS_Msg
+{
+  /* The following fields are transmitted/received on the radio. */
+  uint8_t length;
+  uint8_t fcfhi;
+  uint8_t fcflo;
+  uint8_t dsn;
+  uint16_t destpan;
+  uint16_t addr;
+  uint8_t type;
+  uint8_t group;
+  int8_t data[TOSH_DATA_LENGTH];
+
+  /* The following fields are not actually transmitted or received 
+   * on the radio! They are used for internal accounting only.
+   * The reason they are in this structure is that the AM interface
+   * requires them to be part of the TOS_Msg that is passed to
+   * send/receive operations.
+   */
+  uint8_t strength;
+  uint8_t lqi;
+  bool crc;
+  bool ack;
+  uint16_t time;
+} __attribute((packed)) TOS_Msg;
+
+
+
+typedef struct _BcastMsg {
+  int16_t seqno;
+  uint8_t data[(TOSH_DATA_LENGTH-2)];
+} __attribute__ ((packed)) TOS_BcastMsg;

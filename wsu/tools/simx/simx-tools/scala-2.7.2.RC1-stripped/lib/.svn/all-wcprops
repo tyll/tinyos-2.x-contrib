@@ -1,0 +1,41 @@
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/tinyos-svn/!svn/ver/603/sensorweb/tools/simx-tools/scala-2.7.2.RC1-stripped/lib
+END
+scala-library.jar
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svn/tinyos-svn/!svn/ver/603/sensorweb/tools/simx-tools/scala-2.7.2.RC1-stripped/lib/scala-library.jar
+END
+scala-swing.jar
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/svn/tinyos-svn/!svn/ver/603/sensorweb/tools/simx-tools/scala-2.7.2.RC1-stripped/lib/scala-swing.jar
+END
+scala-dbc.jar
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svn/tinyos-svn/!svn/ver/603/sensorweb/tools/simx-tools/scala-2.7.2.RC1-stripped/lib/scala-dbc.jar
+END
+scala-compiler.jar
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/svn/tinyos-svn/!svn/ver/603/sensorweb/tools/simx-tools/scala-2.7.2.RC1-stripped/lib/scala-compiler.jar
+END
+sbaz-tests.jar
+K 25
+svn:wc:ra_dav:version-url
+V 99
+/svn/tinyos-svn/!svn/ver/603/sensorweb/tools/simx-tools/scala-2.7.2.RC1-stripped/lib/sbaz-tests.jar
+END
+sbaz.jar
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/tinyos-svn/!svn/ver/603/sensorweb/tools/simx-tools/scala-2.7.2.RC1-stripped/lib/sbaz.jar
+END

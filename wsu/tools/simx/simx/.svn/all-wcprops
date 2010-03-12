@@ -1,7 +1,7 @@
 K 25
 svn:wc:ra_dav:version-url
 V 56
-/svn/tinyos-svn/!svn/ver/1689/sensorweb/tools/simx/trunk
+/svn/tinyos-svn/!svn/ver/1793/sensorweb/tools/simx/trunk
 END
 install.sh
 K 25
@@ -13,7 +13,7 @@ simx.sh
 K 25
 svn:wc:ra_dav:version-url
 V 64
-/svn/tinyos-svn/!svn/ver/1248/sensorweb/tools/simx/trunk/simx.sh
+/svn/tinyos-svn/!svn/ver/1793/sensorweb/tools/simx/trunk/simx.sh
 END
 Makefile
 K 25
@@ -25,5 +25,5 @@ README
 K 25
 svn:wc:ra_dav:version-url
 V 63
-/svn/tinyos-svn/!svn/ver/1026/sensorweb/tools/simx/trunk/README
+/svn/tinyos-svn/!svn/ver/1793/sensorweb/tools/simx/trunk/README
 END

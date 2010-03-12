@@ -1,7 +1,7 @@
 10
 
 dir
-1778
+1793
 https://sensorweb.vancouver.wsu.edu/svn/tinyos-svn/sensorweb/tools/simx/trunk/test/Octopus/motes
 https://sensorweb.vancouver.wsu.edu/svn/tinyos-svn
 
@@ -230,40 +230,6 @@ stickney
 
 523
 
-OctopusAppC.nc.orig
-file
-
-
-
-
-2010-03-11T20:11:27.260855Z
-c89f4e9ed1aa03c0ae021e3936309d44
-2008-10-10T09:24:22.256650Z
-145
-stickney
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-4581
-
 OctopusC.nc
 file
 
@@ -298,17 +264,17 @@ xiaogang
 
 17470
 
-variables.py
+OctopusAppC.nc.orig
 file
 
 
 
 
-2010-03-11T20:11:27.265856Z
-27745d402d0bbaa3eca0b8b0349b40e7
-2009-11-08T07:54:01.140877Z
-1299
-xiaogang
+2010-03-11T20:11:27.260855Z
+c89f4e9ed1aa03c0ae021e3936309d44
+2008-10-10T09:24:22.256650Z
+145
+stickney
 
 
 
@@ -330,7 +296,41 @@ xiaogang
 
 
 
-854
+4581
+
+OctopusC.nc_ver_stack
+file
+
+
+
+
+2010-03-11T20:11:27.263356Z
+f52b851ff790032139c5c762febdeab8
+2008-10-10T09:24:22.256650Z
+145
+stickney
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+14270
 
 OctopusAppC.nc
 file
@@ -366,17 +366,17 @@ xiaogang
 
 4919
 
-OctopusC.nc_ver_stack
+variables.py
 file
 
 
 
 
-2010-03-11T20:11:27.263356Z
-f52b851ff790032139c5c762febdeab8
-2008-10-10T09:24:22.256650Z
-145
-stickney
+2010-03-11T20:11:27.265856Z
+27745d402d0bbaa3eca0b8b0349b40e7
+2009-11-08T07:54:01.140877Z
+1299
+xiaogang
 
 
 
@@ -398,7 +398,7 @@ stickney
 
 
 
-14270
+854
 
 OctopusCollectedMsg.java
 file

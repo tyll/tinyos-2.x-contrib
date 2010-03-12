@@ -1,7 +1,7 @@
 10
 
 dir
-1781
+1793
 https://sensorweb.vancouver.wsu.edu/svn/tinyos-svn/sensorweb/tools/simx/trunk/python/simx
 https://sensorweb.vancouver.wsu.edu/svn/tinyos-svn
 
@@ -112,19 +112,19 @@ stickney
 protomap
 dir
 
-fluid
+dist
 dir
 
-dist
+fluid
 dir
 
 watch
 dir
 
-probe
+act
 dir
 
-act
+probe
 dir
 
 txpower

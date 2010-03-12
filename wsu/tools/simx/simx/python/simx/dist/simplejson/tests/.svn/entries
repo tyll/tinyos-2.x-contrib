@@ -1,7 +1,7 @@
 10
 
 dir
-1781
+1793
 https://sensorweb.vancouver.wsu.edu/svn/tinyos-svn/sensorweb/tools/simx/trunk/python/simx/dist/simplejson/tests
 https://sensorweb.vancouver.wsu.edu/svn/tinyos-svn
 
@@ -94,40 +94,6 @@ stickney
 
 639
 
-test_dump.py
-file
-
-
-
-
-2010-03-11T20:11:31.840954Z
-ff5efa5ec26dd5ea995aa628c69c21ca
-2009-01-03T12:27:34.689789Z
-241
-stickney
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-310
-
 test_float.py
 file
 
@@ -161,6 +127,40 @@ stickney
 
 
 432
+
+test_dump.py
+file
+
+
+
+
+2010-03-11T20:11:31.840954Z
+ff5efa5ec26dd5ea995aa628c69c21ca
+2009-01-03T12:27:34.689789Z
+241
+stickney
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+310
 
 test_recursion.py
 file
@@ -196,40 +196,6 @@ stickney
 
 1654
 
-test_fail.py
-file
-
-
-
-
-2010-03-11T20:11:31.825953Z
-29ec5333a0bdebfe88aa5621a2dbd0b5
-2009-01-03T12:27:34.689789Z
-241
-stickney
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-2889
-
 test_scanstring.py
 file
 
@@ -263,6 +229,40 @@ stickney
 
 
 3688
+
+test_fail.py
+file
+
+
+
+
+2010-03-11T20:11:31.825953Z
+29ec5333a0bdebfe88aa5621a2dbd0b5
+2009-01-03T12:27:34.689789Z
+241
+stickney
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2889
 
 test_indent.py
 file
@@ -298,40 +298,6 @@ stickney
 
 905
 
-test_decode.py
-file
-
-
-
-
-2010-03-11T20:11:31.834953Z
-c697687092564de498da6a93c8a94af0
-2009-01-03T12:27:34.689789Z
-241
-stickney
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-835
-
 test_separators.py
 file
 
@@ -365,6 +331,40 @@ stickney
 
 
 927
+
+test_decode.py
+file
+
+
+
+
+2010-03-11T20:11:31.834953Z
+c697687092564de498da6a93c8a94af0
+2009-01-03T12:27:34.689789Z
+241
+stickney
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+835
 
 test_default.py
 file
@@ -400,40 +400,6 @@ stickney
 
 213
 
-test_encode_basestring_ascii.py
-file
-
-
-
-
-2010-03-11T20:11:31.844954Z
-ea84b6a9f4ed882ef2b405370ddb1b41
-2009-01-03T12:27:34.689789Z
-241
-stickney
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-1880
-
 test_unicode.py
 file
 
@@ -467,6 +433,40 @@ stickney
 
 
 2071
+
+test_encode_basestring_ascii.py
+file
+
+
+
+
+2010-03-11T20:11:31.844954Z
+ea84b6a9f4ed882ef2b405370ddb1b41
+2009-01-03T12:27:34.689789Z
+241
+stickney
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1880
 
 test_pass1.py
 file

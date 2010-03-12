@@ -1,0 +1,65 @@
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/tinyos-svn/!svn/ver/770/sensorweb/tools/simx/trunk/python/simx/test/base/Oscilloscope
+END
+OscilloscopeC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 107
+/svn/tinyos-svn/!svn/ver/770/sensorweb/tools/simx/trunk/python/simx/test/base/Oscilloscope/OscilloscopeC.nc
+END
+test_base.py
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/svn/tinyos-svn/!svn/ver/770/sensorweb/tools/simx/trunk/python/simx/test/base/Oscilloscope/test_base.py
+END
+OscilloscopeAppC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 110
+/svn/tinyos-svn/!svn/ver/770/sensorweb/tools/simx/trunk/python/simx/test/base/Oscilloscope/OscilloscopeAppC.nc
+END
+Oscilloscope.h
+K 25
+svn:wc:ra_dav:version-url
+V 105
+/svn/tinyos-svn/!svn/ver/770/sensorweb/tools/simx/trunk/python/simx/test/base/Oscilloscope/Oscilloscope.h
+END
+test_radio.py
+K 25
+svn:wc:ra_dav:version-url
+V 104
+/svn/tinyos-svn/!svn/ver/770/sensorweb/tools/simx/trunk/python/simx/test/base/Oscilloscope/test_radio.py
+END
+Makefile.test
+K 25
+svn:wc:ra_dav:version-url
+V 104
+/svn/tinyos-svn/!svn/ver/770/sensorweb/tools/simx/trunk/python/simx/test/base/Oscilloscope/Makefile.test
+END
+README.txt
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/svn/tinyos-svn/!svn/ver/770/sensorweb/tools/simx/trunk/python/simx/test/base/Oscilloscope/README.txt
+END
+test_node.py
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/svn/tinyos-svn/!svn/ver/770/sensorweb/tools/simx/trunk/python/simx/test/base/Oscilloscope/test_node.py
+END
+Makefile.simx
+K 25
+svn:wc:ra_dav:version-url
+V 104
+/svn/tinyos-svn/!svn/ver/770/sensorweb/tools/simx/trunk/python/simx/test/base/Oscilloscope/Makefile.simx
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 99
+/svn/tinyos-svn/!svn/ver/770/sensorweb/tools/simx/trunk/python/simx/test/base/Oscilloscope/Makefile
+END

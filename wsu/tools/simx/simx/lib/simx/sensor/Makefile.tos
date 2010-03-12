@@ -1,0 +1,9 @@
+# This is designed to be included from a TOS application Makefile.
+#
+# Author: Paul Stickney, May 2008
+
+SIMX ?=simx
+SIMXLIB ?=$(SIMX)/lib/simx
+SIMX_SENSOR_DIR ?=$(SIMXLIB)/sensor
+
+CFLAGS+= -I$(SIMX_SENSOR_DIR)

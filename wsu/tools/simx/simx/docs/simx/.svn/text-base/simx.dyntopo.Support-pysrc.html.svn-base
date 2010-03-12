@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>simx.dyntopo.Support</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        Package&nbsp;simx ::
+        <a href="simx.dyntopo-module.html">Package&nbsp;dyntopo</a> ::
+        Module&nbsp;Support
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="simx.dyntopo.Support-pysrc.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<h1 class="epydoc">Source Code for <a href="simx.dyntopo.Support-module.html">Module simx.dyntopo.Support</a></h1>
+<pre class="py-src">
+<a name="L1"></a><tt class="py-lineno">  1</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-name">sets</tt> <tt class="py-keyword">import</tt> <tt class="py-name">Set</tt> </tt>
+<a name="L2"></a><tt class="py-lineno">  2</tt>  <tt class="py-line"> </tt>
+<a name="L3"></a><tt class="py-lineno">  3</tt>  <tt class="py-line"><tt class="py-comment"># This should correspond with the current TOSSIM noise generator.</tt> </tt>
+<a name="L4"></a><tt class="py-lineno">  4</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># The TOSSIM/T2 wiki claims CPM needs at least 100 readings.</tt> </tt>
+<a name="L5"></a><tt class="py-lineno">  5</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt id="link-0" class="py-name" targets="Variable simx.dyntopo.Support.REQUIRED_TRACE_SIZE=simx.dyntopo.Support-module.html#REQUIRED_TRACE_SIZE"><a title="simx.dyntopo.Support.REQUIRED_TRACE_SIZE" class="py-name" href="#" onclick="return doclink('link-0', 'REQUIRED_TRACE_SIZE', 'link-0');">REQUIRED_TRACE_SIZE</a></tt> <tt class="py-op">=</tt> <tt class="py-number">100</tt> </tt>
+<a name="L6"></a><tt class="py-lineno">  6</tt>  <tt class="py-line"> </tt>
+<a name="DummyMonitor"></a><div id="DummyMonitor-def"><a name="L7"></a><tt class="py-lineno">  7</tt> <a class="py-toggle" href="#" id="DummyMonitor-toggle" onclick="return toggle('DummyMonitor');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="simx.dyntopo.Support.DummyMonitor-class.html">DummyMonitor</a><tt class="py-op">(</tt><tt class="py-base-class">object</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="DummyMonitor-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="DummyMonitor-expanded"><a name="L8"></a><tt class="py-lineno">  8</tt>  <tt class="py-line">    <tt class="py-comment"># Gain may be None!</tt> </tt>
+<a name="DummyMonitor.linkChanged"></a><div id="DummyMonitor.linkChanged-def"><a name="L9"></a><tt class="py-lineno">  9</tt> <a class="py-toggle" href="#" id="DummyMonitor.linkChanged-toggle" onclick="return toggle('DummyMonitor.linkChanged');">-</a><tt class="py-line"><tt class="py-comment"></tt>    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.dyntopo.Support.DummyMonitor-class.html#linkChanged">linkChanged</a><tt class="py-op">(</tt><tt class="py-param">source</tt><tt class="py-op">,</tt> <tt class="py-param">dest</tt><tt class="py-op">,</tt> <tt class="py-param">gain</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="DummyMonitor.linkChanged-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="DummyMonitor.linkChanged-expanded"><a name="L10"></a><tt class="py-lineno"> 10</tt>  <tt class="py-line">        <tt class="py-keyword">pass</tt> </tt>
+</div><a name="DummyMonitor.nodeDirty"></a><div id="DummyMonitor.nodeDirty-def"><a name="L11"></a><tt class="py-lineno"> 11</tt> <a class="py-toggle" href="#" id="DummyMonitor.nodeDirty-toggle" onclick="return toggle('DummyMonitor.nodeDirty');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.dyntopo.Support.DummyMonitor-class.html#nodeDirty">nodeDirty</a><tt class="py-op">(</tt><tt class="py-param">source</tt><tt class="py-op">,</tt> <tt class="py-param">dest</tt><tt class="py-op">,</tt> <tt class="py-param">gain</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="DummyMonitor.nodeDirty-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="DummyMonitor.nodeDirty-expanded"><a name="L12"></a><tt class="py-lineno"> 12</tt>  <tt class="py-line">        <tt class="py-keyword">pass</tt> </tt>
+</div></div><a name="L13"></a><tt class="py-lineno"> 13</tt>  <tt class="py-line"> </tt>
+<a name="L14"></a><tt class="py-lineno"> 14</tt>  <tt class="py-line"> </tt>
+<a name="extendMote"></a><div id="extendMote-def"><a name="L15"></a><tt class="py-lineno"> 15</tt> <a class="py-toggle" href="#" id="extendMote-toggle" onclick="return toggle('extendMote');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.dyntopo.Support-module.html#extendMote">extendMote</a><tt class="py-op">(</tt><tt class="py-param">mote</tt><tt class="py-op">,</tt> <tt class="py-param">txmap</tt><tt class="py-op">=</tt><tt class="py-name">None</tt><tt class="py-op">,</tt> </tt>
+<a name="L16"></a><tt class="py-lineno"> 16</tt>  <tt class="py-line">               <tt class="py-param">onchange</tt><tt class="py-op">=</tt><tt class="py-keyword">lambda</tt> <tt id="link-1" class="py-name" targets="Module simx.base.node=simx.base.node-module.html,Variable simx.probe.probe.Probe.node=simx.probe.probe.Probe-class.html#node"><a title="simx.base.node
+simx.probe.probe.Probe.node" class="py-name" href="#" onclick="return doclink('link-1', 'node', 'link-1');">node</a></tt><tt class="py-op">:</tt> <tt class="py-name">None</tt><tt class="py-op">,</tt> </tt>
+<a name="L17"></a><tt class="py-lineno"> 17</tt>  <tt class="py-line">               <tt class="py-name">monitor</tt><tt class="py-op">=</tt><tt id="link-2" class="py-name" targets="Class simx.dyntopo.Support.DummyMonitor=simx.dyntopo.Support.DummyMonitor-class.html"><a title="simx.dyntopo.Support.DummyMonitor" class="py-name" href="#" onclick="return doclink('link-2', 'DummyMonitor', 'link-2');">DummyMonitor</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> </tt>
+<a name="L18"></a><tt class="py-lineno"> 18</tt>  <tt class="py-line">               <tt id="link-3" class="py-name" targets="Module simx.base.radio=simx.base.radio-module.html,Method simx.base.tossim.TossimBase.radio()=simx.base.tossim.TossimBase-class.html#radio"><a title="simx.base.radio
+simx.base.tossim.TossimBase.radio" class="py-name" href="#" onclick="return doclink('link-3', 'radio', 'link-3');">radio</a></tt><tt class="py-op">=</tt><tt class="py-name">None</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="extendMote-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="extendMote-expanded"><a name="L19"></a><tt class="py-lineno"> 19</tt>  <tt class="py-line">    <tt class="py-docstring">"""</tt> </tt>
+<a name="L20"></a><tt class="py-lineno"> 20</tt>  <tt class="py-line"><tt class="py-docstring">    Extends mote (of TOSSIM.Mote) with singleton attributes.</tt> </tt>
+<a name="L21"></a><tt class="py-lineno"> 21</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L22"></a><tt class="py-lineno"> 22</tt>  <tt class="py-line"><tt class="py-docstring">    The accessors set_txgain, set_pos and mark_clean control the</tt> </tt>
+<a name="L23"></a><tt class="py-lineno"> 23</tt>  <tt class="py-line"><tt class="py-docstring">    following attributes which should be treated as read-only:</tt> </tt>
+<a name="L24"></a><tt class="py-lineno"> 24</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L25"></a><tt class="py-lineno"> 25</tt>  <tt class="py-line"><tt class="py-docstring">    ro_txgain - transmit power gain.</tt> </tt>
+<a name="L26"></a><tt class="py-lineno"> 26</tt>  <tt class="py-line"><tt class="py-docstring">    ro_pld0 - path loss at dl0 (must correspond with link model!)</tt> </tt>
+<a name="L27"></a><tt class="py-lineno"> 27</tt>  <tt class="py-line"><tt class="py-docstring">    ro_pos (x,y) - position, in meters</tt> </tt>
+<a name="L28"></a><tt class="py-lineno"> 28</tt>  <tt class="py-line"><tt class="py-docstring">    ro_dirty - if link gain needs to be re-computed</tt> </tt>
+<a name="L29"></a><tt class="py-lineno"> 29</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="L30"></a><tt class="py-lineno"> 30</tt>  <tt class="py-line">    <tt class="py-comment"># I do not know how to use the new-style property() in this</tt> </tt>
+<a name="L31"></a><tt class="py-lineno"> 31</tt>  <tt class="py-line"><tt class="py-comment"></tt>    <tt class="py-comment"># approach (or if it can even be adapted to</tt> </tt>
+<a name="L32"></a><tt class="py-lineno"> 32</tt>  <tt class="py-line"><tt class="py-comment"></tt>    <tt class="py-comment"># singleton-objects). One problem is the Mote class itself is</tt> </tt>
+<a name="L33"></a><tt class="py-lineno"> 33</tt>  <tt class="py-line"><tt class="py-comment"></tt>    <tt class="py-comment"># "locked" because it is implemented in C++/SWIG. Here we just,</tt> </tt>
+<a name="L34"></a><tt class="py-lineno"> 34</tt>  <tt class="py-line"><tt class="py-comment"></tt>    <tt class="py-comment"># well, fiddle with individual objects.</tt> </tt>
+<a name="L35"></a><tt class="py-lineno"> 35</tt>  <tt class="py-line"><tt class="py-comment"></tt>    <tt class="py-keyword">if</tt> <tt id="link-4" class="py-name" targets="Static Method simx.dyntopo.Link.BasicLinkModel.txmap()=simx.dyntopo.Link.BasicLinkModel-class.html#txmap"><a title="simx.dyntopo.Link.BasicLinkModel.txmap" class="py-name" href="#" onclick="return doclink('link-4', 'txmap', 'link-4');">txmap</a></tt> <tt class="py-keyword">is</tt> <tt class="py-name">None</tt><tt class="py-op">:</tt> </tt>
+<a name="L36"></a><tt class="py-lineno"> 36</tt>  <tt class="py-line">        <tt class="py-keyword">raise</tt> <tt class="py-name">ValueError</tt><tt class="py-op">,</tt> <tt class="py-string">"txmap is required"</tt> </tt>
+<a name="L37"></a><tt class="py-lineno"> 37</tt>  <tt class="py-line"> </tt>
+<a name="L38"></a><tt class="py-lineno"> 38</tt>  <tt class="py-line">    <tt class="py-name">old_addNoiseTraceReading</tt> <tt class="py-op">=</tt> <tt class="py-name">mote</tt><tt class="py-op">.</tt><tt id="link-5" class="py-name" targets="Method simx.base.node.Node.addNoiseTraceReading()=simx.base.node.Node-class.html#addNoiseTraceReading"><a title="simx.base.node.Node.addNoiseTraceReading" class="py-name" href="#" onclick="return doclink('link-5', 'addNoiseTraceReading', 'link-5');">addNoiseTraceReading</a></tt> </tt>
+<a name="L39"></a><tt class="py-lineno"> 39</tt>  <tt class="py-line">    <tt class="py-keyword">def</tt> <tt class="py-def-name">addNoiseTraceReading</tt><tt class="py-op">(</tt><tt class="py-param">value</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L40"></a><tt class="py-lineno"> 40</tt>  <tt class="py-line">        <tt class="py-name">old_addNoiseTraceReading</tt><tt class="py-op">(</tt><tt class="py-name">int</tt><tt class="py-op">(</tt><tt class="py-name">value</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L41"></a><tt class="py-lineno"> 41</tt>  <tt class="py-line">        <tt class="py-name">mote</tt><tt class="py-op">.</tt><tt class="py-name">ro_traces</tt> <tt class="py-op">=</tt> <tt class="py-name">mote</tt><tt class="py-op">.</tt><tt class="py-name">ro_traces</tt> <tt class="py-op">+</tt> <tt class="py-number">1</tt> </tt>
+</div><a name="L42"></a><tt class="py-lineno"> 42</tt>  <tt class="py-line">         </tt>
+<a name="L43"></a><tt class="py-lineno"> 43</tt>  <tt class="py-line">    <tt class="py-name">old_createNoiseModel</tt> <tt class="py-op">=</tt> <tt class="py-name">mote</tt><tt class="py-op">.</tt><tt class="py-name">createNoiseModel</tt> </tt>
+<a name="L44"></a><tt class="py-lineno"> 44</tt>  <tt class="py-line">    <tt class="py-keyword">def</tt> <tt class="py-def-name">createNoiseModel</tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L45"></a><tt class="py-lineno"> 45</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">mote</tt><tt class="py-op">.</tt><tt class="py-name">ro_traces</tt> <tt class="py-op">&lt;</tt> <tt id="link-6" class="py-name"><a title="simx.dyntopo.Support.REQUIRED_TRACE_SIZE" class="py-name" href="#" onclick="return doclink('link-6', 'REQUIRED_TRACE_SIZE', 'link-0');">REQUIRED_TRACE_SIZE</a></tt><tt class="py-op">:</tt> </tt>
+<a name="L46"></a><tt class="py-lineno"> 46</tt>  <tt class="py-line">            <tt class="py-keyword">raise</tt> <tt class="py-name">ValueError</tt><tt class="py-op">(</tt><tt class="py-string">"Refusing to create noise model for %d: "</tt> </tt>
+<a name="L47"></a><tt class="py-lineno"> 47</tt>  <tt class="py-line">                             <tt class="py-string">"only %d of %d required traces"</tt> <tt class="py-op">%</tt> </tt>
+<a name="L48"></a><tt class="py-lineno"> 48</tt>  <tt class="py-line">                             <tt class="py-op">(</tt><tt class="py-name">mote</tt><tt class="py-op">.</tt><tt id="link-7" class="py-name" targets="Method simx.base.node.Node.id()=simx.base.node.Node-class.html#id"><a title="simx.base.node.Node.id" class="py-name" href="#" onclick="return doclink('link-7', 'id', 'link-7');">id</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-name">mote</tt><tt class="py-op">.</tt><tt class="py-name">ro_traces</tt><tt class="py-op">,</tt> <tt id="link-8" class="py-name"><a title="simx.dyntopo.Support.REQUIRED_TRACE_SIZE" class="py-name" href="#" onclick="return doclink('link-8', 'REQUIRED_TRACE_SIZE', 'link-0');">REQUIRED_TRACE_SIZE</a></tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L49"></a><tt class="py-lineno"> 49</tt>  <tt class="py-line">        <tt class="py-keyword">else</tt><tt class="py-op">:</tt> </tt>
+<a name="L50"></a><tt class="py-lineno"> 50</tt>  <tt class="py-line">            <tt class="py-name">old_createNoiseModel</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L51"></a><tt class="py-lineno"> 51</tt>  <tt class="py-line">            <tt class="py-name">mote</tt><tt class="py-op">.</tt><tt class="py-name">ro_valid</tt> <tt class="py-op">=</tt> <tt class="py-name">True</tt> </tt>
+<a name="L52"></a><tt class="py-lineno"> 52</tt>  <tt class="py-line">            <tt class="py-name">onchange</tt><tt class="py-op">(</tt><tt class="py-name">mote</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L53"></a><tt class="py-lineno"> 53</tt>  <tt class="py-line"> </tt>
+<a name="L54"></a><tt class="py-lineno"> 54</tt>  <tt class="py-line">             </tt>
+<a name="L55"></a><tt class="py-lineno"> 55</tt>  <tt class="py-line">    <tt class="py-comment"># Calling SWIG is slow; cache the ID in Python.</tt> </tt>
+<a name="L56"></a><tt class="py-lineno"> 56</tt>  <tt class="py-line"><tt class="py-comment"></tt>    <tt class="py-comment"># The my_id variable is also closured further down to avoid</tt> </tt>
+<a name="L57"></a><tt class="py-lineno"> 57</tt>  <tt class="py-line"><tt class="py-comment"></tt>    <tt class="py-comment"># a function call entirely.</tt> </tt>
+<a name="L58"></a><tt class="py-lineno"> 58</tt>  <tt class="py-line"><tt class="py-comment"></tt>    <tt class="py-name">my_id</tt> <tt class="py-op">=</tt> <tt class="py-name">mote</tt><tt class="py-op">.</tt><tt id="link-9" class="py-name"><a title="simx.base.node.Node.id" class="py-name" href="#" onclick="return doclink('link-9', 'id', 'link-7');">id</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L59"></a><tt class="py-lineno"> 59</tt>  <tt class="py-line">    <tt class="py-name">mote</tt><tt class="py-op">.</tt><tt id="link-10" class="py-name"><a title="simx.base.node.Node.id" class="py-name" href="#" onclick="return doclink('link-10', 'id', 'link-7');">id</a></tt> <tt class="py-op">=</tt> <tt class="py-keyword">lambda</tt><tt class="py-op">:</tt> <tt class="py-name">my_id</tt> </tt>
+<a name="L60"></a><tt class="py-lineno"> 60</tt>  <tt class="py-line"> </tt>
+<a name="L61"></a><tt class="py-lineno"> 61</tt>  <tt class="py-line">    <tt class="py-comment">#</tt> </tt>
+<a name="L62"></a><tt class="py-lineno"> 62</tt>  <tt class="py-line"><tt class="py-comment"></tt>    <tt class="py-comment"># Invert links so they are attached to nodes;</tt> </tt>
+<a name="L63"></a><tt class="py-lineno"> 63</tt>  <tt class="py-line"><tt class="py-comment"></tt>    <tt class="py-comment"># this also provides a simple iterator through neighbors.</tt> </tt>
+<a name="L64"></a><tt class="py-lineno"> 64</tt>  <tt class="py-line"><tt class="py-comment"></tt>    <tt class="py-comment">#</tt> </tt>
+<a name="L65"></a><tt class="py-lineno"> 65</tt>  <tt class="py-line"><tt class="py-comment"></tt>    <tt class="py-comment"># This is potentially very costly memory-wise. However, it doesn't</tt> </tt>
+<a name="L66"></a><tt class="py-lineno"> 66</tt>  <tt class="py-line"><tt class="py-comment"></tt>    <tt class="py-comment"># have the O(n*n) problem with the current access methods to detect</tt> </tt>
+<a name="L67"></a><tt class="py-lineno"> 67</tt>  <tt class="py-line"><tt class="py-comment"></tt>    <tt class="py-comment"># which nodes are connected (more direct access to the underlying</tt> </tt>
+<a name="L68"></a><tt class="py-lineno"> 68</tt>  <tt class="py-line"><tt class="py-comment"></tt>    <tt class="py-comment"># representation may fix this).</tt> </tt>
+<a name="L69"></a><tt class="py-lineno"> 69</tt>  <tt class="py-line"><tt class="py-comment"></tt>    <tt class="py-comment">#</tt> </tt>
+<a name="L70"></a><tt class="py-lineno"> 70</tt>  <tt class="py-line"><tt class="py-comment"></tt>    <tt id="link-11" class="py-name" targets="Method simx.base.node.Node.neighbors()=simx.base.node.Node-class.html#neighbors"><a title="simx.base.node.Node.neighbors" class="py-name" href="#" onclick="return doclink('link-11', 'neighbors', 'link-11');">neighbors</a></tt> <tt class="py-op">=</tt> <tt class="py-name">Set</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L71"></a><tt class="py-lineno"> 71</tt>  <tt class="py-line"> </tt>
+<a name="L72"></a><tt class="py-lineno"> 72</tt>  <tt class="py-line">    <tt class="py-keyword">def</tt> <tt class="py-def-name">add</tt><tt class="py-op">(</tt><tt class="py-param">other</tt><tt class="py-op">,</tt> <tt class="py-param">gain</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L73"></a><tt class="py-lineno"> 73</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L74"></a><tt class="py-lineno"> 74</tt>  <tt class="py-line"><tt class="py-docstring">        Connect this node with the other node using the specified gain.</tt> </tt>
+<a name="L75"></a><tt class="py-lineno"> 75</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L76"></a><tt class="py-lineno"> 76</tt>  <tt class="py-line">        <tt id="link-12" class="py-name"><a title="simx.base.node.Node.neighbors" class="py-name" href="#" onclick="return doclink('link-12', 'neighbors', 'link-11');">neighbors</a></tt><tt class="py-op">.</tt><tt id="link-13" class="py-name" targets="Method simx.base.radio.RadioRedirect.add()=simx.base.radio.RadioRedirect-class.html#add"><a title="simx.base.radio.RadioRedirect.add" class="py-name" href="#" onclick="return doclink('link-13', 'add', 'link-13');">add</a></tt><tt class="py-op">(</tt><tt class="py-name">other</tt><tt class="py-op">)</tt> </tt>
+<a name="L77"></a><tt class="py-lineno"> 77</tt>  <tt class="py-line">        <tt id="link-14" class="py-name"><a title="simx.base.radio
+simx.base.tossim.TossimBase.radio" class="py-name" href="#" onclick="return doclink('link-14', 'radio', 'link-3');">radio</a></tt><tt class="py-op">.</tt><tt id="link-15" class="py-name"><a title="simx.base.radio.RadioRedirect.add" class="py-name" href="#" onclick="return doclink('link-15', 'add', 'link-13');">add</a></tt><tt class="py-op">(</tt><tt class="py-name">my_id</tt><tt class="py-op">,</tt> <tt class="py-name">other</tt><tt class="py-op">.</tt><tt id="link-16" class="py-name"><a title="simx.base.node.Node.id" class="py-name" href="#" onclick="return doclink('link-16', 'id', 'link-7');">id</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt id="link-17" class="py-name" targets="Method simx.base.radio.RadioRedirect.gain()=simx.base.radio.RadioRedirect-class.html#gain,Method simx.dyntopo.Link.BasicLinkModel.gain()=simx.dyntopo.Link.BasicLinkModel-class.html#gain,Method simx.dyntopo.Manager.NodeManager.gain()=simx.dyntopo.Manager.NodeManager-class.html#gain,Method simx.dyntopo.Topo.GenericTopo.gain()=simx.dyntopo.Topo.GenericTopo-class.html#gain"><a title="simx.base.radio.RadioRedirect.gain
+simx.dyntopo.Link.BasicLinkModel.gain
+simx.dyntopo.Manager.NodeManager.gain
+simx.dyntopo.Topo.GenericTopo.gain" class="py-name" href="#" onclick="return doclink('link-17', 'gain', 'link-17');">gain</a></tt><tt class="py-op">)</tt> </tt>
+<a name="L78"></a><tt class="py-lineno"> 78</tt>  <tt class="py-line">        <tt class="py-name">monitor</tt><tt class="py-op">.</tt><tt id="link-18" class="py-name" targets="Method simx.dyntopo.Support.DummyMonitor.linkChanged()=simx.dyntopo.Support.DummyMonitor-class.html#linkChanged"><a title="simx.dyntopo.Support.DummyMonitor.linkChanged" class="py-name" href="#" onclick="return doclink('link-18', 'linkChanged', 'link-18');">linkChanged</a></tt><tt class="py-op">(</tt><tt class="py-name">mote</tt><tt class="py-op">,</tt> <tt class="py-name">other</tt><tt class="py-op">,</tt> <tt id="link-19" class="py-name"><a title="simx.base.radio.RadioRedirect.gain
+simx.dyntopo.Link.BasicLinkModel.gain
+simx.dyntopo.Manager.NodeManager.gain
+simx.dyntopo.Topo.GenericTopo.gain" class="py-name" href="#" onclick="return doclink('link-19', 'gain', 'link-17');">gain</a></tt><tt class="py-op">)</tt> </tt>
+</div><a name="L79"></a><tt class="py-lineno"> 79</tt>  <tt class="py-line"> </tt>
+<a name="L80"></a><tt class="py-lineno"> 80</tt>  <tt class="py-line">    <tt class="py-comment"># Adds neighbor entry, but does not create link in TOSSIM model.</tt> </tt>
+<a name="L81"></a><tt class="py-lineno"> 81</tt>  <tt class="py-line"><tt class="py-comment"></tt>    <tt class="py-comment"># Does nothing if the link already exists.</tt> </tt>
+<a name="L82"></a><tt class="py-lineno"> 82</tt>  <tt class="py-line"><tt class="py-comment"></tt>    <tt class="py-keyword">def</tt> <tt class="py-def-name">touch</tt><tt class="py-op">(</tt><tt class="py-param">other</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L83"></a><tt class="py-lineno"> 83</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L84"></a><tt class="py-lineno"> 84</tt>  <tt class="py-line"><tt class="py-docstring">        If the other node is not connected, mark it as a neighbor.</tt> </tt>
+<a name="L85"></a><tt class="py-lineno"> 85</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L86"></a><tt class="py-lineno"> 86</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">other</tt> <tt class="py-keyword">not</tt> <tt class="py-keyword">in</tt> <tt id="link-20" class="py-name"><a title="simx.base.node.Node.neighbors" class="py-name" href="#" onclick="return doclink('link-20', 'neighbors', 'link-11');">neighbors</a></tt><tt class="py-op">:</tt> </tt>
+<a name="L87"></a><tt class="py-lineno"> 87</tt>  <tt class="py-line">            <tt id="link-21" class="py-name"><a title="simx.base.node.Node.neighbors" class="py-name" href="#" onclick="return doclink('link-21', 'neighbors', 'link-11');">neighbors</a></tt><tt class="py-op">.</tt><tt id="link-22" class="py-name"><a title="simx.base.radio.RadioRedirect.add" class="py-name" href="#" onclick="return doclink('link-22', 'add', 'link-13');">add</a></tt><tt class="py-op">(</tt><tt class="py-name">other</tt><tt class="py-op">)</tt> </tt>
+<a name="L88"></a><tt class="py-lineno"> 88</tt>  <tt class="py-line">            <tt class="py-name">monitor</tt><tt class="py-op">.</tt><tt id="link-23" class="py-name"><a title="simx.dyntopo.Support.DummyMonitor.linkChanged" class="py-name" href="#" onclick="return doclink('link-23', 'linkChanged', 'link-18');">linkChanged</a></tt><tt class="py-op">(</tt><tt class="py-name">mote</tt><tt class="py-op">,</tt> <tt class="py-name">other</tt><tt class="py-op">,</tt> <tt class="py-name">None</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L89"></a><tt class="py-lineno"> 89</tt>  <tt class="py-line"> </tt>
+<a name="L90"></a><tt class="py-lineno"> 90</tt>  <tt class="py-line">    <tt class="py-keyword">def</tt> <tt class="py-def-name">remove</tt><tt class="py-op">(</tt><tt class="py-param">other</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L91"></a><tt class="py-lineno"> 91</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L92"></a><tt class="py-lineno"> 92</tt>  <tt class="py-line"><tt class="py-docstring">        Remove the connection between this node and other.</tt> </tt>
+<a name="L93"></a><tt class="py-lineno"> 93</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L94"></a><tt class="py-lineno"> 94</tt>  <tt class="py-line">        <tt id="link-24" class="py-name"><a title="simx.base.node.Node.neighbors" class="py-name" href="#" onclick="return doclink('link-24', 'neighbors', 'link-11');">neighbors</a></tt><tt class="py-op">.</tt><tt id="link-25" class="py-name" targets="Method simx.base.radio.RadioRedirect.remove()=simx.base.radio.RadioRedirect-class.html#remove"><a title="simx.base.radio.RadioRedirect.remove" class="py-name" href="#" onclick="return doclink('link-25', 'remove', 'link-25');">remove</a></tt><tt class="py-op">(</tt><tt class="py-name">other</tt><tt class="py-op">)</tt> </tt>
+<a name="L95"></a><tt class="py-lineno"> 95</tt>  <tt class="py-line">        <tt id="link-26" class="py-name"><a title="simx.base.radio
+simx.base.tossim.TossimBase.radio" class="py-name" href="#" onclick="return doclink('link-26', 'radio', 'link-3');">radio</a></tt><tt class="py-op">.</tt><tt id="link-27" class="py-name"><a title="simx.base.radio.RadioRedirect.remove" class="py-name" href="#" onclick="return doclink('link-27', 'remove', 'link-25');">remove</a></tt><tt class="py-op">(</tt><tt class="py-name">my_id</tt><tt class="py-op">,</tt> <tt class="py-name">other</tt><tt class="py-op">.</tt><tt id="link-28" class="py-name"><a title="simx.base.node.Node.id" class="py-name" href="#" onclick="return doclink('link-28', 'id', 'link-7');">id</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L96"></a><tt class="py-lineno"> 96</tt>  <tt class="py-line">        <tt class="py-name">monitor</tt><tt class="py-op">.</tt><tt id="link-29" class="py-name"><a title="simx.dyntopo.Support.DummyMonitor.linkChanged" class="py-name" href="#" onclick="return doclink('link-29', 'linkChanged', 'link-18');">linkChanged</a></tt><tt class="py-op">(</tt><tt class="py-name">mote</tt><tt class="py-op">,</tt> <tt class="py-name">other</tt><tt class="py-op">,</tt> <tt class="py-name">None</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L97"></a><tt class="py-lineno"> 97</tt>  <tt class="py-line"> </tt>
+<a name="L98"></a><tt class="py-lineno"> 98</tt>  <tt class="py-line">    <tt class="py-keyword">def</tt> <tt class="py-def-name">gain</tt><tt class="py-op">(</tt><tt class="py-param">other</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L99"></a><tt class="py-lineno"> 99</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L100"></a><tt class="py-lineno">100</tt>  <tt class="py-line"><tt class="py-docstring">        Report the gain between the two nodes.</tt> </tt>
+<a name="L101"></a><tt class="py-lineno">101</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L102"></a><tt class="py-lineno">102</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt id="link-30" class="py-name"><a title="simx.base.radio
+simx.base.tossim.TossimBase.radio" class="py-name" href="#" onclick="return doclink('link-30', 'radio', 'link-3');">radio</a></tt><tt class="py-op">.</tt><tt id="link-31" class="py-name"><a title="simx.base.radio.RadioRedirect.gain
+simx.dyntopo.Link.BasicLinkModel.gain
+simx.dyntopo.Manager.NodeManager.gain
+simx.dyntopo.Topo.GenericTopo.gain" class="py-name" href="#" onclick="return doclink('link-31', 'gain', 'link-17');">gain</a></tt><tt class="py-op">(</tt><tt class="py-name">my_id</tt><tt class="py-op">,</tt> <tt class="py-name">other</tt><tt class="py-op">.</tt><tt id="link-32" class="py-name"><a title="simx.base.node.Node.id" class="py-name" href="#" onclick="return doclink('link-32', 'id', 'link-7');">id</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L103"></a><tt class="py-lineno">103</tt>  <tt class="py-line"> </tt>
+<a name="L104"></a><tt class="py-lineno">104</tt>  <tt class="py-line">    <tt class="py-keyword">def</tt> <tt class="py-def-name">connected</tt><tt class="py-op">(</tt><tt class="py-param">other</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L105"></a><tt class="py-lineno">105</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L106"></a><tt class="py-lineno">106</tt>  <tt class="py-line"><tt class="py-docstring">        Returns True iff the link has been connected logically;</tt> </tt>
+<a name="L107"></a><tt class="py-lineno">107</tt>  <tt class="py-line"><tt class="py-docstring">        it may not actually have been added to the underlying radio model.</tt> </tt>
+<a name="L108"></a><tt class="py-lineno">108</tt>  <tt class="py-line"><tt class="py-docstring">        (As is the case with touch.)</tt> </tt>
+<a name="L109"></a><tt class="py-lineno">109</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L110"></a><tt class="py-lineno">110</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">other</tt> <tt class="py-keyword">in</tt> <tt id="link-33" class="py-name"><a title="simx.base.node.Node.neighbors" class="py-name" href="#" onclick="return doclink('link-33', 'neighbors', 'link-11');">neighbors</a></tt> </tt>
+</div><a name="L111"></a><tt class="py-lineno">111</tt>  <tt class="py-line"> </tt>
+<a name="L112"></a><tt class="py-lineno">112</tt>  <tt class="py-line">    <tt class="py-name">mote</tt><tt class="py-op">.</tt><tt id="link-34" class="py-name"><a title="simx.base.radio.RadioRedirect.add" class="py-name" href="#" onclick="return doclink('link-34', 'add', 'link-13');">add</a></tt> <tt class="py-op">=</tt> <tt id="link-35" class="py-name"><a title="simx.base.radio.RadioRedirect.add" class="py-name" href="#" onclick="return doclink('link-35', 'add', 'link-13');">add</a></tt> </tt>
+<a name="L113"></a><tt class="py-lineno">113</tt>  <tt class="py-line">    <tt class="py-name">mote</tt><tt class="py-op">.</tt><tt class="py-name">touch</tt> <tt class="py-op">=</tt> <tt class="py-name">touch</tt> </tt>
+<a name="L114"></a><tt class="py-lineno">114</tt>  <tt class="py-line">    <tt class="py-name">mote</tt><tt class="py-op">.</tt><tt id="link-36" class="py-name"><a title="simx.base.radio.RadioRedirect.remove" class="py-name" href="#" onclick="return doclink('link-36', 'remove', 'link-25');">remove</a></tt> <tt class="py-op">=</tt> <tt id="link-37" class="py-name"><a title="simx.base.radio.RadioRedirect.remove" class="py-name" href="#" onclick="return doclink('link-37', 'remove', 'link-25');">remove</a></tt> </tt>
+<a name="L115"></a><tt class="py-lineno">115</tt>  <tt class="py-line">    <tt class="py-name">mote</tt><tt class="py-op">.</tt><tt id="link-38" class="py-name"><a title="simx.base.radio.RadioRedirect.gain
+simx.dyntopo.Link.BasicLinkModel.gain
+simx.dyntopo.Manager.NodeManager.gain
+simx.dyntopo.Topo.GenericTopo.gain" class="py-name" href="#" onclick="return doclink('link-38', 'gain', 'link-17');">gain</a></tt> <tt class="py-op">=</tt> <tt id="link-39" class="py-name"><a title="simx.base.radio.RadioRedirect.gain
+simx.dyntopo.Link.BasicLinkModel.gain
+simx.dyntopo.Manager.NodeManager.gain
+simx.dyntopo.Topo.GenericTopo.gain" class="py-name" href="#" onclick="return doclink('link-39', 'gain', 'link-17');">gain</a></tt> </tt>
+<a name="L116"></a><tt class="py-lineno">116</tt>  <tt class="py-line">    <tt class="py-name">mote</tt><tt class="py-op">.</tt><tt id="link-40" class="py-name" targets="Method simx.base.radio.RadioRedirect.connected()=simx.base.radio.RadioRedirect-class.html#connected"><a title="simx.base.radio.RadioRedirect.connected" class="py-name" href="#" onclick="return doclink('link-40', 'connected', 'link-40');">connected</a></tt> <tt class="py-op">=</tt> <tt id="link-41" class="py-name"><a title="simx.base.radio.RadioRedirect.connected" class="py-name" href="#" onclick="return doclink('link-41', 'connected', 'link-40');">connected</a></tt> </tt>
+<a name="L117"></a><tt class="py-lineno">117</tt>  <tt class="py-line">    <tt class="py-name">mote</tt><tt class="py-op">.</tt><tt id="link-42" class="py-name"><a title="simx.base.node.Node.neighbors" class="py-name" href="#" onclick="return doclink('link-42', 'neighbors', 'link-11');">neighbors</a></tt> <tt class="py-op">=</tt> <tt id="link-43" class="py-name"><a title="simx.base.node.Node.neighbors" class="py-name" href="#" onclick="return doclink('link-43', 'neighbors', 'link-11');">neighbors</a></tt> <tt class="py-comment"># not a function call</tt> </tt>
+<a name="L118"></a><tt class="py-lineno">118</tt>  <tt class="py-line"> </tt>
+<a name="L119"></a><tt class="py-lineno">119</tt>  <tt class="py-line"> </tt>
+<a name="L120"></a><tt class="py-lineno">120</tt>  <tt class="py-line">    <tt class="py-keyword">def</tt> <tt class="py-def-name">useFlatNoiseFloor</tt><tt class="py-op">(</tt><tt class="py-param">floor</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L121"></a><tt class="py-lineno">121</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L122"></a><tt class="py-lineno">122</tt>  <tt class="py-line"><tt class="py-docstring">        Add a flat noise floor for the node.</tt> </tt>
+<a name="L123"></a><tt class="py-lineno">123</tt>  <tt class="py-line"><tt class="py-docstring">        This assumes that the noise model is currently empty.</tt> </tt>
+<a name="L124"></a><tt class="py-lineno">124</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L125"></a><tt class="py-lineno">125</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">mote</tt><tt class="py-op">.</tt><tt class="py-name">ro_traces</tt> <tt class="py-op">&gt;</tt> <tt class="py-number">0</tt><tt class="py-op">:</tt> </tt>
+<a name="L126"></a><tt class="py-lineno">126</tt>  <tt class="py-line">            <tt class="py-keyword">raise</tt> <tt class="py-name">RuntimeError</tt><tt class="py-op">(</tt><tt class="py-string">"A flat noise floor can only be added "</tt> </tt>
+<a name="L127"></a><tt class="py-lineno">127</tt>  <tt class="py-line">                               <tt class="py-string">"to motes with no noise readings."</tt><tt class="py-op">)</tt> </tt>
+<a name="L128"></a><tt class="py-lineno">128</tt>  <tt class="py-line">        <tt class="py-keyword">for</tt> <tt class="py-name">i</tt> <tt class="py-keyword">in</tt> <tt class="py-name">xrange</tt><tt class="py-op">(</tt><tt class="py-number">0</tt><tt class="py-op">,</tt> <tt id="link-44" class="py-name"><a title="simx.dyntopo.Support.REQUIRED_TRACE_SIZE" class="py-name" href="#" onclick="return doclink('link-44', 'REQUIRED_TRACE_SIZE', 'link-0');">REQUIRED_TRACE_SIZE</a></tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L129"></a><tt class="py-lineno">129</tt>  <tt class="py-line">            <tt class="py-name">mote</tt><tt class="py-op">.</tt><tt id="link-45" class="py-name"><a title="simx.base.node.Node.addNoiseTraceReading" class="py-name" href="#" onclick="return doclink('link-45', 'addNoiseTraceReading', 'link-5');">addNoiseTraceReading</a></tt><tt class="py-op">(</tt><tt class="py-name">floor</tt><tt class="py-op">)</tt> </tt>
+<a name="L130"></a><tt class="py-lineno">130</tt>  <tt class="py-line">        <tt class="py-name">mote</tt><tt class="py-op">.</tt><tt class="py-name">createNoiseModel</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L131"></a><tt class="py-lineno">131</tt>  <tt class="py-line"> </tt>
+<a name="L132"></a><tt class="py-lineno">132</tt>  <tt class="py-line">    <tt class="py-name">old_turnOn</tt> <tt class="py-op">=</tt> <tt class="py-name">mote</tt><tt class="py-op">.</tt><tt id="link-46" class="py-name" targets="Method simx.base.node.Node.turnOn()=simx.base.node.Node-class.html#turnOn"><a title="simx.base.node.Node.turnOn" class="py-name" href="#" onclick="return doclink('link-46', 'turnOn', 'link-46');">turnOn</a></tt> </tt>
+<a name="L133"></a><tt class="py-lineno">133</tt>  <tt class="py-line">    <tt class="py-keyword">def</tt> <tt class="py-def-name">turnOn</tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L134"></a><tt class="py-lineno">134</tt>  <tt class="py-line">        <tt class="py-name">old_turnOn</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L135"></a><tt class="py-lineno">135</tt>  <tt class="py-line">        <tt class="py-name">mote</tt><tt class="py-op">.</tt><tt class="py-name">ro_dirty</tt> <tt class="py-op">=</tt> <tt class="py-name">True</tt> </tt>
+<a name="L136"></a><tt class="py-lineno">136</tt>  <tt class="py-line">        <tt class="py-name">onchange</tt><tt class="py-op">(</tt><tt class="py-name">mote</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L137"></a><tt class="py-lineno">137</tt>  <tt class="py-line"> </tt>
+<a name="L138"></a><tt class="py-lineno">138</tt>  <tt class="py-line">    <tt class="py-name">old_turnOff</tt> <tt class="py-op">=</tt> <tt class="py-name">mote</tt><tt class="py-op">.</tt><tt id="link-47" class="py-name" targets="Method simx.base.node.Node.turnOff()=simx.base.node.Node-class.html#turnOff"><a title="simx.base.node.Node.turnOff" class="py-name" href="#" onclick="return doclink('link-47', 'turnOff', 'link-47');">turnOff</a></tt> </tt>
+<a name="L139"></a><tt class="py-lineno">139</tt>  <tt class="py-line">    <tt class="py-keyword">def</tt> <tt class="py-def-name">turnOff</tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L140"></a><tt class="py-lineno">140</tt>  <tt class="py-line">        <tt class="py-name">old_turnOff</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L141"></a><tt class="py-lineno">141</tt>  <tt class="py-line">        <tt class="py-name">mote</tt><tt class="py-op">.</tt><tt class="py-name">ro_dirty</tt> <tt class="py-op">=</tt> <tt class="py-name">True</tt> </tt>
+<a name="L142"></a><tt class="py-lineno">142</tt>  <tt class="py-line">        <tt class="py-name">onchange</tt><tt class="py-op">(</tt><tt class="py-name">mote</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L143"></a><tt class="py-lineno">143</tt>  <tt class="py-line"> </tt>
+<a name="L144"></a><tt class="py-lineno">144</tt>  <tt class="py-line">    <tt class="py-keyword">def</tt> <tt class="py-def-name">set_txgain</tt><tt class="py-op">(</tt><tt class="py-param">val</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L145"></a><tt class="py-lineno">145</tt>  <tt class="py-line">        <tt class="py-name">mote</tt><tt class="py-op">.</tt><tt class="py-name">ro_txgain</tt> <tt class="py-op">=</tt> <tt class="py-name">val</tt> </tt>
+<a name="L146"></a><tt class="py-lineno">146</tt>  <tt class="py-line">        <tt class="py-name">mote</tt><tt class="py-op">.</tt><tt class="py-name">ro_pld0</tt> <tt class="py-op">=</tt> <tt id="link-48" class="py-name"><a title="simx.dyntopo.Link.BasicLinkModel.txmap" class="py-name" href="#" onclick="return doclink('link-48', 'txmap', 'link-4');">txmap</a></tt><tt class="py-op">(</tt><tt class="py-name">val</tt><tt class="py-op">)</tt> </tt>
+<a name="L147"></a><tt class="py-lineno">147</tt>  <tt class="py-line">        <tt class="py-name">mote</tt><tt class="py-op">.</tt><tt class="py-name">ro_dirty</tt> <tt class="py-op">=</tt> <tt class="py-name">True</tt> </tt>
+<a name="L148"></a><tt class="py-lineno">148</tt>  <tt class="py-line">        <tt class="py-name">onchange</tt><tt class="py-op">(</tt><tt class="py-name">mote</tt><tt class="py-op">)</tt> </tt>
+<a name="L149"></a><tt class="py-lineno">149</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">val</tt> </tt>
+</div><a name="L150"></a><tt class="py-lineno">150</tt>  <tt class="py-line"> </tt>
+<a name="L151"></a><tt class="py-lineno">151</tt>  <tt class="py-line">    <tt class="py-keyword">def</tt> <tt class="py-def-name">set_pos</tt><tt class="py-op">(</tt><tt class="py-param">val</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L152"></a><tt class="py-lineno">152</tt>  <tt class="py-line">        <tt class="py-name">mote</tt><tt class="py-op">.</tt><tt class="py-name">ro_pos</tt> <tt class="py-op">=</tt> <tt class="py-name">val</tt> </tt>
+<a name="L153"></a><tt class="py-lineno">153</tt>  <tt class="py-line">        <tt class="py-name">mote</tt><tt class="py-op">.</tt><tt class="py-name">ro_dirty</tt> <tt class="py-op">=</tt> <tt class="py-name">True</tt> </tt>
+<a name="L154"></a><tt class="py-lineno">154</tt>  <tt class="py-line">        <tt class="py-name">onchange</tt><tt class="py-op">(</tt><tt class="py-name">mote</tt><tt class="py-op">)</tt> </tt>
+<a name="L155"></a><tt class="py-lineno">155</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">val</tt> </tt>
+</div><a name="L156"></a><tt class="py-lineno">156</tt>  <tt class="py-line"> </tt>
+<a name="L157"></a><tt class="py-lineno">157</tt>  <tt class="py-line">    <tt class="py-keyword">def</tt> <tt class="py-def-name">mark_clean</tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L158"></a><tt class="py-lineno">158</tt>  <tt class="py-line">        <tt class="py-name">mote</tt><tt class="py-op">.</tt><tt class="py-name">ro_dirty</tt> <tt class="py-op">=</tt> <tt class="py-name">False</tt> </tt>
+<a name="L159"></a><tt class="py-lineno">159</tt>  <tt class="py-line">        <tt class="py-name">onchange</tt><tt class="py-op">(</tt><tt class="py-name">mote</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L160"></a><tt class="py-lineno">160</tt>  <tt class="py-line"> </tt>
+<a name="L161"></a><tt class="py-lineno">161</tt>  <tt class="py-line">    <tt class="py-name">mote</tt><tt class="py-op">.</tt><tt class="py-name">set_txgain</tt> <tt class="py-op">=</tt> <tt class="py-name">set_txgain</tt> </tt>
+<a name="L162"></a><tt class="py-lineno">162</tt>  <tt class="py-line">    <tt class="py-name">mote</tt><tt class="py-op">.</tt><tt class="py-name">set_pos</tt> <tt class="py-op">=</tt> <tt class="py-name">set_pos</tt> </tt>
+<a name="L163"></a><tt class="py-lineno">163</tt>  <tt class="py-line">    <tt class="py-name">mote</tt><tt class="py-op">.</tt><tt class="py-name">mark_clean</tt> <tt class="py-op">=</tt> <tt class="py-name">mark_clean</tt> </tt>
+<a name="L164"></a><tt class="py-lineno">164</tt>  <tt class="py-line">    <tt class="py-name">mote</tt><tt class="py-op">.</tt><tt id="link-49" class="py-name"><a title="simx.base.node.Node.turnOn" class="py-name" href="#" onclick="return doclink('link-49', 'turnOn', 'link-46');">turnOn</a></tt> <tt class="py-op">=</tt> <tt id="link-50" class="py-name"><a title="simx.base.node.Node.turnOn" class="py-name" href="#" onclick="return doclink('link-50', 'turnOn', 'link-46');">turnOn</a></tt> </tt>
+<a name="L165"></a><tt class="py-lineno">165</tt>  <tt class="py-line">    <tt class="py-name">mote</tt><tt class="py-op">.</tt><tt id="link-51" class="py-name"><a title="simx.base.node.Node.turnOff" class="py-name" href="#" onclick="return doclink('link-51', 'turnOff', 'link-47');">turnOff</a></tt> <tt class="py-op">=</tt> <tt id="link-52" class="py-name"><a title="simx.base.node.Node.turnOff" class="py-name" href="#" onclick="return doclink('link-52', 'turnOff', 'link-47');">turnOff</a></tt> </tt>
+<a name="L166"></a><tt class="py-lineno">166</tt>  <tt class="py-line">    <tt class="py-name">mote</tt><tt class="py-op">.</tt><tt id="link-53" class="py-name"><a title="simx.base.node.Node.addNoiseTraceReading" class="py-name" href="#" onclick="return doclink('link-53', 'addNoiseTraceReading', 'link-5');">addNoiseTraceReading</a></tt> <tt class="py-op">=</tt> <tt id="link-54" class="py-name"><a title="simx.base.node.Node.addNoiseTraceReading" class="py-name" href="#" onclick="return doclink('link-54', 'addNoiseTraceReading', 'link-5');">addNoiseTraceReading</a></tt> </tt>
+<a name="L167"></a><tt class="py-lineno">167</tt>  <tt class="py-line">    <tt class="py-name">mote</tt><tt class="py-op">.</tt><tt class="py-name">createNoiseModel</tt> <tt class="py-op">=</tt> <tt class="py-name">createNoiseModel</tt> </tt>
+<a name="L168"></a><tt class="py-lineno">168</tt>  <tt class="py-line">    <tt class="py-name">mote</tt><tt class="py-op">.</tt><tt class="py-name">useFlatNoiseFloor</tt> <tt class="py-op">=</tt> <tt class="py-name">useFlatNoiseFloor</tt> </tt>
+<a name="L169"></a><tt class="py-lineno">169</tt>  <tt class="py-line"> </tt>
+<a name="L170"></a><tt class="py-lineno">170</tt>  <tt class="py-line">    <tt class="py-comment"># Direct access to avoid early firing of onchange</tt> </tt>
+<a name="L171"></a><tt class="py-lineno">171</tt>  <tt class="py-line"><tt class="py-comment"></tt>    <tt class="py-name">mote</tt><tt class="py-op">.</tt><tt class="py-name">ro_txgain</tt> <tt class="py-op">=</tt> <tt class="py-number">0</tt> </tt>
+<a name="L172"></a><tt class="py-lineno">172</tt>  <tt class="py-line">    <tt class="py-name">mote</tt><tt class="py-op">.</tt><tt class="py-name">ro_pld0</tt> <tt class="py-op">=</tt> <tt id="link-55" class="py-name"><a title="simx.dyntopo.Link.BasicLinkModel.txmap" class="py-name" href="#" onclick="return doclink('link-55', 'txmap', 'link-4');">txmap</a></tt><tt class="py-op">(</tt><tt class="py-number">0</tt><tt class="py-op">)</tt> </tt>
+<a name="L173"></a><tt class="py-lineno">173</tt>  <tt class="py-line">    <tt class="py-name">mote</tt><tt class="py-op">.</tt><tt class="py-name">ro_pos</tt> <tt class="py-op">=</tt> <tt class="py-op">(</tt><tt class="py-number">0</tt><tt class="py-op">,</tt><tt class="py-number">0</tt><tt class="py-op">)</tt> </tt>
+<a name="L174"></a><tt class="py-lineno">174</tt>  <tt class="py-line">    <tt class="py-name">mote</tt><tt class="py-op">.</tt><tt class="py-name">ro_dirty</tt> <tt class="py-op">=</tt> <tt class="py-name">True</tt> </tt>
+<a name="L175"></a><tt class="py-lineno">175</tt>  <tt class="py-line">    <tt class="py-name">mote</tt><tt class="py-op">.</tt><tt class="py-name">ro_valid</tt> <tt class="py-op">=</tt> <tt class="py-name">False</tt> </tt>
+<a name="L176"></a><tt class="py-lineno">176</tt>  <tt class="py-line">    <tt class="py-name">mote</tt><tt class="py-op">.</tt><tt class="py-name">ro_traces</tt> <tt class="py-op">=</tt> <tt class="py-number">0</tt> </tt>
+<a name="L177"></a><tt class="py-lineno">177</tt>  <tt class="py-line">    <tt class="py-name">onchange</tt><tt class="py-op">(</tt><tt class="py-name">mote</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L178"></a><tt class="py-lineno">178</tt>  <tt class="py-line"> </tt><script type="text/javascript">
+<!--
+expandto(location.href);
+// -->
+</script>
+</pre>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Wed Aug 12 00:17:36 2009
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

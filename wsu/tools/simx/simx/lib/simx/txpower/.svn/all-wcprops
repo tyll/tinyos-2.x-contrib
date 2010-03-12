@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/tinyos-svn/!svn/ver/771/sensorweb/tools/simx/trunk/lib/simx/txpower
+END
+SimxTxPower.py
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/tinyos-svn/!svn/ver/771/sensorweb/tools/simx/trunk/lib/simx/txpower/SimxTxPower.py
+END
+SimxTxPower.nc
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/tinyos-svn/!svn/ver/771/sensorweb/tools/simx/trunk/lib/simx/txpower/SimxTxPower.nc
+END
+SimxTxPowerC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/tinyos-svn/!svn/ver/771/sensorweb/tools/simx/trunk/lib/simx/txpower/SimxTxPowerC.nc
+END
+README
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/tinyos-svn/!svn/ver/771/sensorweb/tools/simx/trunk/lib/simx/txpower/README
+END

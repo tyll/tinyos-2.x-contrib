@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>simx.sensor.extension</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        Package&nbsp;simx ::
+        <a href="simx.sensor-module.html">Package&nbsp;sensor</a> ::
+        Module&nbsp;extension
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="simx.sensor.extension-pysrc.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<h1 class="epydoc">Source Code for <a href="simx.sensor.extension-module.html">Module simx.sensor.extension</a></h1>
+<pre class="py-src">
+<a name="L1"></a><tt class="py-lineno"> 1</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-name">simx</tt><tt class="py-op">.</tt><tt id="link-0" class="py-name" targets="Package simx.base=simx.base-module.html"><a title="simx.base" class="py-name" href="#" onclick="return doclink('link-0', 'base', 'link-0');">base</a></tt> <tt class="py-keyword">import</tt> <tt id="link-1" class="py-name" targets="Class simx.base.extension.Extension=simx.base.extension.Extension-class.html"><a title="simx.base.extension.Extension" class="py-name" href="#" onclick="return doclink('link-1', 'Extension', 'link-1');">Extension</a></tt> </tt>
+<a name="L2"></a><tt class="py-lineno"> 2</tt>  <tt class="py-line"> </tt>
+<a name="SensorMixin"></a><div id="SensorMixin-def"><a name="L3"></a><tt class="py-lineno"> 3</tt> <a class="py-toggle" href="#" id="SensorMixin-toggle" onclick="return toggle('SensorMixin');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="simx.sensor.extension.SensorMixin-class.html">SensorMixin</a><tt class="py-op">(</tt><tt class="py-base-class">object</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="SensorMixin-collapsed" style="display:none;" pad="++" indent="++++"></div><div id="SensorMixin-expanded"><a name="L4"></a><tt class="py-lineno"> 4</tt>  <tt class="py-line">    <tt class="py-docstring">"""</tt> </tt>
+<a name="L5"></a><tt class="py-lineno"> 5</tt>  <tt class="py-line"><tt class="py-docstring">    Extension mixin</tt> </tt>
+<a name="L6"></a><tt class="py-lineno"> 6</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L7"></a><tt class="py-lineno"> 7</tt>  <tt class="py-line"><tt class="py-docstring">    The sensor_controller attribute should be defined on the instance.</tt> </tt>
+<a name="L8"></a><tt class="py-lineno"> 8</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="SensorMixin.connect_sensor"></a><div id="SensorMixin.connect_sensor-def"><a name="L9"></a><tt class="py-lineno"> 9</tt> <a class="py-toggle" href="#" id="SensorMixin.connect_sensor-toggle" onclick="return toggle('SensorMixin.connect_sensor');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.sensor.extension.SensorMixin-class.html#connect_sensor">connect_sensor</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">channel_id</tt><tt class="py-op">,</tt> <tt class="py-param">read_func</tt><tt class="py-op">,</tt> <tt class="py-param">delay</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="SensorMixin.connect_sensor-collapsed" style="display:none;" pad="++" indent="++++++++"></div><div id="SensorMixin.connect_sensor-expanded"><a name="L10"></a><tt class="py-lineno">10</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">sensor_controller</tt><tt class="py-op">.</tt><tt id="link-2" class="py-name" targets="Method simx.sensor.sensor.SensorControl.connect()=simx.sensor.sensor.SensorControl-class.html#connect"><a title="simx.sensor.sensor.SensorControl.connect" class="py-name" href="#" onclick="return doclink('link-2', 'connect', 'link-2');">connect</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-3" class="py-name" targets="Method simx.base.node.Node.id()=simx.base.node.Node-class.html#id"><a title="simx.base.node.Node.id" class="py-name" href="#" onclick="return doclink('link-3', 'id', 'link-3');">id</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-name">channel_id</tt><tt class="py-op">,</tt> <tt class="py-name">read_func</tt><tt class="py-op">,</tt> <tt class="py-name">delay</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L11"></a><tt class="py-lineno">11</tt>  <tt class="py-line"> </tt>
+<a name="SensorMixin.disconnect_sensor"></a><div id="SensorMixin.disconnect_sensor-def"><a name="L12"></a><tt class="py-lineno">12</tt> <a class="py-toggle" href="#" id="SensorMixin.disconnect_sensor-toggle" onclick="return toggle('SensorMixin.disconnect_sensor');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.sensor.extension.SensorMixin-class.html#disconnect_sensor">disconnect_sensor</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">channel_id</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="SensorMixin.disconnect_sensor-collapsed" style="display:none;" pad="++" indent="++++++++"></div><div id="SensorMixin.disconnect_sensor-expanded"><a name="L13"></a><tt class="py-lineno">13</tt>  <tt class="py-line">        <tt class="py-keyword">raise</tt> <tt class="py-name">NotImplementedError</tt><tt class="py-op">(</tt><tt class="py-string">"not done"</tt><tt class="py-op">)</tt> </tt>
+</div></div><a name="L14"></a><tt class="py-lineno">14</tt>  <tt class="py-line"> </tt>
+<a name="L15"></a><tt class="py-lineno">15</tt>  <tt class="py-line"> </tt>
+<a name="SensorExtension"></a><div id="SensorExtension-def"><a name="L16"></a><tt class="py-lineno">16</tt> <a class="py-toggle" href="#" id="SensorExtension-toggle" onclick="return toggle('SensorExtension');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="simx.sensor.extension.SensorExtension-class.html">SensorExtension</a><tt class="py-op">(</tt><tt class="py-base-class">Extension</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="SensorExtension-collapsed" style="display:none;" pad="++" indent="++++"></div><div id="SensorExtension-expanded"><a name="L17"></a><tt class="py-lineno">17</tt>  <tt class="py-line">    <tt class="py-docstring">"""</tt> </tt>
+<a name="L18"></a><tt class="py-lineno">18</tt>  <tt class="py-line"><tt class="py-docstring">    Sensor extension for simx.base.</tt> </tt>
+<a name="L19"></a><tt class="py-lineno">19</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="L20"></a><tt class="py-lineno">20</tt>  <tt class="py-line"> </tt>
+<a name="SensorExtension.__init__"></a><div id="SensorExtension.__init__-def"><a name="L21"></a><tt class="py-lineno">21</tt> <a class="py-toggle" href="#" id="SensorExtension.__init__-toggle" onclick="return toggle('SensorExtension.__init__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.sensor.extension.SensorExtension-class.html#__init__">__init__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">sensor_controller</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="SensorExtension.__init__-collapsed" style="display:none;" pad="++" indent="++++++++"></div><div id="SensorExtension.__init__-expanded"><a name="L22"></a><tt class="py-lineno">22</tt>  <tt class="py-line">        <tt id="link-4" class="py-name"><a title="simx.base.extension.Extension" class="py-name" href="#" onclick="return doclink('link-4', 'Extension', 'link-1');">Extension</a></tt><tt class="py-op">.</tt><tt id="link-5" class="py-name" targets="Method simx.base.channel.ChannelBridge.__init__()=simx.base.channel.ChannelBridge-class.html#__init__,Method simx.base.extension.Extension.__init__()=simx.base.extension.Extension-class.html#__init__,Method simx.base.node.Node.__init__()=simx.base.node.Node-class.html#__init__,Method simx.base.radio.RadioRedirect.__init__()=simx.base.radio.RadioRedirect-class.html#__init__,Method simx.base.tossim.TossimBase.__init__()=simx.base.tossim.TossimBase-class.html#__init__,Method simx.dyntopo.Link.BasicLinkModel.__init__()=simx.dyntopo.Link.BasicLinkModel-class.html#__init__,Method simx.dyntopo.Topo.GenericTopo.__init__()=simx.dyntopo.Topo.GenericTopo-class.html#__init__,Method simx.event.event.Manager.__init__()=simx.event.event.Manager-class.html#__init__,Method simx.event.event.PriorityQueue.__init__()=simx.event.event.PriorityQueue-class.html#__init__,Method simx.inject.inject.Inject.__init__()=simx.inject.inject.Inject-class.html#__init__,Method simx.inject.inject.InvalidVersionWarning.__init__()=simx.inject.inject.InvalidVersionWarning-class.html#__init__,Method simx.inject.queue.FifoQueue.__init__()=simx.inject.queue.FifoQueue-class.html#__init__,Method simx.inject.queue.QueueFullWarning.__init__()=simx.inject.queue.QueueFullWarning-class.html#__init__,Method simx.inject.wiretap.InjectDownstream.__init__()=simx.inject.wiretap.InjectDownstream-class.html#__init__,Method simx.inject.wiretap.InjectPacketSock.__init__()=simx.inject.wiretap.InjectPacketSock-class.html#__init__,Method simx.inject.wiretap.InjectSock.__init__()=simx.inject.wiretap.InjectSock-class.html#__init__,Method simx.inject.wiretap.InjectTrigger.__init__()=simx.inject.wiretap.InjectTrigger-class.html#__init__,Method simx.inject.wiretap.InjectUpstream.__init__()=simx.inject.wiretap.InjectUpstream-class.html#__init__,Method simx.probe.parse.LookupError.__init__()=simx.probe.parse.LookupError-class.html#__init__,Method simx.probe.parse.ProbeLink.__init__()=simx.probe.parse.ProbeLink-class.html#__init__,Method simx.probe.parse.ProbeLoader.__init__()=simx.probe.parse.ProbeLoader-class.html#__init__,Method simx.probe.parse.ReplacementError.__init__()=simx.probe.parse.ReplacementError-class.html#__init__,Method simx.probe.probe.CachingProber.__init__()=simx.probe.probe.CachingProber-class.html#__init__,Method simx.probe.probe.Probe.__init__()=simx.probe.probe.Probe-class.html#__init__,Method simx.probe.probe.ProbeArray.__init__()=simx.probe.probe.ProbeArray-class.html#__init__,Method simx.probe.probe.ProbeStruct.__init__()=simx.probe.probe.ProbeStruct-class.html#__init__,Method simx.probe.probedef.Array.__init__()=simx.probe.probedef.Array-class.html#__init__,Method simx.probe.probedef.Definition.__init__()=simx.probe.probedef.Definition-class.html#__init__,Method simx.probe.probedef.Link.__init__()=simx.probe.probedef.Link-class.html#__init__,Method simx.probe.probedef.Primitive.__init__()=simx.probe.probedef.Primitive-class.html#__init__,Method simx.probe.probedef.Struct.__init__()=simx.probe.probedef.Struct-class.html#__init__,Method simx.sensor.extension.SensorExtension.__init__()=simx.sensor.extension.SensorExtension-class.html#__init__,Method simx.sensor.sensor.SensorControl.__init__()=simx.sensor.sensor.SensorControl-class.html#__init__,Method simx.sensor.sensor.SensorError.__init__()=simx.sensor.sensor.SensorError-class.html#__init__,Method simx.sensor.streamer.BinaryStreamer.__init__()=simx.sensor.streamer.BinaryStreamer-class.html#__init__,Method simx.sensor.streamer.SacStreamer.__init__()=simx.sensor.streamer.SacStreamer-class.html#__init__,Method simx.sensor.streamer.Streamer.__init__()=simx.sensor.streamer.Streamer-class.html#__init__,Method simx.sensor.streamer.TextStreamer.__init__()=simx.sensor.streamer.TextStreamer-class.html#__init__,Method simx.sync.time_control.TimeControl.__init__()=simx.sync.time_control.TimeControl-class.html#__init__"><a title="simx.base.channel.ChannelBridge.__init__
+simx.base.extension.Extension.__init__
+simx.base.node.Node.__init__
+simx.base.radio.RadioRedirect.__init__
+simx.base.tossim.TossimBase.__init__
+simx.dyntopo.Link.BasicLinkModel.__init__
+simx.dyntopo.Topo.GenericTopo.__init__
+simx.event.event.Manager.__init__
+simx.event.event.PriorityQueue.__init__
+simx.inject.inject.Inject.__init__
+simx.inject.inject.InvalidVersionWarning.__init__
+simx.inject.queue.FifoQueue.__init__
+simx.inject.queue.QueueFullWarning.__init__
+simx.inject.wiretap.InjectDownstream.__init__
+simx.inject.wiretap.InjectPacketSock.__init__
+simx.inject.wiretap.InjectSock.__init__
+simx.inject.wiretap.InjectTrigger.__init__
+simx.inject.wiretap.InjectUpstream.__init__
+simx.probe.parse.LookupError.__init__
+simx.probe.parse.ProbeLink.__init__
+simx.probe.parse.ProbeLoader.__init__
+simx.probe.parse.ReplacementError.__init__
+simx.probe.probe.CachingProber.__init__
+simx.probe.probe.Probe.__init__
+simx.probe.probe.ProbeArray.__init__
+simx.probe.probe.ProbeStruct.__init__
+simx.probe.probedef.Array.__init__
+simx.probe.probedef.Definition.__init__
+simx.probe.probedef.Link.__init__
+simx.probe.probedef.Primitive.__init__
+simx.probe.probedef.Struct.__init__
+simx.sensor.extension.SensorExtension.__init__
+simx.sensor.sensor.SensorControl.__init__
+simx.sensor.sensor.SensorError.__init__
+simx.sensor.streamer.BinaryStreamer.__init__
+simx.sensor.streamer.SacStreamer.__init__
+simx.sensor.streamer.Streamer.__init__
+simx.sensor.streamer.TextStreamer.__init__
+simx.sync.time_control.TimeControl.__init__" class="py-name" href="#" onclick="return doclink('link-5', '__init__', 'link-5');">__init__</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">,</tt> <tt class="py-name">extension_name</tt><tt class="py-op">=</tt><tt class="py-string">"sensor"</tt><tt class="py-op">)</tt> </tt>
+<a name="L23"></a><tt class="py-lineno">23</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">sensor_controller</tt> <tt class="py-op">=</tt> <tt class="py-name">sensor_controller</tt> </tt>
+</div><a name="L24"></a><tt class="py-lineno">24</tt>  <tt class="py-line"> </tt>
+<a name="SensorExtension.decorate_node_class"></a><div id="SensorExtension.decorate_node_class-def"><a name="L25"></a><tt class="py-lineno">25</tt> <a class="py-toggle" href="#" id="SensorExtension.decorate_node_class-toggle" onclick="return toggle('SensorExtension.decorate_node_class');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.sensor.extension.SensorExtension-class.html#decorate_node_class">decorate_node_class</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">node_class</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="SensorExtension.decorate_node_class-collapsed" style="display:none;" pad="++" indent="++++++++"></div><div id="SensorExtension.decorate_node_class-expanded"><a name="L26"></a><tt class="py-lineno">26</tt>  <tt class="py-line">        <tt id="link-6" class="py-name"><a title="simx.base.extension.Extension" class="py-name" href="#" onclick="return doclink('link-6', 'Extension', 'link-1');">Extension</a></tt><tt class="py-op">.</tt><tt id="link-7" class="py-name" targets="Static Method simx.base.extension.Extension.mixin()=simx.base.extension.Extension-class.html#mixin"><a title="simx.base.extension.Extension.mixin" class="py-name" href="#" onclick="return doclink('link-7', 'mixin', 'link-7');">mixin</a></tt><tt class="py-op">(</tt><tt class="py-name">node_class</tt><tt class="py-op">,</tt> <tt id="link-8" class="py-name" targets="Class simx.sensor.extension.SensorMixin=simx.sensor.extension.SensorMixin-class.html"><a title="simx.sensor.extension.SensorMixin" class="py-name" href="#" onclick="return doclink('link-8', 'SensorMixin', 'link-8');">SensorMixin</a></tt><tt class="py-op">)</tt> </tt>
+</div><a name="L27"></a><tt class="py-lineno">27</tt>  <tt class="py-line"> </tt>
+<a name="SensorExtension.decorate_node"></a><div id="SensorExtension.decorate_node-def"><a name="L28"></a><tt class="py-lineno">28</tt> <a class="py-toggle" href="#" id="SensorExtension.decorate_node-toggle" onclick="return toggle('SensorExtension.decorate_node');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.sensor.extension.SensorExtension-class.html#decorate_node">decorate_node</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">node</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="SensorExtension.decorate_node-collapsed" style="display:none;" pad="++" indent="++++++++"></div><div id="SensorExtension.decorate_node-expanded"><a name="L29"></a><tt class="py-lineno">29</tt>  <tt class="py-line">        <tt id="link-9" class="py-name" targets="Module simx.base.node=simx.base.node-module.html,Variable simx.probe.probe.Probe.node=simx.probe.probe.Probe-class.html#node"><a title="simx.base.node
+simx.probe.probe.Probe.node" class="py-name" href="#" onclick="return doclink('link-9', 'node', 'link-9');">node</a></tt><tt class="py-op">.</tt><tt class="py-name">sensor_controller</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">sensor_controller</tt> </tt>
+</div></div><a name="L30"></a><tt class="py-lineno">30</tt>  <tt class="py-line"> </tt><script type="text/javascript">
+<!--
+expandto(location.href);
+// -->
+</script>
+</pre>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Wed Aug 12 00:17:37 2009
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

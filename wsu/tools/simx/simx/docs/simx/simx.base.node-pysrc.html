@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>simx.base.node</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        Package&nbsp;simx ::
+        <a href="simx.base-module.html">Package&nbsp;base</a> ::
+        Module&nbsp;node
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="simx.base.node-pysrc.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<h1 class="epydoc">Source Code for <a href="simx.base.node-module.html">Module simx.base.node</a></h1>
+<pre class="py-src">
+<a name="Node"></a><div id="Node-def"><a name="L1"></a><tt class="py-lineno">  1</tt> <a class="py-toggle" href="#" id="Node-toggle" onclick="return toggle('Node');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="simx.base.node.Node-class.html">Node</a><tt class="py-op">(</tt><tt class="py-base-class">object</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Node-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="Node-expanded"><a name="L2"></a><tt class="py-lineno">  2</tt>  <tt class="py-line">    <tt class="py-docstring">"""</tt> </tt>
+<a name="L3"></a><tt class="py-lineno">  3</tt>  <tt class="py-line"><tt class="py-docstring">    Wrapper for a TOSSIM node. This is one of the underlying</tt> </tt>
+<a name="L4"></a><tt class="py-lineno">  4</tt>  <tt class="py-line"><tt class="py-docstring">    components to bridge the gap between TOSSIM and Simx by allowing a</tt> </tt>
+<a name="L5"></a><tt class="py-lineno">  5</tt>  <tt class="py-line"><tt class="py-docstring">    place to inject extra features.</tt> </tt>
+<a name="L6"></a><tt class="py-lineno">  6</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L7"></a><tt class="py-lineno">  7</tt>  <tt class="py-line"><tt class="py-docstring">    For this to work correctly, the nodes objects must only be</tt> </tt>
+<a name="L8"></a><tt class="py-lineno">  8</tt>  <tt class="py-line"><tt class="py-docstring">    fetched/accessed through the TossimBase object.</tt> </tt>
+<a name="L9"></a><tt class="py-lineno">  9</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="L10"></a><tt class="py-lineno"> 10</tt>  <tt class="py-line"> </tt>
+<a name="L11"></a><tt class="py-lineno"> 11</tt>  <tt class="py-line">    <tt class="py-comment">#: Minimum size needed for Tossim CPM model generator.</tt> </tt>
+<a name="L12"></a><tt class="py-lineno"> 12</tt>  <tt class="py-line"><tt class="py-comment"></tt>    <tt id="link-0" class="py-name" targets="Variable simx.base.node.Node.MIN_TRACE_SIZE=simx.base.node.Node-class.html#MIN_TRACE_SIZE"><a title="simx.base.node.Node.MIN_TRACE_SIZE" class="py-name" href="#" onclick="return doclink('link-0', 'MIN_TRACE_SIZE', 'link-0');">MIN_TRACE_SIZE</a></tt> <tt class="py-op">=</tt> <tt class="py-number">100</tt> </tt>
+<a name="L13"></a><tt class="py-lineno"> 13</tt>  <tt class="py-line"> </tt>
+<a name="Node.__init__"></a><div id="Node.__init__-def"><a name="L14"></a><tt class="py-lineno"> 14</tt> <a class="py-toggle" href="#" id="Node.__init__-toggle" onclick="return toggle('Node.__init__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.base.node.Node-class.html#__init__">__init__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">node_target</tt><tt class="py-op">,</tt> <tt class="py-param">tossim_base</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Node.__init__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Node.__init__-expanded"><a name="L15"></a><tt class="py-lineno"> 15</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L16"></a><tt class="py-lineno"> 16</tt>  <tt class="py-line"><tt class="py-docstring">        node_target -- Tossim Node type</tt> </tt>
+<a name="L17"></a><tt class="py-lineno"> 17</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L18"></a><tt class="py-lineno"> 18</tt>  <tt class="py-line"><tt class="py-docstring">        tossim_base -- should be like TossimBase</tt> </tt>
+<a name="L19"></a><tt class="py-lineno"> 19</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L20"></a><tt class="py-lineno"> 20</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_id</tt> <tt class="py-op">=</tt> <tt class="py-name">node_target</tt><tt class="py-op">.</tt><tt id="link-1" class="py-name" targets="Method simx.base.node.Node.id()=simx.base.node.Node-class.html#id"><a title="simx.base.node.Node.id" class="py-name" href="#" onclick="return doclink('link-1', 'id', 'link-1');">id</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L21"></a><tt class="py-lineno"> 21</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-2" class="py-name" targets="Module simx.base.node=simx.base.node-module.html,Variable simx.probe.probe.Probe.node=simx.probe.probe.Probe-class.html#node"><a title="simx.base.node
+simx.probe.probe.Probe.node" class="py-name" href="#" onclick="return doclink('link-2', 'node', 'link-2');">node</a></tt> <tt class="py-op">=</tt> <tt class="py-name">node_target</tt> </tt>
+<a name="L22"></a><tt class="py-lineno"> 22</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-3" class="py-name" targets="Module simx.base.tossim=simx.base.tossim-module.html"><a title="simx.base.tossim" class="py-name" href="#" onclick="return doclink('link-3', 'tossim', 'link-3');">tossim</a></tt> <tt class="py-op">=</tt> <tt class="py-name">tossim_base</tt> </tt>
+<a name="L23"></a><tt class="py-lineno"> 23</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-4" class="py-name" targets="Module simx.base.radio=simx.base.radio-module.html,Method simx.base.tossim.TossimBase.radio()=simx.base.tossim.TossimBase-class.html#radio"><a title="simx.base.radio
+simx.base.tossim.TossimBase.radio" class="py-name" href="#" onclick="return doclink('link-4', 'radio', 'link-4');">radio</a></tt> <tt class="py-op">=</tt> <tt class="py-name">tossim_base</tt><tt class="py-op">.</tt><tt class="py-name">tossim_radio</tt> </tt>
+<a name="L24"></a><tt class="py-lineno"> 24</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">trace_count</tt> <tt class="py-op">=</tt> <tt class="py-number">0</tt> <tt class="py-comment">#: track noise trace additions</tt> </tt>
+<a name="L25"></a><tt class="py-lineno"> 25</tt>  <tt class="py-line">         </tt>
+<a name="L26"></a><tt class="py-lineno"> 26</tt>  <tt class="py-line">        <tt class="py-comment"># Has this node been modified? set below in changed() call</tt> </tt>
+<a name="L27"></a><tt class="py-lineno"> 27</tt>  <tt class="py-line"><tt class="py-comment"></tt>        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">dirty</tt> <tt class="py-op">=</tt> <tt class="py-name">None</tt> </tt>
+<a name="L28"></a><tt class="py-lineno"> 28</tt>  <tt class="py-line"> </tt>
+<a name="L29"></a><tt class="py-lineno"> 29</tt>  <tt class="py-line">        <tt class="py-comment"># A node is only considered valid after the noise model has</tt> </tt>
+<a name="L30"></a><tt class="py-lineno"> 30</tt>  <tt class="py-line"><tt class="py-comment"></tt>        <tt class="py-comment"># been generated for it.</tt> </tt>
+<a name="L31"></a><tt class="py-lineno"> 31</tt>  <tt class="py-line"><tt class="py-comment"></tt>        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">valid</tt> <tt class="py-op">=</tt> <tt class="py-name">False</tt> </tt>
+<a name="L32"></a><tt class="py-lineno"> 32</tt>  <tt class="py-line"> </tt>
+<a name="L33"></a><tt class="py-lineno"> 33</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-5" class="py-name" targets="Method simx.base.node.Node.changed()=simx.base.node.Node-class.html#changed"><a title="simx.base.node.Node.changed" class="py-name" href="#" onclick="return doclink('link-5', 'changed', 'link-5');">changed</a></tt><tt class="py-op">(</tt><tt class="py-name">True</tt><tt class="py-op">)</tt> </tt>
+<a name="L34"></a><tt class="py-lineno"> 34</tt>  <tt class="py-line"> </tt>
+<a name="L35"></a><tt class="py-lineno"> 35</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_links</tt> <tt class="py-op">=</tt> <tt class="py-op">{</tt><tt class="py-op">}</tt> </tt>
+</div><a name="L36"></a><tt class="py-lineno"> 36</tt>  <tt class="py-line"> </tt>
+<a name="L37"></a><tt class="py-lineno"> 37</tt>  <tt class="py-line"> </tt>
+<a name="Node.__getattr__"></a><div id="Node.__getattr__-def"><a name="L38"></a><tt class="py-lineno"> 38</tt> <a class="py-toggle" href="#" id="Node.__getattr__-toggle" onclick="return toggle('Node.__getattr__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.base.node.Node-class.html#__getattr__">__getattr__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">attr</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Node.__getattr__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Node.__getattr__-expanded"><a name="L39"></a><tt class="py-lineno"> 39</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L40"></a><tt class="py-lineno"> 40</tt>  <tt class="py-line"><tt class="py-docstring">        Proxy all unknown attributes to target.</tt> </tt>
+<a name="L41"></a><tt class="py-lineno"> 41</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L42"></a><tt class="py-lineno"> 42</tt>  <tt class="py-line">        <tt class="py-keyword">try</tt><tt class="py-op">:</tt> </tt>
+<a name="L43"></a><tt class="py-lineno"> 43</tt>  <tt class="py-line">            <tt class="py-keyword">return</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">__dict__</tt><tt class="py-op">.</tt><tt id="link-6" class="py-name" targets="Method simx.probe.probe.Probe.get()=simx.probe.probe.Probe-class.html#get,Method simx.probe.probe.ProbeArray.get()=simx.probe.probe.ProbeArray-class.html#get,Method simx.probe.probe.ProbeStruct.get()=simx.probe.probe.ProbeStruct-class.html#get"><a title="simx.probe.probe.Probe.get
+simx.probe.probe.ProbeArray.get
+simx.probe.probe.ProbeStruct.get" class="py-name" href="#" onclick="return doclink('link-6', 'get', 'link-6');">get</a></tt><tt class="py-op">(</tt><tt id="link-7" class="py-name" targets="Function simx.probe.parse.attr()=simx.probe.parse-module.html#attr"><a title="simx.probe.parse.attr" class="py-name" href="#" onclick="return doclink('link-7', 'attr', 'link-7');">attr</a></tt><tt class="py-op">)</tt> <tt class="py-keyword">or</tt> <tt class="py-name">getattr</tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-8" class="py-name"><a title="simx.base.node
+simx.probe.probe.Probe.node" class="py-name" href="#" onclick="return doclink('link-8', 'node', 'link-2');">node</a></tt><tt class="py-op">,</tt> <tt id="link-9" class="py-name"><a title="simx.probe.parse.attr" class="py-name" href="#" onclick="return doclink('link-9', 'attr', 'link-7');">attr</a></tt><tt class="py-op">)</tt> </tt>
+<a name="L44"></a><tt class="py-lineno"> 44</tt>  <tt class="py-line">        <tt class="py-keyword">except</tt> <tt class="py-name">AttributeError</tt><tt class="py-op">:</tt> </tt>
+<a name="L45"></a><tt class="py-lineno"> 45</tt>  <tt class="py-line">            <tt class="py-keyword">raise</tt> <tt class="py-name">AttributeError</tt><tt class="py-op">(</tt> </tt>
+<a name="L46"></a><tt class="py-lineno"> 46</tt>  <tt class="py-line">                <tt class="py-string">"type object '%s' has no attribute '%s': extensions=%s"</tt> <tt class="py-op">%</tt> </tt>
+<a name="L47"></a><tt class="py-lineno"> 47</tt>  <tt class="py-line">                <tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">__class__</tt><tt class="py-op">.</tt><tt class="py-name">__name__</tt><tt class="py-op">,</tt> <tt id="link-10" class="py-name"><a title="simx.probe.parse.attr" class="py-name" href="#" onclick="return doclink('link-10', 'attr', 'link-7');">attr</a></tt><tt class="py-op">,</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-11" class="py-name"><a title="simx.base.tossim" class="py-name" href="#" onclick="return doclink('link-11', 'tossim', 'link-3');">tossim</a></tt><tt class="py-op">.</tt><tt id="link-12" class="py-name" targets="Method simx.base.tossim.TossimBase.extension_names()=simx.base.tossim.TossimBase-class.html#extension_names"><a title="simx.base.tossim.TossimBase.extension_names" class="py-name" href="#" onclick="return doclink('link-12', 'extension_names', 'link-12');">extension_names</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L48"></a><tt class="py-lineno"> 48</tt>  <tt class="py-line"> </tt>
+<a name="L49"></a><tt class="py-lineno"> 49</tt>  <tt class="py-line"> </tt>
+<a name="Node.__hasattr__"></a><div id="Node.__hasattr__-def"><a name="L50"></a><tt class="py-lineno"> 50</tt> <a class="py-toggle" href="#" id="Node.__hasattr__-toggle" onclick="return toggle('Node.__hasattr__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.base.node.Node-class.html#__hasattr__">__hasattr__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">attr</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Node.__hasattr__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Node.__hasattr__-expanded"><a name="L51"></a><tt class="py-lineno"> 51</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L52"></a><tt class="py-lineno"> 52</tt>  <tt class="py-line"><tt class="py-docstring">        Proxy all unknown attributes to target.</tt> </tt>
+<a name="L53"></a><tt class="py-lineno"> 53</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L54"></a><tt class="py-lineno"> 54</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt id="link-13" class="py-name"><a title="simx.probe.parse.attr" class="py-name" href="#" onclick="return doclink('link-13', 'attr', 'link-7');">attr</a></tt> <tt class="py-keyword">in</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">__dict__</tt> <tt class="py-keyword">or</tt> <tt class="py-name">hasattr</tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-14" class="py-name"><a title="simx.base.node
+simx.probe.probe.Probe.node" class="py-name" href="#" onclick="return doclink('link-14', 'node', 'link-2');">node</a></tt><tt class="py-op">,</tt> <tt id="link-15" class="py-name"><a title="simx.probe.parse.attr" class="py-name" href="#" onclick="return doclink('link-15', 'attr', 'link-7');">attr</a></tt><tt class="py-op">)</tt> </tt>
+</div><a name="L55"></a><tt class="py-lineno"> 55</tt>  <tt class="py-line"> </tt>
+<a name="L56"></a><tt class="py-lineno"> 56</tt>  <tt class="py-line"> </tt>
+<a name="Node.id"></a><div id="Node.id-def"><a name="L57"></a><tt class="py-lineno"> 57</tt> <a class="py-toggle" href="#" id="Node.id-toggle" onclick="return toggle('Node.id');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.base.node.Node-class.html#id">id</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Node.id-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Node.id-expanded"><a name="L58"></a><tt class="py-lineno"> 58</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L59"></a><tt class="py-lineno"> 59</tt>  <tt class="py-line"><tt class="py-docstring">        Returns the id of the node.</tt> </tt>
+<a name="L60"></a><tt class="py-lineno"> 60</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L61"></a><tt class="py-lineno"> 61</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_id</tt> </tt>
+</div><a name="L62"></a><tt class="py-lineno"> 62</tt>  <tt class="py-line"> </tt>
+<a name="L63"></a><tt class="py-lineno"> 63</tt>  <tt class="py-line"> </tt>
+<a name="Node.boot_at_time"></a><div id="Node.boot_at_time-def"><a name="L64"></a><tt class="py-lineno"> 64</tt> <a class="py-toggle" href="#" id="Node.boot_at_time-toggle" onclick="return toggle('Node.boot_at_time');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.base.node.Node-class.html#boot_at_time">boot_at_time</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">time</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Node.boot_at_time-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Node.boot_at_time-expanded"><a name="L65"></a><tt class="py-lineno"> 65</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-16" class="py-name"><a title="simx.base.node
+simx.probe.probe.Probe.node" class="py-name" href="#" onclick="return doclink('link-16', 'node', 'link-2');">node</a></tt><tt class="py-op">.</tt><tt class="py-name">bootAtTime</tt><tt class="py-op">(</tt><tt id="link-17" class="py-name" targets="Method simx.sync.time_control.TimeControl.time()=simx.sync.time_control.TimeControl-class.html#time"><a title="simx.sync.time_control.TimeControl.time" class="py-name" href="#" onclick="return doclink('link-17', 'time', 'link-17');">time</a></tt><tt class="py-op">)</tt> </tt>
+</div><a name="L66"></a><tt class="py-lineno"> 66</tt>  <tt class="py-line"> </tt>
+<a name="L67"></a><tt class="py-lineno"> 67</tt>  <tt class="py-line"> </tt>
+<a name="Node.turnOn"></a><div id="Node.turnOn-def"><a name="L68"></a><tt class="py-lineno"> 68</tt> <a class="py-toggle" href="#" id="Node.turnOn-toggle" onclick="return toggle('Node.turnOn');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.base.node.Node-class.html#turnOn">turnOn</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">boot_time</tt><tt class="py-op">=</tt><tt class="py-name">None</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Node.turnOn-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Node.turnOn-expanded"><a name="L69"></a><tt class="py-lineno"> 69</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L70"></a><tt class="py-lineno"> 70</tt>  <tt class="py-line"><tt class="py-docstring">        Turn the mode off and set the dirty flag.</tt> </tt>
+<a name="L71"></a><tt class="py-lineno"> 71</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L72"></a><tt class="py-lineno"> 72</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-18" class="py-name"><a title="simx.base.node
+simx.probe.probe.Probe.node" class="py-name" href="#" onclick="return doclink('link-18', 'node', 'link-2');">node</a></tt><tt class="py-op">.</tt><tt id="link-19" class="py-name" targets="Method simx.base.node.Node.turnOn()=simx.base.node.Node-class.html#turnOn"><a title="simx.base.node.Node.turnOn" class="py-name" href="#" onclick="return doclink('link-19', 'turnOn', 'link-19');">turnOn</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L73"></a><tt class="py-lineno"> 73</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-20" class="py-name"><a title="simx.base.node.Node.changed" class="py-name" href="#" onclick="return doclink('link-20', 'changed', 'link-5');">changed</a></tt><tt class="py-op">(</tt><tt class="py-name">True</tt><tt class="py-op">)</tt> </tt>
+<a name="L74"></a><tt class="py-lineno"> 74</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">boot_time</tt> <tt class="py-keyword">is</tt> <tt class="py-keyword">not</tt> <tt class="py-name">None</tt><tt class="py-op">:</tt> </tt>
+<a name="L75"></a><tt class="py-lineno"> 75</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-21" class="py-name" targets="Method simx.base.node.Node.boot_at_time()=simx.base.node.Node-class.html#boot_at_time"><a title="simx.base.node.Node.boot_at_time" class="py-name" href="#" onclick="return doclink('link-21', 'boot_at_time', 'link-21');">boot_at_time</a></tt><tt class="py-op">(</tt><tt class="py-name">boot_time</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L76"></a><tt class="py-lineno"> 76</tt>  <tt class="py-line"> </tt>
+<a name="L77"></a><tt class="py-lineno"> 77</tt>  <tt class="py-line">    <tt class="py-name">turn_on</tt> <tt class="py-op">=</tt> <tt id="link-22" class="py-name"><a title="simx.base.node.Node.turnOn" class="py-name" href="#" onclick="return doclink('link-22', 'turnOn', 'link-19');">turnOn</a></tt> </tt>
+<a name="L78"></a><tt class="py-lineno"> 78</tt>  <tt class="py-line"> </tt>
+<a name="L79"></a><tt class="py-lineno"> 79</tt>  <tt class="py-line"> </tt>
+<a name="Node.turnOff"></a><div id="Node.turnOff-def"><a name="L80"></a><tt class="py-lineno"> 80</tt> <a class="py-toggle" href="#" id="Node.turnOff-toggle" onclick="return toggle('Node.turnOff');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.base.node.Node-class.html#turnOff">turnOff</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Node.turnOff-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Node.turnOff-expanded"><a name="L81"></a><tt class="py-lineno"> 81</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L82"></a><tt class="py-lineno"> 82</tt>  <tt class="py-line"><tt class="py-docstring">        Turn the mote off and set the dirty flag.</tt> </tt>
+<a name="L83"></a><tt class="py-lineno"> 83</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L84"></a><tt class="py-lineno"> 84</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-23" class="py-name"><a title="simx.base.node
+simx.probe.probe.Probe.node" class="py-name" href="#" onclick="return doclink('link-23', 'node', 'link-2');">node</a></tt><tt class="py-op">.</tt><tt id="link-24" class="py-name" targets="Method simx.base.node.Node.turnOff()=simx.base.node.Node-class.html#turnOff"><a title="simx.base.node.Node.turnOff" class="py-name" href="#" onclick="return doclink('link-24', 'turnOff', 'link-24');">turnOff</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L85"></a><tt class="py-lineno"> 85</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-25" class="py-name"><a title="simx.base.node.Node.changed" class="py-name" href="#" onclick="return doclink('link-25', 'changed', 'link-5');">changed</a></tt><tt class="py-op">(</tt><tt class="py-name">True</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L86"></a><tt class="py-lineno"> 86</tt>  <tt class="py-line"> </tt>
+<a name="L87"></a><tt class="py-lineno"> 87</tt>  <tt class="py-line">    <tt class="py-name">turn_off</tt> <tt class="py-op">=</tt> <tt id="link-26" class="py-name"><a title="simx.base.node.Node.turnOff" class="py-name" href="#" onclick="return doclink('link-26', 'turnOff', 'link-24');">turnOff</a></tt> </tt>
+<a name="L88"></a><tt class="py-lineno"> 88</tt>  <tt class="py-line"> </tt>
+<a name="L89"></a><tt class="py-lineno"> 89</tt>  <tt class="py-line"> </tt>
+<a name="Node.addNoiseTraceReading"></a><div id="Node.addNoiseTraceReading-def"><a name="L90"></a><tt class="py-lineno"> 90</tt> <a class="py-toggle" href="#" id="Node.addNoiseTraceReading-toggle" onclick="return toggle('Node.addNoiseTraceReading');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.base.node.Node-class.html#addNoiseTraceReading">addNoiseTraceReading</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">value</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Node.addNoiseTraceReading-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Node.addNoiseTraceReading-expanded"><a name="L91"></a><tt class="py-lineno"> 91</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L92"></a><tt class="py-lineno"> 92</tt>  <tt class="py-line"><tt class="py-docstring">        Wrapper to keep track of trace counts.</tt> </tt>
+<a name="L93"></a><tt class="py-lineno"> 93</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L94"></a><tt class="py-lineno"> 94</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-27" class="py-name"><a title="simx.base.node
+simx.probe.probe.Probe.node" class="py-name" href="#" onclick="return doclink('link-27', 'node', 'link-2');">node</a></tt><tt class="py-op">.</tt><tt id="link-28" class="py-name" targets="Method simx.base.node.Node.addNoiseTraceReading()=simx.base.node.Node-class.html#addNoiseTraceReading"><a title="simx.base.node.Node.addNoiseTraceReading" class="py-name" href="#" onclick="return doclink('link-28', 'addNoiseTraceReading', 'link-28');">addNoiseTraceReading</a></tt><tt class="py-op">(</tt><tt class="py-name">int</tt><tt class="py-op">(</tt><tt class="py-name">value</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L95"></a><tt class="py-lineno"> 95</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">trace_count</tt> <tt class="py-op">+=</tt> <tt class="py-number">1</tt> </tt>
+</div><a name="L96"></a><tt class="py-lineno"> 96</tt>  <tt class="py-line"> </tt>
+<a name="L97"></a><tt class="py-lineno"> 97</tt>  <tt class="py-line">    <tt class="py-name">add_noise_trace_reading</tt> <tt class="py-op">=</tt> <tt id="link-29" class="py-name"><a title="simx.base.node.Node.addNoiseTraceReading" class="py-name" href="#" onclick="return doclink('link-29', 'addNoiseTraceReading', 'link-28');">addNoiseTraceReading</a></tt> </tt>
+<a name="L98"></a><tt class="py-lineno"> 98</tt>  <tt class="py-line"> </tt>
+<a name="L99"></a><tt class="py-lineno"> 99</tt>  <tt class="py-line">         </tt>
+<a name="Node.createNoiseModel"></a><div id="Node.createNoiseModel-def"><a name="L100"></a><tt class="py-lineno">100</tt> <a class="py-toggle" href="#" id="Node.createNoiseModel-toggle" onclick="return toggle('Node.createNoiseModel');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.base.node.Node-class.html#createNoiseModel">createNoiseModel</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">force</tt><tt class="py-op">=</tt><tt class="py-name">False</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Node.createNoiseModel-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Node.createNoiseModel-expanded"><a name="L101"></a><tt class="py-lineno">101</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L102"></a><tt class="py-lineno">102</tt>  <tt class="py-line"><tt class="py-docstring">        Wrapper that prevents creation of a noise model if not</tt> </tt>
+<a name="L103"></a><tt class="py-lineno">103</tt>  <tt class="py-line"><tt class="py-docstring">        enough noise has been added.</tt> </tt>
+<a name="L104"></a><tt class="py-lineno">104</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L105"></a><tt class="py-lineno">105</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-keyword">not</tt> <tt class="py-name">force</tt> <tt class="py-keyword">and</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">trace_count</tt> <tt class="py-op">&lt;</tt> <tt id="link-30" class="py-name" targets="Class simx.base.node.Node=simx.base.node.Node-class.html"><a title="simx.base.node.Node" class="py-name" href="#" onclick="return doclink('link-30', 'Node', 'link-30');">Node</a></tt><tt class="py-op">.</tt><tt id="link-31" class="py-name"><a title="simx.base.node.Node.MIN_TRACE_SIZE" class="py-name" href="#" onclick="return doclink('link-31', 'MIN_TRACE_SIZE', 'link-0');">MIN_TRACE_SIZE</a></tt><tt class="py-op">:</tt> </tt>
+<a name="L106"></a><tt class="py-lineno">106</tt>  <tt class="py-line">            <tt class="py-keyword">raise</tt> <tt class="py-name">ValueError</tt><tt class="py-op">(</tt> </tt>
+<a name="L107"></a><tt class="py-lineno">107</tt>  <tt class="py-line">                <tt class="py-string">"Refusing to create noise model for %d: "</tt> </tt>
+<a name="L108"></a><tt class="py-lineno">108</tt>  <tt class="py-line">                <tt class="py-string">"only %d of %d required traces added"</tt> <tt class="py-op">%</tt> </tt>
+<a name="L109"></a><tt class="py-lineno">109</tt>  <tt class="py-line">                <tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-32" class="py-name"><a title="simx.base.node.Node.id" class="py-name" href="#" onclick="return doclink('link-32', 'id', 'link-1');">id</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">trace_count</tt><tt class="py-op">,</tt> <tt id="link-33" class="py-name"><a title="simx.base.node.Node" class="py-name" href="#" onclick="return doclink('link-33', 'Node', 'link-30');">Node</a></tt><tt class="py-op">.</tt><tt id="link-34" class="py-name"><a title="simx.base.node.Node.MIN_TRACE_SIZE" class="py-name" href="#" onclick="return doclink('link-34', 'MIN_TRACE_SIZE', 'link-0');">MIN_TRACE_SIZE</a></tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L110"></a><tt class="py-lineno">110</tt>  <tt class="py-line">        <tt class="py-keyword">else</tt><tt class="py-op">:</tt> </tt>
+<a name="L111"></a><tt class="py-lineno">111</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-35" class="py-name"><a title="simx.base.node
+simx.probe.probe.Probe.node" class="py-name" href="#" onclick="return doclink('link-35', 'node', 'link-2');">node</a></tt><tt class="py-op">.</tt><tt class="py-name">createNoiseModel</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L112"></a><tt class="py-lineno">112</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">valid</tt> <tt class="py-op">=</tt> <tt class="py-name">True</tt> </tt>
+<a name="L113"></a><tt class="py-lineno">113</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-36" class="py-name"><a title="simx.base.node.Node.changed" class="py-name" href="#" onclick="return doclink('link-36', 'changed', 'link-5');">changed</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L114"></a><tt class="py-lineno">114</tt>  <tt class="py-line"> </tt>
+<a name="L115"></a><tt class="py-lineno">115</tt>  <tt class="py-line">    <tt id="link-37" class="py-name" targets="Method simx.base.node.Node.create_noise_model()=simx.base.node.Node-class.html#create_noise_model"><a title="simx.base.node.Node.create_noise_model" class="py-name" href="#" onclick="return doclink('link-37', 'create_noise_model', 'link-37');">create_noise_model</a></tt> <tt class="py-op">=</tt> <tt class="py-name">createNoiseModel</tt> </tt>
+<a name="L116"></a><tt class="py-lineno">116</tt>  <tt class="py-line"> </tt>
+<a name="L117"></a><tt class="py-lineno">117</tt>  <tt class="py-line"> </tt>
+<a name="Node.use_flat_noise_floor"></a><div id="Node.use_flat_noise_floor-def"><a name="L118"></a><tt class="py-lineno">118</tt> <a class="py-toggle" href="#" id="Node.use_flat_noise_floor-toggle" onclick="return toggle('Node.use_flat_noise_floor');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.base.node.Node-class.html#use_flat_noise_floor">use_flat_noise_floor</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">floor</tt><tt class="py-op">=</tt><tt class="py-op">-</tt><tt class="py-number">110</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Node.use_flat_noise_floor-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Node.use_flat_noise_floor-expanded"><a name="L119"></a><tt class="py-lineno">119</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L120"></a><tt class="py-lineno">120</tt>  <tt class="py-line"><tt class="py-docstring">        Add a flat noise floor for the node.</tt> </tt>
+<a name="L121"></a><tt class="py-lineno">121</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L122"></a><tt class="py-lineno">122</tt>  <tt class="py-line"><tt class="py-docstring">        It is an error if the noise model is currently empty.</tt> </tt>
+<a name="L123"></a><tt class="py-lineno">123</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L124"></a><tt class="py-lineno">124</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">trace_count</tt> <tt class="py-op">&gt;</tt> <tt class="py-number">0</tt><tt class="py-op">:</tt> </tt>
+<a name="L125"></a><tt class="py-lineno">125</tt>  <tt class="py-line">            <tt class="py-keyword">raise</tt> <tt class="py-name">RuntimeError</tt><tt class="py-op">(</tt> </tt>
+<a name="L126"></a><tt class="py-lineno">126</tt>  <tt class="py-line">                <tt class="py-string">"Noise traces have already been added to this node."</tt><tt class="py-op">)</tt> </tt>
+<a name="L127"></a><tt class="py-lineno">127</tt>  <tt class="py-line"> </tt>
+<a name="L128"></a><tt class="py-lineno">128</tt>  <tt class="py-line">        <tt class="py-keyword">for</tt> <tt id="link-38" class="py-name" targets="Variable simx.probe.probe.ProbeArray.count=simx.probe.probe.ProbeArray-class.html#count"><a title="simx.probe.probe.ProbeArray.count" class="py-name" href="#" onclick="return doclink('link-38', 'count', 'link-38');">count</a></tt> <tt class="py-keyword">in</tt> <tt class="py-name">xrange</tt><tt class="py-op">(</tt><tt class="py-number">0</tt><tt class="py-op">,</tt> <tt id="link-39" class="py-name"><a title="simx.base.node.Node" class="py-name" href="#" onclick="return doclink('link-39', 'Node', 'link-30');">Node</a></tt><tt class="py-op">.</tt><tt id="link-40" class="py-name"><a title="simx.base.node.Node.MIN_TRACE_SIZE" class="py-name" href="#" onclick="return doclink('link-40', 'MIN_TRACE_SIZE', 'link-0');">MIN_TRACE_SIZE</a></tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L129"></a><tt class="py-lineno">129</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">add_noise_trace_reading</tt><tt class="py-op">(</tt><tt class="py-name">floor</tt><tt class="py-op">)</tt> </tt>
+<a name="L130"></a><tt class="py-lineno">130</tt>  <tt class="py-line"> </tt>
+<a name="L131"></a><tt class="py-lineno">131</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-41" class="py-name"><a title="simx.base.node.Node.create_noise_model" class="py-name" href="#" onclick="return doclink('link-41', 'create_noise_model', 'link-37');">create_noise_model</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L132"></a><tt class="py-lineno">132</tt>  <tt class="py-line"> </tt>
+<a name="L133"></a><tt class="py-lineno">133</tt>  <tt class="py-line">         </tt>
+<a name="Node.link"></a><div id="Node.link-def"><a name="L134"></a><tt class="py-lineno">134</tt> <a class="py-toggle" href="#" id="Node.link-toggle" onclick="return toggle('Node.link');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.base.node.Node-class.html#link">link</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">other</tt><tt class="py-op">,</tt> <tt class="py-param">gain</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Node.link-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Node.link-expanded"><a name="L135"></a><tt class="py-lineno">135</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L136"></a><tt class="py-lineno">136</tt>  <tt class="py-line"><tt class="py-docstring">        Create a DIRECTED radio link: this node -&gt; other node.</tt> </tt>
+<a name="L137"></a><tt class="py-lineno">137</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L138"></a><tt class="py-lineno">138</tt>  <tt class="py-line"><tt class="py-docstring">        If gain is None a ValueError is raised.</tt> </tt>
+<a name="L139"></a><tt class="py-lineno">139</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L140"></a><tt class="py-lineno">140</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt id="link-42" class="py-name" targets="Method simx.base.radio.RadioRedirect.gain()=simx.base.radio.RadioRedirect-class.html#gain,Method simx.dyntopo.Link.BasicLinkModel.gain()=simx.dyntopo.Link.BasicLinkModel-class.html#gain,Method simx.dyntopo.Manager.NodeManager.gain()=simx.dyntopo.Manager.NodeManager-class.html#gain,Method simx.dyntopo.Topo.GenericTopo.gain()=simx.dyntopo.Topo.GenericTopo-class.html#gain"><a title="simx.base.radio.RadioRedirect.gain
+simx.dyntopo.Link.BasicLinkModel.gain
+simx.dyntopo.Manager.NodeManager.gain
+simx.dyntopo.Topo.GenericTopo.gain" class="py-name" href="#" onclick="return doclink('link-42', 'gain', 'link-42');">gain</a></tt> <tt class="py-keyword">is</tt> <tt class="py-name">None</tt><tt class="py-op">:</tt> </tt>
+<a name="L141"></a><tt class="py-lineno">141</tt>  <tt class="py-line">            <tt class="py-keyword">raise</tt> <tt class="py-name">ValueError</tt><tt class="py-op">(</tt><tt class="py-string">"gain is None"</tt><tt class="py-op">)</tt> </tt>
+<a name="L142"></a><tt class="py-lineno">142</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">self</tt> <tt class="py-keyword">is</tt> <tt class="py-name">other</tt><tt class="py-op">:</tt> </tt>
+<a name="L143"></a><tt class="py-lineno">143</tt>  <tt class="py-line">            <tt class="py-keyword">raise</tt> <tt class="py-name">ValueError</tt><tt class="py-op">(</tt><tt class="py-string">"can't link to self"</tt><tt class="py-op">)</tt> </tt>
+<a name="L144"></a><tt class="py-lineno">144</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_links</tt><tt class="py-op">[</tt><tt class="py-name">other</tt><tt class="py-op">]</tt> <tt class="py-op">=</tt> <tt id="link-43" class="py-name"><a title="simx.base.radio.RadioRedirect.gain
+simx.dyntopo.Link.BasicLinkModel.gain
+simx.dyntopo.Manager.NodeManager.gain
+simx.dyntopo.Topo.GenericTopo.gain" class="py-name" href="#" onclick="return doclink('link-43', 'gain', 'link-42');">gain</a></tt> </tt>
+<a name="L145"></a><tt class="py-lineno">145</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-44" class="py-name"><a title="simx.base.radio
+simx.base.tossim.TossimBase.radio" class="py-name" href="#" onclick="return doclink('link-44', 'radio', 'link-4');">radio</a></tt><tt class="py-op">.</tt><tt id="link-45" class="py-name" targets="Method simx.base.radio.RadioRedirect.add()=simx.base.radio.RadioRedirect-class.html#add"><a title="simx.base.radio.RadioRedirect.add" class="py-name" href="#" onclick="return doclink('link-45', 'add', 'link-45');">add</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-46" class="py-name"><a title="simx.base.node.Node.id" class="py-name" href="#" onclick="return doclink('link-46', 'id', 'link-1');">id</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-name">other</tt><tt class="py-op">.</tt><tt id="link-47" class="py-name"><a title="simx.base.node.Node.id" class="py-name" href="#" onclick="return doclink('link-47', 'id', 'link-1');">id</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt id="link-48" class="py-name"><a title="simx.base.radio.RadioRedirect.gain
+simx.dyntopo.Link.BasicLinkModel.gain
+simx.dyntopo.Manager.NodeManager.gain
+simx.dyntopo.Topo.GenericTopo.gain" class="py-name" href="#" onclick="return doclink('link-48', 'gain', 'link-42');">gain</a></tt><tt class="py-op">)</tt> </tt>
+</div><a name="L146"></a><tt class="py-lineno">146</tt>  <tt class="py-line"> </tt>
+<a name="L147"></a><tt class="py-lineno">147</tt>  <tt class="py-line"> </tt>
+<a name="Node.link_both"></a><div id="Node.link_both-def"><a name="L148"></a><tt class="py-lineno">148</tt> <a class="py-toggle" href="#" id="Node.link_both-toggle" onclick="return toggle('Node.link_both');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.base.node.Node-class.html#link_both">link_both</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">other</tt><tt class="py-op">,</tt> <tt class="py-param">gain</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Node.link_both-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Node.link_both-expanded"><a name="L149"></a><tt class="py-lineno">149</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L150"></a><tt class="py-lineno">150</tt>  <tt class="py-line"><tt class="py-docstring">        Creates a symmetric radio link: this node &lt;-&gt; other node.</tt> </tt>
+<a name="L151"></a><tt class="py-lineno">151</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L152"></a><tt class="py-lineno">152</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-49" class="py-name" targets="Method simx.base.node.Node.link()=simx.base.node.Node-class.html#link"><a title="simx.base.node.Node.link" class="py-name" href="#" onclick="return doclink('link-49', 'link', 'link-49');">link</a></tt><tt class="py-op">(</tt><tt class="py-name">other</tt><tt class="py-op">,</tt> <tt id="link-50" class="py-name"><a title="simx.base.radio.RadioRedirect.gain
+simx.dyntopo.Link.BasicLinkModel.gain
+simx.dyntopo.Manager.NodeManager.gain
+simx.dyntopo.Topo.GenericTopo.gain" class="py-name" href="#" onclick="return doclink('link-50', 'gain', 'link-42');">gain</a></tt><tt class="py-op">)</tt> </tt>
+<a name="L153"></a><tt class="py-lineno">153</tt>  <tt class="py-line">        <tt class="py-name">other</tt><tt class="py-op">.</tt><tt id="link-51" class="py-name"><a title="simx.base.node.Node.link" class="py-name" href="#" onclick="return doclink('link-51', 'link', 'link-49');">link</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">,</tt> <tt id="link-52" class="py-name"><a title="simx.base.radio.RadioRedirect.gain
+simx.dyntopo.Link.BasicLinkModel.gain
+simx.dyntopo.Manager.NodeManager.gain
+simx.dyntopo.Topo.GenericTopo.gain" class="py-name" href="#" onclick="return doclink('link-52', 'gain', 'link-42');">gain</a></tt><tt class="py-op">)</tt> </tt>
+</div><a name="L154"></a><tt class="py-lineno">154</tt>  <tt class="py-line"> </tt>
+<a name="L155"></a><tt class="py-lineno">155</tt>  <tt class="py-line"> </tt>
+<a name="Node.unlink"></a><div id="Node.unlink-def"><a name="L156"></a><tt class="py-lineno">156</tt> <a class="py-toggle" href="#" id="Node.unlink-toggle" onclick="return toggle('Node.unlink');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.base.node.Node-class.html#unlink">unlink</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">other</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Node.unlink-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Node.unlink-expanded"><a name="L157"></a><tt class="py-lineno">157</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L158"></a><tt class="py-lineno">158</tt>  <tt class="py-line"><tt class="py-docstring">        Unlink the DIRECTIONAL radio link: this node -&gt; other</tt> </tt>
+<a name="L159"></a><tt class="py-lineno">159</tt>  <tt class="py-line"><tt class="py-docstring">        node.</tt> </tt>
+<a name="L160"></a><tt class="py-lineno">160</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L161"></a><tt class="py-lineno">161</tt>  <tt class="py-line">        <tt class="py-comment"># remove with no error</tt> </tt>
+<a name="L162"></a><tt class="py-lineno">162</tt>  <tt class="py-line"><tt class="py-comment"></tt>        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_links</tt><tt class="py-op">.</tt><tt class="py-name">pop</tt><tt class="py-op">(</tt><tt class="py-name">other</tt><tt class="py-op">,</tt> <tt class="py-name">None</tt><tt class="py-op">)</tt> </tt>
+<a name="L163"></a><tt class="py-lineno">163</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-53" class="py-name"><a title="simx.base.radio
+simx.base.tossim.TossimBase.radio" class="py-name" href="#" onclick="return doclink('link-53', 'radio', 'link-4');">radio</a></tt><tt class="py-op">.</tt><tt id="link-54" class="py-name" targets="Method simx.base.radio.RadioRedirect.remove()=simx.base.radio.RadioRedirect-class.html#remove"><a title="simx.base.radio.RadioRedirect.remove" class="py-name" href="#" onclick="return doclink('link-54', 'remove', 'link-54');">remove</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-55" class="py-name"><a title="simx.base.node.Node.id" class="py-name" href="#" onclick="return doclink('link-55', 'id', 'link-1');">id</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-name">other</tt><tt class="py-op">.</tt><tt id="link-56" class="py-name"><a title="simx.base.node.Node.id" class="py-name" href="#" onclick="return doclink('link-56', 'id', 'link-1');">id</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L164"></a><tt class="py-lineno">164</tt>  <tt class="py-line"> </tt>
+<a name="L165"></a><tt class="py-lineno">165</tt>  <tt class="py-line"> </tt>
+<a name="Node.unlink_both"></a><div id="Node.unlink_both-def"><a name="L166"></a><tt class="py-lineno">166</tt> <a class="py-toggle" href="#" id="Node.unlink_both-toggle" onclick="return toggle('Node.unlink_both');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.base.node.Node-class.html#unlink_both">unlink_both</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">other</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Node.unlink_both-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Node.unlink_both-expanded"><a name="L167"></a><tt class="py-lineno">167</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L168"></a><tt class="py-lineno">168</tt>  <tt class="py-line"><tt class="py-docstring">        Unlink both radio links between this node and other node.</tt> </tt>
+<a name="L169"></a><tt class="py-lineno">169</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L170"></a><tt class="py-lineno">170</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-57" class="py-name" targets="Method simx.base.node.Node.unlink()=simx.base.node.Node-class.html#unlink"><a title="simx.base.node.Node.unlink" class="py-name" href="#" onclick="return doclink('link-57', 'unlink', 'link-57');">unlink</a></tt><tt class="py-op">(</tt><tt class="py-name">other</tt><tt class="py-op">)</tt> </tt>
+<a name="L171"></a><tt class="py-lineno">171</tt>  <tt class="py-line">        <tt class="py-name">other</tt><tt class="py-op">.</tt><tt id="link-58" class="py-name"><a title="simx.base.node.Node.unlink" class="py-name" href="#" onclick="return doclink('link-58', 'unlink', 'link-57');">unlink</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L172"></a><tt class="py-lineno">172</tt>  <tt class="py-line"> </tt>
+<a name="L173"></a><tt class="py-lineno">173</tt>  <tt class="py-line">         </tt>
+<a name="Node.get_link"></a><div id="Node.get_link-def"><a name="L174"></a><tt class="py-lineno">174</tt> <a class="py-toggle" href="#" id="Node.get_link-toggle" onclick="return toggle('Node.get_link');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.base.node.Node-class.html#get_link">get_link</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">other</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Node.get_link-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Node.get_link-expanded"><a name="L175"></a><tt class="py-lineno">175</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L176"></a><tt class="py-lineno">176</tt>  <tt class="py-line"><tt class="py-docstring">        Returns the gain of the link or None.</tt> </tt>
+<a name="L177"></a><tt class="py-lineno">177</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L178"></a><tt class="py-lineno">178</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_links</tt><tt class="py-op">.</tt><tt id="link-59" class="py-name"><a title="simx.probe.probe.Probe.get
+simx.probe.probe.ProbeArray.get
+simx.probe.probe.ProbeStruct.get" class="py-name" href="#" onclick="return doclink('link-59', 'get', 'link-6');">get</a></tt><tt class="py-op">(</tt><tt class="py-name">other</tt><tt class="py-op">,</tt> <tt class="py-name">None</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L179"></a><tt class="py-lineno">179</tt>  <tt class="py-line"> </tt>
+<a name="L180"></a><tt class="py-lineno">180</tt>  <tt class="py-line">         </tt>
+<a name="Node.neighbors"></a><div id="Node.neighbors-def"><a name="L181"></a><tt class="py-lineno">181</tt> <a class="py-toggle" href="#" id="Node.neighbors-toggle" onclick="return toggle('Node.neighbors');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.base.node.Node-class.html#neighbors">neighbors</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Node.neighbors-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Node.neighbors-expanded"><a name="L182"></a><tt class="py-lineno">182</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L183"></a><tt class="py-lineno">183</tt>  <tt class="py-line"><tt class="py-docstring">        Returns an iterable object of all linked neigbors.</tt> </tt>
+<a name="L184"></a><tt class="py-lineno">184</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L185"></a><tt class="py-lineno">185</tt>  <tt class="py-line"><tt class="py-docstring">        B{This does not return a list.}</tt> </tt>
+<a name="L186"></a><tt class="py-lineno">186</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L187"></a><tt class="py-lineno">187</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_links</tt><tt class="py-op">.</tt><tt class="py-name">keys</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L188"></a><tt class="py-lineno">188</tt>  <tt class="py-line"> </tt>
+<a name="L189"></a><tt class="py-lineno">189</tt>  <tt class="py-line"> </tt>
+<a name="Node.links"></a><div id="Node.links-def"><a name="L190"></a><tt class="py-lineno">190</tt> <a class="py-toggle" href="#" id="Node.links-toggle" onclick="return toggle('Node.links');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.base.node.Node-class.html#links">links</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Node.links-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Node.links-expanded"><a name="L191"></a><tt class="py-lineno">191</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L192"></a><tt class="py-lineno">192</tt>  <tt class="py-line"><tt class="py-docstring">        Returns an iterable object of links, where each item is a</tt> </tt>
+<a name="L193"></a><tt class="py-lineno">193</tt>  <tt class="py-line"><tt class="py-docstring">        tuple: (other_node, gain).</tt> </tt>
+<a name="L194"></a><tt class="py-lineno">194</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L195"></a><tt class="py-lineno">195</tt>  <tt class="py-line"><tt class="py-docstring">        B{This does not return a list.}</tt> </tt>
+<a name="L196"></a><tt class="py-lineno">196</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L197"></a><tt class="py-lineno">197</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_links</tt><tt class="py-op">.</tt><tt class="py-name">iteritems</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L198"></a><tt class="py-lineno">198</tt>  <tt class="py-line"> </tt>
+<a name="L199"></a><tt class="py-lineno">199</tt>  <tt class="py-line"> </tt>
+<a name="Node.changed"></a><div id="Node.changed-def"><a name="L200"></a><tt class="py-lineno">200</tt> <a class="py-toggle" href="#" id="Node.changed-toggle" onclick="return toggle('Node.changed');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.base.node.Node-class.html#changed">changed</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">dirty</tt><tt class="py-op">=</tt><tt class="py-name">None</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Node.changed-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Node.changed-expanded"><a name="L201"></a><tt class="py-lineno">201</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L202"></a><tt class="py-lineno">202</tt>  <tt class="py-line"><tt class="py-docstring">        Invoke onchange callback.</tt> </tt>
+<a name="L203"></a><tt class="py-lineno">203</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L204"></a><tt class="py-lineno">204</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">dirty</tt> <tt class="py-keyword">is</tt> <tt class="py-keyword">not</tt> <tt class="py-name">None</tt><tt class="py-op">:</tt> </tt>
+<a name="L205"></a><tt class="py-lineno">205</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">dirty</tt> <tt class="py-op">=</tt> <tt class="py-name">dirty</tt> </tt>
+<a name="L206"></a><tt class="py-lineno">206</tt>  <tt class="py-line"> </tt>
+<a name="L207"></a><tt class="py-lineno">207</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-60" class="py-name"><a title="simx.base.tossim" class="py-name" href="#" onclick="return doclink('link-60', 'tossim', 'link-3');">tossim</a></tt><tt class="py-op">.</tt><tt id="link-61" class="py-name" targets="Method simx.base.tossim.TossimBase.node_changed()=simx.base.tossim.TossimBase-class.html#node_changed"><a title="simx.base.tossim.TossimBase.node_changed" class="py-name" href="#" onclick="return doclink('link-61', 'node_changed', 'link-61');">node_changed</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L208"></a><tt class="py-lineno">208</tt>  <tt class="py-line"> </tt>
+<a name="L209"></a><tt class="py-lineno">209</tt>  <tt class="py-line"> </tt>
+<a name="Node.clear_dirty"></a><div id="Node.clear_dirty-def"><a name="L210"></a><tt class="py-lineno">210</tt> <a class="py-toggle" href="#" id="Node.clear_dirty-toggle" onclick="return toggle('Node.clear_dirty');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.base.node.Node-class.html#clear_dirty">clear_dirty</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Node.clear_dirty-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Node.clear_dirty-expanded"><a name="L211"></a><tt class="py-lineno">211</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L212"></a><tt class="py-lineno">212</tt>  <tt class="py-line"><tt class="py-docstring">        Clear the dirty flag.</tt> </tt>
+<a name="L213"></a><tt class="py-lineno">213</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L214"></a><tt class="py-lineno">214</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">dirty</tt> <tt class="py-op">=</tt> <tt class="py-name">False</tt> </tt>
+</div></div><a name="L215"></a><tt class="py-lineno">215</tt>  <tt class="py-line"> </tt><script type="text/javascript">
+<!--
+expandto(location.href);
+// -->
+</script>
+</pre>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Wed Aug 12 00:17:37 2009
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

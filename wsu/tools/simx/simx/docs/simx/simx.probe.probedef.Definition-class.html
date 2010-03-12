@@ -1,0 +1,596 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>simx.probe.probedef.Definition</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        Package&nbsp;simx ::
+        <a href="simx.probe-module.html">Package&nbsp;probe</a> ::
+        <a href="simx.probe.probedef-module.html">Module&nbsp;probedef</a> ::
+        Class&nbsp;Definition
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="simx.probe.probedef.Definition-class.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<!-- ==================== CLASS DESCRIPTION ==================== -->
+<h1 class="epydoc">Class Definition</h1><p class="nomargin-top"><span class="codelink"><a href="simx.probe.probedef-pysrc.html#Definition">source&nbsp;code</a></span></p>
+<dl><dt>Known Subclasses:</dt>
+<dd>
+      <ul class="subclass-list">
+<li><a href="simx.probe.probedef.Array-class.html">Array</a></li><li>, <a href="simx.probe.probedef.Link-class.html">Link</a></li><li>, <a href="simx.probe.probedef.Primitive-class.html">Primitive</a></li><li>, <a href="simx.probe.probedef.Struct-class.html">Struct</a></li>  </ul>
+</dd></dl>
+
+<hr />
+<p>A probe defintion is used to capture the important information about a
+  variable/structure scheme for interaction with Tossim. Among other things
+  this includes type information and memory offsets.</p>
+  <p>Definitions are designed to make minimal distinction between 
+  declarations (variables), structural definitions (types), and typedefs 
+  insomuch as they are represented by the same structures.</p>
+  <p>Variable definitions may be fully resolved and, in doing so, will also
+  enable child definitions to be resolved.</p>
+
+<!-- ==================== INSTANCE METHODS ==================== -->
+<a name="section-InstanceMethods"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Instance Methods</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-InstanceMethods"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="__init__"></a><span class="summary-sig-name">__init__</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">var</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">var_offset</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">size</span>=<span class="summary-sig-default">-1</span>,
+        <span class="summary-sig-arg">offset_bits</span>=<span class="summary-sig-default">None</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="simx.probe.probedef-pysrc.html#Definition.__init__">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="__str__"></a><span class="summary-sig-name">__str__</span>(<span class="summary-sig-arg">self</span>)</span><br />
+      Display according to str_attrs.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="simx.probe.probedef-pysrc.html#Definition.__str__">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="_check_var"></a><span class="summary-sig-name">_check_var</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">var</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="simx.probe.probedef-pysrc.html#Definition._check_var">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="simx.probe.probedef.Definition-class.html#_replace" class="summary-sig-name" onclick="show_private();">_replace</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">var</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">var_offset</span>=<span class="summary-sig-default">0</span>,
+        <span class="summary-sig-arg">level</span>=<span class="summary-sig-default"><code class="variable-quote">'</code><code class="variable-string"></code><code class="variable-quote">'</code></span>,
+        <span class="summary-sig-arg">replace</span>=<span class="summary-sig-default"><code class="variable-group">{</code><code class="variable-group">}</code></span>)</span><br />
+      Common resolving stuff.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="simx.probe.probedef-pysrc.html#Definition._replace">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="simx.probe.probedef.Definition-class.html#_resolve" class="summary-sig-name" onclick="show_private();">_resolve</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">var</span>,
+        <span class="summary-sig-arg">var_offset</span>,
+        <span class="summary-sig-arg">level</span>,
+        <span class="summary-sig-arg">replace</span>)</span><br />
+      Walk the definition and resolve addresses into physical space using 
+      the stored offset information.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="simx.probe.probedef-pysrc.html#Definition._resolve">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="attrs"></a><span class="summary-sig-name">attrs</span>(<span class="summary-sig-arg">self</span>)</span><br />
+      Attributes which survive clones (base must return a new dict).</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="simx.probe.probedef-pysrc.html#Definition.attrs">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="simx.probe.probedef.Definition-class.html#bind" class="summary-sig-name">bind</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">node</span>)</span><br />
+      Bind to a specific node; returns a Probe object.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="simx.probe.probedef-pysrc.html#Definition.bind">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="dup"></a><span class="summary-sig-name">dup</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">**opts</span>)</span><br />
+      Creates a duplicate object using **opts for overwriting.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="simx.probe.probedef-pysrc.html#Definition.dup">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="simx.probe.probedef.Definition-class.html#is_resolved" class="summary-sig-name">is_resolved</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      True if it looks like this object is resolved</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="simx.probe.probedef-pysrc.html#Definition.is_resolved">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="simx.probe.probedef.Definition-class.html#norm_type" class="summary-sig-name">norm_type</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">type</span>)</span><br />
+      Returns normalized type (de-references ProbeLink types).</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="simx.probe.probedef-pysrc.html#Definition.norm_type">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="pack_def"></a><span class="summary-sig-name">pack_def</span>(<span class="summary-sig-arg">self</span>)</span><br />
+      Pack format to access the specific type.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="simx.probe.probedef-pysrc.html#Definition.pack_def">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="probe_attrs"></a><span class="summary-sig-name">probe_attrs</span>(<span class="summary-sig-arg">self</span>)</span><br />
+      Attributes normalized to create Probe objects&quot;</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="simx.probe.probedef-pysrc.html#Definition.probe_attrs">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="simx.probe.probedef.Definition-class.html#resolve" class="summary-sig-name">resolve</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">var</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">var_offset</span>=<span class="summary-sig-default">0</span>,
+        <span class="summary-sig-arg">level</span>=<span class="summary-sig-default"><code class="variable-quote">'</code><code class="variable-string"></code><code class="variable-quote">'</code></span>,
+        <span class="summary-sig-arg">replace</span>=<span class="summary-sig-default"><code class="variable-group">{</code><code class="variable-group">}</code></span>)</span><br />
+      Resolve a definition; see _resolve.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="simx.probe.probedef-pysrc.html#Definition.resolve">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="str_attrs"></a><span class="summary-sig-name">str_attrs</span>(<span class="summary-sig-arg">self</span>)</span><br />
+      Attributes which are displayed with __str__ conversion.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="simx.probe.probedef-pysrc.html#Definition.str_attrs">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="to_basic"></a><span class="summary-sig-name">to_basic</span>(<span class="summary-sig-arg">self</span>)</span><br />
+      Convert the probe definition into a &quot;simple&quot; 
+      dict/list/primitive structure.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="simx.probe.probedef-pysrc.html#Definition.to_basic">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="to_json"></a><span class="summary-sig-name">to_json</span>(<span class="summary-sig-arg">self</span>)</span><br />
+      Return JSON representation of definition.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="simx.probe.probedef-pysrc.html#Definition.to_json">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+</table>
+<!-- ==================== METHOD DETAILS ==================== -->
+<a name="section-MethodDetails"></a>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Method Details</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-MethodDetails"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+</table>
+<a name="_replace"></a>
+<div class="private">
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">_replace</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">var</span>=<span class="sig-default">None</span>,
+        <span class="sig-arg">var_offset</span>=<span class="sig-default">0</span>,
+        <span class="sig-arg">level</span>=<span class="sig-default"><code class="variable-quote">'</code><code class="variable-string"></code><code class="variable-quote">'</code></span>,
+        <span class="sig-arg">replace</span>=<span class="sig-default"><code class="variable-group">{</code><code class="variable-group">}</code></span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="simx.probe.probedef-pysrc.html#Definition._replace">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Common resolving stuff.</p>
+  <p>If level matches a replace specification then a replace occurs (really
+  just a directed resolve). Will return a (resolved, unused_replacements) 
+  or None.</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="_resolve"></a>
+<div class="private">
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">_resolve</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">var</span>,
+        <span class="sig-arg">var_offset</span>,
+        <span class="sig-arg">level</span>,
+        <span class="sig-arg">replace</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="simx.probe.probedef-pysrc.html#Definition._resolve">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Walk the definition and resolve addresses into physical space using 
+  the stored offset information. In addition all ProbeLinks are resolved 
+  and, in the case where resolution fails, an exception is generated.</p>
+  <p>During resolution the object schema may be greatly expanded. That is, 
+  each element in an array and each named field, etc, are themselves 
+  resolved.</p>
+  <p>Replace is a mapping from &quot;levels&quot; to replacement probe 
+  definition objects. The replacement definitions must be able to fit 
+  inside the original definitions. Levels are in the form 
+  &quot;[keyindex1][keyindex2]&quot;, etc with the first level being 
+  &quot;&quot;. If a resolve uses a replacement then it should remove it 
+  from the replace structure.</p>
+  <p>The return value is a tuple of (resolved_type, unused_replacements) 
+  where unused_replacements is in the same form as replace.</p>
+  <p>Entirely new data structures are returned (free from the 
+  originals).</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="bind"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">bind</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">node</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="simx.probe.probedef-pysrc.html#Definition.bind">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Bind to a specific node; returns a Probe object.</p>
+  <p>The definition must already be resolved.</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="is_resolved"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">is_resolved</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="simx.probe.probedef-pysrc.html#Definition.is_resolved">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>True if it looks like this object is resolved</p>
+  <p>This should not be called from within resolve and carries the 
+  implication that all children are also resolved.</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="norm_type"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">norm_type</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">type</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="simx.probe.probedef-pysrc.html#Definition.norm_type">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Returns normalized type (de-references ProbeLink types).</p>
+  <p>Raises a ValueError on an unresolved link.</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="resolve"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">resolve</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">var</span>=<span class="sig-default">None</span>,
+        <span class="sig-arg">var_offset</span>=<span class="sig-default">0</span>,
+        <span class="sig-arg">level</span>=<span class="sig-default"><code class="variable-quote">'</code><code class="variable-string"></code><code class="variable-quote">'</code></span>,
+        <span class="sig-arg">replace</span>=<span class="sig-default"><code class="variable-group">{</code><code class="variable-group">}</code></span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="simx.probe.probedef-pysrc.html#Definition.resolve">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Resolve a definition; see _resolve.</p>
+  <p>Return is of (resolved_type, unused_replacements).</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Wed Aug 12 00:17:36 2009
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

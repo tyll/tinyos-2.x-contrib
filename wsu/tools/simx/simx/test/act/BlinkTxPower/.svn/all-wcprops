@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/tinyos-svn/!svn/ver/773/sensorweb/tools/simx/trunk/test/act/BlinkTxPower
+END
+simx
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/tinyos-svn/!svn/ver/773/sensorweb/tools/simx/trunk/test/act/BlinkTxPower/simx
+END
+BlinkC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/tinyos-svn/!svn/ver/773/sensorweb/tools/simx/trunk/test/act/BlinkTxPower/BlinkC.nc
+END
+BlinkAppC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/tinyos-svn/!svn/ver/773/sensorweb/tools/simx/trunk/test/act/BlinkTxPower/BlinkAppC.nc
+END
+make.sh
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/tinyos-svn/!svn/ver/773/sensorweb/tools/simx/trunk/test/act/BlinkTxPower/make.sh
+END
+test.py
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/tinyos-svn/!svn/ver/773/sensorweb/tools/simx/trunk/test/act/BlinkTxPower/test.py
+END
+harness.py
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/tinyos-svn/!svn/ver/773/sensorweb/tools/simx/trunk/test/act/BlinkTxPower/harness.py
+END
+README.txt
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/tinyos-svn/!svn/ver/773/sensorweb/tools/simx/trunk/test/act/BlinkTxPower/README.txt
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/tinyos-svn/!svn/ver/773/sensorweb/tools/simx/trunk/test/act/BlinkTxPower/Makefile
+END

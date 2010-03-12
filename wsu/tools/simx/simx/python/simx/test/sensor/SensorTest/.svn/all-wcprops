@@ -1,0 +1,41 @@
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/tinyos-svn/!svn/ver/770/sensorweb/tools/simx/trunk/python/simx/test/sensor/SensorTest
+END
+test_sensor.py
+K 25
+svn:wc:ra_dav:version-url
+V 105
+/svn/tinyos-svn/!svn/ver/770/sensorweb/tools/simx/trunk/python/simx/test/sensor/SensorTest/test_sensor.py
+END
+Makefile.test
+K 25
+svn:wc:ra_dav:version-url
+V 104
+/svn/tinyos-svn/!svn/ver/770/sensorweb/tools/simx/trunk/python/simx/test/sensor/SensorTest/Makefile.test
+END
+SensorTestC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 105
+/svn/tinyos-svn/!svn/ver/770/sensorweb/tools/simx/trunk/python/simx/test/sensor/SensorTest/SensorTestC.nc
+END
+Makefile.simx
+K 25
+svn:wc:ra_dav:version-url
+V 104
+/svn/tinyos-svn/!svn/ver/770/sensorweb/tools/simx/trunk/python/simx/test/sensor/SensorTest/Makefile.simx
+END
+SensorTestAppC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 108
+/svn/tinyos-svn/!svn/ver/770/sensorweb/tools/simx/trunk/python/simx/test/sensor/SensorTest/SensorTestAppC.nc
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 99
+/svn/tinyos-svn/!svn/ver/770/sensorweb/tools/simx/trunk/python/simx/test/sensor/SensorTest/Makefile
+END

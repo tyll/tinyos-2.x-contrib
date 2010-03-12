@@ -1,0 +1,47 @@
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/tinyos-svn/!svn/ver/770/sensorweb/tools/simx/trunk/python/simx/dist/simplejson
+END
+LICENSE.txt
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/tinyos-svn/!svn/ver/770/sensorweb/tools/simx/trunk/python/simx/dist/simplejson/LICENSE.txt
+END
+scanner.py
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/tinyos-svn/!svn/ver/770/sensorweb/tools/simx/trunk/python/simx/dist/simplejson/scanner.py
+END
+tool.py
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/tinyos-svn/!svn/ver/770/sensorweb/tools/simx/trunk/python/simx/dist/simplejson/tool.py
+END
+__init__.py
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/tinyos-svn/!svn/ver/770/sensorweb/tools/simx/trunk/python/simx/dist/simplejson/__init__.py
+END
+encoder.py
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/tinyos-svn/!svn/ver/770/sensorweb/tools/simx/trunk/python/simx/dist/simplejson/encoder.py
+END
+README.SIMX
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/tinyos-svn/!svn/ver/770/sensorweb/tools/simx/trunk/python/simx/dist/simplejson/README.SIMX
+END
+decoder.py
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/tinyos-svn/!svn/ver/770/sensorweb/tools/simx/trunk/python/simx/dist/simplejson/decoder.py
+END

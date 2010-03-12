@@ -1,0 +1,7 @@
+Python modules to manipulate (very basic read) SAC files.  Only
+constant-time is support and most header fields are not supported.
+
+SAC is Seismic Analysis Code.
+
+The format is described at:
+http://seismolab.gso.uri.edu/~savage/sac/sac_format.html

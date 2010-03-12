@@ -1,0 +1,47 @@
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/tinyos-svn/!svn/ver/1261/sensorweb/tools/simx/trunk/python/simx/sensor
+END
+sensor.py
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/tinyos-svn/!svn/ver/1261/sensorweb/tools/simx/trunk/python/simx/sensor/sensor.py
+END
+extension.py
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/tinyos-svn/!svn/ver/770/sensorweb/tools/simx/trunk/python/simx/sensor/extension.py
+END
+util.py
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/tinyos-svn/!svn/ver/770/sensorweb/tools/simx/trunk/python/simx/sensor/util.py
+END
+__init__.py
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/tinyos-svn/!svn/ver/770/sensorweb/tools/simx/trunk/python/simx/sensor/__init__.py
+END
+reader.py
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/tinyos-svn/!svn/ver/770/sensorweb/tools/simx/trunk/python/simx/sensor/reader.py
+END
+streamer.py
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/tinyos-svn/!svn/ver/997/sensorweb/tools/simx/trunk/python/simx/sensor/streamer.py
+END
+generator.py
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/tinyos-svn/!svn/ver/770/sensorweb/tools/simx/trunk/python/simx/sensor/generator.py
+END

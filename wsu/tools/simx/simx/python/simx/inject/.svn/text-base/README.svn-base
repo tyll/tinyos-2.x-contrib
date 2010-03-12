@@ -1,0 +1,63 @@
+Piggyback Simulation<->Application Messages on Serial Forwarder
+
+Author: Paul Stickney
+Date: 09 MAY 2008
+
+
+Prelude:
+
+TOSSIM/2 with TOSSIM Live allows WSN simulation to be broken down into
+3 discreet components which can provide realistic levels of
+data-isolations.
+
+1) Simulated Motes. These know only what a real mote would. No more or less.
+
+2) Simulation Environment. This knows the environment being simulated.
+   This includes data such as node location and the true value of
+   external events.
+
+3) Application. Whatever listens to packets coming from the motes.  It
+   only knows selected information about the environment that the
+   application would know in a real mote deployment.
+
+
+Problem:
+
+TOSSIM-Live (sim-sf) provides a method of transparently forwarding data
+from the serial stack of a simulated mote to serial forwarder. This
+provides the Mote<->Application link. However, there is information
+contained the the TOSSIM environment which may be useful to collect,
+record and/or display on the Application.
+
+
+Task/Specification:
+
+Provide a mechanism of passing TOS messages between the TOSSIM
+environment and Applications connected to the SerialForwarder provided
+by sim-sf.
+
+* Messages must be easily receivable in Python within a timely manner.
+
+* Messages from the environment must not go to, or through, motes.
+  That is, the extra control messages must be entirely transparent to
+  the simulated network.
+
+
+Approaches:
+
+1) Modify sim-sf to act as a filtering piggy-back.
+
+2) Use a separate SerialForwarder run in Python. That is, have two
+   SerialForward connections, one for the Motes<->Application and one
+   for Environment<->Application.
+
+3) Use Python to bridge sim-sf and an external SerialForwarder
+
+
+Chosen implementation:
+
+Create a bridge in python between the external serial forwarder and
+the serial forward provided by sim-sf.
+
+The serial forwarder that comes with sim-sf works well. There is no
+need to change it.

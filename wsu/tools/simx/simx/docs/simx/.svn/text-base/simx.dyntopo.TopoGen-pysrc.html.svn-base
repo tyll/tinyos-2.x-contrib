@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>simx.dyntopo.TopoGen</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        Package&nbsp;simx ::
+        <a href="simx.dyntopo-module.html">Package&nbsp;dyntopo</a> ::
+        Module&nbsp;TopoGen
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="simx.dyntopo.TopoGen-pysrc.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<h1 class="epydoc">Source Code for <a href="simx.dyntopo.TopoGen-module.html">Module simx.dyntopo.TopoGen</a></h1>
+<pre class="py-src">
+<a name="L1"></a><tt class="py-lineno"> 1</tt>  <tt class="py-line"><tt class="py-docstring">"""</tt> </tt>
+<a name="L2"></a><tt class="py-lineno"> 2</tt>  <tt class="py-line"><tt class="py-docstring">Functions to generate different topologies.</tt> </tt>
+<a name="L3"></a><tt class="py-lineno"> 3</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L4"></a><tt class="py-lineno"> 4</tt>  <tt class="py-line"><tt class="py-docstring">Each function takes a list of nodes followed by function-specific</tt> </tt>
+<a name="L5"></a><tt class="py-lineno"> 5</tt>  <tt class="py-line"><tt class="py-docstring">keyword arguments. The list of nodes need to support the extended</tt> </tt>
+<a name="L6"></a><tt class="py-lineno"> 6</tt>  <tt class="py-line"><tt class="py-docstring">interface added on via DynTopo.</tt> </tt>
+<a name="L7"></a><tt class="py-lineno"> 7</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L8"></a><tt class="py-lineno"> 8</tt>  <tt class="py-line"><tt class="py-docstring">All unit lengths should be taken as meters.</tt> </tt>
+<a name="L9"></a><tt class="py-lineno"> 9</tt>  <tt class="py-line"><tt class="py-docstring">"""</tt> </tt>
+<a name="L10"></a><tt class="py-lineno">10</tt>  <tt class="py-line"> </tt>
+<a name="L11"></a><tt class="py-lineno">11</tt>  <tt class="py-line"><tt class="py-keyword">import</tt> <tt class="py-name">math</tt> </tt>
+<a name="L12"></a><tt class="py-lineno">12</tt>  <tt class="py-line"><tt class="py-keyword">import</tt> <tt id="link-0" class="py-name" targets="Static Method simx.sensor.generator.Generator.random()=simx.sensor.generator.Generator-class.html#random"><a title="simx.sensor.generator.Generator.random" class="py-name" href="#" onclick="return doclink('link-0', 'random', 'link-0');">random</a></tt> </tt>
+<a name="L13"></a><tt class="py-lineno">13</tt>  <tt class="py-line"> </tt>
+<a name="scatter"></a><div id="scatter-def"><a name="L14"></a><tt class="py-lineno">14</tt> <a class="py-toggle" href="#" id="scatter-toggle" onclick="return toggle('scatter');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.dyntopo.TopoGen-module.html#scatter">scatter</a><tt class="py-op">(</tt><tt class="py-param">nodes</tt><tt class="py-op">,</tt> <tt class="py-param">bounds</tt><tt class="py-op">=</tt><tt class="py-op">(</tt><tt class="py-number">0</tt><tt class="py-op">,</tt><tt class="py-number">0</tt><tt class="py-op">,</tt><tt class="py-number">100</tt><tt class="py-op">,</tt><tt class="py-number">100</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-param">random</tt><tt class="py-op">=</tt><tt id="link-1" class="py-name"><a title="simx.sensor.generator.Generator.random" class="py-name" href="#" onclick="return doclink('link-1', 'random', 'link-0');">random</a></tt><tt class="py-op">.</tt><tt class="py-name">Random</tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="scatter-collapsed" style="display:none;" pad="++" indent="++++"></div><div id="scatter-expanded"><a name="L15"></a><tt class="py-lineno">15</tt>  <tt class="py-line">    <tt class="py-docstring">"""Randomly toss nodes about.</tt> </tt>
+<a name="L16"></a><tt class="py-lineno">16</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L17"></a><tt class="py-lineno">17</tt>  <tt class="py-line"><tt class="py-docstring">    Nodes are randomly placed in bounds (x1,y1,x2,y2). random, if</tt> </tt>
+<a name="L18"></a><tt class="py-lineno">18</tt>  <tt class="py-line"><tt class="py-docstring">    specified, is the random number source.</tt> </tt>
+<a name="L19"></a><tt class="py-lineno">19</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="L20"></a><tt class="py-lineno">20</tt>  <tt class="py-line">    <tt class="py-op">(</tt><tt class="py-name">x1</tt><tt class="py-op">,</tt> <tt class="py-name">y1</tt><tt class="py-op">,</tt> <tt class="py-name">x2</tt><tt class="py-op">,</tt> <tt class="py-name">y2</tt><tt class="py-op">)</tt> <tt class="py-op">=</tt> <tt class="py-name">bounds</tt> </tt>
+<a name="L21"></a><tt class="py-lineno">21</tt>  <tt class="py-line">    <tt class="py-keyword">for</tt> <tt class="py-name">n</tt> <tt class="py-keyword">in</tt> <tt id="link-2" class="py-name" targets="Method simx.dyntopo.Manager.NodeManager.nodes()=simx.dyntopo.Manager.NodeManager-class.html#nodes,Method simx.dyntopo.Topo.GenericTopo.nodes()=simx.dyntopo.Topo.GenericTopo-class.html#nodes"><a title="simx.dyntopo.Manager.NodeManager.nodes
+simx.dyntopo.Topo.GenericTopo.nodes" class="py-name" href="#" onclick="return doclink('link-2', 'nodes', 'link-2');">nodes</a></tt><tt class="py-op">:</tt> </tt>
+<a name="L22"></a><tt class="py-lineno">22</tt>  <tt class="py-line">        <tt class="py-name">n</tt><tt class="py-op">.</tt><tt class="py-name">set_pos</tt><tt class="py-op">(</tt><tt class="py-op">(</tt><tt id="link-3" class="py-name"><a title="simx.sensor.generator.Generator.random" class="py-name" href="#" onclick="return doclink('link-3', 'random', 'link-0');">random</a></tt><tt class="py-op">.</tt><tt class="py-name">uniform</tt><tt class="py-op">(</tt><tt class="py-name">x1</tt><tt class="py-op">,</tt> <tt class="py-name">x2</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt id="link-4" class="py-name"><a title="simx.sensor.generator.Generator.random" class="py-name" href="#" onclick="return doclink('link-4', 'random', 'link-0');">random</a></tt><tt class="py-op">.</tt><tt class="py-name">uniform</tt><tt class="py-op">(</tt><tt class="py-name">y1</tt><tt class="py-op">,</tt> <tt class="py-name">y2</tt><tt class="py-op">)</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L23"></a><tt class="py-lineno">23</tt>  <tt class="py-line"> </tt>
+<a name="line"></a><div id="line-def"><a name="L24"></a><tt class="py-lineno">24</tt> <a class="py-toggle" href="#" id="line-toggle" onclick="return toggle('line');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.dyntopo.TopoGen-module.html#line">line</a><tt class="py-op">(</tt><tt class="py-param">nodes</tt><tt class="py-op">,</tt> <tt class="py-param">start</tt><tt class="py-op">=</tt><tt class="py-op">(</tt><tt class="py-op">-</tt><tt class="py-number">10</tt><tt class="py-op">,</tt><tt class="py-number">0</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-param">end</tt><tt class="py-op">=</tt><tt class="py-op">(</tt><tt class="py-number">10</tt><tt class="py-op">,</tt><tt class="py-number">0</tt><tt class="py-op">)</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="line-collapsed" style="display:none;" pad="++" indent="++++"></div><div id="line-expanded"><a name="L25"></a><tt class="py-lineno">25</tt>  <tt class="py-line">    <tt class="py-docstring">"""Align nodes in a line.</tt> </tt>
+<a name="L26"></a><tt class="py-lineno">26</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L27"></a><tt class="py-lineno">27</tt>  <tt class="py-line"><tt class="py-docstring">    Nodes are placed evenly along the line from start (x,y) to end</tt> </tt>
+<a name="L28"></a><tt class="py-lineno">28</tt>  <tt class="py-line"><tt class="py-docstring">    (x,y).</tt> </tt>
+<a name="L29"></a><tt class="py-lineno">29</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="L30"></a><tt class="py-lineno">30</tt>  <tt class="py-line">    <tt class="py-op">(</tt><tt class="py-name">ox</tt><tt class="py-op">,</tt> <tt class="py-name">oy</tt><tt class="py-op">)</tt> <tt class="py-op">=</tt> <tt id="link-5" class="py-name" targets="Method simx.inject.inject.Inject.start()=simx.inject.inject.Inject-class.html#start"><a title="simx.inject.inject.Inject.start" class="py-name" href="#" onclick="return doclink('link-5', 'start', 'link-5');">start</a></tt> </tt>
+<a name="L31"></a><tt class="py-lineno">31</tt>  <tt class="py-line">    <tt class="py-name">dx</tt> <tt class="py-op">=</tt> <tt class="py-name">end</tt><tt class="py-op">[</tt><tt class="py-number">0</tt><tt class="py-op">]</tt> <tt class="py-op">-</tt> <tt class="py-name">ox</tt> </tt>
+<a name="L32"></a><tt class="py-lineno">32</tt>  <tt class="py-line">    <tt class="py-name">dy</tt> <tt class="py-op">=</tt> <tt class="py-name">end</tt><tt class="py-op">[</tt><tt class="py-number">1</tt><tt class="py-op">]</tt> <tt class="py-op">-</tt> <tt class="py-name">oy</tt> </tt>
+<a name="L33"></a><tt class="py-lineno">33</tt>  <tt class="py-line">    <tt class="py-name">dist</tt> <tt class="py-op">=</tt> <tt class="py-name">math</tt><tt class="py-op">.</tt><tt class="py-name">sqrt</tt><tt class="py-op">(</tt><tt class="py-name">dx</tt><tt class="py-op">*</tt><tt class="py-name">dx</tt> <tt class="py-op">+</tt> <tt class="py-name">dy</tt><tt class="py-op">*</tt><tt class="py-name">dy</tt><tt class="py-op">)</tt> </tt>
+<a name="L34"></a><tt class="py-lineno">34</tt>  <tt class="py-line">    <tt class="py-name">l</tt> <tt class="py-op">=</tt> <tt class="py-name">len</tt><tt class="py-op">(</tt><tt id="link-6" class="py-name"><a title="simx.dyntopo.Manager.NodeManager.nodes
+simx.dyntopo.Topo.GenericTopo.nodes" class="py-name" href="#" onclick="return doclink('link-6', 'nodes', 'link-2');">nodes</a></tt><tt class="py-op">)</tt> <tt class="py-op">-</tt> <tt class="py-number">1</tt> </tt>
+<a name="L35"></a><tt class="py-lineno">35</tt>  <tt class="py-line">    <tt class="py-keyword">if</tt> <tt class="py-name">l</tt> <tt class="py-op">&gt;</tt> <tt class="py-number">0</tt><tt class="py-op">:</tt> </tt>
+<a name="L36"></a><tt class="py-lineno">36</tt>  <tt class="py-line">        <tt class="py-op">(</tt><tt class="py-name">stepx</tt><tt class="py-op">,</tt> <tt class="py-name">stepy</tt><tt class="py-op">)</tt> <tt class="py-op">=</tt> <tt class="py-op">(</tt><tt class="py-name">float</tt><tt class="py-op">(</tt><tt class="py-name">dx</tt><tt class="py-op">)</tt> <tt class="py-op">/</tt> <tt class="py-name">l</tt><tt class="py-op">,</tt> <tt class="py-name">float</tt><tt class="py-op">(</tt><tt class="py-name">dy</tt><tt class="py-op">)</tt> <tt class="py-op">/</tt> <tt class="py-name">l</tt><tt class="py-op">)</tt> </tt>
+<a name="L37"></a><tt class="py-lineno">37</tt>  <tt class="py-line">    <tt class="py-keyword">else</tt><tt class="py-op">:</tt> </tt>
+<a name="L38"></a><tt class="py-lineno">38</tt>  <tt class="py-line">        <tt class="py-op">(</tt><tt class="py-name">stepx</tt><tt class="py-op">,</tt> <tt class="py-name">stepy</tt><tt class="py-op">)</tt> <tt class="py-op">=</tt> <tt class="py-op">(</tt><tt class="py-number">0</tt><tt class="py-op">,</tt> <tt class="py-number">0</tt><tt class="py-op">)</tt> </tt>
+<a name="L39"></a><tt class="py-lineno">39</tt>  <tt class="py-line">    <tt class="py-keyword">for</tt> <tt class="py-name">i</tt><tt class="py-op">,</tt> <tt class="py-name">n</tt> <tt class="py-keyword">in</tt> <tt class="py-name">enumerate</tt><tt class="py-op">(</tt><tt id="link-7" class="py-name"><a title="simx.dyntopo.Manager.NodeManager.nodes
+simx.dyntopo.Topo.GenericTopo.nodes" class="py-name" href="#" onclick="return doclink('link-7', 'nodes', 'link-2');">nodes</a></tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L40"></a><tt class="py-lineno">40</tt>  <tt class="py-line">        <tt class="py-name">x</tt> <tt class="py-op">=</tt> <tt class="py-name">i</tt> <tt class="py-op">*</tt> <tt class="py-name">stepx</tt> </tt>
+<a name="L41"></a><tt class="py-lineno">41</tt>  <tt class="py-line">        <tt class="py-name">y</tt> <tt class="py-op">=</tt> <tt class="py-name">i</tt> <tt class="py-op">*</tt> <tt class="py-name">stepy</tt> </tt>
+<a name="L42"></a><tt class="py-lineno">42</tt>  <tt class="py-line">        <tt class="py-name">n</tt><tt class="py-op">.</tt><tt class="py-name">set_pos</tt><tt class="py-op">(</tt><tt class="py-op">(</tt><tt class="py-name">x</tt> <tt class="py-op">+</tt> <tt class="py-name">ox</tt><tt class="py-op">,</tt> <tt class="py-name">y</tt> <tt class="py-op">+</tt> <tt class="py-name">oy</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L43"></a><tt class="py-lineno">43</tt>  <tt class="py-line"> </tt>
+<a name="grid"></a><div id="grid-def"><a name="L44"></a><tt class="py-lineno">44</tt> <a class="py-toggle" href="#" id="grid-toggle" onclick="return toggle('grid');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.dyntopo.TopoGen-module.html#grid">grid</a><tt class="py-op">(</tt><tt class="py-param">nodes</tt><tt class="py-op">,</tt> <tt class="py-param">offset</tt><tt class="py-op">=</tt><tt class="py-op">(</tt><tt class="py-number">0</tt><tt class="py-op">,</tt><tt class="py-number">0</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-param">spacing</tt><tt class="py-op">=</tt><tt class="py-op">(</tt><tt class="py-number">4</tt><tt class="py-op">,</tt><tt class="py-number">4</tt><tt class="py-op">)</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="grid-collapsed" style="display:none;" pad="++" indent="++++"></div><div id="grid-expanded"><a name="L45"></a><tt class="py-lineno">45</tt>  <tt class="py-line">    <tt class="py-docstring">"""Place nodes in a grid.</tt> </tt>
+<a name="L46"></a><tt class="py-lineno">46</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L47"></a><tt class="py-lineno">47</tt>  <tt class="py-line"><tt class="py-docstring">    The grid starts at offset (x,y) and nodes are placed spacing (x,y)</tt> </tt>
+<a name="L48"></a><tt class="py-lineno">48</tt>  <tt class="py-line"><tt class="py-docstring">    distance apart. If the number of nodes is not a perfect square the</tt> </tt>
+<a name="L49"></a><tt class="py-lineno">49</tt>  <tt class="py-line"><tt class="py-docstring">    last row will contain the odd-nodes-out.</tt> </tt>
+<a name="L50"></a><tt class="py-lineno">50</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="L51"></a><tt class="py-lineno">51</tt>  <tt class="py-line">    <tt class="py-op">(</tt><tt class="py-name">ox</tt><tt class="py-op">,</tt> <tt class="py-name">oy</tt><tt class="py-op">)</tt> <tt class="py-op">=</tt> <tt id="link-8" class="py-name" targets="Variable simx.probe.probe.Probe.offset=simx.probe.probe.Probe-class.html#offset"><a title="simx.probe.probe.Probe.offset" class="py-name" href="#" onclick="return doclink('link-8', 'offset', 'link-8');">offset</a></tt> </tt>
+<a name="L52"></a><tt class="py-lineno">52</tt>  <tt class="py-line">    <tt class="py-op">(</tt><tt class="py-name">sx</tt><tt class="py-op">,</tt> <tt class="py-name">sy</tt><tt class="py-op">)</tt> <tt class="py-op">=</tt> <tt class="py-name">spacing</tt> </tt>
+<a name="L53"></a><tt class="py-lineno">53</tt>  <tt class="py-line">    <tt class="py-name">width</tt> <tt class="py-op">=</tt> <tt class="py-name">int</tt><tt class="py-op">(</tt><tt class="py-name">math</tt><tt class="py-op">.</tt><tt class="py-name">sqrt</tt><tt class="py-op">(</tt><tt class="py-name">len</tt><tt class="py-op">(</tt><tt id="link-9" class="py-name"><a title="simx.dyntopo.Manager.NodeManager.nodes
+simx.dyntopo.Topo.GenericTopo.nodes" class="py-name" href="#" onclick="return doclink('link-9', 'nodes', 'link-2');">nodes</a></tt><tt class="py-op">)</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L54"></a><tt class="py-lineno">54</tt>  <tt class="py-line">    <tt class="py-keyword">if</tt> <tt class="py-name">width</tt> <tt class="py-op">&lt;</tt> <tt class="py-number">1</tt><tt class="py-op">:</tt> </tt>
+<a name="L55"></a><tt class="py-lineno">55</tt>  <tt class="py-line">        <tt class="py-name">width</tt> <tt class="py-op">=</tt> <tt class="py-number">1</tt> </tt>
+<a name="L56"></a><tt class="py-lineno">56</tt>  <tt class="py-line">    <tt class="py-keyword">for</tt> <tt class="py-name">i</tt><tt class="py-op">,</tt> <tt class="py-name">n</tt> <tt class="py-keyword">in</tt> <tt class="py-name">enumerate</tt><tt class="py-op">(</tt><tt id="link-10" class="py-name"><a title="simx.dyntopo.Manager.NodeManager.nodes
+simx.dyntopo.Topo.GenericTopo.nodes" class="py-name" href="#" onclick="return doclink('link-10', 'nodes', 'link-2');">nodes</a></tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L57"></a><tt class="py-lineno">57</tt>  <tt class="py-line">        <tt class="py-name">x</tt> <tt class="py-op">=</tt> <tt class="py-name">sx</tt> <tt class="py-op">*</tt> <tt class="py-op">(</tt><tt class="py-name">i</tt> <tt class="py-op">%</tt> <tt class="py-name">width</tt><tt class="py-op">)</tt> </tt>
+<a name="L58"></a><tt class="py-lineno">58</tt>  <tt class="py-line">        <tt class="py-name">y</tt> <tt class="py-op">=</tt> <tt class="py-name">sy</tt> <tt class="py-op">*</tt> <tt class="py-name">int</tt><tt class="py-op">(</tt><tt class="py-name">i</tt> <tt class="py-op">/</tt> <tt class="py-name">width</tt><tt class="py-op">)</tt> </tt>
+<a name="L59"></a><tt class="py-lineno">59</tt>  <tt class="py-line">        <tt class="py-name">n</tt><tt class="py-op">.</tt><tt class="py-name">set_pos</tt><tt class="py-op">(</tt><tt class="py-op">(</tt><tt class="py-name">x</tt> <tt class="py-op">+</tt> <tt class="py-name">ox</tt><tt class="py-op">,</tt> <tt class="py-name">y</tt> <tt class="py-op">+</tt> <tt class="py-name">oy</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L60"></a><tt class="py-lineno">60</tt>  <tt class="py-line"> </tt>
+<a name="arc"></a><div id="arc-def"><a name="L61"></a><tt class="py-lineno">61</tt> <a class="py-toggle" href="#" id="arc-toggle" onclick="return toggle('arc');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.dyntopo.TopoGen-module.html#arc">arc</a><tt class="py-op">(</tt><tt class="py-param">nodes</tt><tt class="py-op">,</tt> <tt class="py-param">offset</tt><tt class="py-op">=</tt><tt class="py-number">0</tt><tt class="py-op">,</tt> <tt class="py-param">length</tt><tt class="py-op">=</tt><tt class="py-number">2</tt><tt class="py-op">*</tt><tt class="py-name">math</tt><tt class="py-op">.</tt><tt class="py-name">pi</tt><tt class="py-op">,</tt> </tt>
+<a name="L62"></a><tt class="py-lineno">62</tt>  <tt class="py-line">        <tt class="py-param">origin</tt><tt class="py-op">=</tt><tt class="py-op">(</tt><tt class="py-number">0</tt><tt class="py-op">,</tt><tt class="py-number">0</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-param">axis</tt><tt class="py-op">=</tt><tt class="py-op">(</tt><tt class="py-number">10</tt><tt class="py-op">,</tt><tt class="py-number">10</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-param">touching</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="arc-collapsed" style="display:none;" pad="++" indent="++++"></div><div id="arc-expanded"><a name="L63"></a><tt class="py-lineno">63</tt>  <tt class="py-line">    <tt class="py-docstring">"""Align nodes in an arc.</tt> </tt>
+<a name="L64"></a><tt class="py-lineno">64</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L65"></a><tt class="py-lineno">65</tt>  <tt class="py-line"><tt class="py-docstring">    The nodes are placed within length units (in radians) evenly</tt> </tt>
+<a name="L66"></a><tt class="py-lineno">66</tt>  <tt class="py-line"><tt class="py-docstring">    spaced in a counter-clockwise fashion from offset (also in</tt> </tt>
+<a name="L67"></a><tt class="py-lineno">67</tt>  <tt class="py-line"><tt class="py-docstring">    radians). The arc is centered about origin (x,y) with axis of</tt> </tt>
+<a name="L68"></a><tt class="py-lineno">68</tt>  <tt class="py-line"><tt class="py-docstring">    (w,h) relative to the origin.</tt> </tt>
+<a name="L69"></a><tt class="py-lineno">69</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="L70"></a><tt class="py-lineno">70</tt>  <tt class="py-line">    <tt class="py-op">(</tt><tt class="py-name">ox</tt><tt class="py-op">,</tt> <tt class="py-name">oy</tt><tt class="py-op">)</tt> <tt class="py-op">=</tt> <tt class="py-name">origin</tt> </tt>
+<a name="L71"></a><tt class="py-lineno">71</tt>  <tt class="py-line">    <tt class="py-op">(</tt><tt class="py-name">rx</tt><tt class="py-op">,</tt> <tt class="py-name">ry</tt><tt class="py-op">)</tt> <tt class="py-op">=</tt> <tt class="py-name">axis</tt> </tt>
+<a name="L72"></a><tt class="py-lineno">72</tt>  <tt class="py-line">    <tt class="py-name">l</tt> <tt class="py-op">=</tt> <tt class="py-name">len</tt><tt class="py-op">(</tt><tt id="link-11" class="py-name"><a title="simx.dyntopo.Manager.NodeManager.nodes
+simx.dyntopo.Topo.GenericTopo.nodes" class="py-name" href="#" onclick="return doclink('link-11', 'nodes', 'link-2');">nodes</a></tt><tt class="py-op">)</tt> <tt class="py-op">-</tt> <tt class="py-op">(</tt><tt class="py-number">1</tt> <tt class="py-keyword">if</tt> <tt class="py-name">touching</tt> <tt class="py-keyword">else</tt> <tt class="py-number">0</tt><tt class="py-op">)</tt> </tt>
+<a name="L73"></a><tt class="py-lineno">73</tt>  <tt class="py-line">    <tt class="py-keyword">if</tt> <tt class="py-name">l</tt> <tt class="py-op">&gt;</tt> <tt class="py-number">0</tt><tt class="py-op">:</tt> </tt>
+<a name="L74"></a><tt class="py-lineno">74</tt>  <tt class="py-line">        <tt class="py-name">step</tt> <tt class="py-op">=</tt> <tt class="py-name">float</tt><tt class="py-op">(</tt><tt class="py-name">length</tt><tt class="py-op">)</tt> <tt class="py-op">/</tt> <tt class="py-name">l</tt> </tt>
+<a name="L75"></a><tt class="py-lineno">75</tt>  <tt class="py-line">    <tt class="py-keyword">else</tt><tt class="py-op">:</tt> </tt>
+<a name="L76"></a><tt class="py-lineno">76</tt>  <tt class="py-line">        <tt class="py-name">step</tt> <tt class="py-op">=</tt> <tt class="py-number">0</tt> </tt>
+<a name="L77"></a><tt class="py-lineno">77</tt>  <tt class="py-line">    <tt class="py-keyword">for</tt> <tt class="py-name">i</tt><tt class="py-op">,</tt> <tt class="py-name">n</tt> <tt class="py-keyword">in</tt> <tt class="py-name">enumerate</tt><tt class="py-op">(</tt><tt id="link-12" class="py-name"><a title="simx.dyntopo.Manager.NodeManager.nodes
+simx.dyntopo.Topo.GenericTopo.nodes" class="py-name" href="#" onclick="return doclink('link-12', 'nodes', 'link-2');">nodes</a></tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L78"></a><tt class="py-lineno">78</tt>  <tt class="py-line">        <tt class="py-name">theta</tt> <tt class="py-op">=</tt> <tt class="py-name">i</tt> <tt class="py-op">*</tt> <tt class="py-name">step</tt> <tt class="py-op">+</tt> <tt id="link-13" class="py-name"><a title="simx.probe.probe.Probe.offset" class="py-name" href="#" onclick="return doclink('link-13', 'offset', 'link-8');">offset</a></tt> </tt>
+<a name="L79"></a><tt class="py-lineno">79</tt>  <tt class="py-line">        <tt class="py-name">x</tt> <tt class="py-op">=</tt> <tt class="py-name">rx</tt> <tt class="py-op">*</tt> <tt class="py-name">math</tt><tt class="py-op">.</tt><tt class="py-name">cos</tt><tt class="py-op">(</tt><tt class="py-name">theta</tt><tt class="py-op">)</tt> </tt>
+<a name="L80"></a><tt class="py-lineno">80</tt>  <tt class="py-line">        <tt class="py-name">y</tt> <tt class="py-op">=</tt> <tt class="py-name">ry</tt> <tt class="py-op">*</tt> <tt class="py-name">math</tt><tt class="py-op">.</tt><tt class="py-name">sin</tt><tt class="py-op">(</tt><tt class="py-name">theta</tt><tt class="py-op">)</tt> </tt>
+<a name="L81"></a><tt class="py-lineno">81</tt>  <tt class="py-line">        <tt class="py-name">n</tt><tt class="py-op">.</tt><tt class="py-name">set_pos</tt><tt class="py-op">(</tt><tt class="py-op">(</tt><tt class="py-name">x</tt> <tt class="py-op">+</tt> <tt class="py-name">ox</tt><tt class="py-op">,</tt> <tt class="py-name">y</tt> <tt class="py-op">+</tt> <tt class="py-name">oy</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L82"></a><tt class="py-lineno">82</tt>  <tt class="py-line"> </tt>
+<a name="ellipse"></a><div id="ellipse-def"><a name="L83"></a><tt class="py-lineno">83</tt> <a class="py-toggle" href="#" id="ellipse-toggle" onclick="return toggle('ellipse');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.dyntopo.TopoGen-module.html#ellipse">ellipse</a><tt class="py-op">(</tt><tt class="py-param">nodes</tt><tt class="py-op">,</tt> <tt class="py-param">origin</tt><tt class="py-op">=</tt><tt class="py-op">(</tt><tt class="py-number">0</tt><tt class="py-op">,</tt><tt class="py-number">0</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-param">axis</tt><tt class="py-op">=</tt><tt class="py-op">(</tt><tt class="py-number">10</tt><tt class="py-op">,</tt><tt class="py-number">10</tt><tt class="py-op">)</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="ellipse-collapsed" style="display:none;" pad="++" indent="++++"></div><div id="ellipse-expanded"><a name="L84"></a><tt class="py-lineno">84</tt>  <tt class="py-line">    <tt class="py-docstring">"""Align nodes in an ellipse (or circle).</tt> </tt>
+<a name="L85"></a><tt class="py-lineno">85</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L86"></a><tt class="py-lineno">86</tt>  <tt class="py-line"><tt class="py-docstring">    The ellipse is centered at origin (x,y) and has axis (x,y).</tt> </tt>
+<a name="L87"></a><tt class="py-lineno">87</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="L88"></a><tt class="py-lineno">88</tt>  <tt class="py-line">    <tt id="link-14" class="py-name" targets="Function simx.dyntopo.TopoGen.arc()=simx.dyntopo.TopoGen-module.html#arc"><a title="simx.dyntopo.TopoGen.arc" class="py-name" href="#" onclick="return doclink('link-14', 'arc', 'link-14');">arc</a></tt><tt class="py-op">(</tt><tt id="link-15" class="py-name"><a title="simx.dyntopo.Manager.NodeManager.nodes
+simx.dyntopo.Topo.GenericTopo.nodes" class="py-name" href="#" onclick="return doclink('link-15', 'nodes', 'link-2');">nodes</a></tt><tt class="py-op">,</tt> <tt class="py-name">origin</tt><tt class="py-op">=</tt><tt class="py-name">origin</tt><tt class="py-op">,</tt> <tt class="py-name">axis</tt><tt class="py-op">=</tt><tt class="py-name">axis</tt><tt class="py-op">,</tt> <tt class="py-name">touching</tt><tt class="py-op">=</tt><tt class="py-name">False</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L89"></a><tt class="py-lineno">89</tt>  <tt class="py-line"> </tt>
+<a name="place"></a><div id="place-def"><a name="L90"></a><tt class="py-lineno">90</tt> <a class="py-toggle" href="#" id="place-toggle" onclick="return toggle('place');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.dyntopo.TopoGen-module.html#place">place</a><tt class="py-op">(</tt><tt class="py-param">nodes</tt><tt class="py-op">,</tt> <tt class="py-param">position</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="place-collapsed" style="display:none;" pad="++" indent="++++"></div><div id="place-expanded"><a name="L91"></a><tt class="py-lineno">91</tt>  <tt class="py-line">    <tt class="py-docstring">"""Put nodes at specific positions.</tt> </tt>
+<a name="L92"></a><tt class="py-lineno">92</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="L93"></a><tt class="py-lineno">93</tt>  <tt class="py-line">    <tt class="py-keyword">pass</tt> </tt>
+</div><a name="L94"></a><tt class="py-lineno">94</tt>  <tt class="py-line"> </tt><script type="text/javascript">
+<!--
+expandto(location.href);
+// -->
+</script>
+</pre>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Wed Aug 12 00:17:37 2009
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

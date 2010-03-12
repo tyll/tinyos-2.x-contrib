@@ -1,0 +1,11 @@
+This python library directory was taken from the simplejson 2.0.3
+project -- it IS NOT THE FULL simplejson package.  simplejson is
+distributed under the MIT license. See LICENSE.txt.
+
+_speedups.c has been removed; this is intended only as a fall-back
+JSON implementation. Ideally, simplejson has already installed
+correctly for the target platform.
+
+Python files have been modified to use relative imports.
+
+simplejson home: http://pypi.python.org/pypi/simplejson

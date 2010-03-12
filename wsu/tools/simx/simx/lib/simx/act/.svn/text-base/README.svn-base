@@ -1,0 +1,4 @@
+Unlike the other "lib" modules, lib/act does NOT include any code that
+needs to be compiled and/or interact with nesC. Instead this location
+is used to transparently be able to "suck in" simact.py to a tinyos
+application compiled using Simx rules.

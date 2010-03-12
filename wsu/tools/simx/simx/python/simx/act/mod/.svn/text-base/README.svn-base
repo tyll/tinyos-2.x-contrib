@@ -1,0 +1,7 @@
+The modules are just well, modules.
+
+Interface:
+
+setup() -- called when module loaded
+
+handler() -- if defined this is called after message processing occurs

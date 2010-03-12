@@ -1,0 +1,59 @@
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/tinyos-svn/!svn/ver/773/sensorweb/tools/simx/trunk/test/act/Oscilloscope
+END
+topo.txt
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/tinyos-svn/!svn/ver/773/sensorweb/tools/simx/trunk/test/act/Oscilloscope/topo.txt
+END
+OscilloscopeC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/tinyos-svn/!svn/ver/773/sensorweb/tools/simx/trunk/test/act/Oscilloscope/OscilloscopeC.nc
+END
+OscilloscopeAppC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/svn/tinyos-svn/!svn/ver/773/sensorweb/tools/simx/trunk/test/act/Oscilloscope/OscilloscopeAppC.nc
+END
+run-java
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/tinyos-svn/!svn/ver/773/sensorweb/tools/simx/trunk/test/act/Oscilloscope/run-java
+END
+Oscilloscope.h
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/tinyos-svn/!svn/ver/773/sensorweb/tools/simx/trunk/test/act/Oscilloscope/Oscilloscope.h
+END
+README.txt
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/tinyos-svn/!svn/ver/773/sensorweb/tools/simx/trunk/test/act/Oscilloscope/README.txt
+END
+Makefile.simx
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/tinyos-svn/!svn/ver/773/sensorweb/tools/simx/trunk/test/act/Oscilloscope/Makefile.simx
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/tinyos-svn/!svn/ver/773/sensorweb/tools/simx/trunk/test/act/Oscilloscope/Makefile
+END
+model.txt
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/tinyos-svn/!svn/ver/773/sensorweb/tools/simx/trunk/test/act/Oscilloscope/model.txt
+END

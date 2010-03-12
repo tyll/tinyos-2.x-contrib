@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>simx.sync.time_control</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        Package&nbsp;simx ::
+        <a href="simx.sync-module.html">Package&nbsp;sync</a> ::
+        Module&nbsp;time_control
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="simx.sync.time_control-pysrc.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<h1 class="epydoc">Source Code for <a href="simx.sync.time_control-module.html">Module simx.sync.time_control</a></h1>
+<pre class="py-src">
+<a name="L1"></a><tt class="py-lineno">  1</tt>  <tt class="py-line"><tt class="py-keyword">import</tt> <tt class="py-name">types</tt> </tt>
+<a name="L2"></a><tt class="py-lineno">  2</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt id="link-0" class="py-name" targets="Method simx.sync.time_control.TimeControl.time()=simx.sync.time_control.TimeControl-class.html#time"><a title="simx.sync.time_control.TimeControl.time" class="py-name" href="#" onclick="return doclink('link-0', 'time', 'link-0');">time</a></tt> <tt class="py-keyword">import</tt> <tt class="py-name">sleep</tt> </tt>
+<a name="L3"></a><tt class="py-lineno">  3</tt>  <tt class="py-line"> </tt>
+<a name="L4"></a><tt class="py-lineno">  4</tt>  <tt class="py-line"> </tt>
+<a name="TimeControl"></a><div id="TimeControl-def"><a name="L5"></a><tt class="py-lineno">  5</tt> <a class="py-toggle" href="#" id="TimeControl-toggle" onclick="return toggle('TimeControl');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="simx.sync.time_control.TimeControl-class.html">TimeControl</a><tt class="py-op">(</tt><tt class="py-base-class">object</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="TimeControl-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="TimeControl-expanded"><a name="L6"></a><tt class="py-lineno">  6</tt>  <tt class="py-line">    <tt class="py-docstring">"""</tt> </tt>
+<a name="L7"></a><tt class="py-lineno">  7</tt>  <tt class="py-line"><tt class="py-docstring">    Wrapper to control SimxSync and event execution.</tt> </tt>
+<a name="L8"></a><tt class="py-lineno">  8</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L9"></a><tt class="py-lineno">  9</tt>  <tt class="py-line"><tt class="py-docstring">    The big advantage over using SimxSync directly is that this class</tt> </tt>
+<a name="L10"></a><tt class="py-lineno"> 10</tt>  <tt class="py-line"><tt class="py-docstring">    provides a nice interface and supporting structure to run the</tt> </tt>
+<a name="L11"></a><tt class="py-lineno"> 11</tt>  <tt class="py-line"><tt class="py-docstring">    simulation in a multiple of real-world time.</tt> </tt>
+<a name="L12"></a><tt class="py-lineno"> 12</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L13"></a><tt class="py-lineno"> 13</tt>  <tt class="py-line"><tt class="py-docstring">    This class just controls the simulation time; it does absolutely</tt> </tt>
+<a name="L14"></a><tt class="py-lineno"> 14</tt>  <tt class="py-line"><tt class="py-docstring">    no event processing.</tt> </tt>
+<a name="L15"></a><tt class="py-lineno"> 15</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="L16"></a><tt class="py-lineno"> 16</tt>  <tt class="py-line"> </tt>
+<a name="TimeControl.__init__"></a><div id="TimeControl.__init__-def"><a name="L17"></a><tt class="py-lineno"> 17</tt> <a class="py-toggle" href="#" id="TimeControl.__init__-toggle" onclick="return toggle('TimeControl.__init__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.sync.time_control.TimeControl-class.html#__init__">__init__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">tossim</tt><tt class="py-op">,</tt> <tt class="py-param">tossim_sync</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="TimeControl.__init__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="TimeControl.__init__-expanded"><a name="L18"></a><tt class="py-lineno"> 18</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L19"></a><tt class="py-lineno"> 19</tt>  <tt class="py-line"><tt class="py-docstring">        tossim       -- Tossim / simx.base.TossimBase</tt> </tt>
+<a name="L20"></a><tt class="py-lineno"> 20</tt>  <tt class="py-line"><tt class="py-docstring">        tossim_sync  -- SimxSync</tt> </tt>
+<a name="L21"></a><tt class="py-lineno"> 21</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L22"></a><tt class="py-lineno"> 22</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-1" class="py-name" targets="Package simx.sync=simx.sync-module.html"><a title="simx.sync" class="py-name" href="#" onclick="return doclink('link-1', 'sync', 'link-1');">sync</a></tt> <tt class="py-op">=</tt> <tt class="py-name">tossim_sync</tt> </tt>
+<a name="L23"></a><tt class="py-lineno"> 23</tt>  <tt class="py-line"> </tt>
+<a name="L24"></a><tt class="py-lineno"> 24</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_time_fn</tt> <tt class="py-op">=</tt> <tt id="link-2" class="py-name" targets="Module simx.base.tossim=simx.base.tossim-module.html"><a title="simx.base.tossim" class="py-name" href="#" onclick="return doclink('link-2', 'tossim', 'link-2');">tossim</a></tt><tt class="py-op">.</tt><tt id="link-3" class="py-name"><a title="simx.sync.time_control.TimeControl.time" class="py-name" href="#" onclick="return doclink('link-3', 'time', 'link-0');">time</a></tt> </tt>
+<a name="L25"></a><tt class="py-lineno"> 25</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_ticks_per_second</tt> <tt class="py-op">=</tt> <tt id="link-4" class="py-name"><a title="simx.base.tossim" class="py-name" href="#" onclick="return doclink('link-4', 'tossim', 'link-2');">tossim</a></tt><tt class="py-op">.</tt><tt id="link-5" class="py-name" targets="Method simx.base.tossim.TossimBase.ticksPerSecond()=simx.base.tossim.TossimBase-class.html#ticksPerSecond"><a title="simx.base.tossim.TossimBase.ticksPerSecond" class="py-name" href="#" onclick="return doclink('link-5', 'ticksPerSecond', 'link-5');">ticksPerSecond</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L26"></a><tt class="py-lineno"> 26</tt>  <tt class="py-line"> </tt>
+<a name="L27"></a><tt class="py-lineno"> 27</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">is_running</tt> <tt class="py-op">=</tt> <tt class="py-name">False</tt> </tt>
+<a name="L28"></a><tt class="py-lineno"> 28</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">stop_time</tt> <tt class="py-op">=</tt> <tt class="py-number">0</tt> </tt>
+<a name="L29"></a><tt class="py-lineno"> 29</tt>  <tt class="py-line"> </tt>
+<a name="L30"></a><tt class="py-lineno"> 30</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">on_start</tt> <tt class="py-op">=</tt> <tt class="py-keyword">lambda</tt><tt class="py-op">:</tt> <tt class="py-name">None</tt> </tt>
+<a name="L31"></a><tt class="py-lineno"> 31</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">on_stop</tt> <tt class="py-op">=</tt> <tt class="py-keyword">lambda</tt><tt class="py-op">:</tt> <tt class="py-name">None</tt> </tt>
+<a name="L32"></a><tt class="py-lineno"> 32</tt>  <tt class="py-line"> </tt>
+<a name="L33"></a><tt class="py-lineno"> 33</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-6" class="py-name" targets="Method simx.sync.time_control.TimeControl.run_forever()=simx.sync.time_control.TimeControl-class.html#run_forever"><a title="simx.sync.time_control.TimeControl.run_forever" class="py-name" href="#" onclick="return doclink('link-6', 'run_forever', 'link-6');">run_forever</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L34"></a><tt class="py-lineno"> 34</tt>  <tt class="py-line"> </tt>
+<a name="L35"></a><tt class="py-lineno"> 35</tt>  <tt class="py-line"> </tt>
+<a name="TimeControl.time"></a><div id="TimeControl.time-def"><a name="L36"></a><tt class="py-lineno"> 36</tt> <a class="py-toggle" href="#" id="TimeControl.time-toggle" onclick="return toggle('TimeControl.time');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.sync.time_control.TimeControl-class.html#time">time</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="TimeControl.time-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="TimeControl.time-expanded"><a name="L37"></a><tt class="py-lineno"> 37</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L38"></a><tt class="py-lineno"> 38</tt>  <tt class="py-line"><tt class="py-docstring">        Returns the current simulation time.</tt> </tt>
+<a name="L39"></a><tt class="py-lineno"> 39</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L40"></a><tt class="py-lineno"> 40</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_time_fn</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L41"></a><tt class="py-lineno"> 41</tt>  <tt class="py-line"> </tt>
+<a name="L42"></a><tt class="py-lineno"> 42</tt>  <tt class="py-line"> </tt>
+<a name="TimeControl.ticks_per_second"></a><div id="TimeControl.ticks_per_second-def"><a name="L43"></a><tt class="py-lineno"> 43</tt> <a class="py-toggle" href="#" id="TimeControl.ticks_per_second-toggle" onclick="return toggle('TimeControl.ticks_per_second');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.sync.time_control.TimeControl-class.html#ticks_per_second">ticks_per_second</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="TimeControl.ticks_per_second-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="TimeControl.ticks_per_second-expanded"><a name="L44"></a><tt class="py-lineno"> 44</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L45"></a><tt class="py-lineno"> 45</tt>  <tt class="py-line"><tt class="py-docstring">        Returns the number of simulations ticks per second.</tt> </tt>
+<a name="L46"></a><tt class="py-lineno"> 46</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L47"></a><tt class="py-lineno"> 47</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_ticks_per_second</tt> </tt>
+</div><a name="L48"></a><tt class="py-lineno"> 48</tt>  <tt class="py-line"> </tt>
+<a name="L49"></a><tt class="py-lineno"> 49</tt>  <tt class="py-line"> </tt>
+<a name="TimeControl.to_sim_time"></a><div id="TimeControl.to_sim_time-def"><a name="L50"></a><tt class="py-lineno"> 50</tt> <a class="py-toggle" href="#" id="TimeControl.to_sim_time-toggle" onclick="return toggle('TimeControl.to_sim_time');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.sync.time_control.TimeControl-class.html#to_sim_time">to_sim_time</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">time_str</tt><tt class="py-op">,</tt> <tt class="py-param">base_time</tt><tt class="py-op">=</tt><tt class="py-name">None</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="TimeControl.to_sim_time-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="TimeControl.to_sim_time-expanded"><a name="L51"></a><tt class="py-lineno"> 51</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L52"></a><tt class="py-lineno"> 52</tt>  <tt class="py-line"><tt class="py-docstring">        Convert string of hh:mm:ss.fract into tossim time units.</tt> </tt>
+<a name="L53"></a><tt class="py-lineno"> 53</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L54"></a><tt class="py-lineno"> 54</tt>  <tt class="py-line"><tt class="py-docstring">        If the string starts with a +, adds relative to base_time or,</tt> </tt>
+<a name="L55"></a><tt class="py-lineno"> 55</tt>  <tt class="py-line"><tt class="py-docstring">        if not supplied, the current sim time. Raise a ValueError if</tt> </tt>
+<a name="L56"></a><tt class="py-lineno"> 56</tt>  <tt class="py-line"><tt class="py-docstring">        given a non-comformant time_str.</tt> </tt>
+<a name="L57"></a><tt class="py-lineno"> 57</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L58"></a><tt class="py-lineno"> 58</tt>  <tt class="py-line">        <tt class="py-comment"># if time_str is a number, just return it</tt> </tt>
+<a name="L59"></a><tt class="py-lineno"> 59</tt>  <tt class="py-line"><tt class="py-comment"></tt>        <tt class="py-keyword">if</tt> <tt class="py-name">isinstance</tt><tt class="py-op">(</tt><tt id="link-7" class="py-name" targets="Method simx.base.tossim.TossimBase.time_str()=simx.base.tossim.TossimBase-class.html#time_str"><a title="simx.base.tossim.TossimBase.time_str" class="py-name" href="#" onclick="return doclink('link-7', 'time_str', 'link-7');">time_str</a></tt><tt class="py-op">,</tt> <tt class="py-op">(</tt><tt class="py-name">types</tt><tt class="py-op">.</tt><tt class="py-name">IntType</tt><tt class="py-op">,</tt> <tt class="py-name">types</tt><tt class="py-op">.</tt><tt class="py-name">LongType</tt><tt class="py-op">)</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L60"></a><tt class="py-lineno"> 60</tt>  <tt class="py-line">            <tt class="py-keyword">return</tt> <tt id="link-8" class="py-name"><a title="simx.base.tossim.TossimBase.time_str" class="py-name" href="#" onclick="return doclink('link-8', 'time_str', 'link-7');">time_str</a></tt> </tt>
+<a name="L61"></a><tt class="py-lineno"> 61</tt>  <tt class="py-line"> </tt>
+<a name="L62"></a><tt class="py-lineno"> 62</tt>  <tt class="py-line">        <tt class="py-name">tps</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_ticks_per_second</tt> </tt>
+<a name="L63"></a><tt class="py-lineno"> 63</tt>  <tt class="py-line">        <tt class="py-name">t</tt> <tt class="py-op">=</tt> <tt class="py-number">0</tt> </tt>
+<a name="L64"></a><tt class="py-lineno"> 64</tt>  <tt class="py-line"> </tt>
+<a name="L65"></a><tt class="py-lineno"> 65</tt>  <tt class="py-line">        <tt class="py-comment"># be accommodating of extra spaces</tt> </tt>
+<a name="L66"></a><tt class="py-lineno"> 66</tt>  <tt class="py-line"><tt class="py-comment"></tt>        <tt id="link-9" class="py-name"><a title="simx.base.tossim.TossimBase.time_str" class="py-name" href="#" onclick="return doclink('link-9', 'time_str', 'link-7');">time_str</a></tt> <tt class="py-op">=</tt> <tt id="link-10" class="py-name"><a title="simx.base.tossim.TossimBase.time_str" class="py-name" href="#" onclick="return doclink('link-10', 'time_str', 'link-7');">time_str</a></tt><tt class="py-op">.</tt><tt class="py-name">replace</tt><tt class="py-op">(</tt><tt class="py-string">" "</tt><tt class="py-op">,</tt> <tt class="py-string">""</tt><tt class="py-op">)</tt> </tt>
+<a name="L67"></a><tt class="py-lineno"> 67</tt>  <tt class="py-line"> </tt>
+<a name="L68"></a><tt class="py-lineno"> 68</tt>  <tt class="py-line">        <tt class="py-comment"># relative time?</tt> </tt>
+<a name="L69"></a><tt class="py-lineno"> 69</tt>  <tt class="py-line"><tt class="py-comment"></tt>        <tt class="py-keyword">if</tt> <tt id="link-11" class="py-name"><a title="simx.base.tossim.TossimBase.time_str" class="py-name" href="#" onclick="return doclink('link-11', 'time_str', 'link-7');">time_str</a></tt> <tt class="py-keyword">and</tt> <tt id="link-12" class="py-name"><a title="simx.base.tossim.TossimBase.time_str" class="py-name" href="#" onclick="return doclink('link-12', 'time_str', 'link-7');">time_str</a></tt><tt class="py-op">[</tt><tt class="py-number">0</tt><tt class="py-op">]</tt> <tt class="py-op">==</tt> <tt class="py-string">"+"</tt><tt class="py-op">:</tt> </tt>
+<a name="L70"></a><tt class="py-lineno"> 70</tt>  <tt class="py-line">            <tt id="link-13" class="py-name"><a title="simx.base.tossim.TossimBase.time_str" class="py-name" href="#" onclick="return doclink('link-13', 'time_str', 'link-7');">time_str</a></tt> <tt class="py-op">=</tt> <tt id="link-14" class="py-name"><a title="simx.base.tossim.TossimBase.time_str" class="py-name" href="#" onclick="return doclink('link-14', 'time_str', 'link-7');">time_str</a></tt><tt class="py-op">[</tt><tt class="py-number">1</tt><tt class="py-op">:</tt><tt class="py-op">]</tt> </tt>
+<a name="L71"></a><tt class="py-lineno"> 71</tt>  <tt class="py-line">            <tt class="py-keyword">if</tt> <tt class="py-name">base_time</tt> <tt class="py-keyword">is</tt> <tt class="py-keyword">not</tt> <tt class="py-name">None</tt><tt class="py-op">:</tt> </tt>
+<a name="L72"></a><tt class="py-lineno"> 72</tt>  <tt class="py-line">                <tt class="py-name">t</tt> <tt class="py-op">=</tt> <tt class="py-name">base_time</tt> </tt>
+<a name="L73"></a><tt class="py-lineno"> 73</tt>  <tt class="py-line">            <tt class="py-keyword">else</tt><tt class="py-op">:</tt> </tt>
+<a name="L74"></a><tt class="py-lineno"> 74</tt>  <tt class="py-line">                <tt class="py-name">t</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-15" class="py-name"><a title="simx.sync.time_control.TimeControl.time" class="py-name" href="#" onclick="return doclink('link-15', 'time', 'link-0');">time</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L75"></a><tt class="py-lineno"> 75</tt>  <tt class="py-line"> </tt>
+<a name="L76"></a><tt class="py-lineno"> 76</tt>  <tt class="py-line">        <tt class="py-comment"># can't combine below, imagine when fractional part not</tt> </tt>
+<a name="L77"></a><tt class="py-lineno"> 77</tt>  <tt class="py-line"><tt class="py-comment"></tt>        <tt class="py-comment"># supplied</tt> </tt>
+<a name="L78"></a><tt class="py-lineno"> 78</tt>  <tt class="py-line"><tt class="py-comment"></tt>        <tt class="py-name">frac_split</tt> <tt class="py-op">=</tt> <tt id="link-16" class="py-name"><a title="simx.base.tossim.TossimBase.time_str" class="py-name" href="#" onclick="return doclink('link-16', 'time_str', 'link-7');">time_str</a></tt><tt class="py-op">.</tt><tt class="py-name">split</tt><tt class="py-op">(</tt><tt class="py-string">"."</tt><tt class="py-op">,</tt> <tt class="py-number">1</tt><tt class="py-op">)</tt> </tt>
+<a name="L79"></a><tt class="py-lineno"> 79</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">len</tt><tt class="py-op">(</tt><tt class="py-name">frac_split</tt><tt class="py-op">)</tt> <tt class="py-op">&gt;</tt> <tt class="py-number">1</tt><tt class="py-op">:</tt> </tt>
+<a name="L80"></a><tt class="py-lineno"> 80</tt>  <tt class="py-line">            <tt class="py-keyword">try</tt><tt class="py-op">:</tt> </tt>
+<a name="L81"></a><tt class="py-lineno"> 81</tt>  <tt class="py-line">                <tt class="py-name">frac_value</tt> <tt class="py-op">=</tt> <tt class="py-name">float</tt><tt class="py-op">(</tt><tt class="py-string">"."</tt> <tt class="py-op">+</tt> <tt class="py-op">(</tt><tt class="py-name">frac_split</tt><tt class="py-op">[</tt><tt class="py-number">1</tt><tt class="py-op">]</tt> <tt class="py-keyword">or</tt> <tt class="py-string">"0"</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L82"></a><tt class="py-lineno"> 82</tt>  <tt class="py-line">                <tt class="py-keyword">if</tt> <tt class="py-name">frac_value</tt> <tt class="py-op">&lt;</tt> <tt class="py-number">0</tt><tt class="py-op">:</tt> </tt>
+<a name="L83"></a><tt class="py-lineno"> 83</tt>  <tt class="py-line">                    <tt class="py-keyword">raise</tt> <tt class="py-name">ValueError</tt> </tt>
+<a name="L84"></a><tt class="py-lineno"> 84</tt>  <tt class="py-line">                <tt class="py-name">t</tt> <tt class="py-op">+=</tt> <tt class="py-name">int</tt><tt class="py-op">(</tt><tt class="py-name">frac_value</tt> <tt class="py-op">*</tt> <tt class="py-name">tps</tt><tt class="py-op">)</tt> </tt>
+<a name="L85"></a><tt class="py-lineno"> 85</tt>  <tt class="py-line">            <tt class="py-keyword">except</tt> <tt class="py-name">ValueError</tt><tt class="py-op">,</tt> <tt class="py-name">e</tt><tt class="py-op">:</tt> </tt>
+<a name="L86"></a><tt class="py-lineno"> 86</tt>  <tt class="py-line">                <tt class="py-keyword">raise</tt> <tt class="py-name">ValueError</tt><tt class="py-op">(</tt><tt class="py-string">"invalid time: '%s'"</tt> <tt class="py-op">%</tt> <tt id="link-17" class="py-name"><a title="simx.base.tossim.TossimBase.time_str" class="py-name" href="#" onclick="return doclink('link-17', 'time_str', 'link-7');">time_str</a></tt><tt class="py-op">)</tt> </tt>
+<a name="L87"></a><tt class="py-lineno"> 87</tt>  <tt class="py-line"> </tt>
+<a name="L88"></a><tt class="py-lineno"> 88</tt>  <tt class="py-line">        <tt class="py-keyword">try</tt><tt class="py-op">:</tt> </tt>
+<a name="L89"></a><tt class="py-lineno"> 89</tt>  <tt class="py-line">            <tt class="py-comment"># 0 to 3 (hh:mm:ss) components supported</tt> </tt>
+<a name="L90"></a><tt class="py-lineno"> 90</tt>  <tt class="py-line"><tt class="py-comment"></tt>            <tt class="py-name">hms_split</tt> <tt class="py-op">=</tt> <tt class="py-name">frac_split</tt><tt class="py-op">[</tt><tt class="py-number">0</tt><tt class="py-op">]</tt><tt class="py-op">.</tt><tt class="py-name">split</tt><tt class="py-op">(</tt><tt class="py-string">":"</tt><tt class="py-op">)</tt> </tt>
+<a name="L91"></a><tt class="py-lineno"> 91</tt>  <tt class="py-line">            <tt class="py-keyword">if</tt> <tt class="py-name">len</tt><tt class="py-op">(</tt><tt class="py-name">hms_split</tt><tt class="py-op">)</tt> <tt class="py-op">&gt;</tt> <tt class="py-number">3</tt><tt class="py-op">:</tt> </tt>
+<a name="L92"></a><tt class="py-lineno"> 92</tt>  <tt class="py-line">                <tt class="py-keyword">raise</tt> <tt class="py-name">ValueError</tt> </tt>
+<a name="L93"></a><tt class="py-lineno"> 93</tt>  <tt class="py-line"> </tt>
+<a name="L94"></a><tt class="py-lineno"> 94</tt>  <tt class="py-line">            <tt class="py-keyword">for</tt> <tt class="py-name">part</tt><tt class="py-op">,</tt> <tt class="py-name">mul</tt> <tt class="py-keyword">in</tt> <tt class="py-name">zip</tt><tt class="py-op">(</tt><tt class="py-name">reversed</tt><tt class="py-op">(</tt><tt class="py-name">hms_split</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> </tt>
+<a name="L95"></a><tt class="py-lineno"> 95</tt>  <tt class="py-line">                                 <tt class="py-op">[</tt><tt class="py-number">1</tt><tt class="py-op">*</tt><tt class="py-name">tps</tt><tt class="py-op">,</tt> <tt class="py-number">60</tt><tt class="py-op">*</tt><tt class="py-name">tps</tt><tt class="py-op">,</tt> <tt class="py-number">3600</tt><tt class="py-op">*</tt><tt class="py-name">tps</tt><tt class="py-op">]</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L96"></a><tt class="py-lineno"> 96</tt>  <tt class="py-line">                <tt class="py-name">segment</tt> <tt class="py-op">=</tt> <tt class="py-name">int</tt><tt class="py-op">(</tt><tt class="py-name">part</tt> <tt class="py-keyword">or</tt> <tt class="py-number">0</tt><tt class="py-op">)</tt> <tt class="py-op">*</tt> <tt class="py-name">mul</tt> </tt>
+<a name="L97"></a><tt class="py-lineno"> 97</tt>  <tt class="py-line">                <tt class="py-keyword">if</tt> <tt class="py-name">segment</tt> <tt class="py-op">&lt;</tt> <tt class="py-number">0</tt><tt class="py-op">:</tt> </tt>
+<a name="L98"></a><tt class="py-lineno"> 98</tt>  <tt class="py-line">                    <tt class="py-keyword">raise</tt> <tt class="py-name">ValueError</tt> </tt>
+<a name="L99"></a><tt class="py-lineno"> 99</tt>  <tt class="py-line">                <tt class="py-name">t</tt> <tt class="py-op">+=</tt> <tt class="py-name">segment</tt> </tt>
+<a name="L100"></a><tt class="py-lineno">100</tt>  <tt class="py-line"> </tt>
+<a name="L101"></a><tt class="py-lineno">101</tt>  <tt class="py-line">        <tt class="py-keyword">except</tt> <tt class="py-name">ValueError</tt><tt class="py-op">,</tt> <tt class="py-name">e</tt><tt class="py-op">:</tt> </tt>
+<a name="L102"></a><tt class="py-lineno">102</tt>  <tt class="py-line">            <tt class="py-keyword">raise</tt> <tt class="py-name">ValueError</tt><tt class="py-op">(</tt><tt class="py-string">"invalid time: '%s'"</tt> <tt class="py-op">%</tt> <tt id="link-18" class="py-name"><a title="simx.base.tossim.TossimBase.time_str" class="py-name" href="#" onclick="return doclink('link-18', 'time_str', 'link-7');">time_str</a></tt><tt class="py-op">)</tt> </tt>
+<a name="L103"></a><tt class="py-lineno">103</tt>  <tt class="py-line"> </tt>
+<a name="L104"></a><tt class="py-lineno">104</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">t</tt> </tt>
+</div><a name="L105"></a><tt class="py-lineno">105</tt>  <tt class="py-line"> </tt>
+<a name="L106"></a><tt class="py-lineno">106</tt>  <tt class="py-line">     </tt>
+<a name="TimeControl.set_clock_mul"></a><div id="TimeControl.set_clock_mul-def"><a name="L107"></a><tt class="py-lineno">107</tt> <a class="py-toggle" href="#" id="TimeControl.set_clock_mul-toggle" onclick="return toggle('TimeControl.set_clock_mul');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.sync.time_control.TimeControl-class.html#set_clock_mul">set_clock_mul</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">clock_mul</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="TimeControl.set_clock_mul-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="TimeControl.set_clock_mul-expanded"><a name="L108"></a><tt class="py-lineno">108</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L109"></a><tt class="py-lineno">109</tt>  <tt class="py-line"><tt class="py-docstring">        Set the clock multipler, as a float.</tt> </tt>
+<a name="L110"></a><tt class="py-lineno">110</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L111"></a><tt class="py-lineno">111</tt>  <tt class="py-line"><tt class="py-docstring">        If clock_mul is &lt;= 0 the simulation will run at full speed;</tt> </tt>
+<a name="L112"></a><tt class="py-lineno">112</tt>  <tt class="py-line"><tt class="py-docstring">        that is, no real-world synchronization will be performed. The</tt> </tt>
+<a name="L113"></a><tt class="py-lineno">113</tt>  <tt class="py-line"><tt class="py-docstring">        new clock multiplier (which may be different than the</tt> </tt>
+<a name="L114"></a><tt class="py-lineno">114</tt>  <tt class="py-line"><tt class="py-docstring">        requested multiplier) is returned.</tt> </tt>
+<a name="L115"></a><tt class="py-lineno">115</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L116"></a><tt class="py-lineno">116</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-19" class="py-name"><a title="simx.sync" class="py-name" href="#" onclick="return doclink('link-19', 'sync', 'link-1');">sync</a></tt><tt class="py-op">.</tt><tt class="py-name">setClockMul</tt><tt class="py-op">(</tt><tt class="py-name">clock_mul</tt><tt class="py-op">)</tt> </tt>
+<a name="L117"></a><tt class="py-lineno">117</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-20" class="py-name" targets="Method simx.sync.time_control.TimeControl.get_clock_mul()=simx.sync.time_control.TimeControl-class.html#get_clock_mul"><a title="simx.sync.time_control.TimeControl.get_clock_mul" class="py-name" href="#" onclick="return doclink('link-20', 'get_clock_mul', 'link-20');">get_clock_mul</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L118"></a><tt class="py-lineno">118</tt>  <tt class="py-line"> </tt>
+<a name="L119"></a><tt class="py-lineno">119</tt>  <tt class="py-line">             </tt>
+<a name="TimeControl.get_clock_mul"></a><div id="TimeControl.get_clock_mul-def"><a name="L120"></a><tt class="py-lineno">120</tt> <a class="py-toggle" href="#" id="TimeControl.get_clock_mul-toggle" onclick="return toggle('TimeControl.get_clock_mul');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.sync.time_control.TimeControl-class.html#get_clock_mul">get_clock_mul</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="TimeControl.get_clock_mul-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="TimeControl.get_clock_mul-expanded"><a name="L121"></a><tt class="py-lineno">121</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L122"></a><tt class="py-lineno">122</tt>  <tt class="py-line"><tt class="py-docstring">        Returns the clock multiplier, as a float.</tt> </tt>
+<a name="L123"></a><tt class="py-lineno">123</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L124"></a><tt class="py-lineno">124</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-21" class="py-name"><a title="simx.sync" class="py-name" href="#" onclick="return doclink('link-21', 'sync', 'link-1');">sync</a></tt><tt class="py-op">.</tt><tt class="py-name">getClockMul</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L125"></a><tt class="py-lineno">125</tt>  <tt class="py-line"> </tt>
+<a name="L126"></a><tt class="py-lineno">126</tt>  <tt class="py-line"> </tt>
+<a name="TimeControl.run_until"></a><div id="TimeControl.run_until-def"><a name="L127"></a><tt class="py-lineno">127</tt> <a class="py-toggle" href="#" id="TimeControl.run_until-toggle" onclick="return toggle('TimeControl.run_until');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.sync.time_control.TimeControl-class.html#run_until">run_until</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">time</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="TimeControl.run_until-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="TimeControl.run_until-expanded"><a name="L128"></a><tt class="py-lineno">128</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L129"></a><tt class="py-lineno">129</tt>  <tt class="py-line"><tt class="py-docstring">        Run until the specified simulation time.</tt> </tt>
+<a name="L130"></a><tt class="py-lineno">130</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L131"></a><tt class="py-lineno">131</tt>  <tt class="py-line"><tt class="py-docstring">        The time is parsed as with to_sim_time. A false value of time</tt> </tt>
+<a name="L132"></a><tt class="py-lineno">132</tt>  <tt class="py-line"><tt class="py-docstring">        will remove all stop limits.</tt> </tt>
+<a name="L133"></a><tt class="py-lineno">133</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L134"></a><tt class="py-lineno">134</tt>  <tt class="py-line">        <tt class="py-comment"># Every re-start needs to resync to world-time (prevent drift)</tt> </tt>
+<a name="L135"></a><tt class="py-lineno">135</tt>  <tt class="py-line"><tt class="py-comment"></tt>        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-22" class="py-name"><a title="simx.sync" class="py-name" href="#" onclick="return doclink('link-22', 'sync', 'link-1');">sync</a></tt><tt class="py-op">.</tt><tt id="link-23" class="py-name" targets="Method simx.probe.probe.Probe.synchronize()=simx.probe.probe.Probe-class.html#synchronize"><a title="simx.probe.probe.Probe.synchronize" class="py-name" href="#" onclick="return doclink('link-23', 'synchronize', 'link-23');">synchronize</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L136"></a><tt class="py-lineno">136</tt>  <tt class="py-line"> </tt>
+<a name="L137"></a><tt class="py-lineno">137</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-keyword">not</tt> <tt id="link-24" class="py-name"><a title="simx.sync.time_control.TimeControl.time" class="py-name" href="#" onclick="return doclink('link-24', 'time', 'link-0');">time</a></tt><tt class="py-op">:</tt> </tt>
+<a name="L138"></a><tt class="py-lineno">138</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-25" class="py-name"><a title="simx.sync" class="py-name" href="#" onclick="return doclink('link-25', 'sync', 'link-1');">sync</a></tt><tt class="py-op">.</tt><tt class="py-name">setStopAt</tt><tt class="py-op">(</tt><tt class="py-number">0</tt><tt class="py-op">)</tt> </tt>
+<a name="L139"></a><tt class="py-lineno">139</tt>  <tt class="py-line">        <tt class="py-keyword">else</tt><tt class="py-op">:</tt> </tt>
+<a name="L140"></a><tt class="py-lineno">140</tt>  <tt class="py-line">            <tt class="py-name">sim_time</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-26" class="py-name" targets="Method simx.event.event.Manager.to_sim_time()=simx.event.event.Manager-class.html#to_sim_time,Method simx.sync.time_control.TimeControl.to_sim_time()=simx.sync.time_control.TimeControl-class.html#to_sim_time"><a title="simx.event.event.Manager.to_sim_time
+simx.sync.time_control.TimeControl.to_sim_time" class="py-name" href="#" onclick="return doclink('link-26', 'to_sim_time', 'link-26');">to_sim_time</a></tt><tt class="py-op">(</tt><tt id="link-27" class="py-name"><a title="simx.sync.time_control.TimeControl.time" class="py-name" href="#" onclick="return doclink('link-27', 'time', 'link-0');">time</a></tt><tt class="py-op">)</tt> </tt>
+<a name="L141"></a><tt class="py-lineno">141</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-28" class="py-name"><a title="simx.sync" class="py-name" href="#" onclick="return doclink('link-28', 'sync', 'link-1');">sync</a></tt><tt class="py-op">.</tt><tt class="py-name">setStopAt</tt><tt class="py-op">(</tt><tt class="py-name">sim_time</tt><tt class="py-op">)</tt> </tt>
+<a name="L142"></a><tt class="py-lineno">142</tt>  <tt class="py-line"> </tt>
+<a name="L143"></a><tt class="py-lineno">143</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">is_running</tt> <tt class="py-op">=</tt> <tt class="py-name">True</tt> </tt>
+<a name="L144"></a><tt class="py-lineno">144</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">on_start</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L145"></a><tt class="py-lineno">145</tt>  <tt class="py-line"> </tt>
+<a name="L146"></a><tt class="py-lineno">146</tt>  <tt class="py-line"> </tt>
+<a name="TimeControl.run_forever"></a><div id="TimeControl.run_forever-def"><a name="L147"></a><tt class="py-lineno">147</tt> <a class="py-toggle" href="#" id="TimeControl.run_forever-toggle" onclick="return toggle('TimeControl.run_forever');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.sync.time_control.TimeControl-class.html#run_forever">run_forever</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="TimeControl.run_forever-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="TimeControl.run_forever-expanded"><a name="L148"></a><tt class="py-lineno">148</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L149"></a><tt class="py-lineno">149</tt>  <tt class="py-line"><tt class="py-docstring">        Start/continue simulation and run it forever.</tt> </tt>
+<a name="L150"></a><tt class="py-lineno">150</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L151"></a><tt class="py-lineno">151</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-29" class="py-name" targets="Method simx.sync.time_control.TimeControl.run_until()=simx.sync.time_control.TimeControl-class.html#run_until"><a title="simx.sync.time_control.TimeControl.run_until" class="py-name" href="#" onclick="return doclink('link-29', 'run_until', 'link-29');">run_until</a></tt><tt class="py-op">(</tt><tt class="py-name">None</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L152"></a><tt class="py-lineno">152</tt>  <tt class="py-line"> </tt>
+<a name="L153"></a><tt class="py-lineno">153</tt>  <tt class="py-line"> </tt>
+<a name="TimeControl.stop"></a><div id="TimeControl.stop-def"><a name="L154"></a><tt class="py-lineno">154</tt> <a class="py-toggle" href="#" id="TimeControl.stop-toggle" onclick="return toggle('TimeControl.stop');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.sync.time_control.TimeControl-class.html#stop">stop</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="TimeControl.stop-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="TimeControl.stop-expanded"><a name="L155"></a><tt class="py-lineno">155</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L156"></a><tt class="py-lineno">156</tt>  <tt class="py-line"><tt class="py-docstring">        Stop the simulation.</tt> </tt>
+<a name="L157"></a><tt class="py-lineno">157</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L158"></a><tt class="py-lineno">158</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-30" class="py-name"><a title="simx.sync" class="py-name" href="#" onclick="return doclink('link-30', 'sync', 'link-1');">sync</a></tt><tt class="py-op">.</tt><tt class="py-name">setStopAt</tt><tt class="py-op">(</tt><tt class="py-op">-</tt><tt class="py-number">1</tt><tt class="py-op">)</tt> </tt>
+<a name="L159"></a><tt class="py-lineno">159</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">is_running</tt> <tt class="py-op">=</tt> <tt class="py-name">False</tt> </tt>
+<a name="L160"></a><tt class="py-lineno">160</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">on_stop</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L161"></a><tt class="py-lineno">161</tt>  <tt class="py-line"> </tt>
+<a name="L162"></a><tt class="py-lineno">162</tt>  <tt class="py-line"> </tt>
+<a name="TimeControl.run_sim"></a><div id="TimeControl.run_sim-def"><a name="L163"></a><tt class="py-lineno">163</tt> <a class="py-toggle" href="#" id="TimeControl.run_sim-toggle" onclick="return toggle('TimeControl.run_sim');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.sync.time_control.TimeControl-class.html#run_sim">run_sim</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="TimeControl.run_sim-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="TimeControl.run_sim-expanded"><a name="L164"></a><tt class="py-lineno">164</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L165"></a><tt class="py-lineno">165</tt>  <tt class="py-line"><tt class="py-docstring">        Run (or don't run) a simulation cycle based on state.</tt> </tt>
+<a name="L166"></a><tt class="py-lineno">166</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L167"></a><tt class="py-lineno">167</tt>  <tt class="py-line"><tt class="py-docstring">        Returns -1 if there are no events to process and at the</tt> </tt>
+<a name="L168"></a><tt class="py-lineno">168</tt>  <tt class="py-line"><tt class="py-docstring">        stop-limit; 0 if there are no events to process (and not at</tt> </tt>
+<a name="L169"></a><tt class="py-lineno">169</tt>  <tt class="py-line"><tt class="py-docstring">        the stop-limit); &gt;= 1 if there are events to process (implies</tt> </tt>
+<a name="L170"></a><tt class="py-lineno">170</tt>  <tt class="py-line"><tt class="py-docstring">        not at the stop-limit).</tt> </tt>
+<a name="L171"></a><tt class="py-lineno">171</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L172"></a><tt class="py-lineno">172</tt>  <tt class="py-line">        <tt class="py-name">res</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-31" class="py-name"><a title="simx.sync" class="py-name" href="#" onclick="return doclink('link-31', 'sync', 'link-1');">sync</a></tt><tt class="py-op">.</tt><tt class="py-name">runNextEventInTime</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L173"></a><tt class="py-lineno">173</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">res</tt> <tt class="py-op">==</tt> <tt class="py-op">-</tt><tt class="py-number">1</tt><tt class="py-op">:</tt> <tt class="py-comment"># "at stop time"</tt> </tt>
+<a name="L174"></a><tt class="py-lineno">174</tt>  <tt class="py-line">            <tt class="py-keyword">if</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">is_running</tt><tt class="py-op">:</tt> </tt>
+<a name="L175"></a><tt class="py-lineno">175</tt>  <tt class="py-line">                <tt class="py-comment"># transitioned to non-running</tt> </tt>
+<a name="L176"></a><tt class="py-lineno">176</tt>  <tt class="py-line"><tt class="py-comment"></tt>                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-32" class="py-name" targets="Method simx.sync.time_control.TimeControl.stop()=simx.sync.time_control.TimeControl-class.html#stop"><a title="simx.sync.time_control.TimeControl.stop" class="py-name" href="#" onclick="return doclink('link-32', 'stop', 'link-32');">stop</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L177"></a><tt class="py-lineno">177</tt>  <tt class="py-line">            <tt class="py-keyword">else</tt><tt class="py-op">:</tt> </tt>
+<a name="L178"></a><tt class="py-lineno">178</tt>  <tt class="py-line">                <tt class="py-comment"># Minimize CPU-thrashing while stopped; this allows</tt> </tt>
+<a name="L179"></a><tt class="py-lineno">179</tt>  <tt class="py-line"><tt class="py-comment"></tt>                <tt class="py-comment"># run_sim to be executed in a tight loop externally.</tt> </tt>
+<a name="L180"></a><tt class="py-lineno">180</tt>  <tt class="py-line"><tt class="py-comment"></tt>                <tt class="py-name">sleep</tt><tt class="py-op">(</tt><tt class="py-number">0.0005</tt><tt class="py-op">)</tt> </tt>
+<a name="L181"></a><tt class="py-lineno">181</tt>  <tt class="py-line"> </tt>
+<a name="L182"></a><tt class="py-lineno">182</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">res</tt> </tt>
+</div></div><a name="L183"></a><tt class="py-lineno">183</tt>  <tt class="py-line"> </tt><script type="text/javascript">
+<!--
+expandto(location.href);
+// -->
+</script>
+</pre>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Wed Aug 12 00:17:36 2009
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

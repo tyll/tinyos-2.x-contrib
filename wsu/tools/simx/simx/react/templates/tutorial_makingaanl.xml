@@ -1,0 +1,1 @@
+<template description="Making a an L." category="tutorial"><line># Requires: TossimTopo, TopoGen</line><line></line><line>nodes = T[0:8]</line><line>TopoGen.line(nodes, start=(0,0), end=(16,0))</line><line></line><line>nodes = T[8:16]</line><line>TopoGen.line(nodes, start=(0,2), end=(0,16))</line></template>

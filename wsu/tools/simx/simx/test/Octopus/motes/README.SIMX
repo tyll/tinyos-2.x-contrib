@@ -1,0 +1,26 @@
+This directory was original retrieved from the TinyOS 2.x contrib CVS
+on 10 Oct 2008. The application has been modified to work under Tossim
+and use Simx components. Original files have been renamed *.orig*, as
+appropriate.
+
+
+Building Octopus for Tossim/Simx:
+
+SIMXLIB=/path/to/simx/lib make micaz sim
+
+Replace "sim" with "sim-sf" to enable Serial-Forward. If the
+environment variable SIMXLIB is pre-configured and exported it does
+not need to appear before the "make" command.
+
+
+Summary of Changes:
+
+"#idndef TOSSIM" clauses in OctopusAppC.nc and OctopusC.nc to disable
+CC2420ActiveMessageC usage and, by extension, LPL. Tossim, only
+provides the ActiveMessageC and SerialActiveMessageC components.
+
+Changed Sensor wiring in OctopusAppC.nc to use "new SimxSensor(0,
+uint16_t)".
+
+Makefile adjusted to setup required include paths and include
+"Makefile.tos" sources for Simx components.

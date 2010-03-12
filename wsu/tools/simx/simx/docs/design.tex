@@ -1,0 +1,598 @@
+\documentstyle[11pt,a4]{article}
+\begin{document}
+
+\begin{titlepage}
+SimX: Simulation eXtensions for Tossim/T2.
+
+Paul Stickney // 2008-2009
+
+\end{titlepage}
+
+\section{Overview}
+
+SimX is a collection of Simulation Extensions for Tossim/T2.
+(Tossim/T2). Tossim/T2 is the defacto TinyOS 2.x discrete-event
+simulation environment. The tools SimX provides are designed to be
+minimally evasive to the Tossim (sim) and Tossim-Live (sim-sf) TinyOS
+build targets: no modifications are required of either Tossim or
+Tossim-Live in order to use Simx.
+
+\begin{itemize}
+\item Minumum invasion
+\item Discrete components
+\end{itemize}
+
+\subsection{Disclaimer: Run Real Tests}
+
+Simulators, including Tossim, can only be as accurate as the model
+that they are based on. As Chad Metcalf demonstrated, in his
+Tossim-Live paper, Tossim can render an accurate representation of a
+real environment if it is constructed from data collected from the
+original WSN environment. However, using tools like the USC link-gain
+generator (or DynTopo), may lead to idealized models which do not
+adequately represent real-world sitations. {\em All simulation testing
+  should be backed by tests conducted in a real WSN.}
+
+\subsection{Separation: Don't Cheat}
+
+The ideology behind SimX is to provide useful extensions while
+maintaining a separation of concern between simulation layers: the
+simulation (run in Tossim kernel), the simulation environment (SimX,
+code that creates and maintains the environment), and external
+applications (such as MViz). Each component strives to only expose the
+data available in a real environment.
+
+{\em In no case should motes or ``real world'' applications be given
+  more information than an be expected in a real scenario.}
+
+While SimX tries to establish informal barriers that decrease the
+chance of ``leaking information'', the levels of seperation must be
+maintained by the users of SimX to avoid pollution of the simulation
+environment.
+
+During the course of this document the following terms will be used:
+simulation, simulation environment (or just environment), and external
+applications (or applications).
+
+\paragraph{Simulation}
+The simulation engine, Tossim, runs TinyOS code using an event-driven
+simulation environment with virtualized hardware interfaces. The
+simulation operates under the parameters and configuration provided by
+the simulation environment.
+
+\paragraph{Simulation Environment}
+The simulation environment is composed of a set of modules, including
+SimX, and test framework code that is responsible for defining the
+parameters of the simulation environment. This includes link-gain
+information, noise models, sensor input, and environmental
+interaction, if any.
+
+\paragraph{External Applications}
+External applications may communicate with motes, but only insofar as
+provided by the motes themselves, such as when one or motes function
+as a gateway through a serial connection. For testing purposes,
+external applications may also passively monitor the
+environment. However, {\em any interaction with the environment is
+  discouraged} as the relationship is only provided through the
+simulation environment and is not idicative of a real WSN.
+
+\section{Modular Design}
+
+The base SimX modules can be used directly in a Tossim
+environment. The modules provided increased control on the simulation
+environment and are written in a combination of Python, nesC and C++,
+Java, and Scala, according to need. While there are dependencies
+between some of the base modules, {\em most base modules can be used
+  as stand-alone entities or entity-groups in Tossim TinyOS projects}.
+
+Base modules with nesC components are designed to be easy to link into
+existing Tossim projects and require only minimal changes to build
+configurations. Normally, each nesC-SimX module builds its own shared
+library (such as \_SimxPushbackmodule.so) and links it against the
+compiled Tossim module (\_TOSSIM.so). Using this approach enables a
+high degree of customization, allows efficient caching of compiled
+code, and does not require modifications to existing sim/sim-sf TinyOS
+targets.
+
+Since conversion of an application to support Tossim may require some
+modifications, the minimal changes are acceptable. Furthermore, guards
+can be used to maintain non-simulated and simulated code in the same
+codebase.
+
+For example, to add Sensor support to a Tossim project one simply has
+to copy in the Makefile.simx file, modify if needed, and use that as
+the compilation target.
+
+\subsection{SimxBase}
+
+Dependencies: (none)
+nesC: no
+Python: yes
+
+SimxBase is a Python wrapper around the Tossim Python model. It
+provides a mechanism to cleanly decorate nodes with extensions,
+performs some small caching, and adds useful utility
+functions. Because it is a wrapper for Tossim, it exports all the
+initial functionality of the Tossim object.
+
+The features provided by SimxBase are used as a consistent foundation
+for other support, such as sensor readings and a model with dynamic
+gain calculation.
+
+Using tossim base is very simple and consistent.
+
+``
+from TOSSIM import Tossim
+from simx.tossim import TossimBase
+base = TossimBase(Tossim[])
+``
+
+``
+Fetching a single node:
+
+# prefered method
+node0 = base[0]
+
+# just as in Tossim
+node0 = base.getNode(0)
+
+# Tossim.methodCalls have a base.method_call alias for consistency
+node0 = base.get_node(0)
+
+# TossimBase can also fetch multiple nodes
+node2, node3, node4 = base[2:5] # start-index=2, end-index=5
+
+node0, node1 = base[xrange(0, 2)]
+node42, node17 = base[[1,2,3]]
+nodes = base.get_nodes([1,2,3])
+
+Turning on nodes is just like in Tossim:
+
+node.turn_on() # or node.turnOn()
+
+# A node can be turned on and booted at the specified time
+# This is a short-hand for node.turn_on(); node.bootAtTime(time);
+node.turn_on(time)
+
+node.turn_off() # or node.turnOff()
+``
+
+Because of the internal caching semantics of TossimBase nodes should
+be connected using direct access.
+
+``
+Connecting nodes
+
+node0.connect(node1, gain)
+node0.connect_both(node1, gain)
+node0.disconnect(node1, gain)
+node0.disconnect_both(node1, gain)
+
+# List radio connections [Node, Gain]
+node0.connections()
+# Returns list of neighbor nodes
+node0.neighbors()
+``
+
+The radio method of TossimBase returns a radio proxy that will
+correctly dispatch to the correct node.
+
+Notes: Since TossimBase performs caching it is important that only the
+Node objects returned by TossimBase are used. Methods should never be
+called directly on the original Tossim object or radio.
+
+
+\subsection{Probe}
+
+The Probe component allows efficient read and write access to Tossim
+variables using zero-copy mapped buffers. It uses a small C/SWIG
+extension to create the PyBuffer objects. Data marshalling, buffer
+caching, and structure parsing/manipulation is performed in
+Python. The Probe module replaces TossimApp, TossimNescDecls and
+Tossim.Variable for variable-access in the Tossim environment.
+
+Probe is primarily a Python module which reads in the nesC-generated
+``app.xml'' file. After the declarations are read and the Tossim
+environment is initialized, Tossim variables can be read from and and
+written to. In addition to supporting transparent access through
+Python data structures, Probe also has the ability to dynamically
+re-define data-types based on composition of existing types. This
+allows for operations such as treating a ``message\_t'' buffer as both
+a raw TOS message data-structure and a application-specific payload at
+the same time.
+
+Probe is also designed to support other Simx components, most notably
+Simx/Watch. Thus, Probe provides a method of quickly determining which
+variable data may have changed which can be used to significantly
+reduce the amount of expression checks required.
+
+Steps to using Probe.
+\begin{itemize}
+\item Enable building the Probe module from the TinyOS 2 application
+\item Load Tossim and the Probe module
+\item Load the app.xml file with Probe
+\item Lookup a Tossim variableitem
+\item Bind the variable to one or more motes
+\end{itemize}
+
+For efficiency purposes, resolved Probe definitions (returned from
+ProbeLoader.lookup()) and bound Probe objects (returned from bind())
+should be kept until no longer needed. Resolving and binding Probes
+can be rather costly operations.
+
+Example \#1:
+
+import probe.parser.ProbeLoader
+\# Load definitions
+loader = ProbeLoader(``app.xml'')
+\# Bind the variable from Mote \#1
+var1 = loader.lookup(``OscilloscopeC\$buffer'').bind(1)
+\# Set the first byte of the header of the message\_t type
+var1[``header''][0] = 1
+
+Example \#2 (combining structural types): 
+
+Access payload of message\_t as a specific kind of structure (an
+oscilloscope\_t structure in this case).
+
+loader = ProbeLoader(``app.xml'')
+def = loader.lookup(``OscilloscopeC\$buffer'',
+                    (``[data]'', ``oscilloscope\_t''))
+var = def.bind(1)
+print var[``payload''][``version'']
+
+
+Advantages over Tossim.Variable:
+
+\begin{enumerate}
+\item Can modify Tossim variables. This could also be considered a
+  disadvantage.
+\item Easier to use. The entire structure of a variable, including any
+  nested structures (structs or arrays), is exposed in a simple
+  manner. Nested primitives are accessible by direct access/assignment
+  of item slots. No additional marshalling is required to access the
+  contents of a variable.
+\item Can dynamically re-define structure formats to meet application
+  requirements through composition of existing types.
+\item Memory-backed buffers avoid making copies of data and
+  significantly reduce the amount of C/SWIG calls required. This also
+  reduces the complexity of the C code required to marshall the data
+  and moves more control into the Python layer.
+\item Data marshalling handled by standard ``struct'' Python module.
+\item Integrated support for variable watching. A single call to
+  C/SWIG can scan a list of Probe objects to identify which
+  variables have changed.
+\end{enumerate}
+
+Advantages over TossimApp/TossimNescDecls:
+
+Probe was written with variable access from within Tossim exclusively
+in mind. It strives to focus on easy of use from within a Tossim
+environment.
+\begin{enumerate}
+\item Streamlined interface. Only ``essential'' support/access
+  provide. Some extra features found in TossimNescDecls have been
+  dropped entirely.
+\item Faster parsing. Simple tests show a reduction from 2.3 to 1.3
+  seconds.
+\item Supports ``combination'' of structure types.
+\end{enumerate}
+
+Limitations/missing features/disadvantages:
+
+\begin{enumerate}
+  \item Only variables which are wrapped by Tossim can be accessed.
+    These are limited to global variables located in TinyOS components
+    which have not been removed by optimization. This limitation also
+    applies to Tossim.Variable and is imposed by how Tossim operates.
+  \item While the structure of variables and data-types is kept, all
+    non-primitive type information, including structure names, is
+    dropped during the decomposition. Probe is designed to work with
+    raw structures, not simply definitions of
+    structures. TossimNescDecls keeps much more information.
+  \item Only variables and associated structures are supported. No
+    constants, enums, functions, interfaces or components are handled
+    directly.
+  \item There is no support for pointers or zero-length arrays.
+  \item There is no support for unions (this may be added).
+  \item Probe and Probedef objects may use significantly more memory
+    due to the structural decomposition model employed.
+  \item Buffers and shadow buffers are cached (avoids duplication) but
+    never released.
+\end{enumerate}
+
+
+\subsection{Pushback: Uniform callbacks}
+
+The Pushback component is a nesC/SWIG/Python module which provides a
+uniform mechanism for establishing callbacks between compiled nesC
+code in Tossim and the Python/C++ simulation environment.
+
+While not normally used directly, this mechanism is used as the
+underlying transport for such modules as SimxSensor and SimxTxPower
+modules. By employing a dynamic dispatch, Pushback is flexible,
+reduces code duplication, and can easily support future callback-based
+extensions.
+
+The Pushback component is not dependent upon any other SimX modules.
+
+How it works:
+
+The Tossim environment sets up callbacks. Each callback is given a
+particular name. When the node code is executed it may invoke a
+callback by using the SimxPushback nesC module.
+
+\subsection{Sensor: Custom sensor readings}
+
+SimxSensor supplies the SimxSensorC nesC component and supporting
+Python classes. SensorC supports the {\em Read} interface and can
+address 256 independent read channels. Each channel can be configured
+to read in 8, 16, or 32 bit sizes. There is also a per-channel
+read-delay that may be specified as a fixed value, a sampled value, or
+the result of a function.
+
+A Python module, SensorControl, is also provided simplify channel
+management.
+
+Included Python helper functions are available to stream data from
+plain-text files, fixed-width binary files, and SAC (Seismic Activity
+Code) files. In addition, a fully customizable sine-wave generator is
+provided to feed sensor input with easily verifiable test data.
+
+The following nesC instantiates two sensors. SensorA is a 32-bit sensor on channel 0 and SensorB is a 16-bit-wide sensor on channel 2.
+``
+components
+  new SimxSensorC(uint32_t, 0) as SensorA,
+  new SimxSensorC(uint16_t, 2) as SensorB;
+``
+
+Using the sensor module is equally as easy.
+
+``
+from simx.sensor import SensorControl, SensorExtension
+
+# base has already been setup as a TossimBase wrapper object
+base.register_extension(SensorExtension(SensorControl(SimxSensor())))
+
+node0 = base[0]
+node0.connect_sensor(0, funcA, 1)
+node0.connect_sensor(0, funcB, 1)
+
+# disconnect a sensor (future readings will result in failures)
+node0.disconnect_sensor(0)
+``
+
+Both the read functions and delay functions take three
+arguments... the delay function is invoked as soon as Read.read of the
+SimxSensor component is requested and the read function is request
+after the delay and is immediately used as a value to
+SimxSensor.readDone (Read).
+
+In addition the sensor Python modules provide a simple way for connect
+some common sources of channels and some function generators.
+
+The Sensor module relies on the Pushback module.
+
+
+\subsection{Sync: High-fidelity time control}
+
+Sync, or Tossim sync, allows a simulation to be run in ``world
+time''. That is, the simulation can be throttled to run no faster than
+the real WSN would operate. Or, optionally, the ratio of simulation
+time to real-world time may be configured.
+
+Sync provides an advanced version of the time-throttle support
+provided by the Tossim Live extensions. Since Sync actively examines
+the forward event queue it has a higher time accuracy than the Tossim
+Live extension. Peeking forward allows for a much more accurate
+synchronization approach, especially as the frequency of events
+decreases.
+
+Additionally, TSync correctly manages the Python GIL (Global
+Interpreter Lock) to support multi-threaded Python applications. Some
+SimX features, such as Inject, require multi-threading support.
+
+
+\subsubsection{Event: Run at precise times}
+
+The Event module is a pure-Python component that provides convenience
+methods and helpers to run events at a precise simulation time. This
+mechanism can be used to model external events and event propagations.
+
+The Event module also supports configuration of code to execute
+immediately after the node is booted. This provides a safe and easy
+method of configuring sensors and other per-node information.
+
+
+\subsection{Inject: Create SF streams}
+
+{\em The standard Tossim-Live Throttle will not work with Inject.}
+Inject requires threading support to work. Use Sync as an advanced
+alternative to the standard Tossim-Live Throttle.
+
+The Inject module provides a thread-safe mechanism to create
+additional Serial Forward (SF) streams. The primary purpose is to
+allow communication between the Act and React modules but it may also
+be used as any generalized SF transport stream. Inject SF streams can
+also act as a ``piggyback'' by bridging an existing SF connection.
+
+
+\subsection{DynTopo: Dynamic Topology Manager}
+
+\emph{While a dynamic topology can be used to create an interative
+  environment, it is crucial to realize that this environment is only
+  as ``real'' as the contrived forumals used to generate it.}
+
+DynTopo is a pure Python extension that allows for the creation and
+maintenance of topologies with dynamically adjusting link-gain
+models. It achieves this by maintaining a virtual node location and
+applying the USC link-gain formula. Noise generation is not currently
+supported.
+
+DynTopo also provides functions to create topologies (grids, ellipses,
+lines, random scatters, etc.) as well as to save and load generated
+topologies and link-gain models.
+
+
+\subsubsection{TxPower: Simulate TX Power}
+
+{\em TxPower depends on DynTopo}
+
+TxPower is a nesC/Python module that allows motes to change their
+transmission power. Since Tossim itself only works off of a supplied
+link-gain model, this module requires a dynamic topology manager, such
+as DynTopo, to rebuild the simulation model after a power change.
+
+The TxPower module relies on the Pushback module.
+
+
+\section{Act/React: Tossim Visualization Environment}
+
+\subsection{Overview}
+
+The Act and React modules provided a visualization environment for
+Tossim.  In this way, Act/React, along with the base SimX components,
+serve as a replacement for TinyViz in TinyOS 1.x. Act/React are highly
+dependant upon the base SimX components to operate. The exact
+requirement varies based on configuration and required functionality.
+
+
+\subsection{Separation: Again}
+
+As with the rest of the SimX environment, Act/React strive to keep the
+simulation, simulation environment, and application layers
+separate. However, {\em It is up to Act/React users to ensure that
+  cross-layer contamination does not occur.}
+
+
+\subsection{Basic Operation}
+
+Act is a server that runs the Tossim simulation and provides the
+necessary bindings for remote access and is responsible for {\em
+  executing normal python commands in the running environment}.
+
+React is a Java-compatible client (the source is written in Scala)
+that communicates with the Act server to inspect and modify the
+simulation environment. The primary React interface is the Console
+which allows execution of remote commands on an Act server. Additional
+visualization components are also provided.
+
+
+\subsection{Visual Components}
+
+React strives to provide a nice graphical user interface to interact
+with a running Act server and comes with several standard interfaces
+and Act extension modules. The ability for each React visual component
+to perform is dependent upon the corresponding Act module to be
+configured. A minimal Act configuration may not support all React
+components.
+
+{\em All SimX base components can be used directly within Act/React --
+  React simply provides a nice interface.} That is, simulation sensors
+can be connected, TX power and topologies can be simulated and
+generated, event call-backs can be added, etc. The use of React on top
+is simply to provide a nice interaction environment and aid in
+simulation interaction.
+
+
+\subsubsection{Console}
+
+The console allows direct execution of arbitrary Python commands
+inside the Act environment. The output area displays results, errors
+and debugging information. In addition, a history is provided to
+recall previously sent commands.
+
+
+\subsubsection{Template Manager}
+
+Templates allow commands and operations to be saved for future
+execution.  The templates can be directly executed or inserted into
+the current Console buffer.  Templates can also be easily distributed
+between different React clients.
+
+Default templates are included which show a wide range of operations
+such as node manipulation.  These templates can be used, modified, and
+combined as needed to perform a wide range of tasks.  Additionally,
+since the templates are merely python code, they may be used directly
+inside the test harness.
+
+
+\subsubsection{TimeControl}
+
+The time control component uses the TSync module to run the simulation
+``in real time'' as well as providing support to pause and resume the
+simulation. It shows an approximation of the current simulation time,
+the execution status, and allows the simulation to be stopped,
+started, or run until a specific simulation time (absolute-time or
+delta-time).
+
+{\em TimeControl requires the use of TSync and Event}
+
+
+\subsubsection{Topology}
+
+The topology component provides a zoom-able user interface which
+visualizes nodes and links in a synthetic network created by the
+DynTopo component. The topology control also allows a limited form of
+direct mote interaction.
+
+{\em Topology visualization and control requires DynTopo.}
+
+
+\subsubsection{Watch Variables}
+
+{\em This is obsolete. The newer Probe interface is not complete yet.}
+
+
+\subsection{Details}
+
+\subsubsection{Client/Server}
+
+Act/React use a client-server model to interact. This is significantly
+different approach than TinyViz for TinyOS 1.x and has both advantages
+and disadvantages.
+
+\begin{enumerate}
+\item Distributed environment. Act and React can run on separate
+  machines as long as a SF TCP connection can be established. However,
+  performance depends upon the speed of the connection.
+\item Compatible with plain Tossim/T2 C++ bindings. Unlike TinyViz, no
+  additional Jython / Java bridge is required.
+\item Can connect multiple clients. A React server can connect to
+  control an environment while an external application can connect to
+  collect comparison data.
+\item Separation of contexts. By design, the client/server approach
+  force clear protocols to be followed. This makes it more difficult,
+  but not impossible, to cross-pollute some layers.
+\item Increase in overhead and additional transport layer. The
+  communication protocol is more expensive than the Jython Java
+  bindings and requires an explicit API including protocol
+  maintenance.
+\end{enumerate}
+
+\subsubsection{Communication}
+
+{\em This is changing!}  The old SF-based socket with the MIG
+interface has become hard to maintain and, while flexible, suffers
+from some internal problems.  The newer design is based to work off of
+Google Protocol Buffers, but these to do not have sufficient library
+support for the IO component.
+
+All communication is done over SF (Serial-Forward) compatible
+sockets. Messages between Act and React are based on MIG-generated
+structures. Some messages utilize a variable-length encoding. The
+maximum length of message data is 64*1204 bytes in size. The messages
+are further encoded into valid SF message frames with an AM type
+specific to Act. Each encoded message frame has no more than 240 bytes
+of payload. A single Act or React message may take multiple SF
+messages to complete.
+
+Communication with the Act server occurs through Command
+messages. These messages contain Python code which are executed within
+the context of the Act server and loaded modules. Upon completion of
+the command, the Act server sends the appropriate reply messages to
+React. The Act server may also send unsolicited messages, such as when
+internal information has been updated. A general subscribe/publish
+model is used.
+
+\end{document}

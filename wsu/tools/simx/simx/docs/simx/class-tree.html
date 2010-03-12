@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Class Hierarchy</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+
+  <!-- Tree link -->
+      <th bgcolor="#70b0f0" class="navbar-select"
+          >&nbsp;&nbsp;&nbsp;Trees&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">&nbsp;</td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="class-tree.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<center><b>
+ [ <a href="module-tree.html">Module Hierarchy</a>
+ | <a href="class-tree.html">Class Hierarchy</a> ]
+</b></center><br />
+<h1 class="epydoc">Class Hierarchy</h1>
+<ul class="nomargin-top">
+    <li> <strong class="uidlink"><a href="simx.dyntopo.Link.BasicLinkModel-class.html">simx.dyntopo.Link.BasicLinkModel</a></strong>:
+      <em class="summary">A basic Link Layer model derived off of the USC generator.</em>
+    </li>
+    <li> <strong class="uidlink"><a href="simx.probe.probedef.Definition-class.html">simx.probe.probedef.Definition</a></strong>:
+      <em class="summary">A probe defintion is used to capture the important information 
+        about a variable/structure scheme for interaction with Tossim.</em>
+    <ul>
+    <li> <strong class="uidlink"><a href="simx.probe.probedef.Array-class.html">simx.probe.probedef.Array</a></strong>
+    </li>
+    <li> <strong class="uidlink"><a href="simx.probe.probedef.Link-class.html">simx.probe.probedef.Link</a></strong>
+    </li>
+    <li> <strong class="uidlink"><a href="simx.probe.probedef.Primitive-class.html">simx.probe.probedef.Primitive</a></strong>
+    </li>
+    <li> <strong class="uidlink"><a href="simx.probe.probedef.Struct-class.html">simx.probe.probedef.Struct</a></strong>
+    </li>
+    </ul>
+    </li>
+    <li> <strong class="uidlink"><a href="simx.event.event.Manager-class.html">simx.event.event.Manager</a></strong>:
+      <em class="summary">Schedule events to run at a specific time.</em>
+    </li>
+    <li> <strong class="uidlink"><a href="simx.event.event.PriorityQueue-class.html">simx.event.event.PriorityQueue</a></strong>:
+      <em class="summary">[Questionable] PQ implementation.</em>
+    </li>
+    <li> <strong class="uidlink"><a href="simx.probe.parse.ProbeLink-class.html">simx.probe.parse.ProbeLink</a></strong>:
+      <em class="summary">Reference holder to be able to assign references early.</em>
+    </li>
+    <li> <strong class="uidlink">Queue.Queue</strong>:
+      <em class="summary">Create a queue object with a given maximum size.</em>
+    <ul>
+    <li> <strong class="uidlink"><a href="simx.inject.queue.FifoQueue-class.html">simx.inject.queue.FifoQueue</a></strong>:
+      <em class="summary">Like Queue, but discards old items if the capacity is reached.</em>
+    </li>
+    </ul>
+    </li>
+    <li> <strong class="uidlink">asyncore.dispatcher</strong>
+    <ul>
+    <li> <strong class="uidlink"><a href="simx.inject.inject.Inject-class.html">simx.inject.inject.Inject</a></strong>:
+      <em class="summary">Select-dispatch to move packets across sf-compatible streams.</em>
+    </li>
+    <li> <strong class="uidlink"><a href="simx.inject.wiretap.InjectSock-class.html">simx.inject.wiretap.InjectSock</a></strong>
+    <ul>
+    <li> <strong class="uidlink"><a href="simx.inject.wiretap.InjectPacketSock-class.html">simx.inject.wiretap.InjectPacketSock</a></strong>:
+      <em class="summary">Socket connection from SFInject to connected clients.</em>
+    <ul>
+    <li> <strong class="uidlink"><a href="simx.inject.wiretap.InjectDownstream-class.html">simx.inject.wiretap.InjectDownstream</a></strong>
+    </li>
+    <li> <strong class="uidlink"><a href="simx.inject.wiretap.InjectUpstream-class.html">simx.inject.wiretap.InjectUpstream</a></strong>
+    </li>
+    </ul>
+    </li>
+    <li> <strong class="uidlink"><a href="simx.inject.wiretap.InjectTrigger-class.html">simx.inject.wiretap.InjectTrigger</a></strong>:
+      <em class="summary">Do-almost-nothing wrapper for trigger.</em>
+    </li>
+    </ul>
+    </li>
+    </ul>
+    </li>
+    <li> <strong class="uidlink">object</strong>:
+      <em class="summary">The most base type</em>
+    <ul>
+    <li> <strong class="uidlink">exceptions.BaseException</strong>:
+      <em class="summary">Common base class for all exceptions</em>
+    <ul>
+    <li> <strong class="uidlink">exceptions.Exception</strong>:
+      <em class="summary">Common base class for all non-exit exceptions.</em>
+    <ul>
+    <li> <strong class="uidlink">exceptions.StandardError</strong>:
+      <em class="summary">Base class for all standard Python exceptions that do not represent
+        interpreter exiting.</em>
+    <ul>
+    <li> <strong class="uidlink"><a href="exceptions.AssertionError-class.html">exceptions.AssertionError</a></strong>:
+      <em class="summary">Assertion failed.</em>
+    </li>
+    <li> <strong class="uidlink">exceptions.RuntimeError</strong>:
+      <em class="summary">Unspecified run-time error.</em>
+    <ul>
+    <li> <strong class="uidlink"><a href="simx.probe.parse.LookupError-class.html">simx.probe.parse.LookupError</a></strong>:
+      <em class="summary">If an error occurs during a variable lookup.</em>
+    </li>
+    <li> <strong class="uidlink"><a href="simx.probe.parse.ReplacementError-class.html">simx.probe.parse.ReplacementError</a></strong>:
+      <em class="summary">If an error occurs during the replacement (except lookup failure).</em>
+    </li>
+    <li> <strong class="uidlink"><a href="simx.sensor.sensor.SensorError-class.html">simx.sensor.sensor.SensorError</a></strong>:
+      <em class="summary">Small wrapper for 'SensorErrors'</em>
+    </li>
+    </ul>
+    </li>
+    </ul>
+    </li>
+    <li> <strong class="uidlink">exceptions.Warning</strong>:
+      <em class="summary">Base class for warning categories.</em>
+    <ul>
+    <li> <strong class="uidlink">exceptions.RuntimeWarning</strong>:
+      <em class="summary">Base class for warnings about dubious runtime behavior.</em>
+    <ul>
+    <li> <strong class="uidlink"><a href="simx.inject.inject.InvalidVersionWarning-class.html">simx.inject.inject.InvalidVersionWarning</a></strong>:
+      <em class="summary">Warning generated when an invalid version is detected.</em>
+    </li>
+    <li> <strong class="uidlink"><a href="simx.inject.queue.QueueFullWarning-class.html">simx.inject.queue.QueueFullWarning</a></strong>:
+      <em class="summary">Warning issued when queue if full.</em>
+    </li>
+    </ul>
+    </li>
+    </ul>
+    </li>
+    </ul>
+    </li>
+    </ul>
+    </li>
+    <li> <strong class="uidlink"><a href="simx.probe.probe.CachingProber-class.html">simx.probe.probe.CachingProber</a></strong>:
+      <em class="summary">Creating a caching wrapper around a prober.</em>
+    </li>
+    <li> <strong class="uidlink"><a href="simx.base.channel.ChannelBridge-class.html">simx.base.channel.ChannelBridge</a></strong>:
+      <em class="summary">Bridge TOSSIM channels (that are based on system FDs) to Python 
+        where they can be generally accessed.</em>
+    </li>
+    <li> <strong class="uidlink"><a href="simx.dyntopo.Support.DummyMonitor-class.html">simx.dyntopo.Support.DummyMonitor</a></strong>
+    </li>
+    <li> <strong class="uidlink"><a href="simx.base.extension.Extension-class.html">simx.base.extension.Extension</a></strong>
+    <ul>
+    <li> <strong class="uidlink"><a href="simx.sensor.extension.SensorExtension-class.html">simx.sensor.extension.SensorExtension</a></strong>:
+      <em class="summary">Sensor extension for simx.base.</em>
+    </li>
+    </ul>
+    </li>
+    <li> <strong class="uidlink"><a href="simx.sensor.generator.Generator-class.html">simx.sensor.generator.Generator</a></strong>
+    </li>
+    <li> <strong class="uidlink"><a href="simx.dyntopo.Topo.GenericNode-class.html">simx.dyntopo.Topo.GenericNode</a></strong>
+    </li>
+    <li> <strong class="uidlink"><a href="simx.base.node.Node-class.html">simx.base.node.Node</a></strong>:
+      <em class="summary">Wrapper for a TOSSIM node.</em>
+    </li>
+    <li> <strong class="uidlink"><a href="simx.dyntopo.Manager.NodeManager-class.html">simx.dyntopo.Manager.NodeManager</a></strong>:
+      <em class="summary">Generic support for basic item management.</em>
+    <ul>
+    <li> <strong class="uidlink"><a href="simx.dyntopo.Topo.GenericTopo-class.html">simx.dyntopo.Topo.GenericTopo</a></strong>:
+      <em class="summary">Creates a generic topology (that is not tied to TOSSIM).</em>
+    </li>
+    </ul>
+    </li>
+    <li> <strong class="uidlink"><a href="simx.probe.probe.Probe-class.html">simx.probe.probe.Probe</a></strong>
+    <ul>
+    <li> <strong class="uidlink"><a href="simx.probe.probe.ProbeArray-class.html">simx.probe.probe.ProbeArray</a></strong>
+    </li>
+    <li> <strong class="uidlink"><a href="simx.probe.probe.ProbeStruct-class.html">simx.probe.probe.ProbeStruct</a></strong>
+    </li>
+    </ul>
+    </li>
+    <li> <strong class="uidlink"><a href="simx.probe.parse.ProbeLoader-class.html">simx.probe.parse.ProbeLoader</a></strong>:
+      <em class="summary">Build Probe Definitions from a nesC-generate app.xml file.</em>
+    </li>
+    <li> <strong class="uidlink"><a href="simx.base.radio.RadioRedirect-class.html">simx.base.radio.RadioRedirect</a></strong>:
+      <em class="summary">This 'radio' object intercepts calls and redirects them to the 
+        appropriate node.</em>
+    </li>
+    <li> <strong class="uidlink"><a href="simx.sensor.reader.Reader-class.html">simx.sensor.reader.Reader</a></strong>:
+      <em class="summary">Methods to assist in reading from a file.</em>
+    </li>
+    <li> <strong class="uidlink"><a href="simx.sensor.sensor.SensorControl-class.html">simx.sensor.sensor.SensorControl</a></strong>:
+      <em class="summary">Manages the Pushback interconnect for sensors.</em>
+    </li>
+    <li> <strong class="uidlink"><a href="simx.sensor.extension.SensorMixin-class.html">simx.sensor.extension.SensorMixin</a></strong>:
+      <em class="summary">Extension mixin</em>
+    </li>
+    <li> <strong class="uidlink"><a href="simx.sensor.streamer.Streamer-class.html">simx.sensor.streamer.Streamer</a></strong>
+    <ul>
+    <li> <strong class="uidlink"><a href="simx.sensor.streamer.BinaryStreamer-class.html">simx.sensor.streamer.BinaryStreamer</a></strong>:
+      <em class="summary">For streaming binary files in a fixed format.</em>
+    </li>
+    <li> <strong class="uidlink"><a href="simx.sensor.streamer.SacStreamer-class.html">simx.sensor.streamer.SacStreamer</a></strong>:
+      <em class="summary">For streaming SAC streams.</em>
+    </li>
+    <li> <strong class="uidlink"><a href="simx.sensor.streamer.TextStreamer-class.html">simx.sensor.streamer.TextStreamer</a></strong>:
+      <em class="summary">For streaming integer values as text.</em>
+    </li>
+    </ul>
+    </li>
+    <li> <strong class="uidlink">unittest.TestCase</strong>:
+      <em class="summary">A class whose instances are single test cases.</em>
+    <ul>
+    <li> <strong class="uidlink"><a href="simx.base.testutil._Check-class.html" onclick="show_private();">simx.base.testutil._Check</a></strong>
+    </li>
+    </ul>
+    </li>
+    <li> <strong class="uidlink"><a href="simx.sync.time_control.TimeControl-class.html">simx.sync.time_control.TimeControl</a></strong>:
+      <em class="summary">Wrapper to control SimxSync and event execution.</em>
+    </li>
+    <li> <strong class="uidlink"><a href="simx.base.tossim.TossimBase-class.html">simx.base.tossim.TossimBase</a></strong>:
+      <em class="summary">A wrapper for the TOSSIM base object; the primary purpose of this 
+        is to provide a cache of simx.node.Node objects.</em>
+    </li>
+    <li> <strong class="uidlink"><a href="simx.probe.probe._NoProbeLibraryLoaded-class.html" onclick="show_private();">simx.probe.probe._NoProbeLibraryLoaded</a></strong>:
+      <em class="summary">Basic class used for reporting errors when the probe environment is
+        used without being initialized.</em>
+    </li>
+    <li> <strong class="uidlink">dict</strong>:
+      <em class="summary">dict() -&gt; new empty dictionary.</em>
+    <ul>
+    <li> <strong class="uidlink"><a href="simx.probe.probe.Probe.DefaultMemo-class.html">simx.probe.probe.Probe.DefaultMemo</a></strong>
+    </li>
+    </ul>
+    </li>
+    </ul>
+    </li>
+</ul>
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+
+  <!-- Tree link -->
+      <th bgcolor="#70b0f0" class="navbar-select"
+          >&nbsp;&nbsp;&nbsp;Trees&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Wed Aug 12 00:17:36 2009
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

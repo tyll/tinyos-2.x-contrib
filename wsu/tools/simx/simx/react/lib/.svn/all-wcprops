@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/tinyos-svn/!svn/ver/774/sensorweb/tools/simx/trunk/react/lib
+END
+scala-library.jar
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/tinyos-svn/!svn/ver/774/sensorweb/tools/simx/trunk/react/lib/scala-library.jar
+END
+tinyos.jar
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/tinyos-svn/!svn/ver/774/sensorweb/tools/simx/trunk/react/lib/tinyos.jar
+END
+piccolo.jar
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/tinyos-svn/!svn/ver/774/sensorweb/tools/simx/trunk/react/lib/piccolo.jar
+END
+license-piccolo.txt
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/tinyos-svn/!svn/ver/774/sensorweb/tools/simx/trunk/react/lib/license-piccolo.txt
+END
+protobuf-java-2.1.0.jar
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/tinyos-svn/!svn/ver/774/sensorweb/tools/simx/trunk/react/lib/protobuf-java-2.1.0.jar
+END
+scala-compiler.jar
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/tinyos-svn/!svn/ver/774/sensorweb/tools/simx/trunk/react/lib/scala-compiler.jar
+END
+piccolox.jar
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/tinyos-svn/!svn/ver/774/sensorweb/tools/simx/trunk/react/lib/piccolox.jar
+END
+license-protobuf.txt
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/tinyos-svn/!svn/ver/774/sensorweb/tools/simx/trunk/react/lib/license-protobuf.txt
+END

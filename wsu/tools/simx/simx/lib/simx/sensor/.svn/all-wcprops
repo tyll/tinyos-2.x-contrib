@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/tinyos-svn/!svn/ver/1299/sensorweb/tools/simx/trunk/lib/simx/sensor
+END
+SimxSensorImpl32P.nc
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/tinyos-svn/!svn/ver/1299/sensorweb/tools/simx/trunk/lib/simx/sensor/SimxSensorImpl32P.nc
+END
+Makefile.tos
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/tinyos-svn/!svn/ver/771/sensorweb/tools/simx/trunk/lib/simx/sensor/Makefile.tos
+END
+SensorControl.nc
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/tinyos-svn/!svn/ver/1290/sensorweb/tools/simx/trunk/lib/simx/sensor/SensorControl.nc
+END
+SimxSensorP.nc
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/tinyos-svn/!svn/ver/1299/sensorweb/tools/simx/trunk/lib/simx/sensor/SimxSensorP.nc
+END
+SimxSensorC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/tinyos-svn/!svn/ver/1299/sensorweb/tools/simx/trunk/lib/simx/sensor/SimxSensorC.nc
+END

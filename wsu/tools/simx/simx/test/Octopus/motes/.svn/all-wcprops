@@ -1,0 +1,107 @@
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/tinyos-svn/!svn/ver/1299/sensorweb/tools/simx/trunk/test/Octopus/motes
+END
+Octopus.h
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/tinyos-svn/!svn/ver/997/sensorweb/tools/simx/trunk/test/Octopus/motes/Octopus.h
+END
+test_access.py
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/tinyos-svn/!svn/ver/787/sensorweb/tools/simx/trunk/test/Octopus/motes/test_access.py
+END
+OctopusSensorC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/tinyos-svn/!svn/ver/773/sensorweb/tools/simx/trunk/test/Octopus/motes/OctopusSensorC.nc
+END
+Makefile.orig-broken
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/tinyos-svn/!svn/ver/773/sensorweb/tools/simx/trunk/test/Octopus/motes/Makefile.orig-broken
+END
+OctopusC.nc.orig-with-lpl
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/svn/tinyos-svn/!svn/ver/773/sensorweb/tools/simx/trunk/test/Octopus/motes/OctopusC.nc.orig-with-lpl
+END
+Makefile.simx
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/tinyos-svn/!svn/ver/773/sensorweb/tools/simx/trunk/test/Octopus/motes/Makefile.simx
+END
+OctopusAppC.nc.orig
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/tinyos-svn/!svn/ver/773/sensorweb/tools/simx/trunk/test/Octopus/motes/OctopusAppC.nc.orig
+END
+OctopusC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/tinyos-svn/!svn/ver/997/sensorweb/tools/simx/trunk/test/Octopus/motes/OctopusC.nc
+END
+variables.py
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/tinyos-svn/!svn/ver/1299/sensorweb/tools/simx/trunk/test/Octopus/motes/variables.py
+END
+OctopusAppC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/tinyos-svn/!svn/ver/1289/sensorweb/tools/simx/trunk/test/Octopus/motes/OctopusAppC.nc
+END
+OctopusC.nc_ver_stack
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/tinyos-svn/!svn/ver/773/sensorweb/tools/simx/trunk/test/Octopus/motes/OctopusC.nc_ver_stack
+END
+OctopusCollectedMsg.java
+K 25
+svn:wc:ra_dav:version-url
+V 99
+/svn/tinyos-svn/!svn/ver/997/sensorweb/tools/simx/trunk/test/Octopus/motes/OctopusCollectedMsg.java
+END
+OctopusConfig.h
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/tinyos-svn/!svn/ver/1246/sensorweb/tools/simx/trunk/test/Octopus/motes/OctopusConfig.h
+END
+README.SIMX
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/tinyos-svn/!svn/ver/773/sensorweb/tools/simx/trunk/test/Octopus/motes/README.SIMX
+END
+OctopusSentMsg.java
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/tinyos-svn/!svn/ver/773/sensorweb/tools/simx/trunk/test/Octopus/motes/OctopusSentMsg.java
+END
+run.sh
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/tinyos-svn/!svn/ver/1246/sensorweb/tools/simx/trunk/test/Octopus/motes/run.sh
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/tinyos-svn/!svn/ver/773/sensorweb/tools/simx/trunk/test/Octopus/motes/Makefile
+END

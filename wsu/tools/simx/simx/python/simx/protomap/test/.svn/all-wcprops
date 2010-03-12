@@ -1,0 +1,17 @@
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/tinyos-svn/!svn/ver/770/sensorweb/tools/simx/trunk/python/simx/protomap/test
+END
+server_manual.py
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svn/tinyos-svn/!svn/ver/770/sensorweb/tools/simx/trunk/python/simx/protomap/test/server_manual.py
+END
+packet_test.py
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/tinyos-svn/!svn/ver/770/sensorweb/tools/simx/trunk/python/simx/protomap/test/packet_test.py
+END

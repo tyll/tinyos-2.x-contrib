@@ -1,0 +1,33 @@
+# This is designed to be included from a TOS application Makefile.
+#
+# @author Paul Stickney
+
+SIMX ?=simx
+SIMXLIB ?=$(SIMX)/lib/simx
+SIMX_PROBE_DIR ?=$(SIMXLIB)/probe
+
+BUILD=`pwd`/simbuild/simx
+
+CFLAGS +=-I$(SIMX_PROBE_DIR)
+BUILD_EXTRA_DEPS +=simx-probe-check
+
+simx-probe-check: FORCE
+	@if [ ! -f $(SIMX_PROBE_DIR)/probe.i ]; then \
+	echo "'$(SIMX_PROBE_DIR)' does not contain SimX/Probe source."; \
+	echo 'Please set SIMX, SIMXLIB or SIMX_PROBE_DIR correctly.'; \
+	exit 1; \
+	fi
+
+# sim and sim-sf completely ignore this POST_BUILD_EXTRA_DEPS because
+# they reset BUILD_DEPS. The following gets around this restriction.
+micaz: simx-probe
+simx-probe: $(BUILD_DEPS)
+	mkdir -p $(BUILD)
+	APP_ROOT="`pwd`" make -C $(SIMX_PROBE_DIR)
+
+clean: simx-probe-clean
+simx-probe-clean:
+	rm -f SimxProbe.py SimxProbe.pyc
+	rm -f _SimxProbemodule.so _SimxProbe.dll
+
+FORCE:

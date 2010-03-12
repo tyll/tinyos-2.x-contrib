@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/tinyos-svn/!svn/ver/1781/sensorweb/tools/simx/trunk/python/tinyos/message
+END
+__init__.py
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/tinyos-svn/!svn/ver/770/sensorweb/tools/simx/trunk/python/tinyos/message/__init__.py
+END
+MoteIF.py
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/tinyos-svn/!svn/ver/770/sensorweb/tools/simx/trunk/python/tinyos/message/MoteIF.py
+END
+Message.py
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/tinyos-svn/!svn/ver/770/sensorweb/tools/simx/trunk/python/tinyos/message/Message.py
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/tinyos-svn/!svn/ver/770/sensorweb/tools/simx/trunk/python/tinyos/message/Makefile
+END
+SerialPacket.py
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/tinyos-svn/!svn/ver/770/sensorweb/tools/simx/trunk/python/tinyos/message/SerialPacket.py
+END

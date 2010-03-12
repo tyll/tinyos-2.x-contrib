@@ -1,0 +1,11 @@
+test: app.xml run-nose
+
+app.xml: *.nc *.h Makefile*
+	make -f Makefile.simx micaz sim
+
+run-nose: FORCE
+	nosetests test_probe.py
+	nosetests test_live.py
+
+FORCE:
+

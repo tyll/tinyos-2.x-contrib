@@ -1,0 +1,71 @@
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/tinyos-svn/!svn/ver/773/sensorweb/tools/simx/trunk/test/act/Oscilloscope/java
+END
+Graph.java
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/tinyos-svn/!svn/ver/773/sensorweb/tools/simx/trunk/test/act/Oscilloscope/java/Graph.java
+END
+run
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/tinyos-svn/!svn/ver/773/sensorweb/tools/simx/trunk/test/act/Oscilloscope/java/run
+END
+ColorCellEditor.java
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/svn/tinyos-svn/!svn/ver/773/sensorweb/tools/simx/trunk/test/act/Oscilloscope/java/ColorCellEditor.java
+END
+Node.java
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/tinyos-svn/!svn/ver/773/sensorweb/tools/simx/trunk/test/act/Oscilloscope/java/Node.java
+END
+OscilloscopeMsg.java
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/svn/tinyos-svn/!svn/ver/773/sensorweb/tools/simx/trunk/test/act/Oscilloscope/java/OscilloscopeMsg.java
+END
+Window.java
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/tinyos-svn/!svn/ver/773/sensorweb/tools/simx/trunk/test/act/Oscilloscope/java/Window.java
+END
+Data.java
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/tinyos-svn/!svn/ver/773/sensorweb/tools/simx/trunk/test/act/Oscilloscope/java/Data.java
+END
+Constants.java
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/svn/tinyos-svn/!svn/ver/773/sensorweb/tools/simx/trunk/test/act/Oscilloscope/java/Constants.java
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/tinyos-svn/!svn/ver/773/sensorweb/tools/simx/trunk/test/act/Oscilloscope/java/Makefile
+END
+Oscilloscope.java
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/svn/tinyos-svn/!svn/ver/773/sensorweb/tools/simx/trunk/test/act/Oscilloscope/java/Oscilloscope.java
+END
+build.xml
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/tinyos-svn/!svn/ver/773/sensorweb/tools/simx/trunk/test/act/Oscilloscope/java/build.xml
+END

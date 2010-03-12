@@ -1,0 +1,1 @@
+<template description="Write Topology" category="tutorial"><line># Genereate a topology (see &quot;Add nodes&quot;) and then run</line><line># this template. The resulting topology should be written</line><line># to the Console window.</line><line># See &quot;Read Topology&quot; on how to read the topology back in.</line><line></line><line>T.writeTopo(OUT)</line></template>

@@ -1,0 +1,1289 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>simx.probe.probedef</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        Package&nbsp;simx ::
+        <a href="simx.probe-module.html">Package&nbsp;probe</a> ::
+        Module&nbsp;probedef
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="simx.probe.probedef-pysrc.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<h1 class="epydoc">Source Code for <a href="simx.probe.probedef-module.html">Module simx.probe.probedef</a></h1>
+<pre class="py-src">
+<a name="L1"></a><tt class="py-lineno">  1</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-op">.</tt><tt id="link-0" class="py-name" targets="Package simx.probe=simx.probe-module.html,Module simx.probe.probe=simx.probe.probe-module.html"><a title="simx.probe
+simx.probe.probe" class="py-name" href="#" onclick="return doclink('link-0', 'probe', 'link-0');">probe</a></tt> <tt class="py-keyword">import</tt> <tt id="link-1" class="py-name" targets="Class simx.probe.probe.Probe=simx.probe.probe.Probe-class.html"><a title="simx.probe.probe.Probe" class="py-name" href="#" onclick="return doclink('link-1', 'Probe', 'link-1');">Probe</a></tt><tt class="py-op">,</tt> <tt id="link-2" class="py-name" targets="Class simx.probe.probe.ProbeArray=simx.probe.probe.ProbeArray-class.html"><a title="simx.probe.probe.ProbeArray" class="py-name" href="#" onclick="return doclink('link-2', 'ProbeArray', 'link-2');">ProbeArray</a></tt><tt class="py-op">,</tt> <tt id="link-3" class="py-name" targets="Class simx.probe.probe.ProbeStruct=simx.probe.probe.ProbeStruct-class.html"><a title="simx.probe.probe.ProbeStruct" class="py-name" href="#" onclick="return doclink('link-3', 'ProbeStruct', 'link-3');">ProbeStruct</a></tt> </tt>
+<a name="L2"></a><tt class="py-lineno">  2</tt>  <tt class="py-line"> </tt>
+<a name="L3"></a><tt class="py-lineno">  3</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-name">simx</tt> <tt class="py-keyword">import</tt> <tt class="py-name">json</tt> <tt class="py-keyword">as</tt> <tt class="py-name">simplejson</tt> </tt>
+<a name="L4"></a><tt class="py-lineno">  4</tt>  <tt class="py-line"> </tt>
+<a name="L5"></a><tt class="py-lineno">  5</tt>  <tt class="py-line"><tt class="py-comment"># Mapping of a "c name" onto a primitive. At the very least this makes</tt> </tt>
+<a name="L6"></a><tt class="py-lineno">  6</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># the assumption that the compiler used to compile python and the nesC</tt> </tt>
+<a name="L7"></a><tt class="py-lineno">  7</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># compiler aggree on the size of each type. (If the sizes do not match</tt> </tt>
+<a name="L8"></a><tt class="py-lineno">  8</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># the error should be caught during Probe construction.)</tt> </tt>
+<a name="L9"></a><tt class="py-lineno">  9</tt>  <tt class="py-line"><tt class="py-comment"></tt> </tt>
+<a name="L10"></a><tt class="py-lineno"> 10</tt>  <tt class="py-line"><tt class="py-comment"># PST-- this should possibly take into account the "lesser systems";</tt> </tt>
+<a name="L11"></a><tt class="py-lineno"> 11</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># is there a reliable way to determine Python-nesC type mappings?</tt> </tt>
+<a name="L12"></a><tt class="py-lineno"> 12</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt id="link-4" class="py-name" targets="Variable simx.probe.probedef.PRIMITIVES=simx.probe.probedef-module.html#PRIMITIVES"><a title="simx.probe.probedef.PRIMITIVES" class="py-name" href="#" onclick="return doclink('link-4', 'PRIMITIVES', 'link-4');">PRIMITIVES</a></tt> <tt class="py-op">=</tt> <tt class="py-op">{</tt> </tt>
+<a name="L13"></a><tt class="py-lineno"> 13</tt>  <tt class="py-line">    <tt class="py-string">'unsigned char'</tt><tt class="py-op">:</tt> <tt class="py-string">'B'</tt><tt class="py-op">,</tt> </tt>
+<a name="L14"></a><tt class="py-lineno"> 14</tt>  <tt class="py-line">    <tt class="py-string">'signed char'</tt><tt class="py-op">:</tt> <tt class="py-string">'b'</tt><tt class="py-op">,</tt> </tt>
+<a name="L15"></a><tt class="py-lineno"> 15</tt>  <tt class="py-line">    <tt class="py-string">'unsigned short'</tt><tt class="py-op">:</tt><tt class="py-string">'H'</tt><tt class="py-op">,</tt> </tt>
+<a name="L16"></a><tt class="py-lineno"> 16</tt>  <tt class="py-line">    <tt class="py-string">'short'</tt><tt class="py-op">:</tt> <tt class="py-string">'h'</tt><tt class="py-op">,</tt> </tt>
+<a name="L17"></a><tt class="py-lineno"> 17</tt>  <tt class="py-line">    <tt class="py-string">'unsigned int'</tt><tt class="py-op">:</tt> <tt class="py-string">'L'</tt><tt class="py-op">,</tt> <tt class="py-comment">#H/2</tt> </tt>
+<a name="L18"></a><tt class="py-lineno"> 18</tt>  <tt class="py-line">    <tt class="py-string">'int'</tt><tt class="py-op">:</tt> <tt class="py-string">'i'</tt><tt class="py-op">,</tt> <tt class="py-comment">#(TossimApp has this as 'L', why?) h/2</tt> </tt>
+<a name="L19"></a><tt class="py-lineno"> 19</tt>  <tt class="py-line">    <tt class="py-string">'unsigned long'</tt><tt class="py-op">:</tt> <tt class="py-string">'L'</tt><tt class="py-op">,</tt> </tt>
+<a name="L20"></a><tt class="py-lineno"> 20</tt>  <tt class="py-line">    <tt class="py-string">'long'</tt><tt class="py-op">:</tt> <tt class="py-string">'l'</tt><tt class="py-op">,</tt> </tt>
+<a name="L21"></a><tt class="py-lineno"> 21</tt>  <tt class="py-line">    <tt class="py-string">'long long'</tt><tt class="py-op">:</tt> <tt class="py-string">'q'</tt><tt class="py-op">,</tt> </tt>
+<a name="L22"></a><tt class="py-lineno"> 22</tt>  <tt class="py-line">    <tt class="py-string">'unsigned long long'</tt><tt class="py-op">:</tt> <tt class="py-string">'Q'</tt><tt class="py-op">,</tt> </tt>
+<a name="L23"></a><tt class="py-lineno"> 23</tt>  <tt class="py-line">    <tt class="py-string">'float'</tt><tt class="py-op">:</tt> <tt class="py-string">'f'</tt><tt class="py-op">,</tt> </tt>
+<a name="L24"></a><tt class="py-lineno"> 24</tt>  <tt class="py-line">    <tt class="py-string">'double'</tt><tt class="py-op">:</tt> <tt class="py-string">'d'</tt><tt class="py-op">,</tt> <tt class="py-comment">#f/4</tt> </tt>
+<a name="L25"></a><tt class="py-lineno"> 25</tt>  <tt class="py-line">    <tt class="py-string">'char'</tt><tt class="py-op">:</tt> <tt class="py-string">'c'</tt><tt class="py-op">,</tt> </tt>
+<a name="L26"></a><tt class="py-lineno"> 26</tt>  <tt class="py-line">    <tt class="py-comment"># PST- this is very suspect, it might "work" on x86-64</tt> </tt>
+<a name="L27"></a><tt class="py-lineno"> 27</tt>  <tt class="py-line">    <tt class="py-string">'pointer'</tt><tt class="py-op">:</tt> <tt class="py-string">'L'</tt> </tt>
+<a name="L28"></a><tt class="py-lineno"> 28</tt>  <tt class="py-line">    <tt class="py-op">}</tt> </tt>
+<a name="L29"></a><tt class="py-lineno"> 29</tt>  <tt class="py-line"> </tt>
+<a name="L30"></a><tt class="py-lineno"> 30</tt>  <tt class="py-line"> </tt>
+<a name="Definition"></a><div id="Definition-def"><a name="L31"></a><tt class="py-lineno"> 31</tt> <a class="py-toggle" href="#" id="Definition-toggle" onclick="return toggle('Definition');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="simx.probe.probedef.Definition-class.html">Definition</a><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Definition-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="Definition-expanded"><a name="L32"></a><tt class="py-lineno"> 32</tt>  <tt class="py-line">    <tt class="py-docstring">"""</tt> </tt>
+<a name="L33"></a><tt class="py-lineno"> 33</tt>  <tt class="py-line"><tt class="py-docstring">    A probe defintion is used to capture the important information</tt> </tt>
+<a name="L34"></a><tt class="py-lineno"> 34</tt>  <tt class="py-line"><tt class="py-docstring">    about a variable/structure scheme for interaction with</tt> </tt>
+<a name="L35"></a><tt class="py-lineno"> 35</tt>  <tt class="py-line"><tt class="py-docstring">    Tossim. Among other things this includes type information and</tt> </tt>
+<a name="L36"></a><tt class="py-lineno"> 36</tt>  <tt class="py-line"><tt class="py-docstring">    memory offsets.</tt> </tt>
+<a name="L37"></a><tt class="py-lineno"> 37</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L38"></a><tt class="py-lineno"> 38</tt>  <tt class="py-line"><tt class="py-docstring">    Definitions are designed to make minimal distinction between</tt> </tt>
+<a name="L39"></a><tt class="py-lineno"> 39</tt>  <tt class="py-line"><tt class="py-docstring">    declarations (variables), structural definitions (types), and</tt> </tt>
+<a name="L40"></a><tt class="py-lineno"> 40</tt>  <tt class="py-line"><tt class="py-docstring">    typedefs insomuch as they are represented by the same structures.</tt> </tt>
+<a name="L41"></a><tt class="py-lineno"> 41</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L42"></a><tt class="py-lineno"> 42</tt>  <tt class="py-line"><tt class="py-docstring">    Variable definitions may be fully resolved and, in doing so, will</tt> </tt>
+<a name="L43"></a><tt class="py-lineno"> 43</tt>  <tt class="py-line"><tt class="py-docstring">    also enable child definitions to be resolved.</tt> </tt>
+<a name="L44"></a><tt class="py-lineno"> 44</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="L45"></a><tt class="py-lineno"> 45</tt>  <tt class="py-line"> </tt>
+<a name="L46"></a><tt class="py-lineno"> 46</tt>  <tt class="py-line">    <tt class="py-name">__slots__</tt> <tt class="py-op">=</tt> <tt class="py-op">[</tt><tt class="py-string">'var'</tt><tt class="py-op">,</tt> <tt class="py-string">'var_offset'</tt><tt class="py-op">,</tt> <tt class="py-string">'offset_bits'</tt><tt class="py-op">,</tt> <tt class="py-string">'size'</tt><tt class="py-op">]</tt> </tt>
+<a name="L47"></a><tt class="py-lineno"> 47</tt>  <tt class="py-line"> </tt>
+<a name="Definition.__init__"></a><div id="Definition.__init__-def"><a name="L48"></a><tt class="py-lineno"> 48</tt> <a class="py-toggle" href="#" id="Definition.__init__-toggle" onclick="return toggle('Definition.__init__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.probe.probedef.Definition-class.html#__init__">__init__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">var</tt><tt class="py-op">=</tt><tt class="py-name">None</tt><tt class="py-op">,</tt> <tt class="py-param">var_offset</tt><tt class="py-op">=</tt><tt class="py-name">None</tt><tt class="py-op">,</tt> <tt class="py-param">size</tt><tt class="py-op">=</tt><tt class="py-op">-</tt><tt class="py-number">1</tt><tt class="py-op">,</tt> <tt class="py-param">offset_bits</tt><tt class="py-op">=</tt><tt class="py-name">None</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Definition.__init__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Definition.__init__-expanded"><a name="L49"></a><tt class="py-lineno"> 49</tt>  <tt class="py-line">        <tt class="py-keyword">assert</tt> <tt class="py-name">type</tt> <tt class="py-keyword">is</tt> <tt class="py-keyword">not</tt> <tt class="py-name">None</tt> </tt>
+<a name="L50"></a><tt class="py-lineno"> 50</tt>  <tt class="py-line">        <tt class="py-keyword">assert</tt> <tt id="link-5" class="py-name" targets="Variable simx.probe.probe.Probe.size=simx.probe.probe.Probe-class.html#size"><a title="simx.probe.probe.Probe.size" class="py-name" href="#" onclick="return doclink('link-5', 'size', 'link-5');">size</a></tt> <tt class="py-op">&gt;=</tt> <tt class="py-number">0</tt> <tt class="py-comment"># structs may have 0 size</tt> </tt>
+<a name="L51"></a><tt class="py-lineno"> 51</tt>  <tt class="py-line"> </tt>
+<a name="L52"></a><tt class="py-lineno"> 52</tt>  <tt class="py-line">        <tt class="py-comment"># Base TOSSIM variable-entry point (string) and offset in</tt> </tt>
+<a name="L53"></a><tt class="py-lineno"> 53</tt>  <tt class="py-line"><tt class="py-comment"></tt>        <tt class="py-comment"># bytes away from the start of the variable. These are both</tt> </tt>
+<a name="L54"></a><tt class="py-lineno"> 54</tt>  <tt class="py-line"><tt class="py-comment"></tt>        <tt class="py-comment"># set if a probe definition is fully resolved.</tt> </tt>
+<a name="L55"></a><tt class="py-lineno"> 55</tt>  <tt class="py-line"><tt class="py-comment"></tt>        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">var</tt> <tt class="py-op">=</tt> <tt class="py-name">var</tt> </tt>
+<a name="L56"></a><tt class="py-lineno"> 56</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">var_offset</tt> <tt class="py-op">=</tt> <tt class="py-name">var_offset</tt> </tt>
+<a name="L57"></a><tt class="py-lineno"> 57</tt>  <tt class="py-line"> </tt>
+<a name="L58"></a><tt class="py-lineno"> 58</tt>  <tt class="py-line">        <tt class="py-comment"># Offset in BITS from parent and total number of BYTES used.</tt> </tt>
+<a name="L59"></a><tt class="py-lineno"> 59</tt>  <tt class="py-line"><tt class="py-comment"></tt>        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">offset_bits</tt> <tt class="py-op">=</tt> <tt class="py-name">offset_bits</tt> </tt>
+<a name="L60"></a><tt class="py-lineno"> 60</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-6" class="py-name"><a title="simx.probe.probe.Probe.size" class="py-name" href="#" onclick="return doclink('link-6', 'size', 'link-5');">size</a></tt> <tt class="py-op">=</tt> <tt id="link-7" class="py-name"><a title="simx.probe.probe.Probe.size" class="py-name" href="#" onclick="return doclink('link-7', 'size', 'link-5');">size</a></tt> </tt>
+</div><a name="L61"></a><tt class="py-lineno"> 61</tt>  <tt class="py-line"> </tt>
+<a name="L62"></a><tt class="py-lineno"> 62</tt>  <tt class="py-line"> </tt>
+<a name="Definition.attrs"></a><div id="Definition.attrs-def"><a name="L63"></a><tt class="py-lineno"> 63</tt> <a class="py-toggle" href="#" id="Definition.attrs-toggle" onclick="return toggle('Definition.attrs');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.probe.probedef.Definition-class.html#attrs">attrs</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Definition.attrs-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Definition.attrs-expanded"><a name="L64"></a><tt class="py-lineno"> 64</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L65"></a><tt class="py-lineno"> 65</tt>  <tt class="py-line"><tt class="py-docstring">        Attributes which survive clones (base must return a new dict).</tt> </tt>
+<a name="L66"></a><tt class="py-lineno"> 66</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L67"></a><tt class="py-lineno"> 67</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-op">{</tt> </tt>
+<a name="L68"></a><tt class="py-lineno"> 68</tt>  <tt class="py-line">            <tt class="py-string">"var"</tt><tt class="py-op">:</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">var</tt><tt class="py-op">,</tt> <tt class="py-string">"var_offset"</tt><tt class="py-op">:</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">var_offset</tt><tt class="py-op">,</tt> </tt>
+<a name="L69"></a><tt class="py-lineno"> 69</tt>  <tt class="py-line">            <tt class="py-string">"size"</tt><tt class="py-op">:</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-8" class="py-name"><a title="simx.probe.probe.Probe.size" class="py-name" href="#" onclick="return doclink('link-8', 'size', 'link-5');">size</a></tt><tt class="py-op">,</tt> <tt class="py-string">"offset_bits"</tt><tt class="py-op">:</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">offset_bits</tt> </tt>
+<a name="L70"></a><tt class="py-lineno"> 70</tt>  <tt class="py-line">            <tt class="py-op">}</tt> </tt>
+</div><a name="L71"></a><tt class="py-lineno"> 71</tt>  <tt class="py-line"> </tt>
+<a name="L72"></a><tt class="py-lineno"> 72</tt>  <tt class="py-line"> </tt>
+<a name="Definition.probe_attrs"></a><div id="Definition.probe_attrs-def"><a name="L73"></a><tt class="py-lineno"> 73</tt> <a class="py-toggle" href="#" id="Definition.probe_attrs-toggle" onclick="return toggle('Definition.probe_attrs');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.probe.probedef.Definition-class.html#probe_attrs">probe_attrs</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Definition.probe_attrs-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Definition.probe_attrs-expanded"><a name="L74"></a><tt class="py-lineno"> 74</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L75"></a><tt class="py-lineno"> 75</tt>  <tt class="py-line"><tt class="py-docstring">        Attributes normalized to create Probe objects"</tt> </tt>
+<a name="L76"></a><tt class="py-lineno"> 76</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L77"></a><tt class="py-lineno"> 77</tt>  <tt class="py-line">        <tt id="link-9" class="py-name" targets="Method simx.probe.probe.Probe.attrs()=simx.probe.probe.Probe-class.html#attrs,Method simx.probe.probe.ProbeArray.attrs()=simx.probe.probe.ProbeArray-class.html#attrs,Method simx.probe.probe.ProbeStruct.attrs()=simx.probe.probe.ProbeStruct-class.html#attrs,Method simx.probe.probedef.Array.attrs()=simx.probe.probedef.Array-class.html#attrs,Method simx.probe.probedef.Definition.attrs()=simx.probe.probedef.Definition-class.html#attrs,Method simx.probe.probedef.Link.attrs()=simx.probe.probedef.Link-class.html#attrs,Method simx.probe.probedef.Primitive.attrs()=simx.probe.probedef.Primitive-class.html#attrs,Method simx.probe.probedef.Struct.attrs()=simx.probe.probedef.Struct-class.html#attrs"><a title="simx.probe.probe.Probe.attrs
+simx.probe.probe.ProbeArray.attrs
+simx.probe.probe.ProbeStruct.attrs
+simx.probe.probedef.Array.attrs
+simx.probe.probedef.Definition.attrs
+simx.probe.probedef.Link.attrs
+simx.probe.probedef.Primitive.attrs
+simx.probe.probedef.Struct.attrs" class="py-name" href="#" onclick="return doclink('link-9', 'attrs', 'link-9');">attrs</a></tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-10" class="py-name"><a title="simx.probe.probe.Probe.attrs
+simx.probe.probe.ProbeArray.attrs
+simx.probe.probe.ProbeStruct.attrs
+simx.probe.probedef.Array.attrs
+simx.probe.probedef.Definition.attrs
+simx.probe.probedef.Link.attrs
+simx.probe.probedef.Primitive.attrs
+simx.probe.probedef.Struct.attrs" class="py-name" href="#" onclick="return doclink('link-10', 'attrs', 'link-9');">attrs</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L78"></a><tt class="py-lineno"> 78</tt>  <tt class="py-line">        <tt id="link-11" class="py-name"><a title="simx.probe.probe.Probe.attrs
+simx.probe.probe.ProbeArray.attrs
+simx.probe.probe.ProbeStruct.attrs
+simx.probe.probedef.Array.attrs
+simx.probe.probedef.Definition.attrs
+simx.probe.probedef.Link.attrs
+simx.probe.probedef.Primitive.attrs
+simx.probe.probedef.Struct.attrs" class="py-name" href="#" onclick="return doclink('link-11', 'attrs', 'link-9');">attrs</a></tt><tt class="py-op">[</tt><tt class="py-string">'offset'</tt><tt class="py-op">]</tt> <tt class="py-op">=</tt> <tt id="link-12" class="py-name"><a title="simx.probe.probe.Probe.attrs
+simx.probe.probe.ProbeArray.attrs
+simx.probe.probe.ProbeStruct.attrs
+simx.probe.probedef.Array.attrs
+simx.probe.probedef.Definition.attrs
+simx.probe.probedef.Link.attrs
+simx.probe.probedef.Primitive.attrs
+simx.probe.probedef.Struct.attrs" class="py-name" href="#" onclick="return doclink('link-12', 'attrs', 'link-9');">attrs</a></tt><tt class="py-op">[</tt><tt class="py-string">'var_offset'</tt><tt class="py-op">]</tt> </tt>
+<a name="L79"></a><tt class="py-lineno"> 79</tt>  <tt class="py-line">        <tt id="link-13" class="py-name"><a title="simx.probe.probe.Probe.attrs
+simx.probe.probe.ProbeArray.attrs
+simx.probe.probe.ProbeStruct.attrs
+simx.probe.probedef.Array.attrs
+simx.probe.probedef.Definition.attrs
+simx.probe.probedef.Link.attrs
+simx.probe.probedef.Primitive.attrs
+simx.probe.probedef.Struct.attrs" class="py-name" href="#" onclick="return doclink('link-13', 'attrs', 'link-9');">attrs</a></tt><tt class="py-op">[</tt><tt class="py-string">'pack'</tt><tt class="py-op">]</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-14" class="py-name" targets="Method simx.probe.probedef.Array.pack_def()=simx.probe.probedef.Array-class.html#pack_def,Method simx.probe.probedef.Definition.pack_def()=simx.probe.probedef.Definition-class.html#pack_def,Method simx.probe.probedef.Primitive.pack_def()=simx.probe.probedef.Primitive-class.html#pack_def,Method simx.probe.probedef.Struct.pack_def()=simx.probe.probedef.Struct-class.html#pack_def"><a title="simx.probe.probedef.Array.pack_def
+simx.probe.probedef.Definition.pack_def
+simx.probe.probedef.Primitive.pack_def
+simx.probe.probedef.Struct.pack_def" class="py-name" href="#" onclick="return doclink('link-14', 'pack_def', 'link-14');">pack_def</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L80"></a><tt class="py-lineno"> 80</tt>  <tt class="py-line">        <tt class="py-keyword">del</tt> <tt id="link-15" class="py-name"><a title="simx.probe.probe.Probe.attrs
+simx.probe.probe.ProbeArray.attrs
+simx.probe.probe.ProbeStruct.attrs
+simx.probe.probedef.Array.attrs
+simx.probe.probedef.Definition.attrs
+simx.probe.probedef.Link.attrs
+simx.probe.probedef.Primitive.attrs
+simx.probe.probedef.Struct.attrs" class="py-name" href="#" onclick="return doclink('link-15', 'attrs', 'link-9');">attrs</a></tt><tt class="py-op">[</tt><tt class="py-string">'var_offset'</tt><tt class="py-op">]</tt> </tt>
+<a name="L81"></a><tt class="py-lineno"> 81</tt>  <tt class="py-line">        <tt class="py-keyword">del</tt> <tt id="link-16" class="py-name"><a title="simx.probe.probe.Probe.attrs
+simx.probe.probe.ProbeArray.attrs
+simx.probe.probe.ProbeStruct.attrs
+simx.probe.probedef.Array.attrs
+simx.probe.probedef.Definition.attrs
+simx.probe.probedef.Link.attrs
+simx.probe.probedef.Primitive.attrs
+simx.probe.probedef.Struct.attrs" class="py-name" href="#" onclick="return doclink('link-16', 'attrs', 'link-9');">attrs</a></tt><tt class="py-op">[</tt><tt class="py-string">'offset_bits'</tt><tt class="py-op">]</tt> </tt>
+<a name="L82"></a><tt class="py-lineno"> 82</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt id="link-17" class="py-name"><a title="simx.probe.probe.Probe.attrs
+simx.probe.probe.ProbeArray.attrs
+simx.probe.probe.ProbeStruct.attrs
+simx.probe.probedef.Array.attrs
+simx.probe.probedef.Definition.attrs
+simx.probe.probedef.Link.attrs
+simx.probe.probedef.Primitive.attrs
+simx.probe.probedef.Struct.attrs" class="py-name" href="#" onclick="return doclink('link-17', 'attrs', 'link-9');">attrs</a></tt> </tt>
+</div><a name="L83"></a><tt class="py-lineno"> 83</tt>  <tt class="py-line"> </tt>
+<a name="L84"></a><tt class="py-lineno"> 84</tt>  <tt class="py-line"> </tt>
+<a name="Definition.str_attrs"></a><div id="Definition.str_attrs-def"><a name="L85"></a><tt class="py-lineno"> 85</tt> <a class="py-toggle" href="#" id="Definition.str_attrs-toggle" onclick="return toggle('Definition.str_attrs');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.probe.probedef.Definition-class.html#str_attrs">str_attrs</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Definition.str_attrs-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Definition.str_attrs-expanded"><a name="L86"></a><tt class="py-lineno"> 86</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L87"></a><tt class="py-lineno"> 87</tt>  <tt class="py-line"><tt class="py-docstring">        Attributes which are displayed with __str__ conversion.</tt> </tt>
+<a name="L88"></a><tt class="py-lineno"> 88</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L89"></a><tt class="py-lineno"> 89</tt>  <tt class="py-line">        <tt id="link-18" class="py-name"><a title="simx.probe.probe.Probe.attrs
+simx.probe.probe.ProbeArray.attrs
+simx.probe.probe.ProbeStruct.attrs
+simx.probe.probedef.Array.attrs
+simx.probe.probedef.Definition.attrs
+simx.probe.probedef.Link.attrs
+simx.probe.probedef.Primitive.attrs
+simx.probe.probedef.Struct.attrs" class="py-name" href="#" onclick="return doclink('link-18', 'attrs', 'link-9');">attrs</a></tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-19" class="py-name"><a title="simx.probe.probe.Probe.attrs
+simx.probe.probe.ProbeArray.attrs
+simx.probe.probe.ProbeStruct.attrs
+simx.probe.probedef.Array.attrs
+simx.probe.probedef.Definition.attrs
+simx.probe.probedef.Link.attrs
+simx.probe.probedef.Primitive.attrs
+simx.probe.probedef.Struct.attrs" class="py-name" href="#" onclick="return doclink('link-19', 'attrs', 'link-9');">attrs</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L90"></a><tt class="py-lineno"> 90</tt>  <tt class="py-line">        <tt id="link-20" class="py-name"><a title="simx.probe.probe.Probe.attrs
+simx.probe.probe.ProbeArray.attrs
+simx.probe.probe.ProbeStruct.attrs
+simx.probe.probedef.Array.attrs
+simx.probe.probedef.Definition.attrs
+simx.probe.probedef.Link.attrs
+simx.probe.probedef.Primitive.attrs
+simx.probe.probedef.Struct.attrs" class="py-name" href="#" onclick="return doclink('link-20', 'attrs', 'link-9');">attrs</a></tt><tt class="py-op">[</tt><tt class="py-string">'pack'</tt><tt class="py-op">]</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-21" class="py-name"><a title="simx.probe.probedef.Array.pack_def
+simx.probe.probedef.Definition.pack_def
+simx.probe.probedef.Primitive.pack_def
+simx.probe.probedef.Struct.pack_def" class="py-name" href="#" onclick="return doclink('link-21', 'pack_def', 'link-14');">pack_def</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L91"></a><tt class="py-lineno"> 91</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt id="link-22" class="py-name"><a title="simx.probe.probe.Probe.attrs
+simx.probe.probe.ProbeArray.attrs
+simx.probe.probe.ProbeStruct.attrs
+simx.probe.probedef.Array.attrs
+simx.probe.probedef.Definition.attrs
+simx.probe.probedef.Link.attrs
+simx.probe.probedef.Primitive.attrs
+simx.probe.probedef.Struct.attrs" class="py-name" href="#" onclick="return doclink('link-22', 'attrs', 'link-9');">attrs</a></tt> </tt>
+</div><a name="L92"></a><tt class="py-lineno"> 92</tt>  <tt class="py-line"> </tt>
+<a name="L93"></a><tt class="py-lineno"> 93</tt>  <tt class="py-line">     </tt>
+<a name="Definition.dup"></a><div id="Definition.dup-def"><a name="L94"></a><tt class="py-lineno"> 94</tt> <a class="py-toggle" href="#" id="Definition.dup-toggle" onclick="return toggle('Definition.dup');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.probe.probedef.Definition-class.html#dup">dup</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-op">**</tt><tt class="py-param">opts</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Definition.dup-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Definition.dup-expanded"><a name="L95"></a><tt class="py-lineno"> 95</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L96"></a><tt class="py-lineno"> 96</tt>  <tt class="py-line"><tt class="py-docstring">        Creates a duplicate object using **opts for overwriting.</tt> </tt>
+<a name="L97"></a><tt class="py-lineno"> 97</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L98"></a><tt class="py-lineno"> 98</tt>  <tt class="py-line">        <tt id="link-23" class="py-name"><a title="simx.probe.probe.Probe.attrs
+simx.probe.probe.ProbeArray.attrs
+simx.probe.probe.ProbeStruct.attrs
+simx.probe.probedef.Array.attrs
+simx.probe.probedef.Definition.attrs
+simx.probe.probedef.Link.attrs
+simx.probe.probedef.Primitive.attrs
+simx.probe.probedef.Struct.attrs" class="py-name" href="#" onclick="return doclink('link-23', 'attrs', 'link-9');">attrs</a></tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-24" class="py-name"><a title="simx.probe.probe.Probe.attrs
+simx.probe.probe.ProbeArray.attrs
+simx.probe.probe.ProbeStruct.attrs
+simx.probe.probedef.Array.attrs
+simx.probe.probedef.Definition.attrs
+simx.probe.probedef.Link.attrs
+simx.probe.probedef.Primitive.attrs
+simx.probe.probedef.Struct.attrs" class="py-name" href="#" onclick="return doclink('link-24', 'attrs', 'link-9');">attrs</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L99"></a><tt class="py-lineno"> 99</tt>  <tt class="py-line">        <tt id="link-25" class="py-name"><a title="simx.probe.probe.Probe.attrs
+simx.probe.probe.ProbeArray.attrs
+simx.probe.probe.ProbeStruct.attrs
+simx.probe.probedef.Array.attrs
+simx.probe.probedef.Definition.attrs
+simx.probe.probedef.Link.attrs
+simx.probe.probedef.Primitive.attrs
+simx.probe.probedef.Struct.attrs" class="py-name" href="#" onclick="return doclink('link-25', 'attrs', 'link-9');">attrs</a></tt><tt class="py-op">.</tt><tt class="py-name">update</tt><tt class="py-op">(</tt><tt class="py-name">opts</tt><tt class="py-op">)</tt> </tt>
+<a name="L100"></a><tt class="py-lineno">100</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">__class__</tt><tt class="py-op">(</tt><tt class="py-op">**</tt><tt id="link-26" class="py-name"><a title="simx.probe.probe.Probe.attrs
+simx.probe.probe.ProbeArray.attrs
+simx.probe.probe.ProbeStruct.attrs
+simx.probe.probedef.Array.attrs
+simx.probe.probedef.Definition.attrs
+simx.probe.probedef.Link.attrs
+simx.probe.probedef.Primitive.attrs
+simx.probe.probedef.Struct.attrs" class="py-name" href="#" onclick="return doclink('link-26', 'attrs', 'link-9');">attrs</a></tt><tt class="py-op">)</tt> </tt>
+</div><a name="L101"></a><tt class="py-lineno">101</tt>  <tt class="py-line"> </tt>
+<a name="L102"></a><tt class="py-lineno">102</tt>  <tt class="py-line"> </tt>
+<a name="Definition.__str__"></a><div id="Definition.__str__-def"><a name="L103"></a><tt class="py-lineno">103</tt> <a class="py-toggle" href="#" id="Definition.__str__-toggle" onclick="return toggle('Definition.__str__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.probe.probedef.Definition-class.html#__str__">__str__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Definition.__str__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Definition.__str__-expanded"><a name="L104"></a><tt class="py-lineno">104</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L105"></a><tt class="py-lineno">105</tt>  <tt class="py-line"><tt class="py-docstring">        Display according to str_attrs.</tt> </tt>
+<a name="L106"></a><tt class="py-lineno">106</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L107"></a><tt class="py-lineno">107</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">str</tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-27" class="py-name" targets="Method simx.probe.probe.Probe.str_attrs()=simx.probe.probe.Probe-class.html#str_attrs,Method simx.probe.probe.ProbeArray.str_attrs()=simx.probe.probe.ProbeArray-class.html#str_attrs,Method simx.probe.probe.ProbeStruct.str_attrs()=simx.probe.probe.ProbeStruct-class.html#str_attrs,Method simx.probe.probedef.Array.str_attrs()=simx.probe.probedef.Array-class.html#str_attrs,Method simx.probe.probedef.Definition.str_attrs()=simx.probe.probedef.Definition-class.html#str_attrs,Method simx.probe.probedef.Link.str_attrs()=simx.probe.probedef.Link-class.html#str_attrs,Method simx.probe.probedef.Primitive.str_attrs()=simx.probe.probedef.Primitive-class.html#str_attrs,Method simx.probe.probedef.Struct.str_attrs()=simx.probe.probedef.Struct-class.html#str_attrs"><a title="simx.probe.probe.Probe.str_attrs
+simx.probe.probe.ProbeArray.str_attrs
+simx.probe.probe.ProbeStruct.str_attrs
+simx.probe.probedef.Array.str_attrs
+simx.probe.probedef.Definition.str_attrs
+simx.probe.probedef.Link.str_attrs
+simx.probe.probedef.Primitive.str_attrs
+simx.probe.probedef.Struct.str_attrs" class="py-name" href="#" onclick="return doclink('link-27', 'str_attrs', 'link-27');">str_attrs</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L108"></a><tt class="py-lineno">108</tt>  <tt class="py-line"> </tt>
+<a name="L109"></a><tt class="py-lineno">109</tt>  <tt class="py-line"> </tt>
+<a name="Definition.norm_type"></a><div id="Definition.norm_type-def"><a name="L110"></a><tt class="py-lineno">110</tt> <a class="py-toggle" href="#" id="Definition.norm_type-toggle" onclick="return toggle('Definition.norm_type');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.probe.probedef.Definition-class.html#norm_type">norm_type</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">type</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Definition.norm_type-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Definition.norm_type-expanded"><a name="L111"></a><tt class="py-lineno">111</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L112"></a><tt class="py-lineno">112</tt>  <tt class="py-line"><tt class="py-docstring">        Returns normalized type (de-references ProbeLink types).</tt> </tt>
+<a name="L113"></a><tt class="py-lineno">113</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L114"></a><tt class="py-lineno">114</tt>  <tt class="py-line"><tt class="py-docstring">        Raises a ValueError on an unresolved link.</tt> </tt>
+<a name="L115"></a><tt class="py-lineno">115</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L116"></a><tt class="py-lineno">116</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">hasattr</tt><tt class="py-op">(</tt><tt class="py-name">type</tt><tt class="py-op">,</tt> <tt class="py-string">"link"</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L117"></a><tt class="py-lineno">117</tt>  <tt class="py-line">            <tt class="py-name">linked</tt> <tt class="py-op">=</tt> <tt class="py-name">type</tt><tt class="py-op">.</tt><tt id="link-28" class="py-name" targets="Method simx.base.node.Node.link()=simx.base.node.Node-class.html#link"><a title="simx.base.node.Node.link" class="py-name" href="#" onclick="return doclink('link-28', 'link', 'link-28');">link</a></tt> </tt>
+<a name="L118"></a><tt class="py-lineno">118</tt>  <tt class="py-line">            <tt class="py-keyword">if</tt> <tt class="py-name">linked</tt> <tt class="py-keyword">is</tt> <tt class="py-name">None</tt><tt class="py-op">:</tt> </tt>
+<a name="L119"></a><tt class="py-lineno">119</tt>  <tt class="py-line">                <tt class="py-keyword">raise</tt> <tt class="py-name">ValueError</tt><tt class="py-op">(</tt><tt class="py-string">"Unresolved link, ref=%s"</tt> <tt class="py-op">%</tt> <tt class="py-name">type</tt><tt class="py-op">.</tt><tt class="py-name">ref</tt><tt class="py-op">)</tt> </tt>
+<a name="L120"></a><tt class="py-lineno">120</tt>  <tt class="py-line">            <tt class="py-keyword">return</tt> <tt class="py-name">linked</tt> </tt>
+<a name="L121"></a><tt class="py-lineno">121</tt>  <tt class="py-line">        <tt class="py-keyword">else</tt><tt class="py-op">:</tt> </tt>
+<a name="L122"></a><tt class="py-lineno">122</tt>  <tt class="py-line">            <tt class="py-keyword">return</tt> <tt class="py-name">type</tt> </tt>
+</div><a name="L123"></a><tt class="py-lineno">123</tt>  <tt class="py-line"> </tt>
+<a name="L124"></a><tt class="py-lineno">124</tt>  <tt class="py-line"> </tt>
+<a name="Definition.pack_def"></a><div id="Definition.pack_def-def"><a name="L125"></a><tt class="py-lineno">125</tt> <a class="py-toggle" href="#" id="Definition.pack_def-toggle" onclick="return toggle('Definition.pack_def');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.probe.probedef.Definition-class.html#pack_def">pack_def</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Definition.pack_def-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Definition.pack_def-expanded"><a name="L126"></a><tt class="py-lineno">126</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L127"></a><tt class="py-lineno">127</tt>  <tt class="py-line"><tt class="py-docstring">        Pack format to access the specific type.</tt> </tt>
+<a name="L128"></a><tt class="py-lineno">128</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L129"></a><tt class="py-lineno">129</tt>  <tt class="py-line">        <tt class="py-keyword">raise</tt> <tt class="py-name">NotImplementedError</tt><tt class="py-op">(</tt><tt class="py-string">"Subclass must implement"</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L130"></a><tt class="py-lineno">130</tt>  <tt class="py-line"> </tt>
+<a name="L131"></a><tt class="py-lineno">131</tt>  <tt class="py-line"> </tt>
+<a name="Definition._check_var"></a><div id="Definition._check_var-def"><a name="L132"></a><tt class="py-lineno">132</tt> <a class="py-toggle" href="#" id="Definition._check_var-toggle" onclick="return toggle('Definition._check_var');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.probe.probedef.Definition-class.html#_check_var">_check_var</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">var</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Definition._check_var-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Definition._check_var-expanded"><a name="L133"></a><tt class="py-lineno">133</tt>  <tt class="py-line">        <tt class="py-name">var</tt> <tt class="py-op">=</tt> <tt class="py-name">var</tt> <tt class="py-keyword">or</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">var</tt> </tt>
+<a name="L134"></a><tt class="py-lineno">134</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-keyword">not</tt> <tt class="py-name">var</tt><tt class="py-op">:</tt> </tt>
+<a name="L135"></a><tt class="py-lineno">135</tt>  <tt class="py-line">            <tt class="py-keyword">raise</tt> <tt class="py-name">RuntimeError</tt><tt class="py-op">(</tt><tt class="py-string">"Not variable-bound: %s"</tt> <tt class="py-op">%</tt> <tt class="py-name">str</tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L136"></a><tt class="py-lineno">136</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">var</tt> </tt>
+</div><a name="L137"></a><tt class="py-lineno">137</tt>  <tt class="py-line"> </tt>
+<a name="L138"></a><tt class="py-lineno">138</tt>  <tt class="py-line"> </tt>
+<a name="Definition._replace"></a><div id="Definition._replace-def"><a name="L139"></a><tt class="py-lineno">139</tt> <a class="py-toggle" href="#" id="Definition._replace-toggle" onclick="return toggle('Definition._replace');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.probe.probedef.Definition-class.html#_replace">_replace</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">var</tt><tt class="py-op">=</tt><tt class="py-name">None</tt><tt class="py-op">,</tt> <tt class="py-param">var_offset</tt><tt class="py-op">=</tt><tt class="py-number">0</tt><tt class="py-op">,</tt> <tt class="py-param">level</tt><tt class="py-op">=</tt><tt class="py-string">""</tt><tt class="py-op">,</tt> <tt class="py-param">replace</tt><tt class="py-op">=</tt><tt class="py-op">{</tt><tt class="py-op">}</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Definition._replace-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Definition._replace-expanded"><a name="L140"></a><tt class="py-lineno">140</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L141"></a><tt class="py-lineno">141</tt>  <tt class="py-line"><tt class="py-docstring">        Common resolving stuff.</tt> </tt>
+<a name="L142"></a><tt class="py-lineno">142</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L143"></a><tt class="py-lineno">143</tt>  <tt class="py-line"><tt class="py-docstring">        If level matches a replace specification then a replace occurs</tt> </tt>
+<a name="L144"></a><tt class="py-lineno">144</tt>  <tt class="py-line"><tt class="py-docstring">        (really just a directed resolve). Will return a (resolved,</tt> </tt>
+<a name="L145"></a><tt class="py-lineno">145</tt>  <tt class="py-line"><tt class="py-docstring">        unused_replacements) or None.</tt> </tt>
+<a name="L146"></a><tt class="py-lineno">146</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L147"></a><tt class="py-lineno">147</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">level</tt> <tt class="py-keyword">in</tt> <tt class="py-name">replace</tt><tt class="py-op">:</tt> </tt>
+<a name="L148"></a><tt class="py-lineno">148</tt>  <tt class="py-line">            <tt class="py-comment"># PST- stay side-effect free</tt> </tt>
+<a name="L149"></a><tt class="py-lineno">149</tt>  <tt class="py-line"><tt class="py-comment"></tt>            <tt id="link-29" class="py-name" targets="Method simx.probe.probedef.Definition._replace()=simx.probe.probedef.Definition-class.html#_replace"><a title="simx.probe.probedef.Definition._replace" class="py-name" href="#" onclick="return doclink('link-29', '_replace', 'link-29');">_replace</a></tt> <tt class="py-op">=</tt> <tt class="py-name">dict</tt><tt class="py-op">(</tt><tt class="py-name">replace</tt><tt class="py-op">)</tt> </tt>
+<a name="L150"></a><tt class="py-lineno">150</tt>  <tt class="py-line">            <tt class="py-name">r</tt> <tt class="py-op">=</tt> <tt id="link-30" class="py-name"><a title="simx.probe.probedef.Definition._replace" class="py-name" href="#" onclick="return doclink('link-30', '_replace', 'link-29');">_replace</a></tt><tt class="py-op">.</tt><tt class="py-name">pop</tt><tt class="py-op">(</tt><tt class="py-name">level</tt><tt class="py-op">)</tt> </tt>
+<a name="L151"></a><tt class="py-lineno">151</tt>  <tt class="py-line">            <tt class="py-comment">#print "level: ",level,"r ",r.size,self.size</tt> </tt>
+<a name="L152"></a><tt class="py-lineno">152</tt>  <tt class="py-line"><tt class="py-comment"></tt>            <tt class="py-keyword">if</tt> <tt class="py-name">r</tt><tt class="py-op">.</tt><tt id="link-31" class="py-name"><a title="simx.probe.probe.Probe.size" class="py-name" href="#" onclick="return doclink('link-31', 'size', 'link-5');">size</a></tt> <tt class="py-op">&gt;</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-32" class="py-name"><a title="simx.probe.probe.Probe.size" class="py-name" href="#" onclick="return doclink('link-32', 'size', 'link-5');">size</a></tt><tt class="py-op">:</tt> </tt>
+<a name="L153"></a><tt class="py-lineno">153</tt>  <tt class="py-line">                <tt class="py-keyword">raise</tt> <tt class="py-name">ValueError</tt><tt class="py-op">(</tt> </tt>
+<a name="L154"></a><tt class="py-lineno">154</tt>  <tt class="py-line">                    <tt class="py-string">"Target (%s) exceeds level size (%s): %d &gt; %d"</tt> <tt class="py-op">%</tt> </tt>
+<a name="L155"></a><tt class="py-lineno">155</tt>  <tt class="py-line">                    <tt class="py-op">(</tt><tt class="py-name">r</tt><tt class="py-op">,</tt> <tt class="py-name">level</tt><tt class="py-op">,</tt> <tt class="py-name">r</tt><tt class="py-op">,</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-33" class="py-name"><a title="simx.probe.probe.Probe.size" class="py-name" href="#" onclick="return doclink('link-33', 'size', 'link-5');">size</a></tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L156"></a><tt class="py-lineno">156</tt>  <tt class="py-line"> </tt>
+<a name="L157"></a><tt class="py-lineno">157</tt>  <tt class="py-line">            <tt class="py-comment"># Ensure some important data, such as offset bits, are</tt> </tt>
+<a name="L158"></a><tt class="py-lineno">158</tt>  <tt class="py-line"><tt class="py-comment"></tt>            <tt class="py-comment"># kept across a replace. (Could also likely keep a max</tt> </tt>
+<a name="L159"></a><tt class="py-lineno">159</tt>  <tt class="py-line"><tt class="py-comment"></tt>            <tt class="py-comment"># size).</tt> </tt>
+<a name="L160"></a><tt class="py-lineno">160</tt>  <tt class="py-line"><tt class="py-comment"></tt>            <tt class="py-name">resolved_info</tt> <tt class="py-op">=</tt> <tt class="py-name">r</tt><tt class="py-op">.</tt><tt id="link-34" class="py-name" targets="Method simx.probe.probedef.Array._resolve()=simx.probe.probedef.Array-class.html#_resolve,Method simx.probe.probedef.Definition._resolve()=simx.probe.probedef.Definition-class.html#_resolve,Method simx.probe.probedef.Link._resolve()=simx.probe.probedef.Link-class.html#_resolve,Method simx.probe.probedef.Primitive._resolve()=simx.probe.probedef.Primitive-class.html#_resolve,Method simx.probe.probedef.Struct._resolve()=simx.probe.probedef.Struct-class.html#_resolve"><a title="simx.probe.probedef.Array._resolve
+simx.probe.probedef.Definition._resolve
+simx.probe.probedef.Link._resolve
+simx.probe.probedef.Primitive._resolve
+simx.probe.probedef.Struct._resolve" class="py-name" href="#" onclick="return doclink('link-34', '_resolve', 'link-34');">_resolve</a></tt><tt class="py-op">(</tt><tt class="py-name">var</tt><tt class="py-op">,</tt> <tt class="py-name">var_offset</tt><tt class="py-op">,</tt> <tt class="py-name">level</tt><tt class="py-op">,</tt> <tt id="link-35" class="py-name"><a title="simx.probe.probedef.Definition._replace" class="py-name" href="#" onclick="return doclink('link-35', '_replace', 'link-29');">_replace</a></tt><tt class="py-op">)</tt> </tt>
+<a name="L161"></a><tt class="py-lineno">161</tt>  <tt class="py-line">            <tt class="py-keyword">if</tt> <tt class="py-name">resolved_info</tt><tt class="py-op">:</tt> </tt>
+<a name="L162"></a><tt class="py-lineno">162</tt>  <tt class="py-line">                <tt class="py-name">resolved</tt><tt class="py-op">,</tt> <tt class="py-name">_</tt> <tt class="py-op">=</tt> <tt class="py-name">resolved_info</tt> </tt>
+<a name="L163"></a><tt class="py-lineno">163</tt>  <tt class="py-line">                <tt class="py-name">resolved</tt><tt class="py-op">.</tt><tt class="py-name">offset_bits</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">offset_bits</tt> </tt>
+<a name="L164"></a><tt class="py-lineno">164</tt>  <tt class="py-line">                <tt class="py-keyword">return</tt> <tt class="py-name">resolved_info</tt> </tt>
+</div><a name="L165"></a><tt class="py-lineno">165</tt>  <tt class="py-line"> </tt>
+<a name="L166"></a><tt class="py-lineno">166</tt>  <tt class="py-line"> </tt>
+<a name="Definition._resolve"></a><div id="Definition._resolve-def"><a name="L167"></a><tt class="py-lineno">167</tt> <a class="py-toggle" href="#" id="Definition._resolve-toggle" onclick="return toggle('Definition._resolve');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.probe.probedef.Definition-class.html#_resolve">_resolve</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">var</tt><tt class="py-op">,</tt> <tt class="py-param">var_offset</tt><tt class="py-op">,</tt> <tt class="py-param">level</tt><tt class="py-op">,</tt> <tt class="py-param">replace</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Definition._resolve-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Definition._resolve-expanded"><a name="L168"></a><tt class="py-lineno">168</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L169"></a><tt class="py-lineno">169</tt>  <tt class="py-line"><tt class="py-docstring">        Walk the definition and resolve addresses into physical space</tt> </tt>
+<a name="L170"></a><tt class="py-lineno">170</tt>  <tt class="py-line"><tt class="py-docstring">        using the stored offset information. In addition all</tt> </tt>
+<a name="L171"></a><tt class="py-lineno">171</tt>  <tt class="py-line"><tt class="py-docstring">        ProbeLinks are resolved and, in the case where resolution</tt> </tt>
+<a name="L172"></a><tt class="py-lineno">172</tt>  <tt class="py-line"><tt class="py-docstring">        fails, an exception is generated.</tt> </tt>
+<a name="L173"></a><tt class="py-lineno">173</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L174"></a><tt class="py-lineno">174</tt>  <tt class="py-line"><tt class="py-docstring">        During resolution the object schema may be greatly</tt> </tt>
+<a name="L175"></a><tt class="py-lineno">175</tt>  <tt class="py-line"><tt class="py-docstring">        expanded. That is, each element in an array and each named</tt> </tt>
+<a name="L176"></a><tt class="py-lineno">176</tt>  <tt class="py-line"><tt class="py-docstring">        field, etc, are themselves resolved.</tt> </tt>
+<a name="L177"></a><tt class="py-lineno">177</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L178"></a><tt class="py-lineno">178</tt>  <tt class="py-line"><tt class="py-docstring">        Replace is a mapping from "levels" to replacement probe</tt> </tt>
+<a name="L179"></a><tt class="py-lineno">179</tt>  <tt class="py-line"><tt class="py-docstring">        definition objects. The replacement definitions must be able</tt> </tt>
+<a name="L180"></a><tt class="py-lineno">180</tt>  <tt class="py-line"><tt class="py-docstring">        to fit inside the original definitions. Levels are in the form</tt> </tt>
+<a name="L181"></a><tt class="py-lineno">181</tt>  <tt class="py-line"><tt class="py-docstring">        "[keyindex1][keyindex2]", etc with the first level being "".</tt> </tt>
+<a name="L182"></a><tt class="py-lineno">182</tt>  <tt class="py-line"><tt class="py-docstring">        If a resolve uses a replacement then it should remove it from</tt> </tt>
+<a name="L183"></a><tt class="py-lineno">183</tt>  <tt class="py-line"><tt class="py-docstring">        the replace structure.</tt> </tt>
+<a name="L184"></a><tt class="py-lineno">184</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L185"></a><tt class="py-lineno">185</tt>  <tt class="py-line"><tt class="py-docstring">        The return value is a tuple of (resolved_type,</tt> </tt>
+<a name="L186"></a><tt class="py-lineno">186</tt>  <tt class="py-line"><tt class="py-docstring">        unused_replacements) where unused_replacements is in the same</tt> </tt>
+<a name="L187"></a><tt class="py-lineno">187</tt>  <tt class="py-line"><tt class="py-docstring">        form as replace.</tt> </tt>
+<a name="L188"></a><tt class="py-lineno">188</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L189"></a><tt class="py-lineno">189</tt>  <tt class="py-line"><tt class="py-docstring">        Entirely new data structures are returned (free from the</tt> </tt>
+<a name="L190"></a><tt class="py-lineno">190</tt>  <tt class="py-line"><tt class="py-docstring">        originals).</tt> </tt>
+<a name="L191"></a><tt class="py-lineno">191</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L192"></a><tt class="py-lineno">192</tt>  <tt class="py-line">        <tt class="py-keyword">raise</tt> <tt class="py-name">NotImplementedError</tt><tt class="py-op">(</tt><tt class="py-string">"Subclass must implement"</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L193"></a><tt class="py-lineno">193</tt>  <tt class="py-line"> </tt>
+<a name="L194"></a><tt class="py-lineno">194</tt>  <tt class="py-line"> </tt>
+<a name="Definition.resolve"></a><div id="Definition.resolve-def"><a name="L195"></a><tt class="py-lineno">195</tt> <a class="py-toggle" href="#" id="Definition.resolve-toggle" onclick="return toggle('Definition.resolve');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.probe.probedef.Definition-class.html#resolve">resolve</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">var</tt><tt class="py-op">=</tt><tt class="py-name">None</tt><tt class="py-op">,</tt> <tt class="py-param">var_offset</tt><tt class="py-op">=</tt><tt class="py-number">0</tt><tt class="py-op">,</tt> <tt class="py-param">level</tt><tt class="py-op">=</tt><tt class="py-string">""</tt><tt class="py-op">,</tt> <tt class="py-param">replace</tt><tt class="py-op">=</tt><tt class="py-op">{</tt><tt class="py-op">}</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Definition.resolve-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Definition.resolve-expanded"><a name="L196"></a><tt class="py-lineno">196</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L197"></a><tt class="py-lineno">197</tt>  <tt class="py-line"><tt class="py-docstring">        Resolve a definition; see _resolve.</tt> </tt>
+<a name="L198"></a><tt class="py-lineno">198</tt>  <tt class="py-line"><tt class="py-docstring">        </tt> </tt>
+<a name="L199"></a><tt class="py-lineno">199</tt>  <tt class="py-line"><tt class="py-docstring">        Return is of (resolved_type, unused_replacements).</tt> </tt>
+<a name="L200"></a><tt class="py-lineno">200</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L201"></a><tt class="py-lineno">201</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-36" class="py-name"><a title="simx.probe.probedef.Array._resolve
+simx.probe.probedef.Definition._resolve
+simx.probe.probedef.Link._resolve
+simx.probe.probedef.Primitive._resolve
+simx.probe.probedef.Struct._resolve" class="py-name" href="#" onclick="return doclink('link-36', '_resolve', 'link-34');">_resolve</a></tt><tt class="py-op">(</tt><tt class="py-name">var</tt><tt class="py-op">,</tt> <tt class="py-name">var_offset</tt><tt class="py-op">,</tt> <tt class="py-name">level</tt><tt class="py-op">,</tt> <tt class="py-name">replace</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L202"></a><tt class="py-lineno">202</tt>  <tt class="py-line"> </tt>
+<a name="L203"></a><tt class="py-lineno">203</tt>  <tt class="py-line"> </tt>
+<a name="Definition.is_resolved"></a><div id="Definition.is_resolved-def"><a name="L204"></a><tt class="py-lineno">204</tt> <a class="py-toggle" href="#" id="Definition.is_resolved-toggle" onclick="return toggle('Definition.is_resolved');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.probe.probedef.Definition-class.html#is_resolved">is_resolved</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Definition.is_resolved-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Definition.is_resolved-expanded"><a name="L205"></a><tt class="py-lineno">205</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L206"></a><tt class="py-lineno">206</tt>  <tt class="py-line"><tt class="py-docstring">        True if it looks like this object is resolved</tt> </tt>
+<a name="L207"></a><tt class="py-lineno">207</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L208"></a><tt class="py-lineno">208</tt>  <tt class="py-line"><tt class="py-docstring">        This should not be called from within resolve and carries the</tt> </tt>
+<a name="L209"></a><tt class="py-lineno">209</tt>  <tt class="py-line"><tt class="py-docstring">        implication that all children are also resolved.</tt> </tt>
+<a name="L210"></a><tt class="py-lineno">210</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L211"></a><tt class="py-lineno">211</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">var_offset</tt> <tt class="py-keyword">is</tt> <tt class="py-keyword">not</tt> <tt class="py-name">None</tt> </tt>
+</div><a name="L212"></a><tt class="py-lineno">212</tt>  <tt class="py-line"> </tt>
+<a name="L213"></a><tt class="py-lineno">213</tt>  <tt class="py-line"> </tt>
+<a name="Definition.bind"></a><div id="Definition.bind-def"><a name="L214"></a><tt class="py-lineno">214</tt> <a class="py-toggle" href="#" id="Definition.bind-toggle" onclick="return toggle('Definition.bind');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.probe.probedef.Definition-class.html#bind">bind</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">node</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Definition.bind-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Definition.bind-expanded"><a name="L215"></a><tt class="py-lineno">215</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L216"></a><tt class="py-lineno">216</tt>  <tt class="py-line"><tt class="py-docstring">        Bind to a specific node; returns a Probe object.</tt> </tt>
+<a name="L217"></a><tt class="py-lineno">217</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L218"></a><tt class="py-lineno">218</tt>  <tt class="py-line"><tt class="py-docstring">        The definition must already be resolved.</tt> </tt>
+<a name="L219"></a><tt class="py-lineno">219</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L220"></a><tt class="py-lineno">220</tt>  <tt class="py-line">        <tt class="py-comment">#print " self.probe_attrs(): ", self.probe_attrs()</tt> </tt>
+<a name="L221"></a><tt class="py-lineno">221</tt>  <tt class="py-line"><tt class="py-comment"></tt>        <tt class="py-keyword">return</tt> <tt id="link-37" class="py-name"><a title="simx.probe.probe.Probe" class="py-name" href="#" onclick="return doclink('link-37', 'Probe', 'link-1');">Probe</a></tt><tt class="py-op">(</tt><tt id="link-38" class="py-name" targets="Module simx.base.node=simx.base.node-module.html,Variable simx.probe.probe.Probe.node=simx.probe.probe.Probe-class.html#node"><a title="simx.base.node
+simx.probe.probe.Probe.node" class="py-name" href="#" onclick="return doclink('link-38', 'node', 'link-38');">node</a></tt><tt class="py-op">=</tt><tt id="link-39" class="py-name"><a title="simx.base.node
+simx.probe.probe.Probe.node" class="py-name" href="#" onclick="return doclink('link-39', 'node', 'link-38');">node</a></tt><tt class="py-op">,</tt> <tt class="py-op">**</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-40" class="py-name" targets="Method simx.probe.probedef.Definition.probe_attrs()=simx.probe.probedef.Definition-class.html#probe_attrs"><a title="simx.probe.probedef.Definition.probe_attrs" class="py-name" href="#" onclick="return doclink('link-40', 'probe_attrs', 'link-40');">probe_attrs</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L222"></a><tt class="py-lineno">222</tt>  <tt class="py-line">         </tt>
+<a name="L223"></a><tt class="py-lineno">223</tt>  <tt class="py-line"> </tt>
+<a name="Definition.to_basic"></a><div id="Definition.to_basic-def"><a name="L224"></a><tt class="py-lineno">224</tt> <a class="py-toggle" href="#" id="Definition.to_basic-toggle" onclick="return toggle('Definition.to_basic');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.probe.probedef.Definition-class.html#to_basic">to_basic</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Definition.to_basic-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Definition.to_basic-expanded"><a name="L225"></a><tt class="py-lineno">225</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L226"></a><tt class="py-lineno">226</tt>  <tt class="py-line"><tt class="py-docstring">        Convert the probe definition into a "simple"</tt> </tt>
+<a name="L227"></a><tt class="py-lineno">227</tt>  <tt class="py-line"><tt class="py-docstring">        dict/list/primitive structure.</tt> </tt>
+<a name="L228"></a><tt class="py-lineno">228</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L229"></a><tt class="py-lineno">229</tt>  <tt class="py-line">        <tt class="py-keyword">raise</tt> <tt class="py-name">NotImplementedError</tt><tt class="py-op">(</tt><tt class="py-string">"Subclass must implement"</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L230"></a><tt class="py-lineno">230</tt>  <tt class="py-line"> </tt>
+<a name="L231"></a><tt class="py-lineno">231</tt>  <tt class="py-line"> </tt>
+<a name="Definition.to_json"></a><div id="Definition.to_json-def"><a name="L232"></a><tt class="py-lineno">232</tt> <a class="py-toggle" href="#" id="Definition.to_json-toggle" onclick="return toggle('Definition.to_json');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.probe.probedef.Definition-class.html#to_json">to_json</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Definition.to_json-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Definition.to_json-expanded"><a name="L233"></a><tt class="py-lineno">233</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L234"></a><tt class="py-lineno">234</tt>  <tt class="py-line"><tt class="py-docstring">        Return JSON representation of definition.</tt> </tt>
+<a name="L235"></a><tt class="py-lineno">235</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L236"></a><tt class="py-lineno">236</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">simplejson</tt><tt class="py-op">.</tt><tt class="py-name">dumps</tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-41" class="py-name" targets="Method simx.probe.probedef.Array.to_basic()=simx.probe.probedef.Array-class.html#to_basic,Method simx.probe.probedef.Definition.to_basic()=simx.probe.probedef.Definition-class.html#to_basic,Method simx.probe.probedef.Link.to_basic()=simx.probe.probedef.Link-class.html#to_basic,Method simx.probe.probedef.Primitive.to_basic()=simx.probe.probedef.Primitive-class.html#to_basic,Method simx.probe.probedef.Struct.to_basic()=simx.probe.probedef.Struct-class.html#to_basic"><a title="simx.probe.probedef.Array.to_basic
+simx.probe.probedef.Definition.to_basic
+simx.probe.probedef.Link.to_basic
+simx.probe.probedef.Primitive.to_basic
+simx.probe.probedef.Struct.to_basic" class="py-name" href="#" onclick="return doclink('link-41', 'to_basic', 'link-41');">to_basic</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+</div></div><a name="L237"></a><tt class="py-lineno">237</tt>  <tt class="py-line"> </tt>
+<a name="L238"></a><tt class="py-lineno">238</tt>  <tt class="py-line"> </tt>
+<a name="Primitive"></a><div id="Primitive-def"><a name="L239"></a><tt class="py-lineno">239</tt> <a class="py-toggle" href="#" id="Primitive-toggle" onclick="return toggle('Primitive');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="simx.probe.probedef.Primitive-class.html">Primitive</a><tt class="py-op">(</tt><tt class="py-base-class">Definition</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Primitive-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="Primitive-expanded"><a name="L240"></a><tt class="py-lineno">240</tt>  <tt class="py-line"> </tt>
+<a name="L241"></a><tt class="py-lineno">241</tt>  <tt class="py-line">    <tt class="py-name">__slots__</tt> <tt class="py-op">=</tt> <tt class="py-op">[</tt><tt class="py-string">'type'</tt><tt class="py-op">,</tt> <tt class="py-string">'nx_type'</tt><tt class="py-op">]</tt> </tt>
+<a name="L242"></a><tt class="py-lineno">242</tt>  <tt class="py-line"> </tt>
+<a name="Primitive.__init__"></a><div id="Primitive.__init__-def"><a name="L243"></a><tt class="py-lineno">243</tt> <a class="py-toggle" href="#" id="Primitive.__init__-toggle" onclick="return toggle('Primitive.__init__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.probe.probedef.Primitive-class.html#__init__">__init__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">type</tt><tt class="py-op">=</tt><tt class="py-name">None</tt><tt class="py-op">,</tt> <tt class="py-param">nx_type</tt><tt class="py-op">=</tt><tt class="py-name">False</tt><tt class="py-op">,</tt> <tt class="py-op">**</tt><tt class="py-param">args</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Primitive.__init__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Primitive.__init__-expanded"><a name="L244"></a><tt class="py-lineno">244</tt>  <tt class="py-line">        <tt id="link-42" class="py-name" targets="Class simx.probe.probedef.Definition=simx.probe.probedef.Definition-class.html"><a title="simx.probe.probedef.Definition" class="py-name" href="#" onclick="return doclink('link-42', 'Definition', 'link-42');">Definition</a></tt><tt class="py-op">.</tt><tt id="link-43" class="py-name" targets="Method simx.base.channel.ChannelBridge.__init__()=simx.base.channel.ChannelBridge-class.html#__init__,Method simx.base.extension.Extension.__init__()=simx.base.extension.Extension-class.html#__init__,Method simx.base.node.Node.__init__()=simx.base.node.Node-class.html#__init__,Method simx.base.radio.RadioRedirect.__init__()=simx.base.radio.RadioRedirect-class.html#__init__,Method simx.base.tossim.TossimBase.__init__()=simx.base.tossim.TossimBase-class.html#__init__,Method simx.dyntopo.Link.BasicLinkModel.__init__()=simx.dyntopo.Link.BasicLinkModel-class.html#__init__,Method simx.dyntopo.Topo.GenericTopo.__init__()=simx.dyntopo.Topo.GenericTopo-class.html#__init__,Method simx.event.event.Manager.__init__()=simx.event.event.Manager-class.html#__init__,Method simx.event.event.PriorityQueue.__init__()=simx.event.event.PriorityQueue-class.html#__init__,Method simx.inject.inject.Inject.__init__()=simx.inject.inject.Inject-class.html#__init__,Method simx.inject.inject.InvalidVersionWarning.__init__()=simx.inject.inject.InvalidVersionWarning-class.html#__init__,Method simx.inject.queue.FifoQueue.__init__()=simx.inject.queue.FifoQueue-class.html#__init__,Method simx.inject.queue.QueueFullWarning.__init__()=simx.inject.queue.QueueFullWarning-class.html#__init__,Method simx.inject.wiretap.InjectDownstream.__init__()=simx.inject.wiretap.InjectDownstream-class.html#__init__,Method simx.inject.wiretap.InjectPacketSock.__init__()=simx.inject.wiretap.InjectPacketSock-class.html#__init__,Method simx.inject.wiretap.InjectSock.__init__()=simx.inject.wiretap.InjectSock-class.html#__init__,Method simx.inject.wiretap.InjectTrigger.__init__()=simx.inject.wiretap.InjectTrigger-class.html#__init__,Method simx.inject.wiretap.InjectUpstream.__init__()=simx.inject.wiretap.InjectUpstream-class.html#__init__,Method simx.probe.parse.LookupError.__init__()=simx.probe.parse.LookupError-class.html#__init__,Method simx.probe.parse.ProbeLink.__init__()=simx.probe.parse.ProbeLink-class.html#__init__,Method simx.probe.parse.ProbeLoader.__init__()=simx.probe.parse.ProbeLoader-class.html#__init__,Method simx.probe.parse.ReplacementError.__init__()=simx.probe.parse.ReplacementError-class.html#__init__,Method simx.probe.probe.CachingProber.__init__()=simx.probe.probe.CachingProber-class.html#__init__,Method simx.probe.probe.Probe.__init__()=simx.probe.probe.Probe-class.html#__init__,Method simx.probe.probe.ProbeArray.__init__()=simx.probe.probe.ProbeArray-class.html#__init__,Method simx.probe.probe.ProbeStruct.__init__()=simx.probe.probe.ProbeStruct-class.html#__init__,Method simx.probe.probedef.Array.__init__()=simx.probe.probedef.Array-class.html#__init__,Method simx.probe.probedef.Definition.__init__()=simx.probe.probedef.Definition-class.html#__init__,Method simx.probe.probedef.Link.__init__()=simx.probe.probedef.Link-class.html#__init__,Method simx.probe.probedef.Primitive.__init__()=simx.probe.probedef.Primitive-class.html#__init__,Method simx.probe.probedef.Struct.__init__()=simx.probe.probedef.Struct-class.html#__init__,Method simx.sensor.extension.SensorExtension.__init__()=simx.sensor.extension.SensorExtension-class.html#__init__,Method simx.sensor.sensor.SensorControl.__init__()=simx.sensor.sensor.SensorControl-class.html#__init__,Method simx.sensor.sensor.SensorError.__init__()=simx.sensor.sensor.SensorError-class.html#__init__,Method simx.sensor.streamer.BinaryStreamer.__init__()=simx.sensor.streamer.BinaryStreamer-class.html#__init__,Method simx.sensor.streamer.SacStreamer.__init__()=simx.sensor.streamer.SacStreamer-class.html#__init__,Method simx.sensor.streamer.Streamer.__init__()=simx.sensor.streamer.Streamer-class.html#__init__,Method simx.sensor.streamer.TextStreamer.__init__()=simx.sensor.streamer.TextStreamer-class.html#__init__,Method simx.sync.time_control.TimeControl.__init__()=simx.sync.time_control.TimeControl-class.html#__init__"><a title="simx.base.channel.ChannelBridge.__init__
+simx.base.extension.Extension.__init__
+simx.base.node.Node.__init__
+simx.base.radio.RadioRedirect.__init__
+simx.base.tossim.TossimBase.__init__
+simx.dyntopo.Link.BasicLinkModel.__init__
+simx.dyntopo.Topo.GenericTopo.__init__
+simx.event.event.Manager.__init__
+simx.event.event.PriorityQueue.__init__
+simx.inject.inject.Inject.__init__
+simx.inject.inject.InvalidVersionWarning.__init__
+simx.inject.queue.FifoQueue.__init__
+simx.inject.queue.QueueFullWarning.__init__
+simx.inject.wiretap.InjectDownstream.__init__
+simx.inject.wiretap.InjectPacketSock.__init__
+simx.inject.wiretap.InjectSock.__init__
+simx.inject.wiretap.InjectTrigger.__init__
+simx.inject.wiretap.InjectUpstream.__init__
+simx.probe.parse.LookupError.__init__
+simx.probe.parse.ProbeLink.__init__
+simx.probe.parse.ProbeLoader.__init__
+simx.probe.parse.ReplacementError.__init__
+simx.probe.probe.CachingProber.__init__
+simx.probe.probe.Probe.__init__
+simx.probe.probe.ProbeArray.__init__
+simx.probe.probe.ProbeStruct.__init__
+simx.probe.probedef.Array.__init__
+simx.probe.probedef.Definition.__init__
+simx.probe.probedef.Link.__init__
+simx.probe.probedef.Primitive.__init__
+simx.probe.probedef.Struct.__init__
+simx.sensor.extension.SensorExtension.__init__
+simx.sensor.sensor.SensorControl.__init__
+simx.sensor.sensor.SensorError.__init__
+simx.sensor.streamer.BinaryStreamer.__init__
+simx.sensor.streamer.SacStreamer.__init__
+simx.sensor.streamer.Streamer.__init__
+simx.sensor.streamer.TextStreamer.__init__
+simx.sync.time_control.TimeControl.__init__" class="py-name" href="#" onclick="return doclink('link-43', '__init__', 'link-43');">__init__</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">,</tt> <tt class="py-op">**</tt><tt class="py-name">args</tt><tt class="py-op">)</tt> </tt>
+<a name="L245"></a><tt class="py-lineno">245</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">type</tt> <tt class="py-op">=</tt> <tt class="py-name">type</tt>       <tt class="py-comment"># "cname"</tt> </tt>
+<a name="L246"></a><tt class="py-lineno">246</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">nx_type</tt> <tt class="py-op">=</tt> <tt class="py-name">nx_type</tt> <tt class="py-comment"># network type?</tt> </tt>
+</div><a name="L247"></a><tt class="py-lineno">247</tt>  <tt class="py-line"> </tt>
+<a name="L248"></a><tt class="py-lineno">248</tt>  <tt class="py-line"> </tt>
+<a name="Primitive.pack_def"></a><div id="Primitive.pack_def-def"><a name="L249"></a><tt class="py-lineno">249</tt> <a class="py-toggle" href="#" id="Primitive.pack_def-toggle" onclick="return toggle('Primitive.pack_def');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.probe.probedef.Primitive-class.html#pack_def">pack_def</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Primitive.pack_def-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Primitive.pack_def-expanded"><a name="L250"></a><tt class="py-lineno">250</tt>  <tt class="py-line">        <tt class="py-keyword">try</tt><tt class="py-op">:</tt> </tt>
+<a name="L251"></a><tt class="py-lineno">251</tt>  <tt class="py-line">            <tt id="link-44" class="py-name" targets="Package simx.base=simx.base-module.html"><a title="simx.base" class="py-name" href="#" onclick="return doclink('link-44', 'base', 'link-44');">base</a></tt> <tt class="py-op">=</tt> <tt id="link-45" class="py-name"><a title="simx.probe.probedef.PRIMITIVES" class="py-name" href="#" onclick="return doclink('link-45', 'PRIMITIVES', 'link-4');">PRIMITIVES</a></tt><tt class="py-op">.</tt><tt id="link-46" class="py-name" targets="Method simx.probe.probe.Probe.get()=simx.probe.probe.Probe-class.html#get,Method simx.probe.probe.ProbeArray.get()=simx.probe.probe.ProbeArray-class.html#get,Method simx.probe.probe.ProbeStruct.get()=simx.probe.probe.ProbeStruct-class.html#get"><a title="simx.probe.probe.Probe.get
+simx.probe.probe.ProbeArray.get
+simx.probe.probe.ProbeStruct.get" class="py-name" href="#" onclick="return doclink('link-46', 'get', 'link-46');">get</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">type</tt><tt class="py-op">)</tt> </tt>
+<a name="L252"></a><tt class="py-lineno">252</tt>  <tt class="py-line">            <tt class="py-keyword">return</tt> <tt class="py-op">(</tt><tt class="py-string">"!"</tt> <tt class="py-op">+</tt> <tt id="link-47" class="py-name"><a title="simx.base" class="py-name" href="#" onclick="return doclink('link-47', 'base', 'link-44');">base</a></tt><tt class="py-op">)</tt> <tt class="py-keyword">if</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">nx_type</tt> <tt class="py-keyword">else</tt> <tt id="link-48" class="py-name"><a title="simx.base" class="py-name" href="#" onclick="return doclink('link-48', 'base', 'link-44');">base</a></tt> </tt>
+<a name="L253"></a><tt class="py-lineno">253</tt>  <tt class="py-line">        <tt class="py-keyword">except</tt> <tt class="py-name">KeyError</tt><tt class="py-op">,</tt> <tt class="py-name">e</tt><tt class="py-op">:</tt> </tt>
+<a name="L254"></a><tt class="py-lineno">254</tt>  <tt class="py-line">            <tt class="py-keyword">raise</tt> <tt class="py-name">KeyError</tt><tt class="py-op">(</tt><tt class="py-string">"%s: invalid primitive (%s)"</tt> <tt class="py-op">%</tt> <tt class="py-op">(</tt><tt class="py-name">e</tt><tt class="py-op">,</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">type</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L255"></a><tt class="py-lineno">255</tt>  <tt class="py-line"> </tt>
+<a name="L256"></a><tt class="py-lineno">256</tt>  <tt class="py-line"> </tt>
+<a name="Primitive.attrs"></a><div id="Primitive.attrs-def"><a name="L257"></a><tt class="py-lineno">257</tt> <a class="py-toggle" href="#" id="Primitive.attrs-toggle" onclick="return toggle('Primitive.attrs');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.probe.probedef.Primitive-class.html#attrs">attrs</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Primitive.attrs-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Primitive.attrs-expanded"><a name="L258"></a><tt class="py-lineno">258</tt>  <tt class="py-line">        <tt id="link-49" class="py-name"><a title="simx.probe.probe.Probe.attrs
+simx.probe.probe.ProbeArray.attrs
+simx.probe.probe.ProbeStruct.attrs
+simx.probe.probedef.Array.attrs
+simx.probe.probedef.Definition.attrs
+simx.probe.probedef.Link.attrs
+simx.probe.probedef.Primitive.attrs
+simx.probe.probedef.Struct.attrs" class="py-name" href="#" onclick="return doclink('link-49', 'attrs', 'link-9');">attrs</a></tt> <tt class="py-op">=</tt> <tt id="link-50" class="py-name"><a title="simx.probe.probedef.Definition" class="py-name" href="#" onclick="return doclink('link-50', 'Definition', 'link-42');">Definition</a></tt><tt class="py-op">.</tt><tt id="link-51" class="py-name"><a title="simx.probe.probe.Probe.attrs
+simx.probe.probe.ProbeArray.attrs
+simx.probe.probe.ProbeStruct.attrs
+simx.probe.probedef.Array.attrs
+simx.probe.probedef.Definition.attrs
+simx.probe.probedef.Link.attrs
+simx.probe.probedef.Primitive.attrs
+simx.probe.probedef.Struct.attrs" class="py-name" href="#" onclick="return doclink('link-51', 'attrs', 'link-9');">attrs</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">)</tt> </tt>
+<a name="L259"></a><tt class="py-lineno">259</tt>  <tt class="py-line">        <tt id="link-52" class="py-name"><a title="simx.probe.probe.Probe.attrs
+simx.probe.probe.ProbeArray.attrs
+simx.probe.probe.ProbeStruct.attrs
+simx.probe.probedef.Array.attrs
+simx.probe.probedef.Definition.attrs
+simx.probe.probedef.Link.attrs
+simx.probe.probedef.Primitive.attrs
+simx.probe.probedef.Struct.attrs" class="py-name" href="#" onclick="return doclink('link-52', 'attrs', 'link-9');">attrs</a></tt><tt class="py-op">[</tt><tt class="py-string">'type'</tt><tt class="py-op">]</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">type</tt> </tt>
+<a name="L260"></a><tt class="py-lineno">260</tt>  <tt class="py-line">        <tt id="link-53" class="py-name"><a title="simx.probe.probe.Probe.attrs
+simx.probe.probe.ProbeArray.attrs
+simx.probe.probe.ProbeStruct.attrs
+simx.probe.probedef.Array.attrs
+simx.probe.probedef.Definition.attrs
+simx.probe.probedef.Link.attrs
+simx.probe.probedef.Primitive.attrs
+simx.probe.probedef.Struct.attrs" class="py-name" href="#" onclick="return doclink('link-53', 'attrs', 'link-9');">attrs</a></tt><tt class="py-op">[</tt><tt class="py-string">'nx_type'</tt><tt class="py-op">]</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">nx_type</tt> </tt>
+<a name="L261"></a><tt class="py-lineno">261</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt id="link-54" class="py-name"><a title="simx.probe.probe.Probe.attrs
+simx.probe.probe.ProbeArray.attrs
+simx.probe.probe.ProbeStruct.attrs
+simx.probe.probedef.Array.attrs
+simx.probe.probedef.Definition.attrs
+simx.probe.probedef.Link.attrs
+simx.probe.probedef.Primitive.attrs
+simx.probe.probedef.Struct.attrs" class="py-name" href="#" onclick="return doclink('link-54', 'attrs', 'link-9');">attrs</a></tt> </tt>
+</div><a name="L262"></a><tt class="py-lineno">262</tt>  <tt class="py-line"> </tt>
+<a name="L263"></a><tt class="py-lineno">263</tt>  <tt class="py-line"> </tt>
+<a name="Primitive.str_attrs"></a><div id="Primitive.str_attrs-def"><a name="L264"></a><tt class="py-lineno">264</tt> <a class="py-toggle" href="#" id="Primitive.str_attrs-toggle" onclick="return toggle('Primitive.str_attrs');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.probe.probedef.Primitive-class.html#str_attrs">str_attrs</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Primitive.str_attrs-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Primitive.str_attrs-expanded"><a name="L265"></a><tt class="py-lineno">265</tt>  <tt class="py-line">        <tt id="link-55" class="py-name"><a title="simx.probe.probe.Probe.attrs
+simx.probe.probe.ProbeArray.attrs
+simx.probe.probe.ProbeStruct.attrs
+simx.probe.probedef.Array.attrs
+simx.probe.probedef.Definition.attrs
+simx.probe.probedef.Link.attrs
+simx.probe.probedef.Primitive.attrs
+simx.probe.probedef.Struct.attrs" class="py-name" href="#" onclick="return doclink('link-55', 'attrs', 'link-9');">attrs</a></tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-56" class="py-name"><a title="simx.probe.probe.Probe.attrs
+simx.probe.probe.ProbeArray.attrs
+simx.probe.probe.ProbeStruct.attrs
+simx.probe.probedef.Array.attrs
+simx.probe.probedef.Definition.attrs
+simx.probe.probedef.Link.attrs
+simx.probe.probedef.Primitive.attrs
+simx.probe.probedef.Struct.attrs" class="py-name" href="#" onclick="return doclink('link-56', 'attrs', 'link-9');">attrs</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L266"></a><tt class="py-lineno">266</tt>  <tt class="py-line">        <tt class="py-keyword">try</tt><tt class="py-op">:</tt> </tt>
+<a name="L267"></a><tt class="py-lineno">267</tt>  <tt class="py-line">            <tt id="link-57" class="py-name"><a title="simx.probe.probe.Probe.attrs
+simx.probe.probe.ProbeArray.attrs
+simx.probe.probe.ProbeStruct.attrs
+simx.probe.probedef.Array.attrs
+simx.probe.probedef.Definition.attrs
+simx.probe.probedef.Link.attrs
+simx.probe.probedef.Primitive.attrs
+simx.probe.probedef.Struct.attrs" class="py-name" href="#" onclick="return doclink('link-57', 'attrs', 'link-9');">attrs</a></tt><tt class="py-op">[</tt><tt class="py-string">'type'</tt><tt class="py-op">]</tt> <tt class="py-op">=</tt> <tt class="py-name">str</tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-58" class="py-name" targets="Method simx.probe.probedef.Definition.norm_type()=simx.probe.probedef.Definition-class.html#norm_type"><a title="simx.probe.probedef.Definition.norm_type" class="py-name" href="#" onclick="return doclink('link-58', 'norm_type', 'link-58');">norm_type</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">type</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L268"></a><tt class="py-lineno">268</tt>  <tt class="py-line">        <tt class="py-keyword">except</tt> <tt class="py-name">ValueError</tt><tt class="py-op">:</tt> </tt>
+<a name="L269"></a><tt class="py-lineno">269</tt>  <tt class="py-line">            <tt id="link-59" class="py-name"><a title="simx.probe.probe.Probe.attrs
+simx.probe.probe.ProbeArray.attrs
+simx.probe.probe.ProbeStruct.attrs
+simx.probe.probedef.Array.attrs
+simx.probe.probedef.Definition.attrs
+simx.probe.probedef.Link.attrs
+simx.probe.probedef.Primitive.attrs
+simx.probe.probedef.Struct.attrs" class="py-name" href="#" onclick="return doclink('link-59', 'attrs', 'link-9');">attrs</a></tt><tt class="py-op">[</tt><tt class="py-string">'type'</tt><tt class="py-op">]</tt> <tt class="py-op">=</tt> <tt class="py-string">"&lt;unresolved&gt;"</tt> </tt>
+<a name="L270"></a><tt class="py-lineno">270</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt id="link-60" class="py-name"><a title="simx.probe.probe.Probe.attrs
+simx.probe.probe.ProbeArray.attrs
+simx.probe.probe.ProbeStruct.attrs
+simx.probe.probedef.Array.attrs
+simx.probe.probedef.Definition.attrs
+simx.probe.probedef.Link.attrs
+simx.probe.probedef.Primitive.attrs
+simx.probe.probedef.Struct.attrs" class="py-name" href="#" onclick="return doclink('link-60', 'attrs', 'link-9');">attrs</a></tt> </tt>
+</div><a name="L271"></a><tt class="py-lineno">271</tt>  <tt class="py-line"> </tt>
+<a name="L272"></a><tt class="py-lineno">272</tt>  <tt class="py-line"> </tt>
+<a name="Primitive.bind"></a><div id="Primitive.bind-def"><a name="L273"></a><tt class="py-lineno">273</tt> <a class="py-toggle" href="#" id="Primitive.bind-toggle" onclick="return toggle('Primitive.bind');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.probe.probedef.Primitive-class.html#bind">bind</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">node</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Primitive.bind-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Primitive.bind-expanded"><a name="L274"></a><tt class="py-lineno">274</tt>  <tt class="py-line">        <tt id="link-61" class="py-name"><a title="simx.probe.probe.Probe.attrs
+simx.probe.probe.ProbeArray.attrs
+simx.probe.probe.ProbeStruct.attrs
+simx.probe.probedef.Array.attrs
+simx.probe.probedef.Definition.attrs
+simx.probe.probedef.Link.attrs
+simx.probe.probedef.Primitive.attrs
+simx.probe.probedef.Struct.attrs" class="py-name" href="#" onclick="return doclink('link-61', 'attrs', 'link-9');">attrs</a></tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-62" class="py-name"><a title="simx.probe.probedef.Definition.probe_attrs" class="py-name" href="#" onclick="return doclink('link-62', 'probe_attrs', 'link-40');">probe_attrs</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L275"></a><tt class="py-lineno">275</tt>  <tt class="py-line">        <tt class="py-keyword">del</tt> <tt id="link-63" class="py-name"><a title="simx.probe.probe.Probe.attrs
+simx.probe.probe.ProbeArray.attrs
+simx.probe.probe.ProbeStruct.attrs
+simx.probe.probedef.Array.attrs
+simx.probe.probedef.Definition.attrs
+simx.probe.probedef.Link.attrs
+simx.probe.probedef.Primitive.attrs
+simx.probe.probedef.Struct.attrs" class="py-name" href="#" onclick="return doclink('link-63', 'attrs', 'link-9');">attrs</a></tt><tt class="py-op">[</tt><tt class="py-string">'type'</tt><tt class="py-op">]</tt> </tt>
+<a name="L276"></a><tt class="py-lineno">276</tt>  <tt class="py-line">        <tt class="py-keyword">del</tt> <tt id="link-64" class="py-name"><a title="simx.probe.probe.Probe.attrs
+simx.probe.probe.ProbeArray.attrs
+simx.probe.probe.ProbeStruct.attrs
+simx.probe.probedef.Array.attrs
+simx.probe.probedef.Definition.attrs
+simx.probe.probedef.Link.attrs
+simx.probe.probedef.Primitive.attrs
+simx.probe.probedef.Struct.attrs" class="py-name" href="#" onclick="return doclink('link-64', 'attrs', 'link-9');">attrs</a></tt><tt class="py-op">[</tt><tt class="py-string">'nx_type'</tt><tt class="py-op">]</tt> </tt>
+<a name="L277"></a><tt class="py-lineno">277</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt id="link-65" class="py-name"><a title="simx.probe.probe.Probe" class="py-name" href="#" onclick="return doclink('link-65', 'Probe', 'link-1');">Probe</a></tt><tt class="py-op">(</tt><tt id="link-66" class="py-name"><a title="simx.base.node
+simx.probe.probe.Probe.node" class="py-name" href="#" onclick="return doclink('link-66', 'node', 'link-38');">node</a></tt><tt class="py-op">=</tt><tt id="link-67" class="py-name"><a title="simx.base.node
+simx.probe.probe.Probe.node" class="py-name" href="#" onclick="return doclink('link-67', 'node', 'link-38');">node</a></tt><tt class="py-op">,</tt> <tt class="py-op">**</tt><tt id="link-68" class="py-name"><a title="simx.probe.probe.Probe.attrs
+simx.probe.probe.ProbeArray.attrs
+simx.probe.probe.ProbeStruct.attrs
+simx.probe.probedef.Array.attrs
+simx.probe.probedef.Definition.attrs
+simx.probe.probedef.Link.attrs
+simx.probe.probedef.Primitive.attrs
+simx.probe.probedef.Struct.attrs" class="py-name" href="#" onclick="return doclink('link-68', 'attrs', 'link-9');">attrs</a></tt><tt class="py-op">)</tt> </tt>
+</div><a name="L278"></a><tt class="py-lineno">278</tt>  <tt class="py-line"> </tt>
+<a name="L279"></a><tt class="py-lineno">279</tt>  <tt class="py-line">     </tt>
+<a name="Primitive._resolve"></a><div id="Primitive._resolve-def"><a name="L280"></a><tt class="py-lineno">280</tt> <a class="py-toggle" href="#" id="Primitive._resolve-toggle" onclick="return toggle('Primitive._resolve');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.probe.probedef.Primitive-class.html#_resolve">_resolve</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">var</tt><tt class="py-op">,</tt> <tt class="py-param">var_offset</tt><tt class="py-op">,</tt> <tt class="py-param">level</tt><tt class="py-op">,</tt> <tt class="py-param">replace</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Primitive._resolve-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Primitive._resolve-expanded"><a name="L281"></a><tt class="py-lineno">281</tt>  <tt class="py-line">        <tt class="py-name">var</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-69" class="py-name" targets="Method simx.probe.probedef.Definition._check_var()=simx.probe.probedef.Definition-class.html#_check_var"><a title="simx.probe.probedef.Definition._check_var" class="py-name" href="#" onclick="return doclink('link-69', '_check_var', 'link-69');">_check_var</a></tt><tt class="py-op">(</tt><tt class="py-name">var</tt><tt class="py-op">)</tt> </tt>
+<a name="L282"></a><tt class="py-lineno">282</tt>  <tt class="py-line"> </tt>
+<a name="L283"></a><tt class="py-lineno">283</tt>  <tt class="py-line">        <tt class="py-keyword">def</tt> <tt class="py-def-name">own</tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L284"></a><tt class="py-lineno">284</tt>  <tt class="py-line">            <tt class="py-keyword">return</tt> <tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-70" class="py-name" targets="Method simx.probe.probe.Probe.dup()=simx.probe.probe.Probe-class.html#dup,Method simx.probe.probedef.Definition.dup()=simx.probe.probedef.Definition-class.html#dup"><a title="simx.probe.probe.Probe.dup
+simx.probe.probedef.Definition.dup" class="py-name" href="#" onclick="return doclink('link-70', 'dup', 'link-70');">dup</a></tt><tt class="py-op">(</tt><tt class="py-name">var</tt><tt class="py-op">=</tt><tt class="py-name">var</tt><tt class="py-op">,</tt> <tt class="py-name">var_offset</tt><tt class="py-op">=</tt><tt class="py-name">var_offset</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-name">replace</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L285"></a><tt class="py-lineno">285</tt>  <tt class="py-line"> </tt>
+<a name="L286"></a><tt class="py-lineno">286</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-71" class="py-name"><a title="simx.probe.probedef.Definition._replace" class="py-name" href="#" onclick="return doclink('link-71', '_replace', 'link-29');">_replace</a></tt><tt class="py-op">(</tt><tt class="py-name">var</tt><tt class="py-op">,</tt> <tt class="py-name">var_offset</tt><tt class="py-op">,</tt> <tt class="py-name">level</tt><tt class="py-op">,</tt> <tt class="py-name">replace</tt><tt class="py-op">)</tt> <tt class="py-keyword">or</tt> <tt class="py-name">own</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L287"></a><tt class="py-lineno">287</tt>  <tt class="py-line"> </tt>
+<a name="L288"></a><tt class="py-lineno">288</tt>  <tt class="py-line">     </tt>
+<a name="Primitive.to_basic"></a><div id="Primitive.to_basic-def"><a name="L289"></a><tt class="py-lineno">289</tt> <a class="py-toggle" href="#" id="Primitive.to_basic-toggle" onclick="return toggle('Primitive.to_basic');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.probe.probedef.Primitive-class.html#to_basic">to_basic</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Primitive.to_basic-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Primitive.to_basic-expanded"><a name="L290"></a><tt class="py-lineno">290</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">type</tt> </tt>
+</div></div><a name="L291"></a><tt class="py-lineno">291</tt>  <tt class="py-line"> </tt>
+<a name="L292"></a><tt class="py-lineno">292</tt>  <tt class="py-line"> </tt>
+<a name="Array"></a><div id="Array-def"><a name="L293"></a><tt class="py-lineno">293</tt> <a class="py-toggle" href="#" id="Array-toggle" onclick="return toggle('Array');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="simx.probe.probedef.Array-class.html">Array</a><tt class="py-op">(</tt><tt class="py-base-class">Definition</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Array-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="Array-expanded"><a name="L294"></a><tt class="py-lineno">294</tt>  <tt class="py-line"> </tt>
+<a name="L295"></a><tt class="py-lineno">295</tt>  <tt class="py-line">    <tt class="py-comment"># PST- why is separate count kept again?</tt> </tt>
+<a name="L296"></a><tt class="py-lineno">296</tt>  <tt class="py-line"><tt class="py-comment"></tt>    <tt class="py-name">__slots__</tt> <tt class="py-op">=</tt> <tt class="py-op">[</tt><tt class="py-string">'count'</tt><tt class="py-op">,</tt> <tt class="py-string">'element_type'</tt><tt class="py-op">,</tt> <tt class="py-string">'elements'</tt><tt class="py-op">]</tt> </tt>
+<a name="L297"></a><tt class="py-lineno">297</tt>  <tt class="py-line"> </tt>
+<a name="Array.__init__"></a><div id="Array.__init__-def"><a name="L298"></a><tt class="py-lineno">298</tt> <a class="py-toggle" href="#" id="Array.__init__-toggle" onclick="return toggle('Array.__init__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.probe.probedef.Array-class.html#__init__">__init__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">count</tt><tt class="py-op">=</tt><tt class="py-op">-</tt><tt class="py-number">1</tt><tt class="py-op">,</tt> <tt class="py-param">element_type</tt><tt class="py-op">=</tt><tt class="py-name">None</tt><tt class="py-op">,</tt> <tt class="py-param">elements</tt><tt class="py-op">=</tt><tt class="py-name">None</tt><tt class="py-op">,</tt> <tt class="py-op">**</tt><tt class="py-param">args</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Array.__init__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Array.__init__-expanded"><a name="L299"></a><tt class="py-lineno">299</tt>  <tt class="py-line">        <tt id="link-72" class="py-name"><a title="simx.probe.probedef.Definition" class="py-name" href="#" onclick="return doclink('link-72', 'Definition', 'link-42');">Definition</a></tt><tt class="py-op">.</tt><tt id="link-73" class="py-name"><a title="simx.base.channel.ChannelBridge.__init__
+simx.base.extension.Extension.__init__
+simx.base.node.Node.__init__
+simx.base.radio.RadioRedirect.__init__
+simx.base.tossim.TossimBase.__init__
+simx.dyntopo.Link.BasicLinkModel.__init__
+simx.dyntopo.Topo.GenericTopo.__init__
+simx.event.event.Manager.__init__
+simx.event.event.PriorityQueue.__init__
+simx.inject.inject.Inject.__init__
+simx.inject.inject.InvalidVersionWarning.__init__
+simx.inject.queue.FifoQueue.__init__
+simx.inject.queue.QueueFullWarning.__init__
+simx.inject.wiretap.InjectDownstream.__init__
+simx.inject.wiretap.InjectPacketSock.__init__
+simx.inject.wiretap.InjectSock.__init__
+simx.inject.wiretap.InjectTrigger.__init__
+simx.inject.wiretap.InjectUpstream.__init__
+simx.probe.parse.LookupError.__init__
+simx.probe.parse.ProbeLink.__init__
+simx.probe.parse.ProbeLoader.__init__
+simx.probe.parse.ReplacementError.__init__
+simx.probe.probe.CachingProber.__init__
+simx.probe.probe.Probe.__init__
+simx.probe.probe.ProbeArray.__init__
+simx.probe.probe.ProbeStruct.__init__
+simx.probe.probedef.Array.__init__
+simx.probe.probedef.Definition.__init__
+simx.probe.probedef.Link.__init__
+simx.probe.probedef.Primitive.__init__
+simx.probe.probedef.Struct.__init__
+simx.sensor.extension.SensorExtension.__init__
+simx.sensor.sensor.SensorControl.__init__
+simx.sensor.sensor.SensorError.__init__
+simx.sensor.streamer.BinaryStreamer.__init__
+simx.sensor.streamer.SacStreamer.__init__
+simx.sensor.streamer.Streamer.__init__
+simx.sensor.streamer.TextStreamer.__init__
+simx.sync.time_control.TimeControl.__init__" class="py-name" href="#" onclick="return doclink('link-73', '__init__', 'link-43');">__init__</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">,</tt> <tt class="py-op">**</tt><tt class="py-name">args</tt><tt class="py-op">)</tt> </tt>
+<a name="L300"></a><tt class="py-lineno">300</tt>  <tt class="py-line">        <tt class="py-comment"># some arrays can be zero-sized</tt> </tt>
+<a name="L301"></a><tt class="py-lineno">301</tt>  <tt class="py-line"><tt class="py-comment"></tt>        <tt class="py-keyword">assert</tt> <tt id="link-74" class="py-name" targets="Variable simx.probe.probe.ProbeArray.count=simx.probe.probe.ProbeArray-class.html#count"><a title="simx.probe.probe.ProbeArray.count" class="py-name" href="#" onclick="return doclink('link-74', 'count', 'link-74');">count</a></tt> <tt class="py-op">&gt;=</tt> <tt class="py-number">0</tt> </tt>
+<a name="L302"></a><tt class="py-lineno">302</tt>  <tt class="py-line"><tt class="py-comment">#        assert elements is not None and count == len(elements)</tt> </tt>
+<a name="L303"></a><tt class="py-lineno">303</tt>  <tt class="py-line"><tt class="py-comment"></tt>        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-75" class="py-name"><a title="simx.probe.probe.ProbeArray.count" class="py-name" href="#" onclick="return doclink('link-75', 'count', 'link-74');">count</a></tt> <tt class="py-op">=</tt> <tt id="link-76" class="py-name"><a title="simx.probe.probe.ProbeArray.count" class="py-name" href="#" onclick="return doclink('link-76', 'count', 'link-74');">count</a></tt> </tt>
+<a name="L304"></a><tt class="py-lineno">304</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">element_type</tt> <tt class="py-op">=</tt> <tt class="py-name">element_type</tt> </tt>
+<a name="L305"></a><tt class="py-lineno">305</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-77" class="py-name" targets="Variable simx.probe.probe.ProbeArray.elements=simx.probe.probe.ProbeArray-class.html#elements"><a title="simx.probe.probe.ProbeArray.elements" class="py-name" href="#" onclick="return doclink('link-77', 'elements', 'link-77');">elements</a></tt> <tt class="py-op">=</tt> <tt id="link-78" class="py-name"><a title="simx.probe.probe.ProbeArray.elements" class="py-name" href="#" onclick="return doclink('link-78', 'elements', 'link-77');">elements</a></tt> </tt>
+</div><a name="L306"></a><tt class="py-lineno">306</tt>  <tt class="py-line"> </tt>
+<a name="L307"></a><tt class="py-lineno">307</tt>  <tt class="py-line"> </tt>
+<a name="Array.__getitem__"></a><div id="Array.__getitem__-def"><a name="L308"></a><tt class="py-lineno">308</tt> <a class="py-toggle" href="#" id="Array.__getitem__-toggle" onclick="return toggle('Array.__getitem__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.probe.probedef.Array-class.html#__getitem__">__getitem__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">index</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Array.__getitem__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Array.__getitem__-expanded"><a name="L309"></a><tt class="py-lineno">309</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-79" class="py-name"><a title="simx.probe.probe.ProbeArray.elements" class="py-name" href="#" onclick="return doclink('link-79', 'elements', 'link-77');">elements</a></tt><tt class="py-op">[</tt><tt class="py-name">index</tt><tt class="py-op">]</tt> </tt>
+</div><a name="L310"></a><tt class="py-lineno">310</tt>  <tt class="py-line"> </tt>
+<a name="L311"></a><tt class="py-lineno">311</tt>  <tt class="py-line"> </tt>
+<a name="Array.attrs"></a><div id="Array.attrs-def"><a name="L312"></a><tt class="py-lineno">312</tt> <a class="py-toggle" href="#" id="Array.attrs-toggle" onclick="return toggle('Array.attrs');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.probe.probedef.Array-class.html#attrs">attrs</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Array.attrs-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Array.attrs-expanded"><a name="L313"></a><tt class="py-lineno">313</tt>  <tt class="py-line">        <tt id="link-80" class="py-name"><a title="simx.probe.probe.Probe.attrs
+simx.probe.probe.ProbeArray.attrs
+simx.probe.probe.ProbeStruct.attrs
+simx.probe.probedef.Array.attrs
+simx.probe.probedef.Definition.attrs
+simx.probe.probedef.Link.attrs
+simx.probe.probedef.Primitive.attrs
+simx.probe.probedef.Struct.attrs" class="py-name" href="#" onclick="return doclink('link-80', 'attrs', 'link-9');">attrs</a></tt> <tt class="py-op">=</tt> <tt id="link-81" class="py-name"><a title="simx.probe.probedef.Definition" class="py-name" href="#" onclick="return doclink('link-81', 'Definition', 'link-42');">Definition</a></tt><tt class="py-op">.</tt><tt id="link-82" class="py-name"><a title="simx.probe.probe.Probe.attrs
+simx.probe.probe.ProbeArray.attrs
+simx.probe.probe.ProbeStruct.attrs
+simx.probe.probedef.Array.attrs
+simx.probe.probedef.Definition.attrs
+simx.probe.probedef.Link.attrs
+simx.probe.probedef.Primitive.attrs
+simx.probe.probedef.Struct.attrs" class="py-name" href="#" onclick="return doclink('link-82', 'attrs', 'link-9');">attrs</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">)</tt> </tt>
+<a name="L314"></a><tt class="py-lineno">314</tt>  <tt class="py-line">        <tt id="link-83" class="py-name"><a title="simx.probe.probe.Probe.attrs
+simx.probe.probe.ProbeArray.attrs
+simx.probe.probe.ProbeStruct.attrs
+simx.probe.probedef.Array.attrs
+simx.probe.probedef.Definition.attrs
+simx.probe.probedef.Link.attrs
+simx.probe.probedef.Primitive.attrs
+simx.probe.probedef.Struct.attrs" class="py-name" href="#" onclick="return doclink('link-83', 'attrs', 'link-9');">attrs</a></tt><tt class="py-op">[</tt><tt class="py-string">'count'</tt><tt class="py-op">]</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-84" class="py-name"><a title="simx.probe.probe.ProbeArray.count" class="py-name" href="#" onclick="return doclink('link-84', 'count', 'link-74');">count</a></tt> </tt>
+<a name="L315"></a><tt class="py-lineno">315</tt>  <tt class="py-line">        <tt id="link-85" class="py-name"><a title="simx.probe.probe.Probe.attrs
+simx.probe.probe.ProbeArray.attrs
+simx.probe.probe.ProbeStruct.attrs
+simx.probe.probedef.Array.attrs
+simx.probe.probedef.Definition.attrs
+simx.probe.probedef.Link.attrs
+simx.probe.probedef.Primitive.attrs
+simx.probe.probedef.Struct.attrs" class="py-name" href="#" onclick="return doclink('link-85', 'attrs', 'link-9');">attrs</a></tt><tt class="py-op">[</tt><tt class="py-string">'element_type'</tt><tt class="py-op">]</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">element_type</tt> </tt>
+<a name="L316"></a><tt class="py-lineno">316</tt>  <tt class="py-line">        <tt id="link-86" class="py-name"><a title="simx.probe.probe.Probe.attrs
+simx.probe.probe.ProbeArray.attrs
+simx.probe.probe.ProbeStruct.attrs
+simx.probe.probedef.Array.attrs
+simx.probe.probedef.Definition.attrs
+simx.probe.probedef.Link.attrs
+simx.probe.probedef.Primitive.attrs
+simx.probe.probedef.Struct.attrs" class="py-name" href="#" onclick="return doclink('link-86', 'attrs', 'link-9');">attrs</a></tt><tt class="py-op">[</tt><tt class="py-string">'elements'</tt><tt class="py-op">]</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-87" class="py-name"><a title="simx.probe.probe.ProbeArray.elements" class="py-name" href="#" onclick="return doclink('link-87', 'elements', 'link-77');">elements</a></tt> </tt>
+<a name="L317"></a><tt class="py-lineno">317</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt id="link-88" class="py-name"><a title="simx.probe.probe.Probe.attrs
+simx.probe.probe.ProbeArray.attrs
+simx.probe.probe.ProbeStruct.attrs
+simx.probe.probedef.Array.attrs
+simx.probe.probedef.Definition.attrs
+simx.probe.probedef.Link.attrs
+simx.probe.probedef.Primitive.attrs
+simx.probe.probedef.Struct.attrs" class="py-name" href="#" onclick="return doclink('link-88', 'attrs', 'link-9');">attrs</a></tt> </tt>
+</div><a name="L318"></a><tt class="py-lineno">318</tt>  <tt class="py-line"> </tt>
+<a name="L319"></a><tt class="py-lineno">319</tt>  <tt class="py-line"> </tt>
+<a name="Array.str_attrs"></a><div id="Array.str_attrs-def"><a name="L320"></a><tt class="py-lineno">320</tt> <a class="py-toggle" href="#" id="Array.str_attrs-toggle" onclick="return toggle('Array.str_attrs');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.probe.probedef.Array-class.html#str_attrs">str_attrs</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Array.str_attrs-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Array.str_attrs-expanded"><a name="L321"></a><tt class="py-lineno">321</tt>  <tt class="py-line">        <tt id="link-89" class="py-name"><a title="simx.probe.probe.Probe.attrs
+simx.probe.probe.ProbeArray.attrs
+simx.probe.probe.ProbeStruct.attrs
+simx.probe.probedef.Array.attrs
+simx.probe.probedef.Definition.attrs
+simx.probe.probedef.Link.attrs
+simx.probe.probedef.Primitive.attrs
+simx.probe.probedef.Struct.attrs" class="py-name" href="#" onclick="return doclink('link-89', 'attrs', 'link-9');">attrs</a></tt> <tt class="py-op">=</tt> <tt id="link-90" class="py-name"><a title="simx.probe.probedef.Definition" class="py-name" href="#" onclick="return doclink('link-90', 'Definition', 'link-42');">Definition</a></tt><tt class="py-op">.</tt><tt id="link-91" class="py-name"><a title="simx.probe.probe.Probe.str_attrs
+simx.probe.probe.ProbeArray.str_attrs
+simx.probe.probe.ProbeStruct.str_attrs
+simx.probe.probedef.Array.str_attrs
+simx.probe.probedef.Definition.str_attrs
+simx.probe.probedef.Link.str_attrs
+simx.probe.probedef.Primitive.str_attrs
+simx.probe.probedef.Struct.str_attrs" class="py-name" href="#" onclick="return doclink('link-91', 'str_attrs', 'link-27');">str_attrs</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">)</tt> </tt>
+<a name="L322"></a><tt class="py-lineno">322</tt>  <tt class="py-line">        <tt id="link-92" class="py-name"><a title="simx.probe.probe.Probe.attrs
+simx.probe.probe.ProbeArray.attrs
+simx.probe.probe.ProbeStruct.attrs
+simx.probe.probedef.Array.attrs
+simx.probe.probedef.Definition.attrs
+simx.probe.probedef.Link.attrs
+simx.probe.probedef.Primitive.attrs
+simx.probe.probedef.Struct.attrs" class="py-name" href="#" onclick="return doclink('link-92', 'attrs', 'link-9');">attrs</a></tt><tt class="py-op">[</tt><tt class="py-string">'element_type'</tt><tt class="py-op">]</tt> <tt class="py-op">=</tt> <tt class="py-name">str</tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-93" class="py-name"><a title="simx.probe.probedef.Definition.norm_type" class="py-name" href="#" onclick="return doclink('link-93', 'norm_type', 'link-58');">norm_type</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">element_type</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L323"></a><tt class="py-lineno">323</tt>  <tt class="py-line">        <tt class="py-keyword">del</tt> <tt id="link-94" class="py-name"><a title="simx.probe.probe.Probe.attrs
+simx.probe.probe.ProbeArray.attrs
+simx.probe.probe.ProbeStruct.attrs
+simx.probe.probedef.Array.attrs
+simx.probe.probedef.Definition.attrs
+simx.probe.probedef.Link.attrs
+simx.probe.probedef.Primitive.attrs
+simx.probe.probedef.Struct.attrs" class="py-name" href="#" onclick="return doclink('link-94', 'attrs', 'link-9');">attrs</a></tt><tt class="py-op">[</tt><tt class="py-string">'elements'</tt><tt class="py-op">]</tt> </tt>
+<a name="L324"></a><tt class="py-lineno">324</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt id="link-95" class="py-name"><a title="simx.probe.probe.Probe.attrs
+simx.probe.probe.ProbeArray.attrs
+simx.probe.probe.ProbeStruct.attrs
+simx.probe.probedef.Array.attrs
+simx.probe.probedef.Definition.attrs
+simx.probe.probedef.Link.attrs
+simx.probe.probedef.Primitive.attrs
+simx.probe.probedef.Struct.attrs" class="py-name" href="#" onclick="return doclink('link-95', 'attrs', 'link-9');">attrs</a></tt> </tt>
+</div><a name="L325"></a><tt class="py-lineno">325</tt>  <tt class="py-line"> </tt>
+<a name="L326"></a><tt class="py-lineno">326</tt>  <tt class="py-line"> </tt>
+<a name="Array.pack_def"></a><div id="Array.pack_def-def"><a name="L327"></a><tt class="py-lineno">327</tt> <a class="py-toggle" href="#" id="Array.pack_def-toggle" onclick="return toggle('Array.pack_def');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.probe.probedef.Array-class.html#pack_def">pack_def</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Array.pack_def-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Array.pack_def-expanded"><a name="L328"></a><tt class="py-lineno">328</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-96" class="py-name"><a title="simx.probe.probe.ProbeArray.count" class="py-name" href="#" onclick="return doclink('link-96', 'count', 'link-74');">count</a></tt> <tt class="py-op">==</tt> <tt class="py-number">0</tt><tt class="py-op">:</tt> </tt>
+<a name="L329"></a><tt class="py-lineno">329</tt>  <tt class="py-line">            <tt class="py-keyword">return</tt> <tt class="py-string">""</tt> </tt>
+<a name="L330"></a><tt class="py-lineno">330</tt>  <tt class="py-line"> </tt>
+<a name="L331"></a><tt class="py-lineno">331</tt>  <tt class="py-line">        <tt id="link-97" class="py-name"><a title="simx.probe.probedef.Definition.norm_type" class="py-name" href="#" onclick="return doclink('link-97', 'norm_type', 'link-58');">norm_type</a></tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-98" class="py-name"><a title="simx.probe.probedef.Definition.norm_type" class="py-name" href="#" onclick="return doclink('link-98', 'norm_type', 'link-58');">norm_type</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">element_type</tt><tt class="py-op">)</tt> </tt>
+<a name="L332"></a><tt class="py-lineno">332</tt>  <tt class="py-line">        <tt id="link-99" class="py-name" targets="Variable simx.probe.probe.Probe.pack=simx.probe.probe.Probe-class.html#pack"><a title="simx.probe.probe.Probe.pack" class="py-name" href="#" onclick="return doclink('link-99', 'pack', 'link-99');">pack</a></tt> <tt class="py-op">=</tt> <tt id="link-100" class="py-name"><a title="simx.probe.probedef.PRIMITIVES" class="py-name" href="#" onclick="return doclink('link-100', 'PRIMITIVES', 'link-4');">PRIMITIVES</a></tt><tt class="py-op">.</tt><tt id="link-101" class="py-name"><a title="simx.probe.probe.Probe.get
+simx.probe.probe.ProbeArray.get
+simx.probe.probe.ProbeStruct.get" class="py-name" href="#" onclick="return doclink('link-101', 'get', 'link-46');">get</a></tt><tt class="py-op">(</tt><tt id="link-102" class="py-name"><a title="simx.probe.probedef.Definition.norm_type" class="py-name" href="#" onclick="return doclink('link-102', 'norm_type', 'link-58');">norm_type</a></tt><tt class="py-op">.</tt><tt class="py-name">type</tt><tt class="py-op">)</tt> </tt>
+<a name="L333"></a><tt class="py-lineno">333</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt id="link-103" class="py-name"><a title="simx.probe.probe.Probe.pack" class="py-name" href="#" onclick="return doclink('link-103', 'pack', 'link-99');">pack</a></tt><tt class="py-op">:</tt> </tt>
+<a name="L334"></a><tt class="py-lineno">334</tt>  <tt class="py-line">            <tt class="py-comment"># made up of primitive types</tt> </tt>
+<a name="L335"></a><tt class="py-lineno">335</tt>  <tt class="py-line"><tt class="py-comment"></tt>            <tt class="py-keyword">return</tt> <tt class="py-name">str</tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-104" class="py-name"><a title="simx.probe.probe.ProbeArray.count" class="py-name" href="#" onclick="return doclink('link-104', 'count', 'link-74');">count</a></tt><tt class="py-op">)</tt> <tt class="py-op">+</tt> <tt id="link-105" class="py-name"><a title="simx.probe.probe.Probe.pack" class="py-name" href="#" onclick="return doclink('link-105', 'pack', 'link-99');">pack</a></tt> </tt>
+<a name="L336"></a><tt class="py-lineno">336</tt>  <tt class="py-line">        <tt class="py-keyword">else</tt><tt class="py-op">:</tt> </tt>
+<a name="L337"></a><tt class="py-lineno">337</tt>  <tt class="py-line">            <tt class="py-comment"># contains other complex</tt> </tt>
+<a name="L338"></a><tt class="py-lineno">338</tt>  <tt class="py-line"><tt class="py-comment"></tt>            <tt class="py-keyword">return</tt> <tt class="py-name">str</tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-106" class="py-name"><a title="simx.probe.probe.ProbeArray.count" class="py-name" href="#" onclick="return doclink('link-106', 'count', 'link-74');">count</a></tt> <tt class="py-op">*</tt> <tt id="link-107" class="py-name"><a title="simx.probe.probedef.Definition.norm_type" class="py-name" href="#" onclick="return doclink('link-107', 'norm_type', 'link-58');">norm_type</a></tt><tt class="py-op">.</tt><tt id="link-108" class="py-name"><a title="simx.probe.probe.Probe.size" class="py-name" href="#" onclick="return doclink('link-108', 'size', 'link-5');">size</a></tt><tt class="py-op">)</tt> <tt class="py-op">+</tt> <tt class="py-string">"c"</tt> </tt>
+</div><a name="L339"></a><tt class="py-lineno">339</tt>  <tt class="py-line"> </tt>
+<a name="L340"></a><tt class="py-lineno">340</tt>  <tt class="py-line"> </tt>
+<a name="Array._resolve"></a><div id="Array._resolve-def"><a name="L341"></a><tt class="py-lineno">341</tt> <a class="py-toggle" href="#" id="Array._resolve-toggle" onclick="return toggle('Array._resolve');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.probe.probedef.Array-class.html#_resolve">_resolve</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">var</tt><tt class="py-op">,</tt> <tt class="py-param">var_offset</tt><tt class="py-op">,</tt> <tt class="py-param">level</tt><tt class="py-op">,</tt> <tt class="py-param">replace</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Array._resolve-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Array._resolve-expanded"><a name="L342"></a><tt class="py-lineno">342</tt>  <tt class="py-line">        <tt class="py-name">var</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-109" class="py-name"><a title="simx.probe.probedef.Definition._check_var" class="py-name" href="#" onclick="return doclink('link-109', '_check_var', 'link-69');">_check_var</a></tt><tt class="py-op">(</tt><tt class="py-name">var</tt><tt class="py-op">)</tt> </tt>
+<a name="L343"></a><tt class="py-lineno">343</tt>  <tt class="py-line"> </tt>
+<a name="L344"></a><tt class="py-lineno">344</tt>  <tt class="py-line">        <tt class="py-keyword">def</tt> <tt class="py-def-name">own</tt><tt class="py-op">(</tt><tt class="py-param">_replace</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L345"></a><tt class="py-lineno">345</tt>  <tt class="py-line">            <tt class="py-keyword">if</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-110" class="py-name"><a title="simx.probe.probe.ProbeArray.count" class="py-name" href="#" onclick="return doclink('link-110', 'count', 'link-74');">count</a></tt> <tt class="py-op">==</tt> <tt class="py-number">0</tt><tt class="py-op">:</tt> </tt>
+<a name="L346"></a><tt class="py-lineno">346</tt>  <tt class="py-line">                <tt class="py-comment"># PST- what about root?</tt> </tt>
+<a name="L347"></a><tt class="py-lineno">347</tt>  <tt class="py-line"><tt class="py-comment"></tt>                <tt class="py-keyword">return</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-111" class="py-name"><a title="simx.probe.probe.Probe.dup
+simx.probe.probedef.Definition.dup" class="py-name" href="#" onclick="return doclink('link-111', 'dup', 'link-70');">dup</a></tt><tt class="py-op">(</tt><tt id="link-112" class="py-name"><a title="simx.probe.probe.ProbeArray.elements" class="py-name" href="#" onclick="return doclink('link-112', 'elements', 'link-77');">elements</a></tt><tt class="py-op">=</tt><tt class="py-op">[</tt><tt class="py-op">]</tt><tt class="py-op">)</tt> </tt>
+<a name="L348"></a><tt class="py-lineno">348</tt>  <tt class="py-line"> </tt>
+<a name="L349"></a><tt class="py-lineno">349</tt>  <tt class="py-line">            <tt id="link-113" class="py-name"><a title="simx.probe.probedef.Definition.norm_type" class="py-name" href="#" onclick="return doclink('link-113', 'norm_type', 'link-58');">norm_type</a></tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-114" class="py-name"><a title="simx.probe.probedef.Definition.norm_type" class="py-name" href="#" onclick="return doclink('link-114', 'norm_type', 'link-58');">norm_type</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">element_type</tt><tt class="py-op">)</tt> </tt>
+<a name="L350"></a><tt class="py-lineno">350</tt>  <tt class="py-line">            <tt class="py-name">elm_size</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-115" class="py-name"><a title="simx.probe.probe.Probe.size" class="py-name" href="#" onclick="return doclink('link-115', 'size', 'link-5');">size</a></tt> <tt class="py-op">/</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-116" class="py-name"><a title="simx.probe.probe.ProbeArray.count" class="py-name" href="#" onclick="return doclink('link-116', 'count', 'link-74');">count</a></tt> </tt>
+<a name="L351"></a><tt class="py-lineno">351</tt>  <tt class="py-line">            <tt id="link-117" class="py-name"><a title="simx.probe.probe.ProbeArray.elements" class="py-name" href="#" onclick="return doclink('link-117', 'elements', 'link-77');">elements</a></tt> <tt class="py-op">=</tt> <tt class="py-op">[</tt><tt class="py-op">]</tt> </tt>
+<a name="L352"></a><tt class="py-lineno">352</tt>  <tt class="py-line"> </tt>
+<a name="L353"></a><tt class="py-lineno">353</tt>  <tt class="py-line">            <tt class="py-keyword">for</tt> <tt class="py-name">i</tt> <tt class="py-keyword">in</tt> <tt class="py-name">xrange</tt><tt class="py-op">(</tt><tt class="py-number">0</tt><tt class="py-op">,</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-118" class="py-name"><a title="simx.probe.probe.ProbeArray.count" class="py-name" href="#" onclick="return doclink('link-118', 'count', 'link-74');">count</a></tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L354"></a><tt class="py-lineno">354</tt>  <tt class="py-line">                <tt class="py-name">next_level</tt> <tt class="py-op">=</tt> <tt class="py-name">level</tt> <tt class="py-op">+</tt> <tt class="py-string">"[%d]"</tt> <tt class="py-op">%</tt> <tt class="py-name">i</tt> </tt>
+<a name="L355"></a><tt class="py-lineno">355</tt>  <tt class="py-line">                <tt id="link-119" class="py-name" targets="Variable simx.probe.probe.Probe.offset=simx.probe.probe.Probe-class.html#offset"><a title="simx.probe.probe.Probe.offset" class="py-name" href="#" onclick="return doclink('link-119', 'offset', 'link-119');">offset</a></tt> <tt class="py-op">=</tt> <tt class="py-name">i</tt> <tt class="py-op">*</tt> <tt class="py-name">elm_size</tt> <tt class="py-op">+</tt> <tt class="py-name">var_offset</tt> </tt>
+<a name="L356"></a><tt class="py-lineno">356</tt>  <tt class="py-line">                <tt class="py-comment"># updates _replace</tt> </tt>
+<a name="L357"></a><tt class="py-lineno">357</tt>  <tt class="py-line"><tt class="py-comment"></tt>                <tt class="py-name">r</tt><tt class="py-op">,</tt> <tt id="link-120" class="py-name"><a title="simx.probe.probedef.Definition._replace" class="py-name" href="#" onclick="return doclink('link-120', '_replace', 'link-29');">_replace</a></tt> <tt class="py-op">=</tt> <tt id="link-121" class="py-name"><a title="simx.probe.probedef.Definition.norm_type" class="py-name" href="#" onclick="return doclink('link-121', 'norm_type', 'link-58');">norm_type</a></tt><tt class="py-op">.</tt><tt id="link-122" class="py-name"><a title="simx.probe.probedef.Array._resolve
+simx.probe.probedef.Definition._resolve
+simx.probe.probedef.Link._resolve
+simx.probe.probedef.Primitive._resolve
+simx.probe.probedef.Struct._resolve" class="py-name" href="#" onclick="return doclink('link-122', '_resolve', 'link-34');">_resolve</a></tt><tt class="py-op">(</tt> </tt>
+<a name="L358"></a><tt class="py-lineno">358</tt>  <tt class="py-line">                    <tt class="py-name">var</tt><tt class="py-op">,</tt> <tt id="link-123" class="py-name"><a title="simx.probe.probe.Probe.offset" class="py-name" href="#" onclick="return doclink('link-123', 'offset', 'link-119');">offset</a></tt><tt class="py-op">,</tt> <tt class="py-name">next_level</tt><tt class="py-op">,</tt> <tt id="link-124" class="py-name"><a title="simx.probe.probedef.Definition._replace" class="py-name" href="#" onclick="return doclink('link-124', '_replace', 'link-29');">_replace</a></tt><tt class="py-op">)</tt> </tt>
+<a name="L359"></a><tt class="py-lineno">359</tt>  <tt class="py-line">                <tt id="link-125" class="py-name"><a title="simx.probe.probe.ProbeArray.elements" class="py-name" href="#" onclick="return doclink('link-125', 'elements', 'link-77');">elements</a></tt><tt class="py-op">.</tt><tt class="py-name">append</tt><tt class="py-op">(</tt><tt class="py-name">r</tt><tt class="py-op">)</tt> </tt>
+<a name="L360"></a><tt class="py-lineno">360</tt>  <tt class="py-line"> </tt>
+<a name="L361"></a><tt class="py-lineno">361</tt>  <tt class="py-line">            <tt class="py-keyword">return</tt> <tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-126" class="py-name"><a title="simx.probe.probe.Probe.dup
+simx.probe.probedef.Definition.dup" class="py-name" href="#" onclick="return doclink('link-126', 'dup', 'link-70');">dup</a></tt><tt class="py-op">(</tt><tt class="py-name">var</tt><tt class="py-op">=</tt><tt class="py-name">var</tt><tt class="py-op">,</tt> <tt class="py-name">var_offset</tt><tt class="py-op">=</tt><tt class="py-name">var_offset</tt><tt class="py-op">,</tt> </tt>
+<a name="L362"></a><tt class="py-lineno">362</tt>  <tt class="py-line">                             <tt id="link-127" class="py-name"><a title="simx.probe.probe.ProbeArray.elements" class="py-name" href="#" onclick="return doclink('link-127', 'elements', 'link-77');">elements</a></tt><tt class="py-op">=</tt><tt id="link-128" class="py-name"><a title="simx.probe.probe.ProbeArray.elements" class="py-name" href="#" onclick="return doclink('link-128', 'elements', 'link-77');">elements</a></tt><tt class="py-op">)</tt><tt class="py-op">,</tt> </tt>
+<a name="L363"></a><tt class="py-lineno">363</tt>  <tt class="py-line">                    <tt id="link-129" class="py-name"><a title="simx.probe.probedef.Definition._replace" class="py-name" href="#" onclick="return doclink('link-129', '_replace', 'link-29');">_replace</a></tt><tt class="py-op">)</tt> </tt>
+</div><a name="L364"></a><tt class="py-lineno">364</tt>  <tt class="py-line"> </tt>
+<a name="L365"></a><tt class="py-lineno">365</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-130" class="py-name"><a title="simx.probe.probedef.Definition._replace" class="py-name" href="#" onclick="return doclink('link-130', '_replace', 'link-29');">_replace</a></tt><tt class="py-op">(</tt><tt class="py-name">var</tt><tt class="py-op">,</tt> <tt class="py-name">var_offset</tt><tt class="py-op">,</tt> <tt class="py-name">level</tt><tt class="py-op">,</tt> <tt class="py-name">replace</tt><tt class="py-op">)</tt> <tt class="py-keyword">or</tt> <tt class="py-name">own</tt><tt class="py-op">(</tt><tt class="py-name">replace</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L366"></a><tt class="py-lineno">366</tt>  <tt class="py-line"> </tt>
+<a name="L367"></a><tt class="py-lineno">367</tt>  <tt class="py-line">         </tt>
+<a name="Array.bind"></a><div id="Array.bind-def"><a name="L368"></a><tt class="py-lineno">368</tt> <a class="py-toggle" href="#" id="Array.bind-toggle" onclick="return toggle('Array.bind');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.probe.probedef.Array-class.html#bind">bind</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">node</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Array.bind-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Array.bind-expanded"><a name="L369"></a><tt class="py-lineno">369</tt>  <tt class="py-line">        <tt id="link-131" class="py-name"><a title="simx.probe.probe.Probe.attrs
+simx.probe.probe.ProbeArray.attrs
+simx.probe.probe.ProbeStruct.attrs
+simx.probe.probedef.Array.attrs
+simx.probe.probedef.Definition.attrs
+simx.probe.probedef.Link.attrs
+simx.probe.probedef.Primitive.attrs
+simx.probe.probedef.Struct.attrs" class="py-name" href="#" onclick="return doclink('link-131', 'attrs', 'link-9');">attrs</a></tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-132" class="py-name"><a title="simx.probe.probedef.Definition.probe_attrs" class="py-name" href="#" onclick="return doclink('link-132', 'probe_attrs', 'link-40');">probe_attrs</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L370"></a><tt class="py-lineno">370</tt>  <tt class="py-line">        <tt id="link-133" class="py-name"><a title="simx.probe.probe.Probe.attrs
+simx.probe.probe.ProbeArray.attrs
+simx.probe.probe.ProbeStruct.attrs
+simx.probe.probedef.Array.attrs
+simx.probe.probedef.Definition.attrs
+simx.probe.probedef.Link.attrs
+simx.probe.probedef.Primitive.attrs
+simx.probe.probedef.Struct.attrs" class="py-name" href="#" onclick="return doclink('link-133', 'attrs', 'link-9');">attrs</a></tt><tt class="py-op">[</tt><tt class="py-string">'elements'</tt><tt class="py-op">]</tt> <tt class="py-op">=</tt> <tt class="py-op">[</tt><tt class="py-name">e</tt><tt class="py-op">.</tt><tt id="link-134" class="py-name" targets="Method simx.probe.probedef.Array.bind()=simx.probe.probedef.Array-class.html#bind,Method simx.probe.probedef.Definition.bind()=simx.probe.probedef.Definition-class.html#bind,Method simx.probe.probedef.Primitive.bind()=simx.probe.probedef.Primitive-class.html#bind,Method simx.probe.probedef.Struct.bind()=simx.probe.probedef.Struct-class.html#bind"><a title="simx.probe.probedef.Array.bind
+simx.probe.probedef.Definition.bind
+simx.probe.probedef.Primitive.bind
+simx.probe.probedef.Struct.bind" class="py-name" href="#" onclick="return doclink('link-134', 'bind', 'link-134');">bind</a></tt><tt class="py-op">(</tt><tt id="link-135" class="py-name"><a title="simx.base.node
+simx.probe.probe.Probe.node" class="py-name" href="#" onclick="return doclink('link-135', 'node', 'link-38');">node</a></tt><tt class="py-op">)</tt> <tt class="py-keyword">for</tt> <tt class="py-name">e</tt> <tt class="py-keyword">in</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-136" class="py-name"><a title="simx.probe.probe.ProbeArray.elements" class="py-name" href="#" onclick="return doclink('link-136', 'elements', 'link-77');">elements</a></tt><tt class="py-op">]</tt> </tt>
+<a name="L371"></a><tt class="py-lineno">371</tt>  <tt class="py-line">        <tt class="py-keyword">del</tt> <tt id="link-137" class="py-name"><a title="simx.probe.probe.Probe.attrs
+simx.probe.probe.ProbeArray.attrs
+simx.probe.probe.ProbeStruct.attrs
+simx.probe.probedef.Array.attrs
+simx.probe.probedef.Definition.attrs
+simx.probe.probedef.Link.attrs
+simx.probe.probedef.Primitive.attrs
+simx.probe.probedef.Struct.attrs" class="py-name" href="#" onclick="return doclink('link-137', 'attrs', 'link-9');">attrs</a></tt><tt class="py-op">[</tt><tt class="py-string">'element_type'</tt><tt class="py-op">]</tt> </tt>
+<a name="L372"></a><tt class="py-lineno">372</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt id="link-138" class="py-name"><a title="simx.probe.probe.ProbeArray" class="py-name" href="#" onclick="return doclink('link-138', 'ProbeArray', 'link-2');">ProbeArray</a></tt><tt class="py-op">(</tt><tt id="link-139" class="py-name"><a title="simx.base.node
+simx.probe.probe.Probe.node" class="py-name" href="#" onclick="return doclink('link-139', 'node', 'link-38');">node</a></tt><tt class="py-op">=</tt><tt id="link-140" class="py-name"><a title="simx.base.node
+simx.probe.probe.Probe.node" class="py-name" href="#" onclick="return doclink('link-140', 'node', 'link-38');">node</a></tt><tt class="py-op">,</tt> <tt class="py-op">**</tt><tt id="link-141" class="py-name"><a title="simx.probe.probe.Probe.attrs
+simx.probe.probe.ProbeArray.attrs
+simx.probe.probe.ProbeStruct.attrs
+simx.probe.probedef.Array.attrs
+simx.probe.probedef.Definition.attrs
+simx.probe.probedef.Link.attrs
+simx.probe.probedef.Primitive.attrs
+simx.probe.probedef.Struct.attrs" class="py-name" href="#" onclick="return doclink('link-141', 'attrs', 'link-9');">attrs</a></tt><tt class="py-op">)</tt> </tt>
+</div><a name="L373"></a><tt class="py-lineno">373</tt>  <tt class="py-line"> </tt>
+<a name="L374"></a><tt class="py-lineno">374</tt>  <tt class="py-line"> </tt>
+<a name="Array.to_basic"></a><div id="Array.to_basic-def"><a name="L375"></a><tt class="py-lineno">375</tt> <a class="py-toggle" href="#" id="Array.to_basic-toggle" onclick="return toggle('Array.to_basic');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.probe.probedef.Array-class.html#to_basic">to_basic</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Array.to_basic-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Array.to_basic-expanded"><a name="L376"></a><tt class="py-lineno">376</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-142" class="py-name"><a title="simx.probe.probe.ProbeArray.count" class="py-name" href="#" onclick="return doclink('link-142', 'count', 'link-74');">count</a></tt> <tt class="py-op">==</tt> <tt class="py-number">0</tt><tt class="py-op">:</tt> </tt>
+<a name="L377"></a><tt class="py-lineno">377</tt>  <tt class="py-line">            <tt class="py-keyword">return</tt> <tt class="py-op">[</tt><tt class="py-op">]</tt> </tt>
+<a name="L378"></a><tt class="py-lineno">378</tt>  <tt class="py-line">        <tt class="py-keyword">try</tt><tt class="py-op">:</tt> </tt>
+<a name="L379"></a><tt class="py-lineno">379</tt>  <tt class="py-line">            <tt id="link-143" class="py-name"><a title="simx.probe.probedef.Definition.norm_type" class="py-name" href="#" onclick="return doclink('link-143', 'norm_type', 'link-58');">norm_type</a></tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-144" class="py-name"><a title="simx.probe.probedef.Definition.norm_type" class="py-name" href="#" onclick="return doclink('link-144', 'norm_type', 'link-58');">norm_type</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">element_type</tt><tt class="py-op">)</tt> </tt>
+<a name="L380"></a><tt class="py-lineno">380</tt>  <tt class="py-line">        <tt class="py-keyword">except</tt> <tt class="py-name">ValueError</tt><tt class="py-op">:</tt> </tt>
+<a name="L381"></a><tt class="py-lineno">381</tt>  <tt class="py-line">            <tt id="link-145" class="py-name"><a title="simx.probe.probedef.Definition.norm_type" class="py-name" href="#" onclick="return doclink('link-145', 'norm_type', 'link-58');">norm_type</a></tt> <tt class="py-op">=</tt> <tt id="link-146" class="py-name" targets="Class simx.probe.probedef.Primitive=simx.probe.probedef.Primitive-class.html"><a title="simx.probe.probedef.Primitive" class="py-name" href="#" onclick="return doclink('link-146', 'Primitive', 'link-146');">Primitive</a></tt><tt class="py-op">(</tt><tt class="py-string">"&lt;invalid&gt;"</tt><tt class="py-op">,</tt> <tt id="link-147" class="py-name"><a title="simx.probe.probe.Probe.size" class="py-name" href="#" onclick="return doclink('link-147', 'size', 'link-5');">size</a></tt><tt class="py-op">=</tt><tt class="py-number">1</tt><tt class="py-op">)</tt> </tt>
+<a name="L382"></a><tt class="py-lineno">382</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-op">{</tt> </tt>
+<a name="L383"></a><tt class="py-lineno">383</tt>  <tt class="py-line">            <tt class="py-string">'$type'</tt><tt class="py-op">:</tt> <tt class="py-string">'array'</tt><tt class="py-op">,</tt> </tt>
+<a name="L384"></a><tt class="py-lineno">384</tt>  <tt class="py-line">            <tt class="py-string">'$count'</tt><tt class="py-op">:</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-148" class="py-name"><a title="simx.probe.probe.ProbeArray.count" class="py-name" href="#" onclick="return doclink('link-148', 'count', 'link-74');">count</a></tt><tt class="py-op">,</tt> </tt>
+<a name="L385"></a><tt class="py-lineno">385</tt>  <tt class="py-line">            <tt class="py-string">'$of'</tt><tt class="py-op">:</tt> <tt id="link-149" class="py-name"><a title="simx.probe.probedef.Definition.norm_type" class="py-name" href="#" onclick="return doclink('link-149', 'norm_type', 'link-58');">norm_type</a></tt><tt class="py-op">.</tt><tt id="link-150" class="py-name"><a title="simx.probe.probedef.Array.to_basic
+simx.probe.probedef.Definition.to_basic
+simx.probe.probedef.Link.to_basic
+simx.probe.probedef.Primitive.to_basic
+simx.probe.probedef.Struct.to_basic" class="py-name" href="#" onclick="return doclink('link-150', 'to_basic', 'link-41');">to_basic</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L386"></a><tt class="py-lineno">386</tt>  <tt class="py-line">            <tt class="py-op">}</tt> </tt>
+</div></div><a name="L387"></a><tt class="py-lineno">387</tt>  <tt class="py-line"> </tt>
+<a name="L388"></a><tt class="py-lineno">388</tt>  <tt class="py-line"> </tt>
+<a name="Struct"></a><div id="Struct-def"><a name="L389"></a><tt class="py-lineno">389</tt> <a class="py-toggle" href="#" id="Struct-toggle" onclick="return toggle('Struct');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="simx.probe.probedef.Struct-class.html">Struct</a><tt class="py-op">(</tt><tt class="py-base-class">Definition</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Struct-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="Struct-expanded"><a name="L390"></a><tt class="py-lineno">390</tt>  <tt class="py-line"> </tt>
+<a name="L391"></a><tt class="py-lineno">391</tt>  <tt class="py-line">    <tt class="py-name">__slots__</tt> <tt class="py-op">=</tt> <tt class="py-op">[</tt><tt class="py-string">'members'</tt><tt class="py-op">]</tt> </tt>
+<a name="L392"></a><tt class="py-lineno">392</tt>  <tt class="py-line"> </tt>
+<a name="Struct.__init__"></a><div id="Struct.__init__-def"><a name="L393"></a><tt class="py-lineno">393</tt> <a class="py-toggle" href="#" id="Struct.__init__-toggle" onclick="return toggle('Struct.__init__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.probe.probedef.Struct-class.html#__init__">__init__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">members</tt><tt class="py-op">=</tt><tt class="py-name">None</tt><tt class="py-op">,</tt> <tt class="py-op">**</tt><tt class="py-param">args</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Struct.__init__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Struct.__init__-expanded"><a name="L394"></a><tt class="py-lineno">394</tt>  <tt class="py-line">        <tt id="link-151" class="py-name"><a title="simx.probe.probedef.Definition" class="py-name" href="#" onclick="return doclink('link-151', 'Definition', 'link-42');">Definition</a></tt><tt class="py-op">.</tt><tt id="link-152" class="py-name"><a title="simx.base.channel.ChannelBridge.__init__
+simx.base.extension.Extension.__init__
+simx.base.node.Node.__init__
+simx.base.radio.RadioRedirect.__init__
+simx.base.tossim.TossimBase.__init__
+simx.dyntopo.Link.BasicLinkModel.__init__
+simx.dyntopo.Topo.GenericTopo.__init__
+simx.event.event.Manager.__init__
+simx.event.event.PriorityQueue.__init__
+simx.inject.inject.Inject.__init__
+simx.inject.inject.InvalidVersionWarning.__init__
+simx.inject.queue.FifoQueue.__init__
+simx.inject.queue.QueueFullWarning.__init__
+simx.inject.wiretap.InjectDownstream.__init__
+simx.inject.wiretap.InjectPacketSock.__init__
+simx.inject.wiretap.InjectSock.__init__
+simx.inject.wiretap.InjectTrigger.__init__
+simx.inject.wiretap.InjectUpstream.__init__
+simx.probe.parse.LookupError.__init__
+simx.probe.parse.ProbeLink.__init__
+simx.probe.parse.ProbeLoader.__init__
+simx.probe.parse.ReplacementError.__init__
+simx.probe.probe.CachingProber.__init__
+simx.probe.probe.Probe.__init__
+simx.probe.probe.ProbeArray.__init__
+simx.probe.probe.ProbeStruct.__init__
+simx.probe.probedef.Array.__init__
+simx.probe.probedef.Definition.__init__
+simx.probe.probedef.Link.__init__
+simx.probe.probedef.Primitive.__init__
+simx.probe.probedef.Struct.__init__
+simx.sensor.extension.SensorExtension.__init__
+simx.sensor.sensor.SensorControl.__init__
+simx.sensor.sensor.SensorError.__init__
+simx.sensor.streamer.BinaryStreamer.__init__
+simx.sensor.streamer.SacStreamer.__init__
+simx.sensor.streamer.Streamer.__init__
+simx.sensor.streamer.TextStreamer.__init__
+simx.sync.time_control.TimeControl.__init__" class="py-name" href="#" onclick="return doclink('link-152', '__init__', 'link-43');">__init__</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">,</tt> <tt class="py-op">**</tt><tt class="py-name">args</tt><tt class="py-op">)</tt> </tt>
+<a name="L395"></a><tt class="py-lineno">395</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-153" class="py-name" targets="Variable simx.probe.probe.ProbeStruct.members=simx.probe.probe.ProbeStruct-class.html#members"><a title="simx.probe.probe.ProbeStruct.members" class="py-name" href="#" onclick="return doclink('link-153', 'members', 'link-153');">members</a></tt> <tt class="py-op">=</tt> <tt id="link-154" class="py-name"><a title="simx.probe.probe.ProbeStruct.members" class="py-name" href="#" onclick="return doclink('link-154', 'members', 'link-153');">members</a></tt> <tt class="py-keyword">or</tt> <tt class="py-op">{</tt><tt class="py-op">}</tt> </tt>
+</div><a name="L396"></a><tt class="py-lineno">396</tt>  <tt class="py-line"> </tt>
+<a name="L397"></a><tt class="py-lineno">397</tt>  <tt class="py-line"> </tt>
+<a name="Struct.__getitem__"></a><div id="Struct.__getitem__-def"><a name="L398"></a><tt class="py-lineno">398</tt> <a class="py-toggle" href="#" id="Struct.__getitem__-toggle" onclick="return toggle('Struct.__getitem__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.probe.probedef.Struct-class.html#__getitem__">__getitem__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">key</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Struct.__getitem__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Struct.__getitem__-expanded"><a name="L399"></a><tt class="py-lineno">399</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-155" class="py-name"><a title="simx.probe.probe.ProbeStruct.members" class="py-name" href="#" onclick="return doclink('link-155', 'members', 'link-153');">members</a></tt><tt class="py-op">[</tt><tt class="py-name">key</tt><tt class="py-op">]</tt> </tt>
+</div><a name="L400"></a><tt class="py-lineno">400</tt>  <tt class="py-line"> </tt>
+<a name="L401"></a><tt class="py-lineno">401</tt>  <tt class="py-line"> </tt>
+<a name="Struct.attrs"></a><div id="Struct.attrs-def"><a name="L402"></a><tt class="py-lineno">402</tt> <a class="py-toggle" href="#" id="Struct.attrs-toggle" onclick="return toggle('Struct.attrs');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.probe.probedef.Struct-class.html#attrs">attrs</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Struct.attrs-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Struct.attrs-expanded"><a name="L403"></a><tt class="py-lineno">403</tt>  <tt class="py-line">        <tt id="link-156" class="py-name"><a title="simx.probe.probe.Probe.attrs
+simx.probe.probe.ProbeArray.attrs
+simx.probe.probe.ProbeStruct.attrs
+simx.probe.probedef.Array.attrs
+simx.probe.probedef.Definition.attrs
+simx.probe.probedef.Link.attrs
+simx.probe.probedef.Primitive.attrs
+simx.probe.probedef.Struct.attrs" class="py-name" href="#" onclick="return doclink('link-156', 'attrs', 'link-9');">attrs</a></tt> <tt class="py-op">=</tt> <tt id="link-157" class="py-name"><a title="simx.probe.probedef.Definition" class="py-name" href="#" onclick="return doclink('link-157', 'Definition', 'link-42');">Definition</a></tt><tt class="py-op">.</tt><tt id="link-158" class="py-name"><a title="simx.probe.probe.Probe.attrs
+simx.probe.probe.ProbeArray.attrs
+simx.probe.probe.ProbeStruct.attrs
+simx.probe.probedef.Array.attrs
+simx.probe.probedef.Definition.attrs
+simx.probe.probedef.Link.attrs
+simx.probe.probedef.Primitive.attrs
+simx.probe.probedef.Struct.attrs" class="py-name" href="#" onclick="return doclink('link-158', 'attrs', 'link-9');">attrs</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">)</tt> </tt>
+<a name="L404"></a><tt class="py-lineno">404</tt>  <tt class="py-line">        <tt id="link-159" class="py-name"><a title="simx.probe.probe.Probe.attrs
+simx.probe.probe.ProbeArray.attrs
+simx.probe.probe.ProbeStruct.attrs
+simx.probe.probedef.Array.attrs
+simx.probe.probedef.Definition.attrs
+simx.probe.probedef.Link.attrs
+simx.probe.probedef.Primitive.attrs
+simx.probe.probedef.Struct.attrs" class="py-name" href="#" onclick="return doclink('link-159', 'attrs', 'link-9');">attrs</a></tt><tt class="py-op">[</tt><tt class="py-string">'members'</tt><tt class="py-op">]</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-160" class="py-name"><a title="simx.probe.probe.ProbeStruct.members" class="py-name" href="#" onclick="return doclink('link-160', 'members', 'link-153');">members</a></tt> </tt>
+<a name="L405"></a><tt class="py-lineno">405</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt id="link-161" class="py-name"><a title="simx.probe.probe.Probe.attrs
+simx.probe.probe.ProbeArray.attrs
+simx.probe.probe.ProbeStruct.attrs
+simx.probe.probedef.Array.attrs
+simx.probe.probedef.Definition.attrs
+simx.probe.probedef.Link.attrs
+simx.probe.probedef.Primitive.attrs
+simx.probe.probedef.Struct.attrs" class="py-name" href="#" onclick="return doclink('link-161', 'attrs', 'link-9');">attrs</a></tt> </tt>
+</div><a name="L406"></a><tt class="py-lineno">406</tt>  <tt class="py-line"> </tt>
+<a name="L407"></a><tt class="py-lineno">407</tt>  <tt class="py-line"> </tt>
+<a name="Struct.str_attrs"></a><div id="Struct.str_attrs-def"><a name="L408"></a><tt class="py-lineno">408</tt> <a class="py-toggle" href="#" id="Struct.str_attrs-toggle" onclick="return toggle('Struct.str_attrs');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.probe.probedef.Struct-class.html#str_attrs">str_attrs</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Struct.str_attrs-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Struct.str_attrs-expanded"><a name="L409"></a><tt class="py-lineno">409</tt>  <tt class="py-line">        <tt id="link-162" class="py-name"><a title="simx.probe.probe.Probe.attrs
+simx.probe.probe.ProbeArray.attrs
+simx.probe.probe.ProbeStruct.attrs
+simx.probe.probedef.Array.attrs
+simx.probe.probedef.Definition.attrs
+simx.probe.probedef.Link.attrs
+simx.probe.probedef.Primitive.attrs
+simx.probe.probedef.Struct.attrs" class="py-name" href="#" onclick="return doclink('link-162', 'attrs', 'link-9');">attrs</a></tt> <tt class="py-op">=</tt> <tt id="link-163" class="py-name"><a title="simx.probe.probedef.Definition" class="py-name" href="#" onclick="return doclink('link-163', 'Definition', 'link-42');">Definition</a></tt><tt class="py-op">.</tt><tt id="link-164" class="py-name"><a title="simx.probe.probe.Probe.str_attrs
+simx.probe.probe.ProbeArray.str_attrs
+simx.probe.probe.ProbeStruct.str_attrs
+simx.probe.probedef.Array.str_attrs
+simx.probe.probedef.Definition.str_attrs
+simx.probe.probedef.Link.str_attrs
+simx.probe.probedef.Primitive.str_attrs
+simx.probe.probedef.Struct.str_attrs" class="py-name" href="#" onclick="return doclink('link-164', 'str_attrs', 'link-27');">str_attrs</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">)</tt> </tt>
+<a name="L410"></a><tt class="py-lineno">410</tt>  <tt class="py-line">        <tt id="link-165" class="py-name"><a title="simx.probe.probe.Probe.attrs
+simx.probe.probe.ProbeArray.attrs
+simx.probe.probe.ProbeStruct.attrs
+simx.probe.probedef.Array.attrs
+simx.probe.probedef.Definition.attrs
+simx.probe.probedef.Link.attrs
+simx.probe.probedef.Primitive.attrs
+simx.probe.probedef.Struct.attrs" class="py-name" href="#" onclick="return doclink('link-165', 'attrs', 'link-9');">attrs</a></tt><tt class="py-op">[</tt><tt class="py-string">'members'</tt><tt class="py-op">]</tt> <tt class="py-op">=</tt> <tt class="py-string">","</tt><tt class="py-op">.</tt><tt class="py-name">join</tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-166" class="py-name"><a title="simx.probe.probe.ProbeStruct.members" class="py-name" href="#" onclick="return doclink('link-166', 'members', 'link-153');">members</a></tt><tt class="py-op">.</tt><tt class="py-name">keys</tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L411"></a><tt class="py-lineno">411</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt id="link-167" class="py-name"><a title="simx.probe.probe.Probe.attrs
+simx.probe.probe.ProbeArray.attrs
+simx.probe.probe.ProbeStruct.attrs
+simx.probe.probedef.Array.attrs
+simx.probe.probedef.Definition.attrs
+simx.probe.probedef.Link.attrs
+simx.probe.probedef.Primitive.attrs
+simx.probe.probedef.Struct.attrs" class="py-name" href="#" onclick="return doclink('link-167', 'attrs', 'link-9');">attrs</a></tt> </tt>
+</div><a name="L412"></a><tt class="py-lineno">412</tt>  <tt class="py-line"> </tt>
+<a name="L413"></a><tt class="py-lineno">413</tt>  <tt class="py-line"> </tt>
+<a name="Struct.pack_def"></a><div id="Struct.pack_def-def"><a name="L414"></a><tt class="py-lineno">414</tt> <a class="py-toggle" href="#" id="Struct.pack_def-toggle" onclick="return toggle('Struct.pack_def');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.probe.probedef.Struct-class.html#pack_def">pack_def</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Struct.pack_def-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Struct.pack_def-expanded"><a name="L415"></a><tt class="py-lineno">415</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">str</tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-168" class="py-name"><a title="simx.probe.probe.Probe.size" class="py-name" href="#" onclick="return doclink('link-168', 'size', 'link-5');">size</a></tt><tt class="py-op">)</tt> <tt class="py-op">+</tt> <tt class="py-string">"s"</tt> </tt>
+</div><a name="L416"></a><tt class="py-lineno">416</tt>  <tt class="py-line"> </tt>
+<a name="L417"></a><tt class="py-lineno">417</tt>  <tt class="py-line"> </tt>
+<a name="Struct._resolve"></a><div id="Struct._resolve-def"><a name="L418"></a><tt class="py-lineno">418</tt> <a class="py-toggle" href="#" id="Struct._resolve-toggle" onclick="return toggle('Struct._resolve');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.probe.probedef.Struct-class.html#_resolve">_resolve</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">var</tt><tt class="py-op">,</tt> <tt class="py-param">var_offset</tt><tt class="py-op">,</tt> <tt class="py-param">level</tt><tt class="py-op">,</tt> <tt class="py-param">replace</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Struct._resolve-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Struct._resolve-expanded"><a name="L419"></a><tt class="py-lineno">419</tt>  <tt class="py-line">        <tt class="py-name">var</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-169" class="py-name"><a title="simx.probe.probedef.Definition._check_var" class="py-name" href="#" onclick="return doclink('link-169', '_check_var', 'link-69');">_check_var</a></tt><tt class="py-op">(</tt><tt class="py-name">var</tt><tt class="py-op">)</tt> </tt>
+<a name="L420"></a><tt class="py-lineno">420</tt>  <tt class="py-line"> </tt>
+<a name="L421"></a><tt class="py-lineno">421</tt>  <tt class="py-line">        <tt class="py-keyword">def</tt> <tt class="py-def-name">own</tt><tt class="py-op">(</tt><tt class="py-param">_replace</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L422"></a><tt class="py-lineno">422</tt>  <tt class="py-line">            <tt id="link-170" class="py-name"><a title="simx.probe.probe.ProbeStruct.members" class="py-name" href="#" onclick="return doclink('link-170', 'members', 'link-153');">members</a></tt> <tt class="py-op">=</tt> <tt class="py-op">{</tt><tt class="py-op">}</tt> </tt>
+<a name="L423"></a><tt class="py-lineno">423</tt>  <tt class="py-line"> </tt>
+<a name="L424"></a><tt class="py-lineno">424</tt>  <tt class="py-line">            <tt class="py-keyword">for</tt> <tt class="py-name">name</tt><tt class="py-op">,</tt> <tt class="py-name">member</tt> <tt class="py-keyword">in</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-171" class="py-name"><a title="simx.probe.probe.ProbeStruct.members" class="py-name" href="#" onclick="return doclink('link-171', 'members', 'link-153');">members</a></tt><tt class="py-op">.</tt><tt class="py-name">iteritems</tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L425"></a><tt class="py-lineno">425</tt>  <tt class="py-line">                <tt class="py-keyword">if</tt> <tt class="py-name">member</tt><tt class="py-op">.</tt><tt class="py-name">offset_bits</tt> <tt class="py-keyword">is</tt> <tt class="py-name">None</tt><tt class="py-op">:</tt> </tt>
+<a name="L426"></a><tt class="py-lineno">426</tt>  <tt class="py-line">                    <tt class="py-keyword">raise</tt> <tt class="py-name">ValueError</tt><tt class="py-op">(</tt><tt class="py-string">"Required offset_bits missing "</tt> <tt class="py-op">+</tt> </tt>
+<a name="L427"></a><tt class="py-lineno">427</tt>  <tt class="py-line">                                     <tt class="py-string">"for member: "</tt> <tt class="py-op">+</tt> <tt class="py-name">name</tt><tt class="py-op">)</tt> </tt>
+<a name="L428"></a><tt class="py-lineno">428</tt>  <tt class="py-line"> </tt>
+<a name="L429"></a><tt class="py-lineno">429</tt>  <tt class="py-line">                <tt class="py-name">byte_offset</tt> <tt class="py-op">=</tt> <tt class="py-name">member</tt><tt class="py-op">.</tt><tt class="py-name">offset_bits</tt> <tt class="py-op">/</tt> <tt class="py-number">8</tt> </tt>
+<a name="L430"></a><tt class="py-lineno">430</tt>  <tt class="py-line">                <tt class="py-keyword">if</tt> <tt class="py-name">byte_offset</tt> <tt class="py-op">+</tt> <tt class="py-name">member</tt><tt class="py-op">.</tt><tt id="link-172" class="py-name"><a title="simx.probe.probe.Probe.size" class="py-name" href="#" onclick="return doclink('link-172', 'size', 'link-5');">size</a></tt> <tt class="py-op">&gt;</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-173" class="py-name"><a title="simx.probe.probe.Probe.size" class="py-name" href="#" onclick="return doclink('link-173', 'size', 'link-5');">size</a></tt><tt class="py-op">:</tt> </tt>
+<a name="L431"></a><tt class="py-lineno">431</tt>  <tt class="py-line">                    <tt class="py-keyword">raise</tt> <tt class="py-name">ValueError</tt><tt class="py-op">(</tt><tt class="py-string">"Overflow: %d &gt; %d"</tt> <tt class="py-op">%</tt> </tt>
+<a name="L432"></a><tt class="py-lineno">432</tt>  <tt class="py-line">                                     <tt class="py-op">(</tt><tt class="py-name">byte_offset</tt> <tt class="py-op">+</tt> <tt class="py-name">member</tt><tt class="py-op">.</tt><tt id="link-174" class="py-name"><a title="simx.probe.probe.Probe.size" class="py-name" href="#" onclick="return doclink('link-174', 'size', 'link-5');">size</a></tt><tt class="py-op">,</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-175" class="py-name"><a title="simx.probe.probe.Probe.size" class="py-name" href="#" onclick="return doclink('link-175', 'size', 'link-5');">size</a></tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L433"></a><tt class="py-lineno">433</tt>  <tt class="py-line"> </tt>
+<a name="L434"></a><tt class="py-lineno">434</tt>  <tt class="py-line">                <tt class="py-comment"># updates _replace</tt> </tt>
+<a name="L435"></a><tt class="py-lineno">435</tt>  <tt class="py-line"><tt class="py-comment"></tt>                <tt id="link-176" class="py-name"><a title="simx.probe.probe.ProbeStruct.members" class="py-name" href="#" onclick="return doclink('link-176', 'members', 'link-153');">members</a></tt><tt class="py-op">[</tt><tt class="py-name">name</tt><tt class="py-op">]</tt><tt class="py-op">,</tt> <tt id="link-177" class="py-name"><a title="simx.probe.probedef.Definition._replace" class="py-name" href="#" onclick="return doclink('link-177', '_replace', 'link-29');">_replace</a></tt> <tt class="py-op">=</tt> <tt class="py-name">member</tt><tt class="py-op">.</tt><tt id="link-178" class="py-name"><a title="simx.probe.probedef.Array._resolve
+simx.probe.probedef.Definition._resolve
+simx.probe.probedef.Link._resolve
+simx.probe.probedef.Primitive._resolve
+simx.probe.probedef.Struct._resolve" class="py-name" href="#" onclick="return doclink('link-178', '_resolve', 'link-34');">_resolve</a></tt><tt class="py-op">(</tt> </tt>
+<a name="L436"></a><tt class="py-lineno">436</tt>  <tt class="py-line">                    <tt class="py-name">var</tt><tt class="py-op">,</tt> <tt class="py-name">var_offset</tt> <tt class="py-op">+</tt> <tt class="py-name">byte_offset</tt><tt class="py-op">,</tt> </tt>
+<a name="L437"></a><tt class="py-lineno">437</tt>  <tt class="py-line">                    <tt class="py-name">level</tt> <tt class="py-op">+</tt> <tt class="py-string">"[%s]"</tt> <tt class="py-op">%</tt> <tt class="py-name">name</tt><tt class="py-op">,</tt> <tt id="link-179" class="py-name"><a title="simx.probe.probedef.Definition._replace" class="py-name" href="#" onclick="return doclink('link-179', '_replace', 'link-29');">_replace</a></tt><tt class="py-op">)</tt> </tt>
+<a name="L438"></a><tt class="py-lineno">438</tt>  <tt class="py-line"> </tt>
+<a name="L439"></a><tt class="py-lineno">439</tt>  <tt class="py-line">            <tt class="py-keyword">return</tt> <tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-180" class="py-name"><a title="simx.probe.probe.Probe.dup
+simx.probe.probedef.Definition.dup" class="py-name" href="#" onclick="return doclink('link-180', 'dup', 'link-70');">dup</a></tt><tt class="py-op">(</tt><tt class="py-name">var</tt><tt class="py-op">=</tt><tt class="py-name">var</tt><tt class="py-op">,</tt> <tt class="py-name">var_offset</tt><tt class="py-op">=</tt><tt class="py-name">var_offset</tt><tt class="py-op">,</tt> <tt id="link-181" class="py-name"><a title="simx.probe.probe.ProbeStruct.members" class="py-name" href="#" onclick="return doclink('link-181', 'members', 'link-153');">members</a></tt><tt class="py-op">=</tt><tt id="link-182" class="py-name"><a title="simx.probe.probe.ProbeStruct.members" class="py-name" href="#" onclick="return doclink('link-182', 'members', 'link-153');">members</a></tt><tt class="py-op">)</tt><tt class="py-op">,</tt> </tt>
+<a name="L440"></a><tt class="py-lineno">440</tt>  <tt class="py-line">                    <tt id="link-183" class="py-name"><a title="simx.probe.probedef.Definition._replace" class="py-name" href="#" onclick="return doclink('link-183', '_replace', 'link-29');">_replace</a></tt><tt class="py-op">)</tt> </tt>
+</div><a name="L441"></a><tt class="py-lineno">441</tt>  <tt class="py-line"> </tt>
+<a name="L442"></a><tt class="py-lineno">442</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-184" class="py-name"><a title="simx.probe.probedef.Definition._replace" class="py-name" href="#" onclick="return doclink('link-184', '_replace', 'link-29');">_replace</a></tt><tt class="py-op">(</tt><tt class="py-name">var</tt><tt class="py-op">,</tt> <tt class="py-name">var_offset</tt><tt class="py-op">,</tt> <tt class="py-name">level</tt><tt class="py-op">,</tt> <tt class="py-name">replace</tt><tt class="py-op">)</tt> <tt class="py-keyword">or</tt> <tt class="py-name">own</tt><tt class="py-op">(</tt><tt class="py-name">replace</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L443"></a><tt class="py-lineno">443</tt>  <tt class="py-line"> </tt>
+<a name="L444"></a><tt class="py-lineno">444</tt>  <tt class="py-line"> </tt>
+<a name="Struct.bind"></a><div id="Struct.bind-def"><a name="L445"></a><tt class="py-lineno">445</tt> <a class="py-toggle" href="#" id="Struct.bind-toggle" onclick="return toggle('Struct.bind');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.probe.probedef.Struct-class.html#bind">bind</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">node</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Struct.bind-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Struct.bind-expanded"><a name="L446"></a><tt class="py-lineno">446</tt>  <tt class="py-line">        <tt id="link-185" class="py-name"><a title="simx.probe.probe.Probe.attrs
+simx.probe.probe.ProbeArray.attrs
+simx.probe.probe.ProbeStruct.attrs
+simx.probe.probedef.Array.attrs
+simx.probe.probedef.Definition.attrs
+simx.probe.probedef.Link.attrs
+simx.probe.probedef.Primitive.attrs
+simx.probe.probedef.Struct.attrs" class="py-name" href="#" onclick="return doclink('link-185', 'attrs', 'link-9');">attrs</a></tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-186" class="py-name"><a title="simx.probe.probedef.Definition.probe_attrs" class="py-name" href="#" onclick="return doclink('link-186', 'probe_attrs', 'link-40');">probe_attrs</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L447"></a><tt class="py-lineno">447</tt>  <tt class="py-line">        <tt id="link-187" class="py-name"><a title="simx.probe.probe.Probe.attrs
+simx.probe.probe.ProbeArray.attrs
+simx.probe.probe.ProbeStruct.attrs
+simx.probe.probedef.Array.attrs
+simx.probe.probedef.Definition.attrs
+simx.probe.probedef.Link.attrs
+simx.probe.probedef.Primitive.attrs
+simx.probe.probedef.Struct.attrs" class="py-name" href="#" onclick="return doclink('link-187', 'attrs', 'link-9');">attrs</a></tt><tt class="py-op">[</tt><tt class="py-string">'members'</tt><tt class="py-op">]</tt> <tt class="py-op">=</tt> <tt class="py-name">dict</tt><tt class="py-op">(</tt><tt class="py-op">(</tt><tt class="py-name">n</tt><tt class="py-op">,</tt> <tt class="py-name">v</tt><tt class="py-op">.</tt><tt id="link-188" class="py-name"><a title="simx.probe.probedef.Array.bind
+simx.probe.probedef.Definition.bind
+simx.probe.probedef.Primitive.bind
+simx.probe.probedef.Struct.bind" class="py-name" href="#" onclick="return doclink('link-188', 'bind', 'link-134');">bind</a></tt><tt class="py-op">(</tt><tt id="link-189" class="py-name"><a title="simx.base.node
+simx.probe.probe.Probe.node" class="py-name" href="#" onclick="return doclink('link-189', 'node', 'link-38');">node</a></tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L448"></a><tt class="py-lineno">448</tt>  <tt class="py-line">                                <tt class="py-keyword">for</tt> <tt class="py-op">(</tt><tt class="py-name">n</tt><tt class="py-op">,</tt> <tt class="py-name">v</tt><tt class="py-op">)</tt> </tt>
+<a name="L449"></a><tt class="py-lineno">449</tt>  <tt class="py-line">                                <tt class="py-keyword">in</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-190" class="py-name"><a title="simx.probe.probe.ProbeStruct.members" class="py-name" href="#" onclick="return doclink('link-190', 'members', 'link-153');">members</a></tt><tt class="py-op">.</tt><tt class="py-name">iteritems</tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L450"></a><tt class="py-lineno">450</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt id="link-191" class="py-name"><a title="simx.probe.probe.ProbeStruct" class="py-name" href="#" onclick="return doclink('link-191', 'ProbeStruct', 'link-3');">ProbeStruct</a></tt><tt class="py-op">(</tt><tt id="link-192" class="py-name"><a title="simx.base.node
+simx.probe.probe.Probe.node" class="py-name" href="#" onclick="return doclink('link-192', 'node', 'link-38');">node</a></tt><tt class="py-op">=</tt><tt id="link-193" class="py-name"><a title="simx.base.node
+simx.probe.probe.Probe.node" class="py-name" href="#" onclick="return doclink('link-193', 'node', 'link-38');">node</a></tt><tt class="py-op">,</tt> <tt class="py-op">**</tt><tt id="link-194" class="py-name"><a title="simx.probe.probe.Probe.attrs
+simx.probe.probe.ProbeArray.attrs
+simx.probe.probe.ProbeStruct.attrs
+simx.probe.probedef.Array.attrs
+simx.probe.probedef.Definition.attrs
+simx.probe.probedef.Link.attrs
+simx.probe.probedef.Primitive.attrs
+simx.probe.probedef.Struct.attrs" class="py-name" href="#" onclick="return doclink('link-194', 'attrs', 'link-9');">attrs</a></tt><tt class="py-op">)</tt> </tt>
+</div><a name="L451"></a><tt class="py-lineno">451</tt>  <tt class="py-line"> </tt>
+<a name="L452"></a><tt class="py-lineno">452</tt>  <tt class="py-line"> </tt>
+<a name="Struct.to_basic"></a><div id="Struct.to_basic-def"><a name="L453"></a><tt class="py-lineno">453</tt> <a class="py-toggle" href="#" id="Struct.to_basic-toggle" onclick="return toggle('Struct.to_basic');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.probe.probedef.Struct-class.html#to_basic">to_basic</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Struct.to_basic-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Struct.to_basic-expanded"><a name="L454"></a><tt class="py-lineno">454</tt>  <tt class="py-line"><tt class="py-comment">#        res = dict((k, v.to_basic()) for k, v in self.members.iteritems())</tt> </tt>
+<a name="L455"></a><tt class="py-lineno">455</tt>  <tt class="py-line"><tt class="py-comment"></tt>        <tt class="py-name">res</tt> <tt class="py-op">=</tt> <tt class="py-op">{</tt><tt class="py-op">}</tt> </tt>
+<a name="L456"></a><tt class="py-lineno">456</tt>  <tt class="py-line">        <tt class="py-name">res</tt><tt class="py-op">[</tt><tt class="py-string">'$type'</tt><tt class="py-op">]</tt> <tt class="py-op">=</tt> <tt class="py-string">'struct'</tt> </tt>
+<a name="L457"></a><tt class="py-lineno">457</tt>  <tt class="py-line">        <tt class="py-name">res</tt><tt class="py-op">[</tt><tt class="py-string">'$members'</tt><tt class="py-op">]</tt> <tt class="py-op">=</tt> <tt class="py-op">[</tt><tt class="py-op">(</tt><tt class="py-name">k</tt><tt class="py-op">,</tt> <tt class="py-name">v</tt><tt class="py-op">.</tt><tt id="link-195" class="py-name"><a title="simx.probe.probedef.Array.to_basic
+simx.probe.probedef.Definition.to_basic
+simx.probe.probedef.Link.to_basic
+simx.probe.probedef.Primitive.to_basic
+simx.probe.probedef.Struct.to_basic" class="py-name" href="#" onclick="return doclink('link-195', 'to_basic', 'link-41');">to_basic</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> <tt class="py-keyword">for</tt> <tt class="py-name">k</tt><tt class="py-op">,</tt> <tt class="py-name">v</tt> </tt>
+<a name="L458"></a><tt class="py-lineno">458</tt>  <tt class="py-line">                           <tt class="py-keyword">in</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-196" class="py-name"><a title="simx.probe.probe.ProbeStruct.members" class="py-name" href="#" onclick="return doclink('link-196', 'members', 'link-153');">members</a></tt><tt class="py-op">.</tt><tt class="py-name">iteritems</tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">]</tt> </tt>
+<a name="L459"></a><tt class="py-lineno">459</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">res</tt> </tt>
+</div></div><a name="L460"></a><tt class="py-lineno">460</tt>  <tt class="py-line">         </tt>
+<a name="L461"></a><tt class="py-lineno">461</tt>  <tt class="py-line"> </tt>
+<a name="Link"></a><div id="Link-def"><a name="L462"></a><tt class="py-lineno">462</tt> <a class="py-toggle" href="#" id="Link-toggle" onclick="return toggle('Link');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="simx.probe.probedef.Link-class.html">Link</a><tt class="py-op">(</tt><tt class="py-base-class">Definition</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Link-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="Link-expanded"><a name="L463"></a><tt class="py-lineno">463</tt>  <tt class="py-line"> </tt>
+<a name="Link.__init__"></a><div id="Link.__init__-def"><a name="L464"></a><tt class="py-lineno">464</tt> <a class="py-toggle" href="#" id="Link.__init__-toggle" onclick="return toggle('Link.__init__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.probe.probedef.Link-class.html#__init__">__init__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">type</tt><tt class="py-op">=</tt><tt class="py-name">None</tt><tt class="py-op">,</tt> <tt class="py-op">**</tt><tt class="py-param">args</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Link.__init__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Link.__init__-expanded"><a name="L465"></a><tt class="py-lineno">465</tt>  <tt class="py-line">        <tt id="link-197" class="py-name"><a title="simx.probe.probedef.Definition" class="py-name" href="#" onclick="return doclink('link-197', 'Definition', 'link-42');">Definition</a></tt><tt class="py-op">.</tt><tt id="link-198" class="py-name"><a title="simx.base.channel.ChannelBridge.__init__
+simx.base.extension.Extension.__init__
+simx.base.node.Node.__init__
+simx.base.radio.RadioRedirect.__init__
+simx.base.tossim.TossimBase.__init__
+simx.dyntopo.Link.BasicLinkModel.__init__
+simx.dyntopo.Topo.GenericTopo.__init__
+simx.event.event.Manager.__init__
+simx.event.event.PriorityQueue.__init__
+simx.inject.inject.Inject.__init__
+simx.inject.inject.InvalidVersionWarning.__init__
+simx.inject.queue.FifoQueue.__init__
+simx.inject.queue.QueueFullWarning.__init__
+simx.inject.wiretap.InjectDownstream.__init__
+simx.inject.wiretap.InjectPacketSock.__init__
+simx.inject.wiretap.InjectSock.__init__
+simx.inject.wiretap.InjectTrigger.__init__
+simx.inject.wiretap.InjectUpstream.__init__
+simx.probe.parse.LookupError.__init__
+simx.probe.parse.ProbeLink.__init__
+simx.probe.parse.ProbeLoader.__init__
+simx.probe.parse.ReplacementError.__init__
+simx.probe.probe.CachingProber.__init__
+simx.probe.probe.Probe.__init__
+simx.probe.probe.ProbeArray.__init__
+simx.probe.probe.ProbeStruct.__init__
+simx.probe.probedef.Array.__init__
+simx.probe.probedef.Definition.__init__
+simx.probe.probedef.Link.__init__
+simx.probe.probedef.Primitive.__init__
+simx.probe.probedef.Struct.__init__
+simx.sensor.extension.SensorExtension.__init__
+simx.sensor.sensor.SensorControl.__init__
+simx.sensor.sensor.SensorError.__init__
+simx.sensor.streamer.BinaryStreamer.__init__
+simx.sensor.streamer.SacStreamer.__init__
+simx.sensor.streamer.Streamer.__init__
+simx.sensor.streamer.TextStreamer.__init__
+simx.sync.time_control.TimeControl.__init__" class="py-name" href="#" onclick="return doclink('link-198', '__init__', 'link-43');">__init__</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">,</tt> <tt class="py-op">**</tt><tt class="py-name">args</tt><tt class="py-op">)</tt> </tt>
+<a name="L466"></a><tt class="py-lineno">466</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-op">(</tt><tt class="py-keyword">not</tt> <tt class="py-name">type</tt> <tt class="py-keyword">or</tt> <tt class="py-keyword">not</tt> <tt class="py-name">hasattr</tt><tt class="py-op">(</tt><tt class="py-name">type</tt><tt class="py-op">,</tt> <tt class="py-string">"link"</tt><tt class="py-op">)</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L467"></a><tt class="py-lineno">467</tt>  <tt class="py-line">            <tt class="py-keyword">raise</tt> <tt class="py-name">ValueError</tt><tt class="py-op">(</tt><tt class="py-string">"Expecting ProbeLink (found=%s)"</tt> <tt class="py-op">%</tt> <tt class="py-name">repr</tt><tt class="py-op">(</tt><tt class="py-name">type</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L468"></a><tt class="py-lineno">468</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">type</tt> <tt class="py-op">=</tt> <tt class="py-name">type</tt> </tt>
+</div><a name="L469"></a><tt class="py-lineno">469</tt>  <tt class="py-line"> </tt>
+<a name="L470"></a><tt class="py-lineno">470</tt>  <tt class="py-line"> </tt>
+<a name="Link.attrs"></a><div id="Link.attrs-def"><a name="L471"></a><tt class="py-lineno">471</tt> <a class="py-toggle" href="#" id="Link.attrs-toggle" onclick="return toggle('Link.attrs');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.probe.probedef.Link-class.html#attrs">attrs</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Link.attrs-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Link.attrs-expanded"><a name="L472"></a><tt class="py-lineno">472</tt>  <tt class="py-line">        <tt id="link-199" class="py-name"><a title="simx.probe.probe.Probe.attrs
+simx.probe.probe.ProbeArray.attrs
+simx.probe.probe.ProbeStruct.attrs
+simx.probe.probedef.Array.attrs
+simx.probe.probedef.Definition.attrs
+simx.probe.probedef.Link.attrs
+simx.probe.probedef.Primitive.attrs
+simx.probe.probedef.Struct.attrs" class="py-name" href="#" onclick="return doclink('link-199', 'attrs', 'link-9');">attrs</a></tt> <tt class="py-op">=</tt> <tt id="link-200" class="py-name"><a title="simx.probe.probedef.Definition" class="py-name" href="#" onclick="return doclink('link-200', 'Definition', 'link-42');">Definition</a></tt><tt class="py-op">.</tt><tt id="link-201" class="py-name"><a title="simx.probe.probe.Probe.attrs
+simx.probe.probe.ProbeArray.attrs
+simx.probe.probe.ProbeStruct.attrs
+simx.probe.probedef.Array.attrs
+simx.probe.probedef.Definition.attrs
+simx.probe.probedef.Link.attrs
+simx.probe.probedef.Primitive.attrs
+simx.probe.probedef.Struct.attrs" class="py-name" href="#" onclick="return doclink('link-201', 'attrs', 'link-9');">attrs</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">)</tt> </tt>
+<a name="L473"></a><tt class="py-lineno">473</tt>  <tt class="py-line">        <tt id="link-202" class="py-name"><a title="simx.probe.probe.Probe.attrs
+simx.probe.probe.ProbeArray.attrs
+simx.probe.probe.ProbeStruct.attrs
+simx.probe.probedef.Array.attrs
+simx.probe.probedef.Definition.attrs
+simx.probe.probedef.Link.attrs
+simx.probe.probedef.Primitive.attrs
+simx.probe.probedef.Struct.attrs" class="py-name" href="#" onclick="return doclink('link-202', 'attrs', 'link-9');">attrs</a></tt><tt class="py-op">[</tt><tt class="py-string">'type'</tt><tt class="py-op">]</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">type</tt> </tt>
+<a name="L474"></a><tt class="py-lineno">474</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt id="link-203" class="py-name"><a title="simx.probe.probe.Probe.attrs
+simx.probe.probe.ProbeArray.attrs
+simx.probe.probe.ProbeStruct.attrs
+simx.probe.probedef.Array.attrs
+simx.probe.probedef.Definition.attrs
+simx.probe.probedef.Link.attrs
+simx.probe.probedef.Primitive.attrs
+simx.probe.probedef.Struct.attrs" class="py-name" href="#" onclick="return doclink('link-203', 'attrs', 'link-9');">attrs</a></tt> </tt>
+</div><a name="L475"></a><tt class="py-lineno">475</tt>  <tt class="py-line"> </tt>
+<a name="L476"></a><tt class="py-lineno">476</tt>  <tt class="py-line"> </tt>
+<a name="Link.str_attrs"></a><div id="Link.str_attrs-def"><a name="L477"></a><tt class="py-lineno">477</tt> <a class="py-toggle" href="#" id="Link.str_attrs-toggle" onclick="return toggle('Link.str_attrs');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.probe.probedef.Link-class.html#str_attrs">str_attrs</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Link.str_attrs-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Link.str_attrs-expanded"><a name="L478"></a><tt class="py-lineno">478</tt>  <tt class="py-line">        <tt id="link-204" class="py-name"><a title="simx.probe.probe.Probe.attrs
+simx.probe.probe.ProbeArray.attrs
+simx.probe.probe.ProbeStruct.attrs
+simx.probe.probedef.Array.attrs
+simx.probe.probedef.Definition.attrs
+simx.probe.probedef.Link.attrs
+simx.probe.probedef.Primitive.attrs
+simx.probe.probedef.Struct.attrs" class="py-name" href="#" onclick="return doclink('link-204', 'attrs', 'link-9');">attrs</a></tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-205" class="py-name"><a title="simx.probe.probe.Probe.attrs
+simx.probe.probe.ProbeArray.attrs
+simx.probe.probe.ProbeStruct.attrs
+simx.probe.probedef.Array.attrs
+simx.probe.probedef.Definition.attrs
+simx.probe.probedef.Link.attrs
+simx.probe.probedef.Primitive.attrs
+simx.probe.probedef.Struct.attrs" class="py-name" href="#" onclick="return doclink('link-205', 'attrs', 'link-9');">attrs</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L479"></a><tt class="py-lineno">479</tt>  <tt class="py-line">        <tt class="py-keyword">try</tt><tt class="py-op">:</tt> </tt>
+<a name="L480"></a><tt class="py-lineno">480</tt>  <tt class="py-line">            <tt id="link-206" class="py-name"><a title="simx.probe.probe.Probe.attrs
+simx.probe.probe.ProbeArray.attrs
+simx.probe.probe.ProbeStruct.attrs
+simx.probe.probedef.Array.attrs
+simx.probe.probedef.Definition.attrs
+simx.probe.probedef.Link.attrs
+simx.probe.probedef.Primitive.attrs
+simx.probe.probedef.Struct.attrs" class="py-name" href="#" onclick="return doclink('link-206', 'attrs', 'link-9');">attrs</a></tt><tt class="py-op">[</tt><tt class="py-string">'type'</tt><tt class="py-op">]</tt> <tt class="py-op">=</tt> <tt class="py-name">str</tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-207" class="py-name"><a title="simx.probe.probedef.Definition.norm_type" class="py-name" href="#" onclick="return doclink('link-207', 'norm_type', 'link-58');">norm_type</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">type</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L481"></a><tt class="py-lineno">481</tt>  <tt class="py-line">        <tt class="py-keyword">except</tt> <tt class="py-name">ValueError</tt><tt class="py-op">:</tt> </tt>
+<a name="L482"></a><tt class="py-lineno">482</tt>  <tt class="py-line">            <tt id="link-208" class="py-name"><a title="simx.probe.probe.Probe.attrs
+simx.probe.probe.ProbeArray.attrs
+simx.probe.probe.ProbeStruct.attrs
+simx.probe.probedef.Array.attrs
+simx.probe.probedef.Definition.attrs
+simx.probe.probedef.Link.attrs
+simx.probe.probedef.Primitive.attrs
+simx.probe.probedef.Struct.attrs" class="py-name" href="#" onclick="return doclink('link-208', 'attrs', 'link-9');">attrs</a></tt><tt class="py-op">[</tt><tt class="py-string">'type'</tt><tt class="py-op">]</tt> <tt class="py-op">=</tt> <tt class="py-string">"&lt;unresolved&gt;"</tt> </tt>
+<a name="L483"></a><tt class="py-lineno">483</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt id="link-209" class="py-name"><a title="simx.probe.probe.Probe.attrs
+simx.probe.probe.ProbeArray.attrs
+simx.probe.probe.ProbeStruct.attrs
+simx.probe.probedef.Array.attrs
+simx.probe.probedef.Definition.attrs
+simx.probe.probedef.Link.attrs
+simx.probe.probedef.Primitive.attrs
+simx.probe.probedef.Struct.attrs" class="py-name" href="#" onclick="return doclink('link-209', 'attrs', 'link-9');">attrs</a></tt> </tt>
+</div><a name="L484"></a><tt class="py-lineno">484</tt>  <tt class="py-line"> </tt>
+<a name="L485"></a><tt class="py-lineno">485</tt>  <tt class="py-line"> </tt>
+<a name="Link.__getitem__"></a><div id="Link.__getitem__-def"><a name="L486"></a><tt class="py-lineno">486</tt> <a class="py-toggle" href="#" id="Link.__getitem__-toggle" onclick="return toggle('Link.__getitem__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.probe.probedef.Link-class.html#__getitem__">__getitem__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">key_index</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Link.__getitem__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Link.__getitem__-expanded"><a name="L487"></a><tt class="py-lineno">487</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-210" class="py-name"><a title="simx.probe.probedef.Definition.norm_type" class="py-name" href="#" onclick="return doclink('link-210', 'norm_type', 'link-58');">norm_type</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">type</tt><tt class="py-op">)</tt><tt class="py-op">[</tt><tt class="py-name">key_index</tt><tt class="py-op">]</tt> </tt>
+</div><a name="L488"></a><tt class="py-lineno">488</tt>  <tt class="py-line"> </tt>
+<a name="L489"></a><tt class="py-lineno">489</tt>  <tt class="py-line"> </tt>
+<a name="Link._resolve"></a><div id="Link._resolve-def"><a name="L490"></a><tt class="py-lineno">490</tt> <a class="py-toggle" href="#" id="Link._resolve-toggle" onclick="return toggle('Link._resolve');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.probe.probedef.Link-class.html#_resolve">_resolve</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">var</tt><tt class="py-op">,</tt> <tt class="py-param">var_offset</tt><tt class="py-op">,</tt> <tt class="py-param">level</tt><tt class="py-op">,</tt> <tt class="py-param">replace</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Link._resolve-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Link._resolve-expanded"><a name="L491"></a><tt class="py-lineno">491</tt>  <tt class="py-line">        <tt class="py-comment"># Just map-through link</tt> </tt>
+<a name="L492"></a><tt class="py-lineno">492</tt>  <tt class="py-line"><tt class="py-comment"></tt>        <tt class="py-name">var</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-211" class="py-name"><a title="simx.probe.probedef.Definition._check_var" class="py-name" href="#" onclick="return doclink('link-211', '_check_var', 'link-69');">_check_var</a></tt><tt class="py-op">(</tt><tt class="py-name">var</tt><tt class="py-op">)</tt> </tt>
+<a name="L493"></a><tt class="py-lineno">493</tt>  <tt class="py-line">        <tt id="link-212" class="py-name"><a title="simx.probe.probedef.Definition.norm_type" class="py-name" href="#" onclick="return doclink('link-212', 'norm_type', 'link-58');">norm_type</a></tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-213" class="py-name"><a title="simx.probe.probedef.Definition.norm_type" class="py-name" href="#" onclick="return doclink('link-213', 'norm_type', 'link-58');">norm_type</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">type</tt><tt class="py-op">)</tt> </tt>
+<a name="L494"></a><tt class="py-lineno">494</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt id="link-214" class="py-name"><a title="simx.probe.probedef.Definition.norm_type" class="py-name" href="#" onclick="return doclink('link-214', 'norm_type', 'link-58');">norm_type</a></tt><tt class="py-op">.</tt><tt id="link-215" class="py-name"><a title="simx.probe.probedef.Array._resolve
+simx.probe.probedef.Definition._resolve
+simx.probe.probedef.Link._resolve
+simx.probe.probedef.Primitive._resolve
+simx.probe.probedef.Struct._resolve" class="py-name" href="#" onclick="return doclink('link-215', '_resolve', 'link-34');">_resolve</a></tt><tt class="py-op">(</tt><tt class="py-name">var</tt><tt class="py-op">,</tt> <tt class="py-name">var_offset</tt><tt class="py-op">,</tt> <tt class="py-name">level</tt><tt class="py-op">,</tt> <tt class="py-name">replace</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L495"></a><tt class="py-lineno">495</tt>  <tt class="py-line">     </tt>
+<a name="L496"></a><tt class="py-lineno">496</tt>  <tt class="py-line"> </tt>
+<a name="Link.to_basic"></a><div id="Link.to_basic-def"><a name="L497"></a><tt class="py-lineno">497</tt> <a class="py-toggle" href="#" id="Link.to_basic-toggle" onclick="return toggle('Link.to_basic');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.probe.probedef.Link-class.html#to_basic">to_basic</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Link.to_basic-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Link.to_basic-expanded"><a name="L498"></a><tt class="py-lineno">498</tt>  <tt class="py-line">        <tt class="py-keyword">try</tt><tt class="py-op">:</tt> </tt>
+<a name="L499"></a><tt class="py-lineno">499</tt>  <tt class="py-line">            <tt id="link-216" class="py-name"><a title="simx.probe.probedef.Definition.norm_type" class="py-name" href="#" onclick="return doclink('link-216', 'norm_type', 'link-58');">norm_type</a></tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-217" class="py-name"><a title="simx.probe.probedef.Definition.norm_type" class="py-name" href="#" onclick="return doclink('link-217', 'norm_type', 'link-58');">norm_type</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">type</tt><tt class="py-op">)</tt> </tt>
+<a name="L500"></a><tt class="py-lineno">500</tt>  <tt class="py-line">        <tt class="py-keyword">except</tt> <tt class="py-name">ValueError</tt><tt class="py-op">:</tt> </tt>
+<a name="L501"></a><tt class="py-lineno">501</tt>  <tt class="py-line">            <tt id="link-218" class="py-name"><a title="simx.probe.probedef.Definition.norm_type" class="py-name" href="#" onclick="return doclink('link-218', 'norm_type', 'link-58');">norm_type</a></tt> <tt class="py-op">=</tt> <tt id="link-219" class="py-name"><a title="simx.probe.probedef.Primitive" class="py-name" href="#" onclick="return doclink('link-219', 'Primitive', 'link-146');">Primitive</a></tt><tt class="py-op">(</tt><tt class="py-string">"&lt;invalid&gt;"</tt><tt class="py-op">,</tt> <tt id="link-220" class="py-name"><a title="simx.probe.probe.Probe.size" class="py-name" href="#" onclick="return doclink('link-220', 'size', 'link-5');">size</a></tt><tt class="py-op">=</tt><tt class="py-number">0</tt><tt class="py-op">)</tt> </tt>
+<a name="L502"></a><tt class="py-lineno">502</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt id="link-221" class="py-name"><a title="simx.probe.probedef.Definition.norm_type" class="py-name" href="#" onclick="return doclink('link-221', 'norm_type', 'link-58');">norm_type</a></tt><tt class="py-op">.</tt><tt id="link-222" class="py-name"><a title="simx.probe.probedef.Array.to_basic
+simx.probe.probedef.Definition.to_basic
+simx.probe.probedef.Link.to_basic
+simx.probe.probedef.Primitive.to_basic
+simx.probe.probedef.Struct.to_basic" class="py-name" href="#" onclick="return doclink('link-222', 'to_basic', 'link-41');">to_basic</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+</div></div><a name="L503"></a><tt class="py-lineno">503</tt>  <tt class="py-line"> </tt><script type="text/javascript">
+<!--
+expandto(location.href);
+// -->
+</script>
+</pre>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Wed Aug 12 00:17:36 2009
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

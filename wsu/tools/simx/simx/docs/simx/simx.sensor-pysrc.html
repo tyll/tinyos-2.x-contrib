@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>simx.sensor</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        Package&nbsp;simx ::
+        Package&nbsp;sensor
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="simx.sensor-pysrc.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<h1 class="epydoc">Source Code for <a href="simx.sensor-module.html">Package simx.sensor</a></h1>
+<pre class="py-src">
+<a name="L1"></a><tt class="py-lineno">1</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-op">.</tt><tt id="link-0" class="py-name" targets="Package simx.sensor=simx.sensor-module.html,Module simx.sensor.sensor=simx.sensor.sensor-module.html"><a title="simx.sensor
+simx.sensor.sensor" class="py-name" href="#" onclick="return doclink('link-0', 'sensor', 'link-0');">sensor</a></tt> <tt class="py-keyword">import</tt> <tt id="link-1" class="py-name" targets="Class simx.sensor.sensor.SensorControl=simx.sensor.sensor.SensorControl-class.html"><a title="simx.sensor.sensor.SensorControl" class="py-name" href="#" onclick="return doclink('link-1', 'SensorControl', 'link-1');">SensorControl</a></tt><tt class="py-op">,</tt> <tt id="link-2" class="py-name" targets="Class simx.sensor.sensor.SensorError=simx.sensor.sensor.SensorError-class.html"><a title="simx.sensor.sensor.SensorError" class="py-name" href="#" onclick="return doclink('link-2', 'SensorError', 'link-2');">SensorError</a></tt> </tt>
+<a name="L2"></a><tt class="py-lineno">2</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-op">.</tt><tt id="link-3" class="py-name" targets="Module simx.base.extension=simx.base.extension-module.html,Module simx.sensor.extension=simx.sensor.extension-module.html"><a title="simx.base.extension
+simx.sensor.extension" class="py-name" href="#" onclick="return doclink('link-3', 'extension', 'link-3');">extension</a></tt> <tt class="py-keyword">import</tt> <tt id="link-4" class="py-name" targets="Class simx.sensor.extension.SensorExtension=simx.sensor.extension.SensorExtension-class.html"><a title="simx.sensor.extension.SensorExtension" class="py-name" href="#" onclick="return doclink('link-4', 'SensorExtension', 'link-4');">SensorExtension</a></tt> </tt>
+<a name="L3"></a><tt class="py-lineno">3</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-op">.</tt><tt id="link-5" class="py-name" targets="Module simx.sensor.reader=simx.sensor.reader-module.html"><a title="simx.sensor.reader" class="py-name" href="#" onclick="return doclink('link-5', 'reader', 'link-5');">reader</a></tt> <tt class="py-keyword">import</tt> <tt id="link-6" class="py-name" targets="Class simx.sensor.reader.Reader=simx.sensor.reader.Reader-class.html"><a title="simx.sensor.reader.Reader" class="py-name" href="#" onclick="return doclink('link-6', 'Reader', 'link-6');">Reader</a></tt> </tt>
+<a name="L4"></a><tt class="py-lineno">4</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-op">.</tt><tt id="link-7" class="py-name" targets="Module simx.sensor.generator=simx.sensor.generator-module.html,Method simx.sensor.streamer.BinaryStreamer.generator()=simx.sensor.streamer.BinaryStreamer-class.html#generator,Method simx.sensor.streamer.TextStreamer.generator()=simx.sensor.streamer.TextStreamer-class.html#generator"><a title="simx.sensor.generator
+simx.sensor.streamer.BinaryStreamer.generator
+simx.sensor.streamer.TextStreamer.generator" class="py-name" href="#" onclick="return doclink('link-7', 'generator', 'link-7');">generator</a></tt> <tt class="py-keyword">import</tt> <tt id="link-8" class="py-name" targets="Class simx.sensor.generator.Generator=simx.sensor.generator.Generator-class.html"><a title="simx.sensor.generator.Generator" class="py-name" href="#" onclick="return doclink('link-8', 'Generator', 'link-8');">Generator</a></tt> </tt>
+<a name="L5"></a><tt class="py-lineno">5</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-op">.</tt><tt id="link-9" class="py-name" targets="Module simx.sensor.streamer=simx.sensor.streamer-module.html"><a title="simx.sensor.streamer" class="py-name" href="#" onclick="return doclink('link-9', 'streamer', 'link-9');">streamer</a></tt> <tt class="py-keyword">import</tt> <tt id="link-10" class="py-name" targets="Class simx.sensor.streamer.Streamer=simx.sensor.streamer.Streamer-class.html"><a title="simx.sensor.streamer.Streamer" class="py-name" href="#" onclick="return doclink('link-10', 'Streamer', 'link-10');">Streamer</a></tt><tt class="py-op">,</tt> <tt id="link-11" class="py-name" targets="Class simx.sensor.streamer.TextStreamer=simx.sensor.streamer.TextStreamer-class.html"><a title="simx.sensor.streamer.TextStreamer" class="py-name" href="#" onclick="return doclink('link-11', 'TextStreamer', 'link-11');">TextStreamer</a></tt><tt class="py-op">,</tt> <tt id="link-12" class="py-name" targets="Class simx.sensor.streamer.BinaryStreamer=simx.sensor.streamer.BinaryStreamer-class.html"><a title="simx.sensor.streamer.BinaryStreamer" class="py-name" href="#" onclick="return doclink('link-12', 'BinaryStreamer', 'link-12');">BinaryStreamer</a></tt><tt class="py-op">,</tt> <tt id="link-13" class="py-name" targets="Class simx.sensor.streamer.SacStreamer=simx.sensor.streamer.SacStreamer-class.html"><a title="simx.sensor.streamer.SacStreamer" class="py-name" href="#" onclick="return doclink('link-13', 'SacStreamer', 'link-13');">SacStreamer</a></tt> </tt>
+<a name="L6"></a><tt class="py-lineno">6</tt>  <tt class="py-line"> </tt><script type="text/javascript">
+<!--
+expandto(location.href);
+// -->
+</script>
+</pre>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Wed Aug 12 00:17:37 2009
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

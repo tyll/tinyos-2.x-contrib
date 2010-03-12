@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>simx.inject.queue</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        Package&nbsp;simx ::
+        <a href="simx.inject-module.html">Package&nbsp;inject</a> ::
+        Module&nbsp;queue
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="simx.inject.queue-pysrc.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<h1 class="epydoc">Source Code for <a href="simx.inject.queue-module.html">Module simx.inject.queue</a></h1>
+<pre class="py-src">
+<a name="L1"></a><tt class="py-lineno"> 1</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-name">Queue</tt> <tt class="py-keyword">import</tt> <tt class="py-name">Queue</tt> </tt>
+<a name="L2"></a><tt class="py-lineno"> 2</tt>  <tt class="py-line"> </tt>
+<a name="L3"></a><tt class="py-lineno"> 3</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-name">warnings</tt> <tt class="py-keyword">import</tt> <tt class="py-name">warn</tt> </tt>
+<a name="L4"></a><tt class="py-lineno"> 4</tt>  <tt class="py-line"> </tt>
+<a name="L5"></a><tt class="py-lineno"> 5</tt>  <tt class="py-line"> </tt>
+<a name="QueueFullWarning"></a><div id="QueueFullWarning-def"><a name="L6"></a><tt class="py-lineno"> 6</tt> <a class="py-toggle" href="#" id="QueueFullWarning-toggle" onclick="return toggle('QueueFullWarning');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="simx.inject.queue.QueueFullWarning-class.html">QueueFullWarning</a><tt class="py-op">(</tt><tt class="py-base-class">RuntimeWarning</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="QueueFullWarning-collapsed" style="display:none;" pad="++" indent="++++"></div><div id="QueueFullWarning-expanded"><a name="L7"></a><tt class="py-lineno"> 7</tt>  <tt class="py-line">    <tt class="py-docstring">"""</tt> </tt>
+<a name="L8"></a><tt class="py-lineno"> 8</tt>  <tt class="py-line"><tt class="py-docstring">    Warning issued when queue if full.</tt> </tt>
+<a name="L9"></a><tt class="py-lineno"> 9</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="QueueFullWarning.__init__"></a><div id="QueueFullWarning.__init__-def"><a name="L10"></a><tt class="py-lineno">10</tt> <a class="py-toggle" href="#" id="QueueFullWarning.__init__-toggle" onclick="return toggle('QueueFullWarning.__init__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.inject.queue.QueueFullWarning-class.html#__init__">__init__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">queue</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="QueueFullWarning.__init__-collapsed" style="display:none;" pad="++" indent="++++++++"></div><div id="QueueFullWarning.__init__-expanded"><a name="L11"></a><tt class="py-lineno">11</tt>  <tt class="py-line">        <tt class="py-name">RuntimeWarning</tt><tt class="py-op">.</tt><tt id="link-0" class="py-name" targets="Method simx.base.channel.ChannelBridge.__init__()=simx.base.channel.ChannelBridge-class.html#__init__,Method simx.base.extension.Extension.__init__()=simx.base.extension.Extension-class.html#__init__,Method simx.base.node.Node.__init__()=simx.base.node.Node-class.html#__init__,Method simx.base.radio.RadioRedirect.__init__()=simx.base.radio.RadioRedirect-class.html#__init__,Method simx.base.tossim.TossimBase.__init__()=simx.base.tossim.TossimBase-class.html#__init__,Method simx.dyntopo.Link.BasicLinkModel.__init__()=simx.dyntopo.Link.BasicLinkModel-class.html#__init__,Method simx.dyntopo.Topo.GenericTopo.__init__()=simx.dyntopo.Topo.GenericTopo-class.html#__init__,Method simx.event.event.Manager.__init__()=simx.event.event.Manager-class.html#__init__,Method simx.event.event.PriorityQueue.__init__()=simx.event.event.PriorityQueue-class.html#__init__,Method simx.inject.inject.Inject.__init__()=simx.inject.inject.Inject-class.html#__init__,Method simx.inject.inject.InvalidVersionWarning.__init__()=simx.inject.inject.InvalidVersionWarning-class.html#__init__,Method simx.inject.queue.FifoQueue.__init__()=simx.inject.queue.FifoQueue-class.html#__init__,Method simx.inject.queue.QueueFullWarning.__init__()=simx.inject.queue.QueueFullWarning-class.html#__init__,Method simx.inject.wiretap.InjectDownstream.__init__()=simx.inject.wiretap.InjectDownstream-class.html#__init__,Method simx.inject.wiretap.InjectPacketSock.__init__()=simx.inject.wiretap.InjectPacketSock-class.html#__init__,Method simx.inject.wiretap.InjectSock.__init__()=simx.inject.wiretap.InjectSock-class.html#__init__,Method simx.inject.wiretap.InjectTrigger.__init__()=simx.inject.wiretap.InjectTrigger-class.html#__init__,Method simx.inject.wiretap.InjectUpstream.__init__()=simx.inject.wiretap.InjectUpstream-class.html#__init__,Method simx.probe.parse.LookupError.__init__()=simx.probe.parse.LookupError-class.html#__init__,Method simx.probe.parse.ProbeLink.__init__()=simx.probe.parse.ProbeLink-class.html#__init__,Method simx.probe.parse.ProbeLoader.__init__()=simx.probe.parse.ProbeLoader-class.html#__init__,Method simx.probe.parse.ReplacementError.__init__()=simx.probe.parse.ReplacementError-class.html#__init__,Method simx.probe.probe.CachingProber.__init__()=simx.probe.probe.CachingProber-class.html#__init__,Method simx.probe.probe.Probe.__init__()=simx.probe.probe.Probe-class.html#__init__,Method simx.probe.probe.ProbeArray.__init__()=simx.probe.probe.ProbeArray-class.html#__init__,Method simx.probe.probe.ProbeStruct.__init__()=simx.probe.probe.ProbeStruct-class.html#__init__,Method simx.probe.probedef.Array.__init__()=simx.probe.probedef.Array-class.html#__init__,Method simx.probe.probedef.Definition.__init__()=simx.probe.probedef.Definition-class.html#__init__,Method simx.probe.probedef.Link.__init__()=simx.probe.probedef.Link-class.html#__init__,Method simx.probe.probedef.Primitive.__init__()=simx.probe.probedef.Primitive-class.html#__init__,Method simx.probe.probedef.Struct.__init__()=simx.probe.probedef.Struct-class.html#__init__,Method simx.sensor.extension.SensorExtension.__init__()=simx.sensor.extension.SensorExtension-class.html#__init__,Method simx.sensor.sensor.SensorControl.__init__()=simx.sensor.sensor.SensorControl-class.html#__init__,Method simx.sensor.sensor.SensorError.__init__()=simx.sensor.sensor.SensorError-class.html#__init__,Method simx.sensor.streamer.BinaryStreamer.__init__()=simx.sensor.streamer.BinaryStreamer-class.html#__init__,Method simx.sensor.streamer.SacStreamer.__init__()=simx.sensor.streamer.SacStreamer-class.html#__init__,Method simx.sensor.streamer.Streamer.__init__()=simx.sensor.streamer.Streamer-class.html#__init__,Method simx.sensor.streamer.TextStreamer.__init__()=simx.sensor.streamer.TextStreamer-class.html#__init__,Method simx.sync.time_control.TimeControl.__init__()=simx.sync.time_control.TimeControl-class.html#__init__"><a title="simx.base.channel.ChannelBridge.__init__
+simx.base.extension.Extension.__init__
+simx.base.node.Node.__init__
+simx.base.radio.RadioRedirect.__init__
+simx.base.tossim.TossimBase.__init__
+simx.dyntopo.Link.BasicLinkModel.__init__
+simx.dyntopo.Topo.GenericTopo.__init__
+simx.event.event.Manager.__init__
+simx.event.event.PriorityQueue.__init__
+simx.inject.inject.Inject.__init__
+simx.inject.inject.InvalidVersionWarning.__init__
+simx.inject.queue.FifoQueue.__init__
+simx.inject.queue.QueueFullWarning.__init__
+simx.inject.wiretap.InjectDownstream.__init__
+simx.inject.wiretap.InjectPacketSock.__init__
+simx.inject.wiretap.InjectSock.__init__
+simx.inject.wiretap.InjectTrigger.__init__
+simx.inject.wiretap.InjectUpstream.__init__
+simx.probe.parse.LookupError.__init__
+simx.probe.parse.ProbeLink.__init__
+simx.probe.parse.ProbeLoader.__init__
+simx.probe.parse.ReplacementError.__init__
+simx.probe.probe.CachingProber.__init__
+simx.probe.probe.Probe.__init__
+simx.probe.probe.ProbeArray.__init__
+simx.probe.probe.ProbeStruct.__init__
+simx.probe.probedef.Array.__init__
+simx.probe.probedef.Definition.__init__
+simx.probe.probedef.Link.__init__
+simx.probe.probedef.Primitive.__init__
+simx.probe.probedef.Struct.__init__
+simx.sensor.extension.SensorExtension.__init__
+simx.sensor.sensor.SensorControl.__init__
+simx.sensor.sensor.SensorError.__init__
+simx.sensor.streamer.BinaryStreamer.__init__
+simx.sensor.streamer.SacStreamer.__init__
+simx.sensor.streamer.Streamer.__init__
+simx.sensor.streamer.TextStreamer.__init__
+simx.sync.time_control.TimeControl.__init__" class="py-name" href="#" onclick="return doclink('link-0', '__init__', 'link-0');">__init__</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">,</tt> <tt class="py-string">"%s is full: dropping message"</tt> <tt class="py-op">%</tt> <tt id="link-1" class="py-name" targets="Module simx.inject.queue=simx.inject.queue-module.html"><a title="simx.inject.queue" class="py-name" href="#" onclick="return doclink('link-1', 'queue', 'link-1');">queue</a></tt><tt class="py-op">)</tt> </tt>
+</div></div><a name="L12"></a><tt class="py-lineno">12</tt>  <tt class="py-line"> </tt>
+<a name="L13"></a><tt class="py-lineno">13</tt>  <tt class="py-line"> </tt>
+<a name="FifoQueue"></a><div id="FifoQueue-def"><a name="L14"></a><tt class="py-lineno">14</tt> <a class="py-toggle" href="#" id="FifoQueue-toggle" onclick="return toggle('FifoQueue');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="simx.inject.queue.FifoQueue-class.html">FifoQueue</a><tt class="py-op">(</tt><tt class="py-base-class">Queue</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="FifoQueue-collapsed" style="display:none;" pad="++" indent="++++"></div><div id="FifoQueue-expanded"><a name="L15"></a><tt class="py-lineno">15</tt>  <tt class="py-line">    <tt class="py-docstring">"""</tt> </tt>
+<a name="L16"></a><tt class="py-lineno">16</tt>  <tt class="py-line"><tt class="py-docstring">    Like Queue, but discards old items if the capacity is reached.</tt> </tt>
+<a name="L17"></a><tt class="py-lineno">17</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="FifoQueue.__init__"></a><div id="FifoQueue.__init__-def"><a name="L18"></a><tt class="py-lineno">18</tt> <a class="py-toggle" href="#" id="FifoQueue.__init__-toggle" onclick="return toggle('FifoQueue.__init__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.inject.queue.FifoQueue-class.html#__init__">__init__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">size</tt><tt class="py-op">,</tt> <tt class="py-param">name</tt><tt class="py-op">=</tt><tt class="py-string">"queue"</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="FifoQueue.__init__-collapsed" style="display:none;" pad="++" indent="++++++++"></div><div id="FifoQueue.__init__-expanded"><a name="L19"></a><tt class="py-lineno">19</tt>  <tt class="py-line">        <tt class="py-name">Queue</tt><tt class="py-op">.</tt><tt id="link-2" class="py-name"><a title="simx.base.channel.ChannelBridge.__init__
+simx.base.extension.Extension.__init__
+simx.base.node.Node.__init__
+simx.base.radio.RadioRedirect.__init__
+simx.base.tossim.TossimBase.__init__
+simx.dyntopo.Link.BasicLinkModel.__init__
+simx.dyntopo.Topo.GenericTopo.__init__
+simx.event.event.Manager.__init__
+simx.event.event.PriorityQueue.__init__
+simx.inject.inject.Inject.__init__
+simx.inject.inject.InvalidVersionWarning.__init__
+simx.inject.queue.FifoQueue.__init__
+simx.inject.queue.QueueFullWarning.__init__
+simx.inject.wiretap.InjectDownstream.__init__
+simx.inject.wiretap.InjectPacketSock.__init__
+simx.inject.wiretap.InjectSock.__init__
+simx.inject.wiretap.InjectTrigger.__init__
+simx.inject.wiretap.InjectUpstream.__init__
+simx.probe.parse.LookupError.__init__
+simx.probe.parse.ProbeLink.__init__
+simx.probe.parse.ProbeLoader.__init__
+simx.probe.parse.ReplacementError.__init__
+simx.probe.probe.CachingProber.__init__
+simx.probe.probe.Probe.__init__
+simx.probe.probe.ProbeArray.__init__
+simx.probe.probe.ProbeStruct.__init__
+simx.probe.probedef.Array.__init__
+simx.probe.probedef.Definition.__init__
+simx.probe.probedef.Link.__init__
+simx.probe.probedef.Primitive.__init__
+simx.probe.probedef.Struct.__init__
+simx.sensor.extension.SensorExtension.__init__
+simx.sensor.sensor.SensorControl.__init__
+simx.sensor.sensor.SensorError.__init__
+simx.sensor.streamer.BinaryStreamer.__init__
+simx.sensor.streamer.SacStreamer.__init__
+simx.sensor.streamer.Streamer.__init__
+simx.sensor.streamer.TextStreamer.__init__
+simx.sync.time_control.TimeControl.__init__" class="py-name" href="#" onclick="return doclink('link-2', '__init__', 'link-0');">__init__</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">,</tt> <tt id="link-3" class="py-name" targets="Variable simx.probe.probe.Probe.size=simx.probe.probe.Probe-class.html#size"><a title="simx.probe.probe.Probe.size" class="py-name" href="#" onclick="return doclink('link-3', 'size', 'link-3');">size</a></tt><tt class="py-op">)</tt> </tt>
+<a name="L20"></a><tt class="py-lineno">20</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">queue_name</tt> <tt class="py-op">=</tt> <tt class="py-name">name</tt> </tt>
+</div><a name="L21"></a><tt class="py-lineno">21</tt>  <tt class="py-line"> </tt>
+<a name="FifoQueue.fifo_put"></a><div id="FifoQueue.fifo_put-def"><a name="L22"></a><tt class="py-lineno">22</tt> <a class="py-toggle" href="#" id="FifoQueue.fifo_put-toggle" onclick="return toggle('FifoQueue.fifo_put');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="simx.inject.queue.FifoQueue-class.html#fifo_put">fifo_put</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">item</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="FifoQueue.fifo_put-collapsed" style="display:none;" pad="++" indent="++++++++"></div><div id="FifoQueue.fifo_put-expanded"><a name="L23"></a><tt class="py-lineno">23</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L24"></a><tt class="py-lineno">24</tt>  <tt class="py-line"><tt class="py-docstring">        Put an item on the queue. Issues a warning and discards the</tt> </tt>
+<a name="L25"></a><tt class="py-lineno">25</tt>  <tt class="py-line"><tt class="py-docstring">        oldest item if the capacity is reached.</tt> </tt>
+<a name="L26"></a><tt class="py-lineno">26</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L27"></a><tt class="py-lineno">27</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">full</tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L28"></a><tt class="py-lineno">28</tt>  <tt class="py-line">            <tt class="py-name">warn</tt><tt class="py-op">(</tt><tt id="link-4" class="py-name" targets="Class simx.inject.queue.QueueFullWarning=simx.inject.queue.QueueFullWarning-class.html"><a title="simx.inject.queue.QueueFullWarning" class="py-name" href="#" onclick="return doclink('link-4', 'QueueFullWarning', 'link-4');">QueueFullWarning</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">queue_name</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L29"></a><tt class="py-lineno">29</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-5" class="py-name" targets="Method simx.probe.probe.Probe.get()=simx.probe.probe.Probe-class.html#get,Method simx.probe.probe.ProbeArray.get()=simx.probe.probe.ProbeArray-class.html#get,Method simx.probe.probe.ProbeStruct.get()=simx.probe.probe.ProbeStruct-class.html#get"><a title="simx.probe.probe.Probe.get
+simx.probe.probe.ProbeArray.get
+simx.probe.probe.ProbeStruct.get" class="py-name" href="#" onclick="return doclink('link-5', 'get', 'link-5');">get</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L30"></a><tt class="py-lineno">30</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">put</tt><tt class="py-op">(</tt><tt class="py-name">item</tt><tt class="py-op">)</tt> </tt>
+</div></div><a name="L31"></a><tt class="py-lineno">31</tt>  <tt class="py-line"> </tt><script type="text/javascript">
+<!--
+expandto(location.href);
+// -->
+</script>
+</pre>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Wed Aug 12 00:17:37 2009
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

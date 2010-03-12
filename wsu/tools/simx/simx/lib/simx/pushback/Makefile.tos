@@ -1,0 +1,33 @@
+# This is designed to be included from a TOS application Makefile.
+#
+# @author Paul Stickney
+
+SIMX ?=simx
+SIMXLIB ?=$(SIMX)/lib/simx
+SIMX_PUSHBACK_DIR ?=$(SIMXLIB)/pushback
+
+BUILD=`pwd`/simbuild/simx
+
+CFLAGS +=-I$(SIMX_PUSHBACK_DIR)
+BUILD_EXTRA_DEPS +=simx-pushback-check
+
+simx-pushback-check: FORCE
+	@if [ ! -f $(SIMX_PUSHBACK_DIR)/PushbackC.nc ]; then \
+	echo "'$(SIMX_PUSHBACK_DIR)' does not contain SimX/Pushback source."; \
+	echo "Please set SIMX, SIMXLIB or SIMX_PUSHBACK_DIR correctly."; \
+	exit 1; \
+	fi
+
+# sim and sim-sf completely ignore this POST_BUILD_EXTRA_DEPS because
+# they reset BUILD_DEPS. The following gets around this restriction.
+micaz: simx-pushback
+simx-pushback: $(BUILD_DEPS)
+	mkdir -p build
+	APP_ROOT="`pwd`" make -C $(SIMX_PUSHBACK_DIR)
+
+clean: pushback-clean
+pushback-clean:
+	rm -f SimxPushback.py SimxPushback.pyc
+	rm -f _SimxPushbackmodule.so
+
+FORCE:

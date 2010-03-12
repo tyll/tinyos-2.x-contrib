@@ -1,0 +1,1 @@
+<template description="Making a grid" category="tutorial"><line># Requires: TossimTopo, TopoGen</line><line></line><line>nodes = T[0:16]</line><line>TopoGen.grid(nodes, spacing=(1,1))</line></template>

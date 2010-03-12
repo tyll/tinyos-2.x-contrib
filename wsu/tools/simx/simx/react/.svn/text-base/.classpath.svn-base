@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src/main/java"/>
+	<classpathentry kind="src" path="src/main/scala"/>
+	<classpathentry kind="src" path="src/test/scala"/>
+	<classpathentry kind="src" path="src/test/java"/>
+	<classpathentry exported="true" kind="con" path="ch.epfl.lamp.sdt.launching.SCALA_CONTAINER"/>
+	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry exported="true" kind="lib" path="lib/piccolo.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/piccolox.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/protobuf-java-2.1.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/tinyos.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

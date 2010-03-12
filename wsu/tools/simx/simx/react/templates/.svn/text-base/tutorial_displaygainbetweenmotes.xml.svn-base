@@ -1,0 +1,1 @@
+<template description="Display gain between motes" category="tutorial"><line># Requires: TossimTopo</line><line></line><line>node1 = T[0]</line><line>node2 = T[1]</line><line></line><line>print &gt;&gt;OUT, &quot;Gain between %d and %d:&quot; % (node1.id(), node2.id()),</line><line>print &gt;&gt;OUT, T.gain(node1, node2)</line></template>

@@ -1,0 +1,17 @@
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/tinyos-svn/!svn/ver/770/sensorweb/tools/simx/trunk/python/simx/test/sensor
+END
+test_streamer.py
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/tinyos-svn/!svn/ver/770/sensorweb/tools/simx/trunk/python/simx/test/sensor/test_streamer.py
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/tinyos-svn/!svn/ver/770/sensorweb/tools/simx/trunk/python/simx/test/sensor/Makefile
+END

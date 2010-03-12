@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/tinyos-svn/!svn/ver/771/sensorweb/tools/simx/trunk/lib/simx/leds
+END
+Makefile.tos
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/tinyos-svn/!svn/ver/771/sensorweb/tools/simx/trunk/lib/simx/leds/Makefile.tos
+END
+SimxLedsP.nc
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/tinyos-svn/!svn/ver/771/sensorweb/tools/simx/trunk/lib/simx/leds/SimxLedsP.nc
+END
+SimxLedsC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/tinyos-svn/!svn/ver/771/sensorweb/tools/simx/trunk/lib/simx/leds/SimxLedsC.nc
+END

@@ -1,0 +1,17 @@
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/tinyos-svn/!svn/ver/770/sensorweb/tools/simx/trunk/python/simx/test/sensor/data
+END
+integer_source_bad.txt
+K 25
+svn:wc:ra_dav:version-url
+V 107
+/svn/tinyos-svn/!svn/ver/770/sensorweb/tools/simx/trunk/python/simx/test/sensor/data/integer_source_bad.txt
+END
+integer_source.txt
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/svn/tinyos-svn/!svn/ver/770/sensorweb/tools/simx/trunk/python/simx/test/sensor/data/integer_source.txt
+END

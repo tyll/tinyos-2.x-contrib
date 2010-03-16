@@ -100,9 +100,8 @@ implementation {
     char lfn[_MAX_LFN + 1], * fname, * scout, dirnum[8];
 
     // first we'll make the shimmer mac address into a string
-    /*
-     * substitute for biosensics
-     */ sprintf(idname, "ID%02x%02x", 
+
+    sprintf(idname, "ID%02x%02x", 
 	    longAddress[4], longAddress[5]);
     /*
     sprintf(idname, "%02x%02x%02x%02x%02x%02x", 
@@ -138,16 +137,10 @@ implementation {
 	break;
       else if(gfi.fattrib & AM_DIR){      
 	fname = (*gfi.lfname) ? gfi.lfname : gfi.fname;
-	/*
-	 * substitute this line for biosensics
-	 */
 	if(!strncmp(fname, idname, 6)){      // their id prefix has just six chars
 	/*
 	if(!strncmp(fname, idname, 12)){      // it's this shimmer's dir
 	*/
-	  /*
-	   * substitute these for next two lines for biosensics
-	   */	
 	  if((scout = strchr(fname, '-'))){   // if not, something is seriously wrong!
 	    scout += 2;                      // we have to skip the 'M' before the counter
 	   /*
@@ -172,9 +165,7 @@ implementation {
   }
 
   error_t make_basedir() { 
-    /*
-     * substitute for biosensics
-     */ sprintf(dirname, "/data/%s-M%03d", idname, dir_counter);
+    sprintf(dirname, "/data/%s-M%03d", idname, dir_counter);
      /*
     sprintf(dirname, "/data/%s_%03d", idname, dir_counter);
      */
@@ -342,9 +333,7 @@ implementation {
   void do_stores(){
     uint8_t r;
 
-    /*
-     * for biosensics
-     */    sprintf(filename, "%s/%03d.pam", dirname, sequence_number++);
+    sprintf(filename, "%s/%03d.pam", dirname, sequence_number++);
      /*
     sprintf(filename, "%s/%03d", dirname, sequence_number++);
      */

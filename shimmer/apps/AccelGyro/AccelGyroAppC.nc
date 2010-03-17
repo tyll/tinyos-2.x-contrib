@@ -32,13 +32,13 @@
  *         November, 2007
  */
 
- /***********************************************************************************
+/***********************************************************************************
 
    This app uses Bluetooth to stream 3 Accelerometer channels and 3 Gyro channels 
    of data to a BioMOBIUS PC application. 
    Tested on SHIMMER Base Board Rev 1.3, SHIMMER GyroDB 1.0 board.
 
- ***********************************************************************************/
+***********************************************************************************/
 /*
  * @author Adrian Burns 
  * @date November, 2007
@@ -51,43 +51,43 @@
 configuration AccelGyroAppC {
 }
 implementation {
-   components MainC, AccelGyroC;
-   AccelGyroC -> MainC.Boot; 
+  components MainC, AccelGyroC;
+  AccelGyroC -> MainC.Boot; 
 
-   components LedsC;
-   AccelGyroC.Leds -> LedsC;
+  components LedsC;
+  AccelGyroC.Leds -> LedsC;
 
-   components new TimerMilliC() as SampleTimer;
-   AccelGyroC.SampleTimer -> SampleTimer;
-   components new TimerMilliC() as SetupTimer;
-   AccelGyroC.SetupTimer    -> SetupTimer;
-   components new TimerMilliC() as ActivityTimer;
-   AccelGyroC.ActivityTimer -> ActivityTimer;
+  components new TimerMilliC() as SampleTimer;
+  AccelGyroC.SampleTimer -> SampleTimer;
+  components new TimerMilliC() as SetupTimer;
+  AccelGyroC.SetupTimer    -> SetupTimer;
+  components new TimerMilliC() as ActivityTimer;
+  AccelGyroC.ActivityTimer -> ActivityTimer;
   
-   components Counter32khz32C as Counter;
-   components new CounterToLocalTimeC(T32khz);
-   CounterToLocalTimeC.Counter -> Counter;
-   AccelGyroC.LocalTime -> CounterToLocalTimeC;
+  components Counter32khz32C as Counter;
+  components new CounterToLocalTimeC(T32khz);
+  CounterToLocalTimeC.Counter -> Counter;
+  AccelGyroC.LocalTime -> CounterToLocalTimeC;
   
-   components RovingNetworksC;
-   AccelGyroC.BluetoothInit -> RovingNetworksC.Init;
-   AccelGyroC.BTStdControl -> RovingNetworksC.StdControl;
-   AccelGyroC.Bluetooth    -> RovingNetworksC;
+  components RovingNetworksC;
+  AccelGyroC.BluetoothInit -> RovingNetworksC.Init;
+  AccelGyroC.BTStdControl -> RovingNetworksC.StdControl;
+  AccelGyroC.Bluetooth    -> RovingNetworksC;
 
-   components Mma7260P;
-   AccelGyroC.AccelInit -> Mma7260P;
-   AccelGyroC.Accel -> Mma7260P;
+  components Mma7260P;
+  AccelGyroC.AccelInit -> Mma7260P;
+  AccelGyroC.Accel -> Mma7260P;
 
-   components HplAdc12P;
-   AccelGyroC.HplAdc12 -> HplAdc12P;
+  components HplAdc12P;
+  AccelGyroC.HplAdc12 -> HplAdc12P;
 
-   components Msp430DmaC;
-   AccelGyroC.Msp430DmaControl -> Msp430DmaC;
-   AccelGyroC.Msp430DmaChannel -> Msp430DmaC.Channel0;
+  components Msp430DmaC;
+  AccelGyroC.Msp430DmaControl -> Msp430DmaC;
+  AccelGyroC.Msp430DmaChannel -> Msp430DmaC.Channel0;
    
 #ifdef USE_8MHZ_CRYSTAL
-   //   components BusyWaitMicroC;
-   //   AccelGyroC.BusyWait -> BusyWaitMicroC;
+  //   components BusyWaitMicroC;
+  //   AccelGyroC.BusyWait -> BusyWaitMicroC;
 #endif
 }
 

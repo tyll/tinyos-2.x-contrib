@@ -59,6 +59,7 @@ enum {
 }; 
  
 
+#ifndef PLATFORM_BAUDRATE 
 #define PLATFORM_BAUDRATE 57600L
-
+#endif
 #endif //HARDWARE_H

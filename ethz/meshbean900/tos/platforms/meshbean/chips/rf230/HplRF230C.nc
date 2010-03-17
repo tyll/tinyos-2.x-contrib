@@ -62,7 +62,7 @@ implementation
 	components HplAtm128Timer1C as TimerC;
 	HplRF230P.Timer -> TimerC;
 
-	components new AlarmThree16C() as AlarmC;
+	components new AlarmOne16C() as AlarmC;
 	Alarm = AlarmC;
 
 	components RealMainP;

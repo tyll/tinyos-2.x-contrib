@@ -42,7 +42,9 @@ Required Environment:
 	change some of them depends on your system
 Compile:
 	1, cd [tools]/simx/simx
-	2, sudo . install.sh
+	2, . install.sh
+		or 
+	   sudo sh install.sh  
 	3, cd [tools]/simx/simx/react
 	4, make
 Run:

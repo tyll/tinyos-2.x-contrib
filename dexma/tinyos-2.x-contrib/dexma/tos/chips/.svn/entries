@@ -1,37 +1,0 @@
-10
-
-dir
-43
-https://zolertia.svn.sourceforge.net/svnroot/zolertia/tinyos/tos/chips
-https://zolertia.svn.sourceforge.net/svnroot/zolertia
-
-
-
-2009-11-20T12:44:44.701697Z
-39
-zolertia
-
-
-svn:special svn:externals svn:needs-lock
-
-
-
-
-
-
-
-
-
-
-
-fd93729e-b4b6-4676-8a02-b6805cfcd708
-
-adxl345
-dir
-
-msp430X
-dir
-
-tmp102
-dir
-

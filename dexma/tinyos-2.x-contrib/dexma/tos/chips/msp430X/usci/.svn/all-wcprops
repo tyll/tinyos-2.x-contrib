@@ -1,0 +1,251 @@
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svnroot/zolertia/!svn/ver/13/tinyos/tos/chips/msp430X/usci
+END
+PrintfUART.h
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svnroot/zolertia/!svn/ver/46/tinyos/tos/chips/msp430X/usci/PrintfUART.h
+END
+Msp430SpiDmaBP.nc
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svnroot/zolertia/!svn/ver/13/tinyos/tos/chips/msp430X/usci/Msp430SpiDmaBP.nc
+END
+msp430usci.h
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svnroot/zolertia/!svn/ver/46/tinyos/tos/chips/msp430X/usci/msp430usci.h
+END
+HplMsp430UsciAB1RawInterruptsP.nc
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svnroot/zolertia/!svn/ver/13/tinyos/tos/chips/msp430X/usci/HplMsp430UsciAB1RawInterruptsP.nc
+END
+Msp430Uart0P.nc
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svnroot/zolertia/!svn/ver/13/tinyos/tos/chips/msp430X/usci/Msp430Uart0P.nc
+END
+Msp430Uart1P.nc
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svnroot/zolertia/!svn/ver/46/tinyos/tos/chips/msp430X/usci/Msp430Uart1P.nc
+END
+HplMsp430UsciB0P.nc
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svnroot/zolertia/!svn/ver/46/tinyos/tos/chips/msp430X/usci/HplMsp430UsciB0P.nc
+END
+HplMsp430UsciB1P.nc
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svnroot/zolertia/!svn/ver/46/tinyos/tos/chips/msp430X/usci/HplMsp430UsciB1P.nc
+END
+Msp430I2C1P.nc
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svnroot/zolertia/!svn/ver/46/tinyos/tos/chips/msp430X/usci/Msp430I2C1P.nc
+END
+HplMsp430UsciA.nc
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svnroot/zolertia/!svn/ver/46/tinyos/tos/chips/msp430X/usci/HplMsp430UsciA.nc
+END
+Msp430UsciShareB0P.nc
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svnroot/zolertia/!svn/ver/13/tinyos/tos/chips/msp430X/usci/Msp430UsciShareB0P.nc
+END
+Msp430UsciShareB1P.nc
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svnroot/zolertia/!svn/ver/13/tinyos/tos/chips/msp430X/usci/Msp430UsciShareB1P.nc
+END
+HplMsp430UsciRawInterrupts.nc
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svnroot/zolertia/!svn/ver/13/tinyos/tos/chips/msp430X/usci/HplMsp430UsciRawInterrupts.nc
+END
+Msp430UsciA0C.nc
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svnroot/zolertia/!svn/ver/13/tinyos/tos/chips/msp430X/usci/Msp430UsciA0C.nc
+END
+Msp430UsciA1C.nc
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svnroot/zolertia/!svn/ver/13/tinyos/tos/chips/msp430X/usci/Msp430UsciA1C.nc
+END
+HplMsp430UsciA0C.nc
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svnroot/zolertia/!svn/ver/13/tinyos/tos/chips/msp430X/usci/HplMsp430UsciA0C.nc
+END
+HplMsp430UsciA1C.nc
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svnroot/zolertia/!svn/ver/13/tinyos/tos/chips/msp430X/usci/HplMsp430UsciA1C.nc
+END
+Msp430SpiConfigure.nc
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svnroot/zolertia/!svn/ver/13/tinyos/tos/chips/msp430X/usci/Msp430SpiConfigure.nc
+END
+Msp430SpiNoDmaBP.nc
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svnroot/zolertia/!svn/ver/46/tinyos/tos/chips/msp430X/usci/Msp430SpiNoDmaBP.nc
+END
+HplMsp430UsciInterrupts.nc
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svnroot/zolertia/!svn/ver/13/tinyos/tos/chips/msp430X/usci/HplMsp430UsciInterrupts.nc
+END
+Msp430I2CP.nc
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svnroot/zolertia/!svn/ver/46/tinyos/tos/chips/msp430X/usci/Msp430I2CP.nc
+END
+Msp430UsciShareP.nc
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svnroot/zolertia/!svn/ver/13/tinyos/tos/chips/msp430X/usci/Msp430UsciShareP.nc
+END
+Msp430UartP.nc
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svnroot/zolertia/!svn/ver/46/tinyos/tos/chips/msp430X/usci/Msp430UartP.nc
+END
+HplMsp430UsciAB0RawInterruptsP.nc
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svnroot/zolertia/!svn/ver/13/tinyos/tos/chips/msp430X/usci/HplMsp430UsciAB0RawInterruptsP.nc
+END
+HplMsp430UsciB.nc
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svnroot/zolertia/!svn/ver/46/tinyos/tos/chips/msp430X/usci/HplMsp430UsciB.nc
+END
+Msp430I2CConfigure.nc
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svnroot/zolertia/!svn/ver/13/tinyos/tos/chips/msp430X/usci/Msp430I2CConfigure.nc
+END
+HplMsp430UsciA0P.nc
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svnroot/zolertia/!svn/ver/46/tinyos/tos/chips/msp430X/usci/HplMsp430UsciA0P.nc
+END
+HplMsp430UsciA1P.nc
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svnroot/zolertia/!svn/ver/46/tinyos/tos/chips/msp430X/usci/HplMsp430UsciA1P.nc
+END
+Msp430UartConfigure.nc
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svnroot/zolertia/!svn/ver/13/tinyos/tos/chips/msp430X/usci/Msp430UartConfigure.nc
+END
+Msp430SpiNoDmaB0P.nc
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svnroot/zolertia/!svn/ver/13/tinyos/tos/chips/msp430X/usci/Msp430SpiNoDmaB0P.nc
+END
+Msp430SpiB0C.nc
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svnroot/zolertia/!svn/ver/46/tinyos/tos/chips/msp430X/usci/Msp430SpiB0C.nc
+END
+Msp430SpiDmaB0P.nc
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svnroot/zolertia/!svn/ver/13/tinyos/tos/chips/msp430X/usci/Msp430SpiDmaB0P.nc
+END
+Msp430UsciShareA0P.nc
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svnroot/zolertia/!svn/ver/13/tinyos/tos/chips/msp430X/usci/Msp430UsciShareA0P.nc
+END
+Msp430UsciShareA1P.nc
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svnroot/zolertia/!svn/ver/13/tinyos/tos/chips/msp430X/usci/Msp430UsciShareA1P.nc
+END
+Msp430UsciB0C.nc
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svnroot/zolertia/!svn/ver/13/tinyos/tos/chips/msp430X/usci/Msp430UsciB0C.nc
+END
+Msp430UsciB1C.nc
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svnroot/zolertia/!svn/ver/13/tinyos/tos/chips/msp430X/usci/Msp430UsciB1C.nc
+END
+Msp430Uart0C.nc
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svnroot/zolertia/!svn/ver/45/tinyos/tos/chips/msp430X/usci/Msp430Uart0C.nc
+END
+Msp430Uart1C.nc
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svnroot/zolertia/!svn/ver/46/tinyos/tos/chips/msp430X/usci/Msp430Uart1C.nc
+END
+HplMsp430UsciB0C.nc
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svnroot/zolertia/!svn/ver/13/tinyos/tos/chips/msp430X/usci/HplMsp430UsciB0C.nc
+END
+HplMsp430UsciB1C.nc
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svnroot/zolertia/!svn/ver/46/tinyos/tos/chips/msp430X/usci/HplMsp430UsciB1C.nc
+END
+Msp430I2C1C.nc
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svnroot/zolertia/!svn/ver/13/tinyos/tos/chips/msp430X/usci/Msp430I2C1C.nc
+END

@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/svnroot/zolertia/!svn/ver/18/tinyos/tos/chips/msp430X
+END
+msp430regtypes.h
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svnroot/zolertia/!svn/ver/13/tinyos/tos/chips/msp430X/msp430regtypes.h
+END
+McuSleepC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svnroot/zolertia/!svn/ver/13/tinyos/tos/chips/msp430X/McuSleepC.nc
+END
+msp430hardware.h
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svnroot/zolertia/!svn/ver/13/tinyos/tos/chips/msp430X/msp430hardware.h
+END

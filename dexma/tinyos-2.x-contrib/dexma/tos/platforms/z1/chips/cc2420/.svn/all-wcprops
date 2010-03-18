@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svnroot/zolertia/!svn/ver/45/tinyos/tos/platforms/z1/chips/cc2420
+END
+HplCC2420PinsC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svnroot/zolertia/!svn/ver/45/tinyos/tos/platforms/z1/chips/cc2420/HplCC2420PinsC.nc
+END
+HplCC2420InterruptsC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svnroot/zolertia/!svn/ver/45/tinyos/tos/platforms/z1/chips/cc2420/HplCC2420InterruptsC.nc
+END
+HplCC2420SpiC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svnroot/zolertia/!svn/ver/45/tinyos/tos/platforms/z1/chips/cc2420/HplCC2420SpiC.nc
+END
+HplCC2420AlarmC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svnroot/zolertia/!svn/ver/45/tinyos/tos/platforms/z1/chips/cc2420/HplCC2420AlarmC.nc
+END

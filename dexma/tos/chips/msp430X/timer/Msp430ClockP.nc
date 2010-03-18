@@ -97,11 +97,16 @@ implementation
     
   command void Msp430ClockInit.defaultInitClocks()
   {
-	#warning using default msp430 clock configuration
 	//check if calib tables are OK
-	if(CALBC1_8MHZ != 0xFF && CALDCO_8MHZ != 0xFF) {
+	
+	if(CALBC1_8MHZ != 0xFF) {
+	  	DCOCTL = 0x00;
 	  	BCSCTL1 = CALBC1_8MHZ;                    //Set DCO to 8MHz
 	  	DCOCTL = CALDCO_8MHZ;    
+	} else { //start using reasonable values at 8 Mhz
+		DCOCTL = 0x00;
+		BCSCTL1 = 0x8D;
+		DCOCTL = 0x88;
 	}
 
     // BCSCTL1

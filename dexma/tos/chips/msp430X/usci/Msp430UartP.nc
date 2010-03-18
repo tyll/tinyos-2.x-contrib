@@ -243,7 +243,7 @@ implementation {
   default async command error_t UsciResource.immediateRequest[ uint8_t id ]() { return FAIL; }
   default async command error_t UsciResource.release[ uint8_t id ]() { return FAIL; }
   default async command msp430_uart_union_config_t* Msp430UartConfigure.getConfig[uint8_t id]() {
-    return &msp430_uart_default_config;
+    return (msp430_uart_union_config_t *) &msp430_uart_default_config;
   }
 
   default event void Resource.granted[ uint8_t id ]() {}

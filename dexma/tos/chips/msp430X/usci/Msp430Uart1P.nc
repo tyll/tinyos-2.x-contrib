@@ -92,7 +92,7 @@ implementation {
   UsciResource = UartP.UsciResource;
   UsciInterrupts = UartP.UsciInterrupts;
 
-  components HplMsp430Usci1C as UsciC;
+  components HplMsp430UsciA1C as UsciC;
   UartP.Usci -> UsciC;
   
   components Counter32khz16C as CounterC;

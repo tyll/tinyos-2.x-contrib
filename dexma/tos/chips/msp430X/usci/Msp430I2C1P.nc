@@ -91,7 +91,4 @@ implementation {
   components HplMsp430UsciB1C as UsciC;
   I2CP.UsciB -> UsciC;
   
-  components LedsC as Leds;
-  I2CP.Leds -> Leds;
-  
 }

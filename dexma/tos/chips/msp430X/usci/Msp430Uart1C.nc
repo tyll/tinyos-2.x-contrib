@@ -61,10 +61,10 @@
  */
 
 /**
- * An implementation of the UART on USART1 for the MSP430.
+ * An implementation of the UART on USCIA1 for the MSP430.
  * @author Vlado Handziski <handzisk@tkn.tu-berlin.de>
  * @author Jonathan Hui <jhui@archedrock.com>
- * @author Eric B. Decker <cire81@gmail.com>
+ * @author Eric B. Decker <cire831@gmail.com>
  * @author Xavier Orduna <xorduna@dexmatech.com>
  * @version $Revision$ $Date$
  */
@@ -90,7 +90,7 @@ implementation {
   components Msp430Uart1P as UartP;
   Resource = UartP.Resource[ CLIENT_ID ];
   UartStream = UartP.UartStream[ CLIENT_ID ];
-  UartByte = UartP.UartByte[ CLIENT_ID ];;
+  UartByte = UartP.UartByte[ CLIENT_ID ];
   Msp430UartConfigure = UartP.Msp430UartConfigure[ CLIENT_ID ];
 
   components new Msp430UsciA1C() as UsciC;

@@ -84,7 +84,7 @@ generic configuration Msp430Uart0C() {
 implementation {
 
   enum {
-    CLIENT_ID = unique( MSP430_UARTO_BUS ),
+    CLIENT_ID = unique( MSP430_UART0_BUS ),
   };
 
   components Msp430Uart0P as UartP;

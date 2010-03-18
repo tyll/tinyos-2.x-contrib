@@ -87,7 +87,7 @@ generic configuration Msp430SpiB0C() {
 implementation {
 
   enum {
-    CLIENT_ID = unique( MSP430_SPIBO_BUS ),
+    CLIENT_ID = unique( MSP430_SPI0_BUS ),
   };
 
 #ifdef ENABLE_SPIB0_DMA

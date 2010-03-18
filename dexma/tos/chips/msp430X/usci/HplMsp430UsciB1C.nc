@@ -113,8 +113,7 @@ implementation {
   HplUsciP.UCLK -> GIO.UCB1CLK;
   HplUsciP.USDA -> GIO.UCB1SDA;
   HplUsciP.USCL -> GIO.UCB1SCL;
-  
-  
+
   components HplMsp430UsciAB1RawInterruptsP as UsciRawInterrupts;
   HplUsciP.UsciRawInterrupts -> UsciRawInterrupts.UsciB;
   

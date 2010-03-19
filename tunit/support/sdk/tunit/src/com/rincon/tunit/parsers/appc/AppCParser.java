@@ -51,6 +51,9 @@ import com.rincon.tunit.report.TestResult;
  * @author Till Maas
  */
 public class AppCParser {
+  
+  static final String MODULE_NAME_TEST = "TestCaseC";
+  static final String MODULE_NAME_STATS = "StatisticsC";
 
   /** Logging */
   private static Logger log = Logger.getLogger(AppCParser.class);
@@ -142,8 +145,8 @@ public class AppCParser {
       while ((line = in.readLine()) != null) {
         extractOriginalFileAndLineNumber(line);
         extractAssertionId(line);
-        extractModuleName(line, "TestCaseC");
-        extractModuleName(line, "StatisticsC");
+        extractModuleName(line, MODULE_NAME_TEST);
+        extractModuleName(line, MODULE_NAME_STATS);
       }
       
       in.close();
@@ -230,7 +233,12 @@ public class AppCParser {
       try {
         testId = Integer.decode(moduleNameMatcher.group(2)).intValue();
         log.debug(moduleName + " ID " + testId + " is associated with test " + testName);
-        testMap.put(new Integer(testId), testName);
+        
+        if( moduleName.equals(MODULE_NAME_STATS) ) {
+          statsMap.put(new Integer(testId), testName);
+        } else {
+          testMap.put(new Integer(testId), testName);
+        }
         
       } catch (NumberFormatException e) {
     	result.error("NumberFormatException", "NumberFormatException in " + moduleName + "app.c parser");

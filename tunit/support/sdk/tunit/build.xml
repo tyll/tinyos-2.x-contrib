@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<project name="TUnit" default="all">
+  <target name="all" depends="compile,jar" description="Creator of the Universe">
+  </target>
+  <target name="clean" description="remove intermediate files">
+    <delete dir="classes"/>
+  	<delete dir="doc"/>
+  </target>
+  <target name="doc" description="Generate Javadoc">
+  	<mkdir dir="doc"/>
+	<javadoc sourcepath="src" destdir="doc"/>
+  </target>
+  <target name="compile" description="compile the Java source code to class files">
+    <mkdir dir="classes"/>
+    <javac srcdir="src" destdir="classes" source="1.5" target="1.5" includeantruntime="true"/>
+  </target>
+  <target name="jar" depends="compile" description="create a Jar file for the application">
+    <jar destfile="tunit.jar">
+      <fileset dir="classes" includes="**/*.class"/>
+      <fileset dir="src" includes="**/*.jpg"/>
+      <fileset dir="src" includes="**/*.gif"/>
+    </jar>
+  </target>
+</project>

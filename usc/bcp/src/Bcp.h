@@ -1,8 +1,6 @@
 #ifndef BCP_H
 #define BCP_H
 
-#include <Collection.h>
-
 /**
  * PKT_NORMAL: Indicates that a BCP packet contains source-originated data.
  * PKT_NULL: Indicates that a BCP packet was dropped, and a subsequent virtual

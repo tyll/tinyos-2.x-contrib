@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/tinyos-svn/!svn/ver/1132/sensorweb/system/Platform/telosw/ccxx00/splitcontrolmanager
+END
+SplitControlManagerP.nc
+K 25
+svn:wc:ra_dav:version-url
+V 113
+/svn/tinyos-svn/!svn/ver/1132/sensorweb/system/Platform/telosw/ccxx00/splitcontrolmanager/SplitControlManagerP.nc
+END
+SplitControlManagerC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 113
+/svn/tinyos-svn/!svn/ver/1132/sensorweb/system/Platform/telosw/ccxx00/splitcontrolmanager/SplitControlManagerC.nc
+END
+SplitControlManager.h
+K 25
+svn:wc:ra_dav:version-url
+V 111
+/svn/tinyos-svn/!svn/ver/1132/sensorweb/system/Platform/telosw/ccxx00/splitcontrolmanager/SplitControlManager.h
+END

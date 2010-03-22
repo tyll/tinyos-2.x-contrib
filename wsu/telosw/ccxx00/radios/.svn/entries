@@ -1,0 +1,34 @@
+8
+
+dir
+1861
+https://sensorweb.vancouver.wsu.edu/svn/tinyos-svn/sensorweb/system/Platform/telosw/ccxx00/radios
+https://sensorweb.vancouver.wsu.edu/svn/tinyos-svn
+
+
+
+2010-03-12T09:51:12.070607Z
+1792
+de
+
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+71be81bb-8916-4e8f-bb90-10bc8f9fc1e3
+
+cc1100
+dir
+
+cc2500
+dir
+

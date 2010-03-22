@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/tinyos-svn/!svn/ver/1132/sensorweb/system/Platform/telosw/ccxx00/init
+END
+BlazeInitP.nc
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/tinyos-svn/!svn/ver/1132/sensorweb/system/Platform/telosw/ccxx00/init/BlazeInitP.nc
+END
+Ccxx00PlatformInitC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/svn/tinyos-svn/!svn/ver/1132/sensorweb/system/Platform/telosw/ccxx00/init/Ccxx00PlatformInitC.nc
+END
+BlazeInitC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/tinyos-svn/!svn/ver/1132/sensorweb/system/Platform/telosw/ccxx00/init/BlazeInitC.nc
+END
+ReceiveMode.nc
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/tinyos-svn/!svn/ver/1132/sensorweb/system/Platform/telosw/ccxx00/init/ReceiveMode.nc
+END
+BlazeInit.h
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/tinyos-svn/!svn/ver/1132/sensorweb/system/Platform/telosw/ccxx00/init/BlazeInit.h
+END
+ReceiveModeC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/tinyos-svn/!svn/ver/1132/sensorweb/system/Platform/telosw/ccxx00/init/ReceiveModeC.nc
+END
+Ccxx00PlatformInitP.nc
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/svn/tinyos-svn/!svn/ver/1132/sensorweb/system/Platform/telosw/ccxx00/init/Ccxx00PlatformInitP.nc
+END
+ReceiveMode.h
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/tinyos-svn/!svn/ver/1132/sensorweb/system/Platform/telosw/ccxx00/init/ReceiveMode.h
+END

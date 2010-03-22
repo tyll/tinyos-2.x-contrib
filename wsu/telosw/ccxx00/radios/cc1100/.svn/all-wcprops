@@ -1,0 +1,47 @@
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/tinyos-svn/!svn/ver/1792/sensorweb/system/Platform/telosw/ccxx00/radios/cc1100
+END
+config_CC1100.h
+K 25
+svn:wc:ra_dav:version-url
+V 99
+/svn/tinyos-svn/!svn/ver/1132/sensorweb/system/Platform/telosw/ccxx00/radios/cc1100/config_CC1100.h
+END
+CC1100_250kBaud_manchester.h
+K 25
+svn:wc:ra_dav:version-url
+V 112
+/svn/tinyos-svn/!svn/ver/1132/sensorweb/system/Platform/telosw/ccxx00/radios/cc1100/CC1100_250kBaud_manchester.h
+END
+CC1100_915MHz_10kBaud_FccCompliant.h
+K 25
+svn:wc:ra_dav:version-url
+V 120
+/svn/tinyos-svn/!svn/ver/1132/sensorweb/system/Platform/telosw/ccxx00/radios/cc1100/CC1100_915MHz_10kBaud_FccCompliant.h
+END
+CC1100ControlP.nc
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/svn/tinyos-svn/!svn/ver/1132/sensorweb/system/Platform/telosw/ccxx00/radios/cc1100/CC1100ControlP.nc
+END
+CC1100_500kBaud.h
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/svn/tinyos-svn/!svn/ver/1132/sensorweb/system/Platform/telosw/ccxx00/radios/cc1100/CC1100_500kBaud.h
+END
+CC1100ControlC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/svn/tinyos-svn/!svn/ver/1132/sensorweb/system/Platform/telosw/ccxx00/radios/cc1100/CC1100ControlC.nc
+END
+CC1100.h
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/tinyos-svn/!svn/ver/1792/sensorweb/system/Platform/telosw/ccxx00/radios/cc1100/CC1100.h
+END

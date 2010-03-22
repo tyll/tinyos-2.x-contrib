@@ -1,0 +1,70 @@
+8
+
+dir
+1861
+https://sensorweb.vancouver.wsu.edu/svn/tinyos-svn/sensorweb/system/Platform/telosw
+https://sensorweb.vancouver.wsu.edu/svn/tinyos-svn
+
+
+
+2010-03-16T05:16:17.814833Z
+1810
+lugang
+
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+71be81bb-8916-4e8f-bb90-10bc8f9fc1e3
+
+teloswln.sh
+file
+
+
+
+
+2010-03-22T16:45:58.000000Z
+9f13ceefa35d3712fa7bf1863d00b589
+2010-03-16T05:16:17.814833Z
+1810
+lugang
+
+ADC-Actisen-all
+dir
+
+teloswplatform
+dir
+
+telosw.target
+file
+
+
+
+
+2010-03-22T16:45:58.000000Z
+f903e1ba4dfa0a1bf11aefef1ec57b0d
+2010-03-15T19:27:46.558647Z
+1804
+de
+
+ccxx00
+dir
+
+ADC
+dir
+
+RTC
+dir
+
+ADC-Actisen
+dir
+

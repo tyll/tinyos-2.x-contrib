@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/tinyos-svn/!svn/ver/1132/sensorweb/system/Platform/telosw/ccxx00/radios/cc2500
+END
+CC2500ControlC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/svn/tinyos-svn/!svn/ver/1132/sensorweb/system/Platform/telosw/ccxx00/radios/cc2500/CC2500ControlC.nc
+END
+CC2500.h
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/tinyos-svn/!svn/ver/1132/sensorweb/system/Platform/telosw/ccxx00/radios/cc2500/CC2500.h
+END
+CC2500ControlP.nc
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/svn/tinyos-svn/!svn/ver/1132/sensorweb/system/Platform/telosw/ccxx00/radios/cc2500/CC2500ControlP.nc
+END

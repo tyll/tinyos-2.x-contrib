@@ -1,0 +1,17 @@
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/tinyos-svn/!svn/ver/1810/sensorweb/system/Platform/telosw
+END
+teloswln.sh
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/tinyos-svn/!svn/ver/1810/sensorweb/system/Platform/telosw/teloswln.sh
+END
+telosw.target
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/tinyos-svn/!svn/ver/1804/sensorweb/system/Platform/telosw/telosw.target
+END

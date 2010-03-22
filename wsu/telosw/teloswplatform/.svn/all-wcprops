@@ -1,0 +1,65 @@
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/tinyos-svn/!svn/ver/1805/sensorweb/system/Platform/telosw/teloswplatform
+END
+.platform
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/tinyos-svn/!svn/ver/1805/sensorweb/system/Platform/telosw/teloswplatform/.platform
+END
+ActiveMessageC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/tinyos-svn/!svn/ver/1804/sensorweb/system/Platform/telosw/teloswplatform/ActiveMessageC.nc
+END
+PlatformP.nc
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/tinyos-svn/!svn/ver/1805/sensorweb/system/Platform/telosw/teloswplatform/PlatformP.nc
+END
+hardware.h
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/tinyos-svn/!svn/ver/1804/sensorweb/system/Platform/telosw/teloswplatform/hardware.h
+END
+PlatformC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/tinyos-svn/!svn/ver/1805/sensorweb/system/Platform/telosw/teloswplatform/PlatformC.nc
+END
+Msp430Timer32khzMapC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/svn/tinyos-svn/!svn/ver/1804/sensorweb/system/Platform/telosw/teloswplatform/Msp430Timer32khzMapC.nc
+END
+platform.h
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/tinyos-svn/!svn/ver/1804/sensorweb/system/Platform/telosw/teloswplatform/platform.h
+END
+MotePlatformC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/tinyos-svn/!svn/ver/1804/sensorweb/system/Platform/telosw/teloswplatform/MotePlatformC.nc
+END
+MSP430ADC12ChannelConfigM.nc
+K 25
+svn:wc:ra_dav:version-url
+V 106
+/svn/tinyos-svn/!svn/ver/1804/sensorweb/system/Platform/telosw/teloswplatform/MSP430ADC12ChannelConfigM.nc
+END
+platform_message.h
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/tinyos-svn/!svn/ver/1804/sensorweb/system/Platform/telosw/teloswplatform/platform_message.h
+END

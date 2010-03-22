@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/tinyos-svn/!svn/ver/1792/sensorweb/system/Platform/telosw/ccxx00/lpl/xmac
+END
+PowerCycle.h
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/tinyos-svn/!svn/ver/1132/sensorweb/system/Platform/telosw/ccxx00/lpl/xmac/PowerCycle.h
+END
+LplP.nc
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/tinyos-svn/!svn/ver/1132/sensorweb/system/Platform/telosw/ccxx00/lpl/xmac/LplP.nc
+END
+LplC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/tinyos-svn/!svn/ver/1132/sensorweb/system/Platform/telosw/ccxx00/lpl/xmac/LplC.nc
+END
+PowerCycle.nc
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/tinyos-svn/!svn/ver/1132/sensorweb/system/Platform/telosw/ccxx00/lpl/xmac/PowerCycle.nc
+END
+PowerCycleP.nc
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/tinyos-svn/!svn/ver/1792/sensorweb/system/Platform/telosw/ccxx00/lpl/xmac/PowerCycleP.nc
+END
+README.txt
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/tinyos-svn/!svn/ver/1132/sensorweb/system/Platform/telosw/ccxx00/lpl/xmac/README.txt
+END
+Lpl.h
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/tinyos-svn/!svn/ver/1132/sensorweb/system/Platform/telosw/ccxx00/lpl/xmac/Lpl.h
+END
+PowerCycleC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/tinyos-svn/!svn/ver/1792/sensorweb/system/Platform/telosw/ccxx00/lpl/xmac/PowerCycleC.nc
+END

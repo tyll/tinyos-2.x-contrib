@@ -1,0 +1,40 @@
+8
+
+dir
+1861
+https://sensorweb.vancouver.wsu.edu/svn/tinyos-svn/sensorweb/system/Platform/telosw/ccxx00/alarm
+https://sensorweb.vancouver.wsu.edu/svn/tinyos-svn
+
+
+
+2009-10-20T23:03:49.661423Z
+1132
+xum
+
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+71be81bb-8916-4e8f-bb90-10bc8f9fc1e3
+
+AlarmMultiplexC.nc
+file
+
+
+
+
+2010-02-09T22:00:46.000000Z
+ad29e8db14a5aef91893f17a2205a632
+2009-10-20T23:03:49.661423Z
+1132
+xum
+

@@ -1,0 +1,52 @@
+8
+
+dir
+1861
+https://sensorweb.vancouver.wsu.edu/svn/tinyos-svn/sensorweb/system/Platform/telosw/ccxx00/am
+https://sensorweb.vancouver.wsu.edu/svn/tinyos-svn
+
+
+
+2010-03-12T09:51:12.070607Z
+1792
+de
+
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+71be81bb-8916-4e8f-bb90-10bc8f9fc1e3
+
+BlazeActiveMessageC.nc
+file
+
+
+
+
+2010-03-22T16:45:58.000000Z
+eebc27f77a80b47d9b27ca7adbe2f736
+2010-03-12T09:51:12.070607Z
+1792
+de
+
+BlazeActiveMessageP.nc
+file
+
+
+
+
+2010-03-22T16:45:58.000000Z
+a8c1312e0b7f7f3ed0079f311d10d319
+2010-03-12T09:51:12.070607Z
+1792
+de
+

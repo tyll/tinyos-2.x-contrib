@@ -1,0 +1,65 @@
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/tinyos-svn/!svn/ver/1804/sensorweb/system/Platform/telosw/teloswplatform/chips/sht11
+END
+HplSensirionSht11C.nc
+K 25
+svn:wc:ra_dav:version-url
+V 111
+/svn/tinyos-svn/!svn/ver/1804/sensorweb/system/Platform/telosw/teloswplatform/chips/sht11/HplSensirionSht11C.nc
+END
+SensirionSht11.h
+K 25
+svn:wc:ra_dav:version-url
+V 106
+/svn/tinyos-svn/!svn/ver/1804/sensorweb/system/Platform/telosw/teloswplatform/chips/sht11/SensirionSht11.h
+END
+HalSensirionSht11C.nc
+K 25
+svn:wc:ra_dav:version-url
+V 111
+/svn/tinyos-svn/!svn/ver/1804/sensorweb/system/Platform/telosw/teloswplatform/chips/sht11/HalSensirionSht11C.nc
+END
+HalSht11ControlP.nc
+K 25
+svn:wc:ra_dav:version-url
+V 109
+/svn/tinyos-svn/!svn/ver/1804/sensorweb/system/Platform/telosw/teloswplatform/chips/sht11/HalSht11ControlP.nc
+END
+SensirionSht11LogicP.nc
+K 25
+svn:wc:ra_dav:version-url
+V 113
+/svn/tinyos-svn/!svn/ver/1804/sensorweb/system/Platform/telosw/teloswplatform/chips/sht11/SensirionSht11LogicP.nc
+END
+SensirionSht11.nc
+K 25
+svn:wc:ra_dav:version-url
+V 107
+/svn/tinyos-svn/!svn/ver/1804/sensorweb/system/Platform/telosw/teloswplatform/chips/sht11/SensirionSht11.nc
+END
+HalSht11Advanced.nc
+K 25
+svn:wc:ra_dav:version-url
+V 109
+/svn/tinyos-svn/!svn/ver/1804/sensorweb/system/Platform/telosw/teloswplatform/chips/sht11/HalSht11Advanced.nc
+END
+SensirionSht11C.nc
+K 25
+svn:wc:ra_dav:version-url
+V 108
+/svn/tinyos-svn/!svn/ver/1804/sensorweb/system/Platform/telosw/teloswplatform/chips/sht11/SensirionSht11C.nc
+END
+SensirionSht11ReaderP.nc
+K 25
+svn:wc:ra_dav:version-url
+V 114
+/svn/tinyos-svn/!svn/ver/1804/sensorweb/system/Platform/telosw/teloswplatform/chips/sht11/SensirionSht11ReaderP.nc
+END
+HplSensirionSht11P.nc
+K 25
+svn:wc:ra_dav:version-url
+V 111
+/svn/tinyos-svn/!svn/ver/1804/sensorweb/system/Platform/telosw/teloswplatform/chips/sht11/HplSensirionSht11P.nc
+END

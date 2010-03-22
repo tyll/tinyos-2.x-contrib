@@ -1,0 +1,91 @@
+8
+
+dir
+1861
+https://sensorweb.vancouver.wsu.edu/svn/tinyos-svn/sensorweb/system/Platform/telosw/ccxx00/lpl
+https://sensorweb.vancouver.wsu.edu/svn/tinyos-svn
+
+
+
+2010-03-12T09:51:12.070607Z
+1792
+de
+
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+71be81bb-8916-4e8f-bb90-10bc8f9fc1e3
+
+PeriodicTimerC.nc
+file
+
+
+
+
+2010-02-09T22:00:46.000000Z
+4a8926251389c121cee4b57c00f22f62
+2009-10-20T23:03:49.661423Z
+1132
+xum
+
+bmac
+dir
+
+wor
+dir
+
+xmac
+dir
+
+boxmac
+dir
+
+readme.txt
+file
+
+
+
+
+2010-02-09T22:00:46.000000Z
+a4a5dad8c3b1c2c750fa4882ac441a92
+2009-10-20T23:03:49.661423Z
+1132
+xum
+
+alwayson
+dir
+
+Wor.h
+file
+
+
+
+
+2010-02-09T22:00:46.000000Z
+17642db2dda9811381ea1ead98b479db
+2009-10-20T23:03:49.661423Z
+1132
+xum
+
+PeriodicTimerP.nc
+file
+
+
+
+
+2010-02-09T22:00:46.000000Z
+3bdf73df8cb73506ee5b953c83964754
+2009-10-20T23:03:49.661423Z
+1132
+xum
+

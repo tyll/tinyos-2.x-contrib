@@ -1,0 +1,59 @@
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/tinyos-svn/!svn/ver/1269/sensorweb/system/Platform/telosw/ccxx00/crc
+END
+Crc16C.nc
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/tinyos-svn/!svn/ver/1269/sensorweb/system/Platform/telosw/ccxx00/crc/Crc16C.nc
+END
+PacketCrcC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/tinyos-svn/!svn/ver/1132/sensorweb/system/Platform/telosw/ccxx00/crc/PacketCrcC.nc
+END
+Crc32P.nc
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/tinyos-svn/!svn/ver/1269/sensorweb/system/Platform/telosw/ccxx00/crc/Crc32P.nc
+END
+Crc16P.nc
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/tinyos-svn/!svn/ver/1269/sensorweb/system/Platform/telosw/ccxx00/crc/Crc16P.nc
+END
+Crc32C.nc
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/tinyos-svn/!svn/ver/1269/sensorweb/system/Platform/telosw/ccxx00/crc/Crc32C.nc
+END
+CrcX.nc
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/tinyos-svn/!svn/ver/1269/sensorweb/system/Platform/telosw/ccxx00/crc/CrcX.nc
+END
+PacketCrc.nc
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/tinyos-svn/!svn/ver/1132/sensorweb/system/Platform/telosw/ccxx00/crc/PacketCrc.nc
+END
+PacketCrcP.nc
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/tinyos-svn/!svn/ver/1132/sensorweb/system/Platform/telosw/ccxx00/crc/PacketCrcP.nc
+END
+crc.py
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/tinyos-svn/!svn/ver/1269/sensorweb/system/Platform/telosw/ccxx00/crc/crc.py
+END

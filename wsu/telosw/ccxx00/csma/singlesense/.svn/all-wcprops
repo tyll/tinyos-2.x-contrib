@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/tinyos-svn/!svn/ver/1132/sensorweb/system/Platform/telosw/ccxx00/csma/singlesense
+END
+CsmaP.nc
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/tinyos-svn/!svn/ver/1132/sensorweb/system/Platform/telosw/ccxx00/csma/singlesense/CsmaP.nc
+END
+CsmaC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/tinyos-svn/!svn/ver/1132/sensorweb/system/Platform/telosw/ccxx00/csma/singlesense/CsmaC.nc
+END
+Csma.h
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/tinyos-svn/!svn/ver/1132/sensorweb/system/Platform/telosw/ccxx00/csma/singlesense/Csma.h
+END

@@ -1,0 +1,47 @@
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/tinyos-svn/!svn/ver/1804/sensorweb/system/Platform/telosw/teloswplatform/chips/ccxx00
+END
+HplRadioSpiC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 106
+/svn/tinyos-svn/!svn/ver/1804/sensorweb/system/Platform/telosw/teloswplatform/chips/ccxx00/HplRadioSpiC.nc
+END
+HplRadioAlarmC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 108
+/svn/tinyos-svn/!svn/ver/1804/sensorweb/system/Platform/telosw/teloswplatform/chips/ccxx00/HplRadioAlarmC.nc
+END
+DummyIoP.nc
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svn/tinyos-svn/!svn/ver/1804/sensorweb/system/Platform/telosw/teloswplatform/chips/ccxx00/DummyIoP.nc
+END
+HplCC1100PinsP.nc
+K 25
+svn:wc:ra_dav:version-url
+V 108
+/svn/tinyos-svn/!svn/ver/1804/sensorweb/system/Platform/telosw/teloswplatform/chips/ccxx00/HplCC1100PinsP.nc
+END
+HplRadioResetP.nc
+K 25
+svn:wc:ra_dav:version-url
+V 108
+/svn/tinyos-svn/!svn/ver/1804/sensorweb/system/Platform/telosw/teloswplatform/chips/ccxx00/HplRadioResetP.nc
+END
+HplCC1100PinsC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 108
+/svn/tinyos-svn/!svn/ver/1804/sensorweb/system/Platform/telosw/teloswplatform/chips/ccxx00/HplCC1100PinsC.nc
+END
+HplRadioResetC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 108
+/svn/tinyos-svn/!svn/ver/1804/sensorweb/system/Platform/telosw/teloswplatform/chips/ccxx00/HplRadioResetC.nc
+END

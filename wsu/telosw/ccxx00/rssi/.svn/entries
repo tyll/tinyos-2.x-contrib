@@ -1,0 +1,52 @@
+8
+
+dir
+1861
+https://sensorweb.vancouver.wsu.edu/svn/tinyos-svn/sensorweb/system/Platform/telosw/ccxx00/rssi
+https://sensorweb.vancouver.wsu.edu/svn/tinyos-svn
+
+
+
+2009-10-20T23:03:49.661423Z
+1132
+xum
+
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+71be81bb-8916-4e8f-bb90-10bc8f9fc1e3
+
+Ccxx00RssiP.nc
+file
+
+
+
+
+2010-02-09T22:00:46.000000Z
+7a7788b5d487b67c17601d64dc7d19fa
+2009-10-20T23:03:49.661423Z
+1132
+xum
+
+Ccxx00RssiC.nc
+file
+
+
+
+
+2010-02-09T22:00:46.000000Z
+0d89158a1513b47f15cbe16c901cd08d
+2009-10-20T23:03:49.661423Z
+1132
+xum
+

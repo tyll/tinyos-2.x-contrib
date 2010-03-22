@@ -1,0 +1,143 @@
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svn/tinyos-svn/!svn/ver/1805/sensorweb/system/Platform/telosw/ADC
+END
+NormalADCP.nc
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/tinyos-svn/!svn/ver/1059/sensorweb/system/Platform/telosw/ADC/NormalADCP.nc
+END
+IICP.nc
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/tinyos-svn/!svn/ver/1037/sensorweb/system/Platform/telosw/ADC/IICP.nc
+END
+WakeupADCP.nc
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/tinyos-svn/!svn/ver/1037/sensorweb/system/Platform/telosw/ADC/WakeupADCP.nc
+END
+EnergyMeter.nc
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/tinyos-svn/!svn/ver/1467/sensorweb/system/Platform/telosw/ADC/EnergyMeter.nc
+END
+EnergyMeterC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/tinyos-svn/!svn/ver/1467/sensorweb/system/Platform/telosw/ADC/EnergyMeterC.nc
+END
+SensorP.nc
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/tinyos-svn/!svn/ver/1467/sensorweb/system/Platform/telosw/ADC/SensorP.nc
+END
+AccelerometerP.nc
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/tinyos-svn/!svn/ver/1805/sensorweb/system/Platform/telosw/ADC/AccelerometerP.nc
+END
+ADCC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/tinyos-svn/!svn/ver/960/sensorweb/system/Platform/telosw/ADC/ADCC.nc
+END
+WakeupADC.h
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/tinyos-svn/!svn/ver/1037/sensorweb/system/Platform/telosw/ADC/WakeupADC.h
+END
+BatteryVoltageC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/tinyos-svn/!svn/ver/1059/sensorweb/system/Platform/telosw/ADC/BatteryVoltageC.nc
+END
+NormalADC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/tinyos-svn/!svn/ver/1059/sensorweb/system/Platform/telosw/ADC/NormalADC.nc
+END
+Sensor.h
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/tinyos-svn/!svn/ver/1467/sensorweb/system/Platform/telosw/ADC/Sensor.h
+END
+Accelerometer.h
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/tinyos-svn/!svn/ver/1037/sensorweb/system/Platform/telosw/ADC/Accelerometer.h
+END
+NormalADCC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/tinyos-svn/!svn/ver/1059/sensorweb/system/Platform/telosw/ADC/NormalADCC.nc
+END
+WakeupADC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/tinyos-svn/!svn/ver/1037/sensorweb/system/Platform/telosw/ADC/WakeupADC.nc
+END
+IIC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/tinyos-svn/!svn/ver/1037/sensorweb/system/Platform/telosw/ADC/IIC.nc
+END
+EnergyMeterP.nc
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/tinyos-svn/!svn/ver/1467/sensorweb/system/Platform/telosw/ADC/EnergyMeterP.nc
+END
+IICC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/tinyos-svn/!svn/ver/1037/sensorweb/system/Platform/telosw/ADC/IICC.nc
+END
+ADCP.nc
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/tinyos-svn/!svn/ver/1056/sensorweb/system/Platform/telosw/ADC/ADCP.nc
+END
+WakeupADCC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/tinyos-svn/!svn/ver/1037/sensorweb/system/Platform/telosw/ADC/WakeupADCC.nc
+END
+Accelerometer.nc
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/tinyos-svn/!svn/ver/1037/sensorweb/system/Platform/telosw/ADC/Accelerometer.nc
+END
+SensorC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/tinyos-svn/!svn/ver/1059/sensorweb/system/Platform/telosw/ADC/SensorC.nc
+END
+AccelerometerC.nc
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/tinyos-svn/!svn/ver/1037/sensorweb/system/Platform/telosw/ADC/AccelerometerC.nc
+END

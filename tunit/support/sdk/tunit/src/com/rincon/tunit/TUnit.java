@@ -247,7 +247,7 @@ public class TUnit {
         System.err.println("Invalid Package Directory: "
             + packageDirectoryAttempt.getAbsolutePath());
         syntax();
-        System.exit(1);
+        System.exit(2);
 
       } else if (!rootDirectory.getAbsolutePath().toLowerCase().startsWith(
           packageDirectoryAttempt.getAbsolutePath().toLowerCase())) {
@@ -280,7 +280,7 @@ public class TUnit {
         System.err
             .println("a build.xml file, the base package directory is your root directory");
         syntax();
-        System.exit(1);
+        System.exit(2);
 
       } else {
         basePackageDirectory = packageDirectoryAttempt;
@@ -331,7 +331,7 @@ public class TUnit {
     // do something useful?
     if (TestReport.getAllTunitProblems().size() > 0) {
       if(runFromCommandLine) {
-        exit(1);
+        exit(127);
       }
     }
 
@@ -460,7 +460,7 @@ public class TUnit {
           "\n  4) export TOSCONTRIB=/path/to/tinyos-2.x-contrib" +
           "\nAlso ensure you are using absolute paths. For windows/cygwin," +
           "\nthis means \"export TOSCONTRIB=c:/cygwin/opt/tinyos-2.x-contrib\"");
-      exit(1);
+      exit(2);
     }
 
     // 2. Verify it is a valid, existing directory

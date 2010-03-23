@@ -78,13 +78,17 @@ implementation {
   AccelGyroC.AccelInit -> Mma7260P;
   AccelGyroC.Accel -> Mma7260P;
 
-  components HplAdc12P;
-  AccelGyroC.HplAdc12 -> HplAdc12P;
+  components shimmerAnalogSetupC, Msp430DmaC;
+  MainC.SoftwareInit -> shimmerAnalogSetupC.Init;
+  AccelGyroC.shimmerAnalogSetup -> shimmerAnalogSetupC;
+  AccelGyroC.DMA0 -> Msp430DmaC.Channel0;
 
-  components Msp430DmaC;
-  AccelGyroC.Msp430DmaControl -> Msp430DmaC;
-  AccelGyroC.Msp430DmaChannel -> Msp430DmaC.Channel0;
-   
+  components GyroBoardC;
+  AccelGyroC.GyroInit           -> GyroBoardC.Init;
+  AccelGyroC.GyroStdControl     -> GyroBoardC.StdControl;
+  AccelGyroC.GyroBoard      -> GyroBoardC.GyroBoard;
+
+  
 #ifdef USE_8MHZ_CRYSTAL
   //   components BusyWaitMicroC;
   //   AccelGyroC.BusyWait -> BusyWaitMicroC;

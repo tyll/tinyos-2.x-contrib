@@ -81,14 +81,20 @@ module BaseStationP @safe() {
 
     interface AMSend as RadioSend[am_id_t id];
 
-#if defined(DFRF_32KHZ)
+#if defined(DFRF_T32KHZ)
     interface TimeSyncAMSend<T32khz, uint32_t> as TimeSyncRadioSend[am_id_t id];
     interface TimeSyncPacket<T32khz, uint32_t>;
+    interface LocalTime<T32khz>;
+#elif defined(DFRF_TMICRO)
+    interface TimeSyncAMSend<TMicro, uint32_t> as TimeSyncRadioSend[am_id_t id];
+    interface TimeSyncPacket<TMicro, uint32_t>;
+    interface LocalTime<TMicro>;
 #else
     interface TimeSyncAMSend<TMilli, uint32_t> as TimeSyncRadioSend[am_id_t id];
     interface TimeSyncPacket<TMilli, uint32_t>;
+    interface LocalTime<TMilli>;
 #endif
-   
+
     interface Receive as RadioReceive[am_id_t id];
     interface Receive as RadioSnoop[am_id_t id];
     interface Packet as RadioPacket;
@@ -100,8 +106,8 @@ module BaseStationP @safe() {
 implementation
 {
   enum {
-    UART_QUEUE_LEN = 12,
-    RADIO_QUEUE_LEN = 12,
+    UART_QUEUE_LEN = 24,
+    RADIO_QUEUE_LEN = 24,
   };
 
   message_t  uartQueueBufs[UART_QUEUE_LEN];
@@ -178,11 +184,12 @@ implementation
   message_t* receive(am_id_t id, message_t *msg, void *payload, uint8_t len) {
     message_t *ret = msg;
 
-    if(id == AM_DFRF) {
+    if(id == AM_DFRF || id == 0x9b) {
       // overwrite last 4 bytes with eventTime
       nx_uint32_t* eventTime = (nx_uint32_t*)(payload + len - sizeof(nx_uint32_t));
 
       if(call TimeSyncPacket.isValid(msg)) {
+      	call Leds.led0Toggle();
         *eventTime = call TimeSyncPacket.eventTime(msg);
       } else {
         *eventTime = INVALID_TIMESTAMP;
@@ -293,10 +300,27 @@ implementation
   }
 
   error_t send(am_id_t id, am_addr_t addr, message_t* msg, uint8_t len) {
-    if(id == AM_DFRF) {
+    // get eventTime from last 4 bytes
+    nx_uint32_t* eventTimePtr = (nx_uint32_t*)(call RadioPacket.getPayload(msg, len) + len - sizeof(nx_uint32_t));
+    uint32_t eventTime;
+
+    if(id == AM_REMOTECONTROL) {
+#ifdef REMOTECONTROL_DELTA_T
       // get eventTime from last 4 bytes
-      nx_uint32_t* eventTime = (nx_uint32_t*)(call RadioPacket.getPayload(msg, len) + len - sizeof(nx_uint32_t));
-      return call TimeSyncRadioSend.send[id](addr, msg, len, *eventTime);
+      eventTime = call LocalTime.get() + REMOTECONTROL_DELTA_T;
+#else
+      eventTime = *eventTimePtr;
+#endif      
+      return call TimeSyncRadioSend.send[id](addr, msg, len, eventTime);
+    }   
+    else if(id == AM_DFRF) {
+#ifdef DFRF_BASE_DELTA
+      eventTime = call LocalTime.get() + *eventTimePtr;
+#else
+      // get eventTime from last 4 bytes
+      eventTime = *eventTimePtr;
+#endif      
+      return call TimeSyncRadioSend.send[id](addr, msg, len, eventTime);
     } else {
       return call RadioSend.send[id](addr, msg, len);
     }

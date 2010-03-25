@@ -68,6 +68,13 @@ configuration RemoteControlC
 	{
 		interface IntCommand[uint8_t id];
 		interface DataCommand[uint8_t id];
+#if defined(DFRF_32KHZ)
+		interface TimeSyncIntCommand<T32khz, uint32_t>[uint8_t id];
+		interface TimeSyncDataCommand<T32khz, uint32_t>[uint8_t id];
+#else
+		interface TimeSyncIntCommand<TMilli, uint32_t>[uint8_t id];
+		interface TimeSyncDataCommand<TMilli, uint32_t>[uint8_t id];
+#endif		
 		interface StdControl as StdControlCommand[uint8_t id];
 	}
 }
@@ -75,9 +82,10 @@ configuration RemoteControlC
 implementation
 {
 	components
+			TimeSyncMessageC as AM, new TimerMilliC() as TimerC, RandomC, ActiveMessageC,
 	    new AutoStartC(),
-	    RemoteControlM,
-	    ActiveMessageC as AM, new TimerMilliC() as TimerC, RandomC;
+	    RemoteControlM;
+	    
 
 #ifdef LEAF_NODE
 	components	GradientLeafPolicyC as GradientPolicyC;
@@ -93,11 +101,10 @@ implementation
 
 	IntCommand = RemoteControlM;
 	DataCommand = RemoteControlM;
+	TimeSyncIntCommand = RemoteControlM;
+	TimeSyncDataCommand = RemoteControlM;
 	StdControlCommand = RemoteControlM;
-
-
 	RemoteControlM.Receive -> AM.Receive[AM_REMOTECONTROL];
-	RemoteControlM.AMSend -> AM.AMSend[AM_REMOTECONTROL];
 	RemoteControlM.Packet -> AM;
 	RemoteControlM.AMPacket -> AM;
 	RemoteControlM.Timer -> TimerC;
@@ -107,12 +114,16 @@ implementation
 #if defined(DFRF_32KHZ)
   components LocalTime32khzC as LocalTimeProviderC;
   RemoteControlM.LocalTime -> LocalTimeProviderC;
+  RemoteControlM.TimeSyncAMSend -> AM.TimeSyncAMSend32khz[AM_REMOTECONTROL];
+  RemoteControlM.TimeSyncPacket -> AM.TimeSyncPacket32khz;
+  RemoteControlM.PacketTimeStamp -> ActiveMessageC.PacketTimeStamp32khz;
 #else
   components HilTimerMilliC;
   RemoteControlM.LocalTime -> HilTimerMilliC;
+  RemoteControlM.TimeSyncAMSend -> AM.TimeSyncAMSendMilli[AM_REMOTECONTROL];
+  RemoteControlM.TimeSyncPacket -> AM.TimeSyncPacketMilli;
+  RemoteControlM.PacketTimeStamp -> ActiveMessageC.PacketTimeStampMilli;
 #endif
-
-
 
 	RemoteControlM.DfrfControl-> DfrfService.StdControl;
 	RemoteControlM.DfrfSend -> DfrfService;

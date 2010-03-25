@@ -18,18 +18,37 @@
  * ON AN "AS IS" BASIS, AND THE VANDERBILT UNIVERSITY HAS NO OBLIGATION TO
  * PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
  *
- * Author: Janos Sallai
+ * Author: Andras Nadas, Miklos Maroti, Gabor Pap, Janos Sallai
+ * Contact: Janos Sallai (sallai@isis.vanderbilt.edu)
  */
-
-
-#ifndef __BASESTATION_H__
-#define __BASESTATION_H__
-#include "message.h"
-
-enum {
-  AM_DFRF = 0x82,
-  AM_REMOTECONTROL = 0x5e,  
-  INVALID_TIMESTAMP = 0x80000000L,
-};
-
-#endif /* __BASESTATION_H__ */
+ 
+/**
+ * DataCommand interface allows an unstructured stream of bytes to be
+ * passed (up to 24 bytes) to the component and an acknowledgment be sent
+ * back.
+ *
+ * @author Andras Nadas, Miklos Maroti, Gabor Pap
+ * @modified 02/02/05
+ */ 
+ 
+interface TimeSyncDataCommand<precision, size_type>
+{
+	/**
+	 * Called by the RemoteControl module. 
+	 * The implementation must execute the corresponding command,
+	 * then it should signal the ack() event.
+	 *
+	 * @param data Pointer to an application specific parameter.
+	 * @param length The length of the parameter in bytes.
+	 */
+	command void execute(void *data, uint8_t length, size_type timeStamp);
+	
+	/**
+	 * Can be signaled by the implementation during or shortly after
+	 * the execution of the execute() command.
+	 *
+	 * @return Application specific return value. 
+	 *	This value will be routed back to the base station.
+	 */
+	event void ack(uint16_t returnValue, size_type timeStamp);
+}

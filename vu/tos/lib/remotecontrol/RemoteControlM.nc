@@ -48,7 +48,6 @@ module RemoteControlM
         interface StdControl as StdControlCommand[uint8_t id];
 
         interface Receive;
-        interface AMSend;
         interface AMPacket;
         interface Packet;
         interface Timer<TMilli>;
@@ -58,9 +57,19 @@ module RemoteControlM
         interface StdControl as DfrfControl;
         
 #if defined(DFRF_32KHZ)
+        interface TimeSyncAMSend<T32khz, uint32_t>;
         interface LocalTime<T32khz>;
+        interface TimeSyncIntCommand<T32khz, uint32_t>[uint8_t id];
+        interface TimeSyncDataCommand<T32khz, uint32_t>[uint8_t id];
+        interface PacketTimeStamp<T32khz, uint32_t>;
+        interface TimeSyncPacket<T32khz, uint32_t>;
 #else
+        interface TimeSyncAMSend<TMilli, uint32_t>;
         interface LocalTime<TMilli>;
+        interface TimeSyncIntCommand<TMilli, uint32_t>[uint8_t id];
+        interface TimeSyncDataCommand<TMilli, uint32_t>[uint8_t id];
+        interface PacketTimeStamp<TMilli, uint32_t>;
+        interface TimeSyncPacket<TMilli, uint32_t>;
 #endif
         
     }
@@ -80,7 +89,9 @@ implementation
     uint8_t lastAppId;
     uint8_t ackTimer;
     uint16_t ackReturnValue;
-
+    uint32_t commandTimeStamp;
+    uint32_t ackTimeStamp;
+    
     uint8_t state;
     enum
     {
@@ -157,7 +168,7 @@ implementation
         // if ackTimer is not 0 and the remote control command has not been
         // forwarded then we forward it
         else if( sentSeqNum != rcCommand()->seqNum ){
-            if (call AMSend.send(TOS_BCAST_ADDR, &tosMsg, call Packet.payloadLength(&tosMsg)) != SUCCESS)
+            if (call TimeSyncAMSend.send(TOS_BCAST_ADDR, &tosMsg, call Packet.payloadLength(&tosMsg), commandTimeStamp) != SUCCESS)
                 state |= STATE_FORWARDED;
         }
     }
@@ -168,7 +179,7 @@ implementation
     /**
      * Called when the remote control message has been forwarded.
      */
-    event void AMSend.sendDone(message_t* p, error_t success)
+    event void TimeSyncAMSend.sendDone(message_t* p, error_t success)
     {
         sentSeqNum = rcCommand()->seqNum;
         state |= STATE_FORWARDED;
@@ -183,11 +194,11 @@ implementation
 
         if( rcCommand()->dataType == 0 ) {     // IntCommand
             uint16_t cmd = *(nx_uint16_t*)(rcCommand()->data);
-            call IntCommand.execute[lastAppId](cmd);
+            call TimeSyncIntCommand.execute[lastAppId](cmd, commandTimeStamp);
         }
         else if( rcCommand()->dataType == 1 ) {    // DataCommand
-            call DataCommand.execute[lastAppId](rcCommand()->data,
-                call Packet.payloadLength(&tosMsg) - sizeof(remotecontrol_t));
+            call TimeSyncDataCommand.execute[lastAppId](rcCommand()->data,
+                call Packet.payloadLength(&tosMsg) - sizeof(remotecontrol_t), commandTimeStamp);
         }
         else if( rcCommand()->dataType == 2 )    // StdControlCommand
         {
@@ -197,6 +208,8 @@ implementation
             reply.nodeId = localAddress();
             reply.seqNum = rcCommand()->seqNum;
             reply.ret = 0xFF;
+
+            // TODO: implement scheduled execution of std control commands
 
             if( cmd == 0 )  // stop
                 reply.ret = call StdControlCommand.stop[lastAppId]();
@@ -223,11 +236,11 @@ implementation
         remotecontrol_t* newRcCommand = (remotecontrol_t*)payload;
         int8_t age = newRcCommand->seqNum - rcCommand()->seqNum;
 
-        if( state == STATE_IDLE && ( age <= -50 || 0 < age ) )
+        if( state == STATE_IDLE && ( age <= -50 || 0 < age ) && call TimeSyncPacket.isValid(p))
         {
             state = STATE_BUSY;
             tosMsg = *p;
-
+            commandTimeStamp = call TimeSyncPacket.eventTime(p);
             if( rcCommand()->target == localAddress()
                     || rcCommand()->target == TOS_BCAST_ADDR
                     || rcCommand()->target == TOS_SUBGROUP_ADDR )
@@ -258,14 +271,18 @@ implementation
      * When execution has finished, store return value in global and defer
      * routing it back to the root.
      */
-    event void IntCommand.ack[uint8_t appId](uint16_t returnValue)
+    event void TimeSyncIntCommand.ack[uint8_t appId](uint16_t returnValue, uint32_t timeStamp)
     {
         if( appId == lastAppId ) {
             ackReturnValue = returnValue;
+            ackTimeStamp = timeStamp;
             startAckTimer();
         }
     }
 
+    event void IntCommand.ack[uint8_t appId](uint16_t returnValue) {
+    	signal TimeSyncIntCommand.ack[appId](returnValue, call LocalTime.get());
+    }
 
     //***
     // DataCommand interface
@@ -274,12 +291,17 @@ implementation
      * When execution has finished, store return value in global and defer
      * routing it back to the root.
      */
-    event void DataCommand.ack[uint8_t appId](uint16_t returnValue)
+    event void TimeSyncDataCommand.ack[uint8_t appId](uint16_t returnValue, uint32_t timeStamp)
     {
         if( appId == lastAppId ) {
             ackReturnValue = returnValue;
+            ackTimeStamp = timeStamp;
             startAckTimer();
         }
+    }
+
+    event void DataCommand.ack[uint8_t appId](uint16_t returnValue) {
+    	signal TimeSyncDataCommand.ack[appId](returnValue, call LocalTime.get());
     }
 
 
@@ -288,6 +310,11 @@ implementation
 
     default command void IntCommand.execute[uint8_t appId](uint16_t param) {}
     default command void DataCommand.execute[uint8_t appId](void *data, uint8_t length) {}
+    default command void TimeSyncIntCommand.execute[uint8_t appId](uint16_t param, uint32_t ts) { call IntCommand.execute[appId](param); }
+    default command void TimeSyncDataCommand.execute[uint8_t appId](void *data, uint8_t length, uint32_t ts)
+	{
+		call DataCommand.execute[appId](data, length);
+	}
     default command error_t StdControlCommand.start[uint8_t appId]() { return 0xFF; }
     default command error_t StdControlCommand.stop[uint8_t appId]() { return 0xFF; }
 }

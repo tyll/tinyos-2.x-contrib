@@ -32,8 +32,8 @@ interface DfrfReceive<payload_t>
 	 *
 	 * @param data The address of the new data we received. Applications
 	 *	should not modify the first <code>uniqueLength</code> bytes.
-	 * @return FAIL if the data should not be sent forward, SUCCESS
-	 *	otherwise. Most applications should always return SUCCESS.
+	 * @return FALSE if the data should not be sent forward, TRUE
+	 *	otherwise. Most applications should always return TRUE.
 	 */
 	event bool receive(payload_t* data, uint32_t timestamp);
 }

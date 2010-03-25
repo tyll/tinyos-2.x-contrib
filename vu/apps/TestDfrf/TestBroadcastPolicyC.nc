@@ -81,7 +81,8 @@ module TestBroadcastPolicyC {
 
     dbg("TestBroadcastPolicy","Received packet %d @ %d\n", packet->cnt, timeStamp);
     call Leds.set(packet->cnt);
-    return SUCCESS;
+    //return SUCCESS;
+    return TRUE;
   }
 
 }

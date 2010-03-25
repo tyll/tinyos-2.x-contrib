@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Vanderbilt University
+ * Copyright (c) 2008, Vanderbilt University
  * All rights reserved.
  *
  * Permission to use, copy, modify, and distribute this software and its
@@ -18,18 +18,23 @@
  * ON AN "AS IS" BASIS, AND THE VANDERBILT UNIVERSITY HAS NO OBLIGATION TO
  * PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
  *
- * Author: Janos Sallai
+ * Author: Miklos Maroti
  */
 
+#include "Timer.h"
 
-#ifndef __BASESTATION_H__
-#define __BASESTATION_H__
-#include "message.h"
+configuration LocalTimeMicroC
+{
+	provides interface LocalTime<TMicro>;
+}
 
-enum {
-  AM_DFRF = 0x82,
-  AM_REMOTECONTROL = 0x5e,  
-  INVALID_TIMESTAMP = 0x80000000L,
-};
+implementation
+{
+	components CounterOne16C;
+	components new TransformCounterC(TMicro, uint32_t, TMicro, uint16_t, 0, uint32_t);
+	components new CounterToLocalTimeC(TMicro);
 
-#endif /* __BASESTATION_H__ */
+	LocalTime = CounterToLocalTimeC;
+	CounterToLocalTimeC.Counter -> TransformCounterC;
+	TransformCounterC.CounterFrom -> CounterOne16C;
+}

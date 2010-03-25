@@ -114,4 +114,14 @@ implementation {
   BaseStationP.TimeSyncPacket -> TimeSyncRadio;
 
   BaseStationP.Leds -> LedsC;
+
+#if defined(DFRF_T32KHZ)
+  components LocalTime32khzC as LocalTimeProviderC;
+#elif defined(DFRF_TMICRO)
+  components LocalTimeMicroC as LocalTimeProviderC;
+#else
+  components HilTimerMilliC as LocalTimeProviderC;
+#endif
+  
+  BaseStationP.LocalTime -> LocalTimeProviderC;  
 }

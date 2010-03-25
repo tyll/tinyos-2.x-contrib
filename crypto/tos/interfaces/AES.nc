@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009 Centre for Electronics Design and Technology (CEDT),
+* Copyright (c) 2010 Centre for Electronics Design and Technology (CEDT),
 *  Indian Institute of Science (IISc) and Laboratory for Cryptologic
 *  Algorithms (LACAL), Ecole Polytechnique Federale de Lausanne (EPFL).
 *
@@ -34,20 +34,36 @@
 * OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/*
- * Example of usage of the trivium interface for 8-bit microcontroller.
- *
- * This program simply initialises two internal states, encrypt and then decrypt a
- * message.
+/**
+ * 	Interface for the AES cipher in TinyOS.
+ *  Implementation based on the Public domain implementation of Karl Malbrain (malbrain@yahoo.com)
+ *  available at http://code.google.com/p/byte-oriented-aes/downloads/list.
+ *  @author Sylvain Pelissier <sylvain.pelissier@gmail.com>
  */
 
-configuration TestTriviumAppC{
-}
+interface AES{
 
-implementation{
-	components TestTriviumC, MainC;
-	components triviumC;
+    /**
+     *  Compute the expanded key with the key schedule algorithm. It is independent of the plaintext so it as to be done
+	 *	only once per key.
+     *  @param expkey an array that contains the expanded key. It must be (NB_ROUND+1) * 16 bytes long.
+     *  @param key the secret key.
+     */
+	command void keyExpansion(uint8_t *expkey, uint8_t *key);
 
-	TestTriviumC.Boot -> MainC.Boot;
-	TestTriviumC.trivium -> triviumC;
+    /**
+     *  Encrypt one block of plaintext.
+     *  @param in_block the input block of plaintext.
+     *  @param expkey an array that contains the expanded key.
+     *  @param out_block the resulting block of ciphertext.
+     */
+    command void encrypt(uint8_t *in_block, uint8_t *expkey, uint8_t *out_block);
+
+    /**
+     *  Decrypt one block of plaintext.
+     *  @param in_block the input block of ciphertext.
+     *  @param expkey an array that contains the expanded key.
+     *  @param out_block the resulting block of plaintext.
+     */
+    command void decrypt(uint8_t *in_block, uint8_t *expkey, uint8_t *out_block);
 }

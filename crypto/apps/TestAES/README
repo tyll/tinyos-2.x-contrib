@@ -1,0 +1,38 @@
+README for TestTrivium8
+
+Copyright:
+2009 EPFL - Ecole Polytechnique Fédérale de Lausanne and 
+IISC - Indian Institute of Science
+
+Author:
+Sylvain Pelissier <sylvain.pelissier@gmail.com>
+
+Description:
+TestAES is a TinyOS application which shows how the AES interface can be used.
+The programm encrypt and decrypt two message blocks.
+
+TestAES.nc :	The configuration file.
+
+TestAESC.nc :	The module file.
+
+sim.py :		The TOSSIM simulation file.
+
+Installation:
+
+If the AES interface is installed in the TinyOS tree then this program can be compiled with
+the command:
+
+make [mote_name]
+
+where [mote_name] is the name of the mote use, for example mica2 or micaz. To used this program
+with TOSSIM you can compile the program with the command:
+
+make [mote_name] sim
+
+And then the simualtion is launched with:
+
+pythom sim.py
+
+Known bugs/limitations:
+
+None.

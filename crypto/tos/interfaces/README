@@ -1,13 +1,18 @@
 Interfaces of cryptographic algorithms.
 
 Copyright:
-2009 EPFL - Ecole Polytechnique Fédérale de Lausanne and 
+2010 EPFL - Ecole Polytechnique Fédérale de Lausanne and 
 IISC - Indian Institute of Science
 
 Author:
 Sylvain Pelissier <sylvain.pelissier@gmail.com>
 
 Description:
+
+AES.nc:			Interface for the Advance encryption standard (AES). Implementation based on the Public Domain implementation of Karl Malbrain (http://code.google.com/p/byte-oriented-aes/downloads/list).
+
 trivium.nc:		Interface for the Trivium stream cipher. Webpage of the cipher at http://www.ecrypt.eu.org/stream/triviumpf.html
+
 MMH.nc:			Interface for the MMH universal hash function family.
+
 Poly32.nc:		Interface for the MMH universal hash function family.

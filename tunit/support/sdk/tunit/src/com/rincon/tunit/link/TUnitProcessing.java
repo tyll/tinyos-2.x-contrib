@@ -49,6 +49,7 @@ import net.tinyos.message.MoteIF;
  * Automatically Generated
  * 
  * @author David Moss
+ * @author Till Maas
  * 
  */
 public class TUnitProcessing extends Thread implements
@@ -169,8 +170,8 @@ public class TUnitProcessing extends Thread implements
               for (Iterator it = currentListeners.iterator(); it.hasNext();) {
                 ((TUnitProcessing_Events) it.next())
                     .tUnitProcessing_testFailed(inMsg.get_id(), inMsg.get_assertionId(), currentFailMsg
-                        + "; Expected [" + inMsg.get_expected() + "] but got ["
-                        + inMsg.get_actual() + "] (unsigned 32-bit form)");
+                        + "; Expected [" + inMsg.get_expected() + " / 0x" + Long.toHexString(inMsg.get_expected()) + "] but got ["
+                        + inMsg.get_actual() + " / 0x" + Long.toHexString(inMsg.get_actual()) + "] (unsigned 32-bit form)");
               }
               currentFailMsg = "";
             }

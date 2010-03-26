@@ -85,7 +85,7 @@ ucla_ieee802_15_4_packet_sink::enter_search()
   d_chip_cnt = 0;
   d_packet_byte = 0;
 }
-    
+
 inline void
 ucla_ieee802_15_4_packet_sink::enter_have_sync()
 {
@@ -103,7 +103,7 @@ ucla_ieee802_15_4_packet_sink::enter_have_header(int payload_len)
 {
   if (VERBOSE)
     fprintf(stderr, "@ enter_have_header (payload_len = %d)\n", payload_len);
-  
+
   d_state = STATE_HAVE_HEADER;
   d_packetlen  = payload_len;
   d_payload_cnt = 0;
@@ -130,8 +130,8 @@ ucla_ieee802_15_4_packet_sink::decode_chips(unsigned int chips){
 }
 
 ucla_ieee802_15_4_packet_sink_sptr
-ucla_make_ieee802_15_4_packet_sink (gr_msg_queue_sptr target_queue, 
-			   int threshold)
+ucla_make_ieee802_15_4_packet_sink (gr_msg_queue_sptr target_queue,
+				    int threshold)
 {
   return ucla_ieee802_15_4_packet_sink_sptr (new ucla_ieee802_15_4_packet_sink (target_queue, threshold));
 }
@@ -141,7 +141,7 @@ ucla_ieee802_15_4_packet_sink::ucla_ieee802_15_4_packet_sink (gr_msg_queue_sptr 
   : gr_sync_block ("ucla_ieee802_15_4_packet_sink",
 		   gr_make_io_signature (1, 1, sizeof(float)),
 		   gr_make_io_signature (0, 0, 0)),
-    d_target_queue(target_queue), 
+    d_target_queue(target_queue),
     d_threshold(threshold == -1 ? DEFAULT_THRESHOLD : threshold)
 {
   d_sync_vector = 0xA7;
@@ -157,38 +157,37 @@ ucla_ieee802_15_4_packet_sink::~ucla_ieee802_15_4_packet_sink ()
 }
 
 int ucla_ieee802_15_4_packet_sink::work (int noutput_items,
-		      gr_vector_const_void_star &input_items,
-		      gr_vector_void_star &output_items)
+					 gr_vector_const_void_star &input_items,
+					 gr_vector_void_star &output_items)
 {
   float *inbuf = (float *) input_items[0];
   int count=0;
-  
-  if (VERBOSE)
+
+  if (VERBOSE2)
     fprintf(stderr,">>> Entering state machine\n"),fflush(stderr);
   d_processed += noutput_items;
 
   while (count<noutput_items) {
     switch(d_state) {
-      
+
     case STATE_SYNC_SEARCH:    // Look for sync vector
       if (VERBOSE)
 	fprintf(stderr,"SYNC Search, noutput=%d syncvec=%x\n",noutput_items, d_sync_vector),fflush(stderr);
 
       while (count < noutput_items) {
-	
+
 	//if(inbuf[count++] == 0.0)
 	//  continue;
-	
-	
+
 	if(slice(inbuf[count++]))
 	  d_shift_reg = (d_shift_reg << 1) | 1;
 	else
 	  d_shift_reg = d_shift_reg << 1;
-	
+
 	if(d_preamble_cnt > 0){
 	  d_chip_cnt = d_chip_cnt+1;
 	}
-	
+
 	// The first if block syncronizes to chip sequences.
 	if(d_preamble_cnt == 0){
 	  unsigned int threshold;
@@ -197,7 +196,7 @@ int ucla_ieee802_15_4_packet_sink::work (int noutput_items,
 	    //  fprintf(stderr, "Threshold %d d_preamble_cnt: %d\n", threshold, d_preamble_cnt);
 	    //if ((d_shift_reg&0xFFFFFE) == (CHIP_MAPPING[0]&0xFFFFFE)) {
 	    if (VERBOSE2)
-	      fprintf(stderr,"Found 0 in chip sequence\n"),fflush(stderr);	
+	      fprintf(stderr,"Found 0 in chip sequence\n"),fflush(stderr);
 	    // we found a 0 in the chip sequence
 	    d_preamble_cnt+=1;
 	    //fprintf(stderr, "Threshold %d d_preamble_cnt: %d\n", threshold, d_preamble_cnt);
@@ -206,11 +205,11 @@ int ucla_ieee802_15_4_packet_sink::work (int noutput_items,
 	  // we found the first 0, thus we only have to do the calculation every 32 chips
 	  if(d_chip_cnt == 32){
 	    d_chip_cnt = 0;
-	    
+
 	    if(d_packet_byte == 0) {
-	      if (gr_count_bits32((d_shift_reg&0x7FFFFFFE) ^ (CHIP_MAPPING[0]&0xFFFFFFFE)) <= d_threshold) {	
+	      if (gr_count_bits32((d_shift_reg&0x7FFFFFFE) ^ (CHIP_MAPPING[0]&0xFFFFFFFE)) <= d_threshold) {
 		if (VERBOSE2)
-		  fprintf(stderr,"Found %d 0 in chip sequence\n", d_preamble_cnt),fflush(stderr);	
+		  fprintf(stderr,"Found %d 0 in chip sequence\n", d_preamble_cnt),fflush(stderr);
 		// we found an other 0 in the chip sequence
 		d_packet_byte = 0;
 		d_preamble_cnt ++;
@@ -230,7 +229,7 @@ int ucla_ieee802_15_4_packet_sink::work (int noutput_items,
 	      if (gr_count_bits32((d_shift_reg&0x7FFFFFFE) ^ (CHIP_MAPPING[10]&0xFFFFFFFE)) <= d_threshold) {
 		d_packet_byte |= 0xA;
 		if (VERBOSE2)
-		  fprintf(stderr,"Found sync, 0x%x\n", d_packet_byte),fflush(stderr);	
+		  fprintf(stderr,"Found sync, 0x%x\n", d_packet_byte),fflush(stderr);
 		// found SDF
 		// setup for header decode
 		enter_have_sync();
@@ -242,7 +241,7 @@ int ucla_ieee802_15_4_packet_sink::work (int noutput_items,
 		break;
 	      }
 	    }
-	  } 
+	  }
 	}
       }
       break;
@@ -267,7 +266,7 @@ int ucla_ieee802_15_4_packet_sink::work (int noutput_items,
 	    // something is wrong. restart the search for a sync
 	    if(VERBOSE2)
 	      fprintf(stderr, "Found a not valid chip sequence! %u\n", d_shift_reg), fflush(stderr);
-	      
+
 	    enter_search();
 	    break;
 	  }
@@ -336,7 +335,7 @@ int ucla_ieee802_15_4_packet_sink::work (int noutput_items,
 	    if (d_payload_cnt >= d_packetlen){	// packet is filled, including CRC. might do check later in here
 
 	      // build a message
-	      gr_message_sptr msg = gr_make_message(0, 0, 0, d_packetlen_cnt);  	    
+	      gr_message_sptr msg = gr_make_message(0, 0, 0, d_packetlen_cnt);
 	      memcpy(msg->msg(), d_packet, d_packetlen_cnt);
 
 	      d_target_queue->insert_tail(msg);		// send it
@@ -359,8 +358,8 @@ int ucla_ieee802_15_4_packet_sink::work (int noutput_items,
   }   // while
 
   if(VERBOSE2)
-    fprintf(stderr, "Samples Processed: %d\n", d_processed), fflush(stderr);
+    fprintf(stderr, ">>> Samples Processed: %d\n", d_processed), fflush(stderr);
 
   return noutput_items;
 }
-  
+

@@ -26,13 +26,16 @@
 
 from math import pi
 import Numeric
+import struct
+import crc16
+import traceback
+from datetime import datetime
 
 from gnuradio import gr, packet_utils, gru
 from gnuradio import ucla
-import crc16
 import gnuradio.gr.gr_threading as _threading
 import ieee802_15_4
-import struct
+
 
 #import pdb
 
@@ -99,7 +102,6 @@ def make_tinyos_packet_add_crc(payload, pad_for_usrp=True, SFD=0xA7):
         pkt = pkt + (_npadding_bytes(len(pkt), 8) * '\x00')+0*'\x00'
 
     return pkt
-
 
 def make_ieee802_15_4_packet(FCF, seqNr, addressInfo, payload, pad_for_usrp=True, preambleLength=4, SFD=0xA7):
     """
@@ -207,7 +209,7 @@ class ieee802_15_4_mod_pkts(gr.hier_block2):
 
     Send packets by calling send_pkt
     """
-    def __init__(self, pad_for_usrp=True, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         """
 	Hierarchical block for the 802_15_4 O-QPSK  modulation.
 
@@ -222,6 +224,7 @@ class ieee802_15_4_mod_pkts(gr.hier_block2):
         """
 
         try:
+            self.pad_for_usrp = kwargs.pop('pad_for_usrp')
             self.msgq_limit = kwargs.pop('msgq_limit')
         except KeyError:
             pass
@@ -229,11 +232,13 @@ class ieee802_15_4_mod_pkts(gr.hier_block2):
 	gr.hier_block2.__init__(self, "ieee802_15_4_mod_pkts",
 				gr.io_signature(0, 0, 0),  # Input
                                 gr.io_signature(1, 1, gr.sizeof_gr_complex)) # Output
-        self.pad_for_usrp = pad_for_usrp
+        #self.pad_for_usrp = pad_for_usrp
 
         # accepts messages from the outside world
         self.pkt_input = gr.message_source(gr.sizeof_char, self.msgq_limit)
         self.ieee802_15_4_mod = ieee802_15_4.ieee802_15_4_mod(*args, **kwargs)
+
+        print "GR: ieee802_15_4_pkt: Connecting packet input and modulator."
         self.connect(self.pkt_input, self.ieee802_15_4_mod, self)
 
     def send_tinyos_pkt(self, payload='', eof=False):
@@ -244,18 +249,18 @@ class ieee802_15_4_mod_pkts(gr.hier_block2):
         @type payload: string
         """
 
-        print "########## SDR sending a TinyOS packet ###########"
+        print "GR: ieee802_15_4_pkt: ########## SDR sending a TinyOS packet ###########"
 
         if eof:
             msg = gr.message(1) # tell self.pkt_input we're not sending any more packets
         else:
             pkt = make_tinyos_packet(payload,
                                      self.pad_for_usrp)
-            print "pkt =", packet_utils.string_to_hex_list(pkt), len(pkt)
+            print "GR: ieee802_15_4_pkt: pkt =", packet_utils.string_to_hex_list(pkt), len(pkt)
             msg = gr.message_from_string(pkt)
         self.pkt_input.msgq().insert_tail(msg)
 
-        print "########## SDR inserted packet in message Queue ###########"
+        print "GR: ieee802_15_4_pkt: ########## SDR inserted packet in message Queue ###########"
 
     def send_tinyos_pkt_add_crc(self, payload='', eof=False):
         """
@@ -265,18 +270,18 @@ class ieee802_15_4_mod_pkts(gr.hier_block2):
         @type payload: string
         """
 
-        print "########## SDR sending a TinyOS packet ###########"
+        print "GR: ieee802_15_4_pkt: ########## SDR sending a TinyOS packet ###########"
 
         if eof:
             msg = gr.message(1) # tell self.pkt_input we're not sending any more packets
         else:
             pkt = make_tinyos_packet_add_crc(payload,
                                              self.pad_for_usrp)
-            print "pkt =", packet_utils.string_to_hex_list(pkt), len(pkt)
+            print "GR: ieee802_15_4_pkt: pkt =", packet_utils.string_to_hex_list(pkt), len(pkt)
             msg = gr.message_from_string(pkt)
         self.pkt_input.msgq().insert_tail(msg)
 
-        print "########## SDR inserted packet in message Queue ###########"
+        print "GR: ieee802_15_4_pkt: ########## SDR inserted packet in message Queue ###########"
 
 
     def send_pkt(self, seqNr, addressInfo, payload='', eof=False):
@@ -342,7 +347,8 @@ class ieee802_15_4_demod_pkts(gr.hier_block2):
         self.ieee802_15_4_demod = ieee802_15_4.ieee802_15_4_demod(self, *args, **kwargs)
         self._packet_sink = ucla.ieee802_15_4_packet_sink(self._rcvd_pktq, self.threshold)
 
-        self.connect(self,self.ieee802_15_4_demod, self._packet_sink)
+        print "GR: ieee802_15_4_pkt: Connecting demodulator and packet sink."
+        self.connect(self, self.ieee802_15_4_demod, self._packet_sink)
 
         self._watcher = _queue_watcher_thread(self._rcvd_pktq, self.callback)
 
@@ -364,21 +370,38 @@ class _queue_watcher_thread(_threading.Thread):
 
     def run(self):
         while self.keep_running:
-            print "802_15_4_pkt: waiting for packet"
-            msg = self.rcvd_pktq.delete_head()
-            ok = 0
-            payload = msg.to_string()
+            try:
+                print "GR: 802_15_4_pkt: waiting for packet"
+                msg = self.rcvd_pktq.delete_head()
+                print "GR: 802_15_4_pkt: Received Packet at time", datetime.utcnow()
 
-            print "received packet "
-	    crc = crc16.CRC16()
-	    crc.update(payload[:-2])
+                ok = 0
+                payload = msg.to_string()
+                print "GR: 802_15_4_pkt: Packet is of length:", len(payload)
 
-	    crc_check = crc.intchecksum()
-	    print "checksum: %s, received: %s"%(crc_check, str(ord(payload[-2]) + ord(payload[-1])*256))
-	    if len(payload) > 2:
-                ok = (crc_check == ord(payload[-2]) + ord(payload[-1])*256)
-            msg_payload = payload
+                if len(payload) <= 2:
+                    print "GR: ieee802_15_4_pkt: very short packet (less than 2 bytes?)"
+                    continue
 
-            if self.callback:
-                self.callback(ok, msg_payload)
+                crc = crc16.CRC16()
+                crc.update(payload[:-2])
+
+                crc_check = crc.intchecksum()
+                #print "GR: ieee802_15_4_pkt: checksum calc: %s" % crc_check
+                #print "GR: ieee802_15_4_pkt: checksum rec:  %x %x" % (ord(payload[-2]), ord(payload[-1]))
+                #print "GR: ieee802_15_4_pkt: checksum rec:  %s %s" % (str(ord(payload[-2])), str(ord(payload[-1])))
+                #print "GR: ieee802_15_4_pkt: checksum rec:  %s" % str(ord(payload[-2]) + ord(payload[-1])*256)
+
+                if len(payload) > 2:
+                    ok = (crc_check == ord(payload[-2]) + ord(payload[-1])*256)
+
+                msg_payload = payload
+
+                if self.callback:
+                    self.callback(ok, msg_payload)
+                else:
+                    print "GR: ieee802_15_4_pkt: No callback!"
+            except:
+                print "GR: 802_15_4_pkt: malformed packet"
+                traceback.print_exc()
 

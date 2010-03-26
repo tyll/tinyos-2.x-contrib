@@ -110,7 +110,7 @@ public class TestRunManager implements PhoenixError, Messenger {
       // always have a serial forwarder connection, or else there's no way
       // to collect test results.
       if(runProperties.getNode(i).getMotecom().isEmpty() && i > 0) {
-        log.debug("Skipping the serial connection to node " + i + "(" 
+        log.debug("Skipping the serial connection to node " + i + " (target " 
             + runProperties.getNode(i).getTarget() + ") because its motecom isn't defined");
         
       } else {

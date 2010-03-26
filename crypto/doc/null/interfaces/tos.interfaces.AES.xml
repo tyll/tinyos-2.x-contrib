@@ -1,0 +1,168 @@
+<?xml version="1.0" ?><interfacedef loc="44:/opt/tinyos-2.1.0/tos/interfaces/AES.nc" nicename="tos.interfaces.AES" qname="AES">
+      <documentation loc="37:/opt/tinyos-2.1.0/tos/interfaces/AES.nc">
+        <short>
+ 	Interface for the AES cipher in TinyOS.</short>
+        <long>
+ 	Interface for the AES cipher in TinyOS.
+  Implementation based on the Public domain implementation of Karl Malbrain (malbrain@yahoo.com)
+  available at http://code.google.com/p/byte-oriented-aes/downloads/list.
+  @author Sylvain Pelissier &lt;sylvain.pelissier@gmail.com&gt;
+</long>
+      </documentation>
+      <function command="" loc="68:/opt/tinyos-2.1.0/tos/interfaces/AES.nc" name="decrypt" provided="0" ref="0xb734f500">
+        <documentation loc="62:/opt/tinyos-2.1.0/tos/interfaces/AES.nc">
+          <short>
+  Decrypt one block of plaintext.</short>
+          <long>
+  Decrypt one block of plaintext.
+  @param in_block the input block of ciphertext.
+  @param expkey an array that contains the expanded key.
+  @param out_block the resulting block of plaintext.
+</long>
+        </documentation>
+        <interfacedef-ref nicename="tos.interfaces.AES" qname="AES"/>
+        <type-function alignment="I:1" size="I:1">
+          <type-void alignment="I:1" size="I:1"/>
+          <function-parameters>
+            <type-pointer alignment="I:4" size="I:4">
+              <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+                <typename><typedef-ref name="uint8_t" ref="0xb7624d68"/></typename>
+              </type-int>
+            </type-pointer>
+            <type-pointer alignment="I:4" size="I:4">
+              <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+                <typename><typedef-ref name="uint8_t" ref="0xb7624d68"/></typename>
+              </type-int>
+            </type-pointer>
+            <type-pointer alignment="I:4" size="I:4">
+              <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+                <typename><typedef-ref name="uint8_t" ref="0xb7624d68"/></typename>
+              </type-int>
+            </type-pointer>
+          </function-parameters>
+        </type-function>
+        <parameters>
+          <variable loc="68:/opt/tinyos-2.1.0/tos/interfaces/AES.nc" name="in_block" ref="0xb7351f20">
+            <type-pointer alignment="I:4" size="I:4">
+              <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+                <typename><typedef-ref name="uint8_t" ref="0xb7624d68"/></typename>
+              </type-int>
+            </type-pointer>
+          </variable>
+          <variable loc="68:/opt/tinyos-2.1.0/tos/interfaces/AES.nc" name="expkey" ref="0xb734f158">
+            <type-pointer alignment="I:4" size="I:4">
+              <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+                <typename><typedef-ref name="uint8_t" ref="0xb7624d68"/></typename>
+              </type-int>
+            </type-pointer>
+          </variable>
+          <variable loc="68:/opt/tinyos-2.1.0/tos/interfaces/AES.nc" name="out_block" ref="0xb734f398">
+            <type-pointer alignment="I:4" size="I:4">
+              <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+                <typename><typedef-ref name="uint8_t" ref="0xb7624d68"/></typename>
+              </type-int>
+            </type-pointer>
+          </variable>
+        </parameters>
+      </function>
+      <function command="" loc="52:/opt/tinyos-2.1.0/tos/interfaces/AES.nc" name="keyExpansion" provided="0" ref="0xb7352e80">
+        <documentation loc="46:/opt/tinyos-2.1.0/tos/interfaces/AES.nc">
+          <short>
+  Compute the expanded key with the key schedule algorithm.</short>
+          <long>
+  Compute the expanded key with the key schedule algorithm. It is independent of the plaintext so it as to be done
+	only once per key.
+  @param expkey an array that contains the expanded key. It must be (NB_ROUND+1) * 16 bytes long.
+  @param key the secret key.
+</long>
+        </documentation>
+        <interfacedef-ref nicename="tos.interfaces.AES" qname="AES"/>
+        <type-function alignment="I:1" size="I:1">
+          <type-void alignment="I:1" size="I:1"/>
+          <function-parameters>
+            <type-pointer alignment="I:4" size="I:4">
+              <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+                <typename><typedef-ref name="uint8_t" ref="0xb7624d68"/></typename>
+              </type-int>
+            </type-pointer>
+            <type-pointer alignment="I:4" size="I:4">
+              <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+                <typename><typedef-ref name="uint8_t" ref="0xb7624d68"/></typename>
+              </type-int>
+            </type-pointer>
+          </function-parameters>
+        </type-function>
+        <parameters>
+          <variable loc="52:/opt/tinyos-2.1.0/tos/interfaces/AES.nc" name="expkey" ref="0xb7352b20">
+            <type-pointer alignment="I:4" size="I:4">
+              <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+                <typename><typedef-ref name="uint8_t" ref="0xb7624d68"/></typename>
+              </type-int>
+            </type-pointer>
+          </variable>
+          <variable loc="52:/opt/tinyos-2.1.0/tos/interfaces/AES.nc" name="key" ref="0xb7352d20">
+            <type-pointer alignment="I:4" size="I:4">
+              <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+                <typename><typedef-ref name="uint8_t" ref="0xb7624d68"/></typename>
+              </type-int>
+            </type-pointer>
+          </variable>
+        </parameters>
+      </function>
+      <function command="" loc="60:/opt/tinyos-2.1.0/tos/interfaces/AES.nc" name="encrypt" provided="0" ref="0xb7351a18">
+        <documentation loc="54:/opt/tinyos-2.1.0/tos/interfaces/AES.nc">
+          <short>
+  Encrypt one block of plaintext.</short>
+          <long>
+  Encrypt one block of plaintext.
+  @param in_block the input block of plaintext.
+  @param expkey an array that contains the expanded key.
+  @param out_block the resulting block of ciphertext.
+</long>
+        </documentation>
+        <interfacedef-ref nicename="tos.interfaces.AES" qname="AES"/>
+        <type-function alignment="I:1" size="I:1">
+          <type-void alignment="I:1" size="I:1"/>
+          <function-parameters>
+            <type-pointer alignment="I:4" size="I:4">
+              <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+                <typename><typedef-ref name="uint8_t" ref="0xb7624d68"/></typename>
+              </type-int>
+            </type-pointer>
+            <type-pointer alignment="I:4" size="I:4">
+              <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+                <typename><typedef-ref name="uint8_t" ref="0xb7624d68"/></typename>
+              </type-int>
+            </type-pointer>
+            <type-pointer alignment="I:4" size="I:4">
+              <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+                <typename><typedef-ref name="uint8_t" ref="0xb7624d68"/></typename>
+              </type-int>
+            </type-pointer>
+          </function-parameters>
+        </type-function>
+        <parameters>
+          <variable loc="60:/opt/tinyos-2.1.0/tos/interfaces/AES.nc" name="in_block" ref="0xb7351450">
+            <type-pointer alignment="I:4" size="I:4">
+              <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+                <typename><typedef-ref name="uint8_t" ref="0xb7624d68"/></typename>
+              </type-int>
+            </type-pointer>
+          </variable>
+          <variable loc="60:/opt/tinyos-2.1.0/tos/interfaces/AES.nc" name="expkey" ref="0xb7351670">
+            <type-pointer alignment="I:4" size="I:4">
+              <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+                <typename><typedef-ref name="uint8_t" ref="0xb7624d68"/></typename>
+              </type-int>
+            </type-pointer>
+          </variable>
+          <variable loc="60:/opt/tinyos-2.1.0/tos/interfaces/AES.nc" name="out_block" ref="0xb73518b0">
+            <type-pointer alignment="I:4" size="I:4">
+              <type-int alignment="I:1" cname="unsigned char" size="I:1" unsigned="">
+                <typename><typedef-ref name="uint8_t" ref="0xb7624d68"/></typename>
+              </type-int>
+            </type-pointer>
+          </variable>
+        </parameters>
+      </function>
+    </interfacedef>

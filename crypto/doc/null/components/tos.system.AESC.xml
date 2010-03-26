@@ -1,0 +1,21 @@
+<?xml version="1.0" ?><component loc="44:/opt/tinyos-2.1.0/tos/system/AESC.nc" nicename="tos.system.AESC" qname="AESC">
+      <documentation loc="37:/opt/tinyos-2.1.0/tos/system/AESC.nc">
+        <short>
+	Implementation of the AES interface.</short>
+        <long>
+	Implementation of the AES interface.
+</long>
+      </documentation>
+      <module/>
+    <specification><interface loc="45:/opt/tinyos-2.1.0/tos/system/AESC.nc" name="AES" provided="1" ref="0xb73c5198">
+      <component-ref nicename="tos.system.AESC" qname="AESC"/>
+      <type-interface alignment="I:4" size="I:4"><interface-ref name="AES" ref="0xb73c5198" scoped=""/></type-interface>
+      <instance>
+        <interfacedef-ref nicename="tos.interfaces.AES" qname="AES"/>
+      </instance>
+      <interface-functions>
+        <function-ref name="decrypt" ref="0xb73c5370" scoped=""/>
+        <function-ref name="keyExpansion" ref="0xb73c5450" scoped=""/>
+        <function-ref name="encrypt" ref="0xb73c5530" scoped=""/>
+      </interface-functions>
+    </interface></specification><referenced/></component>

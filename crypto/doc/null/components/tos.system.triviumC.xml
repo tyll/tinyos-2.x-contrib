@@ -9,15 +9,15 @@
 </long>
       </documentation>
       <module/>
-    <specification><interface loc="45:/opt/tinyos-2.1.0/tos/system/triviumC.nc" name="trivium" provided="1" ref="0xb7b1b110">
+    <specification><interface loc="45:/opt/tinyos-2.1.0/tos/system/triviumC.nc" name="trivium" provided="1" ref="0xb733d730">
       <component-ref nicename="tos.system.triviumC" qname="triviumC"/>
-      <type-interface alignment="I:4" size="I:4"><interface-ref name="trivium" ref="0xb7b1b110" scoped=""/></type-interface>
+      <type-interface alignment="I:4" size="I:4"><interface-ref name="trivium" ref="0xb733d730" scoped=""/></type-interface>
       <instance>
         <interfacedef-ref nicename="tos.interfaces.trivium" qname="trivium"/>
       </instance>
       <interface-functions>
-        <function-ref name="process_bytes" ref="0xb7b1b2e8" scoped=""/>
-        <function-ref name="gen_keystream" ref="0xb7b1b3c8" scoped=""/>
-        <function-ref name="key_init" ref="0xb7b1b4a8" scoped=""/>
+        <function-ref name="process_bytes" ref="0xb733d908" scoped=""/>
+        <function-ref name="gen_keystream" ref="0xb733d9e8" scoped=""/>
+        <function-ref name="key_init" ref="0xb733dac8" scoped=""/>
       </interface-functions>
     </interface></specification><referenced/></component>

@@ -1,0 +1,114 @@
+<html>
+  <head>
+    <LINK rel="stylesheet" href="nesdoc.css" type="text/css" media="screen"><title>Interface: tos.interfaces.AES</title>
+  </head>
+  <body>
+    <h2>Interface: tos.interfaces.AES</h2>
+    <b>interface AES</b><p>
+ 	Interface for the AES cipher in TinyOS.
+  Implementation based on the Public domain implementation of Karl Malbrain (malbrain@yahoo.com)
+  available at http://code.google.com/p/byte-oriented-aes/downloads/list.
+  
+    <p>
+    <dl>
+      <dt><b>Author:</b>
+      <dd>
+        Sylvain Pelissier &lt;sylvain.pelissier@gmail.com&gt;
+
+      </dd>
+    </dl>
+    <p><p><div id=heading>Commands</div><div id=funcsig><span id=funcnameshort>command void <a href="#decrypt">decrypt</a>(uint8_t *in_block, uint8_t *expkey, uint8_t *out_block)
+      </span><menu>
+  Decrypt one block of plaintext.
+      </menu>
+    </div><div id=funcsig><span id=funcnameshort>command void <a href="#encrypt">encrypt</a>(uint8_t *in_block, uint8_t *expkey, uint8_t *out_block)
+      </span><menu>
+  Encrypt one block of plaintext.
+      </menu>
+    </div><div id=funcsig><span id=funcnameshort>command void <a href="#keyExpansion">keyExpansion</a>(uint8_t *expkey, uint8_t *key)
+      </span><menu>
+  Compute the expanded key with the key schedule algorithm.
+      </menu>
+    </div><p><div id=heading>Commands - Details</div>
+    <a name="decrypt"></a>
+    <h4>decrypt
+    </h4>
+    <span id=funcnameshort>command void <b>decrypt</b>(uint8_t *in_block, uint8_t *expkey, uint8_t *out_block)
+    </span>
+    <p>
+    <menu>
+      
+  Decrypt one block of plaintext.
+  
+      <p>
+      <dl>
+        <dt><b>Parameters:</b>
+        <dd>
+          <code>in_block</code> -  the input block of ciphertext.
+  
+        </dd>
+        <dd>
+          <code>expkey</code> -  an array that contains the expanded key.
+  
+        </dd>
+        <dd>
+          <code>out_block</code> -  the resulting block of plaintext.
+
+        </dd>
+      </dl>
+    </menu>
+    <hr>
+    <a name="encrypt"></a>
+    <h4>encrypt
+    </h4>
+    <span id=funcnameshort>command void <b>encrypt</b>(uint8_t *in_block, uint8_t *expkey, uint8_t *out_block)
+    </span>
+    <p>
+    <menu>
+      
+  Encrypt one block of plaintext.
+  
+      <p>
+      <dl>
+        <dt><b>Parameters:</b>
+        <dd>
+          <code>in_block</code> -  the input block of plaintext.
+  
+        </dd>
+        <dd>
+          <code>expkey</code> -  an array that contains the expanded key.
+  
+        </dd>
+        <dd>
+          <code>out_block</code> -  the resulting block of ciphertext.
+
+        </dd>
+      </dl>
+    </menu>
+    <hr>
+    <a name="keyExpansion"></a>
+    <h4>keyExpansion
+    </h4>
+    <span id=funcnameshort>command void <b>keyExpansion</b>(uint8_t *expkey, uint8_t *key)
+    </span>
+    <p>
+    <menu>
+      
+  Compute the expanded key with the key schedule algorithm. It is independent of the plaintext so it as to be done
+	only once per key.
+  
+      <p>
+      <dl>
+        <dt><b>Parameters:</b>
+        <dd>
+          <code>expkey</code> -  an array that contains the expanded key. It must be (NB_ROUND+1) * 16 bytes long.
+  
+        </dd>
+        <dd>
+          <code>key</code> -  the secret key.
+
+        </dd>
+      </dl>
+    </menu>
+  </body>
+</html>

@@ -6,15 +6,16 @@
 // 128 * 1024
 #define UOB_TAU_HIGH (131072L)
 
-//#define UOB_K 1
-#define UOB_K 2
+#define UOB_K 1
+//#define UOB_K 2
 
-#define PUSH 1
+//#define PUSH 1
 
 //  40 * 1024 -> same cycle count
 #define UOB_PUSH (40960L)
 
 typedef nx_struct trickle_sim_msg {
+  nx_uint16_t sender;
   nx_uint16_t counter;
 } trickle_sim_msg_t;
 

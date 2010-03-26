@@ -68,6 +68,8 @@ implementation {
       }
 
       tsm->counter = counter;
+      tsm->sender = TOS_NODE_ID;
+
       dbg("TrickleSimC",
 	  "%s\tTrickleSimC: sending packet (%hu)\n",
 	  sim_time_string(),
@@ -81,10 +83,6 @@ implementation {
 
   event message_t* Receive.receive(message_t* bufPtr,
 				   void* payload, uint8_t len) {
-    dbg("TrickleSimC",
-	"%s\tTrickleSimC: Received packet of length %hhu.\n",
-	sim_time_string(),
-	len);
     if (len != sizeof(trickle_sim_msg_t)) {
     dbg("TrickleSimC",
 	"%s\tTrickleSimC: Invalid packet.\n",
@@ -92,6 +90,12 @@ implementation {
       return bufPtr;
     } else {
       trickle_sim_msg_t* tsm = (trickle_sim_msg_t*)payload;
+
+      dbg("TrickleSimC",
+	  "%s\tTrickleSimC: Received packet of length %hhu from node %u.\n",
+	  sim_time_string(),
+	  len,
+	  tsm->sender);
 
       if (tsm->counter == counter) {
 	// consistent data

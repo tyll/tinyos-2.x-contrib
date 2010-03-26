@@ -15,6 +15,10 @@
 The aim of this project is to provide Cryptography algorithms in TinyOS 2.x. All contributions are welcomed.
 </p>
 <h2> Implementation done:</h2>
+<h3> Block cipher </h3>
+<h4> AES </h4>
+We provide an interface which provide AES block encryption and decryption. This implementation is based on the <a href="http://code.google.com/p/byte-oriented-aes/downloads/list">Public Domain implementation</a> of Karl Malbrain.
+For more information about this implementation, consult the <a href="doc/null/index.html">source code documentation</a>.
 <h3> Stream cipher </h3>
 <h4> Trivium </h4>
 The Trivium stream cipher is now implemented as a TinyOS interface for 8-bit and 16-bit microcontroller. This implementation follows the original implementation available
@@ -23,7 +27,7 @@ For more information consult the cipher <a href="http://www.ecrypt.eu.org/stream
 For more information about this implementation, consult the <a href="doc/null/index.html">source code documentation</a>.
 <h3> Universal hash functions </h3>
 <h4> MMH </h4>
-We have also implemented the MMH universal function as a TinyOS interface. This function was proposed in the paper of Shai Halevi and Hugo Krawczyk : <a href="http://cr.yp.to/bib/1997/halevi-mmh.ps"><i>MMH: Software Message Authentication in the Gbit/Second Rates</i></a>. We also provide an application which uses this interface and the Trivium interface to construct a Wegman-Carter authentication. This application is available in the <i>apps</i> folder. 
+We have implemented the MMH universal function as a TinyOS interface. This function was proposed in the paper of Shai Halevi and Hugo Krawczyk : <a href="http://cr.yp.to/bib/1997/halevi-mmh.ps"><i>MMH: Software Message Authentication in the Gbit/Second Rates</i></a>. We also provide an application which uses this interface and the Trivium interface to construct a Wegman-Carter authentication. This application is available in the <i>apps</i> folder. 
 <h4> Poly32 </h4>
 We have implemented the Poly32 universal function as a TinyOS interface. This implementation follows the original paper of Ted Krovetz and Phillip Rogaway : <a href="http://www.springerlink.com/content/ycn0r8u3t7nfvenu/"><i>Fast Universal Hashing with Small Keys and No Preprocessing: The <b>PolyR</b> Construction</i></a>
 . We also provide an application which uses this interface and the Trivium interface to construct a Wegman-Carter authentication. This application is available in the <i>apps</i> folder. 

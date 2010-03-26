@@ -63,7 +63,5 @@ implementation {
   // tries to deliver a packet to a node that has no radio stack.
   //components TossdrActiveMessageC;
 
-    //FIXME: What about CC2420ActiveMessage? needed?
-    //components CC2420ActiveMessage;
 }
 

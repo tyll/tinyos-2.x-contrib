@@ -3,9 +3,10 @@ import random, math
 from sim.utils.helper import *
 
 class Scenario():
-    def __init__(self, t, size):
+    def __init__(self, t, size, gain):
         self.t = t
         self.size = size
+        self.gain = gain
         self.r = self.t.radio()
 
         self.max_neigh = 0
@@ -14,7 +15,7 @@ class Scenario():
         #print "\tConnecting " + \
         #    str(x) + "/" + str(y) + " (" + str(xy2id(x, y, self.size)) + ") and " + \
         #    str(x2) + "/" + str(y2) + " (" + str(xy2id(x2, y2, self.size)) + ")"
-        self.r.add(xy2id(x, y, self.size), xy2id(x2, y2, self.size), -50)
+        self.r.add(xy2id(x, y, self.size), xy2id(x2, y2, self.size), self.gain)
 
     def should_connect(self, x, y, x2, y2, connectivity):
         distance = math.sqrt((x-x2)**2 + (y-y2)**2)

@@ -19,6 +19,7 @@ class ContourGraph:
                 sec_after_inject,
                 inject_node,
                 k,
+                distance,
                 filenamebase):
 
         print "="*40
@@ -89,8 +90,9 @@ class ContourGraph:
         plt.title('Model Time to Consistency [s]')
 
         text = str(sqr_nodes) + "x" + str(sqr_nodes) + "\n" + \
-            "Connectivity: " + str(connectivity) + "\n" + \
+            "Distance: " + str(distance) + "\n" + \
             "K: " + str(k)
+#            "Connectivity: " + str(connectivity) + "\n" + \
         plt.text(.5, .1, text,
                  horizontalalignment='center',
                  verticalalignment='center',
@@ -110,12 +112,12 @@ class ContourGraph:
         plt.xlabel("x")
         plt.ylabel("y")
 
-        conn_circ = matplotlib.patches.Circle((0, 0),
-                                             connectivity+.02,
-                                             ls='dotted',
-                                             lw=2,
-                                             ec='w',
-                                             fill=False)
-        fig.gca().add_artist(conn_circ)
+#        conn_circ = matplotlib.patches.Circle((0, 0),
+#                                             connectivity+.02,
+#                                             ls='dotted',
+#                                             lw=2,
+#                                             ec='w',
+#                                             fill=False)
+#        fig.gca().add_artist(conn_circ)
 
         plt.savefig(filenamebase+"_contour.png")

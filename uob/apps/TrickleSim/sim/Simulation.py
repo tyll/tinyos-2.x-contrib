@@ -24,11 +24,19 @@ class SimulationSuite:
         #self.connectivity_list = [1]
         #self.connectivity_list = [1, 2, 3]
         #self.connectivity_list = [1, 1.5, 2, 3]
-        self.connectivity_list = [1, 1.5, 2, 3, 4, 5, 6]
+        #self.connectivity_list = [1, 1.5, 2, 3, 4, 5, 6]
+        #self.connectivity_list = []
+
+        #self.distance_list     = [1, 2, 5, 10]
+        #self.distance_list     = [20, 50, 100]
+        #self.distance_list     = [1, 2.5, 5, 7.5, 10, 25, 50, 75, 100]
+        self.distance_list     = [105, 110, 115, 120, 125]
 
         self.randomize_boot    = True
         self.randomize_seed    = True
-        self.k                 = 0 # NEEDS to BE SETTED MANUALLY
+
+        #self.k                 = 0 # NEEDS to BE SETTED MANUALLY
+        self.k                 = 1 # NEEDS to BE SETTED MANUALLY
 
     def createfilenamebase(self,
                            sqr_nodes,
@@ -36,19 +44,23 @@ class SimulationSuite:
                            randomize_boot,
                            sec_before_inject,
                            sec_after_inject,
-                           inject_node):
+                           inject_node,
+                           distance):
         return "sim/output/trickle_"\
             + str(sqr_nodes) + "_" \
-            + str(sqr_nodes) + "_" \
-            + str(connectivity)
+            + str(sqr_nodes) + "_d" \
+            + str(distance)
+#            + str(connectivity)
 
     def execute(self):
         for sqr_nodes in self.sqr_nodes_list:
-            for connectivity in self.connectivity_list:
+            #for connectivity in self.connectivity_list:
+            for distance in self.distance_list:
 
                 cmd = "python sim/run/SimulationRun.py" + \
                     " -s " + str(sqr_nodes) + \
-                    " -c " + str(connectivity)
+                    " -d " + str(distance)
+#                    " -c " + str(connectivity)
 
                 if self.randomize_boot:
                     cmd = cmd + " -b"
@@ -61,66 +73,53 @@ class SimulationSuite:
                     " -a " + str(self.sec_after_inject) + \
                     " -n " + str(self.inject_node) + \
                     " -f " + self.createfilenamebase(sqr_nodes,
-                                                     connectivity,
+                                                     "XXX",
                                                      self.randomize_boot,
                                                      self.sec_before_inject,
                                                      self.sec_after_inject,
-                                                     self.inject_node)
+                                                     self.inject_node,
+                                                     distance)
                 print "Executing:", cmd
                 os.system(cmd)
-
-                #FIXME: repeated simulation runs result in weird
-                #results
-                # sr = SimulationRun()
-                # sr.execute(sqr_nodes,
-                #            connectivity,
-                #            self.randomize_boot,
-                #            self.randomize_seed,
-                #            self.sec_before_inject,
-                #            self.sec_after_inject,
-                #            self.inject_node,
-                #            self.createfilenamebase(sqr_nodes,
-                #                                    connectivity,
-                #                                    self.randomize_boot,
-                #                                    self.sec_before_inject,
-                #                                    self.sec_after_inject,
-                #                                    self.inject_node))
-
-                # del(sr)
 
     #FIXME: evaluate could run in another thread
     def evaluate(self):
         for sqr_nodes in self.sqr_nodes_list:
-            for connectivity in self.connectivity_list:
+            #for connectivity in self.connectivity_list:
+            for distance in self.distance_list:
 
                 me = MetricEvaluation()
                 me.execute(sqr_nodes,
-                           connectivity,
+                           "XXX",
                            self.randomize_boot,
                            self.sec_before_inject,
                            self.sec_after_inject,
                            self.inject_node, # FIXME: add self.k
+                           distance,
                            self.createfilenamebase(sqr_nodes,
-                                                   connectivity,
+                                                   "XXX",
                                                    self.randomize_boot,
                                                    self.sec_before_inject,
                                                    self.sec_after_inject,
-                                                   self.inject_node))
+                                                   self.inject_node,
+                                                   distance))
 
                 ge = GraphEvaluation()
                 ge.execute(sqr_nodes,
-                           connectivity,
+                           "XXX",
                            self.randomize_boot,
                            self.sec_before_inject,
                            self.sec_after_inject,
                            self.inject_node,
                            self.k,
+                           distance,
                            self.createfilenamebase(sqr_nodes,
-                                                   connectivity,
+                                                   "XXX",
                                                    self.randomize_boot,
                                                    self.sec_before_inject,
                                                    self.sec_after_inject,
-                                                   self.inject_node))
+                                                   self.inject_node,
+                                                   distance))
 
 
 if __name__ == "__main__":

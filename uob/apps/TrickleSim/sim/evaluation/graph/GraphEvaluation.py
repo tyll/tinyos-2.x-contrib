@@ -18,6 +18,7 @@ class GraphEvaluation:
                 sec_after_inject,
                 inject_node,
                 k,
+                distance,
                 filenamebase):
 
         logfilename = filenamebase + ".log"
@@ -30,6 +31,7 @@ class GraphEvaluation:
         print "sec_after_inject\t", sec_after_inject
         print "inject_node\t\t", inject_node
         print "k\t\t\t", k
+        print "distance\t\t", distance
         print "logfilename\t\t", logfilename
         print "="*40
 
@@ -53,6 +55,7 @@ class GraphEvaluation:
                    sec_after_inject,
                    inject_node,
                    k,
+                   distance,
                    filenamebase)
 
         cg = ContourGraph()
@@ -63,6 +66,7 @@ class GraphEvaluation:
                    sec_after_inject,
                    inject_node,
                    k,
+                   distance,
                    filenamebase)
 
         hg = HistGraph()
@@ -73,4 +77,5 @@ class GraphEvaluation:
                    sec_after_inject,
                    inject_node,
                    k,
+                   distance,
                    filenamebase)

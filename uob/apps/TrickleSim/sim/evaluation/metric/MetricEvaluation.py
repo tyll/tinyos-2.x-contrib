@@ -14,6 +14,7 @@ class MetricEvaluation:
                 sec_before_inject,
                 sec_after_inject,
                 inject_node,
+                distance,
                 filenamebase):
 
         logfilename = filenamebase + ".log"
@@ -25,6 +26,7 @@ class MetricEvaluation:
         print "sec_before_inject\t", sec_before_inject
         print "sec_after_inject\t", sec_after_inject
         print "inject_node\t\t", inject_node
+        print "distance\t\t", distance
         print "logfilename\t\t", logfilename
         print "="*40
 
@@ -36,4 +38,5 @@ class MetricEvaluation:
                    sec_before_inject,
                    sec_after_inject,
                    inject_node,
+                   distance,
                    filenamebase)

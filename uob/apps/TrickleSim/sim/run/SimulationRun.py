@@ -8,7 +8,8 @@ from TOSSIM import *
 from tinyos.tossim.TossimApp import *
 
 from sim.TrickleSimMsg import *
-from sim.scenarios.RegularScenario import Scenario
+#from sim.scenarios.RegularScenario import Scenario
+from sim.scenarios.RegularScenarioWithPropagationModel import Scenario
 from datetime import datetime
 
 class SimulationRun:
@@ -23,6 +24,7 @@ class SimulationRun:
                 randomize_boot, randomize_seed,
                 sec_before_inject, sec_after_inject,
                 inject_node,
+                distance,
                 filenamebase):
 
         starttime = datetime.now()
@@ -36,6 +38,7 @@ class SimulationRun:
         print "sec_before_inject\t", sec_before_inject
         print "sec_after_inject\t", sec_after_inject
         print "inject_node\t\t", inject_node
+        print "distance\t\t", distance
         print "logfilename\t\t", logfilename
         print "="*40
 
@@ -53,11 +56,13 @@ class SimulationRun:
         self.t.addChannel("Boot", f)
 
         #scenario setup
-        s = Scenario(self.t, sqr_nodes)
-        s.setup_radio(connectivity)
+        #s = Scenario(self.t, sqr_nodes)
+        s = Scenario(self.t, sqr_nodes, distance)
+        #s.setup_radio(connectivity)
+        s.setup_radio()
         s.setup_boot(randomize=randomize_boot, randomseed=randomize_seed)
 
-        print "Max. Neighbors", s.max_neigh
+        #print "Max. Neighbors", s.max_neigh
         #print "Ticks per Seconds", self.t.ticksPerSecond()
 
         #run
@@ -137,6 +142,12 @@ if __name__ == "__main__":
                          default=1,
                          help="The node to inject the message at.")
 
+    optparser.add_option("-d",
+                         "--distance",
+                         type="float",
+                         default=1,
+                         help="Distance between nodes.")
+
     optparser.add_option("-f",
                          "--filenamebase",
                          action="store",
@@ -156,4 +167,5 @@ if __name__ == "__main__":
                optionsp.before_inject,
                optionsp.after_inject,
                optionsp.node,
+               optionsp.distance,
                optionsp.filenamebase)

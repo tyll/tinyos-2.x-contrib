@@ -20,6 +20,7 @@ class HistGraph:
                 sec_after_inject,
                 inject_node,
                 k,
+                distance,
                 filenamebase):
 
         print "="*40
@@ -81,8 +82,9 @@ class HistGraph:
         plt.grid()
         plt.title('Model Time to Consistency (cdf)')
         text = str(sqr_nodes) + "x" + str(sqr_nodes) + "\n" + \
-            "Connectivity: " + str(connectivity) + "\n" + \
+            "Distance: " + str(distance) + "\n" + \
             "K: " + str(k)
+#            "Connectivity: " + str(connectivity) + "\n" + \
         plt.text(.5, .1, text,
                  horizontalalignment='center',
                  verticalalignment='center',

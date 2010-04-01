@@ -1,0 +1,3 @@
+COMPONENT=TestSerialTimeAppC
+include $(MAKERULES)
+

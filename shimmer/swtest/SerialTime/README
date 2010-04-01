@@ -105,5 +105,10 @@ Wrote 1270063149 to shimmer.  Done!
 In case you're wondering, 1270063149 is the number of seconds since
 January 1, 1970, the beginning of unix time.
 
+How does the test work?  After you send the data (see above), then
+you compile and run serial_recv (make sure the port is right, it's
+hard-coded to /dev/ttyUSB1).  Then, press the user button on the
+programming dock, and the timestring will appear on the console.
+
 Have fun!
 

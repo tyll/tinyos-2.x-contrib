@@ -968,6 +968,10 @@ implementation {
 	return;
   }
 
+  default event void ADXL345Control.setReadAddressDone(error_t error){
+	return;
+  } 
+
   default event void Int1.notify(adxlint_state_t val) {
   }
 

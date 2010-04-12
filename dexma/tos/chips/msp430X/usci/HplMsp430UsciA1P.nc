@@ -295,9 +295,7 @@ implementation
   }
 
   async command uint8_t Usci.rx() {
-    uint8_t value;
-    atomic value = UCA1RXBUF;
-    return value;
+    return UCA1RXBUF;
   }
 
   async command bool Usci.isUart() {

@@ -53,6 +53,7 @@ typedef union TOSRadioFooter {
 
 typedef union TOSRadioMetadata {
   cc2420_metadata_t cc2420;
+  serial_metadata_t serial;
 } message_metadata_t;
 
 #endif

@@ -110,7 +110,7 @@ implementation
   }
 
   async command msp430_uctl1_t Usci.getUctl1() {
-    return int2uctl1(UCB1CTL0);
+    return int2uctl1(UCB1CTL1);
   }
 
   async command void Usci.setUbr(uint16_t control) {
@@ -309,11 +309,12 @@ implementation
   }
 
   async command uint16_t Usci.getOwnAddress(){
-  	return UCB1I2COA;
+  	return UCB1I2COA & ~UCGCEN;
   }
   
   async command void Usci.setOwnAddress( uint16_t addr ){
-	UCB1I2COA = addr;
+	UCB1I2COA &= UCGCEN;
+	UCB1I2COA |= (addr & ~UCGCEN);
   }
 
   /*

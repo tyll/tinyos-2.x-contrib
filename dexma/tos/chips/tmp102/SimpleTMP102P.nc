@@ -24,8 +24,6 @@ implementation {
   task void calculateTemp(){
 	uint16_t tmp;
   	atomic tmp = temp;
-  	tmp = tmp >> 4; 	// tmp = tmp * 0.0625;
-				// We are losing a lot of precision here
   	signal Read.readDone(SUCCESS, tmp);
   }
   

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2009 DEXMA SENSORS SL
+ * Copyright (c) 2009-2010 DEXMA SENSORS SL
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -63,6 +63,7 @@
 /**
  * @author Jonathan Hui <jhui@archrock.com>
  * @author Xavier Orduña <xorduna@dexmatech.com>
+ * @author Jordi Soucheiron <jsoucheiron@dexmatech.com>
  */
 
 #include <I2C.h>

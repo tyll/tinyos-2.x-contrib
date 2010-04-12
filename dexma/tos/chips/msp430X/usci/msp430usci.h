@@ -144,7 +144,6 @@ DEFINE_UNION_CAST(int2uctl1,msp430_uctl1_t,uint8_t)
  *
  * For 32768Hz and 1048576Hz, we use UCOS16=0.
  * For higher cpu dco speeds we use oversampling, UCOS16=1.
- * Settings are taken from page 15-22 of slau144e.
  */
 
 typedef enum {
@@ -164,6 +163,9 @@ typedef enum {
   /* 1MHz = 1000000 Hz, 4MHz 4000000, 8MHz 8000000
    * 16MHz 16000000.   use UCOS16 for oversampling,
    * use both UCBRF and UCBRS.
+   *
+   * Settings for 1MHz, 8Mhz, and 16MHz are taken from
+   * a table on page 15-22 of slau144e.
    */
   UBR_1MHZ_9600=0x6,       UMCTL_1MHZ_9600=0x81,
   UBR_1MHZ_19200=0x3,      UMCTL_1MHZ_19200=0x41,
@@ -281,8 +283,8 @@ typedef union {
 
 const msp430_spi_union_config_t msp430_spi_default_config = { {
   ubr		: 2,			/* smclk/2   */
-  ucmode	: 0,			/* 3 pin master, no ste */
-  ucmst		: 1,
+  ucmode	: 0,			/* 3 pin, no ste */
+  ucmst		: 1,			/* master */
   uc7bit	: 0,			/* 8 bit */
   ucmsb		: 1,			/* msb first, compatible with msp430 usart */
   ucckpl	: 0,			/* inactive state low */
@@ -322,11 +324,9 @@ typedef struct {
   unsigned int ucssel   : 2;	// USCI clock source: (00 UCLKI; 01 ACLK; 10/11 SMCLK
 } __attribute__ ((packed)) msp430_i2cctl1_t ;
 
-DEFINE_UNION_CAST(i2cctl12int,uint8_t,msp430_i2cctl1_t)
-DEFINE_UNION_CAST(int2i2cctl1,msp430_i2cctl1_t,uint8_t)
 
 typedef struct {
-  uint16_t ubr    : 16;			/* baud rate */
+  uint16_t ubr    : 16;			/* baud rate divisor */
 
   /* ctl0 */
   uint8_t         : 1;			/* ucsync, forced to 1 by init code */

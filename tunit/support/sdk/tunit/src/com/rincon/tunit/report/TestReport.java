@@ -80,7 +80,7 @@ public class TestReport {
   private static int totalTunitErrors = 0;
 
   /** TestResult's of all problems encountered by this entire system */
-  private static List allTunitProblems;
+  private static List allTunitProblems = new ArrayList();
 
   /** Creation time of this object in milliseconds */
   private long lastTime;

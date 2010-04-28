@@ -1,0 +1,13 @@
+Due to the limitations of CVS and slow response of
+tinyos-2.x-caretakers to add people to uob project, we have decided to
+move the repository to git.
+
+Hopefully TinyOS 2.x is moving to git anyway, let's see when this happens.
+
+The new location to find applications of University of Bremen ComNets is:
+http://www.comnets.uni-bremen.de/gitweb/
+
+Get a copy with:
+git clone http://www.comnets.uni-bremen.de/~mab/git/tinyos-2.x.git
+and/or
+git clone http://www.comnets.uni-bremen.de/~mab/git/tinyos-2.x-contrib.git

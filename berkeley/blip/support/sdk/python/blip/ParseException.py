@@ -1,5 +1,0 @@
-# -*- python -*-
-
-class ParseException:
-    pass
-

@@ -1,2 +1,0 @@
-#  the sleep interval needs to be set the same for all participating devices
-CFLAGS += -DLOW_POWER_LISTENING -DLPL_SLEEP_INTERVAL=512

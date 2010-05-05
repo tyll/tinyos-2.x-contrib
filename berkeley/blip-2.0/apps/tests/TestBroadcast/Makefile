@@ -1,0 +1,4 @@
+COMPONENT=TestBroadcastAppC
+
+include $(MAKERULES)
+

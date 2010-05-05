@@ -1,0 +1,4 @@
+COMPONENT=TestAMServiceAppC
+
+include $(MAKERULES)
+

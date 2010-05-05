@@ -1,0 +1,35 @@
+PLATFORMS = telosb micaz
+TKN154_PLATFORM_INCLUDE?=$(TOSDIR)/platforms/$(PLATFORM)/mac/tkn154/Makefile.include
+
+CFLAGS += -I$(TOSDIR)/lib/mac/tkn154 \
+	-I$(TOSDIR)/lib/mac/tkn154/dummies \
+	-I$(TOSDIR)/lib/mac/tkn154/interfaces/MCPS \
+	-I$(TOSDIR)/lib/mac/tkn154/interfaces/MLME \
+	-I$(TOSDIR)/lib/mac/tkn154/interfaces/private \
+	-I$(TOSDIR)/lib/mac/tkn154/interfaces/public
+
+ifdef IEEE154_EXTENDED_ADDRESS
+PFLAGS += -DIEEE154_EXTENDED_ADDRESS=$(IEEE154_EXTENDED_ADDRESS)
+endif
+
+ifdef TKN154_DEBUG
+PFLAGS += -DTKN154_DEBUG
+CFLAGS += -I$(TOSDIR)/lib/printf
+PFLAGS += -DPRINTF_BUFFER_SIZE=1000
+endif
+
+# parses the PLATFORM variable
+include $(MAKERULES)
+
+# checks whether the target platform is supported by the application;
+# the application Makefile can define PLATFORMS as a whitespace-separated
+# list of supported platforms
+ifneq ($(PLATFORM),)
+  ifneq ($(PLATFORMS),)
+    ifeq ($(strip $(foreach platform,$(PLATFORMS),$(findstring $(platform),$(PLATFORM)))),)
+      $(error The target platform is not supported by this application - supported platforms are: $(PLATFORMS))
+    endif
+  endif
+  include $(TKN154_PLATFORM_INCLUDE)
+endif
+

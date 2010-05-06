@@ -7,6 +7,7 @@
 #include <netinet/in.h>
 #include <pthread.h>
 #include <Ieee154.h>
+#include <signal.h>
 
 #include "serialsource.h"
 #include "serialprotocol.h"
@@ -224,11 +225,12 @@ void *pan_write(void * arg) {
     
     /* the first byte is the dispatch value */
     /* the second byte is the length of the IEEE154 frame, not including the length byte */
-    // print_buffer(frame, frame[1] + 2);
+    print_buffer(frame, frame[1] + 2);
     while (rv < 0) {
       rv = write_pan_packet(frame, frame[1] + 2);
       debug("pan_write: length: %i result: %i\n", frame[1] + 2, rv);
-      usleep(1e3);
+      // SDH : this isn't supposed to work with pthreads, and doesn't, at least on Linux
+      // usleep(1e3);
     }
     free(frame);
   }
@@ -405,7 +407,7 @@ void *tun_dev_read(void * arg) {
 
       print_buffer(fragment, len + 1);
 
-      queue_push(&pan_q, fragment);
+      printf("PUSH: %i\n", queue_push(&pan_q, fragment));
       fragment = xmalloc(128);
     }
     free(fragment);

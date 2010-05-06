@@ -19,36 +19,6 @@
  * PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS."
  *
  */
-/*
- * Copyright (c) 2007 Matus Harvan
- * All rights reserved
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above
- *       copyright notice, this list of conditions and the following
- *       disclaimer in the documentation and/or other materials provided
- *       with the distribution.
- *     * The name of the author may not be used to endorse or promote
- *       products derived from this software without specific prior
- *       written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
 
 #include <unistd.h>
 #include <fcntl.h>
@@ -85,7 +55,7 @@ int tun_open(char *dev)
     struct ifreq ifr;
     int fd;
 
-    if ((fd = open("/dev/net/tun", O_RDWR | O_NONBLOCK)) < 0)
+    if ((fd = open("/dev/net/tun", O_RDWR)) < 0)
 	return -1;
 
     memset(&ifr, 0, sizeof(ifr));
@@ -109,7 +79,7 @@ int tun_open(char *dev)
     return -1;
 }
 
-int tun_setup(char *dev, struct in6_addr *addr, int pfxlen) {
+int tun_setup(char *dev, ieee154_laddr_t link_address) {
   struct in6_ifreq ifr6;
   struct ifreq ifr;
   int fd;
@@ -138,24 +108,26 @@ int tun_setup(char *dev, struct in6_addr *addr, int pfxlen) {
     return -1;
   }
 
-  /* Global address */
+  /* Addresses */
   memset(&ifr6, 0, sizeof(struct in6_ifreq));
-  memcpy(&ifr6.ifr6_addr, addr, 16);
+  // memcpy(&ifr6.ifr6_addr, addr, 16);
   if (ioctl(fd, SIOGIFINDEX, &ifr) < 0) {
     log_fatal_perror("SIOGIFINDEX");
     return -1;
   }
 
   ifr6.ifr6_ifindex = ifr.ifr_ifindex;
-  ifr6.ifr6_prefixlen = pfxlen;
-  if (ioctl(fd, SIOCSIFADDR, &ifr6) < 0) {
-    log_fatal_perror("SIOCSIFADDR (global)");
-    return -1;
-  }
+  /* don't set the global address */
+/*   ifr6.ifr6_prefixlen = pfxlen; */
+/*   if (ioctl(fd, SIOCSIFADDR, &ifr6) < 0) { */
+/*     log_fatal_perror("SIOCSIFADDR (global)"); */
+/*     return -1; */
+/*   } */
 
-  memset(&ifr6.ifr6_addr.s6_addr[0], 0, 16);
+  /* Just set the lin-local... */
   ifr6.ifr6_addr.s6_addr16[0] = htons(0xfe80);
-  ifr6.ifr6_addr.s6_addr16[7] = addr->s6_addr16[7];
+  ifr6.ifr6_prefixlen = 64;
+  memcpy(&ifr6.ifr6_addr.s6_addr[8], link_address.data, 8);
   
   if (ioctl(fd, SIOCSIFADDR, &ifr6) < 0) {
     log_fatal_perror("SIOCSIFADDR (local)");
@@ -173,33 +145,26 @@ int tun_close(int fd, char *dev)
 }
 
 /* Read/write frames from TUN device */
-int tun_write(int fd, struct split_ip_msg *msg)
-{
+int tun_write(int fd, struct ip6_packet *msg) {
   uint8_t buf[INET_MTU + sizeof(struct tun_pi)], *packet;
   struct tun_pi *pi = (struct tun_pi *)buf;
-  struct generic_header *cur;
+  int length = sizeof(struct ip6_hdr) + sizeof(struct tun_pi);
   packet = (uint8_t *)(pi + 1);
 
-
-  if (ntohs(msg->hdr.plen) + sizeof(struct ip6_hdr) >= INET_MTU)
+  if (ntohs(msg->ip6_hdr.ip6_plen) + sizeof(struct ip6_hdr) >= INET_MTU)
     return 1;
 
   pi->flags = 0;
   pi->proto = htons(ETH_P_IPV6);
 
-  memcpy(packet, &msg->hdr, sizeof(struct ip6_hdr));
+  memcpy(packet, &msg->ip6_hdr, sizeof(struct ip6_hdr));
   packet += sizeof(struct ip6_hdr);
+  length += iov_read(msg->ip6_data, 0, iov_len(msg->ip6_data), packet);
+  
+  debug("delivering packet\n");
+  print_buffer(buf, length);
 
-  cur = msg->headers;
-  while (cur != NULL) {
-    memcpy(packet, cur->hdr.data, cur->len);
-    packet += cur->len;
-    cur = cur->next;
-  }
-
-  memcpy(packet, msg->data, msg->data_len);
-
-  return write(fd, buf, sizeof(struct tun_pi) + sizeof(struct ip6_hdr) + ntohs(msg->hdr.plen));
+  return write(fd, buf, length);
 }
 
 int tun_read(int fd, char *buf, int len)
@@ -207,5 +172,5 @@ int tun_read(int fd, char *buf, int len)
   int out;
   out = read(fd, buf, sizeof(struct tun_pi) + len);
 
-  return out - sizeof(struct tun_pi);
+  return out;
 }

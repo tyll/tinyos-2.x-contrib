@@ -22,4 +22,4 @@ int   queue_push(struct blocking_queue *q, void *data);
 void *queue_pop(struct blocking_queue *q);
 
 
-#endif;
+#endif

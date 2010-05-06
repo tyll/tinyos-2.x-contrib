@@ -1,0 +1,64 @@
+@author Stephen Dawson-Haggerty <stevedh@eecs.berkeley.edu>
+@title blip-2.0 
+
+This is a pre-release of what will become blip-2.0.  It is not close
+to feature-complete yet.
+
+ - Full, unit-tested support for draft-ietf-hc-06
+ - Support for RFC4944 fragmentation
+ - No support for much else (no routing yet).
+
+The support for hc-06 includes adding support for EUI-64 extended
+address mode to the cc2420 radio driver.
+
+Use
+--------------------------------------------------
+
+1. Set up your environment (assuming $TOSCONTRIB is your checkout of tinyos-2.x-contrib)
+$ export LOWPAN_ROOT="$TOSCONTRIB/berkeley/blip-2.0"
+$ export TOSMAKE_PATH="$LOWPAN_ROOT/support/make"
+
+2. Make sure the serial tools are built in $TOSROOT/support/sdk/c/sf (./bootstrap.sh; ./configure; make)
+
+3. Install an IPBaseStation
+$ cd $LOWPAN_ROOT/apps/IPBaseStation
+$ make epic install
+
+4. Start the PC routing driver (works on OSX and Linux); replace the
+dev with whatever device you've programmed wiht IPBaseStation
+$ cd $LOWPAN_ROOT/support/sdk/c/blip
+$ ./bootstrap.sh
+$ ./configure
+$ make
+$ cd interface/
+$ sudo ./ieee154-interface /dev/ttyUSB0 115200
+
+5. Program some UDPEcho nodes.  The "blip2" make extra is
+automatically added for this app, for others you'll have to type it
+("make epic blip2")...
+$ cd $LOWPAN_ROOT/apps/UDPEcho 
+$ make epicinstall.X ...
+
+Addressing
+--------------------------------------------------
+
+Addressing has changed from previous versions of blip; a mote
+automatically assigns itself both 16- and 64-bit IEEE 802.15.4
+addresses.  To find out the the EUI64 of the a mote, you can use the
+app in apps/tests/TestEui; it prints the 64-bit EUI once per second to
+the serial port; you can listen to these messages using tail:
+$ stty -F /dev/ttyUSB0 57600 && tail -f /dev/ttyUSB0
+
+The EUI-64 is directly mapped onto the IPv6 link-local address: for
+instance, my mote with extended address 00:12:6d:45:50:79:d6:9a has
+link-local address fe80::0012:6d45:5079:d69a
+
+There are also _mapped_ short addresses, according to RFC4944.  For
+instance, if the PAN ID is 0x22 (the default tinyos-2.x pan) and the
+short address is 1, the corresponding link-local address is
+fe80::22:ff:fe00:1.  See the RFC for any more details about how these
+addresses are constructed.
+
+The long an the short of it is, if you've programmed your mote with ID
+1, you ought to be able to ping it at fe80::22:ff:fe00:1.
+

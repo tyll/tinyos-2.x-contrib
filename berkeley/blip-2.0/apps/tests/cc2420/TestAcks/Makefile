@@ -1,6 +1,0 @@
-COMPONENT=TestAcksC
-
-include $(MAKERULES)
-
-
- 

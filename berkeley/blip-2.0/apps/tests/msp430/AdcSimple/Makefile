@@ -1,2 +1,0 @@
-COMPONENT=AdcSimpleAppC
-include $(MAKERULES)

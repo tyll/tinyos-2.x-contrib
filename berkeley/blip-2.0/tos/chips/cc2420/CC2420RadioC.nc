@@ -67,7 +67,7 @@ implementation {
   components CC2420TinyosNetworkC;
   components CC2420PacketC;
   components CC2420ControlC;
-  
+
 #if defined(LOW_POWER_LISTENING) || defined(ACK_LOW_POWER_LISTENING)
   components DefaultLplC as LplC;
 #else

@@ -123,7 +123,7 @@ int tun_setup(char *dev, ieee154_laddr_t link_address) {
 
   /* remove any existing addresses */
   snprintf(cmd_buf, 1024, 
-           "ifconfig %s inet6 -alias `ifconfig %s | grep inet6 | cut -f2 | cut -f2 -d' ' | head -n1`",
+           "ifconfig %s inet6 `ifconfig %s | grep inet6 | cut -f2 | cut -f2 -d' ' | head -n1` -alias ",
            dev, dev);
   printf("%s\n", cmd_buf);
   if (system(cmd_buf) != 0) {

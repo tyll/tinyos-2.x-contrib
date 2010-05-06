@@ -1,4 +1,5 @@
 COMPONENT=UDPEchoC
+MAKECMDGOALS := $(MAKECMDGOALS) blip2
 
 # uncomment this for network programming support
 # BOOTLOADER=tosboot
@@ -23,7 +24,7 @@ CFLAGS += -DIEEE154FRAMES_ENABLED
 # CFLAGS += -DREPORT_DEST=\"2001:470:1f04:56d::64\"
 
 # printf debugs.  works only on telosb/tmote sky
-CFLAGS += -DPRINTFUART_ENABLED
+# CFLAGS += -DPRINTFUART_ENABLED
 
 
 include $(MAKERULES)

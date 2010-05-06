@@ -1,4 +1,0 @@
-COMPONENT=TestCommAppC
-
-include $(MAKERULES)
-

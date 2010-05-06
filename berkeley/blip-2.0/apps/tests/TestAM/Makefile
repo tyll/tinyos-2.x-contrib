@@ -1,4 +1,0 @@
-COMPONENT=TestAMAppC
-
-include $(MAKERULES)
-

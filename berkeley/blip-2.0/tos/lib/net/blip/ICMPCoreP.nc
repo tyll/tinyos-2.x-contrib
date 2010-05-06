@@ -13,18 +13,19 @@ module ICMPCoreP {
   provides interface IP as ICMP_IP[uint8_t type];
   uses interface IP;
 } implementation {
-void iov_print(struct ip_iovec *iov) {
-  struct ip_iovec *cur = iov;
-  while (cur != NULL) {
-    int i;
-    printfUART("iovec (%p, %i) ", cur, cur->iov_len);
-    for (i = 0; i < cur->iov_len; i++) {
-      printfUART("%02hhx ", cur->iov_base[i]);
+
+  void iov_print(struct ip_iovec *iov) {
+    struct ip_iovec *cur = iov;
+    while (cur != NULL) {
+      int i;
+      printfUART("iovec (%p, %i) ", cur, cur->iov_len);
+      for (i = 0; i < cur->iov_len; i++) {
+        printfUART("%02hhx ", cur->iov_base[i]);
+      }
+      printfUART("\n");
+      cur = cur->iov_next;
     }
-    printfUART("\n");
-    cur = cur->iov_next;
   }
-}
 
   
   event void IP.recv(void *iph, void *payload, size_t len, struct ip6_metadata *meta) {
@@ -50,10 +51,12 @@ void iov_print(struct ip_iovec *iov) {
       v.iov_base = payload;
       v.iov_len  = len;
 
+      printfUART("icmp: payload len: %i\n", len);
+
       reply.ip6_hdr.ip6_plen = ntohs(iov_len(&v));
 
       req->cksum = htons(msg_cksum(&reply.ip6_hdr, reply.ip6_data, IANA_ICMP));
-      // iov_print(&v);
+      iov_print(&v);
 
       call IP.send(&reply);
       break;

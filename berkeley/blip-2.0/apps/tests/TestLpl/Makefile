@@ -1,4 +1,0 @@
-COMPONENT=TestLplAppC
-
-include $(MAKERULES)
-

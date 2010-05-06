@@ -16,6 +16,7 @@ ifndef LOWPAN_ROOT
 else
   PFLAGS+=-I$(LOWPAN_ROOT)/tos/types
   PFLAGS+=-I$(LOWPAN_ROOT)/tos/interfaces
+  PFLAGS+=-I$(LOWPAN_ROOT)/tos/lib/serial
   PFLAGS+=-I$(LOWPAN_ROOT)/tos/chips/cc2420
   PFLAGS+=-I$(LOWPAN_ROOT)/tos/chips/cc2420/control
   PFLAGS+=-I$(LOWPAN_ROOT)/tos/chips/cc2420/csma

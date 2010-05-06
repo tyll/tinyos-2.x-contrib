@@ -1,6 +1,0 @@
-COMPONENT=BasestationAppC
-BOOTLOADER=tosboot
-
-CFLAGS += -DDELUGE_BASESTATION
-
-include $(MAKERULES)

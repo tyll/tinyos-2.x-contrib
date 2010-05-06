@@ -548,17 +548,6 @@ module IPDispatchP {
       printfUART("fragment length: %i offset: %i\n", frag_len, ctx.offset);
       call BarePacket.setPayloadLength(outgoing, frag_len);
 
-/*       {  */
-/*         int i; */
-/*         uint8_t *f_b = call Ieee154Send.getPayload(outgoing, 0); */
-/*         printfUART("outgoing [%i] (%p): ", frag_len, outgoinBg); */
-/*         for (i = 0; i < frag_len; i++) { */
-/*           printfUART("%02x ", f_b[i]); */
-/*         } */
-/*         printfUART("\n"); */
-/*       } */
-
-
       s_info->link_fragments++;
       s_entry->msg = outgoing;
       s_entry->info = s_info;
@@ -577,7 +566,7 @@ module IPDispatchP {
 
       SENDINFO_INCR(s_info);
     }
-    // printfUART("got %i frags\n", s_info->link_fragments);
+
   done:
     BLIP_STATS_INCR(stats.sent);
     SENDINFO_DECR(s_info);

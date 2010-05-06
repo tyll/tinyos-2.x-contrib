@@ -1,2 +1,0 @@
-COMPONENT=RandRWAppC
-include $(MAKERULES)

@@ -1,5 +1,9 @@
 COMPONENT=BaseStationC
 
+BLIP_L2_MTU = 125
+MAKECMDGOALS := $(MAKECMDGOALS) blip2
+
+
 # radio options.  channel settings will be overridden by the driver
 # CFLAGS += -DCC2420_DEF_RFPOWER=4
 
@@ -14,7 +18,6 @@ COMPONENT=BaseStationC
 # CFLAGS += -DCC2420_NO_UNIQUE
 
 # set for max MPDU
-CFLAGS += -DTOSH_DATA_LENGTH=125
 CFLAGS += -DCC2420_DEF_CHANNEL=15
 CFLAGS += -DPACKET_LINK
 PFLAGS += -DCC2420_HW_ACKNOWLEDGEMENTS
@@ -22,7 +25,7 @@ PFLAGS += -DCC2420_HW_ACKNOWLEDGEMENTS
 # CFLAGS += -DCC2420_NO_ADDRESS_RECOGNITION
 # CFLAGS += -DPRINTFUART_ENABLED
 
-CFLAGS += -I$(TOSROOT)/support/sdk/c/blip/interface -I$(TOSROOT)/tos/lib/serial
+CFLAGS += -I$(LOWPAN_ROOT)/support/sdk/c/blip/interface -I$(LOWPAN_ROOT)/tos/lib/serial
 
 include $(MAKERULES)
 

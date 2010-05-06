@@ -1,2 +1,0 @@
-COMPONENT=TestAdcAppC
-include $(MAKERULES)

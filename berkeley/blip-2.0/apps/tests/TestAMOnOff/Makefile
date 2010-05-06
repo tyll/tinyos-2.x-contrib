@@ -1,4 +1,0 @@
-COMPONENT=TestAMOnOffAppC
-
-include $(MAKERULES)
-

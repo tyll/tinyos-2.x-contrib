@@ -1,4 +1,0 @@
-COMPONENT=TestLocalTimeAppC
-
-include $(MAKERULES)
-

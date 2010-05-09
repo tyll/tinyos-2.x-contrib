@@ -1,0 +1,10 @@
+> I'm working on the IMB400 device on tinyOS 2.x platform. I tried to capture
+> an image using your code;I downloaded from source forge. I did get
+> image(*.ppm and *.pgm format) using your camerajpegTest code using the
+> cameraGUI Java interface. However if I chose the Jpeg option and capture an
+> image I get an image of the format (*.BYTES) on my PC.
+
+cameraTestJpegSerial is an old application whose purpose is to demonstrate that the driver is working. it has an option for jpeg, but this wasn't designed properly. basically it just asks the mote to jpeg encode the image and saves the result into a .bytes file (basically a mote's memory dump). this format is not compatible with the .jpg file format, as it doesn't have the proper headers. it contains quantized DCT blocks, each of them first run-length encoded, and then compressed using HF. all of this is implemented in C (JpegM.nc file, calling files from support/sdk/c/compress), so it was difficult to reimplement it in java.
+
+for later apps (ie, cameraMultiHop), there is a small c app (get_jpg) that basically bytes converts to jpg. you can also use idctApp.c in support/sdk/c/compress that converts .bytes to .pgm or .ppm
+  

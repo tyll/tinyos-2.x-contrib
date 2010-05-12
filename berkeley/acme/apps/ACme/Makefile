@@ -7,8 +7,7 @@ CFLAGS += -DCC2420_DEF_CHANNEL=21
 CFLAGS += -DCC2420_HW_ACKNOWLEDGEMENTS
 CFLAGS += -DTOSH_DATA_LENGTH=102
 
-#CFLAGS += -I../../tos/sensorboards/ACme
-CFLAGS += -I../../tos/sensorboards/ACmeX2
+CFLAGS += -I../../tos/sensorboards/ACme
 
 include $(MAKERULES)
 

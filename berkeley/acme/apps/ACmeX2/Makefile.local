@@ -1,0 +1,5 @@
+# -*- makefile -*-
+
+msg:	
+	mig -DMIG -I$(TOSROOT)/tos/lib/net/blip -I$(TOSROOT)/tos/chips/cc2420 -I$(TOSROOT)/support/sdk/c/blip/lib6lowpan python -python-classname=AcReport ACReport.h ac_report -o util/ACmeX2Report.py
+

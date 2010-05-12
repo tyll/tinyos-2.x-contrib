@@ -24,6 +24,7 @@
  * @author Fred Jiang <fxjiang@eecs.berkeley.edu>
  * @version $Revision$
  */
+
 interface ACMeter {
 	// TRUE = is now ON; FALSE = is now OFF
 	command bool toggle();
@@ -31,5 +32,7 @@ interface ACMeter {
 	command bool getState();
 	command error_t start(uint16_t interval);
 	command error_t stop();
-	event void sampleDone(uint32_t energy);
+	// aenergy is active (real) energy
+	// vaenergy is apparent energy
+	event void sampleDone(uint32_t aenergy, uint32_t vaenergy);
 }

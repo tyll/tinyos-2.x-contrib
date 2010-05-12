@@ -40,11 +40,13 @@ module ACMeterM {
 }
 
 implementation {
-	uint32_t energy;
+	uint32_t raenergy;
+	uint32_t rvaenergy;
 	uint8_t stage;
 	uint8_t onoff_state;
-//	uint16_t interval;
 	bool dirty;
+	
+	uint8_t energyMode;
 	
 	enum STAGES {
 		INIT,
@@ -58,24 +60,23 @@ implementation {
 		CLR
 	};
 	
+	enum ENERGYMODE {
+		RAENERGY,
+		RVAENERGY,
+	};
+	
 	task void signalStartDone() {
 		signal SplitControl.startDone(SUCCESS);
 		return;
 	}
-
-	task void signalSampleDone() {
-          uint32_t l_energy;
-          atomic l_energy = energy;
-          signal ACMeter.sampleDone(l_energy);
-          return;
-	}
 	
 	command error_t SplitControl.start() {
-		atomic energy = 0;
+		atomic raenergy = 0;
+		atomic rvaenergy = 0;
 		atomic stage = INIT;
-		// atomic interval = 1024;
 		atomic dirty = TRUE;
 		atomic onoff_state = SET;
+		atomic energyMode = RAENERGY;
 		call onoff.makeOutput();
 		call onoff.set();
 		call MeterControl.start();
@@ -83,8 +84,6 @@ implementation {
 	}
 
 	command error_t SplitControl.stop() {}
-	
-	//event void SplitControl.startDone(error_t error) {}
 
 	event void MeterControl.startDone(error_t err) {
 		atomic stage = SET_MODE;
@@ -137,14 +136,25 @@ implementation {
 		call Timer.stop();
 		return SUCCESS;
 	}
-
-	// event void ACMeter.sampleDone(uint32_t ener) {}
 	
 	event void Timer.fired() {
+		// first get realEnergy
+		atomic energyMode = RAENERGY;
 		// at 1Hz, reading RENERGY is equal to power
-		 call ADE7753.getReg(ADE7753_RAENERGY, 4);
-		// call ADE7753.getReg(ADE7753_MODE, 3);
-		
+		call ADE7753.getReg(ADE7753_RAENERGY, 4);
+	}
+
+	task void signalSampleDone() {
+		uint32_t l_raenergy, l_rvaenergy;
+		if (energyMode==RAENERGY) {
+			atomic energyMode=RVAENERGY;
+			call ADE7753.getReg(ADE7753_RVAENERGY, 4);	
+		} else if (energyMode==RVAENERGY) {
+			atomic energyMode=RAENERGY;
+			atomic l_raenergy = raenergy;
+			atomic l_rvaenergy = rvaenergy;
+			signal ACMeter.sampleDone(l_raenergy, l_rvaenergy);
+		}
 	}
 
 	async event void ADE7753.getRegDone( error_t error, uint8_t regAddr, uint32_t val, uint16_t len) {
@@ -152,22 +162,28 @@ implementation {
 			dirty = FALSE;
 			return;
 		} else {
-			atomic energy = val;
+			if (energyMode==RAENERGY) {
+				atomic raenergy = val;
+			} else if (energyMode==RVAENERGY) {
+				atomic rvaenergy = val;
+			} else {
+				// should not get here
+			}
 			post signalSampleDone();
 		}
 	}
 	
-  task void setReg() {
-	call ADE7753.setReg(ADE7753_GAIN, 2, ADE7753_GAIN_VAL);
-  }
+	task void setRegGain() {
+		call ADE7753.setReg(ADE7753_GAIN, 2, ADE7753_GAIN_VAL);
+	}
 
 	async event void ADE7753.setRegDone( error_t error, uint8_t regAddr, uint32_t val, uint16_t len) {
 		switch (stage) {
 		case INIT:
 			return;
 		case SET_MODE:
-			atomic stage = SET_GAIN;
-                        post setReg();
+			atomic stage = SET_GAIN;	
+			post setRegGain();
 			return;
 		case SET_GAIN:
 			atomic stage = NORMAL;
@@ -177,6 +193,5 @@ implementation {
 			return;
 		}
 	}
-	
 }
 	

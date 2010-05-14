@@ -36,10 +36,8 @@ implementation{
 	/*********** General Components **************/
 	components new RestC() as Rest;
 	components MainC, RandomC;
-	components MyWebServerP;
 	components DeviceC; 
 	DeviceC.Boot -> MainC;
-	MyWebServerP.Boot -> MainC;
 	
 	
 	/*********** Leds ****************************/

@@ -93,6 +93,7 @@ module AccelGyroC {
 implementation {
   extern int sprintf(char *str, const char *format, ...) __attribute__ ((C));
 
+#define USE_8MHZ_CRYSTAL
 #ifdef LOW_BATTERY_INDICATION
   //#define DEBUG_LOW_BATTERY_INDICATION
   /* during testing of the the (AVcc-AVss)/2 value from the ADC on various SHIMMERS, to get a reliable cut off point 

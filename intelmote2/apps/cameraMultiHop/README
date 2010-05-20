@@ -18,3 +18,51 @@ buidling get_jpg.c file
 2. download and install jpeg-6b dev library
    (in ubuntu: 'sudo aptitude install libjpeg-dev')
 3.build get_jpg.c file by typing 'make' in c/ directory
+
+===============
+app description
+===============
+cameraMultiHop application uses TinyOS's CTP collection protocol to deliver image data
+from an imote2 to a PC base station over multiple hops. CTP provides unreliable multi-hop
+delivery of packets from any node to the base station (for more info, look at either CTP
+TEP, or SenSys'09 paper).
+
+images are requested using get_jpg application in c/ subdirectory and can be grey scale
+or color, and either jpg encoded or raw. it was only tested with QVGA images; jpg typically
+provides 10-fold decrease in transmitted data (see our ImageSense'08 publication for an
+experimental evaluation). image requests are basically RPCs sent by the base station. we
+use DisseminationC library for RPCs (basically network-wide flooding to issue an RPC
+command). 
+
+motes implement a very simple reliable transport protocol on top of CTP (in SendBigMsg
+library). The mote first sends image stats to the base(containing size of the image) and  
+then splits the image buffer into smaller packets which are sent one by one to the base
+station. each packet has a sequence number to allow the base station to reconstruct the
+image. since CTP is a best effort only protocol, base station might not have received
+all packets. base station uses RPC commands to request the missing packets until it
+received all packets.
+
+camNode application:
+====================
+RPC command from a base station is received in DisseminationCmdMsgReceive.changed() event.
+commands 0-3 request images (BW/COL, RAW/JPG); command 5 requests missing packets.
+
+after an image request is received, the image is acquired. acquire completion is followed
+by the fixAcqBuffer() task - which modifies the image buffer as follows: 
+1)for BW RAW images, the image buffer contains 2 bytes per pixel (UyUv), where Uy
+  contains almost no information thus is ignored (not transmitted)
+2)for COL JPG images, we need to convert the compressed 2 byte format, because the JPG
+  compression algorithm works with standard RGB 3 byte format
+
+acquiring is followed by compression for jpg images (using JpegM sublibrary). this is
+a non-standard protocol, ie, data transmitted over the air are in a non-standard
+compressed form. for the reasons of efficiency, the jpg headers are omitted. otherwise
+we use standard dct/idct subroutines of jpeg6b library, an open source huffman coding
+library, and a non-standard run-length encoding library. the jpg compression is
+implemented in c and JpegM.nc file just calls c functions in support/sdk/c/compress
+directory.
+
+the next step is to send image packets to the base station. two send functions are used:
+1) imgStatSend sends image statistics to the base
+2) SendBigMsg sends image packets to the base
+

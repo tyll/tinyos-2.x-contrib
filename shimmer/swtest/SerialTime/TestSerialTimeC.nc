@@ -60,8 +60,13 @@ implementation {
   bool transmissionComplete;
 
   void setupUART() {
-    msp430_uart_union_config_t RN_uart_config = { {ubr: UBR_1MHZ_115200, umctl: UMCTL_1MHZ_115200, 
-						   ssel: 0x02, pena: 0, pev: 0, spb: 0, clen: 1,listen: 0, mm: 0, ckpl: 0, urxse: 0, urxeie: 0, 
+    /*
+     * NOTE:  this sets the baudrate based upon a 4mhz SMCLK given by the 8mhz xt clock config
+     * to run at the default msp430 clock settings, use _1MHZ_ for these two flags
+     */
+    msp430_uart_union_config_t RN_uart_config = { {ubr: UBR_4MHZ_115200, umctl: UMCTL_4MHZ_115200, 
+						   ssel: 0x02, pena: 0, pev: 0, spb: 0, clen: 1,listen: 0, 
+						   mm: 0, ckpl: 0, urxse: 0, urxeie: 0, 
 						   urxwie: 0, utxe : 1, urxe :1} };
 
     call UARTControl.setModeUart(&RN_uart_config); // set to UART mode
@@ -70,7 +75,42 @@ implementation {
     call UARTControl.enableRxIntr();
   }
 
+  void initialize_8mhz_clock(){
+    /* 
+     * set up 8mhz clock to max out 
+     * msp430 throughput 
+     */
+    register uint8_t i;
+
+    atomic CLR_FLAG(BCSCTL1, XT2OFF);
+
+    call Leds.led0On();
+    do{
+      CLR_FLAG(IFG1, OFIFG);
+      for(i = 0; i < 0xff; i++);
+    }
+    while(READ_FLAG(IFG1, OFIFG));
+
+    call Leds.led0Off();
+
+    call Leds.led1On();
+    TOSH_uwait(50000U);
+
+    atomic{
+      BCSCTL2 = 0;
+      SET_FLAG(BCSCTL2, SELM_2);
+    }
+    
+    call Leds.led1Off();
+
+    atomic{
+      SET_FLAG(BCSCTL2, SELS);  // smclk from xt2
+      SET_FLAG(BCSCTL2, DIVS_1);  // divide it by 2; smclk will run at 8 mhz / 2; spi bus will run at 4mhz / 2
+    }
+  }
+
   event void Boot.booted(){
+    initialize_8mhz_clock();
     setupUART();
     
     sync_state = NONE;

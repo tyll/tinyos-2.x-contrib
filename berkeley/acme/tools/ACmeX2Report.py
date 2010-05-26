@@ -12,10 +12,10 @@ DEFAULT_MESSAGE_SIZE = 43
 # The Active Message type associated with this message.
 AM_TYPE = -1
 
-class AcReport(tinyos.message.Message.Message):
+class AcReport(Message.Message):
     # Create a new AcReport of size 43.
     def __init__(self, data="", addr=None, gid=None, base_offset=0, data_length=43):
-        tinyos.message.Message.Message.__init__(self, data, addr, gid, base_offset, data_length)
+        Message.Message.__init__(self, data, addr, gid, base_offset, data_length)
         self.amTypeSet(AM_TYPE)
     
     # Get AM_TYPE

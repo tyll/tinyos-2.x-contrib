@@ -1,0 +1,12 @@
+README for WMTP
+Author/Contact: gems@leme.org.pt
+
+Description:
+WMTP is a modular transport layer architecture for Wireless Sensor 
+Networks (WSNs) that not only integrates and enhances the most
+common features but also adds new ones that are not commonly found
+in WSN transport protocols. WMTP provides the following functions: 
+data reliability, congestion control, weighted fairness, flow control,
+Quality-of-Service (QoS), throttling, and service discovery awareness.
+WMTP's reference implementation was initially developed for TinyOS 1.x,
+and was recently ported to TinyOS 2.x.

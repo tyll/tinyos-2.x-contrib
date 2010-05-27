@@ -1,10 +1,39 @@
 ifeq ($(PLATFORM),iris)
   # include all dirs under tos/chips/atm1281
-	PFLAGS := $(patsubst $(VUTOSDIR)/%, -I$(VUTOSDIR)/%, $(shell find $(VUTOSDIR)/chips/atm1281 -type d)) $(PFLAGS)
+	PFLAGS := $(patsubst $(VUTOSDIR)/%, -I$(VUTOSDIR)/%, $(shell find $(VUTOSDIR)/chips/atm1281 -type d -not -regex '.*\.svn.*')) $(PFLAGS)
 	# include all dirs under tos/platform/iris
-	PFLAGS := $(patsubst $(VUTOSDIR)/%, -I$(VUTOSDIR)/%, $(shell find $(VUTOSDIR)/platforms/iris -type d)) $(PFLAGS)
+	PFLAGS := $(patsubst $(VUTOSDIR)/%, -I$(VUTOSDIR)/%, $(shell find $(VUTOSDIR)/platforms/iris -type d -not -regex '.*\.svn.*')) $(PFLAGS)
 	# include tos/lib/serial
   PFLAGS := -I$(VUTOSDIR)/lib/serial $(PFLAGS)
+endif
+
+ifeq ($(PLATFORM),mica2)
+  # include all dirs under tos/chips/cc1000
+	PFLAGS := $(patsubst $(VUTOSDIR)/%, -I$(VUTOSDIR)/%, $(shell find $(VUTOSDIR)/chips/cc1000 -type d)) $(PFLAGS)
+endif
+
+ifeq ($(PLATFORM),micaz)
+	#$(warning VU make system is adding search directories for micaZ)
+	PFLAGS := -I$(TOSDIR)/chips/rf2xx/layers  $(PFLAGS)
+	PFLAGS := -I$(TOSDIR)/chips/rf2xx/util  $(PFLAGS)
+	PFLAGS := -I$(TOSDIR)/lib/diagmsg  $(PFLAGS)
+	PFLAGS := -I$(VUTOSDIR)/lib/misc   $(PFLAGS)
+	PFLAGS := -I$(VUTOSDIR)/chips/cc2420x  $(PFLAGS)
+	PFLAGS := -I$(VUTOSDIR)/platforms/micaz/chips/cc2420x  $(PFLAGS)
+	PFLAGS := -I$(VUTOSDIR)/platforms/micaz  $(PFLAGS)
+endif
+
+ifeq ($(PLATFORM),telosb)
+	#$(warning VU make system is adding search directories for telosb)
+	PFLAGS := -I$(TOSDIR)/chips/rf2xx/layers  $(PFLAGS)
+	PFLAGS := -I$(TOSDIR)/chips/rf2xx/util  $(PFLAGS)
+	PFLAGS := -I$(TOSDIR)/lib/diagmsg  $(PFLAGS)
+	PFLAGS := -I$(VUTOSDIR)/lib/misc   $(PFLAGS)
+	PFLAGS := -I$(VUTOSDIR)/chips/msp430/timer  $(PFLAGS)
+	PFLAGS := -I$(VUTOSDIR)/chips/msp430/usart  $(PFLAGS)
+	PFLAGS := -I$(VUTOSDIR)/chips/cc2420x  $(PFLAGS)
+	PFLAGS := -I$(VUTOSDIR)/platforms/telosa  $(PFLAGS)
+	PFLAGS := -I$(VUTOSDIR)/platforms/telosa/chips/cc2420x  $(PFLAGS)
 endif
 
 # debug

@@ -61,7 +61,7 @@ enum
 
 /* The number of microseconds a sending MESHBEAN900 mote will wait for an acknowledgement */
 #ifndef SOFTWAREACK_TIMEOUT
-#define SOFTWAREACK_TIMEOUT	800
+#define SOFTWAREACK_TIMEOUT	5000
 #endif
 
 /*

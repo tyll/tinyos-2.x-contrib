@@ -59,10 +59,10 @@ implementation
 	components HplAtm128InterruptC;
 	HplRF230P.Interrupt -> HplAtm128InterruptC.Int5;
 
-	components HplAtm128Timer1C as TimerC;
+	components HplAtm128Timer3C as TimerC;
 	HplRF230P.Timer -> TimerC;
 
-	components new AlarmOne16C() as AlarmC;
+	components new AlarmThree16C() as AlarmC;
 	Alarm = AlarmC;
 
 	components RealMainP;
@@ -70,4 +70,9 @@ implementation
 
 	components LocalTimeMicroC;
 	LocalTimeRadio = LocalTimeMicroC;
+	
+	components McuSleepC;
+    	McuSleepC.McuPowerOverride -> HplRF230P;
+	
+	
 }

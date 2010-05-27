@@ -7,8 +7,6 @@
   %T/platforms/meshbean/chips/atm1281
   %T/platforms/meshbean/chips/atm1281/pins
   %T/platforms/meshbean/chips/atm1281/usart
-  %T/platforms/meshbean/chips/atm128
-  %T/platforms/meshbean/chips/atm128/i2c
   %T/platforms/meshbean/chips/tsl2550
   %T/platforms/meshbean/chips/lm73
   %T/platforms/meshbean/chips/ds2411

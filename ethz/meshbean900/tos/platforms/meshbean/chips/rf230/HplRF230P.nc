@@ -21,12 +21,15 @@
  * Author: Miklos Maroti
  */
 
+#include "atm128hardware.h"
+
 module HplRF230P
 {
 	provides
 	{
 		interface GpioCapture as IRQ;
 		interface Init as PlatformInit;
+		interface McuPowerOverride;
 	}
 
 	uses
@@ -39,11 +42,18 @@ module HplRF230P
 
 implementation
 {
+	norace bool radioOn = FALSE;
+	
 	command error_t PlatformInit.init()
 	{
 		call PortIRQ.makeInput();
 		call PortIRQ.clr();
 		return SUCCESS;
+	}
+	
+	async command mcu_power_t McuPowerOverride.lowestState()
+	{
+		return radioOn ? ATM128_POWER_IDLE : ATM128_POWER_DOWN;
 	}
 	
 	async event void Interrupt.fired() {
@@ -55,6 +65,7 @@ implementation
 	{
 		call Interrupt.edge(TRUE);
 		call Interrupt.enable();
+		radioOn = TRUE;
 	
 		return SUCCESS;
 	}
@@ -67,7 +78,8 @@ implementation
 
 	async command void IRQ.disable()
 	{
-		call Interrupt.disable();
+		  call Interrupt.disable();
+		  radioOn = FALSE;
 	}
 	
 	async event void Timer.overflow() {}

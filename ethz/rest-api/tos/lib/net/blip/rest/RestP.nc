@@ -89,6 +89,10 @@ implementation{
 		
 		// Find the start of the local path
 		start = strchr(buf, '/');
+		if (start == NULL) {
+ 			call Http.sendControl(HTTP_NOT_IMPLEMENTED);
+ 			return;
+ 		}
 		lenTemp = (uint16_t) strcspn(start, " "); 
 		
 		if (lenTemp > 1)
@@ -99,6 +103,10 @@ implementation{
 			
 			// Try to find out the resource
 			start = strrchr(locPath, '/');
+			if (start == NULL) {
+ 				call Http.sendControl(HTTP_NOT_IMPLEMENTED); 
+ 				return;
+ 			}
 			lenTemp = (uint16_t) strcspn(start, " ");
 			strncpy(element, start + 1, lenTemp - 1);
 			element[lenTemp - 1] = '\0';  
@@ -190,7 +198,7 @@ implementation{
 	}
 	
 	event void Http.sendDataDone(){
-		// Not interessting, as the message is a buffer
+		// Not interesting, as the message is a buffer
 		// But theoretically: Is not allowed to send more data before! 
 	}
 
@@ -224,15 +232,9 @@ implementation{
 		call Http.sendData(payload, len - _headerLen); 		
 	}
 	
-	default event void Rest.getReceived[uint8_t app](char *element, uint16_t len, char* buf)
-	{
-	}
+	default event void Rest.getReceived[uint8_t app](char *element, uint16_t len, char* buf){}
 	
-	default event void Rest.putReceived[uint8_t app](char * element, uint16_t len, char *param, char *value)
-	{
-	}
+	default event void Rest.putReceived[uint8_t app](char * element, uint16_t len, char *param, char *value){}
 	
-	default event void Rest.deleteReceived[uint8_t app](char *element, uint16_t len)
-	{
-	}
+	default event void Rest.deleteReceived[uint8_t app](char *element, uint16_t len){}
 }

@@ -26,6 +26,7 @@
  * Provide GeneralIO interfaces for all of the ATmega1281's pins.
  *
  * @author Martin Turon <mturon@xbow.com>
+ * @author Philipp Sommer <sommer@tik.ee.ethz.ch> (Atmega1281 port)
  */
 
 configuration HplAtm128GeneralIOC
@@ -86,6 +87,7 @@ configuration HplAtm128GeneralIOC
     interface GeneralIO as PortF6;
     interface GeneralIO as PortF7;
 
+    // PortG only exposes 6 bits
     interface GeneralIO as PortG0;
     interface GeneralIO as PortG1;
     interface GeneralIO as PortG2;
@@ -98,32 +100,14 @@ configuration HplAtm128GeneralIOC
 implementation
 {
   components 
-  new HplAtm128GeneralIOPortP((uint8_t)&PORTA, (uint8_t)&DDRA, (uint8_t)&PINA) as PortA,
+    new HplAtm128GeneralIOPortP((uint8_t)&PORTA, (uint8_t)&DDRA, (uint8_t)&PINA) as PortA,
     new HplAtm128GeneralIOPortP((uint8_t)&PORTB, (uint8_t)&DDRB, (uint8_t)&PINB) as PortB,
     new HplAtm128GeneralIOPortP((uint8_t)&PORTC, (uint8_t)&DDRC, (uint8_t)&PINC) as PortC,
     new HplAtm128GeneralIOPortP((uint8_t)&PORTD, (uint8_t)&DDRD, (uint8_t)&PIND) as PortD,
     new HplAtm128GeneralIOPortP((uint8_t)&PORTE, (uint8_t)&DDRE, (uint8_t)&PINE) as PortE,
     new HplAtm128GeneralIOPortP((uint8_t)&PORTF, (uint8_t)&DDRF, (uint8_t)&PINF) as PortF,
+    new HplAtm128GeneralIOPortP((uint8_t)&PORTG, (uint8_t)&DDRG, (uint8_t)&PING) as PortG;
 
-  // PortF cannot use sbi, cbi
-    new HplAtm128GeneralIOSlowPinP((uint8_t)&PORTF, (uint8_t)&DDRF, (uint8_t)&PINF, 0) as F0,
-    new HplAtm128GeneralIOSlowPinP((uint8_t)&PORTF, (uint8_t)&DDRF, (uint8_t)&PINF, 1) as F1,
-    new HplAtm128GeneralIOSlowPinP((uint8_t)&PORTF, (uint8_t)&DDRF, (uint8_t)&PINF, 2) as F2,
-    new HplAtm128GeneralIOSlowPinP((uint8_t)&PORTF, (uint8_t)&DDRF, (uint8_t)&PINF, 3) as F3,
-    new HplAtm128GeneralIOSlowPinP((uint8_t)&PORTF, (uint8_t)&DDRF, (uint8_t)&PINF, 4) as F4,
-    new HplAtm128GeneralIOSlowPinP((uint8_t)&PORTF, (uint8_t)&DDRF, (uint8_t)&PINF, 5) as F5,
-    new HplAtm128GeneralIOSlowPinP((uint8_t)&PORTF, (uint8_t)&DDRF, (uint8_t)&PINF, 6) as F6,
-    new HplAtm128GeneralIOSlowPinP((uint8_t)&PORTF, (uint8_t)&DDRF, (uint8_t)&PINF, 7) as F7,
-
-
-  // PortG only exposes 6 bits and cannot use sbi, cbi
-    new HplAtm128GeneralIOSlowPinP((uint8_t)&PORTG, (uint8_t)&DDRG, (uint8_t)&PING, 0) as G0,
-    new HplAtm128GeneralIOSlowPinP((uint8_t)&PORTG, (uint8_t)&DDRG, (uint8_t)&PING, 1) as G1,
-    new HplAtm128GeneralIOSlowPinP((uint8_t)&PORTG, (uint8_t)&DDRG, (uint8_t)&PING, 2) as G2,
-    new HplAtm128GeneralIOSlowPinP((uint8_t)&PORTG, (uint8_t)&DDRG, (uint8_t)&PING, 3) as G3,
-    new HplAtm128GeneralIOSlowPinP((uint8_t)&PORTG, (uint8_t)&DDRG, (uint8_t)&PING, 4) as G4,
-    new HplAtm128GeneralIOSlowPinP((uint8_t)&PORTG, (uint8_t)&DDRG, (uint8_t)&PING, 5) as G5
-    ;
 
   PortA0 = PortA.Pin0;
   PortA1 = PortA.Pin1;
@@ -179,10 +163,10 @@ implementation
   PortF6 = PortF.Pin6;
   PortF7 = PortF.Pin7;
 
-  PortG0 = G0;
-  PortG1 = G1;
-  PortG2 = G2;
-  PortG3 = G3;
-  PortG4 = G4;
-  PortG5 = G5;
+  PortG0 = PortG.Pin0;
+  PortG1 = PortG.Pin1;
+  PortG2 = PortG.Pin2;
+  PortG3 = PortG.Pin3;
+  PortG4 = PortG.Pin4;
+  PortG5 = PortG.Pin5;
 }

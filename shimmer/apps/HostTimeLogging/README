@@ -1,0 +1,190 @@
+this app is identical to JustFATLogging with the exception that it
+does nothing until it acquires a timestamp from a host machine to the
+docked shimmer.  how JustFATLogging works is reproduced here for
+convenience, but the timestamping section applies to this app only.
+
+once again, this app does not perform the regular JustFATLogging
+functionality until the shimmer_timestamp/serial_recv cycle are
+performed.  please read the entire description before trying to run
+this app.
+
+this app uses adc->dma to read the accelerometer, which it samples at
+50 hz.  it writes these unsigned 16-bit binary values in x,y,z triples to
+files on the fatfs filesystem on the sd card.  
+
+the files are structured thus:
+
+under a top-level directory on the card called /data, a directory
+-- named according to the convention below -- is created when the
+application starts, meaning at power-on or reset:
+
+<12-character hex number>  the "mac address" of the shimmer's cc2420
+radio, unique.  you can abbreviate this by defining (default here)
+ABBREVIATED_ID, which causes the directory id to shorted to the string
+"IDabcd" where abcd are the last four characters in the mac address.
+
+<3-digit sequence number> counting from 000.  this number increments
+each time the application is run.
+
+the directory name looks like this:
+
+<hex number>_<sequence number>, e.g. 0000112be777_038
+
+or 
+
+ID<four hex digits>_<sequence number>, e.g. ID04f4_038
+
+this way, shimmer 'a' won't overwrite directories written by shimmer
+'b' if the card travels.  the user doesn't have to do anything.
+
+NOTE: dock-related behaviour described below will not work with
+shimmer, only with shimmer2 and shimmer2r!
+
+files placed in this directory are also numbered sequentially,
+starting at 000.  a new file is created when a) the current file
+exceeds 1mb (about one hour), or b) when the app is interrupted by
+docking the shimmer2/2r. 
+
+logging starts immediately when a powered shimmer2/2r is removed from the dock,
+or, of course, powered-up or reset apart from the dock.  you'll see
+the green LED blink on during each file write.
+
+when the shimmer2/2r is docked it will stop capturing/logging
+acceleration data, but you'll be able to see, read, or transfer
+the files created to your desktop computer.  the yellow LED will be on.
+
+if the red LED comes on or blinks, then you're almost out of power,
+and the app will eventually shut itself down.  if all three LEDs come
+on, then a file write error occurred; you may see this occasionally
+after first programming the device and starting to log.  if it does
+happen at the outset, best to reset the shimmer and being again.  if
+it persists, you might want to check the card with your pc.
+
+/******* CRITICAL TIMESTAMP STUFF! ************/
+
+about the directory/file timestamps: since this application does not
+use either radio and doesn't actively communicate with a host
+computer, it has no sense of time other than its onboard clock
+counting from '0' once it starts running.  in lieu of this important
+reference point, you can -- you must! -- set a real-world timestamp
+for the application at run time by running a simple application on the
+host that acquires time from the system and transmits it to the
+shimmer.  by way of acknowledgment, a second app displays this time on
+a terminal after reading it back from the shimmer.  examples of both
+are provided here, and instructions from the tinyos example app are
+reproduced here:
+
+here's how to transfer a current timestamp to the shimmer from a host
+computer over a serial connection.
+
+The pertinent steps are the UART connection to the serial port, and
+the code in UARTData.rxDone() that collects the timestamp's four bytes
+in order from most- to least-significant, then re-assembles them into
+a 32-bit value and feeds this to the TimeP module, which is the
+timekeeper for an application.
+
+By way of explantion, the programming dock provides two serial ports to 
+the host.  The first is used only for programming the shimmer; the
+second is for data transfer by an application running on either the
+host computer or the shimmer.  We use the second.
+
+On a linux machine, the serial ports will be called something like 
+/dev/ttyUSB0  and /dev/ttyUSB1.  each board attached to the machine will 
+generate  two more ports in order; linux recycles these once the board is
+removed. 
+
+On a windows machine, the serial ports will be called something like COM43 
+and COM44.  Windows rarely recycles these (usually after an update or
+system power down).  Attaching and re-attaching the programming board will 
+generate newly-numbered COM ports for the same device.  
+As Kurt Vonnegut used to say, "And so it goes."
+
+Once a shimmer with an application mimicing the important parts of
+testSerialSetTime is docked, running the shimmer_timesync.py script
+will find the first pair of these on either type of system and send
+the timestamp to the shimmer over the second of the two.  (That means
+that if you have multiple docks attached, you might not send the
+timestamp to the right shimmer.)
+
+We assume that any reasonable linux machine will have python installed
+already.  One python library that might be missing is pyserial, but
+this is provided under
+
+tinyos-2.x/tools/platforms/msp430/pybsl/serial, 
+
+so technically, you could copy the python files to
+/usr/lib/python2.6/site-packages:
+
+(the 2.6 in python2.6 is the current version)
+
+cp -a ~/tinyos-2.x/tools/platforms/msp430/pybsl/serial/*.py
+/usr/lib/python2.6/site-packages
+
+However, instead of doing a brute-force copy and getting unexpected
+results, it's safer to download pyserial from
+http://sourceforge.net/projects/pyserial/files/ and install it.  Pick
+the most current stable version (might want to avoid
+release-candidates, labeled "rc"), closest to the python version on
+your machine.
+
+For windows, you most likely will not have python installed.
+Fortunately, it's a pretty easy operation, and python is a very
+useful, powerful programming language (I like to say that five lines
+of python could be used to control a nuclear sub.  But it has to be
+the *right* five lines.).
+
+First step is download the current version from 
+
+http://www.python.org/download/releases/
+
+As of this writing, v 2.6.x is the latest non-bleeding release, but
+that will change as distros move over to 3.x.  Anyway, follow the link
+for the appropriate item, then download and install the right windows
+installer (yes, you can trust python.org).  Install the 32-bit version
+even if you have a 64-bit system.
+
+Next run the windows installer for pyserial from
+http://sourceforge.net/projects/pyserial/files/ and execute it.  Pick
+the most current stable version, closest to the python version on your
+machine.  That means ignore the green box for the release candidate
+and go down and open the folder icon for a version without the -rc
+suffix (at the time of writing, 2.4).
+
+Next run the windows installer for pywin32 the python for windows 
+extensions.  http://sourceforge.net/projects/pywin32/files/
+
+The final step is to copy the provided scanwin32Util.py and
+shimmerUtil.py modules into Lib\site-packages under your python
+install directory (c:\python26 or similar).  Find these here alongside
+this file.  We thank
+http://pyserial.svn.sourceforge.net/viewvc/pyserial/trunk/pyserial/examples/
+for providing scanwin32.py, which we modified for our purposes.
+
+Once you install these, consult
+http://docs.python.org/using/windows.html for any details.  Our
+experience is that modifying PATH to include the python installation
+directory will give you the ability to run shimmer_timesync.py from a
+command prompt in Windows XP.
+
+In some windows versions or installations you may need to associate a
+program with the file extension .py; when you click on
+shimmer_timesync.py, you will see a dialog box that allows you to
+select python.exe as the default program for .py files.  You can also
+right-click on the file and use the "Open-with" feature.
+
+Sample windows output:
+C:\Documents and Settings\USER\Desktop>shimmer_timesync.py
+Found SHIMMER data port on COM114
+Synchronizing clocks...
+Wrote 1270063149 to shimmer.  Done!
+
+In case you're wondering, 1270063149 is the number of seconds since
+January 1, 1970, the beginning of unix time.
+
+How does the test work?  After you send the data (see above), then
+you compile and run serial_recv (make sure the port is right, it's
+hard-coded to /dev/ttyUSB1).  Then, press the user button on the
+programming dock, and the timestring will appear on the console.
+
+Have fun!
+

@@ -82,9 +82,9 @@ implementation
 	// divide sum to get average
 	atomic delta = deltaSum >> LOG2_DELTA_SUM_COUNT;
 	
-//	call Leds.led2Toggle();						
-//	call Leds.led0Off();
-//	call Leds.led1Off();
+	call Leds.led2Toggle();						
+	call Leds.led0Off();
+	call Leds.led1Off();
 
 	if( delta > (TARGET_DELTA+MAX_DEVIATION) )
 	{
@@ -92,7 +92,7 @@ implementation
 		if( DCOCTL < 0xe0 )
 		{
 			DCOCTL++;
-//			call Leds.led0On();
+			call Leds.led0On();
 		}
 		else if( (BCSCTL1 & 7) < 7 )
 		{
@@ -106,7 +106,7 @@ implementation
 		if( DCOCTL > 0 )
 		{
 			DCOCTL--;
-//			call Leds.led1On();
+			call Leds.led1On();
 		}
 		else if( (BCSCTL1 & 7) > 0 )
 		{
@@ -170,14 +170,7 @@ implementation
   
   async command mcu_power_t McuPowerOverride.lowestState() {
   	if(isOn)
-#if defined(PLATFORM_TELOS) ||  defined(PLATFORM_TELOSA) ||  defined(PLATFORM_TELOSB) ||  defined(PLATFORM_EPIC)
     		return MSP430_POWER_ACTIVE;
-#elif defined(PLATFORM_MICA2) ||  defined(PLATFORM_MICAZ) ||  defined(PLATFORM_XSM) ||  defined(PLATFORM_IRIS) ||  defined(PLATFORM_ZIGBIT)
-    		return ATM128_POWER_IDLE;
-#else
-#warning Assuming 0 is the IDLE power state that prevents MCU from sleep
-    		return 0;
-#endif
 	else
 		return 0xff;
   }  

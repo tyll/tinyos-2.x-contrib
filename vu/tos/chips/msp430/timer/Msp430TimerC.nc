@@ -100,11 +100,11 @@ implementation
            , new Msp430TimerCapComP( TBCCTL6_, TBCCR6_ ) as Msp430TimerB6
            , Msp430TimerCommonP as Common
   	   // online DCO calibration
-  	   , Msp430DcoCalibC, new AutoStartC();
+//  	   , Msp430DcoCalibC, new AutoStartC();
            ;
 
   // online DCO calibration
-  Msp430DcoCalibC.StdControl <- AutoStartC;
+//  Msp430DcoCalibC.StdControl <- AutoStartC;
   
   // Timer A
   TimerA = Msp430TimerA.Timer;

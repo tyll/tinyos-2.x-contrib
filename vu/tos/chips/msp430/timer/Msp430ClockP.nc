@@ -101,7 +101,6 @@ implementation
     // .SELM = 0; select DCOCLK as source for MCLK
     // .DIVM = 0; set the divisor of MCLK to 1
     // .SELS = 0; select DCOCLK as source for SCLK
-//    // .DIVS = 2; set the divisor of SCLK to 4
     // .DIVS = 0; set the divisor of SCLK to 1
     // .DCOR = 0; select internal resistor for DCO
     BCSCTL2 = 0;
@@ -132,15 +131,12 @@ implementation
     // TBCTL
     // .TBCLGRP = 0; each TBCL group latched independently
     // .CNTL = 0; 16-bit counter
-//    // .TBSSEL = 1; source SMCLK = DCO/4
-    // .TBSSEL = 1; source SMCLK = DCO/1
-//    // .ID = 0; input divisor of 1
+    // .TBSSEL = 2; source SMCLK
     // .ID = 2; input divisor of 4
     // .MC = 0; initially disabled
     // .TBCLR = 0; reset timer B
     // .TBIE = 1; enable timer B interrupts
     TBCTL = TBSSEL1 | ID1 | TBIE;
-
   }
 
   default event void Msp430ClockInit.setupDcoCalibrate()

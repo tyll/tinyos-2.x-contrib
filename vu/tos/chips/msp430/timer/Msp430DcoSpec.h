@@ -24,7 +24,8 @@
 #ifndef MS430DCOSPEC_H
 #define MS430DCOSPEC_H
 
-#define TARGET_DCO_HZ 3686400L // the target DCO clock rate in Hz
+//#define TARGET_DCO_HZ 3686400L // the target DCO clock rate in Hz
+#define TARGET_DCO_HZ 32768LL*32LL*4LL // the target DCO clock rate in Hz
 #define ACLK_HZ 32768L 	       // the ACLK rate in Hz
 #define ACLK_PRESCALER 4       // ACLK prescaler
 

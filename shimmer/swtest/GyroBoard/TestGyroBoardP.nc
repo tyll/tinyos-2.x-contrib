@@ -57,6 +57,8 @@ implementation {
   extern int sprintf(char *str, const char *format, ...) __attribute__ ((C));
   extern int snprintf(char *str, size_t len, const char *format, ...) __attribute__ ((C));
 
+#define ABBREVIATED_ID
+
   void do_stores();
 
   uint8_t stop_storage = 0, longAddress[8], directory_set, bad_opendir, bad_mkdir, NUM_ADC_CHANS;
@@ -83,12 +85,13 @@ implementation {
     char lfn[_MAX_LFN + 1], * fname, * scout, dirnum[8];
 
     // first we'll make the shimmer mac address into a string
+#ifdef ABBREVIATED_ID
     sprintf(idname, "Gyro%02x%02x", 
 	    longAddress[4], longAddress[5]);
-    /*
+#else
     sprintf(idname, "%02x%02x%02x%02x%02x%02x", 
 	    longAddress[0], longAddress[1], longAddress[2], longAddress[3], longAddress[4], longAddress[5]);
-    */
+#endif
     gfi.lfname = lfn;
     gfi.lfsize = sizeof(lfn);
 
@@ -106,13 +109,20 @@ implementation {
 
     dir_counter = 0;   // this might be the first log for this shimmer
 
+
     /*
-     * dir format is 
+     * full dir format is:
      * 000102030405   shimmer 12 hex-digit cc2420 mac address
-     * _              separator
+     * -              separator
      * 000            a 3-digit sequential run number
      *
-     * we want to create a new directory with a sequential run number each time for each shimmer
+     * abbreviated format is:
+     * ID             just a nmemonic
+     * 05             last two of shimmer 12 hex-digit cc2420 mac address
+     * -              separator
+     * 000
+     *
+     * we want to create a new directory with a sequential run number each power-up/reset for each shimmer
      */
     while(call FatFs.readdir(&gdp, &gfi) == FR_OK){
       if(*gfi.fname == 0)
@@ -120,16 +130,14 @@ implementation {
       else if(gfi.fattrib & AM_DIR){      
 	fname = (*gfi.lfname) ? gfi.lfname : gfi.fname;
 	
+#ifdef ABBREVIATED_ID
 	if(!strncmp(fname, idname, 6)){      // their id prefix has just six chars
-	  /*
-	    if(!strncmp(fname, idname, 12)){      // it's this shimmer's dir
-	  */
+#else
+	if(!strncmp(fname, idname, 12)){      // it's this shimmer's dir
+#endif
 	  if((scout = strchr(fname, '-'))){   // if not, something is seriously wrong!
-	    scout += 2;                      // we have to skip the 'M' before the counter
-	    /*
-	      if((scout = strchr(fname, '_'))){   // if not, something is seriously wrong!
-	      scout++;
-	   */
+	    scout++;                      // we have to skip the 'M' before the counter
+
 	    strcpy(dirnum, scout);
 	    tmp_counter = atoi(dirnum);
 	    if(tmp_counter >= dir_counter){
@@ -148,10 +156,8 @@ implementation {
   }
 
   error_t make_basedir() { 
-    sprintf(dirname, "/data/%s-M%03d", idname, dir_counter);
-     /*
-    sprintf(dirname, "/data/%s_%03d", idname, dir_counter);
-     */
+    sprintf(dirname, "/data/%s-%03d", idname, dir_counter);
+
     if(call FatFs.mkdir(dirname))
       return FAIL;
     
@@ -265,7 +271,7 @@ implementation {
   }
 
   event void Boot.booted() {
-    initialize_8mhz_clock();
+    //    initialize_8mhz_clock();
 
     sample_period = 20;   // 50 hz
 
@@ -283,6 +289,7 @@ implementation {
     call shimmerAnalogSetup.finishADCSetup(sbuf0);
 
     call GyroStdControl.start();
+
     //    call GyroBoard.autoZero();
 
     NUM_ADC_CHANS = call shimmerAnalogSetup.getNumberOfChannels();
@@ -307,12 +314,8 @@ implementation {
   void do_stores(){
     uint8_t r;
 
-    /*
-     * for biosensics
-     */    sprintf(filename, "%s/%03d.pam", dirname, sequence_number++);
-     /*
     sprintf(filename, "%s/%03d", dirname, sequence_number++);
-     */
+
     TOSH_MAKE_DOCK_N_OUTPUT();
     TOSH_SET_DOCK_N_PIN();
 
@@ -379,7 +382,7 @@ implementation {
      * prevent loss of control of card if the user 
      * puts us back on the dock
      */
-    
+
     if(!stop_storage && !directory_set){
       post initialize_directories();
       if(bad_opendir || bad_mkdir){
@@ -387,6 +390,7 @@ implementation {
 	return;
       }
     }
+
     call Leds.led1Off();
 
     post rollTheBall();

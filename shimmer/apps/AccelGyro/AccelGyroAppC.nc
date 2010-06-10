@@ -74,9 +74,9 @@ implementation {
   AccelGyroC.BTStdControl -> RovingNetworksC.StdControl;
   AccelGyroC.Bluetooth    -> RovingNetworksC;
 
-  components Mma7260P;
-  AccelGyroC.AccelInit -> Mma7260P;
-  AccelGyroC.Accel -> Mma7260P;
+  components AccelC;
+  AccelGyroC.AccelInit -> AccelC;
+  AccelGyroC.Accel -> AccelC;
 
   components shimmerAnalogSetupC, Msp430DmaC;
   MainC.SoftwareInit -> shimmerAnalogSetupC.Init;

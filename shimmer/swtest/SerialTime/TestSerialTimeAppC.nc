@@ -50,6 +50,13 @@ implementation {
   MainC.SoftwareInit   -> TimeC;
   TestSerialTimeC.Time -> TimeC;
 
+  components HostTimeP;
+  MainC.SoftwareInit       -> HostTimeP;
+  TestSerialTimeC.HostTime -> HostTimeP;
+  HostTimeP.UARTControl    -> HplMsp430Usart0C.HplMsp430Usart;
+  HostTimeP.UARTData       -> HplMsp430Usart0C.HplMsp430UsartInterrupts;
+  HostTimeP.Time           -> TimeC;
+
   components UserButtonC;
   TestSerialTimeC.buttonNotify -> UserButtonC;
 }

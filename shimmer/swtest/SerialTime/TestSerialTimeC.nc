@@ -33,47 +33,27 @@
  * @date   April, 2010
  */
 
+#include "msp430usart.h"
 #include <UserButton.h>
 
 module TestSerialTimeC {
   uses {
     interface Boot;
     interface Leds;
+    interface Time;
+    interface HostTime;
+    interface Notify<button_state_t> as buttonNotify;
     interface HplMsp430Usart as UARTControl;
     interface HplMsp430UsartInterrupts as UARTData;
-    interface Time;
-    interface Notify<button_state_t> as buttonNotify;
   }
 }
 implementation {
-  enum {
-    NONE,
-    BYTE_32,
-    BYTE_24,
-    BYTE_16,
-    BYTE_8
-  };
+
   struct tm g_tm;
-  time_t g_host_time = 0;
-  uint8_t sync_state, byte3, byte2, byte1, byte0, toSend, charsSent;
-  char g_timestring[128];
+  time_t time_now;
+  char timestring[128];
+  uint8_t charsSent, toSend;
   bool transmissionComplete;
-
-  void setupUART() {
-    /*
-     * NOTE:  this sets the baudrate based upon a 4mhz SMCLK given by the 8mhz xt clock config
-     * to run at the default msp430 clock settings, use _1MHZ_ for these two flags
-     */
-    msp430_uart_union_config_t RN_uart_config = { {ubr: UBR_4MHZ_115200, umctl: UMCTL_4MHZ_115200, 
-						   ssel: 0x02, pena: 0, pev: 0, spb: 0, clen: 1,listen: 0, 
-						   mm: 0, ckpl: 0, urxse: 0, urxeie: 0, 
-						   urxwie: 0, utxe : 1, urxe :1} };
-
-    call UARTControl.setModeUart(&RN_uart_config); // set to UART mode
-
-    call UARTControl.enableTxIntr();
-    call UARTControl.enableRxIntr();
-  }
 
   void initialize_8mhz_clock(){
     /* 
@@ -94,7 +74,7 @@ implementation {
     call Leds.led0Off();
 
     call Leds.led1On();
-    TOSH_uwait(50000U);
+    TOSH_uwait(50000UL);
 
     atomic{
       BCSCTL2 = 0;
@@ -111,68 +91,33 @@ implementation {
 
   event void Boot.booted(){
     initialize_8mhz_clock();
-    setupUART();
-    
-    sync_state = NONE;
-    transmissionComplete = FALSE;
 
     call buttonNotify.enable();
   }
 
   task void sendOneChar() {
     if(charsSent < toSend)
-      call UARTControl.tx(g_timestring[charsSent++]);
+      call UARTControl.tx(timestring[charsSent++]);
     else{
       transmissionComplete = TRUE;
     }
   }
 
-  task void return_g_timestring() {
-    toSend = strlen(g_timestring);
+  task void return_timestring() {
+    toSend = strlen(timestring);
     charsSent = 0;
     transmissionComplete = FALSE;
     post sendOneChar();
   }
 
-  task void assemble_g_timestring() {
-    time_t time_now;
-
-    g_host_time = byte3;
-    g_host_time = g_host_time << 24;
-    g_host_time = (g_host_time >> 16 | byte2) << 16;
-    g_host_time = (g_host_time >> 8 | byte1) << 8;
-    g_host_time = g_host_time | byte0;
-
-    call Time.setCurrentTime(g_host_time);
-    
+  
+  event void HostTime.timeAndZoneSet(char * g_timestring){
     call Time.time(&time_now);
     call Time.localtime(&time_now, &g_tm);
-    call Time.asctime(&g_tm, g_timestring, 128);
+    call Time.asctime(&g_tm, timestring, 128);
   }
 
-  async event void UARTData.rxDone(uint8_t data) {        
-    switch (sync_state) {
-    case NONE:
-      byte3 = data;
-      sync_state = BYTE_32;
-      break;
-    case BYTE_32:
-      byte2 = data;
-      sync_state = BYTE_24;
-      break;
-    case BYTE_24:
-      byte1 = data;
-      sync_state = BYTE_16;
-      break;
-    case BYTE_16:
-      byte0 = data;
-      sync_state = NONE;
-      post assemble_g_timestring();
-      break;
-    default:
-      break;
-    }
-  }
+  async event void UARTData.rxDone(uint8_t data) { }
 
   async event void UARTData.txDone() {
     if(!transmissionComplete) {
@@ -182,7 +127,7 @@ implementation {
 
   event void buttonNotify.notify( button_state_t val){
     call Leds.led2Toggle();
-    post return_g_timestring();
+    post return_timestring();
   }
 
   event void Time.tick() { }

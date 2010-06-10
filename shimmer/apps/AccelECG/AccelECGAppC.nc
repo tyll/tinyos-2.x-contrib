@@ -48,43 +48,37 @@
 configuration AccelECGAppC {
 }
 implementation {
-components MainC, AccelECGC;
-   AccelECGC -> MainC.Boot; 
+  components MainC, AccelECGC;
+  AccelECGC -> MainC.Boot; 
 
-   components LedsC;
-   AccelECGC.Leds -> LedsC;
+  components LedsC;
+  AccelECGC.Leds -> LedsC;
 
-   components new TimerMilliC() as SampleTimer;
-   AccelECGC.SampleTimer -> SampleTimer;
-   components new TimerMilliC() as SetupTimer;
-   AccelECGC.SetupTimer    -> SetupTimer;
-   components new TimerMilliC() as ActivityTimer;
-   AccelECGC.ActivityTimer -> ActivityTimer;
+  components new TimerMilliC() as SampleTimer;
+  AccelECGC.SampleTimer -> SampleTimer;
+  components new TimerMilliC() as SetupTimer;
+  AccelECGC.SetupTimer    -> SetupTimer;
+  components new TimerMilliC() as ActivityTimer;
+  AccelECGC.ActivityTimer -> ActivityTimer;
   
-   components Counter32khz32C as Counter;
-   components new CounterToLocalTimeC(T32khz);
-   CounterToLocalTimeC.Counter -> Counter;
-   AccelECGC.LocalTime -> CounterToLocalTimeC;
+  components Counter32khz32C as Counter;
+  components new CounterToLocalTimeC(T32khz);
+  CounterToLocalTimeC.Counter -> Counter;
+  AccelECGC.LocalTime -> CounterToLocalTimeC;
   
-   components RovingNetworksC;
-   AccelECGC.BluetoothInit -> RovingNetworksC.Init;
-   AccelECGC.BTStdControl -> RovingNetworksC.StdControl;
-   AccelECGC.Bluetooth    -> RovingNetworksC;
+  components RovingNetworksC;
+  AccelECGC.BluetoothInit -> RovingNetworksC.Init;
+  AccelECGC.BTStdControl -> RovingNetworksC.StdControl;
+  AccelECGC.Bluetooth    -> RovingNetworksC;
 
-   components Mma7260P;
-   AccelECGC.AccelInit -> Mma7260P;
-   AccelECGC.Accel -> Mma7260P;
+  components AccelC;
+  AccelECGC.AccelInit -> AccelC;
+  AccelECGC.Accel -> AccelC;
 
-   components HplAdc12P;
-   AccelECGC.HplAdc12 -> HplAdc12P;
+  components shimmerAnalogSetupC, Msp430DmaC;
+  MainC.SoftwareInit -> shimmerAnalogSetupC.Init;
+  AccelECGC.shimmerAnalogSetup -> shimmerAnalogSetupC;
+  AccelECGC.DMA0 -> Msp430DmaC.Channel0;
 
-   components Msp430DmaC;
-   AccelECGC.Msp430DmaControl -> Msp430DmaC;
-   AccelECGC.Msp430DmaChannel -> Msp430DmaC.Channel0;
-   
-#ifdef USE_8MHZ_CRYSTAL
-   //   components BusyWaitMicroC;
-   //   AccelECGC.BusyWait -> BusyWaitMicroC;
-#endif
 }
 

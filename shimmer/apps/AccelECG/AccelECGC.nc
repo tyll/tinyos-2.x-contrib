@@ -54,10 +54,14 @@
  *
  * @author Mike Healy
  * @date May 13, 2009 - ported to TinyOS 2.x 
+ *
+ * @author Steve Ayer
+ * @date   June, 2010
+ * mods to use shimmerAnalogSetup interface and new GyroBoard module
  */
 
 #include "Timer.h"
-#include "Mma7260.h"
+#include "Mma_Accel.h"
 #include "AccelECG.h"
 #include "crc.h"
 #include "RovingNetworks.h"
@@ -72,15 +76,11 @@ module AccelECGC {
       interface Timer<TMilli> as ActivityTimer;
       interface Timer<TMilli> as SampleTimer;
       interface LocalTime<T32khz>;
-      interface Mma7260 as Accel;
+      interface Mma_Accel as Accel;
       interface StdControl as BTStdControl;
       interface Bluetooth;
-      interface HplAdc12;
-      interface Msp430DmaControl;
-      interface Msp430DmaChannel;
-#ifdef USE_8MHZ_CRYSTAL
-      //      interface BusyWait<TMicro, uint16_t>;
-#endif
+      interface shimmerAnalogSetup;
+      interface Msp430DmaChannel as DMA0;
    }
 } 
 
@@ -124,17 +124,8 @@ implementation {
 
 /* default sample frequency every time the sensor boots up */
    uint16_t sample_freq = SAMPLING_200HZ;
-   enum { NBR_ADC_CHANS = 6 };
-   uint8_t ADC_CHANS[NBR_ADC_CHANS] = {5,    //Accel X
-                                       4,    //Accel Y
-                                       3,    //Accel Z
-                                       1,    //ECG_LALL
-                                       2,    //ECG_RALL
-                                       11};  //(AVcc-AVss)/2 to monitor battery voltage
-   
-   void resetADC12Registers();
-   void stopConversion();
-   void setupDMA(uint16_t *destAddr);
+   uint8_t NBR_ADC_CHANS;
+
   
    /* Internal function to calculate 16 bit CRC */
    uint16_t calc_crc(uint8_t *ptr, uint8_t count) {
@@ -144,11 +135,6 @@ implementation {
          crc = crcByte(crc, *ptr++);
 
       return crc;
-   }
-
-   void sampleADC() {
-      resetADC12Registers();
-      setupDMA(sbuf0);
    }
 
    void init() {
@@ -192,12 +178,13 @@ implementation {
 
       call BluetoothInit.init();
       call AccelInit.init();
-      TOSH_MAKE_ADC_1_INPUT();   // ECG_LALL
-      TOSH_MAKE_ADC_2_INPUT();   // ECG_RALL
 
-      TOSH_SEL_ADC_1_MODFUNC();
-      TOSH_SEL_ADC_2_MODFUNC();
-    
+      call shimmerAnalogSetup.addAccelInputs();
+      call shimmerAnalogSetup.addECGInputs();
+      call shimmerAnalogSetup.finishADCSetup(sbuf0);
+
+      NBR_ADC_CHANS = call shimmerAnalogSetup.getNumberOfChannels();
+
       atomic {
          memset(tx_packet, 0, (FIXED_PACKET_SIZE*2));
          enable_sending = FALSE;
@@ -232,8 +219,8 @@ implementation {
       /* stop all sensing - battery is below the threshold */
       call SetupTimer.stop();
       call ActivityTimer.stop();
-      stopConversion();
-      call Msp430DmaChannel.stopTransfer();
+      call shimmerAnalogSetup.stopConversion();
+      call DMA0.stopTransfer();
       call Accel.wake(FALSE);
       call Leds.led1Off();
 
@@ -377,8 +364,6 @@ implementation {
       call Accel.wake(TRUE);
 
       call SampleTimer.startPeriodic(sample_freq);
-
-      sampleADC();
    }
 
    task void sendPersonality() {
@@ -393,8 +378,8 @@ implementation {
       call SetupTimer.stop();
       call SampleTimer.stop();
       call ActivityTimer.stop();
-      stopConversion();
-      call Msp430DmaChannel.stopTransfer();
+      call shimmerAnalogSetup.stopConversion();
+      call DMA0.stopTransfer();
       call Accel.wake(FALSE);
       call Leds.led1Off();
    }
@@ -474,114 +459,21 @@ implementation {
    }
 
    event void SampleTimer.fired() {
-      call HplAdc12.startConversion();
+      call shimmerAnalogSetup.triggerConversion();
    }
 
-   async event void Msp430DmaChannel.transferDone(error_t success) {
+   async event void DMA0.transferDone(error_t success) {
       if(current_buffer == 0){
-         call Msp430DmaChannel.repeatTransfer((void*)ADC12MEM0_, (void*)sbuf1, NBR_ADC_CHANS);
+         call DMA0.repeatTransfer((void*)ADC12MEM0_, (void*)sbuf1, NBR_ADC_CHANS);
          atomic timestamp1 = call LocalTime.get();
-	      current_buffer = 1;
+	 current_buffer = 1;
       }
       else { 
-         call Msp430DmaChannel.repeatTransfer((void*)ADC12MEM0_, (void*)sbuf0, NBR_ADC_CHANS);
+         call DMA0.repeatTransfer((void*)ADC12MEM0_, (void*)sbuf0, NBR_ADC_CHANS);
          atomic timestamp0 = call LocalTime.get();
-	      current_buffer = 0;
+	 current_buffer = 0;
       }
       post sendSensorData();      
-   }
-
-  /*******************************ADC12 and DMA drivers*******************************/
-   void initADC12CTL0()
-   {
-      adc12ctl0_t ctl0 = {
-         adc12sc:0,                      // start conversion: 0 = no sample-and-conversion-start
-         enc:0,                          // enable conversion: 0 = ADC12 disabled
-         adc12tovie:0,                   // conversion-time-overflow-interrupt: 0 = interrupt dissabled
-         adc12ovie:0,                    // ADC12MEMx overflow-interrupt: 0 = dissabled
-         adc12on:1,                      // ADC12 on: 1 = on
-#ifdef USE_AVCC_REF 
-         refon:0,                        // reference generator: 0 = off
-#else
-         refon:1,                        // reference generator: 0 = off
-#endif
-         r2_5v:1,                        // reference generator voltage: 1 = 2.5V
-         msc:1,                          // multiple sample and conversion: 1 = conversions performed ASAP
-         sht0:SAMPLE_HOLD_4_CYCLES,      // sample-and-hold-time for  ADC12MEM0 to ADC12MEM7  
-         sht1:SAMPLE_HOLD_4_CYCLES};     // sample-and-hold-time for  ADC12MEM8 to ADC12MEM15  
-
-        call HplAdc12.setCtl0(ctl0);
-   }
-
-   void initADC12CTL1()
-   {
-      adc12ctl1_t ctl1 = {
-         adc12busy:0,                    // no operation is active
-         conseq:1,                       // conversion mode: sequence of chans
-         adc12ssel:SHT_SOURCE_SMCLK,     // SHT_SOURCE_SMCLK=3; ADC12 clocl source
-         adc12div:SHT_CLOCK_DIV_8,       // SHT_CLOCK_DIV_8=7; ADC12 clock div 1
-         issh:0,                         // sample-input signal not inverted
-         shp:1,                          // Sample-and-hold pulse-mode select: SAMPCON signal is sourced from the sampling timer
-         shs:0,                          // Sample-and-hold source select= ADC12SC bit
-         cstartadd:0};                   // conversion start addres ADC12MEM0
-
-      call HplAdc12.setCtl1(ctl1);
-   }
-
-   void initADC12MEMCTLx()
-   {
-      adc12memctl_t memctl = {
-         inch: 0,                        // input channel: ADC0
-#ifdef USE_AVCC_REF 
-         sref: REFERENCE_AVcc_AVss,      // reference voltage: 
-#else
-         sref: REFERENCE_VREFplus_AVss,
-#endif
-         eos: 1 };                       // end of sequence flag: 1 indicates last conversion
-
-      uint8_t i = 0;
-
-      for (i = 0; i < NBR_ADC_CHANS; ++i) {
-         memctl.inch = ADC_CHANS[i];
-         if (i < NBR_ADC_CHANS-1)
-            memctl.eos = 0;
-         else 
-            memctl.eos = 1;                   // eos=1 indicates last conversion in sequence
-         call HplAdc12.setMCtl(i, memctl);
-      }
-   }
-
-   void resetADC12Registers()
-   {
-      initADC12CTL0();
-      initADC12CTL1();
-      initADC12MEMCTLx();
-   }
-
-   void stopConversion()
-   {
-      call HplAdc12.stopConversion();
-      call HplAdc12.setIEFlags(0);
-      call HplAdc12.resetIFGs();
-   }                                            
-        
-   async event void HplAdc12.conversionDone(uint16_t iv) {
-   }
-
-   void setupDMA(uint16_t *destAddr) {
-      call Msp430DmaControl.init();
-      call Msp430DmaControl.setFlags(FALSE, FALSE, FALSE);              // sets DMACTL1
-      call Msp430DmaChannel.setupTransfer(DMA_BLOCK_TRANSFER,           //dma_transfer_mode_t transfer_mode, 
-                                          DMA_TRIGGER_ADC12IFGx,        //dma_trigger_t trigger, 
-                                          DMA_EDGE_SENSITIVE,           //dma_level_t level,
-                                          (void*)ADC12MEM0_,            //void *src_addr, 
-                                          (void*)destAddr,              //void *dst_addr, 
-                                          NBR_ADC_CHANS,                //uint16_t size,
-                                          DMA_WORD,                     //dma_byte_t src_byte, 
-                                          DMA_WORD,                     //dma_byte_t dst_byte,
-                                          DMA_ADDRESS_INCREMENTED,      //dma_incr_t src_incr, 
-                                          DMA_ADDRESS_INCREMENTED);     //dma_incr_t dst_incr
-      call Msp430DmaChannel.startTransfer();
    }
 }
 

@@ -55,9 +55,10 @@ implementation {
   JustFATLoggingP.shimmerAnalogSetup -> shimmerAnalogSetupC;
   JustFATLoggingP.DMA0 -> Msp430DmaC.Channel0;
 
-  components Mma7260P;
-  JustFATLoggingP.AccelInit    -> Mma7260P;
-  JustFATLoggingP.Accel        -> Mma7260P;
+  //  components Mma7260P;
+  components AccelC;
+  JustFATLoggingP.AccelInit    -> AccelC;  //Mma7260P;
+  JustFATLoggingP.Accel        -> AccelC;  //Mma7260P;
 
   components FatFsP, diskIOC;
   JustFATLoggingP.FatFs     -> FatFsP;

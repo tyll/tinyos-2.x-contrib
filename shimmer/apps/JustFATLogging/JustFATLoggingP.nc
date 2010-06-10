@@ -37,7 +37,8 @@
 /*
   #include "msp430baudrates.h"
 */
-#include "Mma7260.h"
+//#include "Mma7260.h"
+#include "Mma_Accel.h"
 #include "PowerSupplyMonitor.h"
 //#include "Time.h"
 
@@ -58,7 +59,7 @@ module JustFATLoggingP {
     interface PowerSupplyMonitor;
 
     interface Init as AccelInit;
-    interface Mma7260 as Accel;
+    interface Mma_Accel as Accel;
 
     interface Time;
     interface Leds;
@@ -71,6 +72,8 @@ module JustFATLoggingP {
 implementation {
   extern int sprintf(char *str, const char *format, ...) __attribute__ ((C));
   extern int snprintf(char *str, size_t len, const char *format, ...) __attribute__ ((C));
+
+#define ABBREVIATED_ID
 
   void do_stores();
 
@@ -101,12 +104,13 @@ implementation {
 
     // first we'll make the shimmer mac address into a string
 
+#ifdef ABBREVIATED_ID
     sprintf(idname, "ID%02x%02x", 
 	    longAddress[4], longAddress[5]);
-    /*
+#else
     sprintf(idname, "%02x%02x%02x%02x%02x%02x", 
 	    longAddress[0], longAddress[1], longAddress[2], longAddress[3], longAddress[4], longAddress[5]);
-    */
+#endif
     gfi.lfname = lfn;
     gfi.lfsize = sizeof(lfn);
 
@@ -125,28 +129,32 @@ implementation {
     dir_counter = 0;   // this might be the first log for this shimmer
 
     /*
-     * dir format is 
+     * full dir format is:
      * 000102030405   shimmer 12 hex-digit cc2420 mac address
-     * _              separator
+     * -              separator
      * 000            a 3-digit sequential run number
      *
-     * we want to create a new directory with a sequential run number each time for each shimmer
+     * abbreviated format is:
+     * ID             just a nmemonic
+     * 05             last two of shimmer 12 hex-digit cc2420 mac address
+     * -              separator
+     * 000
+     *
+     * we want to create a new directory with a sequential run number each power-up/reset for each shimmer
      */
     while(call FatFs.readdir(&gdp, &gfi) == FR_OK){
       if(*gfi.fname == 0)
 	break;
       else if(gfi.fattrib & AM_DIR){      
 	fname = (*gfi.lfname) ? gfi.lfname : gfi.fname;
+#ifdef ABBREVIATED_ID
 	if(!strncmp(fname, idname, 6)){      // their id prefix has just six chars
-	/*
+#else
 	if(!strncmp(fname, idname, 12)){      // it's this shimmer's dir
-	*/
+#endif
 	  if((scout = strchr(fname, '-'))){   // if not, something is seriously wrong!
-	    scout += 2;                      // we have to skip the 'M' before the counter
-	   /*
-	  if((scout = strchr(fname, '_'))){   // if not, something is seriously wrong!
 	    scout++;
-	   */
+
 	    strcpy(dirnum, scout);
 	    tmp_counter = atoi(dirnum);
 	    if(tmp_counter >= dir_counter){
@@ -165,10 +173,8 @@ implementation {
   }
 
   error_t make_basedir() { 
-    sprintf(dirname, "/data/%s-M%03d", idname, dir_counter);
-     /*
-    sprintf(dirname, "/data/%s_%03d", idname, dir_counter);
-     */
+    sprintf(dirname, "/data/%s-%03d", idname, dir_counter);
+
     if(call FatFs.mkdir(dirname))
       return FAIL;
     
@@ -333,10 +339,8 @@ implementation {
   void do_stores(){
     uint8_t r;
 
-    sprintf(filename, "%s/%03d.pam", dirname, sequence_number++);
-     /*
     sprintf(filename, "%s/%03d", dirname, sequence_number++);
-     */
+
     TOSH_MAKE_DOCK_N_OUTPUT();
     TOSH_SET_DOCK_N_PIN();
 

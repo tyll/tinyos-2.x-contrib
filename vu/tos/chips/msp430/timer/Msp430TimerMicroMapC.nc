@@ -43,20 +43,20 @@ implementation
   Msp430TimerControl[2] = Msp430TimerC.ControlB2;
   Msp430Compare[2] = Msp430TimerC.CompareB2;
 
-  Msp430Timer[2] = Msp430TimerC.TimerB;
-  Msp430TimerControl[2] = Msp430TimerC.ControlB3;
-  Msp430Compare[2] = Msp430TimerC.CompareB3;
+  Msp430Timer[3] = Msp430TimerC.TimerB;
+  Msp430TimerControl[3] = Msp430TimerC.ControlB3;
+  Msp430Compare[3] = Msp430TimerC.CompareB3;
 
-  Msp430Timer[2] = Msp430TimerC.TimerB;
-  Msp430TimerControl[2] = Msp430TimerC.ControlB4;
-  Msp430Compare[2] = Msp430TimerC.CompareB4;
+  Msp430Timer[4] = Msp430TimerC.TimerB;
+  Msp430TimerControl[4] = Msp430TimerC.ControlB4;
+  Msp430Compare[4] = Msp430TimerC.CompareB4;
 
-  Msp430Timer[2] = Msp430TimerC.TimerB;
-  Msp430TimerControl[2] = Msp430TimerC.ControlB5;
-  Msp430Compare[2] = Msp430TimerC.CompareB5;
+  Msp430Timer[5] = Msp430TimerC.TimerB;
+  Msp430TimerControl[5] = Msp430TimerC.ControlB5;
+  Msp430Compare[5] = Msp430TimerC.CompareB5;
 
-  Msp430Timer[2] = Msp430TimerC.TimerB;
-  Msp430TimerControl[2] = Msp430TimerC.ControlB6;
-  Msp430Compare[2] = Msp430TimerC.CompareB6;
+  Msp430Timer[6] = Msp430TimerC.TimerB;
+  Msp430TimerControl[6] = Msp430TimerC.ControlB6;
+  Msp430Compare[6] = Msp430TimerC.CompareB6;
 }
 

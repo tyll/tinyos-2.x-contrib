@@ -61,7 +61,7 @@
  */
 
 #include "Timer.h"
-#include "Mma7260.h"
+#include "Mma_Accel.h"
 #include "AccelGyro.h"
 #include "crc.h"
 #include "RovingNetworks.h"
@@ -80,7 +80,7 @@ module AccelGyroC {
     interface Timer<TMilli> as ActivityTimer;
     interface Timer<TMilli> as SampleTimer;
     interface LocalTime<T32khz>;
-    interface Mma7260 as Accel;
+    interface Mma_Accel as Accel;
     interface StdControl as BTStdControl;
     interface Bluetooth;
     interface Msp430DmaChannel as DMA0;

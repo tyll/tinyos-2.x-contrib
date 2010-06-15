@@ -21,44 +21,64 @@
  * Author: Miklos Maroti
  */
 
+#include <Timer.h>
+#include <AM.h>
 #include <RadioConfig.h>
+#include <TimeSyncMessageLayer.h>
 
-configuration TimeSyncMessageC
+configuration TimeSyncMessageLayerC
 {
 	provides
 	{
-		interface SplitControl;
-
 		interface Receive[uint8_t id];
 		interface Receive as Snoop[am_id_t id];
 		interface Packet;
 		interface AMPacket;
-		
-		interface PacketTimeStamp<TRadio, uint32_t> as PacketTimeStampRadio;
+
 		interface TimeSyncAMSend<TRadio, uint32_t> as TimeSyncAMSendRadio[am_id_t id];
 		interface TimeSyncPacket<TRadio, uint32_t> as TimeSyncPacketRadio;
 
-		interface PacketTimeStamp<TMilli, uint32_t> as PacketTimeStampMilli;
 		interface TimeSyncAMSend<TMilli, uint32_t> as TimeSyncAMSendMilli[am_id_t id];
 		interface TimeSyncPacket<TMilli, uint32_t> as TimeSyncPacketMilli;
+	}
+
+	uses
+	{
+		interface PacketTimeStamp<TRadio, uint32_t> as PacketTimeStampRadio;
+		interface PacketTimeStamp<TMilli, uint32_t> as PacketTimeStampMilli;
+
+		interface LocalTime<TRadio> as LocalTimeRadio;
+		interface PacketField<uint8_t> as PacketTimeSyncOffset;
 	}
 }
 
 implementation
 {
-	components Cc2420XTimeSyncMessageC as MessageC;
-  
-	SplitControl	= MessageC;
-  	Receive		= MessageC.Receive;
-	Snoop		= MessageC.Snoop;
-	Packet		= MessageC;
-	AMPacket	= MessageC;
+	components TimeSyncMessageLayerP, LocalTimeMilliC;
 
-	PacketTimeStampRadio	= MessageC;
-	TimeSyncAMSendRadio	= MessageC;
-	TimeSyncPacketRadio	= MessageC;
+	Packet = TimeSyncMessageLayerP;
 
-	PacketTimeStampMilli	= MessageC;
-	TimeSyncAMSendMilli	= MessageC;
-	TimeSyncPacketMilli	= MessageC;
+	Receive = TimeSyncMessageLayerP.Receive;
+	Snoop = TimeSyncMessageLayerP.Snoop;
+
+	TimeSyncAMSendRadio = TimeSyncMessageLayerP;
+	TimeSyncPacketRadio = TimeSyncMessageLayerP;
+
+	TimeSyncAMSendMilli = TimeSyncMessageLayerP;
+	TimeSyncPacketMilli = TimeSyncMessageLayerP;
+
+	components Cc2420XActiveMessageC as ActiveMessageC;
+	TimeSyncMessageLayerP.SubAMSend -> ActiveMessageC;
+	TimeSyncMessageLayerP.SubPacket -> ActiveMessageC;
+
+	TimeSyncMessageLayerP.SubReceive -> ActiveMessageC.Receive;
+	TimeSyncMessageLayerP.SubSnoop -> ActiveMessageC.Snoop;
+
+	AMPacket = ActiveMessageC;
+	PacketTimeStampRadio = TimeSyncMessageLayerP;
+	PacketTimeStampMilli = TimeSyncMessageLayerP;
+	
+	TimeSyncMessageLayerP.LocalTimeMilli -> LocalTimeMilliC;
+	LocalTimeRadio = TimeSyncMessageLayerP;
+	PacketTimeSyncOffset = TimeSyncMessageLayerP;
 }

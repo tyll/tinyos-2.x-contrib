@@ -29,7 +29,9 @@ module TestBroadcastPolicyC {
     interface DfrfSend<counter_packet_t>;
     interface DfrfReceive<counter_packet_t>;
     interface Timer<TMilli>;
-#if defined(DFRF_32KHZ)    
+#if defined(DFRF_MICRO)    
+    interface LocalTime<TMicro>;
+#elif defined(DFRF_32KHZ)    
     interface LocalTime<T32khz>;
 #else
     interface LocalTime<TMilli>;
@@ -81,7 +83,7 @@ module TestBroadcastPolicyC {
 
     dbg("TestBroadcastPolicy","Received packet %d @ %d\n", packet->cnt, timeStamp);
     call Leds.set(packet->cnt);
-    //return SUCCESS;
+  
     return TRUE;
   }
 

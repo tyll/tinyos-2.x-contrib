@@ -56,7 +56,14 @@ module RemoteControlM
         interface DfrfSend<reply_t>;
         interface StdControl as DfrfControl;
         
-#if defined(DFRF_32KHZ)
+#if defined(DFRF_MICRO)
+        interface TimeSyncAMSend<TMicro, uint32_t>;
+        interface LocalTime<TMicro>;
+        interface TimeSyncIntCommand<TMicro, uint32_t>[uint8_t id];
+        interface TimeSyncDataCommand<TMicro, uint32_t>[uint8_t id];
+        interface PacketTimeStamp<TMicro, uint32_t>;
+        interface TimeSyncPacket<TMicro, uint32_t>;
+#elif defined(DFRF_32KHZ)
         interface TimeSyncAMSend<T32khz, uint32_t>;
         interface LocalTime<T32khz>;
         interface TimeSyncIntCommand<T32khz, uint32_t>[uint8_t id];
@@ -84,7 +91,7 @@ implementation
 #define TOS_SUBGROUP_ADDR 0xFF00
 #endif
 
-    uint8_t sentSeqNum;
+    uint16_t sentSeqNum;
     message_t tosMsg;
     uint8_t lastAppId;
     uint8_t ackTimer;
@@ -168,6 +175,7 @@ implementation
         // if ackTimer is not 0 and the remote control command has not been
         // forwarded then we forward it
         else if( sentSeqNum != rcCommand()->seqNum ){
+			rcCommand()->source = localAddress();
             if (call TimeSyncAMSend.send(TOS_BCAST_ADDR, &tosMsg, call Packet.payloadLength(&tosMsg), commandTimeStamp) != SUCCESS)
                 state |= STATE_FORWARDED;
         }
@@ -234,7 +242,7 @@ implementation
     event message_t* Receive.receive(message_t* p, void* payload, uint8_t len)
     {
         remotecontrol_t* newRcCommand = (remotecontrol_t*)payload;
-        int8_t age = newRcCommand->seqNum - rcCommand()->seqNum;
+        int16_t age = newRcCommand->seqNum - rcCommand()->seqNum;
 
         if( state == STATE_IDLE && ( age <= -50 || 0 < age ) && call TimeSyncPacket.isValid(p))
         {

@@ -21,7 +21,9 @@
  * Author: Janos Sallai
  */
 
-#if defined(DFRF_32KHZ)
+#if defined(DFRF_MICRO)
+#define TDfrf TMicro
+#elif defined(DFRF_32KHZ)
 #define TDfrf T32khz
 #else
 #define TDfrf TMilli
@@ -51,7 +53,12 @@ configuration DfrfEngineC {
   Engine.Receive -> TimeSyncMessageC.Receive[AM_DFRF_MSG];
   Engine.Timer -> DfrfTimer;
 
-#if defined(DFRF_32KHZ)
+#if defined(DFRF_MICRO)
+  components LocalTimeMicroC as LocalTimeProviderC;
+  Engine.LocalTime -> LocalTimeProviderC;
+  Engine.TimeSyncAMSend -> TimeSyncMessageC.TimeSyncAMSendRadio[AM_DFRF_MSG];
+  Engine.TimeSyncPacket -> TimeSyncMessageC.TimeSyncPacketRadio;
+#elif defined(DFRF_32KHZ)
   components LocalTime32khzC as LocalTimeProviderC;
   Engine.LocalTime -> LocalTimeProviderC;
   Engine.TimeSyncAMSend -> TimeSyncMessageC.TimeSyncAMSend32khz[AM_DFRF_MSG];

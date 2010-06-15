@@ -111,7 +111,13 @@ implementation
 	RemoteControlM.Random -> RandomC;
 	RemoteControlM.RandomInit -> RandomC.SeedInit;
 
-#if defined(DFRF_32KHZ)
+#if defined(DFRF_MICRO)
+  components LocalTimeMicroC as LocalTimeProviderC;
+  RemoteControlM.LocalTime -> LocalTimeProviderC;
+  RemoteControlM.TimeSyncAMSend -> AM.TimeSyncAMSendMicro[AM_REMOTECONTROL];
+  RemoteControlM.TimeSyncPacket -> AM.TimeSyncPacketMicro;
+  RemoteControlM.PacketTimeStamp -> ActiveMessageC.PacketTimeStampMicro;
+#elif defined(DFRF_32KHZ)
   components LocalTime32khzC as LocalTimeProviderC;
   RemoteControlM.LocalTime -> LocalTimeProviderC;
   RemoteControlM.TimeSyncAMSend -> AM.TimeSyncAMSend32khz[AM_REMOTECONTROL];

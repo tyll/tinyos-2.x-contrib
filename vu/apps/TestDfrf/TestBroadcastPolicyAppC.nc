@@ -42,7 +42,9 @@ configuration TestBroadcastPolicyAppC {
   App.Leds -> LedsC;
   App.AMPacket -> AM;
 
-#if defined(DFRF_32KHZ)
+#if defined(DFRF_MICRO)
+  components LocalTimeMicroC as LocalTimeProviderC;
+#elif defined(DFRF_32KHZ)
   components LocalTime32khzC as LocalTimeProviderC;
 #else
   components HilTimerMilliC as LocalTimeProviderC;

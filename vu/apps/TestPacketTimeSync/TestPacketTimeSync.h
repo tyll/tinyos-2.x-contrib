@@ -10,6 +10,18 @@ typedef nx_struct ping_msg {
   nx_uint32_t prev_ping_tx_timestamp;
 } ping_msg_t;
 
+typedef nx_struct real_ping_msg {
+  nx_uint16_t pinger;
+  nx_uint32_t ping_counter;
+  nx_uint32_t ping_event_time;
+  nx_uint32_t prev_ping_counter;
+  nx_uint8_t  prev_ping_tx_timestamp_is_valid;
+  nx_uint32_t prev_ping_tx_timestamp;
+  nx_uint8_t type;
+  nx_uint32_t timestamp;
+} real_ping_msg_t;
+
+
 typedef nx_struct pong_msg {
   nx_uint16_t ponger;
   nx_uint16_t pinger;
@@ -22,6 +34,7 @@ typedef nx_struct pong_msg {
 
 enum {
   AM_PING_MSG = 16,
+  AM_REAL_PING_MSG = 0x3d,
   AM_PONG_MSG = 17,
 };
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, Vanderbilt University
+ * Copyright (c) 2007, Vanderbilt University
  * All rights reserved.
  *
  * Permission to use, copy, modify, and distribute this software and its
@@ -18,8 +18,8 @@
  * ON AN "AS IS" BASIS, AND THE VANDERBILT UNIVERSITY HAS NO OBLIGATION TO
  * PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
  *
- * Author: Janos Sallai
- */ 
+ * Author: Miklos Maroti
+ */
 
 #include <RadioConfig.h>
 
@@ -33,7 +33,7 @@ configuration TimeSyncMessageC
 		interface Receive as Snoop[am_id_t id];
 		interface Packet;
 		interface AMPacket;
-
+		
 		interface PacketTimeStamp<TRadio, uint32_t> as PacketTimeStampRadio;
 		interface TimeSyncAMSend<TRadio, uint32_t> as TimeSyncAMSendRadio[am_id_t id];
 		interface TimeSyncPacket<TRadio, uint32_t> as TimeSyncPacketRadio;
@@ -47,7 +47,7 @@ configuration TimeSyncMessageC
 implementation
 {
 	components Cc2420XTimeSyncMessageC as MessageC;
-
+  
 	SplitControl	= MessageC;
   	Receive		= MessageC.Receive;
 	Snoop		= MessageC.Snoop;

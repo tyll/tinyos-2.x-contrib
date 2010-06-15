@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, Vanderbilt University
+ * Copyright (c) 2007, Vanderbilt University
  * All rights reserved.
  *
  * Permission to use, copy, modify, and distribute this software and its
@@ -18,8 +18,8 @@
  * ON AN "AS IS" BASIS, AND THE VANDERBILT UNIVERSITY HAS NO OBLIGATION TO
  * PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
  *
- * Author: Janos Sallai
- */ 
+ * Author: Miklos Maroti
+ */
 
 #include <RadioConfig.h>
 
@@ -51,24 +51,30 @@ configuration ActiveMessageC
 
 implementation
 {
-	components Cc2420XActiveMessageC as MessageC;
-
+	components TimeSyncMessageC as MessageC;
+	components AMSendOverTimeSyncAMSendC;
+	
 	SplitControl = MessageC;
 
-	AMSend = MessageC;
+	AMSend = AMSendOverTimeSyncAMSendC;
+	AMSendOverTimeSyncAMSendC.SubTimeSyncAMSend -> MessageC;
 	Receive = MessageC.Receive;
 	Snoop = MessageC.Snoop;
-	SendNotifier = MessageC;
+	
+	
+	components Cc2420XActiveMessageC as AMessageC;
+
+	PacketAcknowledgements = AMessageC;
+	LowPowerListening = AMessageC;
+#ifdef PACKET_LINK
+	PacketLink = AMessageC;
+#endif
+	RadioChannel = AMessageC;
+
+	SendNotifier	= AMessageC;
 
 	Packet = MessageC;
 	AMPacket = MessageC;
-
-	PacketAcknowledgements = MessageC;
-	LowPowerListening = MessageC;
-#ifdef PACKET_LINK
-	PacketLink = MessageC;
-#endif
-	RadioChannel = MessageC;
 
 	PacketTimeStampMilli = MessageC;
 	PacketTimeStampMicro = MessageC;

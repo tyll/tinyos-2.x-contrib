@@ -23,6 +23,8 @@ public class TestPacketTimeSync implements net.tinyos.message.MessageListener {
   public void messageReceived(int to, Message message) {
     long t = System.currentTimeMillis();
 
+    System.err.println("INFO: received message type = "+message.amType()+ " length=" + message.dataLength());
+
     if(message instanceof PongMsg) {
       PongMsg pongMsg = (PongMsg)message;
       if(pongMsg.get_ping_counter()==0) return;

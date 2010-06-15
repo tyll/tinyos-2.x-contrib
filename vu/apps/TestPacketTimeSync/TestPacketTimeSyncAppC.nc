@@ -6,12 +6,13 @@ implementation {
   components ActiveMessageC;
   components TimeSyncMessageC;
   components new TimerMilliC();
-  components LocalTimeMicroC;
+  components LocalTimeHybridMicroC as LocalTimeMicroC;
+  components NoSleepC;
 
   App.Boot -> MainC.Boot;
 
-  App.PingReceive -> ActiveMessageC.Receive[AM_PING_MSG];
-  App.PingAMSend -> TimeSyncMessageC.TimeSyncAMSendMicro[AM_PING_MSG];
+  App.PingReceive -> TimeSyncMessageC.Receive[AM_PING_MSG];
+  App.PingAMSend -> TimeSyncMessageC.TimeSyncAMSendRadio[AM_PING_MSG];
   App.PongAMSend -> ActiveMessageC.AMSend[AM_PONG_MSG];
   App.AMControl -> ActiveMessageC;
   App.Leds -> LedsC;

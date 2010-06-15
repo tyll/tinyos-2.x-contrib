@@ -53,7 +53,7 @@ public class RemoteControl extends MessageCenterInternalFrame implements PacketL
     // other constants
     public static int COMMAND_RESEND = 3;
     
-    private static byte sequenceNum = 1;
+    private static int sequenceNum = 1;
     private static byte commandState = START;
     Preferences prefs = null;
     
@@ -429,7 +429,7 @@ public class RemoteControl extends MessageCenterInternalFrame implements PacketL
         }//GEN-END:initComponents
         
 	private void seqnTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_seqnTextFieldActionPerformed
-            sequenceNum = (byte)Integer.parseInt(seqnTextField.getText());
+            sequenceNum = (short)Integer.parseInt(seqnTextField.getText());
 	}//GEN-LAST:event_seqnTextFieldActionPerformed
         
 	private void restartRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_restartRadioButtonActionPerformed
@@ -488,7 +488,7 @@ public class RemoteControl extends MessageCenterInternalFrame implements PacketL
             target = BROADCAST;
         }
         
-        seqnTextField.setText(""+(sequenceNum & 0xFF));
+        seqnTextField.setText(""+(sequenceNum & 0xFFFF));
         switch(selected){
             case 0:
                 int integer;
@@ -497,15 +497,15 @@ public class RemoteControl extends MessageCenterInternalFrame implements PacketL
                 } catch (Exception e){
                     integer = 0;
                 }
-                logTextArea.append((sequenceNum & 0xFF)+". sending integer (target: "+target+", appId: "+(appId & 0xFF)+", integer: "+integer+")\n");
+                logTextArea.append((sequenceNum & 0xFFFF)+". sending integer (target: "+target+", appId: "+(appId & 0xFF)+", integer: "+integer+")\n");
                 sendInteger(target, appId, integer);
                 break;
             case 1:
-                logTextArea.append((sequenceNum & 0xFF)+". sending command (target: "+target+", appId: "+(appId & 0xFF)+", command: "+commandString+") "+COMMAND_RESEND+" times\n");
+                logTextArea.append((sequenceNum & 0xFFFF)+". sending command (target: "+target+", appId: "+(appId & 0xFF)+", command: "+commandString+") "+COMMAND_RESEND+" times\n");
                 sendCommand(target, appId, commandState);
                 break;
             case 2:
-                logTextArea.append((sequenceNum & 0xFF)+". sending data (target: "+target+", appId: "+(appId & 0xFF)+", data: "+dataParamTextField.getText()+")\n");
+                logTextArea.append((sequenceNum & 0xFFFF)+". sending data (target: "+target+", appId: "+(appId & 0xFF)+", data: "+dataParamTextField.getText()+")\n");
                 sendData(target, appId, parseDataField());
                 break;
         }
@@ -702,23 +702,21 @@ public class RemoteControl extends MessageCenterInternalFrame implements PacketL
         }
         
         public static int sendInteger(int target, byte appId, int integer){
-            byte data[] = new byte[7];
+            byte data[] = new byte[10];
             // seqNum
-            data[0] = sequenceNum++;
+            data[0] = (byte)sequenceNum;
+            data[1] = (byte)(sequenceNum/256);
+			sequenceNum++;
             // target
-            Marshaller.setUIntBEElement(data, 1*8, 16, target);
-            //data[1] = (byte)target;
-            //data[2] = (byte)(target/256);
+            Marshaller.setUIntBEElement(data, 2*8, 16, target);
+            // source
+            Marshaller.setUIntBEElement(data, 4*8, 16, 0);
             // dataType
-            Marshaller.setUIntBEElement(data, 3*8, 8, INT);
-            //data[3] = INT;
+            Marshaller.setUIntBEElement(data, 6*8, 8, INT);
             // application ID
-            Marshaller.setUIntBEElement(data, 4*8, 8, appId);
-            //data[4] = appId;
+            Marshaller.setUIntBEElement(data, 7*8, 8, appId);
             // integer (uint16_t)
-            Marshaller.setUIntBEElement(data, 5*8, 16, integer);
-            //data[5] = (byte)integer;
-            //data[6] = (byte)(integer/256);
+            Marshaller.setUIntBEElement(data, 8*8, 16, integer);
             
             //for (int i = 0; i < COMMAND_RESEND; i++)
             //    SerialConnector.instance().sendMessage(BROADCAST,AM_TYPE,data);
@@ -726,28 +724,33 @@ public class RemoteControl extends MessageCenterInternalFrame implements PacketL
             TimedSender ts = new TimedSender(data);
             ts.start();
             
-            return (sequenceNum-1)&0xFF;
+            return (sequenceNum-1)&0xFFFF;
         }
         
         public static int sendData(int target, byte appId, byte pData[]){
             byte data[];
-            if (pData.length > 24){
+            if (pData.length > 21){
                 // write to log that the data part is too long, it will be sent truncated
                 data = new byte[29];
             } else{
-                data = new byte[5+pData.length];
+                data = new byte[8+pData.length];
             }
             // seqNum
-            data[0] = sequenceNum++;
+            data[0] = (byte)sequenceNum;
+            data[1] = (byte)(sequenceNum/256);
+			sequenceNum++;
             // target
-            data[1] = (byte)target;
-            data[2] = (byte)(target/256);
+            data[2] = (byte)target;
+            data[3] = (byte)(target/256);
+            // source
+            data[4] = (byte)0;
+            data[5] = (byte)0;
             // dataType
-            data[3] = DATA;
+            data[6] = DATA;
             // application ID
-            data[4] = appId;
+            data[7] = appId;
             // data copy
-            System.arraycopy(pData, 0, data, 5, data.length-5);
+            System.arraycopy(pData, 0, data, 8, data.length-8);
             
             //for (int i = 0; i < COMMAND_RESEND; i++)
             //	SerialConnector.instance().sendMessage(BROADCAST,AM_TYPE,data);
@@ -755,39 +758,44 @@ public class RemoteControl extends MessageCenterInternalFrame implements PacketL
             ts.start();
 
                 
-            return (sequenceNum-1)&0xFF;
+            return (sequenceNum-1) & 0xFFFF;
         }
         
         public static int sendCommand(int target, byte appId, byte command){
-            byte data[] = new byte[6];
+            byte data[] = new byte[9];
             // seqNum
-            data[0] = sequenceNum++;
+            data[0] = (byte)sequenceNum;
+            data[1] = (byte)(sequenceNum/256);
+			sequenceNum++;
             // target
-            data[1] = (byte)target;
-            data[2] = (byte)(target/256);
+            data[2] = (byte)target;
+            data[3] = (byte)(target/256);
+            // source
+            data[4] = (byte)0;
+            data[5] = (byte)0;
             // dataType
-            data[3] = COMMAND;
+            data[6] = COMMAND;
             // application ID
-            data[4] = appId;
+            data[7] = appId;
             // command
-            data[5] = command;
+            data[8] = command;
             
             //for (int i = 0; i < COMMAND_RESEND; i++)
             //    SerialConnector.instance().sendMessage(BROADCAST,AM_TYPE,data);
             TimedSender ts = new TimedSender(data);
             ts.start();
 
-            return (sequenceNum-1)&0xFF;
+            return (sequenceNum-1)&0xFFFF;
         }
 
 		public void packetReceived(byte[] packet) {
             // unpack tinyos message
             if ( packet[2] == AM_TYPE){
-                byte seqNum = (byte)(packet[PACKET_DATA_BYTE] & 0xFF);
-                byte age = (byte)(seqNum - sequenceNum);
+                int seqNum = (int)(packet[PACKET_DATA_BYTE] & 0xFF) + (int)(packet[PACKET_DATA_BYTE+1] & 0xFF)*256;
+                int age = seqNum - sequenceNum;
                 if (0 < age && age < 64 ){
                     sequenceNum = seqNum;
-                    seqnTextField.setText(""+(sequenceNum & 0xFF));
+                    seqnTextField.setText(""+(sequenceNum & 0xFFFF));
                 }
             }
 		}
@@ -799,6 +807,15 @@ public class RemoteControl extends MessageCenterInternalFrame implements PacketL
         	}
         	public void run(){
         		int i = 0;
+				try {
+					while ( !SerialConnector.instance().sendMessage(BROADCAST,AM_TYPE,data) )
+						sleep(200);
+				}catch(InterruptedException ie){
+					ie.printStackTrace(System.err);
+				}
+
+
+				/*
         		while(i < 2*COMMAND_RESEND){
         			try{
 		    			if(SerialConnector.instance().sendMessage(BROADCAST,AM_TYPE,data)){
@@ -811,6 +828,7 @@ public class RemoteControl extends MessageCenterInternalFrame implements PacketL
         				
         			}
         		}
+				*/
         	}
         }
 }

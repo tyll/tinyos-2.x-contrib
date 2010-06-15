@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Vanderbilt University
+ * Copyright (c) 2010, Vanderbilt University
  * All rights reserved.
  *
  * Permission to use, copy, modify, and distribute this software and its
@@ -19,17 +19,23 @@
  * PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
  *
  * Author: Janos Sallai
- */
+ */ 
+ 
+#include <Timer.h>
+#include <Msp430HybridAlarmCounter.h>
 
+configuration AlarmHybridMicro32C
+{
+	provides interface Alarm<TMicro, uint32_t>;
+}
 
-#ifndef __BASESTATION_H__
-#define __BASESTATION_H__
-#include "message.h"
+implementation
+{
+	components Msp430HybridAlarmCounterC;
+	components new TransformAlarmC(TMicro, uint32_t, T2ghz, uint32_t, 11);
+	components LocalTimeHybridMicroC;
 
-enum {
-  AM_DFRF = 0x82,
-  AM_REMOTECONTROL = 0x5e,  
-  INVALID_TIMESTAMP = 0x80000000L,
-};
-
-#endif /* __BASESTATION_H__ */
+	Alarm = TransformAlarmC;
+	TransformAlarmC.Counter -> LocalTimeHybridMicroC;
+	TransformAlarmC.AlarmFrom -> Msp430HybridAlarmCounterC;
+}

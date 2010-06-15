@@ -92,7 +92,7 @@ configuration BaseStationC {
 }
 implementation {
   components MainC, BaseStationP, LedsC;
-  components ActiveMessageC as Radio, TimeSyncMessageC as TimeSyncRadio, HilTimerMilliC, SerialActiveMessageC as Serial;
+  components TimeSyncMessageC as Radio, SerialActiveMessageC as Serial;
 
   MainC.Boot <- BaseStationP;
 
@@ -104,24 +104,23 @@ implementation {
   BaseStationP.UartPacket -> Serial;
   BaseStationP.UartAMPacket -> Serial;
 
-  BaseStationP.RadioSend -> Radio;
+  BaseStationP.TimeSyncRadioSend -> Radio;
   BaseStationP.RadioReceive -> Radio.Receive;
-  BaseStationP.RadioSnoop -> Radio.Snoop;
+  BaseStationP.RadioSnoop ->   Radio.Snoop;
   BaseStationP.RadioPacket -> Radio;
   BaseStationP.RadioAMPacket -> Radio;
 
-  BaseStationP.TimeSyncRadioSend -> TimeSyncRadio;
-  BaseStationP.TimeSyncPacket -> TimeSyncRadio;
-
   BaseStationP.Leds -> LedsC;
 
-#if defined(DFRF_T32KHZ)
+  BaseStationP.TimeSyncPacket -> Radio;
+  
+#if defined(DFRF_32KHZ)
   components LocalTime32khzC as LocalTimeProviderC;
-#elif defined(DFRF_TMICRO)
+#elif defined(DFRF_MICRO)
   components LocalTimeMicroC as LocalTimeProviderC;
 #else
   components HilTimerMilliC as LocalTimeProviderC;
 #endif
   
-  BaseStationP.LocalTime -> LocalTimeProviderC;  
+  BaseStationP.LocalTime -> LocalTimeProviderC;     
 }

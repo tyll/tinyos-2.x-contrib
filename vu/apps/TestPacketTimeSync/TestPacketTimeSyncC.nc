@@ -101,7 +101,7 @@ implementation {
 
     dbg("TestPacketTimeSync", "%d: TestPacketTimeSync: Received ping of size %d (%d expected)\n", call LocalTime.get(), len, sizeof(ping_msg_t)+4);
 
-    if (locked || len != sizeof(ping_msg_t)+4) {
+    if (locked /*|| len != sizeof(ping_msg_t)*/) {
       return bufPtr;
     } else {
       ping_msg_t* ping = (ping_msg_t*)payload;

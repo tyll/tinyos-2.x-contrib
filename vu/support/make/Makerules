@@ -1,6 +1,8 @@
 #Use the "new" Make structure
 TOSMAKE_PATH += $(VUTOSDIR)/../support/make
 
+PROGRAMMER=avrdude
+
 include $(TOSDIR)/../support/make/Makerules
 
 #Include VU Libs and platforms

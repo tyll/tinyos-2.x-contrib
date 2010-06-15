@@ -1,10 +1,5 @@
 ifeq ($(PLATFORM),iris)
-  # include all dirs under tos/chips/atm1281
-	PFLAGS := $(patsubst $(VUTOSDIR)/%, -I$(VUTOSDIR)/%, $(shell find $(VUTOSDIR)/chips/atm1281 -type d -not -regex '.*\.svn.*')) $(PFLAGS)
-	# include all dirs under tos/platform/iris
-	PFLAGS := $(patsubst $(VUTOSDIR)/%, -I$(VUTOSDIR)/%, $(shell find $(VUTOSDIR)/platforms/iris -type d -not -regex '.*\.svn.*')) $(PFLAGS)
-	# include tos/lib/serial
-  PFLAGS := -I$(VUTOSDIR)/lib/serial $(PFLAGS)
+  PFLAGS := -I$(VUTOSDIR)/platforms/iris  $(PFLAGS)
 endif
 
 ifeq ($(PLATFORM),mica2)
@@ -35,6 +30,21 @@ ifeq ($(PLATFORM),telosb)
 	PFLAGS := -I$(VUTOSDIR)/platforms/telosa  $(PFLAGS)
 	PFLAGS := -I$(VUTOSDIR)/platforms/telosa/chips/cc2420x  $(PFLAGS)
 endif
+
+
+ifeq ($(PLATFORM),xsm)
+  # include all dirs under tos/chips/cc1000
+	PFLAGS := $(patsubst $(VUTOSDIR)/%, -I$(VUTOSDIR)/%, $(shell find $(VUTOSDIR)/chips/cc1000 -type d)) $(PFLAGS)
+endif
+
+ifeq ($(PLATFORM),zigbit)
+  PFLAGS := -I$(VUTOSDIR)/platforms/iris  $(PFLAGS)
+endif
+
+ifeq ($(PLATFORM),zigiris)
+  PFLAGS := -I$(VUTOSDIR)/platforms/iris  $(PFLAGS)
+endif
+
 
 # debug
 #$(warning $(PFLAGS))

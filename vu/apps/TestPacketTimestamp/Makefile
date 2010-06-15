@@ -1,6 +1,4 @@
 COMPONENT=TestPacketTimestampAppC
-PFLAGS+=-I$(VUTOSDIR)/chips/cc1000
-PFLAGS+=-DCC1000_ACK_OFF
 BUILD_EXTRA_DEPS = PingMsg.class PongMsg.class TestPacketTimeStamp.class
 CLEAN_EXTRA = *.class PongMsg.java PingMsg.java
 
@@ -19,5 +17,5 @@ PongMsg.java: TestPacketTimestamp.h
 TestPacketTimeStamp.class: PongMsg.class PingMsg.class
 	javac TestPacketTimeStamp.java
 
-include $(MAKERULES)
+include $(VUMAKERULES)
 

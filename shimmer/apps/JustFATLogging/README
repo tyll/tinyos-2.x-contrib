@@ -9,7 +9,9 @@ under a top-level directory on the card called /data, a directory
 application starts, meaning at power-on or reset:
 
 <12-character hex number>  the "mac address" of the shimmer's cc2420
-radio, unique.
+radio, unique.  you can abbreviate this by defining (default here)
+ABBREVIATED_ID, which causes the directory id to shorted to the string
+"IDabcd" where abcd are the last four characters in the mac address.
 
 <3-digit sequence number> counting from 000.  this number increments
 each time the application is run.
@@ -18,23 +20,36 @@ the directory name looks like this:
 
 <hex number>_<sequence number>, e.g. 0000112be777_038
 
+or 
+
+ID<four hex digits>_<sequence number>, e.g. ID04f4_038
+
 this way, shimmer 'a' won't overwrite directories written by shimmer
 'b' if the card travels.  the user doesn't have to do anything.
 
 NOTE: dock-related behaviour described below will not work with
-shimmer, only with shimmer2!
+shimmer, only with shimmer2 or shimmer2r!
 
 files placed in this directory are also numbered sequentially,
 starting at 000.  a new file is created when a) the current file
 exceeds 1mb (about one hour), or b) when the app is interrupted by
-docking the shimmer2. 
+docking the shimmer2/2r. 
 
 logging starts immediately when a powered shimmer2 is removed from the dock,
-or, of course, powered-up or reset apart from the dock.
+or, of course, powered-up or reset apart from the dock.  you'll see
+the green LED blink on during each file write.
 
-when the shimmer2 is docked it will stop capturing/logging
+when the shimmer2/2r is docked it will stop capturing/logging
 acceleration data, but you'll be able to see, read, or transfer
-the files created to your desktop computer.
+the files created to your desktop computer.  the yellow LED will be
+on.
+
+if the red LED comes on or blinks, then you're almost out of power,
+and the app will eventually shut itself down.  if all three LEDs come
+on, then a file write error occurred; you may see this occasionally
+after first programming the device and starting to log.  if it does
+happen at the outset, best to reset the shimmer and being again.  if
+it persists, you might want to check the card with your pc.
 
 about the directory/file timestamps:  since this application does not
 use either radio and doesn't actively communicate with a host

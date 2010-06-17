@@ -10,3 +10,11 @@
 # @author: LIU Yu <pineapple.liu@gmail.com>
 # @date  : Jun 17, 2010
 #
+
+push( @includes, qw(
+
+  %T/sensorboards/synsb
+  %T/lib/tossim
+  %T/platforms/micaz
+
+) );

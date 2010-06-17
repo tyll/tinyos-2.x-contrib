@@ -8,18 +8,21 @@
 
 /**
  * Demo sensor for synthetic sensorboard.
- *
+ * 
  * @author LIU Yu <pineapple.liu@gmail.com>
- * @date   Apr 13 2009
+ * @date   Jun 18, 2010
  */
 
-#ifndef __SYNSB_H__
-#define __SYNSB_H__
+#warning "synsb.DemoSensor activated"
 
-#ifdef TOSSIM
-#include "sim_synsb.h"
-#else
-#error "This sensorboard (synsb) is only available for TOSSIM."
-#endif
+#include "synsb.h"
 
-#endif /* __SYN_SB_H__ */
+generic configuration DemoSensorC()
+{
+  provides interface Read<uint16_t>;
+}
+implementation
+{
+  components new SyntheticSensorC(uint16_t, S_DEMO_SENSOR) as Sensor;
+  Read = Sensor;
+}

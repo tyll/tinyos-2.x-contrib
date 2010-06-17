@@ -18,10 +18,8 @@ ifeq ($(SENSORBOARD),synsb)
 
 DATASOURCE ?= "bdb:"
 
-ifeq ($(SENSORBOARD),synsb)
 CFLAGS += -I$(HITDKEDIR)/tos/sensorboards/synsb
 CFLAGS += -I$(HITDKEDIR)/tos/lib/tossim
-endif
 
 BUILD_EXTRA_DEPS += custom-sim-module
 CLEAN_EXTRA = *.pyc *.pyo *.dll *.o *.so

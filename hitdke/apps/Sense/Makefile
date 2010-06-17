@@ -2,7 +2,7 @@
 
 #
 # Copyright (c) 2010 Data & Knowledge Engineering Research Center,
-#                    Harbin Institute of Technology.
+#                    Harbin Institute of Technology, P. R. China.
 # All rights reserved.
 #
 

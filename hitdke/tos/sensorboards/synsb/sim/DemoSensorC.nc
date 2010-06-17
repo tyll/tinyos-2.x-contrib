@@ -13,8 +13,6 @@
  * @date   Jun 18, 2010
  */
 
-#warning "synsb.DemoSensor activated"
-
 #include "synsb.h"
 
 generic configuration DemoSensorC()

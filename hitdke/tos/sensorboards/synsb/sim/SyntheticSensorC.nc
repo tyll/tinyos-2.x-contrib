@@ -13,8 +13,6 @@
  * @date   Jan 14, 2010
  */
 
-#warning "synsb.SyntheticSensorC activated"
-
 #include "synsb.h"
 
 #include <sim_event_queue.h>
@@ -31,31 +29,38 @@ implementation
     {
         width_t val;            /* default (undefined) read data */
 
-        // assert(evt);
-
-        sim_time_t readTime = evt->time;
-        int nodeId = evt->mote;
-
-        // obtain value from data source
+        if (evt == NULL)
         {
+            signal Read.readDone(FAIL, ERR_BAD_PTR);
+            return;
+        }
+        else
+        {
+            sim_time_t readTime = evt->time;
+            int nodeId = evt->mote;
+
             SSB_DataSource * pDS = SSB_getDataSource();
             SSB_RecordSet * pRS = NULL;
+
             if (pDS == NULL)
             {
                 signal Read.readDone(FAIL, ERR_BAD_DS);
                 return;
             }
+
             pRS = SSB_queryDataSource(pDS, readTime, nodeId, sensorId);
             if (pRS == NULL)
             {
                 signal Read.readDone(FAIL, ERR_BAD_RS);
                 return;
             }
+
             if (pRS->count <= 0)
             {
                 signal Read.readDone(FAIL, ERR_NO_DATA);
                 return;
             }
+
             val = (width_t)SSB_getFirstRecord(pRS);
         }
 
@@ -65,17 +70,12 @@ implementation
 
     void cleanupReadEvent(sim_event_t* evt)
     {
-        // assert(evt);
-
-        // TODO: do cleanup
-
         return sim_queue_cleanup_event(evt);
     } 
 
     sim_event_t* allocateReadEvent(void)
     {
         sim_event_t* evt = sim_queue_allocate_event();
-        // assert(evt);
 
         evt->time = sim_time();     // current time
         evt->mote = sim_node();     // current mote id

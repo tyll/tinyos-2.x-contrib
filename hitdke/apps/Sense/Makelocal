@@ -11,9 +11,8 @@
 # @date:   Jun 18 2010
 #
 
-COMPONENT = SenseAppC
-
 HITDKEDIR ?= ../..
 SENSORBOARD ?= synsb
 
-include Makelocal
+include $(HITDKEDIR)/support/make/synsb.rules
+

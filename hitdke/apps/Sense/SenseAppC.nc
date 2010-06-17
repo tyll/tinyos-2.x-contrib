@@ -48,6 +48,7 @@ configuration SenseAppC
 implementation { 
   
   components SenseC, MainC, LedsC, new TimerMilliC(), new DemoSensorC() as Sensor;
+//  components SenseC, MainC, LedsC, new TimerMilliC(), new SyntheticSensorC(uint16_t, 0) as Sensor;
 
   SenseC.Boot -> MainC;
   SenseC.Leds -> LedsC;

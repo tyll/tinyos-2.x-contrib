@@ -23,8 +23,36 @@ extern "C"
 {
 #endif
 
-/* TODO */
+typedef enum
+{
+    S_DEMO_SENSOR = 0,
+} SSB_SensorType;
 
+typedef enum
+{
+    ERR_BAD_DS = 0,
+    ERR_BAD_RS = 1,
+    ERR_NO_DATA = 2,
+} SSB_Error;
+
+typedef struct
+{
+    int __unused__;
+} SSB_DataSource;
+
+typedef struct
+{
+    unsigned int count;
+    int __unused__;
+} SSB_RecordSet;
+
+void SSB_initDataSource(void);
+
+SSB_DataSource * SSB_getDataSource(void);
+
+SSB_RecordSet * SSB_queryDataSource(SSB_DataSource * pDS, sim_time_t readTime, int nodeId, int sensorId);
+
+int SSB_getFirstRecord(SSB_RecordSet * pRS);
 
 #ifdef __cplusplus
 }

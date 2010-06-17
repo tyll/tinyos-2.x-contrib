@@ -17,11 +17,7 @@ HITDKEDIR ?= ../..
 SENSORBOARD ?= synsb
 
 ifeq ($(SENSORBOARD),synsb)
-
-  include $(HITDKEDIR)/support/make/synsb.rules
-
+  include $(HITDKEDIR)/sensorboards/synsb/synsb.rules
 else
-
   include $(MAKERULES)
-
 endif

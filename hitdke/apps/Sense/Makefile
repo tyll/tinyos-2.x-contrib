@@ -16,4 +16,12 @@ COMPONENT = SenseAppC
 HITDKEDIR ?= ../..
 SENSORBOARD ?= synsb
 
-include Makelocal
+ifeq ($(SENSORBOARD),synsb)
+
+  include $(HITDKEDIR)/support/make/synsb.rules
+
+else
+
+  include $(MAKERULES)
+
+endif

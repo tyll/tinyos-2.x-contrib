@@ -33,6 +33,7 @@ typedef enum
     ERR_BAD_DS = 0,
     ERR_BAD_RS = 1,
     ERR_NO_DATA = 2,
+    ERR_BAD_PTR = 3,
 } SSB_Error;
 
 typedef struct
@@ -46,13 +47,13 @@ typedef struct
     int __unused__;
 } SSB_RecordSet;
 
-void SSB_initDataSource(void);
+void sim_synsb_initDataSource(void);
 
-SSB_DataSource * SSB_getDataSource(void);
+SSB_DataSource * sim_synsb_getDataSource(void);
 
-SSB_RecordSet * SSB_queryDataSource(SSB_DataSource * pDS, sim_time_t readTime, int nodeId, int sensorId);
+SSB_RecordSet * sim_synsb_queryDataSource(SSB_DataSource * pDS, sim_time_t readTime, int nodeId, int sensorId);
 
-int SSB_getFirstRecord(SSB_RecordSet * pRS);
+int sim_synsb_getFirstRecord(SSB_RecordSet * pRS);
 
 #ifdef __cplusplus
 }

@@ -21,19 +21,19 @@ extern "C" unsigned int unique(const char *);
 extern "C" void assert(void *);
 
 void 
-SSB_initDataSource(void)
+sim_synsb_initDataSource(void)
 {
     return;
 }
 
 SSB_DataSource * 
-SSB_getDataSource(void)
+sim_synsb_getDataSource(void)
 {
     return &theDS;
 }
 
 SSB_RecordSet * 
-SSB_queryDataSource(SSB_DataSource * pDS, sim_time_t readTime, int nodeId, int sensorId)
+sim_synsb_queryDataSource(SSB_DataSource * pDS, sim_time_t readTime, int nodeId, int sensorId)
 {
    /* print debug info. */
     char timeBuf[128];
@@ -44,7 +44,7 @@ SSB_queryDataSource(SSB_DataSource * pDS, sim_time_t readTime, int nodeId, int s
 }
 
 int
-SSB_getFirstRecord(SSB_RecordSet * pRS)
+sim_synsb_getFirstRecord(SSB_RecordSet * pRS)
 {
     return 0;
 }

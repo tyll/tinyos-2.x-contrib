@@ -39,7 +39,7 @@ implementation
             sim_time_t readTime = evt->time;
             int nodeId = evt->mote;
 
-            SSB_DataSource * pDS = SSB_getDataSource();
+            SSB_DataSource * pDS = sim_synsb_getDataSource();
             SSB_RecordSet * pRS = NULL;
 
             if (pDS == NULL)
@@ -48,7 +48,7 @@ implementation
                 return;
             }
 
-            pRS = SSB_queryDataSource(pDS, readTime, nodeId, sensorId);
+            pRS = sim_synsb_queryDataSource(pDS, readTime, nodeId, sensorId);
             if (pRS == NULL)
             {
                 signal Read.readDone(FAIL, ERR_BAD_RS);
@@ -61,7 +61,7 @@ implementation
                 return;
             }
 
-            val = (width_t)SSB_getFirstRecord(pRS);
+            val = (width_t)sim_synsb_getFirstRecord(pRS);
         }
 
         // signal read done with obtained value

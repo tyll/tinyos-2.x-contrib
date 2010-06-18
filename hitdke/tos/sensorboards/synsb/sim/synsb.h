@@ -10,7 +10,7 @@
  * Demo sensor for synthetic sensorboard.
  *
  * @author LIU Yu <pineapple.liu@gmail.com>
- * @date   Apr 13 2009
+ * @date   Jun 18, 2010
  */
 
 #ifndef __SYNSB_H__
@@ -19,9 +19,10 @@
 #ifdef TOSSIM
 #include <sim_synsb.h>
 #else
-#error "This sensorboard (synsb) is only available for TOSSIM."
+#error "This sensorboard *synsb* only compiles with TOSSIM (aka. *sim* or *sim-sf* extras)."
 #endif
 
 typedef SSB_SensorType sensor_t;
 
 #endif /* __SYN_SB_H__ */
+

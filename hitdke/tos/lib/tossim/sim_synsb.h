@@ -16,7 +16,7 @@
 #ifndef __SIM_SYNSB_H__
 #define __SIM_SYNSB_H__
 
-#include <tos.h>
+#include <sim_tossim.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -60,3 +60,4 @@ int sim_synsb_getFirstRecord(SSB_RecordSet * pRS);
 #endif
 
 #endif /* __SIM_SYNSB_H__ */
+

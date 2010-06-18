@@ -21,15 +21,15 @@ DATASOURCE ?= "bdb:"
 CFLAGS += -I$(HITDKEDIR)/tos/sensorboards/synsb
 CFLAGS += -I$(HITDKEDIR)/tos/lib/tossim
 
-BUILD_EXTRA_DEPS += custom-sim-module
+BUILD_EXTRA_DEPS += sim-synsb-module
 CLEAN_EXTRA = *.pyc *.pyo *.dll *.o *.so
 
-CUSTOMSIMFILE ?= $(HITDKEDIR)/tos/lib/tossim/sim_synsb.c
-CUSTOMSIMOBJFILE ?= $(BUILDDIR)/sim_synsb.o
+SYNSBFILE ?= $(HITDKEDIR)/tos/lib/tossim/sim_synsb.c
+SYSNBOBJFILE ?= $(BUILDDIR)/sim_synsb.o
 
-custom-sim-module: $(CUSTOMSIMFILE)
-	@echo "  compiling synthetic sensorboard implementation into $(CUSTOMSIMOBJFILE)"
-	$(GPP) -c $(PLATFORM_CC_FLAGS) $(PLATFORM_FLAGS) -o $(CUSTOMSIMOBJFILE) $(OPTFLAGS) $(CFLAGS) $(SIM_CFLAGS) $(SF_FLAGS) $(CUSTOMSIMFILE) -I$(PYDIR) -I$(SIMDIR)
+sim-synsb-module: $(SYNSBFILE)
+	@echo "  compiling synthetic sensorboard implementation into $(SYNSBOBJFILE)"
+	$(GPP) -c $(PLATFORM_CC_FLAGS) $(PLATFORM_FLAGS) -o $(SYNSBOBJFILE) $(OPTFLAGS) $(CFLAGS) $(SIM_CFLAGS) $(SF_FLAGS) $(SYNSBFILE) -I$(PYDIR) -I$(SIMDIR)
 
 include $(MAKERULES)
 

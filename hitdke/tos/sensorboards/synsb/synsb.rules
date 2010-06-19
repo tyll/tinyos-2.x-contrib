@@ -8,11 +8,8 @@
 
 ## 
 # @author: LIU Yu <pineapple.liu@gmail.com>
-# @date:   Jun 18 2010
+# @date:   Jun 19, 2010
 #
-
-HITDKEDIR ?= ../..
-SENSORBOARD ?= synsb
 
 ifeq ($(SENSORBOARD),synsb)
 

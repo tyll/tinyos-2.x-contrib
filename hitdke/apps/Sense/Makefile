@@ -23,7 +23,7 @@ HITDKEDIR ?= ../..
 # Default SENSORBOARD types are set by specific platforms.
 # 
 # Uncomment the following line (or specify as an environment variable) will set 
-# the SENSORBOARD type to "synsb", which implicitly binds all (supported) Sensor 
+# the SENSORBOARD to "synsb", which implicitly binds all (supported) Sensor 
 # components to HITDKE's Synthetic SensorBoard (SSB) simulator.
 # 
 # NOTE: *synsb* only compiles in TOSSIM mode (aka. *sim* or *sim-sf* extras).

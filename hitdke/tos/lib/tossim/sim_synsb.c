@@ -15,7 +15,7 @@
 
 #include <sim_synsb.h>          /* struct sim_event_t */
 
-static SSB_DataSource theDS; /* global singleton data source object */
+static SSB_DataSource theDS;    /* global singleton data source object */
 
 void 
 sim_synsb_initDataSource(void)

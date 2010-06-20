@@ -36,7 +36,7 @@
 
 #include "Neighbor.h"
 
-module ExampleNeighborP {
+module ExampleNeighborP @safe() {
 
 	provides {
 		interface InitNeighbor;
@@ -51,8 +51,10 @@ module ExampleNeighborP {
 
 	uint8_t offset = uniqueN(UQ_NEIGHBOR_BYTES, sizeof(example_data_t));
 	
-	example_data_t* get_data(neighbor_t* n) {
-		return TCAST(example_data_t* BND(n->bytes,n->bytes+uniqueCount(UQ_NEIGHBOR_BYTES)), n->bytes+offset);
+	example_data_t* ONE get_data(neighbor_t* n) {
+		//return TCAST(example_data_t* BND(n->bytes,n->bytes+uniqueCount(UQ_NEIGHBOR_BYTES)), n->bytes+offset);
+		//return (example_data_t*) (n->bytes+offset);
+		return TCAST(example_data_t* ONE, n->bytes+offset);
 	}
 
 	/***************** InitNeighbor ****************/
@@ -64,11 +66,11 @@ module ExampleNeighborP {
 
 	/***************** ExampleNeighbor ****************/
 
-	command uint16_t ExampleNeighbor.getCounter(neighbor_t* n) {
+	command uint16_t ExampleNeighbor.getCounter(neighbor_t* ONE n) {
 		return get_data(n)->counter;
 	}
 
-	command void ExampleNeighbor.setCounter(neighbor_t* n, uint16_t counter) {
+	command void ExampleNeighbor.setCounter(neighbor_t* ONE n, uint16_t counter) {
 		get_data(n)->counter = counter;
 	}
 

@@ -36,7 +36,7 @@
 
 interface ExampleNeighbor {
 
-	command uint16_t getCounter(neighbor_t* n);
-	command void setCounter(neighbor_t* n, uint16_t counter);
+	command uint16_t getCounter(neighbor_t* ONE n);
+	command void setCounter(neighbor_t* ONE n, uint16_t counter);
 
 }

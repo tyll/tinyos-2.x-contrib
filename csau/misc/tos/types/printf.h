@@ -39,11 +39,11 @@
 
 #ifndef PRINT_H
 #define PRINTF_H
-#define PRINTF_H
+#define PRINT_H
 
 #ifdef TOSSIM
 
-#define printf(...) dbg("printf",__VA_ARGS__)
+#define printf(...) dbg_clear("printf",__VA_ARGS__)
 #define printfflush() 
 
 #else

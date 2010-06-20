@@ -66,7 +66,7 @@ configuration QuickTimeC {
 
 } implementation {
 
-#ifdef QUICKTIME
+#if defined(QUICKTIME) && !defined(TOSSIM)
 #warning "QuickTime is being used"
 	components 
 		QuickTimeP as QT,

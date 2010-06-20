@@ -120,6 +120,8 @@ implementation {
 		table[tableindex] = table[count-1];
 		table[count-1] = NULL;
 		count--;
+
+		signal NeighborTable.evicted(addr);
 		
 		return SUCCESS;
 	}
@@ -193,7 +195,7 @@ implementation {
 
 	/***************** Defaults ****************/	
 
-	default command error_t InitNeighbor.init(neighbor_t* neighbor) {
+ default command error_t InitNeighbor.init(neighbor_t* neighbor) {
 		return SUCCESS;
 	}
 

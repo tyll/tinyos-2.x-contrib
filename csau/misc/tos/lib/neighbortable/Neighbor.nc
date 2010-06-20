@@ -35,9 +35,9 @@
  */
 
 interface Neighbor {
-	command am_addr_t getAddress(neighbor_t* n);
-	command void setAddress(neighbor_t* n, am_addr_t addr);
+	command am_addr_t getAddress(neighbor_t* ONE n);
+	command void setAddress(neighbor_t* ONE n, am_addr_t addr);
 
-	command void setInTable(neighbor_t* n, bool intable);
-	command bool getInTable(neighbor_t* n);
+	command void setInTable(neighbor_t* ONE n, bool intable);
+	command bool getInTable(neighbor_t* ONE n);
 }

@@ -41,7 +41,7 @@
 //#define QUICKTIME 1
 #endif
 
-#ifdef QUICKTIME
+#if defined(QUICKTIME) && !defined(TOSSIM)
 inline void time_start() __attribute__ ((always_inline));
 inline void time_stop() __attribute__ ((always_inline));
 inline uint32_t time_get() __attribute__ ((always_inline));

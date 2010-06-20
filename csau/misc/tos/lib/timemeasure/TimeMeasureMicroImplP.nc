@@ -67,26 +67,26 @@ generic module TimeMeasureMicroImplP(uint8_t numClients) {
 	
 	async command void TimeMeasure.stop[uint8_t client]() {
 		atomic {
-			if(data[client].overflows!=INVALID_OVERFLOW) {
-				uint32_t result = call Counter.get();
-				
-				// too many overflows
-				if(data[client].overflows==INVALID_OVERFLOW) {
-					data[client].time = INVALID_TIME;
-					return;
-				}
-		
-				// add overflows
-				while(data[client].overflows>0) {
-					result += 0xFFFF;
-					data[client].overflows--;
-				}
-
-				result -= data[client].time;
-				data[client].time = result;
-				data[client].overflows = INVALID_OVERFLOW;
+			//if(data[client].overflows!=INVALID_OVERFLOW) {
+			uint32_t result = call Counter.get();
+			
+			// too many overflows
+			if(data[client].overflows==INVALID_OVERFLOW) {
+				data[client].time = INVALID_TIME;
+				return;
 			}
+			
+			// add overflows
+			while(data[client].overflows>0) {
+				result += 0xFFFF;
+				data[client].overflows--;
+			}
+			
+			result -= data[client].time;
+			data[client].time = result;
+			data[client].overflows = INVALID_OVERFLOW;
 		}
+		//}
 	}
 	
 	async command uint32_t TimeMeasure.get[uint8_t client]() {

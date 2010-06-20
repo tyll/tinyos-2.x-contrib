@@ -54,7 +54,7 @@ typedef uint8_t neighbor_flag_t;
 typedef struct neighbor {
   neighbor_flag_t flag;
   am_addr_t addr;
-	uint8_t bytes[uniqueCount(UQ_NEIGHBOR_BYTES)];
+	uint8_t (COUNT(uniqueCount(UQ_NEIGHBOR_BYTES)) bytes)[uniqueCount(UQ_NEIGHBOR_BYTES)];
 } neighbor_t;
 
 #endif

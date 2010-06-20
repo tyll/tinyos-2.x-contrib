@@ -45,6 +45,8 @@ interface NeighborTable {
 	command error_t insert(am_addr_t addr);
 	
 	command error_t evict(am_addr_t addr);
+
+	event void evicted(am_addr_t addr);
 	
 	command bool contains(am_addr_t addr);
 	

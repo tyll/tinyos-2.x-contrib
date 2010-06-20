@@ -49,8 +49,13 @@ configuration TimeMeasureMicroP {
 	};
 	
 	components 
-		new TimeMeasureMicroImplP(CLIENT_COUNT) as Impl,
-		Msp430CounterMicroC as Counter;
+#ifdef PLATFORM_TELOSB
+		Msp430CounterMicroC as Counter,
+#else
+#warning "*** TIMEMEASURES NOT SUPPORTED ON PLATFORM ***"
+		DummyCounterMicroC as Counter,
+#endif
+		new TimeMeasureMicroImplP(CLIENT_COUNT) as Impl;
 
 	Impl.Counter -> Counter;
 	TimeMeasure = Impl;

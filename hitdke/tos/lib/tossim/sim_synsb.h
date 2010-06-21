@@ -17,6 +17,7 @@
 #define __SIM_SYNSB_H__
 
 #include <sim_tossim.h>
+#include <DataSource.h>         /* Synthetic DataSource API's */
 
 #ifdef __cplusplus
 extern "C"
@@ -36,16 +37,8 @@ typedef enum
     ERR_BAD_PTR = 3,
 } SSB_Error;
 
-typedef struct
-{
-    int __unused__;
-} SSB_DataSource;
-
-typedef struct
-{
-    unsigned int count;
-    int __unused__;
-} SSB_RecordSet;
+typedef DataSource SSB_DataSource;
+typedef RecordSet SSB_RecordSet;
 
 void sim_synsb_initDataSource(void);
 

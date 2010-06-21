@@ -15,8 +15,12 @@ ifeq ($(SENSORBOARD),synsb)
 
 DATASOURCE ?= "bdb:"
 
+SDSINCDIR ?= $(HITDKEDIR)/support/sdk/c/synsb/
+SDSLIBFILE ?= $(HITDKEDIR)/support/sdk/c/synsb/libsds.a
+
 CFLAGS += -I$(HITDKEDIR)/tos/sensorboards/synsb
 CFLAGS += -I$(HITDKEDIR)/tos/lib/tossim
+CFLAGS += -I$(SDSINCDIR)
 
 CLEAN_EXTRA = *.pyc *.pyo *.dll *.o *.so
 
@@ -27,11 +31,11 @@ SYNSBOBJFILE ?= $(BUILDDIR)/sim_synsb.o
 
 sim-synsb-module: $(SYNSBFILE)
 	@echo "  compiling synthetic sensorboard implementation into $(SYNSBOBJFILE)"
-	$(GPP) -c $(PLATFORM_CC_FLAGS) $(PLATFORM_FLAGS) -o $(SYNSBOBJFILE) $(OPTFLAGS) $(CFLAGS) $(SIM_CFLAGS) $(SF_FLAGS) $(SYNSBFILE) -I$(PYDIR) -I$(SIMDIR)
+	$(GPP) -c $(PLATFORM_CC_FLAGS) $(PLATFORM_FLAGS) -o $(SYNSBOBJFILE) $(OPTFLAGS) $(CFLAGS) $(SIM_CFLAGS) $(SF_FLAGS) $(SYNSBFILE) -I$(PYDIR) -I$(SIMDIR) -I$(SDSINCDIR)
 
 include $(MAKERULES)
 
-PLATFORM_LIB_FLAGS += $(SYNSBOBJFILE)
+PLATFORM_LIB_FLAGS += $(SYNSBOBJFILE) $(SDSLIBFILE)
 
 else
 

@@ -15,7 +15,7 @@
 
 #include <sim_synsb.h>          /* struct sim_event_t */
 
-static SSB_DataSource theDS;    /* global singleton data source object */
+static DataSource theDS;    /* global singleton data source object */
 
 void 
 sim_synsb_initDataSource(void)
@@ -23,20 +23,20 @@ sim_synsb_initDataSource(void)
     return;
 }
 
-SSB_DataSource * 
+DataSource * 
 sim_synsb_getDataSource(void)
 {
     return &theDS;
 }
 
-SSB_RecordSet * 
-sim_synsb_queryDataSource(SSB_DataSource * pDS, sim_time_t readTime, int nodeId, int sensorId)
+RecordSet * 
+sim_synsb_queryDataSource(DataSource * pDS, sim_time_t readTime, int nodeId, int sensorId)
 {
     return NULL;
 }
 
 int
-sim_synsb_getFirstRecord(SSB_RecordSet * pRS)
+sim_synsb_getFirstRecord(RecordSet * pRS)
 {
     return 0;
 }

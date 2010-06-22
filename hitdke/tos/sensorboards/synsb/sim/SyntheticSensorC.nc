@@ -39,8 +39,8 @@ implementation
             sim_time_t readTime = evt->time;
             int nodeId = evt->mote;
 
-            SSB_DataSource * pDS = sim_synsb_getDataSource();
-            SSB_RecordSet * pRS = NULL;
+            DataSource * pDS = sim_synsb_getDataSource();
+            RecordSet * pRS = NULL;
 
             if (pDS == NULL)
             {

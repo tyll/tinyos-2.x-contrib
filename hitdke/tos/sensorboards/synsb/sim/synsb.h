@@ -22,7 +22,7 @@
 #error "This sensorboard *synsb* only compiles with TOSSIM (aka. *sim* or *sim-sf* extras)."
 #endif
 
-typedef SSB_SensorType sensor_t;
+typedef SensorType sensor_t;
 
 #endif /* __SYN_SB_H__ */
 

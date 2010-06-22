@@ -1,9 +1,12 @@
 ################################################################################
-# The DKERC Synthetic DataSource Project Makefile                              #
+# HITDKE Synthetic DataSource (SDS) Project                                    #
 #                                                                              #
 # Copyright (C) 2010, Data & Knowledge Engineering Research Center,            #
 #                     Harbin Institute of Technology, P. R. China.             #
 # All rights reserved.                                                         #
+#                                                                              #
+# @author LIU Yu <pineapple.liu@gmail.com>                                     #
+# @date   Jun 21, 2010                                                         #
 #                                                                              #
 ################################################################################
 
@@ -30,7 +33,7 @@ RELEASE = 1
 $(LIBRARY)_hdr = DataSource.h
 $(LIBRARY)_src = $($(LIBRARY)_hdr:.h=.c)
 $(LIBRARY)_obj = $($(LIBRARY)_src:.c=.o)
-$(LIBRARY)_sdist = $($(LIBRARY)_hdr) $($(LIBRARY)_src) Makefile
+$(LIBRARY)_sdist = $(LIBRARY).h $($(LIBRARY)_hdr) $($(LIBRARY)_src) Makefile
 
 # build branches
 .PHONY: all clean
@@ -40,7 +43,7 @@ all: lib$(LIBRARY).a
 lib$(LIBRARY).a: $($(LIBRARY)_obj)
 	$(AR) $(ARFLAGS) $(@) $($(LIBRARY)_obj)
 
-$($(LIBRARY)_obj): $($(LIBRARY)_hdr) $($(LIBRARY)_src)
+$($(LIBRARY)_obj): $($(LIBRARY)_sdist)
 
 clean:
 	rm -rf doc

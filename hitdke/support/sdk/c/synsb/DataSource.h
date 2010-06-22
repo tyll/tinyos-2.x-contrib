@@ -7,14 +7,14 @@
  */
 
 /**
- * DKERC DataSource (SDS) API's.
+ * HITDKE Synthetic DataSource (SDS).
  * 
  * @author LIU Yu <pineapple.liu@gmail.com>
  * @date   Jun 21, 2010
  */
 
-#ifndef __DKERC_DATA_SOURCE_H__
-#define __DKERC_DATA_SOURCE_H__
+#ifndef __HITDKE_DATA_SOURCE_H__
+#define __HITDKE_DATA_SOURCE_H__
 
 #ifdef __cplusplus
 extern "C"
@@ -36,6 +36,6 @@ typedef struct
 }
 #endif
 
-#endif /* __DKERC_DATA_SOURCE_H__ */
+#endif /* __HITDKE_DATA_SOURCE_H__ */
 
 

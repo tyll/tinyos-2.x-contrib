@@ -24,7 +24,7 @@ CFLAGS += -I$(SDSINCDIR)
 
 CLEAN_EXTRA = *.pyc *.pyo *.dll *.o *.so
 
-BUILD_EXTRA_DEPS += sim-synsb-module
+BUILD_EXTRA_DEPS += sim-synsb-module hitdke-sds-library
 
 SYNSBFILE ?= $(HITDKEDIR)/tos/lib/tossim/sim_synsb.c
 SYNSBOBJFILE ?= $(BUILDDIR)/sim_synsb.o
@@ -32,6 +32,12 @@ SYNSBOBJFILE ?= $(BUILDDIR)/sim_synsb.o
 sim-synsb-module: $(SYNSBFILE)
 	@echo "  compiling synthetic sensorboard implementation into $(SYNSBOBJFILE)"
 	$(GPP) -c $(PLATFORM_CC_FLAGS) $(PLATFORM_FLAGS) -o $(SYNSBOBJFILE) $(OPTFLAGS) $(CFLAGS) $(SIM_CFLAGS) $(SF_FLAGS) $(SYNSBFILE) -I$(PYDIR) -I$(SIMDIR) -I$(SDSINCDIR)
+
+hitdke-sds-library: $(SDSLIBFILE)
+
+$(SDSLIBFILE):
+	@echo "  building HITDKE synthetic data source (SDS) library"
+	make -C $(SDSINCDIR)
 
 include $(MAKERULES)
 

@@ -14,7 +14,7 @@
 </node>
 <node COLOR="#0033ff" CREATED="1276905082703" ID="Freemind_Link_994594673" MODIFIED="1277201850046" TEXT="Sense">
 <font BOLD="true" NAME="SansSerif" SIZE="16"/>
-<node COLOR="#cc6600" CREATED="1276907768421" ID="Freemind_Link_1446209656" MODIFIED="1277201888078" TEXT="SenseAppC.nc">
+<node COLOR="#cc6600" CREATED="1276907768421" FOLDED="true" ID="Freemind_Link_1446209656" MODIFIED="1277201888078" TEXT="SenseAppC.nc">
 <edge WIDTH="thin"/>
 <font BOLD="true" NAME="SansSerif" SIZE="12"/>
 <node COLOR="#111111" CREATED="1276905612921" HGAP="26" ID="Freemind_Link_809136061" MODIFIED="1276907778265" STYLE="fork" TEXT="copied from main tinyos-2.x tree" VSHIFT="5">
@@ -22,7 +22,7 @@
 <font NAME="SansSerif" SIZE="12"/>
 </node>
 </node>
-<node COLOR="#cc6600" CREATED="1276907764640" ID="Freemind_Link_1406115576" MODIFIED="1277201888078" TEXT="SenseC.nc">
+<node COLOR="#cc6600" CREATED="1276907764640" FOLDED="true" ID="Freemind_Link_1406115576" MODIFIED="1277201888078" TEXT="SenseC.nc">
 <edge WIDTH="thin"/>
 <font BOLD="true" NAME="SansSerif" SIZE="12"/>
 <node COLOR="#111111" CREATED="1276905612921" HGAP="26" ID="Freemind_Link_424100590" MODIFIED="1276907778265" STYLE="fork" TEXT="copied from main tinyos-2.x tree" VSHIFT="5">
@@ -34,16 +34,17 @@
 <font BOLD="true" NAME="SansSerif" SIZE="14"/>
 <icon BUILTIN="messagebox_warning"/>
 </node>
-<node COLOR="#cc6600" CREATED="1276907762562" ID="Freemind_Link_1917234997" MODIFIED="1277202009031" TEXT="Makefile">
+<node COLOR="#cc6600" CREATED="1276907762562" FOLDED="true" ID="Freemind_Link_1917234997" MODIFIED="1277271007281" TEXT="Makefile">
 <edge WIDTH="thin"/>
-<arrowlink COLOR="#ff0033" DESTINATION="Freemind_Link_1285907677" ENDARROW="Default" ENDINCLINATION="49;-16;" ID="Freemind_Arrow_Link_835648965" STARTARROW="None" STARTINCLINATION="33;0;"/>
 <font BOLD="true" NAME="SansSerif" SIZE="12"/>
+<node CREATED="1277275648171" ID="Freemind_Link_1029311141" MODIFIED="1277275650937" TEXT="HITDKEDIR"/>
+<node CREATED="1277275651234" ID="Freemind_Link_627562066" MODIFIED="1277278205953" TEXT="TOSMAKE_PATH"/>
 </node>
 </node>
 </node>
 <node COLOR="#0033ff" CREATED="1277199831734" ID="Freemind_Link_920377597" MODIFIED="1277201850046" POSITION="right" TEXT="support/make">
 <font BOLD="true" NAME="SansSerif" SIZE="16"/>
-<node COLOR="#cc6600" CREATED="1276905194218" ID="Freemind_Link_1285907677" MODIFIED="1277202009031" TEXT="synsb.rules" VSHIFT="4">
+<node COLOR="#cc6600" CREATED="1276905194218" FOLDED="true" ID="Freemind_Link_1285907677" MODIFIED="1277271007281" TEXT="synsb.extra" VSHIFT="4">
 <edge WIDTH="thin"/>
 <font BOLD="true" NAME="SansSerif" SIZE="12"/>
 <node COLOR="#111111" CREATED="1276905950437" ID="Freemind_Link_1437822684" MODIFIED="1277200014687" STYLE="fork" TEXT="common make rules that compiles synsb components into  tossim app" VSHIFT="6"/>
@@ -54,18 +55,18 @@
 <font NAME="SansSerif" SIZE="18"/>
 <node COLOR="#0033ff" CREATED="1276905005671" ID="_" MODIFIED="1277201850046" STYLE="bubble" TEXT="lib/tossim">
 <font BOLD="true" NAME="SansSerif" SIZE="16"/>
-<node COLOR="#cc6600" CREATED="1276905155640" ID="Freemind_Link_1376716728" MODIFIED="1277211302109" TEXT="sim_synsb.{h,c}">
+<node COLOR="#cc6600" CREATED="1276905155640" ID="Freemind_Link_1376716728" MODIFIED="1277279669859" TEXT="sim_synsb.{h,c}">
 <edge WIDTH="thin"/>
-<arrowlink COLOR="#ff0033" DESTINATION="Freemind_Link_726535268" ENDARROW="Default" ENDINCLINATION="-43;-65;" ID="Freemind_Arrow_Link_1340510653" STARTARROW="None" STARTINCLINATION="-230;-86;"/>
+<arrowlink COLOR="#ff0033" DESTINATION="Freemind_Link_726535268" ENDARROW="Default" ENDINCLINATION="-43;-65;" ID="Freemind_Arrow_Link_1340510653" STARTARROW="None" STARTINCLINATION="-234;-60;"/>
 <font BOLD="true" NAME="SansSerif" SIZE="12"/>
 <node COLOR="#111111" CREATED="1276905397515" ID="Freemind_Link_890683198" MODIFIED="1277203091281" STYLE="fork" TEXT="local wrapper of DataSource API&apos;s"/>
-<node COLOR="#cc3300" CREATED="1276906194843" ID="Freemind_Link_1426287343" MODIFIED="1277202770531" TEXT="initDataSource()"/>
+<node COLOR="#cc3300" CREATED="1276906194843" ID="Freemind_Link_1426287343" MODIFIED="1277279159531" TEXT="initDataSource()"/>
 <node COLOR="#cc3300" CREATED="1276906180203" ID="Freemind_Link_1865613145" MODIFIED="1277202770531" TEXT="queryDataSource()"/>
 <node COLOR="#cc3300" CREATED="1276906138062" ID="Freemind_Link_1663359201" MODIFIED="1277202780328" TEXT="theDS">
 <font NAME="SansSerif" SIZE="12"/>
 <node COLOR="#111111" CREATED="1276906159968" ID="Freemind_Link_316619488" MODIFIED="1276907861000" STYLE="fork" TEXT="global singleton DataSource object"/>
-<node COLOR="#cc3300" CREATED="1276906212484" ID="Freemind_Link_1899004256" MODIFIED="1277202770531" TEXT="getDataSource()">
-<arrowlink COLOR="#cc0033" DESTINATION="Freemind_Link_200004894" ENDARROW="None" ENDINCLINATION="113;-21;" ID="Freemind_Arrow_Link_669806496" STARTARROW="Default" STARTINCLINATION="335;0;"/>
+<node COLOR="#cc3300" CREATED="1276906212484" ID="Freemind_Link_1899004256" MODIFIED="1277279168828" TEXT="getDataSource()">
+<arrowlink COLOR="#ff0033" DESTINATION="Freemind_Link_200004894" ENDARROW="None" ENDINCLINATION="34;-7;" ID="Freemind_Arrow_Link_669806496" STARTARROW="Default" STARTINCLINATION="335;0;"/>
 </node>
 </node>
 </node>
@@ -76,11 +77,11 @@
 <icon BUILTIN="help"/>
 </node>
 </node>
-<node COLOR="#cc6600" CREATED="1276905164843" ID="Freemind_Link_726730416" MODIFIED="1277211246062" TEXT="synsb_wrap.cxx">
+<node COLOR="#cc6600" CREATED="1276905164843" ID="Freemind_Link_726730416" MODIFIED="1277277688140" TEXT="synsb_wrap.cxx">
 <edge WIDTH="thin"/>
 <font BOLD="true" NAME="SansSerif" SIZE="12"/>
 <icon BUILTIN="help"/>
-<node COLOR="#111111" CREATED="1276905555312" ID="Freemind_Link_476013373" MODIFIED="1277203052500" STYLE="fork" TEXT="initialize DataSource at the beginning of a tossim app">
+<node COLOR="#111111" CREATED="1276905555312" ID="Freemind_Link_476013373" MODIFIED="1277277727968" STYLE="fork" TEXT="initialize DataSource at the beginning of a tossim app" VSHIFT="2">
 <icon BUILTIN="help"/>
 </node>
 <node COLOR="#111111" CREATED="1276905350187" ID="Freemind_Link_1826101211" MODIFIED="1277203063890" STYLE="fork" TEXT="access/modify DataSource settings in C/C++/Python">
@@ -94,16 +95,16 @@
 <node COLOR="#0033ff" CREATED="1276905190281" ID="Freemind_Link_769182300" MODIFIED="1277201850046" TEXT="sim">
 <edge WIDTH="thin"/>
 <font BOLD="true" NAME="SansSerif" SIZE="16"/>
-<node COLOR="#cc6600" CREATED="1276905208078" ID="Freemind_Link_810618366" MODIFIED="1277202360875" TEXT="SyntheticSensorC.nc">
+<node COLOR="#cc6600" CREATED="1276905208078" ID="Freemind_Link_810618366" MODIFIED="1277279180125" TEXT="SyntheticSensorC.nc">
 <edge WIDTH="thin"/>
-<arrowlink COLOR="#cc0033" DESTINATION="Freemind_Link_726730416" ENDARROW="Default" ENDINCLINATION="7;26;" ID="Freemind_Arrow_Link_312964638" STARTARROW="None" STARTINCLINATION="-89;-37;"/>
+<arrowlink COLOR="#ff0033" DESTINATION="Freemind_Link_726730416" ENDARROW="Default" ENDINCLINATION="8;27;" ID="Freemind_Arrow_Link_312964638" STARTARROW="None" STARTINCLINATION="-105;-36;"/>
 <font BOLD="true" NAME="SansSerif" SIZE="12"/>
 <node COLOR="#111111" CREATED="1276906318218" ID="Freemind_Link_471568756" MODIFIED="1276907860984" STYLE="fork" TEXT="generic Read component"/>
-<node COLOR="#111111" CREATED="1276905686875" ID="Freemind_Link_200004894" MODIFIED="1277203086328" STYLE="fork" TEXT="queries the global DataSource via wrappers"/>
+<node COLOR="#111111" CREATED="1276905686875" ID="Freemind_Link_200004894" MODIFIED="1277279165765" STYLE="fork" TEXT="queries the global DataSource via wrappers"/>
 <node COLOR="#111111" CREATED="1276906485468" ID="Freemind_Link_50372701" MODIFIED="1276907860984" STYLE="fork" TEXT="yield query results as if sensed by this component"/>
 <node COLOR="#111111" CREATED="1276906527953" ID="Freemind_Link_821218146" MODIFIED="1276907860984" TEXT="unsolved problems">
-<node COLOR="#111111" CREATED="1276907098250" ID="Freemind_Link_134748069" MODIFIED="1277200468656" STYLE="fork" TEXT="how to transparently bind data sources (at compile time / during run time)">
-<arrowlink COLOR="#ff0033" DESTINATION="Freemind_Link_1426287343" ENDARROW="Default" ENDINCLINATION="261;0;" ID="Freemind_Arrow_Link_264924664" STARTARROW="None" STARTINCLINATION="-30;-74;"/>
+<node COLOR="#111111" CREATED="1276907098250" ID="Freemind_Link_134748069" MODIFIED="1277279164265" STYLE="fork" TEXT="how to transparently bind data sources (at compile time / during run time)">
+<arrowlink COLOR="#ff0033" DESTINATION="Freemind_Link_1426287343" ENDARROW="Default" ENDINCLINATION="271;0;" ID="Freemind_Arrow_Link_264924664" STARTARROW="None" STARTINCLINATION="-20;-74;"/>
 <icon BUILTIN="help"/>
 </node>
 <node COLOR="#111111" CREATED="1276906591000" ID="Freemind_Link_138422910" MODIFIED="1277199805828" STYLE="fork" TEXT="how to transparently map the schema of a tossim app to that of the DataSource">
@@ -117,17 +118,17 @@
 </node>
 </node>
 </node>
-<node COLOR="#cc6600" CREATED="1276905194218" ID="Freemind_Link_1334875945" MODIFIED="1277201888078" TEXT="sysnb.h">
+<node COLOR="#cc6600" CREATED="1276905194218" FOLDED="true" ID="Freemind_Link_1334875945" MODIFIED="1277201888078" TEXT="sysnb.h">
 <edge WIDTH="thin"/>
 <font BOLD="true" NAME="SansSerif" SIZE="12"/>
 <node COLOR="#111111" CREATED="1276906259328" ID="Freemind_Link_941548546" MODIFIED="1276907860984" STYLE="fork" TEXT="TEP109 required header file (includes sim_synsb.h)"/>
 </node>
-<node COLOR="#cc6600" CREATED="1276905197281" ID="Freemind_Link_892559068" MODIFIED="1277201888078" TEXT=".sensor">
+<node COLOR="#cc6600" CREATED="1276905197281" FOLDED="true" ID="Freemind_Link_892559068" MODIFIED="1277201888078" TEXT=".sensor">
 <edge WIDTH="thin"/>
 <font BOLD="true" NAME="SansSerif" SIZE="12"/>
 <node COLOR="#111111" CREATED="1276906266750" ID="Freemind_Link_1333258623" MODIFIED="1276907860984" STYLE="fork" TEXT="TEP109 required perl script (specifies include order)"/>
 </node>
-<node COLOR="#cc6600" CREATED="1276905200703" ID="Freemind_Link_1416838156" MODIFIED="1277201888078" TEXT="DemoSensorC.nc">
+<node COLOR="#cc6600" CREATED="1276905200703" FOLDED="true" ID="Freemind_Link_1416838156" MODIFIED="1277201888078" TEXT="DemoSensorC.nc">
 <edge WIDTH="thin"/>
 <font BOLD="true" NAME="SansSerif" SIZE="12"/>
 <node COLOR="#111111" CREATED="1276906283750" ID="Freemind_Link_948821469" MODIFIED="1276907860984" STYLE="fork" TEXT="TEP109 required default Sensor component"/>
@@ -152,7 +153,7 @@
 </node>
 </node>
 </node>
-<node COLOR="#0033ff" CREATED="1276905475015" ID="Freemind_Link_726535268" MODIFIED="1277211302109" POSITION="left" TEXT="DataSource API&apos;s">
+<node COLOR="#0033ff" CREATED="1276905475015" FOLDED="true" ID="Freemind_Link_726535268" MODIFIED="1277279669859" POSITION="left" TEXT="DataSource API&apos;s">
 <font NAME="SansSerif" SIZE="18"/>
 <node COLOR="#cc6600" CREATED="1277199605234" ID="Freemind_Link_144141978" MODIFIED="1277201946796" TEXT="sds.h">
 <font BOLD="true" NAME="SansSerif" SIZE="12"/>

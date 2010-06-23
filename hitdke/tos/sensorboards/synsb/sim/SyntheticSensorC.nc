@@ -7,72 +7,56 @@
  */
 
 /**
- * Sensor emulator that outputs sensor readings from a data source. 
+ * Generic-type virtual Sensor component.
  * 
  * @author LIU Yu <pineapple.liu@gmail.com>
- * @date   Jan 14, 2010
+ * @date   June 24, 2010
  */
 
 #include "synsb.h"
 
-#include <sim_event_queue.h>
-#include <sim_synsb.h>          /* sim_synsb_{get,query}DataSource */
+#include <sim_event_queue.h>    /* FOR: sim_{event,time}_t, sim_node() */
+#include <sim_synsb.h>          /* FOR: sim_synsb_{init,query}DataSource */
 
 generic module SyntheticSensorC(typedef width_t @integer(), 
     sensor_t sensorId)
 {
+    provides interface Init;
     provides interface Read<width_t>;
 }
 implementation
 {
     void handleReadEvent(sim_event_t* evt)
     {
-        width_t val;            /* default (undefined) read data */
+        width_t val = 0;        /* (not-yet) obtained data */
 
         if (evt == NULL)
         {
-            signal Read.readDone(FAIL, ERR_BAD_PTR);
+            signal Read.readDone(EINVAL, val);
             return;
         }
         else
         {
             sim_time_t readTime = evt->time;
             int nodeId = evt->mote;
-
-            DataSource * pDS = sim_synsb_getDataSource();
-            RecordSet * pRS = NULL;
-
-            if (pDS == NULL)
-            {
-                signal Read.readDone(FAIL, ERR_BAD_DS);
-                return;
-            }
-
-            pRS = sim_synsb_queryDataSource(pDS, readTime, nodeId, sensorId);
-            if (pRS == NULL)
-            {
-                signal Read.readDone(FAIL, ERR_BAD_RS);
-                return;
-            }
-
-            if (pRS->count <= 0)
-            {
-                signal Read.readDone(FAIL, ERR_NO_DATA);
-                return;
-            }
-
-            val = (width_t)sim_synsb_getFirstRecord(pRS);
+            SensorValue sv = sim_synsb_queryDataSource(readTime, nodeId, sensorId);
+            
+            /* TODO: examine some fields of sv to determine return status */
+            
+            /* TODO: wait some time according to SensorModel */
+            
+            val = (width_t)sv.data;
         }
-
-        // signal read done with obtained value
+        /* signal read done with obtained value */
         signal Read.readDone(SUCCESS, val);
+        return;
     }
-
+    
     void cleanupReadEvent(sim_event_t* evt)
     {
         return sim_queue_cleanup_event(evt);
     } 
-
+    
     sim_event_t* allocateReadEvent(void)
     {
         sim_event_t* evt = sim_queue_allocate_event();
@@ -87,17 +71,35 @@ implementation
 
         return evt;
     }
-
-    task void queryDataSource()
+    
+    task void scheduleReadEvent()
     {
-        // insert a read event into the global event queue
+        /* allocate a new <tt>readEvent</tt> */
         sim_event_t * readEvent = allocateReadEvent();
+        
+        /* TODO: apply Sensor latency model to <tt>readEvent-&gt;time</tt> */
+        readEvent->time = sim_time() + 1;
+
+        /* insert <tt>readEvent</tt> to TOSSIM's global event queue */
         sim_queue_insert(readEvent);
-    }    
+    }
     
     command error_t Read.read() 
     {
-        return post queryDataSource();
+        char timeBuf[128];
+        sim_print_time(timeBuf, 128, sim_time());
+        dbg("SynSB", "mote %d sensor %d reads data at time %s\n", sim_node(), sensorId, timeBuf);
+        return post scheduleReadEvent();
+    }
+    
+    command error_t Init.init()
+    {
+        dbg("SynSB", "mote %d trying to initialize DataSource\n", sim_node());
+        if (sim_synsb_initDataSource(FALSE) != 0)
+        {
+            return FAIL;
+        }
+        return SUCCESS;
     }
 }
 

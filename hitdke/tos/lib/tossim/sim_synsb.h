@@ -7,17 +7,17 @@
  */
 
 /**
- * C library for accessing synthetic data.
+ * Local wrappers for the Synthetic DataSource (SDS) library routines.
  *
  * @author LIU Yu <pineapple.liu@gmail.com>
- * @date   Jun 17 2008
+ * @date   June 24, 2010
  */
 
 #ifndef __SIM_SYNSB_H__
 #define __SIM_SYNSB_H__
 
 #include <sim_tossim.h>         /* FOR: sim_time_t */
-#include <sds.h>                /* FOR: HITDKE Synthetic DataSource API's */
+#include <sds.h>                /* FOR: Synthetic DataSource (SDS) API's */
 
 #ifdef __cplusplus
 extern "C"
@@ -29,22 +29,25 @@ typedef enum
     S_DEMO_SENSOR = 0,
 } SensorType;
 
-typedef enum
+typedef struct
 {
-    ERR_BAD_DS = 0,
-    ERR_BAD_RS = 1,
-    ERR_NO_DATA = 2,
-    ERR_BAD_PTR = 3,
-} Error;
+    int status;
+    int data;
+} SensorValue;
 
-void sim_synsb_initDataSource(void);
+/**
+ * Initialize the global DataSource object.
+ * @param force 
+ * @return 0 on success, positive otherwise
+ */
+int sim_synsb_initDataSource(bool force);
 
-DataSource * sim_synsb_getDataSource(void);
+/**
+ * Query the global DataSource object.
+ * @return a variant-type data.
+ */
+SensorValue sim_synsb_queryDataSource(sim_time_t readTime, int nodeId, int sensorId);
 
-RecordSet * sim_synsb_queryDataSource(DataSource * pDS, sim_time_t readTime, 
-    int nodeId, int sensorId);
-
-int sim_synsb_getFirstRecord(RecordSet * pRS);
 
 #ifdef __cplusplus
 }

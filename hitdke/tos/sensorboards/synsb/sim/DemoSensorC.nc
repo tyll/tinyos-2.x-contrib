@@ -21,6 +21,7 @@ generic configuration DemoSensorC()
 }
 implementation
 {
-  components new SyntheticSensorC(uint16_t, S_DEMO_SENSOR) as Sensor;
+  components new SyntheticSensorP(uint16_t, S_DEMO_SENSOR) as Sensor;
   Read = Sensor;
 }
+

@@ -8,8 +8,12 @@
 
 ## 
 # @author: LIU Yu <pineapple.liu@gmail.com>
-# @date:   Jun 19, 2010
+# @date:   Jun 22, 2010
 #
+
+BUILD_DEPS = sim-synsb-deps
+
+SENSORBOARD ?= synsb
 
 ifeq ($(SENSORBOARD),synsb)
 
@@ -22,30 +26,29 @@ CFLAGS += -I$(HITDKEDIR)/tos/sensorboards/synsb
 CFLAGS += -I$(HITDKEDIR)/tos/lib/tossim
 CFLAGS += -I$(SDSINCDIR)
 
-CLEAN_EXTRA = *.pyc *.pyo *.dll *.o *.so
+.PHONY: sim-synsb-deps sim-synsb-module hitdke-sds-library
 
-BUILD_EXTRA_DEPS += sim-synsb-module hitdke-sds-library
+sim-synsb-deps: sim-synsb-module hitdke-sds-library
 
 SYNSBFILE ?= $(HITDKEDIR)/tos/lib/tossim/sim_synsb.c
 SYNSBOBJFILE ?= $(BUILDDIR)/sim_synsb.o
 
 sim-synsb-module: $(SYNSBFILE)
-	@echo "  compiling synthetic sensorboard implementation into $(SYNSBOBJFILE)"
+	@echo "  compiling the HITDKE Synthetic SensorBoard (SynSB) extension into $(SYNSBOBJFILE)"
 	$(GPP) -c $(PLATFORM_CC_FLAGS) $(PLATFORM_FLAGS) -o $(SYNSBOBJFILE) $(OPTFLAGS) $(CFLAGS) $(SIM_CFLAGS) $(SF_FLAGS) $(SYNSBFILE) -I$(PYDIR) -I$(SIMDIR) -I$(SDSINCDIR)
 
 hitdke-sds-library: $(SDSLIBFILE)
 
 $(SDSLIBFILE):
-	@echo "  building HITDKE synthetic data source (SDS) library"
+	@echo "  building the HITDKE Synthetic DataSource (SDS) library"
 	make -C $(SDSINCDIR)
-
-include $(MAKERULES)
 
 PLATFORM_LIB_FLAGS += $(SYNSBOBJFILE) $(SDSLIBFILE)
 
 else
 
-include $(MAKERULES)
+sim-synsb-deps:
+	@echo "  WARNING: invalid SENSORBOARD type '$(SENSORBOARD)', change to 'synsb' to enable SynSB features"
 
 endif
 

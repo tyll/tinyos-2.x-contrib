@@ -11,13 +11,26 @@
 # @date:   Jun 22, 2010
 #
 
+SENSORBOARD ?= synsb
+DATASOURCE ?= "bdb:"
+
+.PHONY: sim-synsb-deps
+.PHONY: sim-synsb-module hitdke-sds-library
+.PHONY: sim-synsb-wrongsb
+
 BUILD_DEPS = sim-synsb-deps
 
-SENSORBOARD ?= synsb
+##
+# the "sim-exe" target is defined in "$TOSROOT/support/make/sim.extra"
+# 
+sim-exe: sim-synsb-deps
 
 ifeq ($(SENSORBOARD),synsb)
-
-DATASOURCE ?= "bdb:"
+sim-synsb-deps: sim-synsb-module hitdke-sds-library
+PLATFORM_LIB_FLAGS += $(SYNSBOBJFILE) $(SDSLIBFILE)
+else
+sim-synsb-deps: sim-synsb-wrongsb
+endif
 
 SDSINCDIR ?= $(HITDKEDIR)/support/sdk/c/synsb/
 SDSLIBFILE ?= $(HITDKEDIR)/support/sdk/c/synsb/libsds.a
@@ -25,10 +38,6 @@ SDSLIBFILE ?= $(HITDKEDIR)/support/sdk/c/synsb/libsds.a
 CFLAGS += -I$(HITDKEDIR)/tos/sensorboards/synsb
 CFLAGS += -I$(HITDKEDIR)/tos/lib/tossim
 CFLAGS += -I$(SDSINCDIR)
-
-.PHONY: sim-synsb-deps sim-synsb-module hitdke-sds-library
-
-sim-synsb-deps: sim-synsb-module hitdke-sds-library
 
 SYNSBFILE ?= $(HITDKEDIR)/tos/lib/tossim/sim_synsb.c
 SYNSBOBJFILE ?= $(BUILDDIR)/sim_synsb.o
@@ -43,12 +52,6 @@ $(SDSLIBFILE):
 	@echo "  building the HITDKE Synthetic DataSource (SDS) library"
 	make -C $(SDSINCDIR)
 
-PLATFORM_LIB_FLAGS += $(SYNSBOBJFILE) $(SDSLIBFILE)
-
-else
-
-sim-synsb-deps:
+sim-synsb-wrongsb:
 	@echo "  WARNING: invalid SENSORBOARD type '$(SENSORBOARD)', change to 'synsb' to enable SynSB features"
-
-endif
 

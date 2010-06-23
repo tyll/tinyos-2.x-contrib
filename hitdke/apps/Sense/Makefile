@@ -13,13 +13,7 @@
 
 COMPONENT = SenseAppC
 
-SENSORBOARD ?= synsb
-
-ifeq ($(SENSORBOARD),synsb)
 HITDKEDIR ?= ../..
 TOSMAKE_PATH += $(HITDKEDIR)/support/make
-BUILD_EXTRA_DEPS += sim-synsb-deps
-endif
 
 include $(MAKERULES)
-

@@ -15,6 +15,6 @@
 
 interface SensorLatencyModel
 {
-    command uint8_t getUnitLatency(void);
+    command uint8_t getReadLatency(void);
 }
 

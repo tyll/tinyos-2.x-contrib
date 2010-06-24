@@ -24,10 +24,17 @@ extern "C"
 {
 #endif
 
+
+#ifndef SIM_SYNSB_CHANNEL
+#define SIM_SYNSB_CHANNEL "TOSSIM.DB"
+#endif /* SIM_SYNSB_CHANNEL */
+
+
 typedef enum
 {
     S_DEMO_SENSOR = 0,
 } SensorType;
+
 
 typedef struct
 {
@@ -35,12 +42,14 @@ typedef struct
     int data;
 } SensorValue;
 
+
 /**
  * Initialize the global DataSource object.
  * @param force 
  * @return 0 on success, positive otherwise
  */
 int sim_synsb_initDataSource(bool force);
+
 
 /**
  * Query the global DataSource object.

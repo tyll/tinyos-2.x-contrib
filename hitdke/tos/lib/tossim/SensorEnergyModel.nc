@@ -15,6 +15,6 @@
 
 interface SensorEnergyModel
 {
-    command double getUnitEnergy(void);
+    command double getReadEnergy(void);
 }
 

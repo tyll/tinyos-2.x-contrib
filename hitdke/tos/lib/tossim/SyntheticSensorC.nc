@@ -9,6 +9,9 @@
 /**
  * Generic-type virtual Sensor component.
  * 
+ * @param width_t type of return value
+ * @param sensor_t type of sensor device to emulate
+ * 
  * @author LIU Yu <pineapple.liu@gmail.com>
  * @date   June 24, 2010
  */
@@ -23,6 +26,7 @@ generic module SyntheticSensorC(typedef width_t @integer(),
     {
         interface Init;
         interface Read<width_t>;
+        interface ReadNow<width_t>;
     }
     uses
     {
@@ -48,8 +52,6 @@ implementation
             SensorValue sv = sim_synsb_queryDataSource(readTime, nodeId, sensorId);
             
             /* TODO: examine some fields of sv to determine return status */
-            
-            /* TODO: wait some time according to SensorModel */
             
             val = (width_t)sv.data;
         }
@@ -83,9 +85,11 @@ implementation
         /* allocate a new <tt>readEvent</tt> */
         sim_event_t * readEvent = allocateReadEvent();
         
-        /* TODO: apply Sensor latency model to <tt>readEvent-&gt;time</tt> */
-        readEvent->time = sim_time() + (call LatencyModel.getUnitLatency());
+        /* apply Sensor latency model to <tt>readEvent-&gt;time</tt> */
+        readEvent->time = sim_time() + (call LatencyModel.getReadLatency());
         
+        /* TODO: apply Sensor energy model if Power TOSSIM is detected */
+
         /* insert <tt>readEvent</tt> to TOSSIM's global event queue */
         sim_queue_insert(readEvent);
     }
@@ -94,13 +98,18 @@ implementation
     {
         char timeBuf[128];
         sim_print_time(timeBuf, 128, sim_time());
-        dbg("SynSB", "mote %d sensor %d reads data at time %s\n", sim_node(), sensorId, timeBuf);
-        return post scheduleReadEvent();
+        dbg(SIM_SYNSB_CHANNEL, "mote %d sensor %d reads data at time %s\n", sim_node(), sensorId, timeBuf);
+        return (post scheduleReadEvent());
     }
     
+    async command error_t ReadNow.read()
+    {
+        return (call Read.read());
+    }
+
     command error_t Init.init()
     {
-        dbg("SynSB", "mote %d trying to initialize DataSource\n", sim_node());
+        dbg(SIM_SYNSB_CHANNEL, "mote %d trying to initialize DataSource\n", sim_node());
         if (sim_synsb_initDataSource(FALSE) != 0)
         {
             return FAIL;

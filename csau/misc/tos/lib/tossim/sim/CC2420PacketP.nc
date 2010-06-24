@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009 Aarhus University
+ * Copyright (c) 2010 Aarhus University
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,47 +31,23 @@
 
 /**
  * @author Morten Tranberg Hansen <mth at cs dot au dot dk>
- * @date   August 19 2009
+ * @date   February 08 2010
  */
 
-#include "printf.h"
+module CC2420PacketP {
 
-module TestNeighborTableP {
-
-	uses {
-		interface Boot;
-		interface Timer<TMilli>;
-
-		interface NeighborTable;
-		interface ExampleNeighbor;
-	}
+	provides {
+		interface CC2420PacketBody;
+	} 
 
 } implementation {
 
-	am_addr_t neighbor = 100;
+	async command tossim_header_t* CC2420PacketBody.getHeader(message_t* msg) {
+    return (tossim_header_t*)msg->header;
+  }
 
-	event void Boot.booted() {
-		call NeighborTable.insert(neighbor);
-		call Timer.startPeriodic(1024);
-		printf("Booted! Counter init to %hu\n", call ExampleNeighbor.getCounter(call NeighborTable.get(neighbor)));
-	}
-
-	event void Timer.fired() {
-		neighbor_t* n = call NeighborTable.get(neighbor);
-		uint16_t c = call ExampleNeighbor.getCounter(n);
-
-		c++;		
-
-		call ExampleNeighbor.setCounter(n, c);
-
-		printf("Counter is now %hu\n", c);
-
-		printfflush();
-
-	}
-
-	event void NeighborTable.evicted(am_addr_t addr) {
-
-	}
-
+  async command tossim_metadata_t* CC2420PacketBody.getMetadata(message_t* msg) {
+    return (tossim_metadata_t*)msg->metadata;
+  }
+	
 }

@@ -1,0 +1,20 @@
+***** tos/lib/tossim/sim *****
+
+Implements CC2420 functionality for TOSSIM.  Supported features include:
+
+- Ieee154MessageC
+- Packet link layer functionality.
+- Duplicate detection.
+
+The only changed files compared to the original tinyos tree is:
+
+		MainC: removed the line that always includes TossimActiveMessageC			
+		ActiveMessageC: added the CC2420 send and receive layers
+		TossimRadioMsg.h: added packet link metadata
+
+Add the following to your Makefile in order to compile.
+
+CFLAGS += -I$(TOSCONTRIB)/csau/misc/tos/lib/tossim
+CFLAGS += -I$(TOSDIR)/chips/cc2420/link
+CFLAGS += -I$(TOSDIR)/chips/cc2420/unique
+

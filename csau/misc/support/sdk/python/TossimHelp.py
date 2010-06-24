@@ -1,5 +1,6 @@
+"""
 /*
- * Copyright (c) 2009 Aarhus University
+ * Copyright (c) 2008-2010 Aarhus University
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,47 +32,49 @@
 
 /**
  * @author Morten Tranberg Hansen <mth at cs dot au dot dk>
- * @date   August 19 2009
+ * @date   October 12 2008
  */
+"""
 
-#include "printf.h"
+def loadLinkModel(t, file):
+    #print "Loading link model from " + file + "... "
+    r = t.radio()
+    f = open(file, "r")
+    nodes = []
+    lines = f.readlines()
+    for line in lines:
+        s = line.split("\t")
+        if (len(s) > 0):
+            if s[0] =="gain":
+                #print " ", s[1], " ", s[2], " ", s[3];
+                r.add(int(s[1]), int(s[2]), float(s[3]))
+            if s[0]=="noise":
+                #print " ", s[1], " ", s[2], " ", s[3];
+                r.setNoise(int(s[1]), float(s[2]), float(s[3]))
+                nodes.append(int(s[1]))
+            #if int(s[1])>nodecount:
+                #nodecount = int(s[1])
+    return nodes
 
-module TestNeighborTableP {
+def loadNoiseModel(t, file, nodes):
+    #print "Loading noise model from " + file + "... "
+    noise = open(file, "r")
+    lines = noise.readlines()
+    for line in lines:
+        str = line.strip()
+        if (str != ""):
+            val = int(str)
+            for i in nodes:
+                t.getNode(i).addNoiseTraceReading(val)
 
-	uses {
-		interface Boot;
-		interface Timer<TMilli>;
+    for i in nodes:
+      #print "Creating noise model for ",i;
+      t.getNode(i).createNoiseModel()
 
-		interface NeighborTable;
-		interface ExampleNeighbor;
-	}
-
-} implementation {
-
-	am_addr_t neighbor = 100;
-
-	event void Boot.booted() {
-		call NeighborTable.insert(neighbor);
-		call Timer.startPeriodic(1024);
-		printf("Booted! Counter init to %hu\n", call ExampleNeighbor.getCounter(call NeighborTable.get(neighbor)));
-	}
-
-	event void Timer.fired() {
-		neighbor_t* n = call NeighborTable.get(neighbor);
-		uint16_t c = call ExampleNeighbor.getCounter(n);
-
-		c++;		
-
-		call ExampleNeighbor.setCounter(n, c);
-
-		printf("Counter is now %hu\n", c);
-
-		printfflush();
-
-	}
-
-	event void NeighborTable.evicted(am_addr_t addr) {
-
-	}
-
-}
+def initializeNodes(t, nodes):
+    #print "Initializing nodes..."
+    for i in nodes:
+      #print "nr: ", i
+      #t.getNode(i).bootAtTime((31 + t.ticksPerSecond() / 10) * i + 1);
+      t.getNode(i).bootAtTime((31 + t.ticksPerSecond() / 10) + 1);
+      

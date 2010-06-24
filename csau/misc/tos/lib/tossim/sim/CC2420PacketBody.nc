@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009 Aarhus University
+ * Copyright (c) 2010 Aarhus University
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,47 +31,13 @@
 
 /**
  * @author Morten Tranberg Hansen <mth at cs dot au dot dk>
- * @date   August 19 2009
+ * @date   February 08 2010
  */
 
-#include "printf.h"
+interface CC2420PacketBody {
 
-module TestNeighborTableP {
-
-	uses {
-		interface Boot;
-		interface Timer<TMilli>;
-
-		interface NeighborTable;
-		interface ExampleNeighbor;
-	}
-
-} implementation {
-
-	am_addr_t neighbor = 100;
-
-	event void Boot.booted() {
-		call NeighborTable.insert(neighbor);
-		call Timer.startPeriodic(1024);
-		printf("Booted! Counter init to %hu\n", call ExampleNeighbor.getCounter(call NeighborTable.get(neighbor)));
-	}
-
-	event void Timer.fired() {
-		neighbor_t* n = call NeighborTable.get(neighbor);
-		uint16_t c = call ExampleNeighbor.getCounter(n);
-
-		c++;		
-
-		call ExampleNeighbor.setCounter(n, c);
-
-		printf("Counter is now %hu\n", c);
-
-		printfflush();
-
-	}
-
-	event void NeighborTable.evicted(am_addr_t addr) {
-
-	}
+  async command tossim_header_t *getHeader(message_t *msg);
+  
+  async command tossim_metadata_t *getMetadata(message_t *msg);
 
 }

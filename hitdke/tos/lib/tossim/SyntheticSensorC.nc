@@ -13,16 +13,22 @@
  * @date   June 24, 2010
  */
 
-#include "synsb.h"
-
 #include <sim_event_queue.h>    /* FOR: sim_{event,time}_t, sim_node() */
 #include <sim_synsb.h>          /* FOR: sim_synsb_{init,query}DataSource */
 
 generic module SyntheticSensorC(typedef width_t @integer(), 
     sensor_t sensorId)
 {
-    provides interface Init;
-    provides interface Read<width_t>;
+    provides
+    {
+        interface Init;
+        interface Read<width_t>;
+    }
+    uses
+    {
+        interface SensorLatencyModel as LatencyModel;
+        interface SensorEnergyModel as EnergyModel;
+     }
 }
 implementation
 {
@@ -78,8 +84,8 @@ implementation
         sim_event_t * readEvent = allocateReadEvent();
         
         /* TODO: apply Sensor latency model to <tt>readEvent-&gt;time</tt> */
-        readEvent->time = sim_time() + 1;
-
+        readEvent->time = sim_time() + (call LatencyModel.getUnitLatency());
+        
         /* insert <tt>readEvent</tt> to TOSSIM's global event queue */
         sim_queue_insert(readEvent);
     }

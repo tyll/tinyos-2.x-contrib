@@ -17,11 +17,18 @@
 
 generic configuration DemoSensorC()
 {
-  provides interface Read<uint16_t>;
+    provides interface Read<uint16_t>;
 }
 implementation
 {
-  components new SyntheticSensorP(uint16_t, S_DEMO_SENSOR) as Sensor;
-  Read = Sensor;
+    components new SyntheticSensorC(uint16_t, S_DEMO_SENSOR);
+    components DefaultSensorModelC, MainC;
+
+    SyntheticSensorC.LatencyModel -> DefaultSensorModelC;
+    SyntheticSensorC.EnergyModel -> DefaultSensorModelC;
+
+    MainC.SoftwareInit -> SyntheticSensorC;
+    Read = SyntheticSensorC;
 }
+
 

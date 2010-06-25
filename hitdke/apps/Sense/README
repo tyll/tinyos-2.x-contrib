@@ -1,0 +1,43 @@
+This TinyOS application shows the basic usage of the TOSSIM DB simulator.
+
+TOSSIM DB is the Data-Enriched Simulator for TinyOS applications. When a 
+TinyOS application is compiled with this extension, its Sensor components
+implicitly accesse a compile-time-specified, external data source (i.e. 
+real historical data or synthetic data generator), and yield obtained data
+*as if* sensed in real time.
+
+Visit http://openjudge.net/~liuyu/Project/TossimDB to learn the details.
+
+
+PRE-REQUISITES:
+
+  The following directives in the application's local Makefile are necessary for
+  TOSSIM DB to i) compile correctly, and ii) locate third-party data source.
+
+    HITDKEDIR ?= /opt/tinyos-2.x-contrib/hitdke
+    TOSMAKE_PATH += $(HITDKEDIR)/support/make
+    DATASOURCE = $(HITDKEDIR)/tos/lib/tossim/synsb/data/IntelLab/tossim-db.xml
+
+
+HOW TO COMPILE:
+
+  There are two alternatives compiling this application, one for on-mote execution 
+  and the other for simulation with TOSSIM DB.
+
+  a) Compile for burning to real sensor mote (i.e. MicaZ):
+
+    $ env SENSORBOARD=basicsb make micaz install
+
+  b) Compile for simulation with TOSSIM DB:
+
+    $ env SENSORBOARD=synsb make micaz sim synsb
+
+
+HOW TO EXECUTE:
+
+  When the applications is compiled for TOSSIM DB simulation, it can be executed using
+  the following Python script,
+
+    $ ./sim-run.py
+
+

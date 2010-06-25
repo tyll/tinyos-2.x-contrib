@@ -13,9 +13,9 @@
 
 COMPONENT = SenseAppC
 
-HITDKEDIR ?= ../..
+HITDKEDIR ?= /opt/tinyos-2.x-contrib/hitdke
 TOSMAKE_PATH += $(HITDKEDIR)/support/make
-DATASOURCE = $(HITDKEDIR)/tos/sensorboards/synsb/data/IntelLab/tossim-db.xml
+DATASOURCE = $(HITDKEDIR)/tos/lib/tossim/synsb/data/IntelLab/tossim-db.xml
 
 include $(MAKERULES)
 

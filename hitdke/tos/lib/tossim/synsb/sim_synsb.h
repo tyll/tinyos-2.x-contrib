@@ -16,6 +16,7 @@
 #ifndef __SIM_SYNSB_H__
 #define __SIM_SYNSB_H__
 
+
 #include <sim_tossim.h>         /* FOR: sim_time_t */
 #include <sds.h>                /* FOR: Synthetic DataSource (SDS) API's */
 
@@ -28,6 +29,11 @@ extern "C"
 #ifndef SIM_SYNSB_CHANNEL
 #define SIM_SYNSB_CHANNEL "TOSSIM.DB"
 #endif /* SIM_SYNSB_CHANNEL */
+
+
+#ifndef SIM_SYNSB_DSD
+#error SIM_SYNSB_CHANNEL ": " "external data source SIM_SYNSB_DSD is not specified."
+#endif /* SIM_SYNSB_DSD */
 
 
 typedef struct

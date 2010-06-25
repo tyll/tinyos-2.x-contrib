@@ -19,7 +19,7 @@
 #ifdef TOSSIM
 #include <sim_synsb.h>
 #else
-#error "This sensorboard *synsb* only compiles with TOSSIM (aka. *sim* or *sim-sf* extras)."
+#error "This sensorboard *synsb* only compiles in TOSSIM DB mode (aka. "sim", "sim-sf", etc.)."
 #endif
 
 #endif /* __SYN_SB_H__ */

@@ -12,7 +12,7 @@
 #
 
 SENSORBOARD ?= synsb
-DATASOURCE ?= "bdb:"
+DATASOURCE ?= $(HITDKEDIR)/tos/lib/tossim/synsb/data/IntelLab/tossim-db.xml
 
 .PHONY: sim-synsb-deps
 .PHONY: sim-synsb-module hitdke-sds-library
@@ -35,6 +35,7 @@ endif
 SDSINCDIR ?= $(HITDKEDIR)/support/sdk/c/synsb/
 SDSLIBFILE ?= $(HITDKEDIR)/support/sdk/c/synsb/libsds.a
 
+CFLAGS += -DSIM_SYNSB_DSD=\"$(DATASOURCE)\"
 CFLAGS += -I./sim-db
 CFLAGS += -I./sim-synsb
 CFLAGS += -I./sim

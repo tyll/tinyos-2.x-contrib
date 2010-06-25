@@ -23,11 +23,12 @@ int
 sim_synsb_initDataSource(bool forceConnect)
 {
     static bool isConnected = false;
+    static char theDSDFile[] = SIM_SYNSB_DSD;
     
     if (!isConnected || forceConnect)
     {
         /* TODO: connect to DataSource */
-        
+        printf("about to open file: %s\n", theDSDFile);
         
         isConnected = true;     /* avoid re-initialize */
     }

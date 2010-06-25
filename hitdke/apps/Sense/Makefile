@@ -15,5 +15,7 @@ COMPONENT = SenseAppC
 
 HITDKEDIR ?= ../..
 TOSMAKE_PATH += $(HITDKEDIR)/support/make
+DATASOURCE = $(HITDKEDIR)/tos/sensorboards/synsb/data/IntelLab/tossim-db.xml
 
 include $(MAKERULES)
+

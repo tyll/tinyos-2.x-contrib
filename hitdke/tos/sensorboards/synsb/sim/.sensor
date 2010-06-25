@@ -13,8 +13,13 @@
 
 push( @includes, qw(
 
+  ./sim-synsb
+  ./sim-sensor
+  ./sim
+  %T/sensorboards/synsb/chips
   %T/sensorboards/synsb
+  %T/lib/tossim/chips
   %T/lib/tossim
-  %T/platforms/micaz
 
 ) );
+

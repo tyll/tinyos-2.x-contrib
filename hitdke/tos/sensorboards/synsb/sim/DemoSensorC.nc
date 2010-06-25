@@ -10,7 +10,7 @@
  * Demo sensor for synthetic sensorboard.
  * 
  * @author LIU Yu <pineapple.liu@gmail.com>
- * @date   Jun 18, 2010
+ * @date   June 25, 2010
  */
 
 #include "synsb.h"
@@ -21,14 +21,12 @@ generic configuration DemoSensorC()
 }
 implementation
 {
-    components new SyntheticSensorC(uint16_t, S_DEMO_SENSOR);
-    components DefaultSensorModelC, MainC;
-
+    components new SyntheticSensorC(uint16_t, "S_DEMO_SENSOR");
+    components DefaultSensorModelC;
+    
     SyntheticSensorC.LatencyModel -> DefaultSensorModelC;
     SyntheticSensorC.EnergyModel -> DefaultSensorModelC;
-
-    MainC.SoftwareInit -> SyntheticSensorC;
+    
     Read = SyntheticSensorC;
 }
-
 

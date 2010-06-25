@@ -35,10 +35,9 @@
 
 /**
  * 
- * Sensing demo application. See README.txt file in this directory for usage
- * instructions and have a look at tinyos-2.x/doc/html/tutorial/lesson5.html
- * for a general tutorial on sensing in TinyOS.
+ * Sensing demo application for TOSSIM/DB extension.
  * 
+ * @author LIU Yu <pineapple.liu@gmail.com>
  * @author Jan Hauer
  */
 
@@ -47,11 +46,12 @@ configuration SenseAppC
 } 
 implementation { 
   
-  components SenseC, MainC, LedsC, new TimerMilliC(), new DemoSensorC() as Sensor;
-//  components SenseC, MainC, LedsC, new TimerMilliC(), new SyntheticSensorC(uint16_t, 0) as Sensor;
+  components SenseC, MainC, LedsC, new TimerMilliC();
+  components new TempC() as Sensor;
 
   SenseC.Boot -> MainC;
   SenseC.Leds -> LedsC;
   SenseC.Timer -> TimerMilliC;
   SenseC.Read -> Sensor;
 }
+

@@ -35,23 +35,26 @@ endif
 SDSINCDIR ?= $(HITDKEDIR)/support/sdk/c/synsb/
 SDSLIBFILE ?= $(HITDKEDIR)/support/sdk/c/synsb/libsds.a
 
+CFLAGS += -I./sim-db
+CFLAGS += -I./sim-synsb
+CFLAGS += -I./sim
 CFLAGS += -I$(HITDKEDIR)/tos/sensorboards/synsb
-CFLAGS += -I$(HITDKEDIR)/tos/lib/tossim
+CFLAGS += -I$(HITDKEDIR)/tos/lib/tossim/synsb
 CFLAGS += -I$(SDSINCDIR)
 
-SYNSBFILE ?= $(HITDKEDIR)/tos/lib/tossim/sim_synsb.c
+SYNSBFILE ?= $(HITDKEDIR)/tos/lib/tossim/synsb/sim_synsb.c
 SYNSBOBJFILE ?= $(BUILDDIR)/sim_synsb.o
 
 sim-synsb-module: $(SYNSBFILE)
-	@echo "  compiling the HITDKE Synthetic SensorBoard (SynSB) extension into $(SYNSBOBJFILE)"
+	@echo "  compiling the TOSSIM DB extension into $(SYNSBOBJFILE)"
 	$(GPP) -c $(PLATFORM_CC_FLAGS) $(PLATFORM_FLAGS) -o $(SYNSBOBJFILE) $(OPTFLAGS) $(CFLAGS) $(SIM_CFLAGS) $(SF_FLAGS) $(SYNSBFILE) -I$(PYDIR) -I$(SIMDIR) -I$(SDSINCDIR)
 
 hitdke-sds-library: $(SDSLIBFILE)
 
 $(SDSLIBFILE):
-	@echo "  building the HITDKE Synthetic DataSource (SDS) library"
+	@echo "  building the Synthetic DataSource (SDS) library"
 	make -C $(SDSINCDIR)
 
 sim-synsb-wrongsb:
-	@echo "  WARNING: invalid SENSORBOARD type '$(SENSORBOARD)', change to 'synsb' to enable SynSB features"
+	@echo "  WARNING: invalid SENSORBOARD type '$(SENSORBOARD)', change to 'synsb' to enable TOSSIM DB features"
 

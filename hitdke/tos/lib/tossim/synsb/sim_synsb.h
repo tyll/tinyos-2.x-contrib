@@ -30,12 +30,6 @@ extern "C"
 #endif /* SIM_SYNSB_CHANNEL */
 
 
-typedef enum
-{
-    S_DEMO_SENSOR = 0,
-} SensorType;
-
-
 typedef struct
 {
     int status;
@@ -45,11 +39,17 @@ typedef struct
 
 /**
  * Initialize the global DataSource object.
- * @param force 
- * @return 0 on success, positive otherwise
+ * @param forceConnect
+ * @return 0 on success
  */
-int sim_synsb_initDataSource(bool force);
+int sim_synsb_initDataSource(bool forceConnect);
 
+/**
+ * Map sensor name string to the sensor id in configured DataSource.
+ * @param sensorName
+ * @return senorId
+ */
+int sim_synsb_mapSensorId(const char * sensorName);
 
 /**
  * Query the global DataSource object.

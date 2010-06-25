@@ -13,17 +13,35 @@
  * @date   June 24, 2010
  */
 
-#include <sim_synsb.h>          /* struct sim_event_t */
+#include <sim_synsb.h>          /* struct sim_{time,event}_t */
 
-static DataSource theDS;    /* global singleton data source object */
+
+static DataSource theDS;        /* global singleton data source object */
+
 
 int
-sim_synsb_initDataSource(bool force)
+sim_synsb_initDataSource(bool forceConnect)
 {
-    /* TODO */
-
+    static bool isConnected = false;
+    
+    if (!isConnected || forceConnect)
+    {
+        /* TODO: connect to DataSource */
+        
+        
+        isConnected = true;     /* avoid re-initialize */
+    }
+    
     return 0;
 }
+
+
+int 
+sim_synsb_mapSensorId(const char * sensorName)
+{
+    return 0;
+}
+
 
 SensorValue 
 sim_synsb_queryDataSource(sim_time_t readTime, int nodeId, int sensorId)

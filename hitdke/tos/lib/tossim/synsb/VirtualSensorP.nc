@@ -21,7 +21,7 @@
 #include <sim_synsb.h>          /* FOR: sim_synsb_{init,query}DataSource */
 
 
-generic module SyntheticSensorP(typedef width_t @integer(), 
+generic module VirtualSensorP(typedef width_t @integer(), 
     char sensorName[])
 {
     provides

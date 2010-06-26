@@ -16,7 +16,7 @@
  * @date   June 25, 2010
  */
 
-generic configuration SyntheticSensorC(typedef width_t @integer(), 
+generic configuration VirtualSensorC(typedef width_t @integer(), 
     char sensorName[])
 {
     provides
@@ -32,14 +32,14 @@ generic configuration SyntheticSensorC(typedef width_t @integer(),
 }
 implementation
 {
-    components new SyntheticSensorP(width_t, sensorName);
+    components new VirtualSensorP(width_t, sensorName);
     components MainC;
     
-    SyntheticSensorP.LatencyModel = LatencyModel;
-    SyntheticSensorP.EnergyModel = EnergyModel;
-    SyntheticSensorP.Init <- MainC.SoftwareInit;
+    VirtualSensorP.LatencyModel = LatencyModel;
+    VirtualSensorP.EnergyModel = EnergyModel;
+    VirtualSensorP.Init <- MainC.SoftwareInit;
     
-    Read = SyntheticSensorP;
-    ReadNow = SyntheticSensorP;
+    Read = VirtualSensorP;
+    ReadNow = VirtualSensorP;
 }
 

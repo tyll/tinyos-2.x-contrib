@@ -21,12 +21,12 @@ generic configuration DemoSensorC()
 }
 implementation
 {
-    components new SyntheticSensorC(uint16_t, "S_DEMO_SENSOR");
+    components new VirtualSensorC(uint16_t, "S_DEMO_SENSOR");
     components DefaultSensorModelC;
     
-    SyntheticSensorC.LatencyModel -> DefaultSensorModelC;
-    SyntheticSensorC.EnergyModel -> DefaultSensorModelC;
+    VirtualSensorC.LatencyModel -> DefaultSensorModelC;
+    VirtualSensorC.EnergyModel -> DefaultSensorModelC;
     
-    Read = SyntheticSensorC;
+    Read = VirtualSensorC;
 }
 

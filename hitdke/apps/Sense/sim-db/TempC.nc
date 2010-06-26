@@ -6,12 +6,12 @@ generic configuration TempC()
 }
 implementation
 {
-    components new SyntheticSensorC(uint16_t, "S_TEMPERATURE");
+    components new VirtualSensorC(uint16_t, "S_TEMPERATURE");
     components DefaultSensorModelC;
     
-    SyntheticSensorC.LatencyModel -> DefaultSensorModelC;
-    SyntheticSensorC.EnergyModel -> DefaultSensorModelC;
+    VirtualSensorC.LatencyModel -> DefaultSensorModelC;
+    VirtualSensorC.EnergyModel -> DefaultSensorModelC;
 
-    Read = SyntheticSensorC;
+    Read = VirtualSensorC;
 }
 

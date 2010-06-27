@@ -25,26 +25,26 @@ BUILD_DEPS = sim-synsb-deps
 # 
 sim-exe: sim-synsb-deps
 
-ifeq ($(SENSORBOARD),synsb)
-sim-synsb-deps: sim-synsb-module hitdke-sds-library
-PLATFORM_LIB_FLAGS += $(SYNSBOBJFILE) $(SDSLIBFILE)
-else
-sim-synsb-deps: sim-synsb-wrongsb
-endif
-
-SDSINCDIR ?= $(HITDKEDIR)/support/sdk/c/synsb/
-SDSLIBFILE ?= $(HITDKEDIR)/support/sdk/c/synsb/libsds.a
-
 CFLAGS += -DSIM_SYNSB_DSD=\"$(DATASOURCE)\"
-CFLAGS += -I./sim-db
-CFLAGS += -I./sim-synsb
-CFLAGS += -I./sim
+CFLAGS += -I. # make "./sim" the first directory to look for components
 CFLAGS += -I$(HITDKEDIR)/tos/sensorboards/synsb
 CFLAGS += -I$(HITDKEDIR)/tos/lib/tossim/synsb
 CFLAGS += -I$(SDSINCDIR)
 
+DBILIBFILE ?= /usr/lib/libdbi.a
+
+SDSINCDIR ?= $(HITDKEDIR)/support/sdk/c/synsb/
+SDSLIBFILE ?= $(HITDKEDIR)/support/sdk/c/synsb/libsds.a
+
 SYNSBFILE ?= $(HITDKEDIR)/tos/lib/tossim/synsb/sim_synsb.c
 SYNSBOBJFILE ?= $(BUILDDIR)/sim_synsb.o
+
+ifeq ($(SENSORBOARD),synsb)
+sim-synsb-deps: sim-synsb-module hitdke-sds-library
+PLATFORM_LIB_FLAGS += $(SYNSBOBJFILE) $(SDSLIBFILE) $(DBILIBFILE)
+else
+sim-synsb-deps: sim-synsb-wrongsb
+endif
 
 sim-synsb-module: $(SYNSBFILE)
 	@echo "  compiling the TOSSIM DB extension into $(SYNSBOBJFILE)"

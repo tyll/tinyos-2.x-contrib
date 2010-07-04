@@ -157,8 +157,6 @@ implementation{
   void conditionalFQDiscard()
   {
     fe_queue_entry_t* discardQe;
-    if( call SendStack.size () != call QEntryPool.maxSize() - call QEntryPool.size() )
-      call BcpDebugIF.reportError( 0x3a ); // Mis-match pool should equal queue!
     if( call SendStack.size() == call SendStack.maxSize() ) {
       discardQe = call SendStack.popBottom(); 
       if( call MessagePool.put(discardQe->msg) != SUCCESS ){ 

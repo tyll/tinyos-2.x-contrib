@@ -34,19 +34,8 @@
  * @date   February 08 2010
  */
 
-configuration CC2420PacketC {
+interface CC2420Packet {
 
-	provides {
-    interface PacketAcknowledgements as Acks;	
-		interface CC2420PacketBody;
-		interface CC2420Packet;
-	} 
+	async command uint8_t getLqi(message_t* msg);
 
-} implementation {
-
-	components TossimPacketModelC as Network;
-  Acks = Network;
-	components CC2420PacketP;
-	CC2420PacketBody = CC2420PacketP;
-	CC2420Packet = CC2420PacketP;
 }

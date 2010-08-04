@@ -39,6 +39,7 @@ configuration CC2420RadioC {
 	provides {
 		interface PacketAcknowledgements;
 		interface PacketLink;
+		interface CC2420Packet;
 	}
 
 } implementation {
@@ -53,5 +54,6 @@ configuration CC2420RadioC {
 #endif
 
 	PacketLink = LinkC;
+	CC2420Packet = CC2420PacketC;
 
 }

@@ -38,6 +38,7 @@ module CC2420PacketP {
 
 	provides {
 		interface CC2420PacketBody;
+		interface CC2420Packet;
 	} 
 
 } implementation {
@@ -49,5 +50,9 @@ module CC2420PacketP {
   async command tossim_metadata_t* CC2420PacketBody.getMetadata(message_t* msg) {
     return (tossim_metadata_t*)msg->metadata;
   }
+
+	async command uint8_t CC2420Packet.getLqi(message_t* msg) {
+		return (call CC2420PacketBody.getMetadata(msg))->strength;
+	}
 	
 }

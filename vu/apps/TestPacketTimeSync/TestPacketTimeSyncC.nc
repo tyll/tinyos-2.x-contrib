@@ -53,11 +53,11 @@ implementation {
   event void AMControl.startDone(error_t err) {
     if (err == SUCCESS) {
     if(call AMPacket.address() == 1) {
-          call MilliTimer.startPeriodic(100);
+          call MilliTimer.startPeriodic(1024/4);
     }
 #if defined(PINGER)
     else {
-      call MilliTimer.startPeriodic(100);
+      call MilliTimer.startPeriodic(1024/4);
     }
 #endif
 

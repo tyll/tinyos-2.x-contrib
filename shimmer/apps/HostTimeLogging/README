@@ -1,4 +1,4 @@
-this app is identical to JustFATLogging with the exception that it
+This app is identical to JustFATLogging with the exception that it
 does nothing until it acquires a timestamp from a host machine to the
 docked shimmer.  how JustFATLogging works is reproduced here for
 convenience, but the timestamping section applies to this app only.

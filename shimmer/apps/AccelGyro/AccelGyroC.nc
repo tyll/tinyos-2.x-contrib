@@ -179,10 +179,10 @@ implementation {
      */
 #endif /* USE_8MHZ_CRYSTAL */
 
-    // pins for gyro, gyro enable
     call BluetoothInit.init();
+
     call AccelInit.init();
-    
+
     atomic {
       memset(tx_packet, 0, (FIXED_PACKET_SIZE*2));
       enable_sending = FALSE;
@@ -196,8 +196,9 @@ implementation {
 
     NBR_ADC_CHANS = call shimmerAnalogSetup.getNumberOfChannels();
 
-    call GyroInit.init();
 
+    // pins for gyro, gyro enable
+    
     call Bluetooth.disableRemoteConfig(TRUE);
   }
 
@@ -384,11 +385,13 @@ implementation {
   }
 
   task void startSensing() {
+    call GyroInit.init();
+    call GyroStdControl.start();
+
     call ActivityTimer.startPeriodic(1000);
     call Accel.setSensitivity(RANGE_4_0G);
     call Accel.wake(TRUE);
 
-    call GyroStdControl.start();
 
     call SampleTimer.startPeriodic(sample_freq);
   }

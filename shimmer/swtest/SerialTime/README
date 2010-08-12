@@ -28,7 +28,9 @@ testSerialSetTime is docked, running the shimmer_timesync.py script
 will find the first pair of these on either type of system and send
 the timestamp to the shimmer over the second of the two.  (That means
 that if you have multiple docks attached, you might not send the
-timestamp to the right shimmer.)
+timestamp to the right shimmer.)  NOTE:  find the shimmer_timesync.py
+and mentioned-later serial_recv.py in the scripts directory next to
+swtest. 
 
 We assume that any reasonable linux machine will have python installed
 already.  One python library that might be missing is pyserial, but
@@ -106,7 +108,7 @@ In case you're wondering, 1270063149 is the number of seconds since
 January 1, 1970, the beginning of unix time.
 
 How does the test work?  After you send the data (see above), then
-you compile and run serial_recv (make sure the port is right, it's
+you compile and run serial_recv.py (make sure the port is right, it's
 hard-coded to /dev/ttyUSB1).  Then, press the user button on the
 programming dock, and the timestring will appear on the console.
 

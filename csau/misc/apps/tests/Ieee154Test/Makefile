@@ -18,6 +18,8 @@ CFLAGS += -I$(TOSCONTRIB)/csau/misc/tos/system
 CFLAGS += -I$(TOSCONTRIB)/csau/misc/tos/lib/tossim
 CFLAGS += -I$(TOSDIR)/chips/cc2420/link
 CFLAGS += -I$(TOSDIR)/chips/cc2420/unique
+CFLAGS += -I$(TOSDIR)/chips/cc2420/lpl
+CFLAGS += -I$(TOSDIR)/chips/cc2420/interfaces
 
 BUILD_EXTRA_DEPS += 
 CLEAN_EXTRA = simbuild build doc app.xml 

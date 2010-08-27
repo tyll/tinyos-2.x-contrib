@@ -47,24 +47,17 @@ configuration ActiveMessageC {
 implementation {
   components TossimActiveMessageC as AM;
   components TossimPacketModelC as Network;
-	components TossimAdapterC as Adapter;
 
   components CpmModelC as Model;
 
   components ActiveMessageAddressC as Address;
   components MainC;
-  
-#ifdef PACKET_LINK
-  components PacketLinkC as LinkC;
-#else
-  components PacketLinkDummyC as LinkC;
-#endif
 	
-	components UniqueSendC;
-  components UniqueReceiveC;
-	
+	components CC2420RadioC;
+
   MainC.SoftwareInit -> Network;
-  SplitControl = Network;
+  SplitControl = CC2420RadioC;
+	CC2420RadioC.SubControl -> Network;
   
   AMSend       = AM;
   Receive      = AM.Receive;
@@ -73,22 +66,11 @@ implementation {
   AMPacket     = AM;
   PacketAcknowledgements = Network;
 
-  AM.Model -> Adapter;
-	Adapter.SubModel -> Network.Packet;
+  AM.Model -> CC2420RadioC;
+	CC2420RadioC.SubModel -> Network.Packet;
   AM.amAddress -> Address;
 
-	// Send Layers
-	Adapter.SubSend -> UniqueSendC;
-	UniqueSendC.SubSend -> LinkC;
-	//TODO: insert LPL?
-	LinkC.SubSend -> Adapter;
-
-	// Receive Layers
-	//TODO: insert LPL?
-	Adapter.SubReceive -> UniqueReceiveC.Receive;
-	UniqueReceiveC.SubReceive -> Adapter;
-
-	Adapter.Packet -> AM;
+	CC2420RadioC.Packet -> AM;
 
   Network.GainRadioModel -> Model;
 }

@@ -52,27 +52,20 @@ configuration Ieee154MessageC {
 implementation {
   components TossimIeee154MessageC as Ieee154;
   components TossimPacketModelC as Network;
-	components TossimAdapterC as Adapter;
 
   components CpmModelC as Model;
 
   components ActiveMessageAddressC as Address;
   components MainC;
 
-#ifdef PACKET_LINK
-  components PacketLinkC as LinkC;
-#else
-  components PacketLinkDummyC as LinkC;
-#endif
-	
-	components UniqueSendC;
-  components UniqueReceiveC;
-
   components new FcfsResourceQueueC(uniqueCount(RADIO_SEND_RESOURCE));
+
+	components CC2420RadioC;
   
   MainC.SoftwareInit -> Network;
 	MainC.SoftwareInit -> FcfsResourceQueueC;
-  SplitControl = Network;
+  SplitControl = CC2420RadioC;
+	CC2420RadioC.SubControl -> Network;
  
 	SendResource = Ieee154;
   Ieee154Send = Ieee154;
@@ -81,23 +74,12 @@ implementation {
   Ieee154Packet = Ieee154;
   PacketAcknowledgements = Network;
 
-  Ieee154.Model -> Adapter;
-	Adapter.SubModel -> Network.Packet;
+  Ieee154.Model -> CC2420RadioC;
+	CC2420RadioC.SubModel -> Network.Packet;
   Ieee154.amAddress -> Address;
 	Ieee154.Queue -> FcfsResourceQueueC;
 
-	// Send Layers
-	Adapter.SubSend -> UniqueSendC;
-	UniqueSendC.SubSend -> LinkC;
-	//TODO: insert LPL?
-	LinkC.SubSend -> Adapter;
-
-	// Receive Layers
-	//TODO: insert LPL?
-	Adapter.SubReceive -> UniqueReceiveC.Receive;
-	UniqueReceiveC.SubReceive -> Adapter;
-
-	Adapter.Packet -> Ieee154;
+	CC2420RadioC.Packet -> Ieee154;
 
   Network.GainRadioModel -> Model;
 }

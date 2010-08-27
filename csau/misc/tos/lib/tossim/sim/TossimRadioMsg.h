@@ -20,6 +20,9 @@ typedef nx_struct tossim_metadata {
   nx_int8_t strength;
   nx_uint8_t ack;
   nx_uint16_t time;
+#ifdef LOW_POWER_LISTENING
+  nx_uint16_t rxInterval;
+#endif
 #ifdef PACKET_LINK
   nx_uint16_t maxRetries;
   nx_uint16_t retryDelay;

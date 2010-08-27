@@ -37,22 +37,73 @@
 configuration CC2420RadioC {
 
 	provides {
+		interface TossimPacketModel as Model;		
+		interface SplitControl as Control;
+
+		interface LowPowerListening;
 		interface PacketAcknowledgements;
 		interface PacketLink;
 		interface CC2420Packet;
 	}
 
+	uses {
+		interface TossimPacketModel as SubModel;		
+		interface SplitControl as SubControl;
+		interface Packet;
+	}
+
 } implementation {
 
-	components CC2420PacketC;
-  PacketAcknowledgements = CC2420PacketC;
+  components TossimPacketModelC as Network;
+	components TossimAdapterC as Adapter;
 
 #ifdef PACKET_LINK
   components PacketLinkC as LinkC;
 #else
   components PacketLinkDummyC as LinkC;
 #endif
+	
+	components UniqueSendC;
+  components UniqueReceiveC;
 
+#ifdef LOW_POWER_LISTENING
+  components DefaultLplC as LplC;
+#else
+  components DummyLplC as LplC;
+#endif
+
+	components CC2420CsmaC;
+	components CC2420TransmitC;
+	components CC2420ReceiveC;
+	components CC2420PacketC;
+
+	// Control Layers
+	Control = LplC;
+	LplC.SubControl -> CC2420CsmaC;
+	CC2420CsmaC.SubControl = SubControl;
+
+	// Send layers
+	Adapter.SubSend -> UniqueSendC;
+	UniqueSendC.SubSend -> LinkC;
+	LinkC.SubSend -> LplC;
+	LplC.SubSend -> CC2420TransmitC;
+	CC2420TransmitC.SubSend -> Adapter;
+	
+	// Receive Layers
+	Adapter.SubReceive -> LplC;
+	LplC.SubReceive -> UniqueReceiveC.Receive;
+	UniqueReceiveC.SubReceive -> CC2420ReceiveC;
+	CC2420ReceiveC.SubReceive ->	Adapter;	
+
+	Model = Adapter.Model;
+	Adapter.SubModel = SubModel;
+
+	Adapter.Packet = Packet;
+	CC2420TransmitC.ChannelAccess -> Network;;
+	CC2420TransmitC.CC2420PacketBody -> CC2420PacketC;
+
+	LowPowerListening = LplC;
+  PacketAcknowledgements = CC2420PacketC;
 	PacketLink = LinkC;
 	CC2420Packet = CC2420PacketC;
 

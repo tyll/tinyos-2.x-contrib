@@ -1,0 +1,4 @@
+COMPONENT=TransmitterC
+
+include $(MAKERULES)
+

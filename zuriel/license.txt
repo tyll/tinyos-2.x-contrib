@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2010 INSERT_AFFILIATION_NAME_HERE
+* Copyright (c) 2010 Department of Information Engineering at University of Padova.
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
@@ -11,7 +11,7 @@
 *   notice, this list of conditions and the following disclaimer in the
 *   documentation and/or other materials provided with the
 *   distribution.
-* - Neither the name of INSERT_AFFILIATION_NAME_HERE nor the names of
+* - Neither the name of University of Padova nor the names of
 *   its contributors may be used to endorse or promote products derived
 *   from this software without specific prior written permission.
 *

@@ -76,12 +76,9 @@ implementation {
   MainC.SoftwareInit   -> TimeC;
   HostTimeLoggingP.Time -> TimeC;
 
-  components HostTimeP;
-  MainC.SoftwareInit        -> HostTimeP;
-  HostTimeLoggingP.HostTime -> HostTimeP;
-  HostTimeP.UARTControl     -> HplMsp430Usart0C.HplMsp430Usart;
-  HostTimeP.UARTData        -> HplMsp430Usart0C.HplMsp430UsartInterrupts;
-  HostTimeP.Time            -> TimeC;
+  components HostTimeC;
+  MainC.SoftwareInit        -> HostTimeC;
+  HostTimeLoggingP.HostTime -> HostTimeC;
 
   // these two sections for getting/acknowledging wall time from host
   components HplMsp430Usart0C;

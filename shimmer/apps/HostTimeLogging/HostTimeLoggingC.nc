@@ -44,8 +44,9 @@ implementation {
   components LedsC;
   HostTimeLoggingP.Leds -> LedsC;
   
-  components new TimerMilliC() as sampleTimer;
+  components new AlarmMilli16C() as sampleTimer;
   components new TimerMilliC() as warningTimer;
+  HostTimeLoggingP.sampleTimerInit -> sampleTimer;
   HostTimeLoggingP.sampleTimer   -> sampleTimer;
   HostTimeLoggingP.warningTimer  -> warningTimer;
 

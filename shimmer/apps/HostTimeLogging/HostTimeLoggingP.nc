@@ -301,6 +301,7 @@ implementation {
   }
 
   task void fireUpSystem(){
+    call buttonNotify.disable();
 
     call UARTControl.disableUart();
 

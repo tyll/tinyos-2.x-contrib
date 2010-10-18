@@ -11,4 +11,7 @@ ifdef CURRENT_TIME
 PFLAGS += -DCURRENT_TIME=$(CURRENT_TIME)
 endif
 
+# this tells the sd driver to use proper clock calibration for spi bus during card init
+PFLAGS += -DSMCLK_4MHZ
+
 include $(MAKERULES)

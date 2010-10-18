@@ -9,4 +9,7 @@ COMPONENT=HostTimeLoggingC
 
 PFLAGS += -DHOST_TIME
 
+# this tells the sd driver to use proper clock calibration for spi bus during card init
+PFLAGS += -DSMCLK_4MHZ
+
 include $(MAKERULES)

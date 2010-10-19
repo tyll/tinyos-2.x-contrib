@@ -33,11 +33,7 @@ interface S4Neighborhood {
   
   command am_addr_t getClosestBeaconAddr(uint16_t addr);
   
-    command error_t addNextHopEntry(uint16_t addr, uint16_t nextHop);
-      
-    command error_t removeNextHopEntry(uint16_t addr);
-      
-    command error_t removeAllNextHopEntries();
+    
 
 
   

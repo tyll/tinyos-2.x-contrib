@@ -54,24 +54,15 @@ implementation {
   components 
              S4QueuedSendM as QueuedSendM
            , LedsC as Leds        /////Diff
-           , ActiveMessageC        ///??????????????????
-           , S4ActiveMessageC    ///??????????????????????
+           , ActiveMessageC        
+           , S4ActiveMessageC   
 #ifdef SERIAL_LOGGING
-           , new SerialAMSenderC(AM_RTLOGGINGPACKET)  ////??????????????
-           , SerialActiveMessageC  ////?????????????????????????
+           , new SerialAMSenderC(AM_RTLOGGINGPACKET)  
+           , SerialActiveMessageC  
 #endif
            , new TimerMilliC() as QueueRetransmitTimer
-           , RandomLfsrC
-
-	   
-  ////////////////////////////////////////////////Qasim
-  
-  #ifdef EXP_BACKOFF
-  	,RandomLfsrC as Random
-  #endif
-  
-  //////////////////////////////////////////////////////
-            ;
+           , RandomLfsrC	     
+           ;
             
 
   
@@ -82,15 +73,12 @@ implementation {
   AMSend = QueuedSendM.QueueSendMsg;
   Receive = BottomReceiveMsg;
  
-  QueuedSendM.AirSendMsg = BottomSendMsg;   /////QueuedSendM.SerialSendMsg= ?????????
+  QueuedSendM.AirSendMsg = BottomSendMsg;   
   QueuedSendM.Leds -> Leds;  
-  QueuedSendM.Acks -> S4ActiveMessageC;/////Additional Added????
+  QueuedSendM.Acks -> S4ActiveMessageC;
   
   
   
-#ifndef NO_S4_INTROSPECT
-  //QueuedSendM.Logger -> Logger;
-#endif
 
 /////////////////////////////////////////// Qasim 1/15/2007
 

@@ -60,7 +60,7 @@ module S4StateM {
     interface S4StateCommand;
     interface FreezeThaw;
     
-    interface RoutingTable;///////////////// Qasim
+    interface RoutingTable;
     
   }
   uses {
@@ -68,7 +68,7 @@ module S4StateM {
     interface AMSend as S4StateAMSend;
     interface Receive as S4StateReceive;
 
-    //interface Logger;
+    
 
     interface Leds;
     
@@ -77,29 +77,26 @@ module S4StateM {
     
     interface Timer<TMilli> as BeaconTimer;
     interface Timer<TMilli> as BeaconRetransmitTimer;
-#ifdef FW_COORD_TABLE  /////////////Qasim
+#ifdef FW_COORD_TABLE 
     interface CoordinateTable;
     interface StdControl as CoordinateTableControl;
     interface Init as CoordinateTableControlInit;
-#endif///////////Qasim
+#endif
 
     interface LinkEstimator; 
     interface LinkEstimatorSynch;
-    //LinkEstimator.StdControl is wired in LinkEstimatorComm
+    
 
     interface Random;
     interface AMPacket;
     
     
-    #ifdef PLATFORM_MICA2 /////////////qasim
+    #ifdef PLATFORM_MICA2 
     	interface CC1000Control;
     	interface Time;
-    #endif////////qasim
+    #endif
     
-    
-    //interface Init as UARTLoggerInit;
-    
-    
+
     interface Timer<TMilli> as BeaconUpdateTimer;
 #ifdef CHECK_LINK
       interface Timer<TMilli> as CheckLinkTimer;
@@ -181,7 +178,7 @@ implementation {
 
   bool initialized = FALSE; ////////////////////???????????????????
 
-///////////////////////////Qasim
+
 
 
 uint8_t beacon_send_retries = 0;
@@ -216,7 +213,7 @@ uint8_t beacon_send_retries = 0;
   bool clusterupdatetimer_started;
 #endif
 
-  NextHopTableEntry nextHopTable[N_NODES / MAX_ROOT_BEACONS];
+ 
 
   uint8_t dv_send_retries = 0;
 
@@ -275,7 +272,7 @@ static void rootBeaconInit(S4RootBeacon* b);
 
 task void sendBeaconTask();
 
-////////////qasim
+
 
 #ifdef CRROUTING
 static void init_cluster_msg();
@@ -296,9 +293,6 @@ static void set_dv_update_msg();
         
     call S4Topology.getRootBeaconIDs(original_root_beacon_id);
 
-#ifdef TOSSIM
-    //call BeaconDisplayTimer.startPeriodic(10000);
-#endif
 
     b_timer_int = I_BEACON_INTERVAL *INTERVAL_MUL;
     b_timer_jit = I_BEACON_JITTER;
@@ -313,7 +307,7 @@ static void set_dv_update_msg();
     state_beaconing_coords = TRUE;
 
     beacon_msg_length = sizeof(S4BeaconMsg);
-    beacon_seqno = 1;////////////////////////????????????????
+    beacon_seqno = 1;
     rcv_beacon_ptr = &rcv_beacon_buf;
     
     
@@ -368,9 +362,7 @@ static void set_dv_update_msg();
   
 #endif
 
-  for (i = 0; i < N_NODES / MAX_ROOT_BEACONS; i++) {      
-        nextHopTable[i].addr = INVALID_NODE_ID;
-  }
+  
 
 
 #ifdef MULTIPLE_BEACON
@@ -457,25 +449,25 @@ static void set_dv_update_msg();
   }
   
   
-  ////////////******************************************************************
   
-	void displayRootBeacons() {
-	  #ifdef TOSSIM
-
-	    int i;
-	    for (i = 0; i < MAX_BEACON_VECTOR_SIZE; i++) {
-	      dbg("S4-beacon", "BeaconDisplayTimer: hopcount=%d, i=%d, nodeid=%d, parent=%d, valid=%d, time=%s\n", rootBeacons[i].hops,
-											i, rootBeacons[i].nodeid, rootBeacons[i].parent,
-											rootBeacons[i].valid, sim_time_string()
-		 );		  		                		    
-	    }
-	  #endif
-	}
-
+  
+  void displayRootBeacons() {
 #ifdef TOSSIM
-	event void BeaconDisplayTimer.fired() {
-	    displayRootBeacons();
-	}
+    
+    int i;
+    for (i = 0; i < MAX_BEACON_VECTOR_SIZE; i++) {
+      dbg("S4-beacon", "BeaconDisplayTimer: hopcount=%d, i=%d, nodeid=%d, parent=%d, valid=%d, time=%s\n", rootBeacons[i].hops,
+          i, rootBeacons[i].nodeid, rootBeacons[i].parent,
+          rootBeacons[i].valid, sim_time_string()
+          );		  		                		    
+    }
+#endif
+  }
+  
+#ifdef TOSSIM
+  event void BeaconDisplayTimer.fired() {
+    displayRootBeacons();
+  }
 #endif
   
   
@@ -596,7 +588,7 @@ static void set_dv_update_msg();
   }
 
   
-  //////////////// qasim
+  
   
   static  bool is_greater_by_2(uint8_t _new, uint8_t old) {
       uint8_t range = (uint8_t) MSG_VALID_RANGE8;
@@ -623,15 +615,14 @@ static void set_dv_update_msg();
       }
       return (t1 && t2);
     }
-
   
-  ///////////////////
+  
   
   
   
   static  uint8_t quality_with_retransmissions(uint8_t quality, uint8_t k) {
   
-  #ifdef RETEX_QUALITY ////////////////////// Qasim
+  #ifdef RETEX_QUALITY 
     float qi,qf;
     uint8_t q;
     int i;
@@ -640,7 +631,7 @@ static void set_dv_update_msg();
     for (i = 1; i < k; i++) {
       qf = qf*qi;
     }
-    //q = 255 - (uint8_t) (qf*255.0);
+    
     q = (uint8_t)(255*( 1.0 - qf ));
     dbg("S4-debug","quality_with_restransmissions(%d): %d -> %d\n", k, quality, q);
     return q;
@@ -692,8 +683,8 @@ static void set_dv_update_msg();
 #endif
 
 
-#ifdef MULTIPLE_BEACON  /////////////   qasim
-    uint8_t counter=0;  ///////////// qasim
+#ifdef MULTIPLE_BEACON  
+    uint8_t counter=0; 
 
 #ifndef SAME_SEQNO
 
@@ -716,7 +707,7 @@ static void set_dv_update_msg();
     // the other option is to use the synchronize interface from the LinkEstimator
     // and store the value of the quality.
     ///**************************************************
-    /////////////QASIM
+    
 #ifdef MULTIPLE_BEACON
                        
     while(counter<MAX_BEACON_VECTOR_SIZE && next_beacon<call S4Topology.getRootNodesCount())
@@ -860,27 +851,23 @@ static void set_dv_update_msg();
     if (b!=NULL) {
       b->valid = 1;
       b->nodeid = call AMPacket.address();
-      b->parent = TOS_BCAST_ADDR; /////////////???? invalid?
-      b->hops = 0; //////////////INVALID_COMPONENT???
-      b->last_seqno = root_beacon_seqno;  /////////////??????
+      b->parent = TOS_BCAST_ADDR; 
+      b->hops = 0; 
+      b->last_seqno = root_beacon_seqno;  
 #ifdef BEACON_ETX
       b->combined_quality = 0;
 #else
       b->combined_quality = 255;
 #endif
 
-///////////////////// QASIM
-
-b->updated=0;
+      b->updated=0;
 #ifdef RELIABLE_BCAST
-b->bcastlost=0;
+      b->bcastlost=0;
 #endif
 
 #ifdef SHOW_BEACONID
-b->nodeid=INVALID_NODE_ID;
+      b->nodeid=INVALID_NODE_ID;
 #endif
-
-///////////////////////////
 
     } else 
       dbg("S4-error","rootBeaconSetMyself called with NULL pointer\n");
@@ -904,21 +891,7 @@ b->nodeid=INVALID_NODE_ID;
 
   }
 
-  NextHopTableEntry* getNextHopEntry(uint16_t addr) {
-    int i=0;
-
-    for (i=0; i < N_NODES / MAX_ROOT_BEACONS; i++ ) {
-      dbg("NodeState", "InextHopTable[%d].addr=%d, nextHop=%d\n", i, nextHopTable[i].addr, 
-                                                                     nextHopTable[i].nextHop);  
-      if (addr!=INVALID_NODE_ID && nextHopTable[i].addr == addr) {
-	return &nextHopTable[i];
-      }
-    }
-
-    return NULL;
-  }
-
-
+  
 
   /* Inits rootBeacon (if I'm a beacon), my_coords, my_coords_parents */
   static void init_my_coords() {
@@ -950,8 +923,6 @@ b->nodeid=INVALID_NODE_ID;
     A parent which dies is replaced when another node is chosen as a replacement parent */
   static void dropParent(uint8_t addr) {
     int i;
-    
-
     
     for (i = 0; i < call S4Topology.getRootNodesCount(); i++) {
       if (rootBeacons[i].parent == addr) {
@@ -986,7 +957,7 @@ b->nodeid=INVALID_NODE_ID;
     bool valid_seqno = FALSE;
     bool same_parent = FALSE;
     bool better_parent = FALSE;
-    bool equal_parent = FALSE; ///////////qasim
+    bool equal_parent = FALSE; 
     uint8_t from_ld;
     uint8_t current_parent_ld; //indices into the link estimator table
     uint8_t received_quality, received_combined_quality;
@@ -1013,21 +984,16 @@ b->nodeid=INVALID_NODE_ID;
       dbg("S4-beacon","Returning due to higher hash compared to %d", rootBeacons[root_id].nodeid);
       return;
     }
-    else if (/*rootBeacons[root_id].valid &&*/ rootBeacons[root_id].nodeid != nodeid) {
+    else if (rootBeacons[root_id].nodeid != nodeid) {
       int i;
       force_update = TRUE;
 
       dv_round = 0;
       dbg("S4-beacon", "Changing rootbeacon %d from %d to %d\n", root_id, rootBeacons[root_id].nodeid, nodeid);
 
-      //call Init.init();
+      
       for (i=1; i<MAX_CLUSTER_SIZE; i++)
         ClusterTable[i].valid = 0;
-
-      for (i = 0; i < N_NODES / MAX_ROOT_BEACONS; i++) {
-        nextHopTable[i].quality = 0 ;  //this nexthop is still valid; but it should make way for better neighbors on priority basis
-      } 
-
     }
 
     if (root_id >= MAX_ROOT_BEACONS) {
@@ -1079,7 +1045,7 @@ b->nodeid=INVALID_NODE_ID;
  
     dbg("S4-debug","Root beacon message: source: %d seqno:%d hopcount:%d last_hop:%d comb.quality:%d\n",
                   root_id, seqno, hopcount, from, quality);
-    //call Logger.LogReceiveRootBeacon( seqno, root_id, from, hopcount, quality);
+    
 
 
     if (!(rootBeacons[root_id].valid)) {
@@ -1105,17 +1071,12 @@ b->nodeid=INVALID_NODE_ID;
         if (hopcount == rootBeacons[root_id].hops) {
            different_hop = FALSE;
           /* in this case we can use information with the same sequence number also */
-
           
           valid_seqno = is_within_range(seqno, rootBeacons[root_id].last_seqno);
-
-          /////////////////Qasim
-          
           
           /* modified by Feng Wang for slow update */
 	  //valid_seqno = is_within_range(seqno, rootBeacons[root_id].last_seqno);
 	  valid_seqno = is_greater_by_2(seqno, rootBeacons[root_id].last_seqno);
-
           
           ////////////////////////////
           
@@ -1123,8 +1084,7 @@ b->nodeid=INVALID_NODE_ID;
           dbg("S4-debug","ROOT: update: same hopcount, valid_seqno: %d threshold %d\n", 
               valid_seqno, quality_update_threshold);
         } else {
-          different_hop = TRUE;
-          
+          different_hop = TRUE;          
           
           ///valid_seqno = is_within_range(seqno, rootBeacons[root_id].last_seqno); /// feng weng ullo
           valid_seqno = is_greater_by_2(seqno, rootBeacons[root_id].last_seqno);//// feng weng ullo
@@ -1149,7 +1109,7 @@ b->nodeid=INVALID_NODE_ID;
             dbg("S4-debug","UpdateBeacon: same parent,   same hop, increase tolerance: t[ %d ]= %d\n",root_id,rootBeacons[root_id].tolerance);
           }
 #endif //ETX_TOLERANCE
-//This entire ifdef is here just for logging, unnecessary otherwise
+          //This entire ifdef is here just for logging, unnecessary otherwise
           if (call LinkEstimator.getBidirectionalQuality(current_parent_ld,&current_quality) != SUCCESS) 
              current_quality = 0;
           if (current_quality > 0) {
@@ -1171,9 +1131,7 @@ b->nodeid=INVALID_NODE_ID;
 #endif
         /* ###### IMPORTANT CHANGE by FENG WANG ######
 	         * also accept same seqno from better parent (for now, just smaller hopcount)
-	         */
-	        //} else if (valid_seqno) {
-	        //} else if (valid_seqno || ( (seqno == rootBeacons[root_id].last_seqno) && (hopcount < rootBeacons[root_id].hops) )) {
+	         */	        
 	        } else if ( valid_seqno || 
 	                    ( is_within_2(seqno,rootBeacons[root_id].last_seqno) && (hopcount <= rootBeacons[root_id].hops) ) ||
 	                    ( (seqno == rootBeacons[root_id].last_seqno) && (hopcount < rootBeacons[root_id].hops) ) ) {
@@ -1187,14 +1145,13 @@ b->nodeid=INVALID_NODE_ID;
              combine_root_quality(current_quality, rootBeacons[root_id].combined_quality);
              min_update_quality = apply_threshold(current_combined_quality, quality_update_threshold);
 
-          // modified by Feng Wang
-	 //better_parent = (received_combined_quality > min_update_quality);
+          // modified by Feng Wang	 
 #ifdef CRROUTING
-	            //always choose shorter paths
-	            //added on Mar 05: must be above the quality threshold
-	            better_parent = (hopcount < rootBeacons[root_id].hops);
-	            equal_parent = (hopcount == rootBeacons[root_id].hops);
-	            //dbg(DBG_ROUTE,"received_quality is %d, better_parent is %d\n",received_quality,better_parent);
+             //always choose shorter paths
+             //added on Mar 05: must be above the quality threshold
+             better_parent = (hopcount < rootBeacons[root_id].hops);
+             equal_parent = (hopcount == rootBeacons[root_id].hops);
+             //dbg(DBG_ROUTE,"received_quality is %d, better_parent is %d\n",received_quality,better_parent);
 #endif
 #else 
           if (current_quality > 0) {
@@ -1263,7 +1220,7 @@ b->nodeid=INVALID_NODE_ID;
     
     
     
-    /////////////////////////////////////////////////////   qasim
+    
     
     /* ##### IMPORTANT CHANGE by FENG WANG #####
          * 1. instead of only accepting larger seqno, we also
@@ -1276,7 +1233,7 @@ b->nodeid=INVALID_NODE_ID;
        bool coordinates_changed, parent_changed;
        
     
-    /////////////////////////////////////////// 
+       /////////////////////////////////////////// 
     
   
       //do the update and the logging
@@ -1297,11 +1254,7 @@ b->nodeid=INVALID_NODE_ID;
         }
         dbg("S4-temp","root_beacon_%d DIRECTED GRAPH: add edge %d\n",root_id,
             from);
-      }
-
-      
-      ///////////////////qasim
-      
+      }      
       
       //added by Feng Wang
       if (rootBeacons[root_id].hops != hopcount) {
@@ -1309,25 +1262,17 @@ b->nodeid=INVALID_NODE_ID;
       }
       
       //////////////////////////
-      
-//    if (rootBeacons[root_id].nodeid != nodeid ) {
 
-        if (root_id >= call S4Topology.getRootNodesCount() )
+      if (root_id >= call S4Topology.getRootNodesCount() )
           call S4Topology.setRootNodesCount(root_id+1);
 
-          call S4Topology.setRootBeaconID(rootBeacons[root_id].nodeid, 0xFF);
-          call S4Topology.setRootBeaconID(nodeid, root_id);
-
-
-          dbg("S4-beacon", "HERE\n");
-
-          if (rootBeacons[root_id].nodeid == call AMPacket.address()) {
-            dbg("S4-beacon", "IN HERE\n");
-            state_is_root_beacon = FALSE;
-          }
-//    }
-
+      call S4Topology.setRootBeaconID(rootBeacons[root_id].nodeid, 0xFF);
+      call S4Topology.setRootBeaconID(nodeid, root_id);
       
+      
+      if (rootBeacons[root_id].nodeid == call AMPacket.address()) {
+        state_is_root_beacon = FALSE;
+      }
       
       rootBeacons[root_id].valid = TRUE;
       rootBeacons[root_id].nodeid = nodeid;
@@ -1340,24 +1285,19 @@ b->nodeid=INVALID_NODE_ID;
       my_coords_parents.parent[root_id] = rootBeacons[root_id].parent;
       
       dbg("S4-beacon","CHANGED! root_id=%d, nodeid=%d, from=%d, hopcount=%d\n", root_id, nodeid, from, hopcount);
-
-
+      
+      
       //log a change if either the coordinate or the parent changed
       if (coordinates_changed) {
         dbg("S4-debug","COORDS: My Coordinates changed: ");
         coordinates_print(&my_coords);
         signal S4Locator.statusChanged();
-      }
-      if (coordinates_changed || parent_changed) {
-        //call Logger.LogUpdateCoordinates(&my_coords,&my_coords_parents);
-      }
- 
-      
+      }      
       
       dbg("S4-debug", "Reached end of updateBeaconInfo\n");
     }
   } //end updateBeaconInfo
-
+  
 
 
 
@@ -1380,9 +1320,8 @@ b->nodeid=INVALID_NODE_ID;
     
     uint8_t neighbor;
     uint8_t quality;
-
    
-   ///////////////////////////////qasim
+   
    #ifdef RELIABLE_BCAST
        int j;
        uint8_t beacon_j;
@@ -1404,9 +1343,6 @@ b->nodeid=INVALID_NODE_ID;
         * for each beacon inside the message,
         * i.e. rcv_bvr_data_ptr->beacons[i].seqno
         */
-
-    
-    //////////qasim
     
   
   #ifdef FW_COORD_TABLE
@@ -1414,7 +1350,6 @@ b->nodeid=INVALID_NODE_ID;
       coordinates_init(&received_coords);
   #endif
   
-
 
   
   #ifdef MULTIPLE_BEACON
@@ -1434,8 +1369,7 @@ b->nodeid=INVALID_NODE_ID;
           coordinates_set_component(&received_coords, i, beacon_info->hopcount);
   #endif
   #endif
-        }
-        //else
+        }        
       }
       
       if (!rcv_buffer_busy) 
@@ -1650,10 +1584,10 @@ b->nodeid=INVALID_NODE_ID;
     //displayRootBeacons();
     if (coordinates_count_valid_components(&my_coords) != 0) {
       coordinates_copy(&my_coords, coords);
-      //displayRootBeacons();
+      
       return SUCCESS;
     } else {
-      //displayRootBeacons();
+      
       return FAIL;
     }
   }
@@ -1763,8 +1697,6 @@ b->nodeid=INVALID_NODE_ID;
   #ifndef FLOOD_BEACON_ONCE
       int32_t jitter, jitter2;
       uint32_t interval;
-      
-  
   
       if (state_beaconing_coords) {
         //will also log my coordinates        
@@ -1782,8 +1714,6 @@ b->nodeid=INVALID_NODE_ID;
   #ifndef CHECK_LINK
       beacon_round++;  dbg("BVR", "beacon_round=%d\n", beacon_round);
       if (beacon_round > MAX_BEACON_ROUND) {
-        //call BeaconTimer.stop();
-  
         //added by Feng Wang, to start the ClusterTimer
   #ifdef CRROUTING
         i = coordinates_get_closest_beacon(&my_coords);    
@@ -1814,8 +1744,6 @@ b->nodeid=INVALID_NODE_ID;
   
       }
   #endif
-      
-
   
       /* if busy, just wait for next timeout.
        * the only possibility is we are in the 
@@ -1979,8 +1907,6 @@ b->nodeid=INVALID_NODE_ID;
   
             if (indx < 0) { // not found in pending
   
-              //dbg(DBG_ROUTE,"%d new pending beacon %d ",(int)(tos_state.tos_time/4000),rootBeacons[beacon_j].nodeid);
-  
               for (i=0; i<MAX_PENDING_BEACON; i++) {
                 if (!pending_beacons[i].occupied) {
                   indx = i;
@@ -1992,8 +1918,6 @@ b->nodeid=INVALID_NODE_ID;
             if (indx >= 0 && indx < MAX_PENDING_BEACON) { //valid index
               //reset for current broadcast session
   
-              //dbg_clear(DBG_ROUTE,"entry %d\n",indx);
-  
               pending_beacons[indx].occupied = TRUE;
               pending_beacons[indx].beacon_id = beacon_j;
               pending_beacons[indx].n_rcv = 0;
@@ -2004,8 +1928,7 @@ b->nodeid=INVALID_NODE_ID;
   #endif
               pending_beacons[indx].retries = 0;
             } else { //pending_beacons table must be full
-              //dbg_clear(DBG_ROUTE,"\n");
-              //dbg(DBG_ROUTE,"%d pending_beacons is full\n",(int)(tos_state.tos_time/4000));
+              
             }
           }
         }
@@ -2172,7 +2095,7 @@ b->nodeid=INVALID_NODE_ID;
         return rcvMsg;
       }
       
-      //displayRootBeacons();
+      
   
       if (!rcv_buffer_busy) {
         post processMessage();
@@ -2272,8 +2195,6 @@ b->nodeid=INVALID_NODE_ID;
           if (pending_beacons[i].retries > MAX_REBCAST) {
             //too many retries, remove it
   
-            //dbg(DBG_ROUTE,"%d exceed retry limit, reset pending_beacons entry %d\n",(int)(tos_state.tos_time/4000),i);
-  
             pending_beacons[i].occupied = FALSE;
             rootBeacons[pending_beacons[i].beacon_id].bcastlost = 0;
             pending_beacons[i].retries = 0;
@@ -2290,18 +2211,13 @@ b->nodeid=INVALID_NODE_ID;
               //dbg(DBG_ROUTE,"dist_to_orig %d\n",dist_to_orig);
               if ( (dist_to_orig == 0 && pending_beacons[i].n_rcv < n_ngb) ||
                    (dist_to_orig > 0 && pending_beacons[i].n_rcv*3 < n_ngb) ) {
-                   //(dist_to_orig > 0 && pending_beacons[i].n_rcv == 0) ) {
-                   //(dist_to_orig > 0 && pending_beacons[i].n_rcv*5 == 0) ) {
-                   //(dist_to_orig > 0 && pending_beacons[i].n_rcv*5 < n_ngb) ) {
-              //if ( pending_beacons[i].n_rcv == 0 ) {
+                   
                 uint8_t indx = pending_beacons[i].beacon_id;
-                //dbg(DBG_ROUTE,"%d bcastlost for beacon %d\n",(int)(tos_state.tos_time/4000),indx);
+                
                 rootBeacons[indx].bcastlost = 1;
                 pending_beacons[i].retries++;
               } else {
                 //received by sufficient neighbors, remove it
-  
-                //dbg(DBG_ROUTE,"%d received by sufficient neighbors, reset pending_beacons entry %d\n",(int)(tos_state.tos_time/4000),i);
   
                 pending_beacons[i].occupied = FALSE;
                 pending_beacons[i].retries = 0;
@@ -2409,14 +2325,7 @@ b->nodeid=INVALID_NODE_ID;
         }
       }
 
-      nhte = getNextHopEntry(dest_addr);
-      if (nhte != NULL  ) {
-	  *next_hop = nhte->nextHop;
-	  if (*next_hop != INVALID_NODE_ID) {			 
-	    dbg(DBG_ROUTE,"nexthop (from next hop table) of %d is %d \n",dest_addr,*next_hop);
-	    return SUCCESS;
-	  }
-      } 
+      
   
       //if not in routing table, forward to closest_beacon (of dest) first
       //if I'm the closest_beacon, and dest is not in my routing table, then
@@ -2440,8 +2349,7 @@ b->nodeid=INVALID_NODE_ID;
            * i.e. i'm the closest beacon myself and dest is not in my routing table
            */          
            
-          dbg(DBG_ROUTE,"routing failure: no valid parent, broadcasting...\n");
-          //return FAIL;
+          dbg(DBG_ROUTE,"routing failure: no valid parent, broadcasting...\n");          
         }
         dbg(DBG_ROUTE,"nexthop (from closest beacon) of %d is %d (hc %d)\n",closest_beacon,*next_hop,rootBeacons[closest_beacon].hops);
         return SUCCESS;
@@ -2458,25 +2366,7 @@ b->nodeid=INVALID_NODE_ID;
       int i;
       //first, check if this dest is stored in routing table
       if (cluster_size > 0) {
-        /*
-  #ifdef TOSSIM
-        //check if any duplicate entries
-        int hit[1000];
-        for (i=0;i<1000;i++)
-          hit[i] = 0;
-  
-        //dbg(DBG_ROUTE,"cluster routing table:\n");
-        for (i=0; i<cluster_size; i++) {
-          //dbg_clear(DBG_ROUTE,"\t dest: %d, nexthop: %d, hopcount: %d\n",
-          //    ClusterTable[i].dest,ClusterTable[i].parent,ClusterTable[i].hops);
-          hit[ClusterTable[i].dest]++;
-  
-        for (i=0;i<1000;i++)
-          if (hit[i] > 1)
-            dbg(DBG_ROUTE,"duplicate entries for destination %d\n",i);
-        }
-  #endif
-        */
+        
         for (i=0; i<cluster_size; i++) {
           if (ClusterTable[i].dest == dest_addr) {
             *next_hop = ClusterTable[i].parent;
@@ -2526,7 +2416,7 @@ b->nodeid=INVALID_NODE_ID;
   #endif
   
   #ifdef LOCAL_DV
-  //if using local distance vector
+    //if using local distance vector
   
     static void init_cluster_msg() {
       cluster_msg_ptr = (DVMsg*) &cluster_buf.data[0];
@@ -2593,30 +2483,11 @@ b->nodeid=INVALID_NODE_ID;
       uint8_t n_ngb;
       call LinkEstimator.getNumGoodLinks(&n_ngb);
   #endif
-      /*
-      int k = 0;
-      uint16_t from;
-      dbg(DBG_ROUTE,"%d received dv from %d: ",sim_time(),rcv_dv_msg->header.last_hop);
-      while (k < MAX_VECTOR_SIZE) { 
-        dbg_clear(DBG_ROUTE,"[%d,#%d,%d,%d] ",
-                            rcv_dv_data_ptr->dv_adv[k].source,
-                            rcv_dv_data_ptr->dv_adv[k].seqno,
-                            rcv_dv_data_ptr->dv_adv[k].scope,
-                            rcv_dv_data_ptr->dv_adv[k].hopcount);
-        source = rcv_dv_data_ptr->dv_adv[k].source;
-        hopcount = rcv_dv_data_ptr->dv_adv[k].hopcount;
-        scope = rcv_dv_data_ptr->dv_adv[k].scope;
-        seqno = rcv_dv_data_ptr->dv_adv[k].seqno;
-        from = rcv_dv_msg->header.last_hop;
-        //call Logger.LogReceiveBeacon( seqno, source, from, hopcount, scope);
-        k++;
-      }
-      dbg_clear(DBG_ROUTE,"\n");
-      */
+      
 
       if (!rcv_clusterbuffer_busy) {
         dbg(DBG_ROUTE,"Assertion failed: rcv_clusterbuffer_busy should be true!!\n");
-        //return;
+        
       }
       
       dbg(DBG_ROUTE,"processing DVMessage\n");
@@ -3125,7 +2996,7 @@ b->nodeid=INVALID_NODE_ID;
   
       jitter = ((call Random.rand32()) % (b_timer_jit>>2)) - (b_timer_jit >> 3);
       interval = update_int + jitter;
-      //dbg(DBG_ROUTE,"%d start ClusterUpdateTimer in %d\n",(int)(tos_state.tos_time/4000),interval);
+      
       call Leds.led2Toggle();
       call ClusterUpdateTimer.startOneShot( interval);
   
@@ -3165,7 +3036,7 @@ b->nodeid=INVALID_NODE_ID;
   #endif
             //############# simple heuristics #######################
               uint8_t dist_to_orig = ClusterTable[pending_dvs[i].indx].hops;
-              //dbg(DBG_ROUTE,"dist_to_orig %d\n",dist_to_orig);
+              
               if ( (dist_to_orig == 0 && pending_dvs[i].n_rcv < n_ngb) ||
                    (dist_to_orig > 0 && dist_to_orig+1 < ClusterTable[pending_dvs[i].indx].scope && pending_dvs[i].n_rcv*3 < n_ngb) ) {
                    
@@ -3324,120 +3195,23 @@ b->nodeid=INVALID_NODE_ID;
       
       //added by tahir
       command am_addr_t S4Neighborhood.getClosestBeaconAddr(uint16_t addr) {
-                  uint8_t original_root_beacon_id[N_NODES];      
-                  Coordinates coords;
-                       
-                  uint8_t closest_beacon;
-                  uint16_t closestBeaconAddr;
-                  
-                  call S4Topology.getRootBeaconIDs(original_root_beacon_id);
-                  call S4Locator.getCoordinates(&coords);
-                  closest_beacon = coordinates_get_closest_beacon(&coords);    
-       
-                  if (coords.comps[closest_beacon] >= coords.comps[original_root_beacon_id[addr]] - 1)
-                    return addr; 
-                         
-                  closestBeaconAddr = search( original_root_beacon_id, N_NODES, closest_beacon);
-                    
-                  return closestBeaconAddr;
-      }
-            
-            
-      command error_t S4Neighborhood.addNextHopEntry(uint16_t addr, uint16_t nextHop) {
-          int i=0;
-          int firstInvalid = -1;
-          int worstQualityIndex = -1;
-          int worstQuality = -1;
-          
-          
-          /*if (!goodNextHop(nextHop)) {
-            dbg("TestBVR", "Did not add to table due to bad next hop\n");
-            return FAIL;
-          }*/
-          
-          for (i=0; i < N_NODES / MAX_ROOT_BEACONS; i++ ) {
-            if (nextHopTable[i].addr == addr && getBidirectionalQuality(nextHop) >= nextHopTable[i].quality) {        
-              nextHopTable[i].addr = addr;
-              nextHopTable[i].nextHop = nextHop;
-              nextHopTable[i].quality = getBidirectionalQuality(nextHop);
-              
-              dbg("NodeState", "nextHopTable[%d].addr=%d, nextHop=%d\n", i, nextHopTable[i].addr, nextHopTable[i].nextHop);  
-              
-              return SUCCESS;
-            }
-            
-            if (nextHopTable[i].addr == addr) {
-              dbg("NodeState", "next hop already known\n");
-              return SUCCESS;
-            }
-            
-            if ( firstInvalid == -1  &&  nextHopTable[i].addr == INVALID_NODE_ID ) {
-              firstInvalid = i;
-            }
-            if (worstQualityIndex == -1 && getBidirectionalQuality(nextHop) >= nextHopTable[i].quality) {
-              worstQualityIndex = i;
-              worstQuality = nextHopTable[i].quality;
-            }
-            
-            if (worstQualityIndex != -1 && nextHopTable[i].quality < worstQuality) {
-              worstQualityIndex = i;
-              worstQuality = nextHopTable[i].quality;
-            }
-            
-          }
-          
-          if ( firstInvalid > -1 ) {      
-            nextHopTable[firstInvalid].addr = addr;
-            nextHopTable[firstInvalid].nextHop = nextHop;
-            nextHopTable[firstInvalid].quality = getBidirectionalQuality(nextHop);
-            
-            dbg("NodeState", "Storing InextHopTable[%d].addr=%d, nextHop=%d\n", firstInvalid, nextHopTable[firstInvalid].addr, 
-                                                                                   nextHopTable[firstInvalid].nextHop);  
-            
-            return SUCCESS;
-          }
-          
-          if ( worstQualityIndex > -1 ) {      
-            nextHopTable[worstQualityIndex].addr = addr;
-            nextHopTable[worstQualityIndex].nextHop = nextHop;
-            nextHopTable[worstQualityIndex].quality = getBidirectionalQuality(nextHop);
-      
-            dbg("NodeState", "Storing WnextHopTable[%d].addr=%d, nextHop=%d\n", worstQualityIndex, nextHopTable[worstQualityIndex].addr, 
-                                                                                      nextHopTable[worstQualityIndex].nextHop);  
-      
-            return SUCCESS;
-          }
-          
-          return FAIL;
-        }
-          
-        command error_t S4Neighborhood.removeNextHopEntry(uint16_t addr) {
-          int i=0;
-      
-          for (i=0; i < N_NODES / MAX_ROOT_BEACONS; i++ ) {
-            if (nextHopTable[i].addr == addr) {
-              nextHopTable[i].addr = INVALID_NODE_ID;
-              nextHopTable[i].quality = 0;
-            }
-          }
-      
-          return SUCCESS;
-        }
+        uint8_t original_root_beacon_id[N_NODES];      
+        Coordinates coords;
         
-        command error_t S4Neighborhood.removeAllNextHopEntries() {
-          int i=0;
-      
-          for (i=0; i < N_NODES / MAX_ROOT_BEACONS; i++ ) {      
-            nextHopTable[i].addr = INVALID_NODE_ID;      
-            nextHopTable[i].quality = 0;
-          }
-      
-          return SUCCESS;
-        }
-
-
-	
-	
+        uint8_t closest_beacon;
+        uint16_t closestBeaconAddr;
+        
+        call S4Topology.getRootBeaconIDs(original_root_beacon_id);
+        call S4Locator.getCoordinates(&coords);
+        closest_beacon = coordinates_get_closest_beacon(&coords);    
+        
+        if (coords.comps[closest_beacon] >= coords.comps[original_root_beacon_id[addr]] - 1)
+          return addr; 
+        
+        closestBeaconAddr = search( original_root_beacon_id, N_NODES, closest_beacon);
+        
+        return closestBeaconAddr;
+      }
   
   } // end of implementation
    

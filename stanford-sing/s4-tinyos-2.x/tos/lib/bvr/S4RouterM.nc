@@ -74,7 +74,7 @@ module S4RouterM {
     interface S4Receive;
     interface Init;
     
-    #ifdef FAILURE_RECOVERY //////////// Qasim
+    #ifdef FAILURE_RECOVERY 
         command void set_fr_timer(uint16_t t);
         command error_t get_fr_timer(uint16_t *t);
 #endif
@@ -98,7 +98,7 @@ module S4RouterM {
     interface Packet;
     interface AMPacket;
     
-    #ifdef FAILURE_RECOVERY  ///////// Qasim
+    #ifdef FAILURE_RECOVERY  
        interface Timer as FRSendReplyTimer;
        interface Timer as FRWaitReplyTimer;
        interface LinkEstimator;
@@ -466,7 +466,7 @@ implementation {
         uint8_t status = LOG_ROUTE_INVALID_STATUS;
         
         S4AppMsg* pS4Msg = (S4AppMsg*)msg->data;
-        //uint16_t total_length = offsetof(S4AppMsg,type_data) + offsetof(S4AppData,data) + mhLength;
+        
         
         error_t result;
     
@@ -486,10 +486,7 @@ implementation {
     
           } else {
             /*Have room*/
-            //if (!coords_valid) {
-            //  dbg(DBG_ROUTE,"S4Router$send: could not get valid coordinates\n");
-            //  status = LOG_ROUTE_NO_VALID_COORDINATES;
-            //}
+            
 
             send_buffer.busy = TRUE; 
             send_buffer.msg = msg;

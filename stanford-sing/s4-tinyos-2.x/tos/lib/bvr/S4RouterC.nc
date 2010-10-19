@@ -26,7 +26,7 @@ implementation {
             
             ;
 
-  #ifdef FAILURE_RECOVERY ////////////// Qasim
+  #ifdef FAILURE_RECOVERY ////////////// 
      ,LinkEstimatorC
   #endif
   
@@ -41,7 +41,7 @@ implementation {
 
   //internal
   
-  //StdControl = Timer;  //////////// Qasim
+  
   StdControl = S4CommStack;
   StdControl = S4StateC;
   //StdControl = S4CommandC;
@@ -78,7 +78,7 @@ implementation {
   
   
   
-  #ifdef FAILURE_RECOVERY  ////////////////  Qasim
+  #ifdef FAILURE_RECOVERY  ////////////////  
   
   S4RouterM.FRReqSendMsg->S4CommStack.SendMsg[AM_FRREQ_MSG];
   S4RouterM.FRReqReceiveMsg->S4CommStack.ReceiveMsg[AM_FRREQ_MSG];

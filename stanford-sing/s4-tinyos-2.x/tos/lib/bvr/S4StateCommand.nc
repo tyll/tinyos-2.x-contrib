@@ -20,19 +20,19 @@ interface S4StateCommand {
     command error_t stopRootBeacon();
     
     #ifdef FW_ROOTBEACON CMD
-    ///////////// *******Qasim
+    ///////////// 
     
     command error_t setRootBeacon(uint8_t n);
     command error_t isRootBeacon(bool *value);
     
     #endif  
-    ///////////// ****Qasim
+    ///////////// 
 
     command error_t getRootInfo(uint8_t n , S4RootBeacon **r);
     command error_t getNumNeighbors(uint8_t *n);
 
 
-    ////////////// *********** Qasim
+    ////////////// 
      command uint16_t get_routing_state();
      command uint16_t get_sent_bv();
      command uint16_t get_sent_dv();

@@ -308,7 +308,7 @@ implementation {
     call AccelInit.init();
 
     call sampleTimerInit.init();
-    sample_period = 20;   // 50 hz
+    sample_period = 100;   // 10 hz
 
     // just a flag so we only do this once
     directory_set = 0;
@@ -318,7 +318,7 @@ implementation {
     // we'll use this to id which shimmer wrote the files
     call IDChip.read(longAddress);
 
-    call Accel.setSensitivity(RANGE_1_5G);
+    call Accel.setSensitivity(RANGE_4_0G);
 
     call shimmerAnalogSetup.addAccelInputs();
     call shimmerAnalogSetup.finishADCSetup(sbuf0);

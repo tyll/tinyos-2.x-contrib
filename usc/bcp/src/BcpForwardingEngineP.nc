@@ -26,9 +26,6 @@ module BcpForwardingEngineP{
     interface AMSend as BeaconSend;
     interface Receive as BeaconReceive;
 
-    // Added for LPL, hate that it is required at this layer
-    interface LowPowerListening as LPL;
-    
     interface RootControl;
     interface Pool<fe_queue_entry_t> as QEntryPool;
     interface Pool<message_t> as MessagePool;
@@ -474,9 +471,6 @@ implementation{
     hdr->burstNotifyAddr = notifyBurstyLinkNeighbor_m;
     notifyBurstyLinkNeighbor_m = TOS_NODE_ID;
     
-    // Set the LPL header value
-    call LPL.setRxSleepInterval(qe->msg, LPL_SLEEP_INTERVAL_MS);
- 
     // Update the txCount field
     hdr->txCount++;
 
@@ -1020,7 +1014,7 @@ implementation{
       }
       if (call QEntryPool.put(qe) != SUCCESS)
       {
-        call BcpDebugIF.reportError( 0x38 );
+        call BcpDebugIF.reportError( 0x41 );
         dbg("ERROR", "%s: Memory leak, failed QEntryPool.put().\n", __FUNCTION__);
       }
 

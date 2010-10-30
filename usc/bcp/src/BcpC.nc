@@ -73,7 +73,6 @@ implementation{
   Forwarder.BcpDebugIF    =  BcpDebugIF; 
   Forwarder.CC2420PacketBody -> CC2420PacketC;
   Forwarder.txRetryTimer -> txRetryTimer;
-  Forwarder.LPL -> PlatformActiveMessageC;
   Forwarder.getBackpressure = getBackpressure;
   
   Router.BlacklistTimer -> txRetryTimer;

@@ -18,13 +18,26 @@ module BcpRateControllerP{
 }
 implementation{
 
+  uint16_t thirdRoot( uint32_t A_p )
+  {
+    uint16_t retVal = 2; // A Guess
+    uint32_t retValCubed = 0;
+    uint8_t  count = 0;
+    // We'll just do 10 iterations
+    for( count = 0; count < 10; count++ ){
+      retValCubed = (uint32_t)retVal * (uint32_t)retVal;
+//      retVal = (2*retVal + A_p/(retValCubed))/3;
+    }
+    return retVal;
+  }
+
   uint16_t fourthRoot( uint32_t A_p )
   {
     uint16_t retVal = 2; // A Guess
     uint32_t retValCubed = 0;
     uint8_t  count = 0;
-    // We'll just do three iterations
-    for( count = 0; count < 3; count++ ){
+    // We'll just do 10 iterations
+    for( count = 0; count < 10; count++ ){
       retValCubed = (uint32_t)retVal * (uint32_t)retVal * (uint32_t)retVal;
       retVal = (3*retVal + A_p/(retValCubed))>>2;
     }
@@ -35,15 +48,16 @@ implementation{
     uint32_t newMean = 0;
 
     // Prop Fair
-    newMean = 175 * call getBackpressure.get();
+    //newMean = 85 * call getBackpressure.get();
 
-    if( newMean < 175 ){
+    // Max-Min Fair
+    newMean = 150 * fourthRoot( 50 * call getBackpressure.get() );
+
+    // Truncate the Prop Fair controller for small Q size @ 10 PPS
+    if( newMean < 100 ){
       // Random num Gen dies @ mean zero
       newMean = 100;
     }
-
-    // Max-Min Fair
-    //newMean = 4throot( v_m * call getBackpressure.get() );
 
     // Set the new mean for the exponential R.V.
     call setMean.set( newMean );

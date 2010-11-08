@@ -1,0 +1,111 @@
+
+HotMAC
+
+Cite as "Design and Evaluation of a Versatile and Efficient
+Receiver-Initiated Link Layer for Low-Power Wireless."  in SenSys
+2010, Zurich.  In the paper it is referred to as A-MAC.
+
+@author Stephen Dawson-Haggerty <stevedh@eecs.berkeley.edu>
+
+I've captured some of the considerations I've tried to keep in my head
+while doing this implementation below.  In general, tasks are your
+enemy.  Avoid them like the plague in MAC code.  Additionally, there
+are a number of MAC parameters which are configurable at compile time
+in hotmac.h.
+
+XXX : NB : the implementation has problems if you (a) use the
+multichannel extension and (b) use broadcasts.  The broadcast sender
+never switches channels after the first receiver has him change
+channels.  There's nothing fundamental here -- I just never got around
+to fixing & testing this.
+
+The core Hotmac state machines are about 2.5k, but there's a bunch of
+other junk -- virtualizing the alarms uses 1k and could probably be
+optimized.
+
+================================================================================
+
+HotMAC is a receiver-initiated protocol similar to RI-MAC.  However,
+it contains a number of additional optimizations to improve
+common-case behavior and to perform well over a number of workloads.
+
+Basic exchange.  A packet exchange begins with the receiver
+transmitting a probe frame.  Any senders on the channel reply to the
+probe frame with an 802.15.4 ACK, which causes the receiver to stay
+awake.  The sender then has a limited amount of time to transmit its
+data frame.  The receiver transmits a send probe following the data
+which acknowledges the data frame as well as checking for more data.
+
+Backcast.  Multiple senders may be waiting for the receiver to poll
+the medium, and thus all will respond to the same probe.  Fortunately,
+these frames will interfere constructively, and the sender will still
+receive a single ACK frame under most circumstances.
+
+Contention.  Multiple senders on the channel may send data in response
+to the same probe, causing a collision.  For that reason, each probe
+contains a number of contention slots.  If a timeout expires after an
+acked probe with no data being received, the receiver assumes there
+was a collision and doubles the number of contention slots.
+
+Broadcast.  To send a broadcast frame, senders stay and transmit the
+frame in response to any probes without backing off.  To prevent loops
+in the state machine, multiple receptions, and to avoid requiring
+sender state, receivers shut down immediately after receiving a
+broadcast.  This means that senders contending with broadcasts will be
+a little screwed -- they'll often loose.  It also means that if two
+contending senders are both sending broadcast frames, some receivers
+will only receive one.  You should jitter your broadcasts
+appropriately.
+
+Streaming.  After receiving a data frame, the receiver transmits the
+probe which ACKs the packet.  The sender may respond to this probe
+with a new data frame.  This avoids the need to wait the full probe
+period.
+
+Fast turn on.  The default TinyOS stack makes a bunch of things sync
+rather then async -- for instance, syncing the cc2420 settings or
+loading a message.  These can increase turn-on time by 200-300% when
+other tasks are present, and so all of the turn-on code is async.
+This has the added benefit of making it deterministic; turning on the
+radio and loading a probe frame takes 144 jiffies on telosb (well, in
+the absence of SPI bus contention...).
+
+Retransmissions.  Can be set on a per-packet basis, using
+PacketAcknowledgements.  The delay field will be ignored; a randomized
+value proportional to the duty cycle will be used.  NOTA BENE: if no
+retransmissions are used, the case of (a -> b) X (b -> a) results in
+deadlock -- both will fail.
+
+Concurrency.  The implementation tries, wherever possible, to avoid
+being effected by other tasks in the system.  This means using almost
+no sync code.  This is necessary for correctness.  You can, however,
+delay certain timeouts with long tasks; this doesn't effect
+correctness, but may increase energy consumption.
+
+Multi channel.  The channel whitelist in receive/HotmacReceiveP.nc
+contains the list of channels receivers choose from when sending
+probes.  Moving data off the control channel significantly improves
+performance in networks with lots of parallel flows, but there are
+some cases when it may reduce PDR or energy consumption, since each
+receiver will only transmit one probe on the control channel instead
+of many when there are multipl senders.  In general this didn't seem
+to be a big problem, but we didn't exhaustively study the issue.
+
+--------------------------------------------------------------------------------
+Important cases to handle well: 
+ - broadcast
+ - chain sending (streaming)
+ - send from receive
+ - send from sendDone
+ - (a -> b) and (b -> a)
+ - packet sizes
+
+Audit Checks:
+ - state machine hang 
+   * probe timer reset
+   * receive/send side lockup
+   * invalid error recovery
+ - race conditions
+   * okay, just run with interrupts disabled a lot? prevents at least the time-of-check races
+ - no printf in async :-/
+ - timings work for full-MTU packets

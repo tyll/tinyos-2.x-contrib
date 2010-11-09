@@ -1,0 +1,41 @@
+
+11/8/2010 : HotMAC Release 
+
+Cite as: 
+Prabal Dutta, Stephen Dawson-Haggerty, Yin Chen, Chieh-Jan Liang, and
+Andreas Terzis. Design and Evaluation of a Versatile and Efficient
+Receiver-Initiated Link Layer for Low-Power Wireless. in Proceedings
+of the Eighth ACM Conference on Embedded Networked Sensor Systems
+(SenSys '10), November 2010.
+
+Yes, it's called A-MAC in the paper.  Yes, this is the same MAC.
+
+Implementation in tos/chips/cc2420_hotmac
+  - see NOTES in that directory for implementation considerations
+Test app in apps apps/HotmacBM
+  - see EXPERIMENTS for some notes on running tests
+
+--------------------------------------------------
+
+Environment setup:
+
+set TOSCONTRIB to your contrib dir root.  For me, that means
+$ export TOSCONTRIB=/Users/stevedh/src/cvs/tinyos-2.x-contrib
+
+add the make extra dir to TOSMAKE_PATH. 
+$ export TOSMAKE_PATH=$TOSCONTRIB/berkeley/hotmac/support/make
+
+You can then build using Hotmac with a 
+$ make epic hotmac
+
+--------------------------------------------------
+
+Stability notes:
+
+The implementation is reasonably careful, and we were able to run
+large-scale tests on it for several hours (multi-hop networks with
+CTP) without much trouble.  However, it is still research code and we
+have reason to believe there are occasional lockups which we haven't
+fully debugged.  Thus, I would not recommend using it in a deployment
+without some pretty significant validation; this isn't the kind of
+thing you want to crash...

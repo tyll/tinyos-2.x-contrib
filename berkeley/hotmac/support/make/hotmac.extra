@@ -1,0 +1,11 @@
+
+HOTMAC_ROOT=$(TOSCONTRIB)/berkeley/hotmac/tos/chips/cc2420_hotmac
+
+PFLAGS += -I$(HOTMAC_ROOT) \
+       -I$(HOTMAC_ROOT)/alarm \
+       -I$(HOTMAC_ROOT)/control \
+       -I$(HOTMAC_ROOT)/interfaces \
+       -I$(HOTMAC_ROOT)/packet \
+       -I$(HOTMAC_ROOT)/receive \
+       -I$(HOTMAC_ROOT)/spi \
+       -I$(HOTMAC_ROOT)/transmit

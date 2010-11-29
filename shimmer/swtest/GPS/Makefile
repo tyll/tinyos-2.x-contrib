@@ -1,0 +1,3 @@
+COMPONENT=TestGPSAppC
+
+include $(MAKERULES)

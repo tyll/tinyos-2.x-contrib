@@ -1,0 +1,19 @@
+This master mode is useful when the device only wants to initiate connections (not
+receive them). In this mode the device will NOT be discoverable or connectable.
+
+It boots up, initialises the hardware and then connects to a slave and transmits accel and 
+gyro data for 30s then disconnects for 30s, this cycles over and over again.
+
+At compile time you need to provide a Bluetooth Slave Address to connect to so do 
+"make BT_SLAVE=0011f6057c35 shimmer2" for example....where 0011f6057c35 is your Bluetooth device address
+
+The app uses the BioMOBIUS frame format but just change that to
+whatever you need.
+
+SimpleMasterTest does no sampling; it sends a string to the slave
+instead of data.  To build this instead of BluetoothMasterTest, just
+run 
+
+make -f Make.simple ...etc...
+
+instead.

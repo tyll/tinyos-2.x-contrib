@@ -1,0 +1,1 @@
+CFLAGS += -I$(TKN154_GTS_TOS)/platforms/telosb/mac/tkn154 \

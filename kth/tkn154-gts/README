@@ -1,0 +1,10 @@
+@author Aitor Hernandez <aitorhh@kth.se>
+@title gts-implementation
+
+
+Use
+--------------------------------------------------
+
+1. Set up your environment (assuming $TOSCONTRIB is your checkout of tinyos-2.x-contrib)
+$  export TOSCONTRIB=/home/aitorhh/workspace/tinyos-2.x-contrib-kth
+

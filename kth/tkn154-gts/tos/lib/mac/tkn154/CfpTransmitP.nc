@@ -543,9 +543,7 @@ implementation {
 			case SUCCESS:
 			// frame was successfully transmitted, if ACK was requested
 			// then a matching ACK was successfully received as well   
-#ifndef PAN_MODELING_CFP
 			currentEntry->expiration = FALSE;
-#endif
 			m_txStatus = IEEE154_SUCCESS;
 			break;
 			case FAIL:
@@ -597,9 +595,7 @@ implementation {
 		uint8_t frameType = mhr[MHR_INDEX_FC1] & FC1_FRAMETYPE_MASK;
 
 		if (frameType == FC1_FRAMETYPE_DATA) {
-#ifndef PAN_MODELING_CFP
 			currentEntry->expiration = FALSE;
-#endif
 			dbg("CfpTransmit", "Received frame, DSN: %lu, type: 0x%lu\n",
 					(uint32_t) mhr[MHR_INDEX_SEQNO], (uint32_t) frameType);
 			return signal CfpRx.received(frame);

@@ -43,10 +43,6 @@
 #warning "Beacon transmission enabled -> COORDINADOR"
 #warning "GTS enabled"
 
-#ifdef PAN_MODELING_CFP
-#warning "PANs modeling enabled -> Not default GTS requested queue and deallocation modified"
-#endif
-
 module CoordCfpOneQueueP
 {
 	provides
@@ -195,11 +191,6 @@ implementation
 			gtsSpecField[1] = directionMask & GTS_DIRECTIONS_MASK;
 		}
 
-#ifdef PAN_MODELING_CFP
-		// The next GTSdb will be empty
-		GTSdbNext.numGtsSlots = 0;
-#endif
-
 		return len;
 	}
 
@@ -246,18 +237,10 @@ implementation
 	task void processGtsQueueTaskDone() {
 		if (call GtsRequestQueue.size()) {
 			// we serve next GTS request if there are space on the superframe
-#ifndef PAN_MODELING_CFP
 			if (GTSdbNext.numGtsSlots < CFP_NUMBER_SLOTS)
 			post processGtsQueueTask();
 			else
 			setGtsRequestWaitPending(); //we need to wait to serve the request
-#else
-			if (GTSdbNext.numGtsSlots < DELTA_U)
-			// are there more gts requests?
-			post processGtsQueueTask();
-			else
-			setGtsRequestWaitPending(); //we need to wait to serve the request
-#endif
 		}
 	}
 
@@ -419,7 +402,6 @@ implementation
 		/* This event is signalled after each gts slot in order to detect if
 		 * it is being used or not
 		 */
-#ifndef PAN_MODELING_CFP
 		ieee154_GTSentry_t* currentEntryRead = db + val; //entry of the current superframe (GTSdb)
 		indexGtsSlot = call GtsUtility.getGtsEntryIndex( &GTSdbNext, currentEntryRead->shortAddress, currentEntryRead->direction );
 
@@ -482,7 +464,6 @@ implementation
 				currentEntry->expirationTimeout = m_expiredTimeout;
 			}
 
-#endif
 		}
 
 		return;
@@ -523,11 +504,6 @@ implementation
 		//enable the processing for new request if any
 		resetGtsRequestWaitPending();
 		if(call GtsRequestQueue.size()) post processGtsQueueTask();
-
-#ifdef PAN_MODELING_CFP
-		// we reset the counter on the GTS descriptor writer
-		signal GtsSpecUpdated.notify(TRUE);
-#endif
 	}
 
 	/***************************************************************************************

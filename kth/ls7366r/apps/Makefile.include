@@ -1,0 +1,20 @@
+PLATFORMS = telosb tmote
+
+LS7366R_ROOT=$(TOSCONTRIB)/kth/ls7366r
+LS7366R_TOS=$(LS7366R_ROOT)/tos
+LS7366R_PLATFORM_INCLUDE?=$(LS7366R_TOS)/platforms/telosb/chips/ls7366r/Makefile.include
+
+# parses the PLATFORM variable
+include $(MAKERULES)
+
+# checks whether the target platform is supported by the application;
+# the application Makefile can define PLATFORMS as a whitespace-separated
+# list of supported platforms
+ifneq ($(PLATFORM),)
+  ifneq ($(PLATFORMS),)
+    ifeq ($(strip $(foreach platform,$(PLATFORMS),$(findstring $(platform),$(PLATFORM)))),)
+      $(error The target platform is not supported by this application - supported platforms are: $(PLATFORMS))
+    endif
+  endif
+  include $(LS7366R_PLATFORM_INCLUDE)
+endif

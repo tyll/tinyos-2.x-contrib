@@ -1,0 +1,6 @@
+CFLAGS += -I$(LS7366R_TOS)/platforms/telosb/chips/ls7366r \
+		  -I$(LS7366R_TOS)/chips/ls7366r \
+		  -I$(LS7366R_TOS)/chips/ls7366r/interfaces \
+		  -I$(LS7366R_TOS)/chips/ls7366r/control \
+		  -I$(LS7366R_TOS)/chips/ls7366r/spi
+		  

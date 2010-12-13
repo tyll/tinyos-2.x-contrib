@@ -1,0 +1,33 @@
+README for LS7366R Chip driver
+Author/Contact: Aitor Hernandez <aitorhh@kth.se>
+
+Description:
+
+This project provides the chip implementation for the LS7366R SPI
+external counter that could be attached to the mote with its 
+connections
+--------------------------------------------------
+
+Contents:
+
+Implementation in tos/chips/ls7366r
+  - see README in that directory for implementation considerations
+  
+Platform dependent files in tos/platforms/telosb/chips/ls7366r
+
+Test app in apps apps/TestCounter
+  - see README for apps description
+  
+Documentation in docs/pdf
+  - see ls7366r.pdf for description of the implementation and
+    schematic and PCB board information
+
+--------------------------------------------------
+
+Environment setup:
+
+set TOSCONTRIB to your contrib dir root.  i.e., for me:
+$ export TOSCONTRIB=/home/aitorhh/workspace/tinyos-2.x-contrib-kth/
+
+You can then build using ls7366r with a 
+$ make telosb

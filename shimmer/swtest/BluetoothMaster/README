@@ -17,3 +17,11 @@ run
 make -f Make.simple ...etc...
 
 instead.
+
+IMPORTANT NOTE:  after using the bluetooth module in master mode, to return to
+slave mode, an application will have to explicitly call 
+
+Bluetooth.setRadioMode(SLAVE_MODE); 
+
+*before* calling BTStdControl.start()
+

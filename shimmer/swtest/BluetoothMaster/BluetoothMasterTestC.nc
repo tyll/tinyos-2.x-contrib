@@ -89,7 +89,7 @@ module BluetoothMasterTestC {
 implementation {
   extern int sprintf(char *str, const char *format, ...) __attribute__ ((C));
 
-#define USE_8MHZ_CRYSTAL
+  //#define USE_8MHZ_CRYSTAL
 //#define LOW_BATTERY_INDICATION
 #define USE_AVCC_REF /* approx 0.5 milliamps saving when using AVCC compared to 2.5V or 1.5V internal ref */
 
@@ -147,9 +147,9 @@ implementation {
   }
 
   event void Boot.booted() {
-    call FastClockInit.init();
+    //    call FastClockInit.init();
 
-    call FastClock.setSMCLK(1);  // want smclk to run at 1mhz
+    //    call FastClock.setSMCLK(1);  // want smclk to run at 1mhz
 
     atomic {
       memset(tx_packet, 0, (FIXED_PACKET_SIZE*2));

@@ -57,7 +57,7 @@ implementation
 	SELN = IO.PortB0;
 
 	components HplAtm128InterruptC;
-    	HplRF212P.Interrupt -> HplAtm128InterruptC.Int5;
+    HplRF212P.Interrupt -> HplAtm128InterruptC.Int5;
 
 	components HplAtm128Timer3C as TimerC;
 	HplRF212P.Timer -> TimerC;
@@ -72,7 +72,7 @@ implementation
 	LocalTimeRadio = LocalTimeMicroC;
 	
 	components McuSleepC;
-    	McuSleepC.McuPowerOverride -> HplRF212P;
+    McuSleepC.McuPowerOverride -> HplRF212P;
 	
 	
 }

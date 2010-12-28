@@ -12,9 +12,9 @@
   %T/platforms/iris
   %T/platforms/micaz
   %T/platforms/mica
-  %T/chips/rf2xx/rf230
-  %T/chips/rf2xx/layers
-  %T/chips/rf2xx/util
+  %T/chips/rf230
+  %T/lib/rfxlink/layers
+  %T/lib/rfxlink/util
   %T/chips/ds2401
   %T/chips/atm1281
   %T/chips/atm1281/adc

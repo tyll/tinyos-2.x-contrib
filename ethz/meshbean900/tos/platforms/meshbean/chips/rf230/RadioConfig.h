@@ -61,7 +61,7 @@ enum
 
 /* The number of microseconds a sending MESHBEAN mote will wait for an acknowledgement */
 #ifndef SOFTWAREACK_TIMEOUT
-#define SOFTWAREACK_TIMEOUT	800
+#define SOFTWAREACK_TIMEOUT	1000
 #endif
 
 /*
@@ -77,6 +77,7 @@ inline uint16_t RF230_CRCBYTE_COMMAND(uint16_t crc, uint8_t data)
  * This is the timer type of the radio alarm interface
  */
 typedef TThree TRadio;
+typedef uint16_t tradio_size;
 
 /**
  * The number of radio alarm ticks per one microsecond 
@@ -87,12 +88,5 @@ typedef TThree TRadio;
  * The base two logarithm of the number of radio alarm ticks per one millisecond
  */
 #define RADIO_ALARM_MILLI_EXP	10
-
-/**
- * Make PACKET_LINK automaticaly enabled for Ieee154MessageC
- */
-#if !defined(TFRAMES_ENABLED) && !defined(PACKET_LINK)
-#define PACKET_LINK
-#endif
 
 #endif//__RADIOCONFIG_H__

@@ -1,0 +1,3 @@
+
+LS7366R_ROOT=$(TOSCONTRIB)/kth/ls7366r
+LS7366R_PLATFORM_INCLUDE?=$(LS7366R_ROOT)/tos/platforms/$(PLATFORM)/chips/ls7366r/Makefile.include

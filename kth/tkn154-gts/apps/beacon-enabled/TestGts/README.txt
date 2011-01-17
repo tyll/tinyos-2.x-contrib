@@ -1,7 +1,8 @@
-README for TestGTS
-Author/Contact: Aitor Hernandez <aitorhh@kth.se>
+@title README for TestGTS
+@author Aitor Hernandez <aitorhh@kth.se>
 
-*Description:*
+Description
+--------------------------------------------------
 
 In this application one node takes the role of a PAN coordinator in a
 beacon-enabled 802.15.4 PAN, it transmits periodic beacons and waits for
@@ -19,7 +20,8 @@ Once, the devices has the slots allocated, they star sending data packets
 to the coordinator using their slots. And the NODE_ID=0x02 will receive packet
 in its reception slot.
 
-*Criteria for a successful test:*
+Criteria for a successful test
+--------------------------------------------------
 
 LED2. Coordinator and device should both toggle LED2 in unison, indicating that they
 are sending/receiving beacons. 
@@ -29,7 +31,9 @@ LED1. They should also toggle LED1 when coordinator receives a packet
 LED0. This led is blinking in case of failure, or an error in the transmission. 
 We fail in case we don't have any slot allocated.
 
-*Options:*
+Options
+--------------------------------------------------
+
 1. Deallocations
 	We have implemented a deallocation mechanism to end the simulation test. And see 
 	if the deallocations initiated by the device are working. (See MLME_GTS.confirm())
@@ -48,9 +52,13 @@ We fail in case we don't have any slot allocated.
 	so it will be inefficient depending on the amout of request on the network.
 	See GTS implementation Documentation. 
 
-*Tools:* NONE
+Tools
+--------------------------------------------------
+None
 
-*Usage:* 
+
+Usage
+--------------------------------------------------
 
 1a. Install the coordinator:
 
@@ -72,7 +80,9 @@ We fail in case we don't have any slot allocated.
 
 You can change some of the configuration parameters in app_profile.h
 
-*Known bugs/limitations:*
+Known bugs/limitations
+--------------------------------------------------
+
 
 - Many TinyOS 2 platforms do not have a clock that satisfies the
   precision/accuracy requirements of the IEEE 802.15.4 standard (e.g. 

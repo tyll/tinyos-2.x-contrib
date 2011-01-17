@@ -1,7 +1,8 @@
-README for tkn154 test applications
-Author/Contact: Aitor Hernandez <aitorhh@kth.se>
+@title README for tkn154 test applications
+@author Aitor Hernandez <aitorhh@kth.se>
 
-Description:
+Description
+--------------------------------------------------
 
 This folder contains test applications for "TKN15.4" with the GTS
 implementation. To test the GTS is only possible the use of beacon-enabled

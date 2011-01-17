@@ -1,5 +1,5 @@
-@author Aitor Hernandez <aitorhh@kth.se>
 @title gts-implementation
+@author Aitor Hernandez <aitorhh@kth.se>
 
 Documentation
 --------------------------------------------------
@@ -20,11 +20,7 @@ B) To create *your new application*
 	   
 Use
 --------------------------------------------------
-* To compile the *example application* use:
-
-	make {telosb, tmote} install,#ID /dev/ttyUSB#PORT
-	
-	Substitute #ID by the desired id and the #PORT with the USB port
+* Refer to the README in the apps/ folder and in the desired application
 
 Platforms
 --------------------------------------------------

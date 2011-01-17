@@ -1,4 +1,4 @@
-PLATFORMS = telosb micaz
+PLATFORMS = telosb
 
 # load the modified files
 TKN154_GTS_ROOT=$(TOSCONTRIB)/kth/tkn154-gts

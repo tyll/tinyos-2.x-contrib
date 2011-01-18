@@ -8,8 +8,9 @@
 
 <h1>SING Contributions</h1>
 
-<p>Currently, SING has one contribution in the repository, an application
-for sampling RSSI from the CC2420 at high frequency (up to 1.3 kHz). All code
+<p>Currently, SING has two contributions in the repository, an application
+for sampling RSSI from the CC2420 at high frequency (up to 1.3 kHz)
+and a TinyOS 2.x port of the S4 routing protocol. All code
 and documentation, unless otherwise specified, is under 
 the <A HREF="license.txt">Stanford SING license</A>, which is 
 a <A HREF="http://www.opensource.org/licenses/bsd-license.php">"new BSD" license</A>.
@@ -23,6 +24,16 @@ boots, it begins sampling, storing the readings to flash. When it collects
 all of the samples, it sends them the the UART. There is a Java application
 to read the UART messages and print the results. The 
 <A HREF="apps/RssiSample/README.txt">README</A> has further details.</p>
+
+<h2>TinyOS 2.x port of S4</h2>
+<p>
+S4 is a point-to-point routing protocol which significantly improves upon BVR
+in terms of both routing performance and the amount of state required at each
+node. It was originally written for TinyOS 1.x by Y.Mao, F. Wang et al and 
+published in NSDI 2007. This is a TinyOS 2.x port of the original S4 source
+code. The <A HREF="s4-tinyos-2.x/apps/TestS4Simple/README">README</A> has
+further details.
+</p>
 
 </body>
 </html>

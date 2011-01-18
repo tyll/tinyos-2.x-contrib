@@ -45,8 +45,9 @@ implementation {
   components LedsC;
   JustFATLoggingP.Leds -> LedsC;
   
-  components new TimerMilliC() as sampleTimer;
+  components new AlarmMilli16C() as sampleTimer;
   components new TimerMilliC() as warningTimer;
+  JustFATLoggingP.sampleTimerInit -> sampleTimer;
   JustFATLoggingP.sampleTimer   -> sampleTimer;
   JustFATLoggingP.warningTimer  -> warningTimer;
 

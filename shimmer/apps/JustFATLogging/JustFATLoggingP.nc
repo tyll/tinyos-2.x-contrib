@@ -64,7 +64,8 @@ module JustFATLoggingP {
     interface Time;
     interface Leds;
 
-    interface Timer<TMilli> as sampleTimer;
+    interface Init as sampleTimerInit;
+    interface Alarm<TMilli, uint16_t> as sampleTimer;
     interface Timer<TMilli> as warningTimer;
   }
 }
@@ -292,6 +293,7 @@ implementation {
 
     call AccelInit.init();
 
+    call sampleTimerInit.init();
     sample_period = 20;   // 50 hz
 
     // just a flag so we only do this once
@@ -354,8 +356,9 @@ implementation {
       call Leds.set(0);
   }
   
-  event void sampleTimer.fired() {
+  async event void sampleTimer.fired() {
     call shimmerAnalogSetup.triggerConversion();
+    call sampleTimer.start(sample_period);
   }
 
   event void PowerSupplyMonitor.voltageThresholdReached(uint8_t t) {
@@ -417,7 +420,7 @@ implementation {
 
     do_stores();
  
-    call sampleTimer.startPeriodic(sample_period);
+    call sampleTimer.start(sample_period);
   }
 
   task void dock_check() {

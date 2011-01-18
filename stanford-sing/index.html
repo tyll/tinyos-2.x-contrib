@@ -7,10 +7,11 @@
 <img src="http://www.tinyos.net/scoop/images/tos-jwall.jpg"></img>
 
 <h1>SING Contributions</h1>
+<p>
+This directory contains contributions from <a href="http://sing.stanford.edu">the Stanford Information Networking Group </a>.
+</p>
 
-<p>Currently, SING has two contributions in the repository, an application
-for sampling RSSI from the CC2420 at high frequency (up to 1.3 kHz)
-and a TinyOS 2.x port of the S4 routing protocol. All code
+<p>All code
 and documentation, unless otherwise specified, is under 
 the <A HREF="license.txt">Stanford SING license</A>, which is 
 a <A HREF="http://www.opensource.org/licenses/bsd-license.php">"new BSD" license</A>.
@@ -34,6 +35,77 @@ published in NSDI 2007. This is a TinyOS 2.x port of the original S4 source
 code. The <A HREF="s4-tinyos-2.x/apps/TestS4Simple/README">README</A> has
 further details.
 </p>
+
+<h2> Grant-to-Send </h2>
+
+<p>Grant-to-send(GTS) is a collision avoidance mechanism with no control packets
+which can be used for protocol isolation mechanism. By using GTS, each protocol
+can prevent not only intra-protocol collisions but also inter-protocol collisions.
+With this collision avoidance, each protocol can improve performance and also 
+debugging becomes easier due to less interactions between protocols.
+</p>
+
+<p>
+Grant-to-send adds grant duration field (one byte) to each packet. Transmitter
+and overhearer of this packet are suppressed during this grant, and receiver
+becomes the only sender around the previous transmitter. 
+</p>
+
+<p>
+The grant duration must be set to be the time by which the receiver finishes
+its transmissions. For simple forwarding (as in collection protocols) the grant
+should be one packet time (~10ms depending on the length of the packet). When
+GTS is used for Deluge, request packets can set its grant duration to be the
+duration of data burst they are requesting (number of pkts * one packet time). 
+When the grant duration is zero, it reverts to regular CSMA network.
+</p>
+
+<p>
+For inter-operability, CC2420 packet header has one more field, GTS-packet
+indication field (one byte). CC2420ReceiveP for GTS checks for this field
+and filters out non-GTS packets.
+</p>
+
+<p>
+A more detailed description can be found
+<a href="http://sing.stanford.edu/pubs/sing-06-01.pdf"> here </a>
+</p>
+
+<h2> Fair Waiting Protocol </h2>
+
+<p>
+The key insight behind <a href="http://sing.stanford.edu/mnet/mnet.html">the MNet architecture</a> is that isolation improves
+visibility. Just as the isolation between processes in an OS makes it easier to determine what causes a crash,
+isolating protocols can simplify network troubleshooting. To achieve this goal, the MNet architecture 
+institutes the Fair Waiting Protocol (FWP) between wireless sensor protocols and single-hop packet
+communication. Reversing the common approach of requesting the channel, FWP allows a protocol to grant its
+local channel to another node to prevent local collisions. FWP provides a sound basis for building higher
+-level protocols. 
+</p>
+
+<p>
+FWP introduces two mechanisms to isolate protocols from one another. The first is grant-to-send, a novel
+collision avoidance scheme where protocols provide information on future transmissions in each data packet. As
+the name suggests, rather than request a node's channel by sending it a control packet, as request-to-send
+/clear-to-send protocols do, in grant-to-send a node can give its channel to another node by transmitting to
+it. Grant-to-send introduces a single byte header to each data packet, a much smaller overhead than the two
+packet handshake of request-to-send/clear-to-send (RTS/CTS) protocols, but our initial experiments suggest
+it can isolate protocols well and greatly avoid collisions. Furthermore, grant-to-send can be used for
+broadcast based protocols, while RTS/CTS is unusable because it must request the channel from every
+destination. Instead, with grant-to-send, a node can request a broadcast by granting its channel. 
+     
+</p>
+
+<p>
+FWP's second mechanism is fair queuing. Just as an operating system schedules processes to share the processor, 
+FWP schedules protocols to share the wireless channel, using a classical fair queuing algorithm. Protocol grant 
+times provide a clear measurement of channel occupancy. Fair queuing in a multi-hop wireless network is a 
+challenging problem, as each node has its own individual view of channel usage. There are traffic patterns 
+which cannot be scheduled fairly at all nodes. Furthermore, as not all nodes have the same workload, they must 
+implicitly schedule protocols fairly based on limited information. We are exploring one approach FWP can use to 
+achieve this goal, called protocol penalties.
+</p>
+
 
 </body>
 </html>

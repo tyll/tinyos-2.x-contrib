@@ -1,0 +1,3 @@
+a simple application that, upon connection, sends a string once per
+second to a bt master.  
+

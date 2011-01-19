@@ -7,4 +7,4 @@ sensorboard.
 It provides commands for reading and writing registers on the ADE. It also
 confugures the Usart0 Transmit Register.
 
-A test application for this driver is in /apps/powernetTest
+See /apps for powernet application code.

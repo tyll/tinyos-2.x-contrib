@@ -1,0 +1,10 @@
+@author Maria Kazandjieva, <mariakaz@cs.stanford.edu>
+@date Nov 24, 2008
+
+This is the SPI driver for the ADE7752 powerchip found on the powerNet
+sensorboard.
+
+It provides commands for reading and writing registers on the ADE. It also
+confugures the Usart0 Transmit Register.
+
+A test application for this driver is in /apps/powernetTest

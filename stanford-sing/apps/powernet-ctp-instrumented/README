@@ -1,0 +1,32 @@
+@author Maria Kazandjieva, <mariakaz@cs.stanford.edu>
+@date Jan 20, 2011
+
+
+This is a sample application for the PowerNet motes that measure
+real-time power draw. The code samplies the ADE chip once per second
+to get instantaneous power draw. Power Readings are buffered and when
+the buffer is full it is sent to the base station. 
+
+The code uses the Collection Tree Protocol (CTP) to get data to the
+basestation. Here we used a modified version of CTP, hence the shadow
+ctp/ directory. The modifications allow us to collect data about the
+state of the network: ETX, etc.
+
+The code also includes Deluge so that meters can be reprogrammed
+remotely.
+
+To view the data, use a packet sniffer, or an additional mote running
+the PowerBase application, and issuing  the following command:
+> java net.tinyos.tools.Listen -comm serial@/dev/ttyUSB*:telosb
+
+The radio operates on channel 26, and the setting can be changes in the
+Makefile. Make sure both base station and motes are on the same
+channel.
+
+To program onto the powernet board using the miniprogrammer, run
+> make epic install miniprog
+
+The drivers for SPI communication with the ADE7753 are located under
+sensorboards/PowerNetDriver
+
+

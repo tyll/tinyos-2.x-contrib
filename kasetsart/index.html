@@ -1,7 +1,18 @@
 <html>
 <head>
    <title>IWING's TinyOS Projects</title>
+   <style>
+    pre {
+        background-color: #F9F9F9;
+        border: 1px dashed #2F6FAB;
+        color: black;
+        line-height: 1.1em;
+        padding: 1em;
+    }
+    </style>
 </head>
+
+
 <body TEXT="#000000" BGCOLOR="#FFFFFF" LINK="#0000EF" VLINK="#55188A" ALINK="#FF0000">
 
 <img src="http://tinyos.net/tos-jwall.jpg"></img>
@@ -18,8 +29,9 @@ visualization tool for TOSSIM.
 </p>
 
 <hr />
-<h2>IWING-MRF Sensor Mote Hardware</h2>
-IWING-MRF is a low-cost, AVR-based mote hardware.  Main features include
+<h2>IWING-MRF Platform</h2>
+This project is to implement TinyOS on the IWING-MRF platform.  IWING-MRF is a
+low-cost, AVR-based mote hardware.  Main features include
 <ul>
     <li>
     ATMega328P microcontroller clocked at 12MHz, 32KB flash, 2KB SRAM.
@@ -36,6 +48,16 @@ IWING-MRF is a low-cost, AVR-based mote hardware.  Main features include
     Easy-to-make single-sided PCB.
     </li>
 </ul>
+Run the <code>install.sh</code> script to let your current TinyOS installation
+know the IWING-MRF platform.
+
+<pre>sudo -E ./install.sh</pre>
+
+You can then build and install your application
+on an IWING-MRF mote by running:
+
+<pre>make iwing-mrf
+make iwing-mrf install</pre>
 
 <hr />
 <h2>TinyOS Visualization</h2>

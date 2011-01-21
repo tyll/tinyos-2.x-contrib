@@ -1,16 +1,61 @@
 <html>
 <head>
-   <title>Index Placeholder</title>
+   <title>IWING's TinyOS Projects</title>
 </head>
 <body TEXT="#000000" BGCOLOR="#FFFFFF" LINK="#0000EF" VLINK="#55188A" ALINK="#FF0000">
 
-<img src="http://www.tinyos.net/scoop/images/tos-jwall.jpg"></img>
+<img src="http://tinyos.net/tos-jwall.jpg"></img>
 
-<h1>Index Placeholder</h1>
+<h1>IWING's TinyOS Projects</h1>
 
 <p>
-This file is a placeholder for your personal index file.  It is linked to from your entry in the main index file found in <i>tinyos-2.x-contrib/index.html</i>.  It should be used to document any projects contained in this directory.  Please update it as appropriate. 
+This page briefly describes two TinyOS-related projects being developed by the
+<a href="http://iwing.cpe.ku.ac.th/en" target="_blank">Intelligent Wireless Network Group (IWING)</a>
+at <a href="http://www.cpe.ku.ac.th" target="_blank">Department of Computer Engineering</a>,
+<a href="http://www.ku.ac.th" target="_blank">Kasetsart University</a>.  The two projects are:
+(1) TinyOS Port for IWING-MRF sensor mote hardware, and (2) TosVis, a
+visualization tool for TOSSIM.
 </p>
+
+<hr />
+<h2>IWING-MRF Sensor Mote Hardware</h2>
+IWING-MRF is a low-cost, AVR-based mote hardware.  Main features include
+<ul>
+    <li>
+    ATMega328P microcontroller clocked at 12MHz, 32KB flash, 2KB SRAM.
+    </li>
+    <li>
+    MRF24J40MA, IEEE802.15.4 transceiver module from Microchip.
+    </li>
+    <li>
+    Reprogrammable via USB port using the built-in bootloader based on
+    <a href="http://www.obdev.at/products/vusb/usbasploader.html">USBaspLoader</a>.
+    No extra usb-to-serial adapter or chip is required.
+    </li>
+    <li>
+    Easy-to-make single-sided PCB.
+    </li>
+</ul>
+
+<hr />
+<h2>TinyOS Visualization</h2>
+<p>
+TinyOS Visualization (TosVis) is a graphical visualization tool for TinyOS
+Simulator (TOSSIM) It is written in Python and based on the TopoVis library,
+another tool developed by IWING to create snapshots and animations for
+wireless ad hoc and sensor networks.  TosVis collects and analyzes debugging
+messages produced by TOSSIM such as LEDs and radio activities.  More
+activities can be easily visualized by extending the provided Python base
+class.
+</p>
+
+<hr />
+<i>
+    <b>Contact:</b> 
+    <a href="mailto:chaiporn.j@ku.ac.th">Chaiporn Jaikaeo</a><br/>
+    <b>Homepage:</b> 
+    <a href="http://www.cpe.ku.ac.th/~cpj">http://www.cpe.ku.ac.th/~cpj</a>
+</i>
 
 </body>
 </html>

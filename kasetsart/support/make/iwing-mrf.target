@@ -1,0 +1,16 @@
+#-*-Makefile-*- vim:syntax=make
+
+PLATFORM = iwing-mrf
+PROGRAMMER = avrdude
+DEFAULT_PROGRAM_AVR = usbasp
+MCU = atmega328p
+
+# Make nesC use __ instead of dollar signs in identifiers so that it can
+# operate with standard toolchain
+PFLAGS += -fnesc-separator=__
+AMADDR = ActiveMessageAddressC__addr
+
+$(call TOSMake_include_platform,avr)
+
+iwing-mrf: $(BUILD_DEPS)
+	@:

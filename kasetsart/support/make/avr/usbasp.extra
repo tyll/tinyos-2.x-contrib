@@ -1,0 +1,17 @@
+#-*-Makefile-*- vim:syntax=make
+
+PROGRAM = usbasp
+
+ifeq ($(PROGRAMMER),avrdude)
+    PROGRAMMER_FLAGS = -c usbasp -p $(MCU)
+    PROGRAMMER_INSTALL_SREC_FLAGS = -U flash:w:$(INSTALL_SREC):a
+endif
+
+program: FORCE
+	@echo "    installing $(PLATFORM) binary using USBAsp"
+	$(PROGRAMMER) $(PROGRAMMER_FLAGS) $(PROGRAMMER_INSTALL_SREC_FLAGS)
+
+program_bl: FORCE
+	@echo "    installing $(PLATFORM) bootloader using dapa"
+	$(PROGRAMMER) $(PROGRAMMER_FLAGS) $(PROGRAMMER_INSTALL_BOOTLOADER_FLAGS)
+

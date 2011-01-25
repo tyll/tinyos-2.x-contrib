@@ -18,10 +18,10 @@
  * ON AN "AS IS" BASIS, AND THE VANDERBILT UNIVERSITY HAS NO OBLIGATION TO
  * PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
  *
- * Author: Miklos Maroti, Janos Sallai
+ * Author: Janos Sallai, Miklos Maroti
  */
 
-interface Cc2420XDriverConfig
+interface CC2420XDriverConfig
 {
 	/**
 	 * Returns the length of a dummy header to align the payload properly.

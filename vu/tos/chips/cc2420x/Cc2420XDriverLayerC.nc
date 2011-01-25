@@ -18,13 +18,13 @@
  * ON AN "AS IS" BASIS, AND THE VANDERBILT UNIVERSITY HAS NO OBLIGATION TO
  * PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
  *
- * Author: Miklos Maroti, Janos Sallai
+ * Author: Janos Sallai, Miklos Maroti
  */
 
 #include <RadioConfig.h>
-#include <Cc2420XDriverLayer.h>
+#include <CC2420XDriverLayer.h>
 
-configuration Cc2420XDriverLayerC
+configuration CC2420XDriverLayerC
 {
 	provides
 	{
@@ -44,19 +44,19 @@ configuration Cc2420XDriverLayerC
 
 	uses
 	{
-		interface Cc2420XDriverConfig as Config;
+		interface CC2420XDriverConfig as Config;
 		interface PacketTimeStamp<TRadio, uint32_t>;
 	}
 }
 
 implementation
 {
-	components Cc2420XDriverLayerP as DriverLayerP,
+	components CC2420XDriverLayerP as DriverLayerP,
 		BusyWaitMicroC,
 		TaskletC,
 		MainC,
 		RadioAlarmC,
-		HplCc2420XC as HplC;
+		HplCC2420XC as HplC;
 
 
 	MainC.SoftwareInit -> DriverLayerP.SoftwareInit;

@@ -21,15 +21,15 @@
  * Author: Miklos Maroti, Janos Sallai
  */
 
-#include <Cc2420XRadio.h>
+#include <CC2420XRadio.h>
 #include <RadioConfig.h>
 #include <Tasklet.h>
 
-module Cc2420XRadioP
+module CC2420XRadioP
 {
 	provides
 	{
-		interface Cc2420XDriverConfig;
+		interface CC2420XDriverConfig;
 		interface SoftwareAckConfig;
 		interface UniqueConfig;
 		interface CsmaConfig;
@@ -48,7 +48,7 @@ module Cc2420XRadioP
 	{
 		interface Ieee154PacketLayer;
 		interface RadioAlarm;
-		interface RadioPacket as Cc2420XPacket;
+		interface RadioPacket as CC2420XPacket;
 
 		interface PacketTimeStamp<TRadio, uint32_t>;
 	}
@@ -57,30 +57,30 @@ module Cc2420XRadioP
 implementation
 {
 
-/*----------------- Cc2420XDriverConfig -----------------*/
+/*----------------- CC2420XDriverConfig -----------------*/
 
-	async command uint8_t Cc2420XDriverConfig.headerLength(message_t* msg)
+	async command uint8_t CC2420XDriverConfig.headerLength(message_t* msg)
 	{
 		return offsetof(message_t, data) - sizeof(cc2420xpacket_header_t);
 	}
 
-	async command uint8_t Cc2420XDriverConfig.maxPayloadLength()
+	async command uint8_t CC2420XDriverConfig.maxPayloadLength()
 	{
 		return sizeof(cc2420xpacket_header_t) + TOSH_DATA_LENGTH;
 	}
 
-	async command uint8_t Cc2420XDriverConfig.metadataLength(message_t* msg)
+	async command uint8_t CC2420XDriverConfig.metadataLength(message_t* msg)
 	{
 		return 0;
 	}
 
-	async command uint8_t Cc2420XDriverConfig.headerPreloadLength()
+	async command uint8_t CC2420XDriverConfig.headerPreloadLength()
 	{
 		// we need the fcf, dsn, destpan and dest
 		return 7;
 	}
 
-	async command bool Cc2420XDriverConfig.requiresRssiCca(message_t* msg)
+	async command bool CC2420XDriverConfig.requiresRssiCca(message_t* msg)
 	{
 		return call Ieee154PacketLayer.isDataFrame(msg);
 	}
@@ -226,7 +226,7 @@ implementation
 		 * ack required: 8-16 byte separation, 11 bytes airtime, 5-10 bytes separation
 		 */
 
-		uint8_t len = call Cc2420XPacket.payloadLength(msg);
+		uint8_t len = call CC2420XPacket.payloadLength(msg);
 		return call Ieee154PacketLayer.getAckRequired(msg) ? len + 6 + 16 + 11 + 10 : len + 6 + 10;
 	}
 

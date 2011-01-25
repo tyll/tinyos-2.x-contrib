@@ -23,7 +23,7 @@
 
 #include <RadioConfig.h>
 
-configuration Cc2420XTimeSyncMessageC
+configuration CC2420XTimeSyncMessageC
 {
 	provides
 	{
@@ -46,7 +46,7 @@ configuration Cc2420XTimeSyncMessageC
 
 implementation
 {
-	components Cc2420XActiveMessageC as ActiveMessageC, TimeSyncMessageLayerC;
+	components CC2420XActiveMessageC as ActiveMessageC, TimeSyncMessageLayerC;
   
 	SplitControl	= ActiveMessageC;
 	AMPacket	= TimeSyncMessageLayerC;
@@ -65,7 +65,7 @@ implementation
 	TimeSyncMessageLayerC.PacketTimeStampRadio -> ActiveMessageC;
 	TimeSyncMessageLayerC.PacketTimeStampMilli -> ActiveMessageC;
 
-	components Cc2420XDriverLayerC as DriverLayerC;
+	components CC2420XDriverLayerC as DriverLayerC;
 
 	TimeSyncMessageLayerC.LocalTimeRadio -> DriverLayerC;
 	TimeSyncMessageLayerC.PacketTimeSyncOffset -> DriverLayerC.PacketTimeSyncOffset;

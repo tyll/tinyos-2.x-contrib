@@ -29,7 +29,7 @@
 #include <Ieee154PacketLayer.h>
 #include <ActiveMessageLayer.h>
 #include <MetadataFlagsLayer.h>
-#include <Cc2420XDriverLayer.h>
+#include <CC2420XDriverLayer.h>
 #include <TimeStampingLayer.h>
 #include <LowPowerListeningLayer.h>
 #include <PacketLinkLayer.h>

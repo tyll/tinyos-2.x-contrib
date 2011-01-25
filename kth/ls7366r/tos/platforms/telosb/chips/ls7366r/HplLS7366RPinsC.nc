@@ -32,7 +32,6 @@
  *
  * @author Aitor Hernandez <aitorhh@kth.se>
  * @modified 2010/06/02
- * 
  */
 
 configuration HplLS7366RPinsC {

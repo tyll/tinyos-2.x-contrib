@@ -78,18 +78,31 @@ signal from a magnetometer.
 module GyroMagC {
   uses {
     interface Boot;
+
+    interface FastClock;
+    interface Init as FastClockInit;
+
     interface Init as BluetoothInit;
-    interface Init as GyroMagInit;
-    interface GyroMagBoard;
-    interface StdControl as GyroMagStdControl;
+    interface Init as GyroInit;
+    interface Init as MagInit;
+
+    interface GyroBoard;
+    interface StdControl as GyroStdControl;
+    interface Magnetometer;
+
     interface Leds;
+
     interface shimmerAnalogSetup;
+
     interface Timer<TMilli> as SetupTimer;
     interface Timer<TMilli> as ActivityTimer;
     interface Timer<TMilli> as SampleTimer;
+
     interface LocalTime<T32khz>;
+
     interface StdControl as BTStdControl;
     interface Bluetooth;
+
     interface Msp430DmaChannel as DMA0;
   }
 } 
@@ -97,7 +110,6 @@ module GyroMagC {
 implementation {
   extern int sprintf(char *str, const char *format, ...) __attribute__ ((C));
 
-  //#define USE_8MHZ_CRYSTAL
 #ifdef LOW_BATTERY_INDICATION
   //#define DEBUG_LOW_BATTERY_INDICATION
   /* during testing of the the (AVcc-AVss)/2 value from the ADC on various SHIMMERS, to get a reliable cut off point 
@@ -148,45 +160,9 @@ implementation {
   }
 
   void init() {
-#ifdef USE_8MHZ_CRYSTAL
-    register uint8_t i;
-    /* 
-     * set up 8mhz clock to max out 
-     * msp430 throughput 
-     */
+    call FastClockInit.init();
+    call FastClock.setSMCLK(1);
 
-    atomic CLR_FLAG(BCSCTL1, XT2OFF); // basic clock system control reg, turn off XT2 osc
-
-    call Leds.led0On();
-    do{
-      CLR_FLAG(IFG1, OFIFG);
-      for(i = 0; i < 0xff; i++);
-    }
-    while(READ_FLAG(IFG1, OFIFG));
-
-    call Leds.led0Off();
-
-    call Leds.led1On();
-    TOSH_uwait(50000UL);
-    //      call BusyWait.wait(50000UL);
-
-    atomic{ 
-      BCSCTL2 = 0; 
-      SET_FLAG(BCSCTL2, SELM_2); /* select master clock source, XT2CLK when XT2 oscillator present */
-    }                            /*on-chip. LFXT1CLK when XT2 oscillator not present on-chip. */
-
-    call Leds.led1Off();
-
-    atomic{
-      SET_FLAG(BCSCTL2, SELS);  // smclk from xt2
-      SET_FLAG(BCSCTL2, DIVS_3);  // divide it by 8
-    }
-    /* 
-     * end clock set up 
-     */
-#endif /* USE_8MHZ_CRYSTAL */
-
-    // pins for gyro, gyro enable
     call BluetoothInit.init();
 
     // mag pointer init
@@ -203,9 +179,6 @@ implementation {
     call shimmerAnalogSetup.finishADCSetup(sbuf0);
 
     NBR_ADC_CHANS = call shimmerAnalogSetup.getNumberOfChannels();
-
-    //    call GyroMagInit.init();
-    //    call GyroMagStdControl.start();
 
     call Bluetooth.disableRemoteConfig(TRUE);
   }
@@ -235,7 +208,8 @@ implementation {
     call ActivityTimer.stop();
     call shimmerAnalogSetup.stopConversion();
     call DMA0.stopTransfer();
-    call GyroMagStdControl.stop();
+    call GyroStdControl.stop();
+    call Magnetometer.disableBus();
     call Leds.led1Off();
 
 
@@ -284,9 +258,6 @@ implementation {
       linkDisconnecting = TRUE;
     }
   }
-
-
-
 
   /* check voltage level and if it is low then stop sampling, send message and disconnect */
   void checkBattVoltageLevel(uint16_t battery_voltage) {
@@ -399,13 +370,14 @@ implementation {
   }
 
   task void startSensing() {
-    call GyroMagInit.init();
-    call GyroMagStdControl.start();
+    call GyroInit.init();
+    call GyroStdControl.start();
+    call Magnetometer.enableBus();
     // six second pause here waiting for gyros to start up...
 
     call ActivityTimer.startPeriodic(1000);
 
-    call GyroMagBoard.magRunContinuousConversion();
+    call Magnetometer.runContinuousConversion();
 
     call SampleTimer.startPeriodic(sample_freq);
   }
@@ -426,7 +398,8 @@ implementation {
     call DMA0.stopTransfer();
     // MAG STOP
     call Leds.led1Off();
-    call GyroMagStdControl.stop();
+    call GyroStdControl.stop();
+    call Magnetometer.disableBus();
   }
 
   task void reallysendSensorData() {
@@ -443,8 +416,7 @@ implementation {
     uint16_t heading;
     register uint8_t i;
 
-    call GyroMagBoard.convertMagRegistersToData(readBuf, realVals);
-    //    heading = call GyroMagBoard.readMagHeading(readBuf);
+    call Magnetometer.convertRegistersToData(readBuf, realVals);
 
     if(current_buffer == 0){
       for(i = 0; i < 3; i++)
@@ -459,16 +431,16 @@ implementation {
   }
 
   task void clockin_result(){
-    call GyroMagBoard.readMagData();
+    call Magnetometer.readData();
   }
 
-  event void GyroMagBoard.magReadDone(uint8_t * data, error_t success){
+  event void Magnetometer.readDone(uint8_t * data, error_t success){
     //    call GyroMagBoard.ledToggle();
     memcpy(readBuf, data, 7);
     post collect_results();
   }
   
-  event void GyroMagBoard.magWriteDone(error_t success){
+  event void Magnetometer.writeDone(error_t success){
   }
 
   async event void Bluetooth.connectionMade(uint8_t status) { 
@@ -565,7 +537,7 @@ implementation {
     post clockin_result();
   }
 
-  async event void GyroMagBoard.buttonPressed() {
+  async event void GyroBoard.buttonPressed() {
   }
 }
 

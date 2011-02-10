@@ -47,6 +47,9 @@ signal from a magnetometer.
  * @author Steve Ayer
  * @date July, 2010   
  * this application is significantly modified to replace accel channels with mag.
+ * @date February, 2011
+ * modified to use separated gyroboard and magnetometer interfaces/implementations 
+ * (gyromagboard now abandoned)
  */
 
 
@@ -59,6 +62,10 @@ implementation {
   components LedsC;
   GyroMagC.Leds -> LedsC;
 
+  components FastClockC;
+  GyroMagC.FastClockInit -> FastClockC;
+  GyroMagC.FastClock -> FastClockC;
+  
   components new TimerMilliC() as SampleTimer;
   GyroMagC.SampleTimer -> SampleTimer;
   components new TimerMilliC() as SetupTimer;
@@ -81,9 +88,13 @@ implementation {
   GyroMagC.shimmerAnalogSetup -> shimmerAnalogSetupC;
   GyroMagC.DMA0 -> Msp430DmaC.Channel0;
 
-  components GyroMagBoardC;
-  GyroMagC.GyroMagInit         -> GyroMagBoardC.Init;
-  GyroMagC.GyroMagStdControl   -> GyroMagBoardC.StdControl;
-  GyroMagC.GyroMagBoard        -> GyroMagBoardC.GyroMagBoard;
+  components GyroBoardC;
+  GyroMagC.GyroInit         -> GyroBoardC.Init;
+  GyroMagC.GyroStdControl   -> GyroBoardC.StdControl;
+  GyroMagC.GyroBoard        -> GyroBoardC.GyroBoard;
+  
+  components MagnetometerC;
+  GyroMagC.MagInit      -> MagnetometerC.Init;
+  GyroMagC.Magnetometer -> MagnetometerC.Magnetometer;
 }
 

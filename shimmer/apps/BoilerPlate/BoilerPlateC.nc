@@ -54,9 +54,11 @@ module BoilerPlateC {
       interface Boot;
       interface Init as BluetoothInit;
       interface Init as AccelInit;
-      interface Init as GyroMagInit;
-      interface GyroMagBoard;
-      interface StdControl as GyroMagStdControl;
+      interface Init as GyroInit;
+      interface Init as MagInit;
+      interface GyroBoard;
+      interface Magnetometer;
+      interface StdControl as GyroStdControl;
       interface Leds;
       interface shimmerAnalogSetup;
       interface Timer<TMilli> as SetupTimer;
@@ -109,13 +111,14 @@ implementation {
 
    task void startSensing() {
       if((stored_config[NV_SENSORS0] & SENSOR_GYRO) || (stored_config[NV_SENSORS0] & SENSOR_MAG)) {
-         call GyroMagInit.init();
-         call GyroMagStdControl.start();
+         call GyroInit.init();
+         call GyroStdControl.start();
+	 call Magnetometer.enableBus();
       }
 
       if(stored_config[NV_SENSORS0] & SENSOR_MAG)
       {
-         call GyroMagBoard.magRunContinuousConversion();
+         call Magnetometer.runContinuousConversion();
       }
       
       if(stored_config[NV_SENSORS0] & SENSOR_ACCEL) {
@@ -138,8 +141,10 @@ implementation {
       call DMA0.stopTransfer();
       if(stored_config[NV_SENSORS0] & SENSOR_ACCEL)
          call Accel.wake(FALSE);
-      if((stored_config[NV_SENSORS0] & SENSOR_GYRO) || (stored_config[NV_SENSORS0] & SENSOR_MAG))
-         call GyroMagStdControl.stop();
+      if((stored_config[NV_SENSORS0] & SENSOR_GYRO) || (stored_config[NV_SENSORS0] & SENSOR_MAG)){
+         call GyroStdControl.stop();
+	 call Magnetometer.disableBus();
+      }
       call Leds.led1Off();
       atomic sensing = FALSE;
    }
@@ -324,7 +329,7 @@ implementation {
 
 
    task void clockin_result() {
-      call GyroMagBoard.readMagData();
+      call Magnetometer.readData();
    }
 
    
@@ -332,7 +337,7 @@ implementation {
       int16_t realVals[3];
       register uint8_t i;
 
-      call GyroMagBoard.convertMagRegistersToData(readBuf, realVals);
+      call Magnetometer.convertRegistersToData(readBuf, realVals);
 
       if(current_buffer == 0) {
          for(i = 0; i < 3; i++)
@@ -506,7 +511,8 @@ implementation {
 
    event void Boot.booted() {
       init();
-      call BTStdControl.start(); }
+      call BTStdControl.start(); 
+   }
 
 
    async event void Bluetooth.connectionMade(uint8_t status) { 
@@ -604,16 +610,16 @@ implementation {
    }
 
 
-   async event void GyroMagBoard.buttonPressed() {
+   async event void GyroBoard.buttonPressed() {
    }
 
 
-   event void GyroMagBoard.magReadDone(uint8_t * data, error_t success) {
+   event void Magnetometer.readDone(uint8_t * data, error_t success) {
       memcpy(readBuf, data, 7);
       post collect_results();
    }
 
 
-   event void GyroMagBoard.magWriteDone(error_t success){
+   event void Magnetometer.writeDone(error_t success){
    }
 }

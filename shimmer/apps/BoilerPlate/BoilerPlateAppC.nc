@@ -71,11 +71,20 @@ implementation {
    BoilerPlateC.GyroInit       -> GyroBoardC.Init;
    BoilerPlateC.GyroStdControl -> GyroBoardC.StdControl;
    BoilerPlateC.GyroBoard      -> GyroBoardC.GyroBoard;
-*/
    components GyroMagBoardC;
    BoilerPlateC.GyroMagInit       -> GyroMagBoardC.Init;
    BoilerPlateC.GyroMagStdControl -> GyroMagBoardC.StdControl;
    BoilerPlateC.GyroMagBoard      -> GyroMagBoardC.GyroMagBoard;
+*/
+
+   components GyroBoardC;
+   BoilerPlateC.GyroInit       -> GyroBoardC.Init;
+   BoilerPlateC.GyroStdControl -> GyroBoardC.StdControl;
+   BoilerPlateC.GyroBoard      -> GyroBoardC.GyroBoard;
+   
+   components MagnetometerC;
+   BoilerPlateC.MagInit        -> MagnetometerC.Init;
+   BoilerPlateC.Magnetometer   -> MagnetometerC.Magnetometer;
 
    components BPCommandParserC;
    BoilerPlateC.BPCommandParser -> BPCommandParserC;

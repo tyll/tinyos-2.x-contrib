@@ -20,12 +20,15 @@
 */
 
 /**
- * One wire device type identification interface.
- * This interface allows one-wire device drivers to specify any predicate they wish to test whether a device with a given ROM id is associated with its device type.
- *
+ * Module to check whether an ID is associated with the DS1825 device type. 
  * @author Doug Carlson <carlson@cs.jhu.edu>
- * @modified 6/16/10 initial revision
+ * @modified 6/16/10
  */
-interface OneWireDeviceType {
-  command bool isOfType(onewire_t id);
+module Ds1825TypeP {
+  provides interface OneWireDeviceType;
+}
+implementation {
+  command bool OneWireDeviceType.isOfType(onewire_t id){
+    return id.familyCode == 0x3b;
+  }
 }

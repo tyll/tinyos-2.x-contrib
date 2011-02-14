@@ -23,18 +23,24 @@
  * @author Janos Sallai
  * @author David Moss
  * @author Doug Carlson
+ * @modified 6/16/10 added definitions for general multi-type multi-device onewire bus.
  */
 
 #ifndef ONEWIRE_H
 #define ONEWIRE_H
 
-#ifndef MAX_DEVICES_PER_TYPE
-#define MAX_DEVICES_PER_TYPE 8
+#ifndef MAX_ONEWIRE_DEVICES_PER_TYPE
+#define MAX_ONEWIRE_DEVICES_PER_TYPE 8
+#endif
+
+#ifndef MAX_ONEWIRE_DEVICES
+#define MAX_ONEWIRE_DEVICES 16
 #endif
 
 enum {
   ONEWIRE_SERIAL_LENGTH = 6,
-  ONEWIRE_DATA_LENGTH = 8
+  ONEWIRE_DATA_LENGTH = 8,
+  ONEWIRE_WORDS_LENGTH = 2,
 };
 
 typedef union onewire_t {
@@ -45,24 +51,10 @@ typedef union onewire_t {
      uint8_t serial[ONEWIRE_SERIAL_LENGTH];
      uint8_t crc;
   };
-//TODO this isn't quite right
+  uint32_t words[ONEWIRE_WORDS_LENGTH];
   uint64_t id;
-  
 } onewire_t;
 
-
-typedef uint8_t onewire_in_t;
-
-#define ONEWIRE_NULL_ADDR 0
-
-enum {
-  CMD_GET_ID = 0x33,
-  CMD_CONVERT_TEMPERATURE = 0x44,
-  CMD_READ_SCRATCHPAD = 0xBE,
-  CMD_WRITE_SCRATCHPAD = 0x4E,
-  CMD_MATCH_ROM = 0x55,
-  CMD_ALARM_SEARCH = 0xEC,
-  CMD_SEARCH = 0xF0,
-};
-
+#define ONEWIRE_NULL_ADDR 0LL
+#define ONEWIRE_CLIENT "OneWire Client"
 #endif // ONEWIRE_H

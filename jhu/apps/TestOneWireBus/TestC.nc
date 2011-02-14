@@ -14,8 +14,6 @@ implementation {
       new TimerMilliC() as StopTimer,
       RandomC;
 
-  components SerialPrintfC;
-
   components Ds1825C, 
     DummyOWC;
 

@@ -43,8 +43,8 @@ implementation {
     return numDevices;
   }
 
-  command onewire_t OneWireDeviceInstanceManager.getDevice(uint8_t index) {
-    return devices[index];
+  command onewire_t OneWireDeviceInstanceManager.getDevice(uint8_t deviceIndex) {
+    return devices[deviceIndex];
   }
 
   command error_t OneWireDeviceInstanceManager.setDevice(onewire_t id) {

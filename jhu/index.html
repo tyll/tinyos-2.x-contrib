@@ -20,5 +20,35 @@ the intend use.</p>
 communication. An earlier version was included in the tools package of
 TinyOS 2.0.2 as part of the Deluge T2.</p>
 
+<h1>OneWire Bus</h1>
+<p>Framework for communication with devices over the Dallas OneWire
+protocol.  Each of the following should contain a README.txt file, and
+the nesdocs should be pretty comprehensive.  Much of this code was
+adapted from PeoplePower co's OSHAN distribution.  Please respect
+their copyright/license notices.
+</p>
+<ul>
+    <li><tt>tos/platforms/telosb</tt> modified to use ADC0 as the
+    external onewire data/power.  Change the wiring in
+    <tt>tos/platforms/telosb/hardware/onewire/PlatformOneWireInitC.nc</tt>
+    if you wish to use a different port. PLEASE NOTE: You *MUST* add a
+    pull-up resistor from the onewire bus pin to Vcc.  On a telosb, it
+    works fine with ~5k ohm.</li>
+
+    <li><tt>tos/lib/onewire</tt> generic driver code and
+    interfaces</li>
+
+    <li><tt>apps/PlatformTests/TestDs1825</tt> for testing with
+    multiple DS1825 temperature sensors. The Makefile in this
+    directory may be a good starting point for projects wishing to
+    include the JHU onewire code  </li>
+
+    <li><tt>apps/TestOneWireBus</tt> for testing the bus multiplexing
+    code with a DS1825 temperature sensor.  Please note that the
+    device type implementations under dummyOW contain device-specific
+    IDs for testing: you'll need to change these to match your
+    hardware if you use this app.</li>
+
+</ul> 
 </body>
 </html>

@@ -26,6 +26,7 @@
  * @author Doug Carlson <carlson@cs.jhu.edu>
  * 
  * @modified 6/16/10 Added addressDevice command per 1-wire standards.
+ * @modified 2/14/11 switched surf leds for generic leds
  */
  
 generic module OneWireMasterP () {
@@ -35,8 +36,9 @@ generic module OneWireMasterP () {
   
   uses {
     interface GeneralIO as Pin;
+    //interface GeneralIO as DebugPin;
     interface BusyWait<TMicro, uint16_t>;
-    interface MultiLed;
+    interface Leds;
   }
 }
 
@@ -120,6 +122,10 @@ implementation {
     bool present;
 
     atomic {
+      call Leds.led0On();
+      //call DebugPin.makeOutput();
+      //call DebugPin.set();
+      //call DebugPin.clr();
       // it is assumed that the bus is in idle state here
     
       // transmit reset pulse
@@ -134,6 +140,7 @@ implementation {
       call BusyWait.wait(t_PDHIGH);
       present = (0 == call Pin.get());
       call BusyWait.wait(t_PDLOW);
+      call Leds.led0Off();
     }
     return present ? SUCCESS : FAIL;
   }

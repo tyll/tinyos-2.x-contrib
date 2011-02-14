@@ -54,5 +54,5 @@ interface OneWireDeviceMapper {
     * @param index The index of the device to retrieve. 
     * @return The hardware ID of the device at index. This will be equal to NULL_ONEWIRE_ADDR if an index outside of [0, numDevices()] is provided.
     */
-  command onewire_t getDevice(uint8_t index);  
+  command onewire_t getDevice(uint8_t deviceIndex);  
 }

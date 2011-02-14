@@ -1,4 +1,4 @@
-/*
+/* 
  * Copyright (c) 2009-2010 People Power Company
  * All rights reserved.
  *
@@ -13,7 +13,7 @@
  *   notice, this list of conditions and the following disclaimer in the
  *   documentation and/or other materials provided with the
  *   distribution.
- * - Neither the name of the People Power Company nor the names of
+ * - Neither the name of the People Power Corporation nor the names of
  *   its contributors may be used to endorse or promote products derived
  *   from this software without specific prior written permission.
  *
@@ -32,32 +32,31 @@
  */
 
 
+
 /**
+ * Platform hardware presentation layer for the DS1825 one-wire chip
  * @author David Moss
- * @author Peter A. Bigot <pab@peoplepowerco.com>
  */
-generic configuration OneWireMasterC () {
+
+configuration PlatformOneWireInitC {
   provides {
-    interface OneWireMaster;
+    interface Init;
+    interface HplMsp430GeneralIO as OneWireIO;
   }
-  uses {
-    interface GeneralIO as Pin;
-  }
-}
-
-implementation {
-
-  components new OneWireMasterP();
-  OneWireMaster = OneWireMasterP;
-  Pin = OneWireMasterP.Pin;
-
-  components BusyWaitMicroC;
-  OneWireMasterP.BusyWait -> BusyWaitMicroC;
+} implementation {
   
-  //components LedsC as Leds;
-  components NoLedsC as Leds;
-  OneWireMasterP.Leds -> Leds;
+  components PlatformOneWireInitP;
+  Init = PlatformOneWireInitP;
+  
+  components HplMsp430GeneralIOC as GeneralIOC;
+#if defined(SURF_REV_A)
+  OneWireIO = GeneralIOC.Port35;
+  PlatformOneWireInitP.OneWireIO -> GeneralIOC.Port35;
+#else
+  //port60 == ADC 0 (connector U2 pin 3 on telosb)
+  OneWireIO = GeneralIOC.Port60;
+  PlatformOneWireInitP.OneWireIO -> GeneralIOC.Port60;
+#endif
 
 }
-
 

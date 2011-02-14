@@ -50,8 +50,8 @@ module OneWireDeviceMapperP {
     return numDevices;
   }
 
-  command onewire_t OneWireDeviceMapper.getDevice(uint8_t index) {
-    return devices[index];
+  command onewire_t OneWireDeviceMapper.getDevice(uint8_t deviceIndex) {
+    return devices[deviceIndex];
   }
 
   command error_t OneWireDeviceMapper.refresh() {

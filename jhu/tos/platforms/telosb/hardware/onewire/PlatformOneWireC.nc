@@ -1,4 +1,4 @@
-/*
+/* 
  * Copyright (c) 2009-2010 People Power Company
  * All rights reserved.
  *
@@ -13,7 +13,7 @@
  *   notice, this list of conditions and the following disclaimer in the
  *   documentation and/or other materials provided with the
  *   distribution.
- * - Neither the name of the People Power Company nor the names of
+ * - Neither the name of the People Power Corporation nor the names of
  *   its contributors may be used to endorse or promote products derived
  *   from this software without specific prior written permission.
  *
@@ -32,32 +32,26 @@
  */
 
 
+
 /**
+ * Platform wiring for OneWire master
  * @author David Moss
- * @author Peter A. Bigot <pab@peoplepowerco.com>
  */
-generic configuration OneWireMasterC () {
+
+configuration PlatformOneWireC {
   provides {
     interface OneWireMaster;
-  }
-  uses {
-    interface GeneralIO as Pin;
   }
 }
 
 implementation {
+  components PlatformOneWireInitC;
 
-  components new OneWireMasterP();
-  OneWireMaster = OneWireMasterP;
-  Pin = OneWireMasterP.Pin;
-
-  components BusyWaitMicroC;
-  OneWireMasterP.BusyWait -> BusyWaitMicroC;
-  
-  //components LedsC as Leds;
-  components NoLedsC as Leds;
-  OneWireMasterP.Leds -> Leds;
-
+  components new OneWireMasterC();
+  components new Msp430GpioC() as OneWirePinC;
+  OneWireMasterC.Pin -> OneWirePinC;
+  OneWirePinC -> PlatformOneWireInitC.OneWireIO;
+ 
+  OneWireMaster = OneWireMasterC;
 }
-
 

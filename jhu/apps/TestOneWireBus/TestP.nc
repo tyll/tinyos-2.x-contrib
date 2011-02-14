@@ -97,7 +97,7 @@ implementation {
   }
 
   event void Ds1825Read.readDone(error_t result, int16_t val) {
-    printf("TestP Ds1825Read.readDone %x %x from %llx\n\r", result, val, (call Ds1825Dim.currentDevice()).id);
+    printf("TestP Ds1825Read.readDone %x [[%x]] from %llx\n\r", result, val, (call Ds1825Dim.currentDevice()).id);
     if (state != S_DONE) {
       call Ds1825ReadTimer.startOneShot(call Random.rand16() % TEST_INTERVAL);
     }

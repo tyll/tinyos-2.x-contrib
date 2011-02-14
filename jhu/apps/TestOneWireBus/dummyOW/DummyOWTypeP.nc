@@ -2,8 +2,8 @@ module DummyOWTypeP {
   provides interface OneWireDeviceType;
 }
 implementation {
-  uint8_t matchId[8]={0xff,0x00,0x00,0x00,
-                      0x07,0xa7,0xdc,0x3b};
+  uint8_t matchId[8]={0xef,0x00,0x00,0x00,
+                      0x06,0xb1,0xc3,0x3b};
 
   command bool OneWireDeviceType.isOfType(onewire_t id){
     uint8_t i;

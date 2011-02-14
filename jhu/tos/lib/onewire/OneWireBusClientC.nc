@@ -18,12 +18,22 @@
 *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 *  THE POSSIBILITY OF SUCH DAMAGE.
 */
-/**
- * Generic configuration to handle wiring for shared resource/shared interfaces. The usage is roughly similar to the AMSenderC. Device-type drivers SHOULD use a new instance of OneWireBusClientC for all interactions with the bus. They SHOULD associate a OneWireDeviceType with their OneWireBusClientC, which will allow them to be notified when new device instances are present.
- * The parameter indicates the maximum number of onewire devices of this type which will ever be attached to the bus. Setting this to a low value will save some RAM space, but will cause some devices to be unaddressable if this limit is exceeded.
+/** Generic configuration to handle wiring for shared resource/shared
+ * interfaces. The usage is roughly similar to the AMSenderC.
+ * Device-type drivers SHOULD use a new instance of OneWireBusClientC
+ * for all interactions with the bus. They SHOULD associate a
+ * OneWireDeviceType with their OneWireBusClientC, which will allow
+ * them to be notified when new device instances are present.  The
+ * parameter indicates the maximum number of onewire devices of this
+ * type which will ever be attached to the bus. Setting this to a low
+ * value will save some RAM space, but will cause some devices to be
+ * unaddressable if this limit is exceeded.
+ *
  * @author Doug Carlson <carlson@cs.jhu.edu>
  * @modified 6/16/10
  */
+
+
 generic configuration OneWireBusClientC(uint8_t maxDevices) {
   provides {
     interface OneWireMaster;

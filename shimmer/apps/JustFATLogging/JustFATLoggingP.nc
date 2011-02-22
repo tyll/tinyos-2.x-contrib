@@ -304,7 +304,7 @@ implementation {
     // we'll use this to id which shimmer wrote the files
     call IDChip.read(longAddress);
 
-    call Accel.setSensitivity(RANGE_2_0G);
+    call Accel.setSensitivity(RANGE_1_5G);
 
     call FatFs.mount(&gfs);
 

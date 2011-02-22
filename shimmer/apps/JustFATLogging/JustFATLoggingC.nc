@@ -78,18 +78,4 @@ implementation {
   components TimeC;
   MainC.SoftwareInit   -> TimeC;
   JustFATLoggingP.Time -> TimeC;
-  
-  /*
-  components TimeP;
-  MainC.SoftwareInit   -> TimeP.Init;
-  JustFATLoggingP.Time -> TimeP;
-  
-  components new TimerMilliC() as LocalTimer;
-  TimeP.Timer -> LocalTimer;
-
-  components Counter32khz64C as Counter;
-  components new CounterToLocalTime64C(T32khz);
-  CounterToLocalTime64C.Counter -> Counter;
-  TimeP.LocalTime64 -> CounterToLocalTime64C;
-  */
 }

@@ -1,0 +1,53 @@
+DESCRIPTION
+
+    TinyOS Visualization (TosVis) is a graphical visualization tool for
+    TinyOS's TOSSIM (TinyOS Simulator).  It is based on the TopoVis library.
+
+
+CONTENTS
+
+    README    -- this file
+    lib/      -- contains the TosVis Python package
+    examples/ -- contains sample scripts
+
+
+INSTALLATION
+
+    Copy the directory lib/tosvis to a place that will be searched by Python
+    (either the 'site-packages' directory or a directory listed in
+    $PYTHONPATH).
+
+
+USAGE
+
+    o Build your application using TOSSIM
+
+        make micaz sim
+
+    o Instantiate a TosVis object with a specified time limit for running
+      simulation.
+
+        from tosvis import *
+        tv = TosVis(100)
+
+    o Prepare a set of nodes using the provided Node class or its subclass.
+      Then add them to TosVis object
+
+        node1 = Node( (100,100) )
+        node2 = Node( (150,150) )
+        tv.addNode(node1)
+        tv.addNode(node2)
+
+    o Start the simulation by invoking the 'run' method
+
+        tv.run()
+
+
+AUTHOR INFORMATION
+
+    Chaiporn (Art) Jaikaeo
+    Intelligent Wireless Networking Group (IWING) -- http://iwing.cpe.ku.ac.th
+    Department of Computer Engineering
+    Kasetsart University
+    chaiporn.j@ku.ac.th
+

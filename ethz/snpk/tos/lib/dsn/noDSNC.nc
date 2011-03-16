@@ -49,7 +49,9 @@ implementation
 	DsnSend = DSNP.DsnSend;
 	DsnReceive = DSNP.DsnReceive;
 	DSNP.DsnPlatform -> DsnPlatformC;
+#ifndef NODSN	
 	DSNP.UartStream->DsnPlatformC;
+#endif
 	
 }
 

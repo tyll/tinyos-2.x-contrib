@@ -500,7 +500,7 @@ implementation
 	command error_t DsnSend.logWarning(void * msg){return call DSN.logWarning(msg); }
 	command error_t DsnSend.logInfo(void * msg){return call DSN.logInfo(msg); }
 	command error_t DsnSend.logDebug(void * msg){return call DSN.logDebug(msg); }
-	async command void DsnSend.logInt(uint32_t _n){return call DSN.logInt(_n); }
+	async command void DsnSend.logInt(uint32_t _n){call DSN.logInt(_n); }
 	command error_t DsnSend.logPacket(message_t * msg){return call DSN.logPacket(msg); }
 	command error_t DsnSend.stopLog(){return call DSN.stopLog(); }
 	command error_t DsnSend.startLog() 	{return call DSN.startLog(); }

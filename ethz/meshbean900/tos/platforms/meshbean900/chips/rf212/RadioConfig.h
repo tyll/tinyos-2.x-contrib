@@ -36,6 +36,17 @@ enum
 	RF212_TRX_CTRL_0_VALUE = 0,
 
 	/**
+	 * This is the value of the TRX_CTRL_2 register which configures the 
+	 * data rate and modulation type. Use the constants from RF212DriverLayer.h
+	 */
+	RF212_TRX_CTRL_2_VALUE = RF212_DATA_MODE_BPSK_20,
+	//RF212_TRX_CTRL_2_VALUE = RF212_DATA_MODE_BPSK_40, 
+	//RF212_TRX_CTRL_2_VALUE = RF212_DATA_MODE_OQPSK_SIN_RC_100, 
+	//RF212_TRX_CTRL_2_VALUE = RF212_DATA_MODE_OQPSK_SIN_RC_400, 
+	//RF212_TRX_CTRL_2_VALUE = RF212_DATA_MODE_OQPSK_SIN_250, 
+	//RF212_TRX_CTRL_2_VALUE = RF212_DATA_MODE_OQPSK_SIN_1000, 
+
+	/**
 	 * This is the default value of the CCA_MODE field in the PHY_CC_CCA register
 	 * which is used to configure the default mode of the clear channel assesment
 	 */
@@ -45,7 +56,7 @@ enum
 	 * This is the value of the CCA_THRES register that controls the
 	 * energy levels used for clear channel assesment
 	 */
-	RF212_CCA_THRES_VALUE = 0xC7,
+	RF212_CCA_THRES_VALUE = 0x77,
 };
 
 /* This is the default value of the TX_PWR field of the PHY_TX_PWR register. */
@@ -55,7 +66,7 @@ enum
 
 /* This is the default value of the CHANNEL field of the PHY_CC_CCA register. */
 #ifndef RF212_DEF_CHANNEL
-#define RF212_DEF_CHANNEL	11
+#define RF212_DEF_CHANNEL	1
 #endif
 
 /* The number of microseconds a sending MESHBEAN900 mote will wait for an acknowledgement */

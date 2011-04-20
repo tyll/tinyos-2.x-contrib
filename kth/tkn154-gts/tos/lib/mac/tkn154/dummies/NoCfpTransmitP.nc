@@ -124,7 +124,7 @@ implementation {
 	#endif
 	}
 
-	async event void RadioTx.transmitDone(ieee154_txframe_t *frame, const ieee154_timestamp_t *timestamp, error_t result) {}
+	async event void RadioTx.transmitDone(ieee154_txframe_t *frame, error_t result) {}
 
 	async event void RadioOff.offDone() {}
 
@@ -134,7 +134,7 @@ implementation {
 	{
 		ASSERT(0); // should never happen, because we never call RadioToken.request()
 	}
-	event message_t* RadioRx.received(message_t* frame, const ieee154_timestamp_t *timestamp) {return frame;}
+	event message_t* RadioRx.received(message_t* frame) {return frame;}
 
 	default event message_t* CfpRx.received(message_t* data) {return data;}
 

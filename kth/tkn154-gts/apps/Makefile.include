@@ -1,4 +1,12 @@
 PLATFORMS = telosb
+		  
+		  PFLAGS += -DTSCHDEBUG_ENABLED
+PFLAGS += 	-DIEEE154_ASSOCIATION_DISABLED \
+			-DIEEE154_DISASSOCIATION_DISABLED \
+			-DIEEE154_PROMISCUOUS_MODE_DISABLED \
+			-DIEEE154_COORD_REALIGNMENT_DISABLED \
+			-DIEEE154_COORD_BROADCAST_DISABLED \
+			#-DIEEE154_GTS_DISABLED
 
 # load the modified files
 TKN154_GTS_ROOT=$(TOSCONTRIB)/kth/tkn154-gts
@@ -10,7 +18,9 @@ CFLAGS += -I$(TKN154_GTS_TOS)/lib/mac/tkn154 \
 	-I$(TKN154_GTS_TOS)/lib/mac/tkn154/interfaces/MCPS \
 	-I$(TKN154_GTS_TOS)/lib/mac/tkn154/interfaces/MLME \
 	-I$(TKN154_GTS_TOS)/lib/mac/tkn154/interfaces/private \
-	-I$(TKN154_GTS_TOS)/lib/mac/tkn154/interfaces/public
+	-I$(TKN154_GTS_TOS)/lib/mac/tkn154/interfaces/public \
+	-I$(TKN154_GTS_TOS)/lib/debug \
+	-I$(TKN154_GTS_TOS)/lib/interfaces
 	
 	
 TKN154_PLATFORM_INCLUDE?=$(TOSDIR)/platforms/$(PLATFORM)/mac/tkn154/Makefile.include
@@ -22,15 +32,16 @@ CFLAGS += -I$(TOSDIR)/lib/mac/tkn154 \
 	-I$(TOSDIR)/lib/mac/tkn154/interfaces/private \
 	-I$(TOSDIR)/lib/mac/tkn154/interfaces/public
 	
+TOSMAKE_PATH += $(TOSDIR)/../apps/tests/tkn154/extras
 
+# legacy
 ifdef IEEE154_EXTENDED_ADDRESS
-PFLAGS += -DIEEE154_EXTENDED_ADDRESS=$(IEEE154_EXTENDED_ADDRESS)
+$(error To set the extended address of a device to X pass 'extaddr,X' to the make system (e.g. "make telosb extaddr,0x012345"))
 endif
 
+# legacy
 ifdef TKN154_DEBUG
-PFLAGS += -DTKN154_DEBUG
-CFLAGS += -I$(TOSDIR)/lib/printf
-PFLAGS += -DPRINTF_BUFFER_SIZE=1000
+$(error To enable debug mode pass 'tkn154debug' to the make system (e.g. "make telosb tkn154debug"))
 endif
 
 

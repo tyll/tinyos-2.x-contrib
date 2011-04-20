@@ -97,7 +97,6 @@ implementation
 	norace uint32_t m_previousBeaconInterval;
 	norace uint32_t m_dt;
 	norace uint32_t m_lastBeaconTxTime;
-	norace ieee154_timestamp_t m_lastBeaconTxRefTime;
 	norace ieee154_macBattLifeExtPeriods_t m_battLifeExtPeriods;
 
 	/* variables that describe the latest superframe */
@@ -313,10 +312,18 @@ implementation
 		m_startTime = m_updateStartTime;
 		m_txOneBeaconImmediately = FALSE;
 		m_previousBeaconInterval = 0;
-		if (m_startTime) {
-			memcpy(&m_lastBeaconTxRefTime, call IncomingSF.sfStartTimeRef(), sizeof(ieee154_timestamp_t));
-			m_lastBeaconTxTime = call IncomingSF.sfStartTime();
+		m_beaconOrder = m_updateBeaconOrder;
+		if (m_beaconOrder < 15) {
+			m_beaconInterval = ((uint32_t) 1 << m_beaconOrder) * IEEE154_aBaseSuperframeDuration;
 		} else {
+			m_beaconInterval = 0;
+		}
+		m_superframeOrder = m_updateSuperframeOrder;
+		if (m_startTime)
+		// schedule outgoing beacon relative to incoming beacon; here we calculate
+		// the last time we would have sent a beacon (simplifies the code below)
+		m_lastBeaconTxTime = call IncomingSF.sfStartTime() + m_startTime - m_beaconInterval;
+		else {
 			// no StartTime defined by next higher layer - but
 			// if a realignment frame was transmitted, the next
 			// beacon tx time must take the old BI into consideration
@@ -325,16 +332,9 @@ implementation
 			else
 			m_txOneBeaconImmediately = TRUE;
 		}
-		m_beaconOrder = m_updateBeaconOrder;
-		m_superframeOrder = m_updateSuperframeOrder;
-		if (m_beaconOrder < 15) {
-			m_beaconInterval = ((uint32_t) 1 << m_updateBeaconOrder) * IEEE154_aBaseSuperframeDuration;
-		} else {
-			m_beaconInterval = 0;
-		}
 		m_dt = m_beaconInterval;
-		m_txState = S_TX_IDLE;
 		m_battLifeExtPeriods = call MLME_GET.macBattLifeExtPeriods();
+		m_txState = S_TX_IDLE;
 
 		// (3) update PIB
 		call MLME_SET.macBeaconOrder(m_beaconOrder);
@@ -408,7 +408,7 @@ implementation
 
 	async event void RadioToken.transferredFrom(uint8_t fromClientID)
 	{
-		dbg_serial("BeaconSynchronizeP","Token transferred, will Tx beacon in %lu\n",
+		dbg_serial("BeaconTransmitP","Token transferred, will Tx beacon in %lu\n",
 				(uint32_t) ((m_lastBeaconTxTime + m_dt) - call BeaconSendAlarm.getNow()));
 		if (m_requestBitmap & (REQUEST_REALIGNMENT_DONE_PENDING | REQUEST_UPDATE_SF))
 		post signalGrantedTask(); // need to be in sync context
@@ -442,12 +442,38 @@ implementation
 					signal BeaconSendAlarm.fired();
 					return;
 				} else if (m_startTime != 0) {
-					// a new sf spec was put into operation, with a user-defined StartTime    
-					// here m_lastBeaconTxTime is actually the last time a beacon was received
 
-					dbg_serial("BeaconTransmitP", "First beacon to be sent at %lu.\n", m_startTime);
-					m_dt = m_startTime;
-					m_startTime = 0;
+					// The outgoing superframe (our beacon transmission) has to be scheduled relative
+					// to an incoming superframe (from our coordinator). The standard says that this
+					// should be done only for the initial beacon tranmission, but we do it for
+					// every transmission, because otherwise we'll run into problems (overlapping 
+					// superframes) due to clock drift eventually
+
+					if (call IsTrackingBeacons.getNow()) {
+
+						// we calculate the "ideal" time of our last transmitted beacon
+						// relative to the last incoming beacon
+						uint32_t idealLastTxTime = call IncomingSF.sfStartTime() + m_startTime - m_beaconInterval;
+
+						// only if the offset between ideal and the actual last beacon transmission 
+						// is close (i.e. could have been an effect of clock drift), we replace the 
+						// timestamp of the actual transmission with that one of the ideal beacon time;
+						// max. clock drift per node is +- 40 ppm, we need to consider +- 80 ppm;
+						// max. clock drift is a function of the BO; we take two discrete values to 
+						// cover the "lower" BO (max. 1ms drift) and "upper" BO (max. 24 ms drift)
+						// this could be done more granular one day ...
+						uint32_t maxAllowedOffset = (m_beaconOrder > 9) ? 1488 : 62;
+						uint32_t jitter;
+
+						if ( (jitter = idealLastTxTime - m_lastBeaconTxTime) < maxAllowedOffset || (jitter = m_lastBeaconTxTime - idealLastTxTime) < maxAllowedOffset) {
+							m_lastBeaconTxTime = idealLastTxTime;
+							dbg_serial("BeaconTransmitP", "Scheduling beacon relative to last Rx beacon (correcting a jitter of: %lu), updated TxTime %lu\n", (uint32_t) jitter, (uint32_t) m_lastBeaconTxTime);
+						} else {
+							// we don't touch m_lastBeaconTxTime!
+							dbg_serial("BeaconTransmitP", "Jitter too large (missed an incoming beacon?)! %lu vs. %lu\n", idealLastTxTime, m_lastBeaconTxTime);
+						}
+					}
+
 				} else if (m_previousBeaconInterval != 0) {
 					// a new sf spec was put into operation, after a realignment frame 
 					// broadcast; the next beacon time should still be calculated using the
@@ -489,7 +515,6 @@ implementation
 	async event void BeaconSendAlarm.fired()
 	{
 		// start/schedule beacon transmission
-		ieee154_timestamp_t *timestamp = &m_lastBeaconTxRefTime;
 		m_txState = S_TX_LOCKED;
 
 		if (call IsBroadcastReady.getNow())
@@ -499,30 +524,29 @@ implementation
 
 		if (m_txOneBeaconImmediately) {
 			m_txOneBeaconImmediately = FALSE;
-			timestamp = NULL;
+			m_dt = 0;
 		}
-		call BeaconTx.transmit(&m_beaconFrame, timestamp, m_dt);
-		dbg_serial("BeaconTransmitP","Beacon Tx scheduled for %lu\n", (uint32_t) (*timestamp + m_dt));
+		call BeaconTx.transmit(&m_beaconFrame, m_lastBeaconTxTime, m_dt);
+		dbg_serial("BeaconTransmitP","Beacon Tx scheduled for %lu\n", m_lastBeaconTxTime + m_dt);
 	}
 
-	async event void BeaconTx.transmitDone(ieee154_txframe_t *frame, const ieee154_timestamp_t *timestamp, error_t result)
+	async event void BeaconTx.transmitDone(ieee154_txframe_t *frame, error_t result)
 	{
 		// The beacon frame was transmitted, i.e. the CAP has just started
 		// update the state then pass the token on to the next component 
 
 		uint8_t gtsFieldLength;
+		uint32_t timestamp = ((ieee154_metadata_t*) frame->metadata)->timestamp;
 
 		ASSERT(result == SUCCESS); // must succeed, we're sending without CCA or ACK request
-		if (timestamp != NULL) {
-			m_lastBeaconTxTime = frame->metadata->timestamp;
-			memcpy(&m_lastBeaconTxRefTime, timestamp, sizeof(ieee154_timestamp_t));
+		if (timestamp != IEEE154_INVALID_TIMESTAMP) {
+			dbg_serial("BeaconTransmitP", "Beacon Tx (bsn: %lu), offset to last %lu\n",
+					(uint32_t) frame->header->mhr[MHR_INDEX_SEQNO], (uint32_t) (timestamp - m_lastBeaconTxTime));
+			m_lastBeaconTxTime = timestamp;
 			m_dt = m_beaconInterval; // transmit the next beacon at m_lastBeaconTxTime + m_dt 
-			dbg_serial("BeaconTransmitP", "Beacon Tx (bsn: %lu) success at %lu\n",
-					(uint32_t) frame->header->mhr[MHR_INDEX_SEQNO], (uint32_t) m_lastBeaconTxTime);
 		} else {
 			// Timestamp is invalid; this is bad. We need the beacon timestamp for the 
 			// slotted CSMA-CA, because it defines the slot reference time. We can't use this superframe
-			// TODO: check if this was the initial beacon (then m_lastBeaconTxRefTime is invalid)
 			dbg_serial("BeaconTransmitP", "Invalid timestamp!\n");
 			m_dt += m_beaconInterval;
 			call RadioToken.request();
@@ -682,11 +706,8 @@ implementation
 
 			// (1) update pending addresses
 			if (m_payloadState & MODIFIED_PENDING_ADDR_FIELD) {
-				//len = call PendingAddrWrite.getLength();
 				len = call PendingAddrWrite.write(beaconSpecs-1, beaconSpecs-m_payload);
-				
 				beaconSpecs -= len;
-				//call PendingAddrWrite.write(beaconSpecs, len);
 				if (len != m_pendingAddrLen) {
 					m_pendingAddrLen = len;
 					m_payloadState |= MODIFIED_SPECS_MASK; // need to rewrite specs before
@@ -697,10 +718,7 @@ implementation
 			// (2) update GTS spec
 			if (m_payloadState & MODIFIED_GTS_FIELD) {
 				len = call GtsInfoWrite.write(beaconSpecs-1, beaconSpecs-m_payload);
-			
-				//len = call GtsInfoWrite.getLength();
 				beaconSpecs -= len;
-				//call GtsInfoWrite.write(beaconSpecs, len);
 				numGtsSlots = getNumGtsSlots(beaconSpecs);
 				if (len != m_pendingGtsLen || ((IEEE154_aNumSuperframeSlots - 1 - numGtsSlots) != m_numCapSlots-1)) {
 					m_pendingGtsLen = len;
@@ -834,14 +852,14 @@ implementation
 		return IEEE154_MAX_BEACON_JITTER(m_beaconOrder) + IEEE154_RADIO_TX_DELAY;
 	}
 
-	async command const ieee154_timestamp_t* OutgoingSF.sfStartTimeRef()
-	{
-		return &m_lastBeaconTxRefTime;
-	}
-
 	async command bool OutgoingSF.isBroadcastPending()
 	{
 		return m_framePendingBit;
+	}
+
+	async command uint32_t OutgoingSF.beaconInterval()
+	{
+		return ((uint32_t) 1 << m_beaconOrder) * IEEE154_aBaseSuperframeDuration;
 	}
 
 	async command bool IsSendingBeacons.getNow()

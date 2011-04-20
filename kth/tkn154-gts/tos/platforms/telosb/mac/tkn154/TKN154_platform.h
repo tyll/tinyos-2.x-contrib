@@ -62,7 +62,13 @@ enum {
   BEACON_PAYLOAD_UPDATE_INTERVAL = 2500,
 };
 
-typedef uint32_t ieee154_timestamp_t;
+// Defines the time to power the CC2420 radio from "Power Down" mode to "Idle"
+// mode. The actual start up time of the oscillator is 860 us (with default
+// capacitor, see CC2420 datasheet), but our constant must also include
+// software latency (task posting, etc.) + shutting the radio down
+// -> we keep it conservative, otherwise we may lose beacons
+// NOTE: if this constant is not defined, the radio will never be powered down
+// during inactive period, but always stay in idle (which consumes more energy).
 
 #endif
 

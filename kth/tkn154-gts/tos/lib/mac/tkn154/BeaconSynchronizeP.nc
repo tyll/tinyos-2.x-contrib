@@ -89,10 +89,8 @@ implementation
 	/* variables that describe the current beacon configuration */
 	norace ieee154_macBeaconOrder_t m_beaconOrder;
 	norace ieee154_macSuperframeOrder_t m_superframeOrder;
-
 	norace uint32_t m_dt;
 	norace uint32_t m_lastBeaconRxTime;
-	norace ieee154_timestamp_t m_lastBeaconRxRefTime;
 	message_t m_beacon;
 	norace message_t *m_beaconPtr = &m_beacon;
 
@@ -344,7 +342,7 @@ implementation
 		}
 	}
 
-	event message_t* BeaconRx.received(message_t *frame, const ieee154_timestamp_t *timestamp)
+	event message_t* BeaconRx.received(message_t *frame)
 	{
 		if (wasBeaconReceived()) {
 			dbg_serial("BeaconSynchronizeP", "Got another beacon! -> ignoring it ...\n");
@@ -356,12 +354,8 @@ implementation
 			message_t *tmp = m_beaconPtr;
 			setBeaconReceived();
 			m_beaconPtr = frame;
-			/*      dbg_serial("BeaconSynchronizeP", "Got beacon, timestamp: %lu, now: %lu\n", */
-			/*          (uint32_t) *timestamp, (uint32_t) call TrackAlarm.getNow());*/
-			if (timestamp != NULL)
-			memcpy(&m_lastBeaconRxRefTime, timestamp, sizeof(ieee154_timestamp_t));
-			else
-			dbg_serial("BeaconSynchronizeP", "Beacon timestamp invalid!\n");
+			dbg_serial("BeaconSynchronizeP", "Got beacon, timestamp: %lu, now: %lu\n",
+					((ieee154_metadata_t*) m_beaconPtr->metadata)->timestamp, (uint32_t) call TrackAlarm.getNow());
 			if (getRxState() == RX_RECEIVING) {
 				call TrackAlarm.stop(); // may fail
 				call RadioOff.off(); // may fail
@@ -429,19 +423,18 @@ implementation
 			uint8_t gtsFieldLength;
 			uint32_t timestamp = call Frame.getTimestamp(m_beaconPtr);
 
-			dbg_serial("BeaconSynchronizeP", "Got beacon, timestamp: %lu, offset to previous: %lu\n",
-					(uint32_t) timestamp, (uint32_t) (timestamp - m_lastBeaconRxTime));
+			dbg_serial("BeaconSynchronizeP", "Got beacon, bsn: %lu, offset to last: %lu\n",
+					(uint32_t) mhr[MHR_INDEX_SEQNO], (uint32_t) (timestamp - m_lastBeaconRxTime));
 
 			m_numBeaconsMissed = 0;
-			m_numGtsSlots = (payload[2] & 7);
+			m_numGtsSlots = payload[BEACON_INDEX_GTS_SPEC] & GTS_DESCRIPTOR_COUNT_MASK;
 			gtsFieldLength = 1 + ((m_numGtsSlots > 0) ? 1 + m_numGtsSlots * GTS_LIST_MULTIPLY: 0);
 			m_lastBeaconRxTime = timestamp;
-			m_numCapSlots = (payload[1] & 0x0F) + 1;
+			m_numCapSlots = ((payload[BEACON_INDEX_SF_SPEC2] & SF_SPEC2_FINAL_CAPSLOT_MASK) >> SF_SPEC2_FINAL_CAPSLOT_OFFSET) + 1;
 			//MLME_SET does not have the macSuperframeOrder
-			m_superframeOrder = (payload[0] & 0xF0) >> 4;
+			m_superframeOrder = (payload[BEACON_INDEX_SF_SPEC1] & SF_SPEC1_SO_MASK) >> SF_SPEC1_SO_OFFSET;
 			call SetMacSuperframeOrder.set(m_superframeOrder);
 			m_sfSlotDuration = (((uint32_t) 1) << (m_superframeOrder)) * IEEE154_aBaseSlotDuration;
-
 			memcpy(m_gtsField, &payload[2], gtsFieldLength);
 #ifdef IEEE154_BEACON_TX_DISABLED
 			//check if we have a time slot
@@ -454,7 +447,7 @@ implementation
 #endif
 
 			// check for battery life extension
-			if (payload[1] & 0x10) {
+			if (payload[BEACON_INDEX_SF_SPEC2] & SF_SPEC2_BATT_LIFE_EXT) {
 				// BLE is active; calculate the time offset from slot0
 				m_battLifeExtDuration = IEEE154_SHR_DURATION + frameLen * IEEE154_SYMBOLS_PER_OCTET;
 				if (frameLen > IEEE154_aMaxSIFSFrameSize)
@@ -466,7 +459,7 @@ implementation
 			m_battLifeExtDuration = 0;
 
 			m_framePendingBit = mhr[MHR_INDEX_FC1] & FC1_FRAME_PENDING ? TRUE : FALSE;
-			m_beaconOrder = (payload[0] & 0x0F);
+			m_beaconOrder = (payload[BEACON_INDEX_SF_SPEC1] & SF_SPEC1_BO_MASK) >> SF_SPEC1_BO_OFFSET;
 			call MLME_SET.macBeaconOrder(m_beaconOrder);
 
 			m_dt = getBeaconInterval(m_beaconOrder);
@@ -562,14 +555,14 @@ implementation
 		return IEEE154_MAX_BEACON_JITTER(m_beaconOrder) + IEEE154_RADIO_RX_DELAY;
 	}
 
-	async command const ieee154_timestamp_t* IncomingSF.sfStartTimeRef()
-	{
-		return &m_lastBeaconRxRefTime;
-	}
-
 	async command bool IncomingSF.isBroadcastPending()
 	{
 		return m_framePendingBit;
+	}
+
+	async command uint32_t IncomingSF.beaconInterval()
+	{
+		return getBeaconInterval(m_beaconOrder);
 	}
 
 	async command bool IsTrackingBeacons.getNow()
@@ -588,11 +581,11 @@ implementation
 
 	default event message_t* MLME_BEACON_NOTIFY.indication (message_t* frame) {return frame;}
 	default event void MLME_SYNC_LOSS.indication (
-	ieee154_status_t lossReason,
-	uint16_t panID,
-	uint8_t logicalChannel,
-	uint8_t channelPage,
-	ieee154_security_t *security) {}
+			ieee154_status_t lossReason,
+			uint16_t panID,
+			uint8_t logicalChannel,
+			uint8_t channelPage,
+			ieee154_security_t *security) {}
 
 	event message_t* CoordRealignmentRx.received(message_t* frame)
 	{
@@ -600,11 +593,11 @@ implementation
 		ieee154_macPANId_t panID = *(nxle_uint16_t*) &payload[1];
 		if (panID == call MLME_GET.macPANId())
 		signal MLME_SYNC_LOSS.indication(
-		IEEE154_REALIGNMENT, // LossReason
-		panID, // PANId
-		payload[5], // LogicalChannel,
-		call Frame.getPayloadLength(frame) == 9 ? payload[8] : call MLME_GET.phyCurrentPage(),
-		NULL);
+				IEEE154_REALIGNMENT, // LossReason
+				panID, // PANId
+				payload[5], // LogicalChannel,
+				call Frame.getPayloadLength(frame) == 9 ? payload[8] : call MLME_GET.phyCurrentPage(),
+				NULL);
 		return frame;
 	}
 

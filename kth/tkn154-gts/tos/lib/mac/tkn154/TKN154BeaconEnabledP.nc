@@ -81,7 +81,6 @@ configuration TKN154BeaconEnabledP
 		interface GtsUtility;
 
 	}uses {
-
 		interface RadioRx;
 		interface RadioTx;
 		interface RadioOff;
@@ -99,6 +98,9 @@ configuration TKN154BeaconEnabledP
 		interface Alarm<TSymbolIEEE802154,uint32_t> as Alarm7;
 		interface Alarm<TSymbolIEEE802154,uint32_t> as Alarm8;
 		interface Alarm<TSymbolIEEE802154,uint32_t> as Alarm9;
+		interface Alarm<TSymbolIEEE802154,uint32_t> as Alarm12;
+		interface Alarm<TSymbolIEEE802154,uint32_t> as Alarm13;
+
 
 		interface Timer<TSymbolIEEE802154> as Timer1;
 		interface Timer<TSymbolIEEE802154> as Timer2;
@@ -110,6 +112,7 @@ configuration TKN154BeaconEnabledP
 		interface LocalTime<TSymbolIEEE802154>;
 		interface Random;
 		interface Leds;
+		interface PinDebug;
 	}
 }
 implementation
@@ -179,6 +182,7 @@ implementation
 	new NoDispatchSlottedCsmaP(OUTGOING_SUPERFRAME) as CoordCap,
 	NoCoordCfpP as CoordCfp,
 	new NoDispatchCfpQueueP() as CoordCfpQueue,
+	
 
 #ifndef IEEE154_GTS_DISABLED
 	DeviceCfpP as DeviceCfp,
@@ -189,6 +193,9 @@ implementation
 #endif
 #endif
 
+	new InactivePeriodP(INCOMING_SUPERFRAME) as DeviceInactivePeriod,
+	new InactivePeriodP(OUTGOING_SUPERFRAME) as CoordInactivePeriod,
+	
 #ifndef IEEE154_RXENABLE_DISABLED
 	RxEnableP,
 #else
@@ -382,15 +389,12 @@ implementation
 	DataP.CoordCapRx -> CoordCap.FrameRx[FC1_FRAMETYPE_DATA];
 	DataP.DeviceCapTx -> DeviceCapQueue.FrameTx[unique(CAP_TX_CLIENT)];
 	DataP.CoordCapTx -> CoordCapQueue.FrameTx[unique(CAP_TX_CLIENT)];
-
 	DataP.DeviceCapRx -> PollP.DataRx;
 	DataP.DeviceCapRx -> PromiscuousModeP.FrameRx;
 	DataP.DeviceCapRx -> DeviceCap.FrameRx[FC1_FRAMETYPE_DATA];
-
 	DataP.MoteCfpRx -> CfpTransmitP.CfpRx;
 	DataP.DeviceCfpTx -> DeviceCfpQueue.FrameTx[unique(CFP_TX_CLIENT)];
 	DataP.CoordCfpTx -> CoordCfpQueue.FrameTx[unique(CFP_TX_CLIENT)];
-
 	DataP.TxFramePool -> TxFramePoolP;
 	DataP.BroadcastTx -> CoordBroadcastP.BroadcastDataFrame;
 	DataP.IndirectTx -> IndirectTxP.FrameTx[unique(INDIRECT_TX_CLIENT)];
@@ -483,6 +487,7 @@ implementation
 	DeviceCap.Leds = Leds;
 	DeviceCap.TrackSingleBeacon -> BeaconSynchronizeP.TrackSingleBeacon;
 	DeviceCap.MLME_SYNC_LOSS -> BeaconSynchronizeP;
+	DeviceCap.PinDebug = PinDebug;
 
 	/* ---------------------- CAP (outgoing superframe) ------------------- */
 
@@ -512,6 +517,7 @@ implementation
 	CoordCap.Leds = Leds;
 	CoordCap.FrameBackup -> BackupP;
 	CoordCap.FrameRestore -> BackupP;
+	CoordCap.PinDebug = PinDebug;
 
 	/* -------------------------- GTS general --------------------------- */
 
@@ -601,6 +607,30 @@ implementation
 
 	//CoordCfp.LocalTime = LocalTime;
 
+	/* --------------- Inactive Period (incoming superframe) -------------- */
+
+	components new RadioClientC(RADIO_CLIENT_DEVICE_INACTIVE_PERIOD) as DeviceInactivePeriodClient;
+	DeviceInactivePeriod.RadioToken -> DeviceInactivePeriodClient;
+	DeviceInactivePeriod.Alarm = Alarm12;
+	DeviceInactivePeriod.RadioControl = PhySplitControl;
+	DeviceInactivePeriod.SF -> BeaconSynchronizeP.IncomingSF;
+	DeviceInactivePeriod.IsEmbedded -> BeaconTransmitP.IsSendingBeacons;
+	DeviceInactivePeriod.RadioOff -> DeviceInactivePeriodClient;
+	DeviceInactivePeriod.MLME_GET -> PibP;
+	DeviceInactivePeriod.TimeCalc -> PibP;
+
+	/* --------------- Inactive Period (outgoing superframe) -------------- */
+
+	components new RadioClientC(RADIO_CLIENT_COORD_INACTIVE_PERIOD) as CoordInactivePeriodClient;
+	CoordInactivePeriod.RadioToken -> CoordInactivePeriodClient;
+	CoordInactivePeriod.Alarm = Alarm13;
+	CoordInactivePeriod.RadioControl = PhySplitControl;
+	CoordInactivePeriod.SF -> BeaconTransmitP.OutgoingSF;
+	CoordInactivePeriod.IsEmbedded -> BeaconSynchronizeP.IsTrackingBeacons;
+	CoordInactivePeriod.RadioOff -> CoordInactivePeriodClient;
+	CoordInactivePeriod.MLME_GET -> PibP;
+	CoordInactivePeriod.TimeCalc -> PibP;
+	
 	/* -------------------------- promiscuous mode ------------------------ */
 
 	components new RadioClientC(RADIO_CLIENT_PROMISCUOUSMODE) as PromiscuousModeRadioClient;
@@ -619,7 +649,6 @@ implementation
 	RxEnableP.IsSendingBeacons-> BeaconTransmitP.IsSendingBeacons;
 	RxEnableP.TimeCalc -> PibP.TimeCalc;
 	RxEnableP.WasRxEnabled -> CfpTransmitP.WasRxEnabled;
-
 	RxEnableP.WasRxEnabled -> DeviceCap.WasRxEnabled;
 	RxEnableP.WasRxEnabled -> CoordCap.WasRxEnabled;
 	RxEnableP.RxEnableTimer = Timer5;

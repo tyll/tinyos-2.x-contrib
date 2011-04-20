@@ -95,6 +95,8 @@ uses
 	interface GetNow<ieee154_cap_frame_backup_t*> as FrameRestore;
 	interface SplitControl as TrackSingleBeacon;
 	interface MLME_SYNC_LOSS;
+	
+	interface PinDebug;
 }
 }
 implementation
@@ -218,11 +220,10 @@ implementation
 		m_guardTime = (call SuperframeStructure.numCapSlots() == IEEE154_aNumSuperframeSlots
 				&& call MLME_GET.macBeaconOrder() == call MLME_GET.macSuperframeOrder() ? call SuperframeStructure.guardTime() : 0);
 
-		dbg_serial("DispatchSlottedCsmaP", "Starting CAP at %lu\n", call CapEndAlarm.getNow());
-		dbg_serial("DispatchSlottedCsmaP", "CAP time: %lu\n", capDuration);
-		dbg_serial("DispatchSlottedCsmaP", "Got token, remaining CAP time: %lu\n",
-				call SuperframeStructure.sfStartTime() + capDuration - m_guardTime - call CapEndAlarm.getNow());
+//		dbg_serial("DispatchSlottedCsmaP", "Got token, remaining CAP time: %lu\n",
+//				call SuperframeStructure.sfStartTime() + capDuration - m_guardTime - call CapEndAlarm.getNow());
 
+		
 		if (capDuration < m_guardTime || capDuration == 0) {
 			// CAP is too short to do anything useful
 			dbg_serial("DispatchSlottedCsmaP", "CAP too short!\n");
@@ -246,8 +247,10 @@ implementation
 			}
 			call CapEndAlarm.startAt(call SuperframeStructure.sfStartTime(), capDuration);
 
-			if (call SuperframeStructure.battLifeExtDuration() > 0)
-			call BLEAlarm.startAt(call SuperframeStructure.sfStartTime(), call SuperframeStructure.battLifeExtDuration());
+			if (call SuperframeStructure.battLifeExtDuration() > 0) {
+				dbg_serial("DispatchSlottedCsmaP", "battLifeExtDuration enabled!\n");
+				call BLEAlarm.startAt(call SuperframeStructure.sfStartTime(), call SuperframeStructure.battLifeExtDuration());
+			}
 		}
 		updateState();
 	}
@@ -312,7 +315,6 @@ implementation
 		ieee154_macDSN_t dsn = call MLME_GET.macDSN();
 		frame->header->mhr[MHR_INDEX_SEQNO] = dsn++;
 		call MLME_SET.macDSN(dsn);
-
 		m_csma.NB = 0;
 		m_csma.macMaxCsmaBackoffs = m_macMaxCSMABackoffs = call MLME_GET.macMaxCSMABackoffs();
 		m_csma.macMaxBE = m_macMaxBE = call MLME_GET.macMaxBE();
@@ -388,9 +390,7 @@ implementation
 					}
 					m_lock = FALSE; // unlock
 					dbg_flush_state();
-					//printf(" alarm=%lu ; getNow=%lu\n", call CapEndAlarm.getAlarm(), call CapEndAlarm.getNow() );printfflush();
-
-					dbg_serial("DispatchSlottedCsmaP", "Handing over to CFP in %lu\n", call CapEndAlarm.getNow() );
+					dbg_serial("DispatchSlottedCsmaP", "Handing over to CFP.\n");
 					call RadioToken.transferTo(RADIO_CLIENT_CFP);
 					return;
 				} else
@@ -503,7 +503,7 @@ implementation
 			else {
 				error_t res;
 				res = call SlottedCsmaCa.transmit(m_currentFrame, &m_csma,
-						call SuperframeStructure.sfStartTimeRef(), dtMax, m_resume, m_remainingBackoff);
+						call SuperframeStructure.sfStartTime(), dtMax, m_resume, m_remainingBackoff);
 				dbg("DispatchSlottedCsmaP", "SlottedCsmaCa.transmit() -> %lu\n", (uint32_t) res);
 				next = WAIT_FOR_TXDONE; // this will NOT clear the lock
 			}
@@ -550,6 +550,8 @@ implementation
 	}
 
 	async event void CapEndAlarm.fired() {
+
+		//dbg_serial("DispatchSlottedCsmaP", "CapEndAlarm.fired()\n");
 		updateState();
 	}
 	async event void BLEAlarm.fired() {updateState();}
@@ -586,7 +588,6 @@ implementation
 			// frame was successfully transmitted, if ACK was requested
 			// then a matching ACK was successfully received as well   
 			m_txStatus = IEEE154_SUCCESS;
-
 			if (DEVICE_ROLE && frame->payload[0] == CMD_FRAME_DATA_REQUEST &&
 					((frame->header->mhr[MHR_INDEX_FC1]) & FC1_FRAMETYPE_MASK) == FC1_FRAMETYPE_CMD) {
 				// this was a data request frame
@@ -604,7 +605,7 @@ implementation
 			break;
 			case FAIL:
 			// The CSMA-CA algorithm failed: the frame was not transmitted,
-			// because channel was never idle        
+			// because channel was never idle                              
 			m_txStatus = IEEE154_CHANNEL_ACCESS_FAILURE;
 			break;
 			case ENOACK:
@@ -619,9 +620,8 @@ implementation
 				m_csma.macMaxBE = m_macMaxBE;
 				m_csma.BE = m_BE;
 				m_macMaxFrameRetries -= 1;
-			} else {	
-				m_txStatus = IEEE154_NO_ACK;
-			}
+			} else
+			m_txStatus = IEEE154_NO_ACK;
 			break;
 			case EINVAL: // DEBUG!!!
 			dbg_serial("DispatchSlottedCsmaP", "EINVAL returned by transmitDone()!\n");
@@ -672,7 +672,7 @@ implementation
 		updateState();
 	}
 
-	event message_t* RadioRx.received(message_t* frame, const ieee154_timestamp_t *timestamp)
+	event message_t* RadioRx.received(message_t* frame)
 	{
 		// received a frame -> find out frame type and
 		// signal it to responsible client component

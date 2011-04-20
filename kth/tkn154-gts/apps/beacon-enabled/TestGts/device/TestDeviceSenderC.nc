@@ -82,7 +82,8 @@ module TestDeviceSenderC
 
 		char payload[] = "Hello Coordinator";
 		uint8_t *payloadRegion;
-		m_payloadLen = 2;
+		
+		m_payloadLen = sizeof(payload);
 		payloadRegion = call Packet.getPayload(&m_frame, m_payloadLen);
 		if (m_payloadLen <= call Packet.maxPayloadLength()) {
 			memcpy(payloadRegion, payload, m_payloadLen);
@@ -146,11 +147,10 @@ module TestDeviceSenderC
 			}
 		} else {
 			// when to start transmitting packets
-			if (TOS_NODE_ID == 0x02) 
-				if (m_conf_steps > 1) post packetSendTask();
-			else if (m_conf_steps > 0) post packetSendTask();
-
-			printfflush();
+//			if (TOS_NODE_ID == 0x02){
+//				if (m_conf_steps > 1) post packetSendTask();
+//			}else if (m_conf_steps > 0) post packetSendTask();
+			post packetSendTask();
 
 			//received a beacon during synchronization, toggle LED2
 			if (beaconSequenceNumber & 1)
@@ -202,8 +202,9 @@ module TestDeviceSenderC
 			call MLME_GTS.request(call GtsUtility.setGtsCharacteristics(1, GTS_TX_ONLY_REQUEST, GTS_DEALLOCATE_REQUEST) ,NULL);
 			call MLME_GTS.request(call GtsUtility.setGtsCharacteristics(1, GTS_RX_ONLY_REQUEST, GTS_DEALLOCATE_REQUEST) ,NULL);
 		}
-		else
-		call MLME_GTS.request(call GtsUtility.setGtsCharacteristics(1, GTS_TX_ONLY_REQUEST, GTS_DEALLOCATE_REQUEST) ,NULL);
+		else{
+		//call MLME_GTS.request(call GtsUtility.setGtsCharacteristics(1, GTS_TX_ONLY_REQUEST, GTS_DEALLOCATE_REQUEST) ,NULL);
+		}
 	}
 	
 	task void setConfigurationTask() {
@@ -214,7 +215,7 @@ module TestDeviceSenderC
 			//	a. for id = 0x02 mote, allocate a RX slot
 			//	b. for id != 0x02 mote, allocate a TX slot 
 			if (TOS_NODE_ID == 0x02)
-			call MLME_GTS.request(call GtsUtility.setGtsCharacteristics(1, GTS_RX_ONLY_REQUEST, GTS_ALLOCATE_REQUEST) ,NULL);
+				call MLME_GTS.request(call GtsUtility.setGtsCharacteristics(1, GTS_RX_ONLY_REQUEST, GTS_ALLOCATE_REQUEST) ,NULL);
 			else {
 				call MLME_GTS.request(call GtsUtility.setGtsCharacteristics(1, GTS_TX_ONLY_REQUEST, GTS_ALLOCATE_REQUEST) ,NULL);
 			}
@@ -233,8 +234,6 @@ module TestDeviceSenderC
 
 	task void packetSendTask()
 	{
-		m_payloadLen = sizeof(m_payload);
-
 		if (!m_wasScanSuccessful) {
 			return;
 		} else if( call MCPS_DATA.request (

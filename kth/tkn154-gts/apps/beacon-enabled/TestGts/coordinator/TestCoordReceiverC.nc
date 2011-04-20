@@ -171,10 +171,8 @@ module TestCoordReceiverC
 		else
 		call Leds.led2Off();
 		
-		if (startSend)
-			post packetSendTask();
+		if (startSend) post packetSendTask();
 
-		printfflush();
 	}
 
 	event void MLME_GTS.confirm (

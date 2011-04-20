@@ -41,236 +41,235 @@
 
 module DataP
 {
-  provides
-  {
-    interface Init;
-    interface MCPS_DATA; 
-    interface MCPS_PURGE;
-  } uses {
-    interface FrameRx as CoordCapRx;
-    interface FrameTx as DeviceCapTx;
-    interface FrameTx as CoordCapTx;
-    interface FrameTx as BroadcastTx;
-    interface FrameRx as DeviceCapRx;
-    interface Pool<ieee154_txframe_t> as TxFramePool;
-    interface FrameTx as DeviceCfpTx;
-    interface FrameTx as CoordCfpTx;
-    interface FrameTx as IndirectTx;
-    interface FrameRx as MoteCfpRx;
-    interface FrameUtility;
-    interface Purge as PurgeDirect;
-    interface Purge as PurgeIndirect;
-    interface Purge as PurgeGtsDevice;
-    interface Purge as PurgeGtsCoord;
-    interface MLME_GET;
-    interface Leds;
-    interface Packet;
-    interface IEEE154Frame as Frame;
-    interface Get<uint64_t> as LocalExtendedAddress;
-  }
+	provides
+	{
+		interface Init;
+		interface MCPS_DATA;
+		interface MCPS_PURGE;
+	}uses {
+		interface FrameRx as CoordCapRx;
+		interface FrameTx as DeviceCapTx;
+		interface FrameTx as CoordCapTx;
+		interface FrameTx as BroadcastTx;
+		interface FrameRx as DeviceCapRx;
+		interface Pool<ieee154_txframe_t> as TxFramePool;
+		interface FrameTx as DeviceCfpTx;
+		interface FrameTx as CoordCfpTx;
+		interface FrameTx as IndirectTx;
+		interface FrameRx as MoteCfpRx;
+		interface FrameUtility;
+		interface Purge as PurgeDirect;
+		interface Purge as PurgeIndirect;
+		interface Purge as PurgeGtsDevice;
+		interface Purge as PurgeGtsCoord;
+		interface MLME_GET;
+		interface Leds;
+		interface Packet;
+		interface IEEE154Frame as Frame;
+		interface Get<uint64_t> as LocalExtendedAddress;
+	}
 }
 implementation
 {
-  message_t* dataReceived(message_t* frame);
-  void finishTxTransaction(ieee154_txframe_t *txFrame, ieee154_status_t status);
+	message_t* dataReceived(message_t* frame);
+	void finishTxTransaction(ieee154_txframe_t *txFrame, ieee154_status_t status);
 
-  command error_t Init.init()
-  {
-    return SUCCESS;
-  }
-  
-  command ieee154_status_t MCPS_DATA.request  (
-                          message_t *frame,
-                          uint8_t payloadLen,
-                          uint8_t msduHandle,
-                          uint8_t txOptions)
-  {
-    uint8_t srcAddrMode = call Frame.getSrcAddrMode(frame);
-    uint8_t dstAddrMode = call Frame.getDstAddrMode(frame);
-    ieee154_address_t dstAddr;
-    ieee154_status_t txStatus;
-    ieee154_txframe_t *txFrame;
-    uint8_t sfType=0;
-    uint8_t *mhr, mhrLen = call Frame.getHeaderLength(frame);
+	command error_t Init.init()
+	{
+		return SUCCESS;
+	}
 
-    if (payloadLen > call Packet.maxPayloadLength() || 
-        mhrLen + payloadLen + 2 > IEEE154_aMaxPHYPacketSize) // extra 2 for MAC footer (CRC)
-      txStatus = IEEE154_INVALID_PARAMETER;
-    else if ((!srcAddrMode && !dstAddrMode) || 
-        (srcAddrMode > ADDR_MODE_EXTENDED_ADDRESS || dstAddrMode > ADDR_MODE_EXTENDED_ADDRESS) ||
-        (srcAddrMode == ADDR_MODE_RESERVED || dstAddrMode  == ADDR_MODE_RESERVED))
-      txStatus = IEEE154_INVALID_ADDRESS; 
-    else if (!(txFrame = call TxFramePool.get()))
-      txStatus = IEEE154_TRANSACTION_OVERFLOW;
-    else {
-      // construct the DATA frame
-      txFrame->header = &((message_header_t*) frame->header)->ieee154;
-      txFrame->payload = (uint8_t*) frame->data;
-      txFrame->metadata = &((message_metadata_t*) frame->metadata)->ieee154;
-      txFrame->payloadLen = payloadLen;
-      mhr = txFrame->header->mhr;
-      txFrame->headerLen = mhrLen;
-      mhr[MHR_INDEX_FC1] &= ~(FC1_FRAMETYPE_MASK | FC1_FRAME_PENDING | FC1_ACK_REQUEST);
-      mhr[MHR_INDEX_FC1] |= FC1_FRAMETYPE_DATA;
-      if (txOptions & TX_OPTIONS_ACK)
-        mhr[MHR_INDEX_FC1] |= FC1_ACK_REQUEST;
-      mhr[MHR_INDEX_FC2] &= ~FC2_FRAME_VERSION_MASK;
-      if (payloadLen > IEEE154_aMaxMACSafePayloadSize)
-        mhr[MHR_INDEX_FC2] |= FC2_FRAME_VERSION_1;
-      txFrame->handle = msduHandle;
-      
-      // in case a node is both, coordinator and device (e.g. in a 
-      // cluster-tree topology), it has to be decided whether the frame 
-      // is to be sent in the incoming or outgoing superframe (sf); 
-      // we do this by comparing the destination address to the
-      // coordinator address in the PIB, if they match the frame is
-      // sent in the incoming sf otherwise in the outgoing sf
-      call Frame.getDstAddr(frame, &dstAddr);
-      if (dstAddrMode == ADDR_MODE_SHORT_ADDRESS) {
-        if (dstAddr.shortAddress == call MLME_GET.macCoordShortAddress())
-          sfType = INCOMING_SUPERFRAME;
-        else
-          sfType = OUTGOING_SUPERFRAME;
-      } else if (dstAddrMode == ADDR_MODE_EXTENDED_ADDRESS) {
-        if (dstAddr.extendedAddress == call MLME_GET.macCoordExtendedAddress())
-          sfType = INCOMING_SUPERFRAME;
-        else
-          sfType = OUTGOING_SUPERFRAME;
-      } else if (dstAddrMode == ADDR_MODE_NOT_PRESENT) // to PAN Coord
-        sfType = INCOMING_SUPERFRAME;
+	command ieee154_status_t MCPS_DATA.request (
+			message_t *frame,
+			uint8_t payloadLen,
+			uint8_t msduHandle,
+			uint8_t txOptions)
+	{
+		uint8_t srcAddrMode = call Frame.getSrcAddrMode(frame);
+		uint8_t dstAddrMode = call Frame.getDstAddrMode(frame);
+		ieee154_address_t dstAddr;
+		ieee154_status_t txStatus;
+		ieee154_txframe_t *txFrame;
+		uint8_t sfType=0;
+		uint8_t *mhr, mhrLen = call Frame.getHeaderLength(frame);
 
-      // GTS?
-      if (txOptions & TX_OPTIONS_GTS)
-        if (sfType == INCOMING_SUPERFRAME)
-          txStatus = call DeviceCfpTx.transmit(txFrame);
-        else{
-          txStatus = call CoordCfpTx.transmit(txFrame);
-        }
+		if (payloadLen > call Packet.maxPayloadLength() ||
+				mhrLen + payloadLen + 2 > IEEE154_aMaxPHYPacketSize) // extra 2 for MAC footer (CRC)
+		txStatus = IEEE154_INVALID_PARAMETER;
+		else if ((!srcAddrMode && !dstAddrMode) ||
+				(srcAddrMode > ADDR_MODE_EXTENDED_ADDRESS || dstAddrMode > ADDR_MODE_EXTENDED_ADDRESS) ||
+				(srcAddrMode == ADDR_MODE_RESERVED || dstAddrMode == ADDR_MODE_RESERVED))
+		txStatus = IEEE154_INVALID_ADDRESS;
+		else if (!(txFrame = call TxFramePool.get()))
+		txStatus = IEEE154_TRANSACTION_OVERFLOW;
+		else {
+			// construct the DATA frame
+			txFrame->header = &((message_header_t*) frame->header)->ieee154;
+			txFrame->payload = (uint8_t*) frame->data;
+			txFrame->metadata = &((message_metadata_t*) frame->metadata)->ieee154;
+			txFrame->payloadLen = payloadLen;
+			mhr = txFrame->header->mhr;
+			txFrame->headerLen = mhrLen;
+			mhr[MHR_INDEX_FC1] &= ~(FC1_FRAMETYPE_MASK | FC1_FRAME_PENDING | FC1_ACK_REQUEST);
+			mhr[MHR_INDEX_FC1] |= FC1_FRAMETYPE_DATA;
+			if (txOptions & TX_OPTIONS_ACK)
+			mhr[MHR_INDEX_FC1] |= FC1_ACK_REQUEST;
+			mhr[MHR_INDEX_FC2] &= ~FC2_FRAME_VERSION_MASK;
+			if (payloadLen > IEEE154_aMaxMACSafePayloadSize)
+			mhr[MHR_INDEX_FC2] |= FC2_FRAME_VERSION_1;
+			txFrame->handle = msduHandle;
 
-      // indirect transmission?
-      else if ((txOptions & TX_OPTIONS_INDIRECT) && 
-          (dstAddrMode >= ADDR_MODE_SHORT_ADDRESS)) {
-        if (dstAddrMode == ADDR_MODE_SHORT_ADDRESS && dstAddr.shortAddress == 0xFFFF) {
-          mhr[MHR_INDEX_FC1] &= ~FC1_ACK_REQUEST;
-          txStatus = call BroadcastTx.transmit(txFrame);
-        } else
-          txStatus = call IndirectTx.transmit(txFrame);
+			// in case a node is both, coordinator and device (e.g. in a 
+			// cluster-tree topology), it has to be decided whether the frame 
+			// is to be sent in the incoming or outgoing superframe (sf); 
+			// we do this by comparing the destination address to the
+			// coordinator address in the PIB, if they match the frame is
+			// sent in the incoming sf otherwise in the outgoing sf
+			call Frame.getDstAddr(frame, &dstAddr);
+			if (dstAddrMode == ADDR_MODE_SHORT_ADDRESS) {
+				if (dstAddr.shortAddress == call MLME_GET.macCoordShortAddress())
+				sfType = INCOMING_SUPERFRAME;
+				else
+				sfType = OUTGOING_SUPERFRAME;
+			} else if (dstAddrMode == ADDR_MODE_EXTENDED_ADDRESS) {
+				if (dstAddr.extendedAddress == call MLME_GET.macCoordExtendedAddress())
+				sfType = INCOMING_SUPERFRAME;
+				else
+				sfType = OUTGOING_SUPERFRAME;
+			} else if (dstAddrMode == ADDR_MODE_NOT_PRESENT) // to PAN Coord
+			sfType = INCOMING_SUPERFRAME;
 
-      // transmission in the CAP
-      } else 
-        if (sfType == INCOMING_SUPERFRAME)
-          txStatus = call DeviceCapTx.transmit(txFrame);
-        else
-          txStatus = call CoordCapTx.transmit(txFrame);
+			// GTS?
+			if (txOptions & TX_OPTIONS_GTS)
+			if (sfType == INCOMING_SUPERFRAME)
+			txStatus = call DeviceCfpTx.transmit(txFrame);
+			else {
+				txStatus = call CoordCfpTx.transmit(txFrame);
+			}
 
-      if (txStatus != IEEE154_SUCCESS) {
-        call TxFramePool.put(txFrame);
-      }
-    }
-    return txStatus;
-  }
+			// indirect transmission?
+			else if ((txOptions & TX_OPTIONS_INDIRECT) &&
+					(dstAddrMode >= ADDR_MODE_SHORT_ADDRESS)) {
+				if (dstAddrMode == ADDR_MODE_SHORT_ADDRESS && dstAddr.shortAddress == 0xFFFF) {
+					mhr[MHR_INDEX_FC1] &= ~FC1_ACK_REQUEST;
+					txStatus = call BroadcastTx.transmit(txFrame);
+				} else
+				txStatus = call IndirectTx.transmit(txFrame);
 
-  command ieee154_status_t MCPS_PURGE.request  (
-                          uint8_t msduHandle)
-  {
-    if (call PurgeDirect.purge(msduHandle) == IEEE154_SUCCESS ||
-        call PurgeIndirect.purge(msduHandle) == IEEE154_SUCCESS ||
-        call PurgeGtsDevice.purge(msduHandle) == IEEE154_SUCCESS ||
-        call PurgeGtsCoord.purge(msduHandle) == IEEE154_SUCCESS)
-      return IEEE154_SUCCESS;
-    else
-      return IEEE154_INVALID_HANDLE;
-  }
+				// transmission in the CAP
+			} else
+			if (sfType == INCOMING_SUPERFRAME)
+			txStatus = call DeviceCapTx.transmit(txFrame);
+			else
+			txStatus = call CoordCapTx.transmit(txFrame);
 
-  event void PurgeDirect.purgeDone(ieee154_txframe_t *data, ieee154_status_t status)
-  {
-    finishTxTransaction(data, status);
-  }
+			if (txStatus != IEEE154_SUCCESS) {
+				call TxFramePool.put(txFrame);
+			}
+		}
+		return txStatus;
+	}
 
-  event void PurgeIndirect.purgeDone(ieee154_txframe_t *data, ieee154_status_t status)
-  {
-    finishTxTransaction(data, status);
-  }
+	command ieee154_status_t MCPS_PURGE.request (
+			uint8_t msduHandle)
+	{
+		if (call PurgeDirect.purge(msduHandle) == IEEE154_SUCCESS ||
+				call PurgeIndirect.purge(msduHandle) == IEEE154_SUCCESS ||
+				call PurgeGtsDevice.purge(msduHandle) == IEEE154_SUCCESS ||
+				call PurgeGtsCoord.purge(msduHandle) == IEEE154_SUCCESS)
+		return IEEE154_SUCCESS;
+		else
+		return IEEE154_INVALID_HANDLE;
+	}
 
-  event void PurgeGtsDevice.purgeDone(ieee154_txframe_t *data, ieee154_status_t status)
-  {
-    finishTxTransaction(data, status);
-  }
+	event void PurgeDirect.purgeDone(ieee154_txframe_t *data, ieee154_status_t status)
+	{
+		finishTxTransaction(data, status);
+	}
 
-  event void PurgeGtsCoord.purgeDone(ieee154_txframe_t *data, ieee154_status_t status)
-  {
-    finishTxTransaction(data, status);
-  }
+	event void PurgeIndirect.purgeDone(ieee154_txframe_t *data, ieee154_status_t status)
+	{
+		finishTxTransaction(data, status);
+	}
 
-  event message_t* MoteCfpRx.received(message_t* frame)
-  {
-    return dataReceived(frame);
-  }
+	event void PurgeGtsDevice.purgeDone(ieee154_txframe_t *data, ieee154_status_t status)
+	{
+		finishTxTransaction(data, status);
+	}
 
-  event message_t* CoordCapRx.received(message_t* frame)
-  {
-    return dataReceived(frame);
-  }
+	event void PurgeGtsCoord.purgeDone(ieee154_txframe_t *data, ieee154_status_t status)
+	{
+		finishTxTransaction(data, status);
+	}
 
-  event message_t* DeviceCapRx.received(message_t* frame)
-  {
-    return dataReceived(frame);
-  }
+	event message_t* MoteCfpRx.received(message_t* frame)
+	{
+		return dataReceived(frame);
+	}
 
-  message_t* dataReceived(message_t* frame)
-  {
-    return signal MCPS_DATA.indication(frame);
-  }
+	event message_t* CoordCapRx.received(message_t* frame)
+	{
+		return dataReceived(frame);
+	}
 
-  void finishTxTransaction(ieee154_txframe_t *txFrame, ieee154_status_t status)
-  {
-    uint8_t handle = txFrame->handle;
-    uint32_t txTime = txFrame->metadata->timestamp;
-    message_t *msg = (message_t*) ((uint8_t*) txFrame->header - offsetof(message_t, header));
+	event message_t* DeviceCapRx.received(message_t* frame)
+	{
+		return dataReceived(frame);
+	}
 
-    call TxFramePool.put(txFrame);
-    signal MCPS_DATA.confirm(msg, handle, status, txTime);
-  }
+	message_t* dataReceived(message_t* frame)
+	{
+		return signal MCPS_DATA.indication(frame);
+	}
 
-  event void BroadcastTx.transmitDone(ieee154_txframe_t *txFrame, ieee154_status_t status)
-  {
-    finishTxTransaction(txFrame, status);
-  }
+	void finishTxTransaction(ieee154_txframe_t *txFrame, ieee154_status_t status)
+	{
+		uint8_t handle = txFrame->handle;
+		uint32_t txTime = txFrame->metadata->timestamp;
+		message_t *msg = (message_t*) ((uint8_t*) txFrame->header - offsetof(message_t, header));
 
-  event void DeviceCapTx.transmitDone(ieee154_txframe_t *txFrame, ieee154_status_t status)
-  {
-    finishTxTransaction(txFrame, status);
-  }
-  
-  event void CoordCapTx.transmitDone(ieee154_txframe_t *txFrame, ieee154_status_t status)
-  {
-    finishTxTransaction(txFrame, status);
-  }
+		call TxFramePool.put(txFrame);
+		signal MCPS_DATA.confirm(msg, handle, status, txTime);
+	}
 
-  event void DeviceCfpTx.transmitDone(ieee154_txframe_t *txFrame, ieee154_status_t status)
-  {
-    finishTxTransaction(txFrame, status);
-  }
-  
-  event void CoordCfpTx.transmitDone(ieee154_txframe_t *txFrame, ieee154_status_t status)
-  {
-    finishTxTransaction(txFrame, status);
-  }
+	event void BroadcastTx.transmitDone(ieee154_txframe_t *txFrame, ieee154_status_t status)
+	{
+		finishTxTransaction(txFrame, status);
+	}
 
+	event void DeviceCapTx.transmitDone(ieee154_txframe_t *txFrame, ieee154_status_t status)
+	{
+		finishTxTransaction(txFrame, status);
+	}
 
-  event void IndirectTx.transmitDone(ieee154_txframe_t *txFrame, ieee154_status_t status)
-  {
-    finishTxTransaction(txFrame, status);
-  }
+	event void CoordCapTx.transmitDone(ieee154_txframe_t *txFrame, ieee154_status_t status)
+	{
+		finishTxTransaction(txFrame, status);
+	}
 
-  default event void MCPS_DATA.confirm(  
-                          message_t *msg,
-                          uint8_t msduHandle,
-                          ieee154_status_t status,
-                          uint32_t Timestamp) {}
+	event void DeviceCfpTx.transmitDone(ieee154_txframe_t *txFrame, ieee154_status_t status)
+	{
+		finishTxTransaction(txFrame, status);
+	}
 
-  default event message_t* MCPS_DATA.indication(message_t* frame) { return frame; }
-  default command ieee154_status_t DeviceCfpTx.transmit(ieee154_txframe_t *data) {return IEEE154_INVALID_GTS;}
-  default command ieee154_status_t BroadcastTx.transmit(ieee154_txframe_t *data) {return IEEE154_INVALID_PARAMETER;}
-  default command ieee154_status_t CoordCfpTx.transmit(ieee154_txframe_t *data) {return IEEE154_INVALID_GTS;}
+	event void CoordCfpTx.transmitDone(ieee154_txframe_t *txFrame, ieee154_status_t status)
+	{
+		finishTxTransaction(txFrame, status);
+	}
+
+	event void IndirectTx.transmitDone(ieee154_txframe_t *txFrame, ieee154_status_t status)
+	{
+		finishTxTransaction(txFrame, status);
+	}
+
+	default event void MCPS_DATA.confirm(
+			message_t *msg,
+			uint8_t msduHandle,
+			ieee154_status_t status,
+			uint32_t Timestamp) {}
+
+	default event message_t* MCPS_DATA.indication(message_t* frame) {return frame;}
+	default command ieee154_status_t DeviceCfpTx.transmit(ieee154_txframe_t *data) {return IEEE154_INVALID_GTS;}
+	default command ieee154_status_t BroadcastTx.transmit(ieee154_txframe_t *data) {return IEEE154_INVALID_PARAMETER;}
+	default command ieee154_status_t CoordCfpTx.transmit(ieee154_txframe_t *data) {return IEEE154_INVALID_GTS;}
 }

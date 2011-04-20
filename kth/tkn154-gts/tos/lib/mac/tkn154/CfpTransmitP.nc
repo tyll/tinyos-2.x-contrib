@@ -125,18 +125,6 @@ implementation {
 		IDLE_MODE,
 	}slot_mode_t;
 
-#ifndef IEEE154_BEACON_TX_DISABLED
-	enum {
-		RADIO_TRANSFER_TO = RADIO_CLIENT_BEACONTRANSMIT,
-	};
-
-	/* ----------------------- Special vars ----------------------- */
-#else
-	enum {
-		RADIO_TRANSFER_TO = RADIO_CLIENT_BEACONSYNCHRONIZE,
-	};
-#endif
-
 	next_state_t tryReceive();
 	next_state_t tryTransmit();
 	next_state_t trySwitchOff();
@@ -271,7 +259,7 @@ implementation {
 					m_lock = FALSE; // unlock
 					dbg_flush_state();
 					dbg_serial("CfpTransmitP", "Handing over to Inactive Period in %lu.\n", call CfpEndAlarm.getNow() );
-					call RadioToken.transferTo(RADIO_TRANSFER_TO);
+					call RadioToken.transferTo(RADIO_CLIENT_DEVICE_INACTIVE_PERIOD);
 
 #ifndef IEEE154_BEACON_TX_DISABLED
 					//post cfpDoneTask();
@@ -357,7 +345,7 @@ implementation {
 				next = DO_NOTHING; // frame doesn't fit in the remaining CFP slot
 			} else {
 				error_t res;
-				res = call RadioTx.transmit(m_currentFrame, call SF.sfStartTimeRef(), dtMax);
+				res = call RadioTx.transmit(m_currentFrame, call SF.sfStartTime(), dtMax);
 				next = WAIT_FOR_TXDONE; // this will NOT clear the lock
 			}
 		}
@@ -441,6 +429,7 @@ implementation {
 
 		// to gts slot number = 6 (9) ..  0 (15)
 		currentEntry = &((call GetGtsCoordinatorDb.get())->db[--m_numGtsSlots]);
+		dbg_serial("CfpTransmitP", "currentEntry->direction: %u\n", currentEntry->direction);
 
 		// the direction is refered to the device
 		if (currentEntry->direction == GTS_RX_ONLY_REQUEST) {
@@ -470,6 +459,8 @@ implementation {
 		if (m_slotNumber == deviceDb[GTS_TX_ONLY_REQUEST].startingSlot) {
 			slot_mode = TX_MODE;
 		} else if(m_slotNumber == deviceDb[GTS_RX_ONLY_REQUEST].startingSlot) {
+			dbg_serial("CfpTransmitP", "\t \t \t \t Reception slot\n ");
+
 			slot_mode = RX_MODE;
 		} else {
 			slot_mode = IDLE_MODE;
@@ -497,6 +488,7 @@ implementation {
 		
 		//Warning: the functions call MLME_GET are sync but called from async context
 		m_guardTime = ( call MLME_GET.macBeaconOrder() == call MLME_GET.macSuperframeOrder() ? call SF.guardTime() : 0);
+//		dbg_serial("CfpTransmitP", "numCapSlots=%u ;m_gtsDuration=%u \n", call SF.numCapSlots(), m_gtsDuration);
 
 		if (m_gtsDuration < m_guardTime || m_gtsDuration == 0) {
 			// CFP is too short to do something
@@ -505,7 +497,7 @@ implementation {
 		//	post cfpDoneTask();
 			signal HasCfpExpired.notify(TRUE); //Update the coordinator DB	
 #endif
-			call RadioToken.transferTo(RADIO_TRANSFER_TO);
+			call RadioToken.transferTo(RADIO_CLIENT_DEVICE_INACTIVE_PERIOD);
 			return;
 		}
 
@@ -534,7 +526,7 @@ implementation {
 		updateState();
 	}
 
-	async event void RadioTx.transmitDone(ieee154_txframe_t *frame, const ieee154_timestamp_t *timestamp, error_t result) {
+	async event void RadioTx.transmitDone(ieee154_txframe_t *frame, error_t result) {
 		bool done = TRUE;
 		dbg("CfpTransmitP", "CfpTransmitP.transmitDone() in %lu -> %lu\n", call CfpEndAlarm.getNow(), (uint32_t) result);
 
@@ -587,7 +579,7 @@ implementation {
 		ASSERT(0); // should never happen, because we never call RadioToken.request()
 	}
 
-	event message_t* RadioRx.received(message_t* frame, const ieee154_timestamp_t *timestamp)
+	event message_t* RadioRx.received(message_t* frame)
 	{
 		// received a frame -> find out frame type and
 		// signal it to responsible client component

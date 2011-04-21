@@ -1,0 +1,20 @@
+
+***** tos/lib/net/ub *****
+
+A Unified Broadcast (UB) layer for TinyOS 2.x.  It hooks into the AM stack
+by modifying three core files:
+
+  - DirectAMSenderC.nc: where the UB layer is inserted as a layer in the send stack
+	- AMReceiveC.nc: where the UB layer is inserted as a layer in the receive stack
+  - AMSenderC.nc, DirectAMSenderC.nc, and LplAMSenderC.nc: to provide the UnifiedBroadcast
+    interface to the sending protocol.
+
+UB delays and combines broadcasts at the sending side, in order to
+save on the number of broadcasts sent.  The combined broadcasts are
+seperated at the receiver and delivered to the according protocol as
+normal.
+
+UB delays can be disabled per sender through the UnifiedBroadcast
+interface.  Note that disabling any delay for a protocol is not the
+same as sending the protocols broadcast without UB as they can still
+be combined with already delayed broadcasts.

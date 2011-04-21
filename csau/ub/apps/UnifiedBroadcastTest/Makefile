@@ -1,0 +1,24 @@
+COMPONENT=src/UnifiedBroadcastAppC
+
+CFLAGS += -Isrc
+
+##### Config #####
+
+CFLAGS += -DSENDER=0
+CFLAGS += -DUB_NO_TIMESTAMP
+CFLAGS += -DUNIFIED_BROADCAST
+
+#CFLAGS += -DLOW_POWER_LISTENING
+CFLAGS += -DLPL_DEF_LOCAL_WAKEUP=200
+CFLAGS += -DLPL_DEF_REMOTE_WAKEUP=200
+CFLAGS += -DLPL_INTERVAL=200 #for FTSP
+
+##### End #####
+
+CFLAGS += -I$(TOSCONTRIB)/csau/ub/tos/lib/net/ub
+
+BUILD_EXTRA_DEPS += 
+CLEAN_EXTRA = simbuild build doc app.xml 
+
+include $(MAKERULES)
+

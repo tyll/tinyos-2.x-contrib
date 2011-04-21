@@ -18,7 +18,9 @@ module CC2420CsmaC {
 		if(running) {
 			return FAIL;
 		} 
-
+#ifdef SOFTWAREENERGY
+		softenergy_on(SOFTENERGY_COMPONENT_RADIO_RECEIVE);
+#endif
 		return call SubControl.start();
 	}
 	
@@ -32,6 +34,9 @@ module CC2420CsmaC {
 		if(!running) {
 			return FAIL;
 		}
+#ifdef SOFTWAREENERGY
+		softenergy_off(SOFTENERGY_COMPONENT_RADIO_RECEIVE);
+#endif
 		dbg("CC2420Csma","CSMA stop\n");
 		return call SubControl.stop();
 	}

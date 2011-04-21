@@ -40,7 +40,7 @@ configuration CC2420PacketC {
     interface PacketAcknowledgements as Acks;	
 		interface CC2420PacketBody;
 		interface CC2420Packet;
-
+		//interface PacketTimeSyncOffset;
     /*interface PacketTimeStamp<T32khz, uint32_t> as PacketTimeStamp32khz;
     interface PacketTimeStamp<TMilli, uint32_t> as PacketTimeStampMilli;
     interface PacketTimeSyncOffset;*/
@@ -53,4 +53,5 @@ configuration CC2420PacketC {
 	components CC2420PacketP;
 	CC2420PacketBody = CC2420PacketP;
 	CC2420Packet = CC2420PacketP;
+	//PacketTimeSyncOffset = CC2420PacketP;
 }

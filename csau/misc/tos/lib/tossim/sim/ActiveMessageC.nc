@@ -42,6 +42,7 @@ configuration ActiveMessageC {
     interface Packet;
     interface AMPacket;
     interface PacketAcknowledgements;
+		interface LowPowerListening;
   }
 }
 implementation {
@@ -65,6 +66,7 @@ implementation {
   Packet       = AM;
   AMPacket     = AM;
   PacketAcknowledgements = Network;
+	LowPowerListening = CC2420RadioC;
 
   AM.Model -> CC2420RadioC;
 	CC2420RadioC.SubModel -> Network.Packet;

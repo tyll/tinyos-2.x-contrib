@@ -1,0 +1,46 @@
+\chapter{Introduction}
+
+%-----------------------------------------------------------
+% keywords: MEMS, sensor nodes, WSNs
+%-----------------------------------------------------------
+More than ten years have passed since the advances made in the \ac{MEMS} area, which enabled the development of tiny, low-cost, low-power, and multifunctional sensing devices, which are capable of performing tasks such as sensing, data processing using a micro-controller and communication through a transceiver. Such sensor nodes may be embedded in the environment, deployed in inaccessible, dangerous, or even hostile environments in which the sensor nodes need to configure themselves in a communication network, in order to collect information that has to be pieced together to assemble a picture of the environment wider than what each sensor individually senses. These constrained sensor nodes and their envisioned applications made way for the introduction of a set of new key paradigms in networking, which led to the 
+creation of the concept of a \ac{WSN}. WSNs consist of a number of tiny sensor nodes which work together for a common goal, that is, fulfil its applications objectives.
+
+%-----------------------------------------------------------
+% keywords: WSNs applications, data fusion, Tagus-SensorNet
+%-----------------------------------------------------------
+Typical WSNs applications are dedicated to closely observe real-world phenomena. One important operation on collecting 
+data from a WSN is \textit{data aggregation}, whereby data reported by each sensor node is agglomerated to form a single meaningful result.Let's take a more realistic look at possible applications within a WSN, namely in Tagus-SensorNet \cite{conf/icccn/PedrosaMRN08}. Tagus-SensorNet is a WSN test-bed which was deployed in IST-TUL in Taguspark Campus and currently integrates multiple applications, one of which, for instance, is the monitoring of the campuses buildings vibration. Consider a student walking over one of the many bridges that can be found on this campus. The bridge that the student is walking on, is monitored by multiple sensors along its path, eventually all sensor nodes will detect vibrations at different points in time when the student walks near the range of each sensor node. Vibration readings and timestamps (indicating the time at which the student was sensed) are passed along so that fusion of such information from various sensor nodes will add up to  a global result. In this scenario, it might as well be the time elapsed since the student started walking the bridge and its direction. The fusion of individual sensor readings is possible only 
+by exchanging messages that are timestamped by each sensor's local clock. This clearly mandates for a \textit{common notion of time} among the sensor nodes.
+
+%-----------------------------------------------------------
+% keywords: Network protocols, sensor node oscillator
+%-----------------------------------------------------------
+However, not only WSN applications but also many of the networking protocols used in WSNs need this common notion of time. Prime examples are MAC protocols based on \ac{TDMA} or \ac{MAC} protocols with coordinated wake up, like the one used in the IEEE 802.15.4 \ac{WPAN} standard. Sensor nodes running a TDMA protocol need to agree on boundaries of time slots; otherwise their transmission would overlap and collide. Almost all clock devices of sensor nodes and computers share the same common structure: the sensor nodes possesses an oscillator of a specified frequency and counter register, which is incremented in hardware after a certain number of oscillator pulses. The sensor node's software has only access to the value of this register and the time between two increments determines the achievable time  resolution: events happening between two increments cannot be distinguished from their timestamps.
+
+%-----------------------------------------------------------
+% keywords: synchronization protocol, traditional
+%-----------------------------------------------------------
+We have seen by now that WSNs applications and network protocols have in fact requirements for a common notion of time. Protocols that provide such a common notion of time are clock synchronization protocols. In the past, researchers have developed successful clock synchronization protocols for traditional networks, whether they are hardware-based solutions such as algorithms relying on the clock information from \ac{GPS} or software-based solutions such as \ac{NTP}. These are unsuitable for a wireless sensor environment because the challenges posed by WSNs are different and manifold; to name a few, limited energy and bandwidth, limited hardware, latency, and unstable network conditions by mobility of sensors, dynamic topology, and multi-hopping. Hence, clock synchronization protocols different from the conventional protocols are needed in order to deal with the challenges specific to WSNs.
+
+%-----------------------------------------------------------
+% keywords: available WSN time synchronization protocols
+%-----------------------------------------------------------
+Regarding the available time synchronization protocols specifically for WSN, the choice of picking the most suitable can be quite peculiar. All of them, tend to fill the necessary requirements of a WSN time synchronization protocol, but fail, by seeking time precisions that are not required by their applications. For example, \ac{FTSP} \cite{Maroti04:FTSP} manages to achieve an outstanding average precision error per hop of 0,5 $\mu$s. This achievable precision error can be seen as acceptable for most wired networks. But for WSNs, where most sensor nodes are resource constrained, typically energy limited, the effort spending on trying to achieve such precision error is resource demanding. One can even state that most WSN applications don't even need such fine-grained time precisions, but then we would be putting aside those exotic applications that in fact do need it. Nonetheless, an application should be able to be provided with the desired time precision
+it requires.
+
+\section{Motivation and Goals}
+Having realized the inadequacy of existing synchronization approaches, there is a need to develop a simple, scalable, and
+energy-efficient solution to the problem of timing synchronization in sensor networks that is also flexible enough to meet the desired levels of accuracy, precision and algorithmic overhead.
+This dissertation proposes the \ac{TTSP}, an adaptive approach to time synchronization which tries to achieve a network wide synchronization in a scalable fashion way with application specific precision while making an efficient use of the available network resources. This means that the synchronization protocol is aware of the applications time precision requirements, preventing itself from wasting valuable network resources in order to deliver a precision that clearly exceeds the applications demand or it's not even suitable. The use of this adaptive approach allows the network administrator to design its applications taking into account the realistic time precision requirements he needs.
+
+\section{Contributions}
+The contributions from this dissertation are the following:
+\begin{itemize}
+\item A brief survey of existing time synchronization protocols for WSNs.
+\item An adaptive time synchronization algorithm for use in multi-hop WSNs.
+\item A reference implementation of the system developed for TinyOS and tested in Crossbow's micaZ nodes.
+\end{itemize}
+
+\section{Document Structure}
+The remainder of this document is organized into four main chapters. The following chapter, chapter two, provides an overview of the current state of the art of WSN time synchronization protocols. Chapter three, in turn, provides a detailed view of the proposed architecture. Chapter four provides an objective validation of TTSP's functionality, as well as an evaluation of its performance. Chapter five draws some final conclusions.

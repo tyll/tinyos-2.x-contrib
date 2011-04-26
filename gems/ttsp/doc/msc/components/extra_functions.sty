@@ -1,0 +1,124 @@
+%%
+%% This is file 'extra_functions.sty',
+%%
+%% AUTHOR: Pedro Tomás
+%%
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{extra_functions}
+
+% These packages are required for the \fancychapter
+\usepackage{minitoc}
+  \setcounter{minitocdepth}{1}
+  \setlength{\mtcindent}{24pt}
+  \renewcommand{\mtcfont}{\small\rm}
+  \renewcommand{\mtcSfont}{\small\bf}
+\usepackage{bbm}
+
+\RequirePackage{color}
+\definecolor{chaptergrey}{rgb}{0.6,0.6,0.6}
+
+\@ifundefined{verbatim@processline}{\RequirePackage{verbatim}}{}
+
+\def\boxedverbatim{%
+  \def\verbatim@processline{%
+    {\setbox0=\hbox{\the\verbatim@line}%
+    \hsize=\wd0 \the\verbatim@line\par}}%
+  \@minipagetrue%%%DPC%%%
+  \@tempswatrue%%%DPC%%%
+  \setbox0=\vbox\bgroup\vspace*{0.2cm}\footnotesize\verbatim
+}
+\def\endboxedverbatim{%
+  \endverbatim
+  \unskip\setbox0=\lastbox %%%DPC%%%
+  \hspace*{0.2cm}
+  \vspace*{-0.2cm}
+  \egroup
+  \fbox{\box0}% <<<=== change here for centering,...
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%separate "abstract"%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand*{\titulo}[1]{\th@StoreIn{\th@titulo}{#1}}
+\newcommand*{\th@titulo}{\relax} % command is optional
+
+\newenvironment{abstract_separate}{
+        \thispagestyle{empty}
+        {\hspace*{18\p@}}\\
+        {\hspace*{18\p@} \bfseries Title:~} \@title \vspace*{2cm}\\
+        {\hspace*{18\p@} \bfseries Abstract:} 
+        \begin{justify}
+    }{
+        \end{justify}
+    }
+
+\newenvironment{keywords_separate}{
+        {\hspace*{18\p@}}\\
+        {\hspace*{18\p@} \bfseries Keywords:} 
+        \begin{justify}
+    }{
+        \end{justify}
+    }
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%separate "resumo"%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newenvironment{resumo_separado}{
+        \thispagestyle{empty}
+        {\hspace*{18\p@}}\\
+        {\hspace*{18\p@} \bfseries T\'itulo:~} \th@titulo\\
+        {\hspace*{18\p@} \bfseries Nome:~} \@author \vspace*{1cm}\\
+        {\hspace*{18\p@}  Curso de Mestrado em: Engenharia Electrot\'{e}cnica e de Computadores} \\
+        {\hspace*{18\p@}  Orientador:~} \th@supervisor\\
+        \ifthenelse{\equal{\th@othersupervisor}{\relax}}{\relax}{{\hspace*{18\p@}  Co-orientador:~}\th@othersupervisor\\}
+         {\hspace*{18\p@}  Provas conclu\'idas em:~\vspace*{1.5cm}\\} 
+        {\hspace*{18\p@} \bfseries Resumo:} 
+        \begin{justify}
+    }{
+        \end{justify}
+    }
+\newenvironment{palavraschave_separate}{
+        {\hspace*{18\p@}}\\
+        {\hspace*{18\p@} \bfseries Palavras Chave:} 
+        \begin{justify}
+    }{
+        \end{justify}
+    }
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%end separates
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand*{\chapnumfont}{%
+%   \usefont{T1}{\@defaultcnfont}{b}{n}\fontsize{100}{130}\selectfont%
+  \usefont{T1}{pbk}{b}{n}
+  \fontsize{150}{130}
+  \selectfont
+  \color{chaptergrey}
+}
+\def\@makechapterhead#1{%
+  \vspace*{50\p@}%
+  {\parindent \z@ \raggedright \normalfont
+    {\chapnumfont\ifnum \c@secnumdepth >\m@ne
+%         \huge\bfseries \@chapapp\space \thechapter
+        \raggedleft\bfseries \thechapter
+        \par\nobreak
+        \vskip 20\p@
+    \fi}
+    \interlinepenalty\@M
+    {\raggedleft\Huge \bfseries #1\par\nobreak}
+    \vskip 40\p@
+  }}
+
+\newcommand{\fancychapter}[1]{\chapter{#1}\vfill\minitoc\pagebreak}
+
+% This commmand allows to place horizontal lines with a custom width... replaces the standard hline command
+\newcommand{\hlinew}[1]{%
+  \noalign{\ifnum0=`}\fi\hrule \@height #1 \futurelet
+   \reserved@a\@xhline}
+
+% This command defines some marks... See the table in chapter 5.
+\def\Mark#1{\raisebox{0pt}[0pt][0pt]{\textsuperscript{\footnotesize\ensuremath{\ifcase#1\or *\or \dagger\or \ddagger\or%
+    \mathsection\or \mathparagraph\or \|\or **\or \dagger\dagger%
+    \or \ddagger\ddagger \else\textsuperscript{\expandafter\romannumeral#1}\fi}}}}
+
+\endinput

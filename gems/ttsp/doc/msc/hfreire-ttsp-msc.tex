@@ -1,0 +1,135 @@
+\documentclass[defaultstyle,10pt,master,Helvetica]{./components/thesis}
+
+\usepackage{ucs}
+\usepackage[utf8x]{inputenc}
+ \usepackage[english]{babel}
+\usepackage{amsmath, amsthm, amssymb, amsfonts}
+\usepackage{multirow}
+\usepackage{colortbl}
+\usepackage{ctable}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage[hang,small,bf]{subfigure}
+\usepackage{algorithmic}
+\usepackage[chapter]{algorithm}
+\usepackage{cite}
+\usepackage[printonlyused]{acronym}
+\usepackage{./components/extra_functions}
+\usepackage{hhline}
+\usepackage{tabularx}
+\usepackage{hyperref}
+\hypersetup{ a4paper=true,
+             colorlinks=false,
+             citecolor=red,
+             breaklinks=true,
+             bookmarks=true,
+             bookmarksnumbered=true,
+             bookmarksopen=true,
+             pdftitle={TTSP - Tagus Time Synchronization Protocol},
+             pdfauthor={Hugo Miguel Pinho Freire},
+             pdfsubject={TTSP - Tagus Time Synchronization Protocol: An Adaptive Approach to Time Synchronization in Tagus-SensorNet}, 
+             pdfcreator={Hugo Miguel Pinho Freire},  
+             pdfkeywords={Wireless Sensor Networks, Time Synchronization, TTSP} 
+}
+\usepackage{url} 
+\usepackage{acronym}
+
+\renewcommand{\theparagraph}{\Alph{paragraph}~--}
+\input{./components/pagesetup.tex}
+
+\begin{document}
+
+
+\pdfbookmark[0]{Titlepage}{Title}
+
+\univlogo{2cm}{2cm}{./images/01-istutl}
+
+\title{TTSP - Tagus Time Synchronization Protocol}
+\subtitle{An Adaptive Approach to Time Synchronization in Tagus-SensorNet}
+\author{Hugo Miguel Pinho Freire}
+\degree{Engenharia de Redes de Comunicações}
+\supervisor{Prof. Doutor Rui Manuel Rodrigues Rocha}
+\date{Novembro de 2010}
+\finalthesis{true}
+\presidentofjury{Prof. Doutor Rui Jorge Morais Tomaz Valadas}
+\vogalone{Prof. Doutor Luis Filipe Lourenço Bernardo}
+\vogaltwo{Prof. Doutor Carlos Manuel Ribeiro Almeida}
+
+\maketitle
+\clearpage
+\thispagestyle{empty}
+\cleardoublepage
+\setcounter{page}{1} \pagenumbering{roman}
+\baselineskip 18pt 
+
+\pdfbookmark[0]{Acknowledgments}{acknowledgments}
+\input{./misc/01-acknowledgments.tex}
+
+\input{./misc/02-abstract.tex}
+\input{./misc/03-keywords.tex}
+\clearpage
+\thispagestyle{empty}
+\cleardoublepage
+
+\input{./misc/04-resumo.tex}
+
+\input{./misc/05-palavraschave.tex}
+\clearpage
+\thispagestyle{empty}
+\cleardoublepage
+
+\dominitoc
+\dominilof
+\dominilot
+
+\renewcommand{\baselinestretch}{1}
+\pdfbookmark[0]{Contents}{toc}
+\setcounter{tocdepth}{2}
+\tableofcontents
+\cleardoublepage
+\renewcommand{\baselinestretch}{1.5}
+
+\pdfbookmark[1]{List of Figures}{lof}
+\listoffigures
+\cleardoublepage
+
+\pdfbookmark[1]{List of Tables}{lot}
+\listoftables
+\cleardoublepage
+
+\pdfbookmark[1]{List of Acronyms}{loac}
+\input{./misc/06-acronyms.tex}
+\cleardoublepage
+
+\setcounter{page}{1} \pagenumbering{arabic}
+\baselineskip 18pt
+
+\input{./chapters/01-introduction.tex}
+\cleardoublepage
+
+\input{./chapters/02-stateoftheart.tex}
+\cleardoublepage
+
+\input{./chapters/03-architecture.tex}
+\cleardoublepage
+
+\input{./chapters/04-implementation.tex}
+\cleardoublepage
+
+\input{./chapters/05-evaluation.tex}
+\cleardoublepage
+
+\input{./chapters/06-conclusions.tex}
+\cleardoublepage
+
+\pdfbookmark[0]{Bibliography}{bib}
+\bibliographystyle{IEEEtran}
+\bibliography{bibliography}
+
+%\appendix
+%\pdfbookmark[1]{Appendix A}{appendix}
+%\input{./appendixes/01-appendixa.tex}
+
+\cleardoublepage
+\cleardoublepage
+\end{document}

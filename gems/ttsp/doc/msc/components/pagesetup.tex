@@ -1,0 +1,62 @@
+\hoffset 0in
+\voffset 0in
+\oddsidemargin 2 cm
+\evensidemargin 2 cm
+\marginparsep 0in
+\topmargin -0.25 cm
+\textwidth 12.5 cm
+\textheight 22.4 cm
+
+% ########################################################
+% Fomatting for The Fancy Headers
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\renewcommand{\chaptermark}[1]{\markboth{\thechapter.\ #1}{}}
+\renewcommand{\sectionmark}[1]{\markright{\thesection\ #1}}
+% x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x
+% comment next 3 lines if no Header and Hooter on every page
+% For IST MSc Thesis do not use Header nor Footer 
+%\fancyhf{} \fancyhead[LE]{\bfseries\nouppercase{\leftmark}} % comment for IST MSc Thesis
+%\fancyhead[RO]{\bfseries\nouppercase{\rightmark}} % comment for IST MSc Thesis
+%\fancyfoot[LE,RO]{\bfseries\thepage} % comment for IST MSc Thesis
+% x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x
+\fancyhead{}
+\renewcommand{\headrulewidth}{0.0pt}
+\renewcommand{\footrulewidth}{0.0pt}
+\addtolength{\headheight}{2pt} % make space for the rule
+\fancypagestyle{plain}{%
+   \fancyhead{} % get rid of headers
+   \renewcommand{\headrulewidth}{0pt} % and the line
+   \renewcommand{\footrulewidth}{0pt}
+}
+\fancypagestyle{blank}{%
+   \fancyhf{} % get rid of headers and footers
+   \renewcommand{\headrulewidth}{0pt} % and the line
+   \renewcommand{\footrulewidth}{0pt}
+}
+\fancypagestyle{abstract}{%
+   \fancyhead{}
+   \renewcommand{\headrulewidth}{0pt}
+   \renewcommand{\footrulewidth}{0.0pt}
+}
+\fancypagestyle{document}{% 
+	% x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x
+	% comment next 3 lines if no Header and Hooter on every page
+	% For IST MSc Thesis do not use Header nor Footer
+%	\fancyhf{} \fancyhead[LE]{\bfseries\nouppercase{\leftmark}} % comment for IST MSc Thesis
+%	\fancyhead[RO]{\bfseries\nouppercase{\rightmark}} % comment for IST MSc Thesis
+%	\fancyfoot[LE,RO]{\bfseries\thepage} % comment for IST MSc Thesis
+	% x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x
+	\fancyhead{}
+	\renewcommand{\headrulewidth}{0.0pt}
+	\renewcommand{\footrulewidth}{0.0pt}
+	\addtolength{\headheight}{2pt} % make space for the rule
+}
+\setcounter{secnumdepth} {5}
+\setcounter{tocdepth} {5}
+\renewcommand{\thesubsubsection}{\thesubsection.\Alph{subsubsection}}
+
+\renewcommand{\subfigtopskip}{0.3 cm}
+\renewcommand{\subfigbottomskip}{0.2 cm}
+\renewcommand{\subfigcapskip}{0.3 cm}
+\renewcommand{\subfigcapmargin}{0.2 cm}

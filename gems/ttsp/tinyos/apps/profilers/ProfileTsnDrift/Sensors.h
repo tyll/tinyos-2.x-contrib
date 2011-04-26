@@ -1,0 +1,12 @@
+#ifndef SENSORS_H
+#define SENSORS_H
+
+enum {
+	SENSOR_TYPE_PHOTO = 0,
+	SENSOR_TYPE_TEMP = 1,
+	SENSOR_TYPE_VOLTAGE = 2,
+	SENSOR_TYPE_SINE = 3,
+	SENSOR_NUM_TYPES = 4
+};
+
+#endif

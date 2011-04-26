@@ -1,0 +1,90 @@
+% Table Example
+\newcommand{\greyrow}{\rowcolor[rgb]{0.9,0.9,0.9}}
+\newcommand{\whiterow}{\rowcolor[rgb]{1,1,1}}
+\newcommand{\greycell}[1]{\multicolumn{1}{{>{\columncolor[rgb]{0.9,0.9,0.9}}c}}{#1}}
+\newcommand{\lightgreycell}[1]{\multicolumn{1}{{>{\columncolor[rgb]{0.9,0.9,0.9}}c}}{#1}}
+\newcommand{\mediumgreycell}[1]{\multicolumn{1}{{>{\columncolor[rgb]{0.8,0.8,0.8}}c}}{#1}}
+\newcommand{\darkgreycell}[1]{\multicolumn{1}{{>{\columncolor[rgb]{0.7,0.7,0.7}}c}}{#1}}
+\newcommand{\whitecell}[1]{\multicolumn{1}{{>{\columncolor[rgb]{1,1,1}}c}}{#1}}
+
+\newcommand{\cellformatG}[1]{\multicolumn{1}{{>{\columncolor[rgb]{.9,.9,.9}}c}}{#1}}
+\newcommand{\cellformatW}[1]{\multicolumn{1}{{>{\columncolor[rgb]{1,1,1}}c}}{#1}}
+\newcommand{\cellformatlG}[1]{\multicolumn{1}{{|>{\columncolor[rgb]{.9,.9,.9}}c}}{#1}}
+\newcommand{\cellformatlW}[1]{\multicolumn{1}{{|>{\columncolor[rgb]{1,1,1}}c}}{#1}}
+\newcommand{\cellformatrG}[1]{\multicolumn{1}{{>{\columncolor[rgb]{.9,.9,.9}}c|}}{#1}}
+\newcommand{\cellformatrW}[1]{\multicolumn{1}{{>{\columncolor[rgb]{1,1,1}}c|}}{#1}}
+\newcommand{\cellformatlrG}[1]{\multicolumn{1}{{|>{\columncolor[rgb]{.9,.9,.9}}c|}}{#1}}
+\newcommand{\cellformatlrW}[1]{\multicolumn{1}{{|>{\columncolor[rgb]{1,1,1}}c|}}{#1}}
+
+\begin{table}[t]
+\centering
+\caption{Example table}
+\label{table:table1}
+\begin{tabular}{c c c c c c}
+\hlinew{0.08cm}
+\cellformatrG{}&\cellformatlG{}&\cellformatrG{}&\cellformatlG{}&\cellformatrG{}&\cellformatlG{}\\
+\cellformatrG{}&
+\cellformatlG{\multirow{-2}{*}{\centering\bf \#Layers}} & 
+\cellformatrG{\multirow{-2}{*}{\centering\bf \#Nets}} & 
+\cellformatlG{\multirow{-2}{*}{\centering \#Nodes\Mark1}} & 
+\cellformatrG{\multirow{-2}{1.8cm}{\centering Critical path}}&
+\cellformatlG{\multirow{-2}{2cm}{\centering\bf Latency ($T_{iter}$)}}\\
+\cellformatrG{\multirow{-3}{2.2cm}{\centering Benchmark: ANN}} &
+\cellformatlG{\footnotesize $(1)$} & 
+\cellformatrG{\footnotesize$(2)$} & 
+\cellformatlG{\footnotesize$(3)=8\cdot(1)\cdot(2)$} & 
+\cellformatrG{\footnotesize$(4)=4\cdot(1)$} & 
+\cellformatlG{\footnotesize$(5)$}\\
+\hlinew{0.04cm}
+\cellformatrW{A1} & \cellformatlW{\bf 3--1501} & \cellformatrW{       1   } & \cellformatlW{\bf 24--12008}  & \cellformatrW{\bf 12--6004} & \cellformatlW{    4}\\
+\cellformatrW{A2} & \cellformatlW{    501    } & \cellformatrW{       1   } & \cellformatlW{     4008    }  & \cellformatrW{  2004      } & \cellformatlW{\bf 2--2000 }\\
+\cellformatrW{A3} & \cellformatlW{     10    } & \cellformatrW{\bf 2--1024} & \cellformatlW{\bf 160--81920} & \cellformatrW{    40      } & \cellformatlW{   60\Mark2 }\\
+\cellformatrW{A4} & \cellformatlW{     10    } & \cellformatrW{      50   } & \cellformatlW{     4000    }  & \cellformatrW{    40      } & \cellformatlW{\bf 80--1200}\\
+\hlinew{0.08cm}
+\multicolumn{6}{c}{\vspace*{-0.3cm}}\\
+%%%%%%%%%%%%% SECOND PART OF THE TABLE %%%%%%%%%%%%%%%%%%%%%%%%
+\hlinew{0.08cm}
+\cellformatrG{}&\cellformatlG{}&\cellformatrG{}&\cellformatlG{}&\cellformatrG{}&\cellformatlG{}\\
+\cellformatrG{}&
+\cellformatlG{\multirow{-2}{1.6cm}{\centering\bf FFT size\Mark3}} & 
+\cellformatrG{\multirow{-2}{*}{\centering\it\#Inputs}} & 
+\cellformatlG{\multirow{-2}{*}{\centering\it \#Nodes\Mark1}} & 
+\cellformatrG{\multirow{-2}{1.8cm}{\centering\it Critical path}}&
+\cellformatlG{\multirow{-2}{2cm}{\centering\bf Latency ($T_{iter}$)}}\\
+\cellformatrG{\multirow{-3}{2.2cm}{\centering Benchmark: FFT}}& 
+\cellformatlG{\footnotesize$(1)$} & 
+\cellformatrG{\footnotesize$(2)=2^{(1)}$} & 
+\cellformatlG{\footnotesize$(3)=10\cdot(1)\cdot (2)$} & 
+\cellformatrG{\footnotesize$(4)=4\cdot (1)$} & 
+\cellformatlG{\footnotesize$(5)$}\\
+\hlinew{0.04cm}
+\cellformatrW{F1} & \cellformatlW{\bf 1--10} & \cellformatrW{2--1024} & \cellformatlW{\bf 20--102400} &  \cellformatrW{4--40} & \cellformatlW{6--60\Mark2}\\
+\cellformatrW{F2} & \cellformatlW{\bf 5} & \cellformatrW{32} & \cellformatlW{1600} & \cellformatrW{20} & \cellformatlW{\bf 40 -- 1500}\\
+\hlinew{0.08cm}
+\multicolumn{6}{c}{\vspace*{-0.3cm}}\\
+% THIRD AND LAST TABLE!!!
+\hlinew{0.08cm}
+\cellformatrG{}&\cellformatlG{}&\cellformatrG{}&\cellformatlG{}&\cellformatrG{}&\cellformatlG{}\\
+\cellformatrG{}&
+\cellformatlG{\multirow{-2}{*}{\centering\bf\#Types}} & 
+\cellformatrG{\multirow{-2}{*}{\centering\bf \#Nodes}} & 
+\cellformatlG{\multirow{-2}{*}{\centering\it \#Networks}} & 
+\cellformatrG{\multirow{-2}{1.8cm}{\centering\it Critical path}}&
+\cellformatlG{\multirow{-2}{2cm}{\centering\bf Latency ($T_{iter}$)}}\\
+\cellformatrG{\multirow{-3}{2.2cm}{\centering Benchmark: Random networks}}& 
+\cellformatlG{\footnotesize$(1)$} & 
+\cellformatrG{\footnotesize$(2)$} & 
+\cellformatlG{\footnotesize$(3)$} &
+\cellformatrG{\footnotesize$(4)$} & 
+\cellformatlG{\footnotesize$(5)$}\\
+\hlinew{0.04cm}
+\cellformatrW{R1} & \cellformatlW{3} & \cellformatrW{10--2000} & \cellformatlW{500} &  \cellformatrW{\it variable} & \cellformatlW{\footnotesize$(4)$}\\
+\cellformatrW{R2} & \cellformatlW{3} & \cellformatrW{  50    } & \cellformatlW{500} &  \cellformatrW{\it variable} & \cellformatlW{\footnotesize$(4)\times [1;\cdots;20]$}\\
+\hlinew{0.08cm}
+\multicolumn{6}{c}{\vspace*{-0.3cm}}\\
+\multicolumn{6}{l}{\it\Mark1 Excluding constant nodes.}\\
+\multicolumn{6}{l}{\it\Mark2 Value kept proportional to the critical path: $(5)=(4)*1.5$.}\\
+\multicolumn{6}{l}{\it\Mark3 A size of $x$ corresponds to a $2^x$ point FFT.}\\
+\multicolumn{6}{l}{\it Values in bold indicate the parameter being varied.}
+\end{tabular}
+\end{table}

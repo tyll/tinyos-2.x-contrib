@@ -1,0 +1,307 @@
+\chapter{State of the art}
+
+%-----------------------------------------------------------
+% keywords: state-of-the-art, classifications
+%-----------------------------------------------------------
+In this section the current state-of-the-art in time synchronization protocols will be reviewed. Since most WSNs are very closed associated  with the application, therefore the intended protocols used for synchronization are different from each other in some aspects and similar to one another in other aspects. Even so, a synchronization protocol can be broadly classified by its approach on pair-wise and network-wide synchronization. We will focus this state-of-the-art on these two classifications, but nonetheless, the remaining classifications will be briefly exposed in this section.
+
+\section{Classification of synchronization protocols}
+%-----------------------------------------------------------
+% keywords:
+%-----------------------------------------------------------
+In order to use a broadly classification of synchronization protocols, that is, to select a wider, common base among all available classification, it is indispensable to view the synchronization protocol architecture in its building blocks, and select the classification that best identifies the approach used in each block \cite{1076303}. The common architecture of a synchronization protocol can be seen as the composite of two synchronization algorithms, namely, a pair-wise and a network-wide synchronization algorithm.
+
+\setcounter{secnumdepth}{3}
+\subsection{Classification by pair-wise synchronization approach}
+%-----------------------------------------------------------
+% keywords:
+%-----------------------------------------------------------
+The building block of a synchronization protocol is the synchronization that occurs between a single pair of sensor nodes. The main goal of a pair-wise synchronization is to synchronize two nodes that share the same radio range, that is, within a single-hop. The choices for approach on a pair-wise synchronization can be broadly classified between a sender-to-receiver or a receiver-to-receiver.
+
+\setcounter{secnumdepth}{0}
+\subsection{Sender-to-receiver vs. receiver-to-receiver}
+%-----------------------------------------------------------
+% keywords: Sender-to-receiver, receiver-to-receiver, delay
+%-----------------------------------------------------------
+In a sender-to-receiver scheme, a sender node periodically sends a message with its local time as a time-stamp to the receiver and then the receiver synchronizes with the sender using the time-stamp received from the sender. On the other side, in a receiver-to-receiver scheme, assuming that any two receivers receive the same message (in a promiscuous medium), they receive it at approximately the same time. The receivers then exchange the time at which they received that message and compute their offset based on the difference in reception times.
+
+\setcounter{secnumdepth}{3}
+\subsection{Classification by network-wide synchronization approach}
+%-----------------------------------------------------------
+% keywords:
+%-----------------------------------------------------------
+The other building block of a synchronization protocol is the synchronization that occurs in the whole network. In order for all sensor nodes in a multi-hop network to be synchronized, there needs to be an algorithm that disseminates and makes sure
+that all sensor nodes are in fact synchronized to a common reference. In a network-wide synchronization, a broadly approach is to use centralized scheme like a master-slave, or a distributed scheme like peer-to-peer.
+
+\setcounter{secnumdepth}{0}
+\subsection{Master-slave vs. Peer-to-peer}
+%-----------------------------------------------------------
+% keywords:
+%-----------------------------------------------------------
+In a master-slave structure, one node is assigned as the master and the remainder of the other nodes as slaves. The slaves nodes will consider the local clock reading of the master node as the reference time and attempt to synchronize with the master. In a peer-to-peer structure, any node can communicate directly with every other node in the network. This has the advantage of increased flexibility and by eliminating the risk of master node failure, which would prevent further synchronization, but increases the complexity and difficulty to control its behaviour on the network.
+
+\setcounter{secnumdepth}{3}
+\subsection{Other classifications}
+%-----------------------------------------------------------
+% keywords:
+%-----------------------------------------------------------
+Other less broadly classifications for synchronization protocols are detailed here.
+
+\setcounter{secnumdepth}{0}
+\subsubsection{Physical vs. logical time}
+%-----------------------------------------------------------
+% keywords:
+%-----------------------------------------------------------
+It is important that two sensor nodes should have the same idea about the duration of 1 s and additionally a sensor node's second should come as close as possible to 1 s of real time or \ac{UTC}.
+
+\subsubsection{External vs. internal synchronization}
+%-----------------------------------------------------------
+% keywords:
+%-----------------------------------------------------------
+The synchronization of all clocks in the network to a time supplied from outside the network is referred to as external synchronization, while internal synchronization is the synchronization of all clocks in the network, without a predetermined master time.
+
+\subsubsection{Clock correction vs. untethered clocks}
+%-----------------------------------------------------------
+% keywords:
+%-----------------------------------------------------------
+By choosing to correct the clock, the local clocks of all the sensor nodes in the network are corrected in order to keep the
+entire network synchronized. While with untethered clocks, every sensor node maintains its own clock as it is, and keeps a time translation table relating its clock to the clock of the other sensor nodes. In this approach local timestamps are compared using that table. A global time-scale is maintained in this way with the clocks untethered.
+
+\subsubsection{Stationary vs. mobile networks}
+%-----------------------------------------------------------
+% keywords:
+%-----------------------------------------------------------
+Mobility is an inherent advantage of a wireless environment, but it induces more difficulties in achieving synchronization. It leads to frequent changes in network topology and demands that the protocol be more robust.
+
+\subsubsection{Instantaneous vs. continuous  synchronization}
+%-----------------------------------------------------------
+% keywords:
+%-----------------------------------------------------------
+Synchronizing a local clock can be seen in two different approaches, the simplest one but also the one that can give space for unpredicted results, is an instantaneous correction of the local clock as soon as we have an offset to which synchronize the local clock. While on a continuous approach, the clock correction is gradually done over time, assuring a time consistency.
+
+\subsubsection{Global vs. local synchronization}
+%-----------------------------------------------------------
+% keywords:
+%-----------------------------------------------------------
+A global algorithm attempts to keep all nodes of a sensor network synchronized. The scope of local algorithms is often restricted to some geographic neighbourhood of an interesting event. In global algorithms, sensor nodes are therefore required to keep synchronized with not only single-hop neighbours but also with distant sensor nodes (multi-hop). Clearly, an algorithm giving global synchronization also gives local synchronization.
+
+\subsubsection{Absolute vs. relative time}
+%-----------------------------------------------------------
+% keywords:
+%-----------------------------------------------------------
+Many applications need only accurate time differences and it would be sufficient to estimate the drift instead of phase offset. However, absolute synchronization is the more general case as it includes relative synchronization as a special case.
+
+\subsubsection{Hardware- vs. software-based algorithms}
+%-----------------------------------------------------------
+% keywords:
+%-----------------------------------------------------------
+Some algorithms require dedicated hardware like \ac{GPS} receivers or dedicated communication equipment while software-based algorithms use plain messages passing, using the same channels as for normal data packets.
+
+\subsubsection{A priori vs. posteriori synchronization}
+%-----------------------------------------------------------
+% keywords:
+%-----------------------------------------------------------
+In a priori algorithms, the time synchronization protocol runs all the time, even when there is no external event to observe. In a posteriori synchronization (also called post-facto synchronization), the synchronization process is triggered by an external event.
+
+\subsubsection{Deterministic vs. probabilistic precision bounds}
+%-----------------------------------------------------------
+% keywords:
+%-----------------------------------------------------------
+Some algorithms can (under certain conditions) guarantee absolute upper bounds on the synchronization error between nodes or with respect to external time. Other algorithms can only give stochastic bounds in the sense that synchronization error is with some probability smaller than a prescribed bound.
+
+\setcounter{secnumdepth}{2}
+\section{Existing Protocols}
+%-----------------------------------------------------------
+% keywords:
+%-----------------------------------------------------------
+\setcounter{secnumdepth}{3}
+
+\subsection{Reference-Broadcast Synchronization (RBS)}
+%-----------------------------------------------------------
+% keywords:
+%-----------------------------------------------------------
+\ac{RBS}, as described in \cite{Elson02-RBS}, uses a receiver-to-receiver synchronization algorithm for pair-wise synchronization. RBS uses one sensor node to act as a beacon by broadcasting a reference packet. All receivers record the packet arrival time. The receiver sensor nodes then exchange their recorded time-stamps and estimate their relative phase offsets. RBS also estimates the clock skew by using a least-squares linear regression. One of the interesting features about using a receiver-to-receiver approach is that all timing uncertainties (including MAC medium access time) on the transmitter's side are eliminated. For a network-wide synchronization, RBS uses the concept of domain clusters. A domain cluster can be seen as cluster of sensor nodes locally synchronized within a beacons range. In order for two domain clusters to communicate between themselves, the sensor nodes that belong to both of the domain clusters act as gateways between these two domains. The gateway reconciles timestamps while forwarding  messages between domains, according to their next-hop destination and its time difference to the current node.
+
+The authors conclude that the use of a receiver-to-receiver approach successfully eliminates the delay uncertainties on the sender side.
+
+\subsection{Adaptive Clock Synchronization (ACS)}
+%-----------------------------------------------------------
+% keywords:
+%-----------------------------------------------------------
+\ac{ACS}, as described in \cite{conf/ipsn/PalChaudhuriSJ04}, extends the deterministic RBS protocol to provide a probabilistic bound on the accuracy of the clock synchronization, based on the need of the application and the resource constraint in WSNs, allowing a trade-off between accuracy and resource requirement.
+
+The algorithm assumes a sensor node in the network, known as the sender node, that does not need any time synchronization. Its only purpose is to broadcast reference packets to its neighbours with a known fixed time interval. The neighbours are able to estimate the relative clock skew between the receiver and the sender and send it back to the sender node. Then the sender node composes all the relative clock skew estimations and broadcasts a packet containing them. Each receiver after receiving this packet, can now calculate its own slope relative to all the receivers in the broadcast region of a
+particular sender. In order to extend this synchronization to the whole network, the author considers senders at various levels.
+
+The author concludes that by using a receiver-to-receiver pair-wise synchronization achieves better synchronization bounds than a sender-to-receiver approach and that by probabilistic sending reference messages keeps the clocks of the sensor nodes in the network within a specified error bound.
+
+\subsubsection{Distributed Time Synchronization Protocol (DTSP)}
+%-----------------------------------------------------------
+% keywords:
+%-----------------------------------------------------------
+\ac{DTSP}, as described in \cite{solis06}, is a fully distributed and asynchronous protocol. It uses a sender-to-receiver pair-wise synchronization algorithm, in which timestamps, the latest relative skew
+estimations and time differences estimations between transmitted and received timestamps are exchanged between a pair of nodes. At the end of this algorithm, its possible to obtain estimates of offsets at given times and skews between two neighboring nodes. In order for all sensor nodes to be able to agree on a common time, a reference sensor node is chosen. This reference doesn't need to be known by the other sensor nodes. Thus, discarding any construction knowledge about the network topology. Each sensor node will need to asynchronously broadcast its numbers to its neighbors. Each sensor node will update its numbers based on received broadcast. This then will lead to an estimate of the offset with respect to any node which acts as a reference node.
+
+The author concludes that DTSP is fully distributed and does not require a network topology construction such as rooted trees.
+
+\subsection{Asynchronous Diffusion (AD)}
+%-----------------------------------------------------------
+% keywords:
+%-----------------------------------------------------------
+Qun Li and Daniela Rus \cite{conf/infocom/LiR04} presented a high-level framework for global synchronization, named \ac{AD}. The authors proposed three methods for global synchronization in WSNs. The first two methods, all-node-based and cluster-based synchronization, use global information and are, hence, not suitable for large WSNs. In the third method (diffusion), each node sets its clock to the average clock time of its neighbors.
+
+The authors showed that the diffusion method converges to a global average value. A drawback of this approach is the
+potentially large number of messages exchanged between neighbouring nodes, especially in dense networks. Another drawback of this algorithm is that the convergence speed is slow compared to that of a synchronization algorithm with an initiator.
+
+\subsection{Average TimeSync (ATS)}
+%-----------------------------------------------------------
+% keywords:
+%-----------------------------------------------------------
+The \ac{ATS} protocol, as described in \cite{schenato07}, is an algorithm based on a class of popular distributed algorithms known as consensus, agreement, gossip or rendezvous whose main idea is averaging local information. First, it starts by estimating the relative skew with regard to all its neighbors. By using a  distributed  consensus algorithm based only on local information  exchange, all nodes are forced to converge to a common virtual clock rate.
+After the skew compensation algorithm is applied, the virtual clock estimators have all the same skew. At this point it is
+only necessary to compensate for possible offset errors. Once again, the authors adopt a consensus algorithm to update the virtual clock offset of all sensor nodes.
+
+The author concludes that ATS is fully distributed, asynchronous, includes skew compensation and is computationally lite. Moreover, it is robust to changes in the network topology. To the authors knowledge, only DTSP and ATS are fully distributed and provide a skew compensation. However, ATS has not been optimized to cope with the fact that the clock skews change over time and that there are small measurement time delays, turning out, to add multiplicative noise into the consensus dynamics.
+
+\subsection{Timing-Sync Protocol for Sensor Networks (TPSN)}
+%-----------------------------------------------------------
+% keywords:
+%-----------------------------------------------------------
+\ac{TPSN}, as described in \cite{Ganeriwal03:TPSN}, uses a sender-to-receiver synchronization algorithm for pair-wise synchronization. TPSN reduces the uncertainties by using timestamps at the medium access control (MAC) layer. This eliminates the uncertainties introduced by the MAC layer (e.g., retransmissions, back-offs, medium access). For network-wide synchronization, TPSN first establishes a hierarchical structure in the network and then the pair-wise synchronization is performed along the edges of this structure. This structure can be seen as a spanning tree, in which the root of the tree is the reference sensor node, to which all other sensor nodes shall synchronize with.
+
+TPSN has two main phases. A level discovery phase, starts after the network is deployed, with the root node broadcasting its level 0 and every other immediate neighbors assigning themselves as level 1, one greater than the level they have received. This process is continued and eventually every node in the network is assigned a level, thus constructing a spanning tree. In the synchronization phase, the pair-wise synchronization algorithm is performed along the edges of the hierarchical structure earlier established, eventually synchronizing every sensor node with the root.
+
+TPSN authors conclude that TPSN roughly gives a 2x better performance than RBS, while still using a sender-to-receiver approach with MAC layer timestamping.
+
+\subsection{Delay Measurement Time Synchronization (DMTS)}
+%-----------------------------------------------------------
+% keywords:
+%-----------------------------------------------------------
+\ac{DMTS}, as described in \cite{ping03}, uses a sender-to-receiver pair-wise synchronization algorithm in which, a sensor node is selected as the master and broadcasts its time. All the receiver
+sensor nodes measure the time delay and set their time as received by the master plus the measured time transfer delay. As a result, all the sensor nodes that have received the time synchronization message can be synchronized with the master. A master selection algorithm is used to select a sensor node to act as the master. DMTS uses the concept of time \textit{source level} to identify the distance from the master to another sensor node. A master is of time \textit{source level 0}. A sensor node that has synchronized with the master is level 1 time source. A node that synchronized
+with a level \textit{n} node will have a time \textit{source level n+1}. The root node will periodically  broadcast its time. Each node that has been synchronized directly or indirectly with the master will broadcast its time once and only once. If the broadcast is from a source of upper level than itself, it will ignore that broadcast. Thus, DMTS guarantees that the master time will propagate to sensor nodes with a limited number of broadcasts.
+
+The author concludes that DMTS is energy efficient, because only one
+broadcast is needed to synchronize all sensor nodes in single hop,
+and that it is also lightweight since there is no complex operation
+involved.
+
+\subsection{Flooding Time Synchronization Protocol (FTSP)}
+%-----------------------------------------------------------
+% keywords:
+%-----------------------------------------------------------
+The \ac{FTSP}, as described in \cite{Maroti04:FTSP}, is tailored for applications requiring stringent time precision. FTSP uses a sender-to-receiver pair-wise synchronization algorithm by broadcasting timestamps to neighbouring sensor nodes. The intrinsic delays in a sender-to-receiver algorithm are minimized by applying time-stamps at the MAC layer, thus achieving a high precision performance. By using comprehensive error compensation including skew estimation, its possible to minimize the frequency that synchronization is done on the network. For a network-wide synchronization, FTSP uses an algorithm for selecting a master among the sensor nodes. This master starts to broadcast time-stamps to its neighbours. Once those neighbours get synchronized with the master, they will also start to broadcast timestamps to its neighbours, thus initiating a controlled and periodic flooding over the network. If the master stops broadcasting after a certain period of time, the algorithm for selecting a master will be again initiated, thus achieving robustness over topology changes.
+
+The authors conclude that FTSP performance is far superior to other time synchronization protocols by achieving a precision of less than 2$\mu$s while tolerating dynamic topology updates.
+
+\subsection{Lightweight Time Synchronization (LTS)}
+%-----------------------------------------------------------
+% keywords:
+%-----------------------------------------------------------
+Jana Greunen and Jan Rabaey have proposed the \ac{LTS} \cite{conf/wsna/GreunenR03}, which is basically a lightweight tree-based synchronization algorithm. LTS uses a sender-to-receiver synchronization algorithm for pair-wise synchronization. This approach requires the exchange of only three messages to synchronize a pair of nodes. For the network-wide synchronization, LTS constructs a spanning tree composed of all the sensor nodes in the network. The root of the spanning tree is considered to be the reference node to which all other sensor nodes should synchronize.LTS offers two different approaches for initiating the synchronization on the network. The first, the most common approach, is the one which the master triggers the synchronization process, thus synchronizing every sensor node on the spanning tree. The second approach, is a distributed synchronization, where sensor nodes keep track of their own clock drift and their synchronization accuracy. In this scheme, the sensor nodes trigger their own resynchronization as needed.
+
+The authors show that the communication complexity and accuracy of a multi-hop synchronization is a function of the construction and depth of the spanning tree. Additionally, the authors show that the required refresh rate of multi-hop synchronization can be seen as a function of clock drift and the accuracy of single-hop synchronization.
+
+\subsection{TinySeRSync}
+%-----------------------------------------------------------
+% keywords:
+%-----------------------------------------------------------
+The TinySeRSync protocol, as described in \cite{conf/ccs/SunNW06}, has been designed taking into account security and resilience time synchronization for WSNs. TinySeRSync uses a secure sender-to-receiver algorithm for pair-wise time synchronization technique using hardware-assisted and authenticated MAC layer time-stamping. It also uses a secure and resilient global time synchronization algorithm based on local broadcast authentication. The goal of secure single-hop pair-wise time synchronization is to ensure two neighbour sensor nodes can obtain their clock difference through message exchanges in a secure fashion. For that purpose TinySeRSync authenticates the source, the content (i.e., the timing information), and the timeliness of each pair of nodes used for synchronization. For network-wide synchronization, TinySeRSync uses a reference node which broadcasts synchronization messages periodically to adjust the clocks of all sensor nodes. The synchronization messages are flooded throughout the network to reach the sensor nodes that cannot communicate with the reference node directly. In order for TinySeRSync to be resilient to compromised nodes in the network, the sensor nodes that cannot get synchronization messages directly from the reference node, pick the median value from all non-reference neighbour nodes. The authors conclude that TinySeRSync is secure against external attacks and resilient against compromised nodes.
+
+
+\subsection{TSync}
+%-----------------------------------------------------------
+% keywords:
+%-----------------------------------------------------------
+Dai and Han proposed TSync \cite{journals/sigmobile/DaiH04} with the goal to achieve an accurate lightweight, flexible and comprehensive time synchronization for WSNs. TSync adopted a bidirectional approach. TSync uses a sender-to-receiver synchronization algorithm for pair-wise synchronization. TSync consists of two mechanisms for synchronization: a push-based mechanism and pull-based mechanism, \ac{HRTS} and \ac{ITR} respectively. HRTS uses an idea similar to RBS except for the synchronization of the receivers after the beacon synchronization message was sent. Instead of the receivers exchanging messages among themselves, a designated node sends its time to the beacon node that, in turn, broadcasts this message over the entire network, thus significantly reducing the number of message exchanges involved in receiver-to-receiver approach. In some cases, HRTS push-based synchronization scheme unnecessarily synchronizes too many nodes despite being parametrized to a small radius, whereas
+ITR is able to offer a targeted on-demand alternative to synchronize just those nodes that need it. ITR is intended for use by sensor nodes that wish to synchronize their clocks during the interval between two synchronizations HRTS. For network-wide synchronization TSync uses a dynamically hierarchical structure, where levels are assigned to each sensor node based on its distance to the beacon node.
+
+The authors conclude that TSync bidirectional approach can be flexibly parametrized to suit the time synchronization needs of a given application.
+
+%-----------------------------------------------------------
+% keywords: protocol comparison, tables, hardware platforms
+%-----------------------------------------------------------
+\section{Existing Protocol Comparison}
+In section 2.1 the two most common classification criteria for a time synchronization protocol were introduced. In this
+section, the previously discussed protocols are classified accordingly to this same criteria. Table \ref{classificationcomparison} lists, for each discussed protocol, its classification under each criterion.
+
+Additionally, Table \ref{precisioncomparison} lists, again, for each protocol, the average precision error per hop that was measured in simulations conducted by the their respective authors, together with the hardware platform that was used. 
+It's important to stress that these simulations reflect different multi-hop network topologies  but, particular identical evaluation methodologies, which can serve the purpose of pointing out the achievable precision error within a WSN that employs one of those specific protocols. Regarding this last table, protocols who show a n.a. (not available) as a value, either don't disclose enough information or were not implemented on a hardware platform. Regarding the hardware platforms that were used by their respective authors to evaluate and validate their protocols, most of these don't differ much from each other except for the radio interface. Most of them use an ATMEL microprocessor while Tmote Sky uses a Texas Instruments microprocessor. The processors clock ranges between 4 MHz on Mica to 8 MHz on MicaZ and Tmote Sky. The radio interface commonly found on these platforms is a Chipcon which its data rate can go from 38,4 kbps while using
+the 868/916 MHz band on Mica2, to 250 kbps while using the 2,4 GHz band on MicaZ and Tmote Sky. The memory sizes are still very limited, ranging from 1 kB of RAM on Mica to 10 kB of RAM on Tmote Sky.
+
+\begin{table}
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+Protocol &  \multicolumn{2}{|c|}{Pair-wise} &  \multicolumn{2}{|c|}{Network-wide} \\
+& \multicolumn{2}{|c|}{synchronization approach} & \multicolumn{2}{|c|}{synchronization approach}\\
+\cline{2-5}
+& Sender- & Receiver- & Master- & Peer \\
+&  -to-receiver & -to-receiver & -slave & -to-peer \\ \hline
+RBS \cite{Elson02-RBS} & \cellcolor[gray]{.8} & \textbullet & \cellcolor[gray]{.8} & \textbullet \\ \hline
+ACS \cite{conf/ipsn/PalChaudhuriSJ04}& \cellcolor[gray]{.8} & \textbullet & \cellcolor[gray]{.8} & \textbullet \\ \hline
+DTSP \cite{solis06}& \textbullet & \cellcolor[gray]{.8} & \cellcolor[gray]{.8} & \textbullet \\ \hline
+AD \cite{conf/infocom/LiR04}& \textbullet & \cellcolor[gray]{.8} & \cellcolor[gray]{.8} & \textbullet \\ \hline
+ATS \cite{schenato07}& \textbullet & \cellcolor[gray]{.8} & \cellcolor[gray]{.8} & \textbullet \\ \hline
+TPSN \cite{Ganeriwal03:TPSN}& \textbullet & \cellcolor[gray]{.8} & \textbullet & \cellcolor[gray]{.8} \\ \hline
+DMTS \cite{ping03}& \textbullet & \cellcolor[gray]{.8} & \textbullet & \cellcolor[gray]{.8} \\ \hline
+FTSP \cite{Maroti04:FTSP}& \textbullet & \cellcolor[gray]{.8} & \textbullet & \cellcolor[gray]{.8} \\ \hline
+LTS \cite{conf/wsna/GreunenR03}& \textbullet & \cellcolor[gray]{.8} & \textbullet & \cellcolor[gray]{.8} \\ \hline
+TinySeRSync \cite{conf/ccs/SunNW06}& \textbullet & \cellcolor[gray]{.8} & \textbullet & \cellcolor[gray]{.8} \\ \hline
+TSync \cite{journals/sigmobile/DaiH04}& \textbullet & \cellcolor[gray]{.8} & \textbullet & \cellcolor[gray]{.8} \\   
+\hline
+\end{tabular}
+\caption{Comparison of existing protocols.}
+\label{classificationcomparison}
+\end{center}
+\end{table}
+
+\begin{table}
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+Protocol & Average precision & Hardware\\
+& error per hop ($\mu$s) & platform\\ \hline
+ACS \cite{conf/ipsn/PalChaudhuriSJ04}& n.a.& n.a. \\ \hline
+AD \cite{conf/infocom/LiR04}& n.a. & n.a. \\ \hline
+ATS \cite{schenato07}& 13,8 & Tmote Sky \\ \hline
+DMTS \cite{ping03}& 22,5 & Mica \\ \hline
+DTSP \cite{solis06}& 5,25 & Mica, Mica2 \\ \hline
+FTSP \cite{Maroti04:FTSP}& 0,5 & Mica, Mica2\\ \hline
+LTS \cite{conf/wsna/GreunenR03}& 50000 & n.a. \\ \hline
+RBS \cite{Elson02-RBS}& 9,6 & PC, Mica \\ \hline
+TPSN \cite{Ganeriwal03:TPSN}& 4,52 & Mica \\ \hline
+TinySeRSync \cite{conf/ccs/SunNW06}& 1,7 & MicaZ \\ \hline
+TSync \cite{journals/sigmobile/DaiH04}& 9,8 & MANTIS Nymph \\                                                   
+\hline
+\end{tabular}
+\caption{Comparison of the average precision error per hop achieved by each protocol.}
+\label{precisioncomparison}
+\end{center}
+\end{table}
+
+\section{Discussion}
+%-----------------------------------------------------------
+% keywords: Sender-to-receiver and master-slave, Receiver-to-receiver and peer-to-peer, implementation
+%-----------------------------------------------------------
+This chapter listed many of the time synchronization protocols that were specifically designed for WSNs. Looking at Table \ref{classificationcomparison}, one can see that most protocols assume a sender-to-receiver approach for pair-wise synchronization. Even though an approach like a receiver-to-receiver synchronization, which performs a  synchronization among receivers, can reduce the time-critical path by eliminating the delay uncertainties at the sender side, the use of techniques like MAC layer timestamping on a simple sender-to-receiver synchronization algorithm like TPSN and FTSP,
+can significantly minimize that same time-critical path and achieve similar time precisions than those that employ a more
+complex receiver-to-receiver approach.
+
+%-----------------------------------------------------------
+% keywords: 
+%-----------------------------------------------------------
+A more critical analysis is needed for the network-wide synchronization approach. As one can see, there is not an approach
+that outlines itself more than the other. It's easy to understand that when one chooses to use a master-slave approach he is sacrificing redundancy on the network over low complexity on how to implement and to predict the behaviour of the protocol. A peer-to-peer approach although more complex, can easily adapt to network topology changes, better distribute the communication, computation load and energy consumption involved on synchronizing every sensor node on the network. Recent protocols which use a master-slave approach like FTSP and DMTS use algorithms in the network for master election when the master dies or is removed from the network, and opt to use a more dynamic hierarchical structure. Thus, providing more redundancy to the network and making it more resilient to network topology changes.
+
+%-----------------------------------------------------------
+% keywords: 
+%-----------------------------------------------------------
+Relating these protocols to the need of being adaptable to the intrinsic needs of the application. Few of these protocols take into account mechanisms of controlling the required accuracy and precision needed for a given application. Most of 
+them were tailored to deliver the maximum accuracy and precision they could get on the network. As can be seen in Table \ref{precisioncomparison}, the average precision error achievable by most of these protocols is quite remarkable. FTSP only, manages to achieve an average precision error of 0,5 $\mu$s per hop. One important aspect to consider here is, once these sensor nodes get synchronized, it's necessary to repeat the synchronization procedure in a near future, or else, this average precision error will start to raise. Indeed, the clocks oscillator is susceptible to frequency shifts that can increase/decrease the oscillating frequency, mainly due to external factors such as the temperature, pressure or the quality of the component itself. The frequency of a synchronization round must be very high to maintain such precision errors. Eventually the needed resources to maintain such synchronization round profile are quite high. Most of the authors are not able to justify the use for these precision errors. Most of these protocols, do not even consider the precision requirements needed by the application, nor their authors quantify the impact on resource consumption while trying to achieve such precision error, clearly forgetting about the intrinsic resource constraints that a WSN is limited to. Even though, some of these protocols have taken into account these constraints, and paid some attention to the realistic needs of the application, like LTS, which makes a base assumption that WSN applications should not need for tight precision in the network and proposes an algorithm that controls the depth of its spanning tree to maintain a desired precision. ACS, on the other hand, considers the needs for accuracy of the application and the resource constraint in WSNs, but lacks a reference implementation, mainly justified by the complexity surrounding the protocol, which involves probabilistic precision bounds and a peer-to-peer structure for network-wide synchronization. Both previous mentioned protocols, LTS and ACS, lack a real implementation, and therefore real world testing.
+
+%-----------------------------------------------------------
+% keywords: 
+%-----------------------------------------------------------
+This situation stresses the need for the development of an adaptive approach to time synchronization in WSN, one that adapts to the time precision requirements of its applications by providing flexibility on achieving a desired time precision and at the same time adapts his resource consumption while trying to achieve this, a need that led to the development of TTSP. This basic approach shall free valuable resources and ultimately contribute to saving energy, by adjusting the resource consumption to match the necessary effort required to fill the time synchronization requirements, therefore extending the networks useful life-time.
+

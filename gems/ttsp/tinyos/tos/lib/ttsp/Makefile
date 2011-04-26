@@ -1,0 +1,3 @@
+COMPONENT ?= AdaptiveTimeSyncC
+
+include $(MAKERULES)

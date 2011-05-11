@@ -39,7 +39,7 @@ module BPCommandParserP{
 }
 
 implementation {
-   uint8_t waiting_for_args = 0, args[1], arg_size = 0, pending_command;
+   uint8_t waiting_for_args = 0, args[MAX_COMMAND_ARG_SIZE], arg_size = 0, pending_command;
 
    async command void BPCommandParser.handleByte(uint8_t data) {
       if(waiting_for_args) {
@@ -58,10 +58,12 @@ implementation {
             case TOGGLE_LED_COMMAND:
             case GET_ACCEL_SENSITIVITY_COMMAND:
             case GET_CONFIG_SETUP_BYTE0_COMMAND:
+            case GET_ACCEL_CALIBRATION_COMMAND:
+            case GET_GYRO_CALIBRATION_COMMAND:
+            case GET_MAG_CALIBRATION_COMMAND:
                signal BPCommandParser.activate(data, 0, NULL);
                break;
             case SET_SAMPLING_RATE_COMMAND:
-            case SET_SENSORS_COMMAND:
             case SET_ACCEL_SENSITIVITY_COMMAND:
             case SET_5V_REGULATOR_COMMAND:
             case SET_PMUX_COMMAND:
@@ -69,6 +71,15 @@ implementation {
                waiting_for_args = 1;
                pending_command = data;
                break;
+            case SET_SENSORS_COMMAND:
+               waiting_for_args = 2;
+               pending_command = data;
+               break;
+            case SET_ACCEL_CALIBRATION_COMMAND:
+            case SET_GYRO_CALIBRATION_COMMAND:
+            case SET_MAG_CALIBRATION_COMMAND:
+               waiting_for_args = 21;
+               pending_command = data;
             default:
          }
       }

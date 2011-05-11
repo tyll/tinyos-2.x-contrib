@@ -41,8 +41,9 @@ implementation {
    components LedsC;
    BoilerPlateC.Leds -> LedsC;
 
-   components new TimerMilliC() as SampleTimer;
-   BoilerPlateC.SampleTimer   -> SampleTimer;
+   components new AlarmMilli16C() as SampleTimer;
+   BoilerPlateC.SampleTimerInit  -> SampleTimer;
+   BoilerPlateC.SampleTimer      -> SampleTimer;
    components new TimerMilliC() as SetupTimer;
    BoilerPlateC.SetupTimer    -> SetupTimer;
    components new TimerMilliC() as ActivityTimer;
@@ -66,16 +67,6 @@ implementation {
    MainC.SoftwareInit               -> shimmerAnalogSetupC.Init;
    BoilerPlateC.shimmerAnalogSetup  -> shimmerAnalogSetupC;
    BoilerPlateC.DMA0                -> Msp430DmaC.Channel0;
-/*
-   components GyroBoardC;
-   BoilerPlateC.GyroInit       -> GyroBoardC.Init;
-   BoilerPlateC.GyroStdControl -> GyroBoardC.StdControl;
-   BoilerPlateC.GyroBoard      -> GyroBoardC.GyroBoard;
-   components GyroMagBoardC;
-   BoilerPlateC.GyroMagInit       -> GyroMagBoardC.Init;
-   BoilerPlateC.GyroMagStdControl -> GyroMagBoardC.StdControl;
-   BoilerPlateC.GyroMagBoard      -> GyroMagBoardC.GyroMagBoard;
-*/
 
    components GyroBoardC;
    BoilerPlateC.GyroInit       -> GyroBoardC.Init;
@@ -85,6 +76,14 @@ implementation {
    components MagnetometerC;
    BoilerPlateC.MagInit        -> MagnetometerC.Init;
    BoilerPlateC.Magnetometer   -> MagnetometerC.Magnetometer;
+
+   components StrainGaugeC;
+   BoilerPlateC.StrainInit     -> StrainGaugeC.Init;
+   BoilerPlateC.StrainGauge    -> StrainGaugeC.StrainGauge;
+
+   components DigitalHeartRateC;
+   BoilerPlateC.DigitalHeartInit -> DigitalHeartRateC.Init;
+   BoilerPlateC.DigitalHeartRate -> DigitalHeartRateC;
 
    components BPCommandParserC;
    BoilerPlateC.BPCommandParser -> BPCommandParserC;

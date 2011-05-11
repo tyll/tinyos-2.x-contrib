@@ -56,14 +56,19 @@ module BoilerPlateC {
       interface Init as AccelInit;
       interface Init as GyroInit;
       interface Init as MagInit;
+      interface Init as StrainInit;
+      interface Init as DigitalHeartInit;
       interface GyroBoard;
       interface Magnetometer;
+      interface StrainGauge;
+      interface DigitalHeartRate;
       interface StdControl as GyroStdControl;
       interface Leds;
       interface shimmerAnalogSetup;
       interface Timer<TMilli> as SetupTimer;
       interface Timer<TMilli> as ActivityTimer;
-      interface Timer<TMilli> as SampleTimer;
+      interface Init as SampleTimerInit;
+      interface Alarm<TMilli, uint16_t> as SampleTimer;
       interface LocalTime<T32khz>;
       interface Mma_Accel as Accel;
       interface StdControl as BTStdControl;
@@ -85,39 +90,39 @@ implementation {
    void configure_channels();
    void prepareDataPacket();
 
-   int8_t tx_packet[((DATA_PACKET_SIZE%2)?(DATA_PACKET_SIZE+1):DATA_PACKET_SIZE)]; 
+   uint8_t res_packet[RESPONSE_PACKET_SIZE], readBuf[7];
+   int8_t tx_packet[DATA_PACKET_SIZE+1]; 
    // (+1) because MSP430 CPU can only read/write 16-bit values at even addresses,
    // so use an empty first  byte to even up the memory locations for 16-bit values
-   uint8_t start_val = ((DATA_PACKET_SIZE%2)?1:0);
+   // due to the 3 bytes before the first 16 bit data channel
+   uint8_t start_val = 1;
 
-   uint8_t res_packet[RESPONSE_PACKET_SIZE];
+   norace uint8_t nbr_adc_chans, nbr_1byte_digi_chans, nbr_2byte_digi_chans, current_buffer;
+   int8_t sbuf0[(MAX_NUM_2_BYTE_CHANNELS*2) + MAX_NUM_1_BYTE_CHANNELS], sbuf1[(MAX_NUM_2_BYTE_CHANNELS*2) + MAX_NUM_1_BYTE_CHANNELS]; 
+   norace uint16_t timestamp0, timestamp1;
 
-   uint8_t nbr_adc_chans, nbr_digi_chans, readBuf[7];
-   norace uint8_t current_buffer = 0;
-   int16_t sbuf0[11], sbuf1[11];    // maximum of 11 channels, (3 x Accel) + (3 x Gyro) + (3 x Mag) + (2 x AnEx) 
-   uint16_t timestamp0, timestamp1;
-   bool enable_sending, enable_receiving, command_mode_complete, activity_led_on;
+   norace bool sensing, enable_sending, enable_receiving, commandPending, command_mode_complete;
+   bool wasSensing, sendAck, inquiryResponse, samplingRateResponse, accelSensitivityResponse, configSetupByte0Response;
 
-   bool sensing, commandPending, wasSensing;
-   bool sendAck, inquiryResponse, samplingRateResponse, accelSensitivityResponse, configSetupByte0Response;
-
-   uint8_t g_action, g_arg_size, g_arg[MAX_COMMAND_ARG_SIZE];
+   uint8_t g_arg_size, g_arg[MAX_COMMAND_ARG_SIZE];
+   norace uint8_t g_action;
 
    // Configuration
-   uint8_t stored_config[NV_NUM_CONFIG_BYTES];
+   norace uint8_t stored_config[NV_NUM_CONFIG_BYTES];
    uint8_t channel_contents[MAX_NUM_CHANNELS];
 
+   bool accelCalibrationResponse, gyroCalibrationResponse, magCalibrationResponse;
 
 
    task void startSensing() {
-      if((stored_config[NV_SENSORS0] & SENSOR_GYRO) || (stored_config[NV_SENSORS0] & SENSOR_MAG)) {
+      if(stored_config[NV_SENSORS0] & SENSOR_GYRO){
          call GyroInit.init();
          call GyroStdControl.start();
-	 call Magnetometer.enableBus();
       }
 
       if(stored_config[NV_SENSORS0] & SENSOR_MAG)
       {
+         call MagInit.init();
          call Magnetometer.runContinuousConversion();
       }
       
@@ -125,11 +130,24 @@ implementation {
          call Accel.setSensitivity(stored_config[NV_ACCEL_SENSITIVITY]);
          call Accel.wake(TRUE);
       }
+
+      if(stored_config[NV_SENSORS1] & SENSOR_STRAIN) {
+         call StrainInit.init();
+         call StrainGauge.powerOn();
+         // Sets 5V reg
+         stored_config[NV_CONFIG_SETUP_BYTE0] |= CONFIG_5V_REG;
+         call InternalFlash.write((void*)NV_CONFIG_SETUP_BYTE0, (void*)&stored_config[NV_CONFIG_SETUP_BYTE0], 1);
+      }
+
+      if(stored_config[NV_SENSORS1] & SENSOR_HEART) {
+         call DigitalHeartRate.enableRate(15);
+      }
+
       call ActivityTimer.startPeriodic(1000);
 
       if(stored_config[NV_SAMPLING_RATE] != SAMPLING_0HZ_OFF)
-         call SampleTimer.startPeriodic(stored_config[NV_SAMPLING_RATE]); 
-      atomic sensing = TRUE;
+         call SampleTimer.start(stored_config[NV_SAMPLING_RATE]); 
+      sensing = TRUE;
    }
 
 
@@ -143,19 +161,28 @@ implementation {
          call Accel.wake(FALSE);
       if((stored_config[NV_SENSORS0] & SENSOR_GYRO) || (stored_config[NV_SENSORS0] & SENSOR_MAG)){
          call GyroStdControl.stop();
-	 call Magnetometer.disableBus();
+	      call Magnetometer.disableBus();
+      }
+      if(stored_config[NV_SENSORS1] & SENSOR_STRAIN) {
+         call StrainGauge.powerOff();
+         // clears 5V reg
+         stored_config[NV_CONFIG_SETUP_BYTE0] &= ~CONFIG_5V_REG;
+         call InternalFlash.write((void*)NV_CONFIG_SETUP_BYTE0, (void*)&stored_config[NV_CONFIG_SETUP_BYTE0], 1);
+      }
+      if(stored_config[NV_SENSORS1] & SENSOR_HEART) {
+         call DigitalHeartRate.disableRate();
       }
       call Leds.led1Off();
-      atomic sensing = FALSE;
+      sensing = FALSE;
    }
 
 
    task void sendSensorData() {
-      atomic if(enable_sending) {
+      if(enable_sending) {
          prepareDataPacket();
 
          // send data over the air
-         call Bluetooth.write(tx_packet+start_val, (3 + ((nbr_adc_chans+nbr_digi_chans)*2)));
+         call Bluetooth.write(tx_packet+start_val, (3 + ((nbr_adc_chans+nbr_2byte_digi_chans)*2)+ nbr_1byte_digi_chans));
          enable_sending = FALSE;
       }
    }
@@ -163,14 +190,11 @@ implementation {
 
    task void sendResponse() {
       uint16_t packet_length = 0;
-      bool temp;
+      uint8_t i;
       
-      atomic { 
-         temp = enable_sending;
-         enable_sending = FALSE;
-         commandPending = FALSE;
-      }
-      if(temp) {
+      commandPending = FALSE;
+      
+      if(enable_sending) {
          if(sendAck) {
             // if sending other response prepend acknowledgement to start
             // else just send acknowledgement by itself 
@@ -178,35 +202,54 @@ implementation {
             sendAck = FALSE;
          }
          if(inquiryResponse) {
-            *(res_packet + packet_length++) = INQUIRY_RESPONSE;                        //packet type
-            *(res_packet + packet_length++) = stored_config[NV_SAMPLING_RATE];         //ADC sampling rate
-            *(res_packet + packet_length++) = stored_config[NV_ACCEL_SENSITIVITY];     //Accel Sensitivity
-            *(res_packet + packet_length++) = stored_config[NV_CONFIG_SETUP_BYTE0];    //Config Setup Byte 0
-            *(res_packet + packet_length++) = nbr_adc_chans + nbr_digi_chans;          //number of data channels
-            *(res_packet + packet_length++) = stored_config[NV_BUFFER_SIZE];           //buffer size 
-            memcpy((res_packet + packet_length), channel_contents, (nbr_adc_chans + nbr_digi_chans));
-            packet_length += nbr_adc_chans + nbr_digi_chans;
+            *(res_packet + packet_length++) = INQUIRY_RESPONSE;                                             //packet type
+            *(res_packet + packet_length++) = stored_config[NV_SAMPLING_RATE];                              //ADC sampling rate
+            *(res_packet + packet_length++) = stored_config[NV_ACCEL_SENSITIVITY];                          //Accel Sensitivity
+            *(res_packet + packet_length++) = stored_config[NV_CONFIG_SETUP_BYTE0];                         //Config Setup Byte 0
+            *(res_packet + packet_length++) = nbr_adc_chans + nbr_1byte_digi_chans + nbr_2byte_digi_chans;  //number of data channels
+            *(res_packet + packet_length++) = stored_config[NV_BUFFER_SIZE];                                //buffer size 
+            memcpy((res_packet + packet_length), channel_contents, (nbr_adc_chans + nbr_1byte_digi_chans + nbr_2byte_digi_chans));
+            packet_length += nbr_adc_chans + nbr_1byte_digi_chans + nbr_2byte_digi_chans;
             inquiryResponse = FALSE;
          }
          else if(samplingRateResponse) {
-            *(res_packet + packet_length++) = SAMPLING_RATE_RESPONSE;                  // packet type
-            *(res_packet + packet_length++) = stored_config[NV_SAMPLING_RATE];         // ADC sampling rate
+            *(res_packet + packet_length++) = SAMPLING_RATE_RESPONSE;                     // packet type
+            *(res_packet + packet_length++) = stored_config[NV_SAMPLING_RATE];            // ADC sampling rate
             samplingRateResponse = FALSE;
          }
          else if(accelSensitivityResponse) {
-            *(res_packet + packet_length++) = ACCEL_SENSITIVITY_RESPONSE;              // packet type
-            *(res_packet + packet_length++) = stored_config[NV_ACCEL_SENSITIVITY];     // Accel Sensitivity
+            *(res_packet + packet_length++) = ACCEL_SENSITIVITY_RESPONSE;                 // packet type
+            *(res_packet + packet_length++) = stored_config[NV_ACCEL_SENSITIVITY];        // Accel Sensitivity
             accelSensitivityResponse = FALSE;
          }
          else if(configSetupByte0Response) {
-            *(res_packet + packet_length++) = CONFIG_SETUP_BYTE0_RESPONSE;             // packet type
-            *(res_packet + packet_length++) = stored_config[NV_CONFIG_SETUP_BYTE0];    // Config setup byte 0
+            *(res_packet + packet_length++) = CONFIG_SETUP_BYTE0_RESPONSE;                // packet type
+            *(res_packet + packet_length++) = stored_config[NV_CONFIG_SETUP_BYTE0];       // Config setup byte 0
             configSetupByte0Response = FALSE;
+         }
+         else if(accelCalibrationResponse){
+            *(res_packet + packet_length++) = ACCEL_CALIBRATION_RESPONSE;                 // packet type
+            for(i=0; i<21; i++)
+               *(res_packet + packet_length++) = stored_config[NV_ACCEL_CALIBRATION + i]; // Calibration values
+            accelCalibrationResponse = FALSE;
+         }
+         else if(gyroCalibrationResponse){
+            *(res_packet + packet_length++) = GYRO_CALIBRATION_RESPONSE;                  // packet type
+            for(i=0; i<21; i++)
+               *(res_packet + packet_length++) = stored_config[NV_GYRO_CALIBRATION + i];  // Calibration values
+            gyroCalibrationResponse = FALSE;
+         }
+         else if(magCalibrationResponse){
+            *(res_packet + packet_length++) = MAG_CALIBRATION_RESPONSE;                   // packet type
+            for(i=0; i<21; i++)
+               *(res_packet + packet_length++) = stored_config[NV_MAG_CALIBRATION + i];   // Calibration values
+            magCalibrationResponse = FALSE;
          }
          else {}
 
          // send data over the air
          call Bluetooth.write(res_packet, packet_length);
+         enable_sending = FALSE;
       }
    }
 
@@ -232,7 +275,7 @@ implementation {
          case SET_SAMPLING_RATE_COMMAND:
             stored_config[NV_SAMPLING_RATE] = g_arg[0];
             call InternalFlash.write((void*)NV_SAMPLING_RATE, (void*)&stored_config[NV_SAMPLING_RATE], 1);
-            atomic if(sensing) {
+            if(sensing) {
                post stopSensing();
                post startSensing();
             }
@@ -242,7 +285,7 @@ implementation {
             break;
          case START_STREAMING_COMMAND:
             // start capturing on ^G
-            atomic if(command_mode_complete)
+            if(command_mode_complete)
                post startSensing();
             else
                // give config a chance, wait 5 secs
@@ -250,11 +293,12 @@ implementation {
             break;
          case SET_SENSORS_COMMAND:
             stored_config[NV_SENSORS0] = g_arg[0];
-            call InternalFlash.write((void*)NV_SENSORS0, (void*)&stored_config[NV_SENSORS0], 1);
-            atomic if(sensing) {
+            stored_config[NV_SENSORS1] = g_arg[1];
+            call InternalFlash.write((void*)NV_SENSORS0, (void*)&stored_config[NV_SENSORS0], 2);
+
+            if(sensing) {
                post stopSensing();
                post ConfigureChannelsTask();
-               //post startSensing();
                wasSensing = TRUE;
             }
             else
@@ -264,7 +308,7 @@ implementation {
             if((g_arg[0] == RANGE_1_5G) || (g_arg[0] == RANGE_2_0G) || (g_arg[0] == RANGE_4_0G) || (g_arg[0] == RANGE_6_0G)) {
                stored_config[NV_ACCEL_SENSITIVITY] = g_arg[0];
                call InternalFlash.write((void*)NV_ACCEL_SENSITIVITY, (void*)&stored_config[NV_ACCEL_SENSITIVITY], 1);
-               atomic if(sensing) {
+               if(sensing) {
                   post stopSensing();
                   post startSensing();
                }
@@ -300,7 +344,7 @@ implementation {
          case SET_CONFIG_SETUP_BYTE0_COMMAND:
             stored_config[NV_CONFIG_SETUP_BYTE0] = g_arg[0];
             if(stored_config[NV_CONFIG_SETUP_BYTE0] & CONFIG_5V_REG)
-               TOSH_SET_SER0_RTS_PIN;
+               TOSH_SET_SER0_RTS_PIN();
             else
                TOSH_CLR_SER0_RTS_PIN();
 #ifdef PWRMUX_UTIL
@@ -318,6 +362,27 @@ implementation {
          case GET_CONFIG_SETUP_BYTE0_COMMAND:
             configSetupByte0Response = TRUE;
             break;
+         case SET_ACCEL_CALIBRATION_COMMAND:
+            memcpy(&stored_config[NV_ACCEL_CALIBRATION], g_arg, 21);
+            call InternalFlash.write((void*)NV_ACCEL_CALIBRATION, (void*)&stored_config[NV_ACCEL_CALIBRATION], 21);
+            break;
+         case GET_ACCEL_CALIBRATION_COMMAND:
+            accelCalibrationResponse = TRUE;
+            break; 
+         case SET_GYRO_CALIBRATION_COMMAND:
+            memcpy(&stored_config[NV_GYRO_CALIBRATION], g_arg, 21);
+            call InternalFlash.write((void*)NV_GYRO_CALIBRATION, (void*)&stored_config[NV_GYRO_CALIBRATION], 21);
+            break;
+         case GET_GYRO_CALIBRATION_COMMAND:
+            gyroCalibrationResponse = TRUE;
+            break; 
+         case SET_MAG_CALIBRATION_COMMAND:
+            memcpy(&stored_config[NV_MAG_CALIBRATION], g_arg, 21);
+            call InternalFlash.write((void*)NV_MAG_CALIBRATION, (void*)&stored_config[NV_MAG_CALIBRATION], 21);
+            break;
+         case GET_MAG_CALIBRATION_COMMAND:
+            magCalibrationResponse = TRUE;
+            break; 
          case STOP_STREAMING_COMMAND:
             post stopSensing();
             break;
@@ -327,28 +392,45 @@ implementation {
       post sendResponse();
    }
 
-
-   task void clockin_result() {
-      call Magnetometer.readData();
-   }
-
    
    task void collect_results() {
+      uint8_t rate = 0;
       int16_t realVals[3];
-      register uint8_t i;
+      register uint8_t i, j=0;
 
-      call Magnetometer.convertRegistersToData(readBuf, realVals);
+      if(stored_config[NV_SENSORS0] & SENSOR_MAG) {
+         call Magnetometer.convertRegistersToData(readBuf, realVals);
 
-      if(current_buffer == 0) {
-         for(i = 0; i < 3; i++)
-            *(sbuf0 + i + nbr_adc_chans) = *(realVals + i);
+         if(current_buffer == 0) {
+            for(i = 0; i < 3; i++)
+               *((uint16_t *)sbuf0 + j++ + nbr_adc_chans) = *(realVals + i);
+         }
+         else {
+            for(i = 0; i < 3; i++)
+               *((uint16_t *)sbuf1 + j++ + nbr_adc_chans) = *(realVals + i);
+         }
       }
-      else {
-         for(i = 0; i < 3; i++)
-            *(sbuf1 + i + nbr_adc_chans) = *(realVals + i);
+
+      // 8 bit channels must come after 16 bit channels
+      // due allignment for 16 bit read/writes
+      j = 0;
+      if(stored_config[NV_SENSORS1] & SENSOR_HEART) {
+         call DigitalHeartRate.getRate(&rate);
+         if(current_buffer == 0) 
+            *(sbuf0 + j++ + ((nbr_adc_chans + nbr_2byte_digi_chans)*2)) = rate;
+         else
+            *(sbuf1 + j++ + ((nbr_adc_chans + nbr_2byte_digi_chans)*2)) = rate;
       }
 
       post sendSensorData();
+   }
+
+
+   task void clockin_result() {
+      if(stored_config[NV_SENSORS0] & SENSOR_MAG)
+         call Magnetometer.readData();
+      else
+         post collect_results();
    }
 
 
@@ -358,23 +440,29 @@ implementation {
       call FastClock.setSMCLK(1);  // set smclk to 1MHz
 #endif // USE_8MHZ_CRYSTAL
    
-      atomic {
-         enable_sending = FALSE;
-         enable_receiving = FALSE;
-         command_mode_complete = FALSE;
-         activity_led_on = FALSE;
-         sensing = FALSE;
-         sendAck = FALSE;
-         inquiryResponse = FALSE;
-         samplingRateResponse = FALSE;
-         accelSensitivityResponse = FALSE;
-         configSetupByte0Response = FALSE;
-         commandPending = FALSE;
-         wasSensing = FALSE;
-         nbr_adc_chans = 0;
-         nbr_digi_chans = 0;
-      }
+      enable_sending = FALSE;
+      enable_receiving = FALSE;
+      command_mode_complete = FALSE;
+      sensing = FALSE;
+      wasSensing = FALSE;
+      sendAck = FALSE;
+      commandPending = FALSE;
+      current_buffer = 0;
+      nbr_1byte_digi_chans = 0;
+      nbr_2byte_digi_chans = 0;
+      nbr_adc_chans = 0;
+      samplingRateResponse = FALSE;
+      accelSensitivityResponse = FALSE;
+      configSetupByte0Response = FALSE;
+      inquiryResponse = FALSE;
+      accelCalibrationResponse = FALSE;
+      gyroCalibrationResponse = FALSE;
+      magCalibrationResponse = FALSE;
+
       call BluetoothInit.init();
+      call Bluetooth.disableRemoteConfig(TRUE);
+
+      call SampleTimerInit.init();
 
       call InternalFlash.read((void*)0, (void*)stored_config, NV_NUM_CONFIG_BYTES);
       if(stored_config[NV_SENSORS0] == 0xFF) {
@@ -383,20 +471,17 @@ implementation {
          stored_config[NV_SAMPLING_RATE] = SAMPLING_50HZ;
          stored_config[NV_BUFFER_SIZE] = 1;
          stored_config[NV_SENSORS0] = SENSOR_ACCEL;
+         stored_config[NV_SENSORS1] = 0;
          stored_config[NV_ACCEL_SENSITIVITY] = RANGE_1_5G;
          stored_config[NV_CONFIG_SETUP_BYTE0] = 0;
          call InternalFlash.write((void*)0, (void*)stored_config, NV_NUM_CONFIG_BYTES);
       }
 
-      configure_channels();
-
-      call Bluetooth.disableRemoteConfig(TRUE);
-   
       // Set SER0_RTS pin to be I/O in order to control 5V regulator on AnEx board
       TOSH_MAKE_SER0_RTS_OUTPUT();
       TOSH_SEL_SER0_RTS_IOFUNC();
       if(stored_config[NV_CONFIG_SETUP_BYTE0] & CONFIG_5V_REG)
-	TOSH_SET_SER0_RTS_PIN();
+	      TOSH_SET_SER0_RTS_PIN();
       else
          TOSH_CLR_SER0_RTS_PIN();
 #ifdef PWRMUX_UTIL
@@ -407,6 +492,7 @@ implementation {
          TOSH_CLR_PWRMUX_SEL_PIN();
 #endif
 
+      configure_channels();
    }
 
 
@@ -414,7 +500,8 @@ implementation {
       uint8_t *channel_contents_ptr = channel_contents;
 
       nbr_adc_chans = 0;
-      nbr_digi_chans = 0;
+      nbr_1byte_digi_chans = 0;
+      nbr_2byte_digi_chans = 0;
 
       call shimmerAnalogSetup.reset();
       // Accel
@@ -441,10 +528,9 @@ implementation {
       // EMG
       else if(stored_config[NV_SENSORS0] & SENSOR_EMG){
          call shimmerAnalogSetup.addEMGInput();
-         *channel_contents_ptr++ = EMG_1;
-         *channel_contents_ptr++ = EMG_2;
+         *channel_contents_ptr++ = EMG;
       }
-      //GSR
+      // GSR
       else if(stored_config[NV_SENSORS0] & SENSOR_GSR){
          call shimmerAnalogSetup.addGSRInput();
          *channel_contents_ptr++ = GSR_LO;
@@ -460,20 +546,33 @@ implementation {
          call shimmerAnalogSetup.addAnExInput(0);
          *channel_contents_ptr++ = ANEX_A0;
       }
+      // Strain Gauge
+      if(stored_config[NV_SENSORS1] & SENSOR_STRAIN) {
+         call shimmerAnalogSetup.addStrainGaugeInputs();
+         *channel_contents_ptr++ = STRAIN_HIGH;
+         *channel_contents_ptr++ = STRAIN_LOW;
+      }
+      // Digital channels need to be after ADC channels to allow for DMA
       // Mag
-      // needs to be last to allow DMA for ADC channels
       if(stored_config[NV_SENSORS0] & SENSOR_MAG) {
          *channel_contents_ptr++ = X_MAG;
          *channel_contents_ptr++ = Y_MAG;
          *channel_contents_ptr++ = Z_MAG;
-         nbr_digi_chans += 3;
+         nbr_2byte_digi_chans += 3;
+      }
+      // 1 byte digital channels must come after 2 byte digital channels
+      // Heart Rate
+      if(stored_config[NV_SENSORS1] & SENSOR_HEART) {
+         call DigitalHeartInit.init();
+         *channel_contents_ptr++ = HEART_RATE;
+         nbr_1byte_digi_chans += 1;
       }
 
-      call shimmerAnalogSetup.finishADCSetup(sbuf0);
+      call shimmerAnalogSetup.finishADCSetup((uint16_t *)sbuf0);
       nbr_adc_chans = call shimmerAnalogSetup.getNumberOfChannels();
 
 
-      atomic if(wasSensing) {
+      if(wasSensing) {
          post startSensing();
          wasSensing = FALSE;
       }
@@ -483,28 +582,36 @@ implementation {
    // The MSP430 CPU is byte addressed and little endian/
    // packets are sent little endian so the word 0xABCD will be sent as bytes 0xCD 0xAB
    void prepareDataPacket() {
-      uint16_t *p_packet, *p_ADCsamples;
-      uint8_t *p8_packet, i;
+      uint16_t *p_packet, *p_samples;
+      uint8_t *p8_packet, *p8_samples, i;
 
       p8_packet = &tx_packet[start_val];
     
       *p8_packet++ = DATA_PACKET;
       if(current_buffer == 0) {
-         p_ADCsamples = sbuf0;
+         p_samples = (uint16_t *)sbuf0;
          *p8_packet++ = timestamp0 & 0xff;
          *p8_packet++ = (timestamp0 >> 8) & 0xff;
          current_buffer = 1;
       }
       else {
-         p_ADCsamples = sbuf1;
+         p_samples = (uint16_t *)sbuf1;
          *p8_packet++ = timestamp1 & 0xff;
          *p8_packet++ = (timestamp1 >> 8) & 0xff;
          current_buffer = 0;
       }
 
       p_packet = (uint16_t *)p8_packet;
-      for(i=0; i<(nbr_adc_chans+nbr_digi_chans); i++, p_packet++, p_ADCsamples++){
-         *p_packet = *p_ADCsamples; 
+      // ADC channels and 2 byte digi channels
+      for(i=0; i<nbr_adc_chans + nbr_2byte_digi_chans; i++, p_packet++, p_samples++){
+         *p_packet = *p_samples; 
+      }
+      
+      p8_packet = (uint8_t *)p_packet;
+      p8_samples = (uint8_t *)p_samples;
+      // 1 byte digi channels
+      for(i=0; i<nbr_1byte_digi_chans; i++, p8_packet++, p_samples++){
+         *p8_packet = *p_samples; 
       }
    }
 
@@ -516,38 +623,34 @@ implementation {
 
 
    async event void Bluetooth.connectionMade(uint8_t status) { 
-      atomic {
-         enable_sending = TRUE;
-         enable_receiving = TRUE;
-      }
+      enable_sending = TRUE;
+      enable_receiving = TRUE;
       call Leds.led2On();
    }
 
    
    async event void Bluetooth.commandModeEnded() { 
-      atomic command_mode_complete = TRUE;
+      command_mode_complete = TRUE;
    }
     
 
    async event void Bluetooth.connectionClosed(uint8_t reason){
-      atomic { 
-         enable_sending = FALSE;
-         enable_receiving = FALSE;
-         sensing = FALSE;
-      }
+      enable_sending = FALSE;
+      enable_receiving = FALSE;
+      sensing = FALSE;
       call Leds.led2Off();
       post stopSensing();
    }
 
 
    async event void Bluetooth.dataAvailable(uint8_t data){
-      atomic if(enable_receiving)
+      if(enable_receiving)
          call BPCommandParser.handleByte(data);
    }
 
 
    event void Bluetooth.writeDone(){
-      atomic enable_sending = TRUE;
+      enable_sending = TRUE;
    }
 
 
@@ -559,24 +662,23 @@ implementation {
 
 
    event void ActivityTimer.fired() {
-      atomic {
-         // toggle activity led every second
-         if(activity_led_on) {
-            call Leds.led1On();
-            activity_led_on = FALSE;
-         }
-         else {
-            call Leds.led1Off();
-            activity_led_on = TRUE;
-         }
-      }
+      // toggle activity led every second
+      call Leds.led1Toggle();
    }
 
 
-   event void SampleTimer.fired() {
+   //event void SampleTimer.fired() {
+   async event void SampleTimer.fired() {
+      call SampleTimer.start(stored_config[NV_SAMPLING_RATE]); 
+      if(current_buffer == 0){
+         timestamp0 = call LocalTime.get();
+      }
+      else { 
+         timestamp1 = call LocalTime.get();
+      }
       if(nbr_adc_chans > 0)
          call shimmerAnalogSetup.triggerConversion();
-      else if(nbr_digi_chans > 0)
+      else if((nbr_1byte_digi_chans > 0) || (nbr_2byte_digi_chans > 0))
          post clockin_result();
    }
 
@@ -584,15 +686,11 @@ implementation {
    async event void DMA0.transferDone(error_t success) {
       if(current_buffer == 0){
          call DMA0.repeatTransfer((void*)ADC12MEM0_, (void*)sbuf1, nbr_adc_chans);
-         atomic timestamp1 = call LocalTime.get();
-         //current_buffer = 1;
       }
       else { 
          call DMA0.repeatTransfer((void*)ADC12MEM0_, (void*)sbuf0, nbr_adc_chans);
-         atomic timestamp0 = call LocalTime.get();
-         //current_buffer = 0;
       }
-      if(nbr_digi_chans > 0)
+      if((nbr_1byte_digi_chans > 0) || (nbr_2byte_digi_chans > 0))
          post clockin_result();
       else
          post sendSensorData();      
@@ -600,10 +698,13 @@ implementation {
 
 
    async event void BPCommandParser.activate(uint8_t action, uint8_t arg_size, uint8_t *arg){
-      atomic if(!commandPending) {
-         g_action = action;
+      bool temp;
+
+      atomic temp = commandPending; // to keep atomic section as short as possible
+      if(!temp) {
          g_arg_size = arg_size;
          memcpy(g_arg, arg, arg_size);
+         g_action = action;
          commandPending = TRUE;
          post ProcessCommand();
       }
@@ -621,5 +722,21 @@ implementation {
 
 
    event void Magnetometer.writeDone(error_t success){
+   }
+
+   async event void DigitalHeartRate.beat(uint32_t time) {
+   }
+
+   event void DigitalHeartRate.newConnectionState(bool up){
+      if(up){
+         if((stored_config[NV_SENSORS1] & SENSOR_HEART) && (sensing)) {
+            call DigitalHeartRate.enableRate(15);
+         }
+      }
+      else{
+         if((stored_config[NV_SENSORS1] & SENSOR_HEART) && (sensing)) {
+            call DigitalHeartRate.disableRate();   // this flushes any old data 
+         }
+      }
    }
 }

@@ -19,6 +19,8 @@ Currently the following parameters can be configured. This configuration is stor
    - Sampling rate
    - Which sensors are sampled
    - Accelerometer sensitivity
+   - The state of the 5V regulator on the AnEx board
+   - The power mux
 
 
 The following commands are available:
@@ -34,6 +36,12 @@ The following commands are available:
    - SET_PMUX_COMMAND
    - SET_CONFIG_SETUP_BYTE0_COMMAND
    - GET_CONFIG_SETUP_BYTE0_COMMAND
+   - SET_ACCEL_CALIBRATION_COMMAND
+   - GET_ACCEL_CALIBRATION_COMMAND
+   - SET_GYRO_CALIBRATION_COMMAND
+   - GET_GYRO_CALIBRATION_COMMAND
+   - SET_MAG_CALIBRATION_COMMAND
+   - GET_MAG_CALIBRATION_COMMAND
    - STOP_STREAMING_COMMAND
 
 
@@ -46,6 +54,8 @@ Config Setup Byte 0:
    - Bit 2: Not yet assigned
    - Bit 1: Not yet assigned
    - Bit 0: Not yet assigned
+Config Setup Byte 1-4:
+   - Not yet assigned
 
 
 The format of the configuration data stored in Infomem is as follows:
@@ -54,7 +64,10 @@ The format of the configuration data stored in Infomem is as follows:
       Byte 1: Buffer Size
       Byte 2 - 11: Selected Sensors (Allows for up to 80 different sensors)
       Byte 12: Accel Sensitivity
-      Byte 13: Config Byte 0
+      Byte 13 - 17: Config Bytes (Allows for 40 individual boolean settings)
+      Byte 18 - 38: Accelerometers calibration values
+      Byte 39 - 59: Gyroscopes calibration values
+      Byte 60 - 80: Magnetometer calibration values
 
 
 The assignment of the selected sensors field is a follows:
@@ -68,16 +81,41 @@ The assignment of the selected sensors field is a follows:
          Bit 2: GSR
          Bit 1: AnEx ADC Channel 7
          Bit 0: AnEx ADC Channel 0
-      Byte3 - Byte11
+      Byte3
+         Bit 7: Strain Gauge
+         Bit 6: Heart Rate
+         Bit 5: Not yet assigned
+         Bit 4: Not yet assigned
+         Bit 3: Not yet assigned
+         Bit 2: Not yet assigned
+         Bit 1: Not yet assigned
+         Bit 0: Not yet assigned
+      Byte4 - Byte11
          Not yet assigned
 
 
 TODO:
    - Support for dynamically changing GSR resistor values
    - Support for variable data buffer size
-   - Eliminate all potential race conditions
-   - Save (and read back) calibration data to Infomem
-   - Battery monitoring
    - Real world time stamps
       - and command to initialise
-   - Documentation
+
+
+Changelog:
+- 10 Jan 2011
+   - initial release
+   - support for Accelerometer, Gyroscope, Magnetometer, ECG, EMG, AnEx sensors
+   - Sampling rate, Accel sensitivity, 5V regulater and PMUX (volatage monitoring) configurable
+   - save configuration to InfoMem
+- 29 Mar 2011
+   - support for Strain Gauge and Heart Rate sensors
+   - fixed EMG problem
+      - a second EMG channel was being added erroneously
+   - support for transmitting 8-bit data channels instead of just 16-bit 
+- 21 Apr 2011
+   - Fixed bug in heart rate support
+   - Fixed bug in timestamping
+   - changed SampleTimer to an Alarm
+- 4 May 2011
+   - removed a lot of unnecessary atomic commands
+   - added support for writing and reading accel, gyro and mag calibration data

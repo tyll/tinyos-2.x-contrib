@@ -67,16 +67,33 @@ enum {
    SET_CONFIG_SETUP_BYTE0_COMMAND   = 0x0E,
    CONFIG_SETUP_BYTE0_RESPONSE      = 0x0F,
    GET_CONFIG_SETUP_BYTE0_COMMAND   = 0x10,
+   SET_ACCEL_CALIBRATION_COMMAND    = 0x11,
+   ACCEL_CALIBRATION_RESPONSE       = 0x12,
+   GET_ACCEL_CALIBRATION_COMMAND    = 0x13,
+   SET_GYRO_CALIBRATION_COMMAND     = 0x14,
+   GYRO_CALIBRATION_RESPONSE        = 0x15,
+   GET_GYRO_CALIBRATION_COMMAND     = 0x16,
+   SET_MAG_CALIBRATION_COMMAND      = 0x17,
+   MAG_CALIBRATION_RESPONSE         = 0x18,
+   GET_MAG_CALIBRATION_COMMAND      = 0x19,
    STOP_STREAMING_COMMAND           = 0x20,
    ACK_COMMAND_PROCESSED            = 0xFF
+};
+
+// Maximum number of channels
+enum {
+   MAX_NUM_2_BYTE_CHANNELS = 11,
+   MAX_NUM_1_BYTE_CHANNELS = 1,
+   MAX_NUM_CHANNELS = MAX_NUM_2_BYTE_CHANNELS + MAX_NUM_1_BYTE_CHANNELS
 };
 
 
 // Packet Sizes
 enum {
-   DATA_PACKET_SIZE = 25,        // biggest possibly required i.e 11 channels + 3 bytes
-   RESPONSE_PACKET_SIZE = 17,    // biggest possibly required
-   MAX_COMMAND_ARG_SIZE = 1      // maximum number of arguments for any command sent so shimmer    
+   DATA_PACKET_SIZE = 3 + (MAX_NUM_2_BYTE_CHANNELS * 2) + MAX_NUM_1_BYTE_CHANNELS,
+   //RESPONSE_PACKET_SIZE = 6 + MAX_NUM_CHANNELS,    // biggest possibly required
+   RESPONSE_PACKET_SIZE = 22,             // biggest possibly required (calibration responses)
+   MAX_COMMAND_ARG_SIZE = 21              // maximum number of arguments for any command sent to shimmer (calibration data)    
 };
 
 // Channel contents
@@ -94,27 +111,33 @@ enum {
    ECG_LA_LL   = 0x0A,
    GSR_LO      = 0x0B,
    GSR_HI      = 0x0C,
-   EMG_1       = 0x0D,
-   EMG_2       = 0x0E,
-   ANEX_A0     = 0x0F,
-   ANEX_A7     = 0x10
+   EMG         = 0x0D,
+   ANEX_A0     = 0x0E,
+   ANEX_A7     = 0x0F,
+   STRAIN_HIGH = 0x10,
+   STRAIN_LOW  = 0x11, 
+   HEART_RATE  = 0x12
 };
 
 // Infomem contents;
 enum {
-   NV_NUM_CONFIG_BYTES = 14, 
-   MAX_NUM_CHANNELS = 11 
+   NV_NUM_CONFIG_BYTES = 81
 };
 
 enum {
-   NV_SAMPLING_RATE = 0,
-   NV_BUFFER_SIZE = 1,
-   NV_SENSORS0 = 2,
-   NV_ACCEL_SENSITIVITY = 12,
-   NV_CONFIG_SETUP_BYTE0 = 13
+   NV_SAMPLING_RATE      = 0,
+   NV_BUFFER_SIZE        = 1,
+   NV_SENSORS0           = 2,
+   NV_SENSORS1           = 3,
+   NV_ACCEL_SENSITIVITY  = 12,
+   NV_CONFIG_SETUP_BYTE0 = 13,
+   NV_ACCEL_CALIBRATION  = 18,
+   NV_GYRO_CALIBRATION   = 39,
+   NV_MAG_CALIBRATION    = 60
 };
 
 //Sensor bitmap
+//SENSORS0
 enum {
    SENSOR_ACCEL   = 0x80,
    SENSOR_GYRO    = 0x40,
@@ -125,11 +148,16 @@ enum {
    SENSOR_ANEX_A7 = 0x02,
    SENSOR_ANEX_A0 = 0x01
 };
+//SENSORS1
+enum {
+   SENSOR_STRAIN  = 0x80,
+   SENSOR_HEART   = 0x40
+};
 
 // Config Byte0 bitmap
 enum {
    CONFIG_5V_REG = 0x80,
-   CONFIG_PMUX   = 0x40,
+   CONFIG_PMUX   = 0x40
 };
 
 #endif // SHIMMER_H

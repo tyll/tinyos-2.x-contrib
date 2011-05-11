@@ -1,0 +1,3 @@
+COMPONENT=SimpleGsrAppC
+
+include $(MAKERULES)

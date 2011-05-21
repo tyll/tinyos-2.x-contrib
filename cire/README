@@ -1,0 +1,24 @@
+
+Motenet provides a socket interface for TinyOS base station programs.
+
+See support/sdk/c/{motenet,libnet/README for more details.
+
+This is the tinyos-2.x-contrib version which is essentially the same as what is
+branched off the svn trunk.   The directory structure mirrors the svn trunk,
+support/sdk/c/{motenet,libnet,sf}.
+
+The main components are:
+
+motenet: The core of libmotenet.  Libmotenet provides the socket interface for
+both AM and IPv6 sockets.  It is a superset of the libmote library previously
+provided for base station communications.  Libmotenet current uses the serial
+forwarder (support/sdk/c/sf) for gateway functions.
+
+libnet: provides various misc. network functions used by libmotenet.  See
+libnet/README for details.
+
+sf: a copy of the serial forwarder provided by the svn trunk.   Here to enable
+independent compilation.  No changes from the svn trunk.
+
+support/sdk/java/net/tinyos/packet/BaudRate.java: used by sf.  Same as
+what is in the svn trunk.

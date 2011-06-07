@@ -1,0 +1,4 @@
+CFLAGS += -g -I../ -I./code -Wall -lm
+all:
+	gcc $(CFLAGS) dctApp.c huffmanUncompress.c  -o dctApp.exe
+#	gcc $(CFLAGS) idctApp.c jpegUncompress.c huffmanUncompress.c -o idctApp.exe

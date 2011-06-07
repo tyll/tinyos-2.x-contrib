@@ -1,0 +1,32 @@
+COMPONENT=cameraModuleC
+
+
+PFLAGS += -Icompress
+PFLAGS += -IdpcmSupport
+#PFLAGS += -IBigMsg
+PFLAGS += -IcameraComm
+#PFLAGS += -IprovaAck
+PFLAGS += -IdriverCam/ov7670
+PFLAGS += -IdriverCam/xbow_cb
+PFLAGS += -IdriverCam/cif
+PFLAGS += -DTOSH_DATA_LENGTH=43
+#67
+
+CFLAGS += -DCC2420_DEF_RFPOWER=15
+
+CC2420_CHANNEL=26
+
+
+SYSTEM_CORE_FREQUENCY := 104
+SYSTEM_BUS_FREQUENCY := 104
+
+PFLAGS += -DACK_DISABLE=1
+#PFLAGS += -DPSNR_ENV=1
+PFLAGS += -DTEST_ENV=1
+#PFLAGS += -DSERIAL_MODE=1
+
+TOSMAKE_PATH += make
+#TOSMAKE_PATH += $(INTELMOTE2_CONTRIB_DIR)/support/make
+
+include $(MAKERULES)
+#$(call TOSMake_include,intelmote2.extra)

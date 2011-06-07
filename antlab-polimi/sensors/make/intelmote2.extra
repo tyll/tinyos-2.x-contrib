@@ -1,0 +1,37 @@
+ifeq ($(PLATFORM),intelmote2)
+
+	PFLAGS := -I$(INTELMOTE2_CONTRIB_DIR)/tos/chips/pxa27x $(PFLAGS)
+	PFLAGS := -I$(INTELMOTE2_CONTRIB_DIR)/tos/platforms/intelmote2 $(PFLAGS)
+	PFLAGS := -I$(INTELMOTE2_CONTRIB_DIR)/tos/platforms/intelmote2/chips/da9030 $(PFLAGS)
+
+
+# Boot Loader changes are moved in to the default compile, however it
+# is easier to have a way to eliminate the boot loader changes if required.
+# Uncommenting the IFDEF will require an extra compile time flag to include
+# the boot loader changes.
+# The changes are 
+#   barcert.s - Defines a new linker section for reset handler.
+#   PXA27XUSBClientM.nc - Added Message type of boot loader.
+# If uncommented the Usage is: make imote2 bootloader.
+# - Junaith
+
+PFLAGS += -DBOOTLOADER
+
+#override the original makefile to use as instead of gcc to assemble files
+	AS = echo 
+	ASFLAGS = -mcpu=iwmmxt -mfpu=softfpa -defsym BOOTLOADER=1
+	GAS := $(AS) $(ASFLAGS) 
+	
+	ASSEMBLY_FILES = $(INTELMOTE2_CONTRIB_DIR)/tos/platforms/intelmote2/toscrt0.s $(INTELMOTE2_CONTRIB_DIR)/tos/chips/pxa27x/pxa27x_util.s $(INTELMOTE2_CONTRIB_DIR)/tos/chips/pxa27x/mmu_table.s
+	ASSEMBLY_OBJS:= $(ASSEMBLY_FILES)
+
+	PFLAGS := -I$(INTELMOTE2_CONTRIB_DIR)/tos/chips/pxa27x $(PFLAGS)
+	PFLAGS := -I$(INTELMOTE2_CONTRIB_DIR)/tos/platforms/intelmote2 $(PFLAGS)
+	PFLAGS := -I$(INTELMOTE2_CONTRIB_DIR)/tos/platforms/intelmote2/chips/da9030 $(PFLAGS)
+	
+	CFLAGS := -T$(INTELMOTE2_CONTRIB_DIR)/tos/platforms/intelmote2/tos.x -DSYSTEM_CORE_FREQUENCY=$(SYSTEM_CORE_FREQUENCY) -DSYSTEM_BUS_FREQUENCY=$(SYSTEM_BUS_FREQUENCY)
+
+bytes: FORCE
+	@objdump -h $(MAIN_EXE) | perl -ne '$$b{$$1}=hex $$2 if /^\s*\d+\s*\.(text|data|bss|stack)\s+(\S+)/; END { printf("%16d bytes in ROM\n%16d bytes in RAM\n%16d bytes in STACK\n%16d bytes available in HEAP\n",$$b{text}+$$b{data},$$b{data}+$$b{bss},$$b{stack},262144-$$b{data}-$$b{bss}-$$b{stack} ); }'
+
+endif

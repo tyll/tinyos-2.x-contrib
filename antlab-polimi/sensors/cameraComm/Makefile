@@ -1,0 +1,12 @@
+
+COMPONENT=RadioMsgC
+
+
+SYSTEM_CORE_FREQUENCY := 208
+SYSTEM_BUS_FREQUENCY := 208
+
+TOSMAKE_PATH += make
+#TOSMAKE_PATH += $(INTELMOTE2_CONTRIB_DIR)/support/make
+
+include $(MAKERULES)
+$(call TOSMake_include,intelmote2.extra)

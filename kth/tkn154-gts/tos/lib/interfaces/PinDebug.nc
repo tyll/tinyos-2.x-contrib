@@ -42,5 +42,7 @@ interface PinDebug{
 	command void ADC1set();
 	command void ADC1clr();
 
-	
+	command void ADC2toggle();
+	command void ADC2set();
+	command void ADC2clr();
 }

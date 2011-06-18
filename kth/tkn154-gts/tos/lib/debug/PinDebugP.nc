@@ -38,6 +38,7 @@ module PinDebugP @ safe() {
 	uses {
 		interface GeneralIO as PinADC0;
 		interface GeneralIO as PinADC1;
+		interface GeneralIO as PinADC2;
 	}
 	provides{
 		interface PinDebug;
@@ -51,6 +52,7 @@ implementation {
 	command error_t Reset.init() {
 		call PinADC0.makeOutput();
 		call PinADC1.makeOutput();
+		call PinADC2.makeOutput();
 
 		return SUCCESS;
 	}
@@ -58,9 +60,12 @@ implementation {
 	command void PinDebug.ADC0set(){call PinADC0.set();	}
 	command void PinDebug.ADC0clr(){call PinADC0.clr();	}
 	
-	command void PinDebug.ADC1toggle(){call PinADC1.toggle();	}
+	command void PinDebug.ADC1toggle(){call PinADC1.toggle(); }
 	command void PinDebug.ADC1set(){call PinADC1.set();	}
 	command void PinDebug.ADC1clr(){call PinADC1.clr();	}
-
+	
+	command void PinDebug.ADC2toggle(){call PinADC2.toggle(); }
+	command void PinDebug.ADC2set(){call PinADC2.set();	}
+	command void PinDebug.ADC2clr(){call PinADC2.clr();	}
 
 }

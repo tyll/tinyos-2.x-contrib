@@ -53,5 +53,9 @@ implementation {
 	command void PinDebug.ADC1toggle(){}
 	command void PinDebug.ADC1set(){}
 	command void PinDebug.ADC1clr(){}
+	
+	command void PinDebug.ADC2toggle(){}
+	command void PinDebug.ADC2set(){}
+	command void PinDebug.ADC2clr(){}
 
 }

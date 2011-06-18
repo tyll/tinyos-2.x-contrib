@@ -1,0 +1,63 @@
+PLATFORMS = telosb micaz
+
+# load the modified files from the default GTS
+TKN154_GTS_MOD_TOS=$(TOSCONTRIB)/kth/tkn154-gts-mod/tos
+CFLAGS += -I$(TKN154_GTS_MOD_TOS)/lib/mac/tkn154 \
+		  -I$(TKN154_GTS_MOD_TOS)/lib/mac/tkn154/dummies \
+		  -I$(TKN154_GTS_MOD_TOS)/lib/mac/tkn154/interfaces/public \
+
+
+# load the modified files from the default GTS
+TKN154_GTS_ROOT=$(TOSCONTRIB)/kth/tkn154-gts
+TKN154_GTS_TOS=$(TKN154_GTS_ROOT)/tos
+TKN154_GTS_PLATFORM_INCLUDE?=$(TKN154_GTS_MOD_TOS)/platforms/$(PLATFORM)/mac/tkn154/Makefile.include
+
+CFLAGS += -I$(TKN154_GTS_TOS)/lib/mac/tkn154 \
+	-I$(TKN154_GTS_TOS)/lib/mac/tkn154/dummies \
+	-I$(TKN154_GTS_TOS)/lib/mac/tkn154/interfaces/MCPS \
+	-I$(TKN154_GTS_TOS)/lib/mac/tkn154/interfaces/MLME \
+	-I$(TKN154_GTS_TOS)/lib/mac/tkn154/interfaces/private \
+	-I$(TKN154_GTS_TOS)/lib/mac/tkn154/interfaces/public \
+	-I$(TKN154_GTS_TOS)/lib/debug \
+	-I$(TKN154_GTS_TOS)/lib/interfaces
+	
+	
+TKN154_PLATFORM_INCLUDE?=$(TOSDIR)/platforms/$(PLATFORM)/mac/tkn154/Makefile.include
+
+CFLAGS += -I$(TOSDIR)/lib/mac/tkn154 \
+	-I$(TOSDIR)/lib/mac/tkn154/dummies \
+	-I$(TOSDIR)/lib/mac/tkn154/interfaces/MCPS \
+	-I$(TOSDIR)/lib/mac/tkn154/interfaces/MLME \
+	-I$(TOSDIR)/lib/mac/tkn154/interfaces/private \
+	-I$(TOSDIR)/lib/mac/tkn154/interfaces/public
+	
+TOSMAKE_PATH += $(TOSDIR)/../apps/tests/tkn154/extras
+
+# legacy
+ifdef IEEE154_EXTENDED_ADDRESS
+$(error To set the extended address of a device to X pass 'extaddr,X' to the make system (e.g. "make telosb extaddr,0x012345"))
+endif
+
+# legacy
+ifdef TKN154_DEBUG
+$(error To enable debug mode pass 'tkn154debug' to the make system (e.g. "make telosb tkn154debug"))
+endif
+
+
+# parses the PLATFORM variable
+include $(MAKERULES)
+
+# checks whether the target platform is supported by the application;
+# the application Makefile can define PLATFORMS as a whitespace-separated
+# list of supported platforms
+ifneq ($(PLATFORM),)
+  ifneq ($(PLATFORMS),)
+    ifeq ($(strip $(foreach platform,$(PLATFORMS),$(findstring $(platform),$(PLATFORM)))),)
+      $(error The target platform is not supported by this application - supported platforms are: $(PLATFORMS))
+    endif
+  endif
+    include $(TKN154_GTS_PLATFORM_INCLUDE)
+    include $(TKN154_PLATFORM_INCLUDE)
+  
+endif
+

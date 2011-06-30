@@ -128,7 +128,7 @@ implementation {
 
   async command void HplUsart.disableUart(){
     CLR_BIT(UCSR1B, TXEN1);		// disable tx
-    SET_BIT(UCSR1B, RXEN1);		// disable rx
+    CLR_BIT(UCSR1B, RXEN1);		// disable rx
     call McuPowerState.update();
   }
   

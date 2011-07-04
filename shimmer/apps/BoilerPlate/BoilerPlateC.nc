@@ -40,13 +40,14 @@
    Byte:       0      |    1-2    |  3-4  |  5-6  | ... | chanX
 
    Inquiry Response Packet Format:
-          Packet Type | ADC Sampling rate | Accel Sensitivity | Config Byte 0 |Num Chans | Buf size | Chan1 | Chan2 | ... | ChanX
-   Byte:       0      |         1         |          2        |       3       |    4     |     5    |   6   |   7   | ... |   x
+          Packet Type | ADC Sampling rate | Accel Range | Config Byte 0 |Num Chans | Buf size | Chan1 | Chan2 | ... | ChanX
+   Byte:       0      |         1         |       2     |       3       |    4     |     5    |   6   |   7   | ... |   x
 
 ***********************************************************************************/
 #include "Timer.h"
 #include "Mma_Accel.h"
 #include "RovingNetworks.h"
+#include "Gsr.h"
 #include "Shimmer.h"
 
 module BoilerPlateC {
@@ -58,19 +59,21 @@ module BoilerPlateC {
       interface Init as MagInit;
       interface Init as StrainInit;
       interface Init as DigitalHeartInit;
+      interface Init as GsrInit;
+      interface Init as SampleTimerInit;
       interface GyroBoard;
       interface Magnetometer;
       interface StrainGauge;
       interface DigitalHeartRate;
       interface StdControl as GyroStdControl;
+      interface Mma_Accel as Accel;
+      interface Gsr;
       interface Leds;
       interface shimmerAnalogSetup;
       interface Timer<TMilli> as SetupTimer;
       interface Timer<TMilli> as ActivityTimer;
-      interface Init as SampleTimerInit;
       interface Alarm<TMilli, uint16_t> as SampleTimer;
       interface LocalTime<T32khz>;
-      interface Mma_Accel as Accel;
       interface StdControl as BTStdControl;
       interface Bluetooth;
       interface Msp430DmaChannel as DMA0;
@@ -102,9 +105,9 @@ implementation {
    norace uint16_t timestamp0, timestamp1;
 
    norace bool sensing, enable_sending, enable_receiving, commandPending, command_mode_complete;
-   bool wasSensing, sendAck, inquiryResponse, samplingRateResponse, accelSensitivityResponse, configSetupByte0Response;
+   bool wasSensing, sendAck, inquiryResponse, samplingRateResponse, accelRangeResponse, configSetupByte0Response, gsrRangeResponse, shimmerVersionResponse;
 
-   uint8_t g_arg_size, g_arg[MAX_COMMAND_ARG_SIZE];
+   uint8_t g_arg_size, g_arg[MAX_COMMAND_ARG_SIZE], gsr_active_resistor;
    norace uint8_t g_action;
 
    // Configuration
@@ -127,8 +130,21 @@ implementation {
       }
       
       if(stored_config[NV_SENSORS0] & SENSOR_ACCEL) {
-         call Accel.setSensitivity(stored_config[NV_ACCEL_SENSITIVITY]);
+         call Accel.setSensitivity(stored_config[NV_ACCEL_RANGE]);
          call Accel.wake(TRUE);
+      }
+
+      if(stored_config[NV_SENSORS0] & SENSOR_GSR) {
+         call GsrInit.init();
+         if(stored_config[NV_GSR_RANGE] <= HW_RES_3M3) {
+            call Gsr.setRange(stored_config[NV_GSR_RANGE]);
+            gsr_active_resistor = stored_config[NV_GSR_RANGE];
+         }
+         else {
+            call Gsr.setRange(HW_RES_40K);
+            gsr_active_resistor = HW_RES_40K;
+         }
+
       }
 
       if(stored_config[NV_SENSORS1] & SENSOR_STRAIN) {
@@ -204,7 +220,7 @@ implementation {
          if(inquiryResponse) {
             *(res_packet + packet_length++) = INQUIRY_RESPONSE;                                             //packet type
             *(res_packet + packet_length++) = stored_config[NV_SAMPLING_RATE];                              //ADC sampling rate
-            *(res_packet + packet_length++) = stored_config[NV_ACCEL_SENSITIVITY];                          //Accel Sensitivity
+            *(res_packet + packet_length++) = stored_config[NV_ACCEL_RANGE];                                //Accel range
             *(res_packet + packet_length++) = stored_config[NV_CONFIG_SETUP_BYTE0];                         //Config Setup Byte 0
             *(res_packet + packet_length++) = nbr_adc_chans + nbr_1byte_digi_chans + nbr_2byte_digi_chans;  //number of data channels
             *(res_packet + packet_length++) = stored_config[NV_BUFFER_SIZE];                                //buffer size 
@@ -217,10 +233,10 @@ implementation {
             *(res_packet + packet_length++) = stored_config[NV_SAMPLING_RATE];            // ADC sampling rate
             samplingRateResponse = FALSE;
          }
-         else if(accelSensitivityResponse) {
-            *(res_packet + packet_length++) = ACCEL_SENSITIVITY_RESPONSE;                 // packet type
-            *(res_packet + packet_length++) = stored_config[NV_ACCEL_SENSITIVITY];        // Accel Sensitivity
-            accelSensitivityResponse = FALSE;
+         else if(accelRangeResponse) {
+            *(res_packet + packet_length++) = ACCEL_RANGE_RESPONSE;                       // packet type
+            *(res_packet + packet_length++) = stored_config[NV_ACCEL_RANGE];              // Accel range
+            accelRangeResponse = FALSE;
          }
          else if(configSetupByte0Response) {
             *(res_packet + packet_length++) = CONFIG_SETUP_BYTE0_RESPONSE;                // packet type
@@ -245,12 +261,24 @@ implementation {
                *(res_packet + packet_length++) = stored_config[NV_MAG_CALIBRATION + i];   // Calibration values
             magCalibrationResponse = FALSE;
          }
+         else if(gsrRangeResponse) {
+            *(res_packet + packet_length++) = GSR_RANGE_RESPONSE;                          // packet type
+            *(res_packet + packet_length++) = stored_config[NV_GSR_RANGE];                 // GSR range 
+            gsrRangeResponse = FALSE;
+         }
+         else if(shimmerVersionResponse) {
+            *(res_packet + packet_length++) = SHIMMER_VERSION_RESPONSE;                   // packet type
+            *(res_packet + packet_length++) = SHIMMER_VER;                                // Shimmer Version
+            shimmerVersionResponse = FALSE;
+         }
          else {}
 
          // send data over the air
          call Bluetooth.write(res_packet, packet_length);
          enable_sending = FALSE;
       }
+      else
+         post sendResponse();
    }
 
 
@@ -304,18 +332,18 @@ implementation {
             else
                post ConfigureChannelsTask();
             break;
-         case SET_ACCEL_SENSITIVITY_COMMAND:
+         case SET_ACCEL_RANGE_COMMAND:
             if((g_arg[0] == RANGE_1_5G) || (g_arg[0] == RANGE_2_0G) || (g_arg[0] == RANGE_4_0G) || (g_arg[0] == RANGE_6_0G)) {
-               stored_config[NV_ACCEL_SENSITIVITY] = g_arg[0];
-               call InternalFlash.write((void*)NV_ACCEL_SENSITIVITY, (void*)&stored_config[NV_ACCEL_SENSITIVITY], 1);
+               stored_config[NV_ACCEL_RANGE] = g_arg[0];
+               call InternalFlash.write((void*)NV_ACCEL_RANGE, (void*)&stored_config[NV_ACCEL_RANGE], 1);
                if(sensing) {
                   post stopSensing();
                   post startSensing();
                }
             }
             break;
-         case GET_ACCEL_SENSITIVITY_COMMAND:
-            accelSensitivityResponse = TRUE;
+         case GET_ACCEL_RANGE_COMMAND:
+            accelRangeResponse = TRUE;
             break;
          case SET_5V_REGULATOR_COMMAND:
             if(g_arg[0]) {
@@ -386,6 +414,24 @@ implementation {
          case STOP_STREAMING_COMMAND:
             post stopSensing();
             break;
+         case SET_GSR_RANGE_COMMAND:
+            if((g_arg[0] == HW_RES_40K) || (g_arg[0] == HW_RES_287K) || 
+               (g_arg[0] == HW_RES_1M) || (g_arg[0] == HW_RES_3M3) ||
+               (g_arg[0] == GSR_AUTORANGE) || (g_arg[0] == GSR_X4)) {
+               stored_config[NV_GSR_RANGE] = g_arg[0];
+               call InternalFlash.write((void*)NV_GSR_RANGE, (void*)&stored_config[NV_GSR_RANGE], 1);
+               if(sensing) {
+                  post stopSensing();
+                  post startSensing();
+               }
+            }
+            break;
+         case GET_GSR_RANGE_COMMAND:
+            gsrRangeResponse = TRUE;
+            break;
+         case GET_SHIMMER_VERSION_COMMAND:
+            shimmerVersionResponse = TRUE;
+            break;
          default:
       }
       sendAck = TRUE;
@@ -396,9 +442,10 @@ implementation {
    task void collect_results() {
       uint8_t rate = 0;
       int16_t realVals[3];
-      register uint8_t i, j=0;
-
+      register uint8_t i, j;
+      
       if(stored_config[NV_SENSORS0] & SENSOR_MAG) {
+         j = 0;
          call Magnetometer.convertRegistersToData(readBuf, realVals);
 
          if(current_buffer == 0) {
@@ -413,8 +460,8 @@ implementation {
 
       // 8 bit channels must come after 16 bit channels
       // due allignment for 16 bit read/writes
-      j = 0;
       if(stored_config[NV_SENSORS1] & SENSOR_HEART) {
+         j = 0;
          call DigitalHeartRate.getRate(&rate);
          if(current_buffer == 0) 
             *(sbuf0 + j++ + ((nbr_adc_chans + nbr_2byte_digi_chans)*2)) = rate;
@@ -431,6 +478,21 @@ implementation {
          call Magnetometer.readData();
       else
          post collect_results();
+   }
+
+
+   task void autorange_gsr() {
+      uint8_t current_active_resistor = gsr_active_resistor;
+
+      // GSR channel will always be last ADC channel
+      if(current_buffer == 0) {
+         gsr_active_resistor = call Gsr.controlRange(*((uint16_t *)sbuf0 + (nbr_adc_chans - 1)), gsr_active_resistor);
+         *((uint16_t *)sbuf0 + (nbr_adc_chans - 1)) |= (current_active_resistor << 14);
+      }
+      else {
+         gsr_active_resistor = call Gsr.controlRange(*((uint16_t *)sbuf1 + (nbr_adc_chans - 1)), gsr_active_resistor);
+         *((uint16_t *)sbuf1 + (nbr_adc_chans - 1)) |= (current_active_resistor << 14);
+      }
    }
 
 
@@ -452,8 +514,10 @@ implementation {
       nbr_2byte_digi_chans = 0;
       nbr_adc_chans = 0;
       samplingRateResponse = FALSE;
-      accelSensitivityResponse = FALSE;
+      accelRangeResponse = FALSE;
       configSetupByte0Response = FALSE;
+      gsrRangeResponse = FALSE;
+      shimmerVersionResponse = FALSE;
       inquiryResponse = FALSE;
       accelCalibrationResponse = FALSE;
       gyroCalibrationResponse = FALSE;
@@ -467,12 +531,13 @@ implementation {
       call InternalFlash.read((void*)0, (void*)stored_config, NV_NUM_CONFIG_BYTES);
       if(stored_config[NV_SENSORS0] == 0xFF) {
          // if config was never written to Infomem write default
-         // Accel only, 50Hz, buffer size of 1, 5V reg and PMUX off
+         // Accel only, 50Hz, buffer size of 1, GSR range as HW_RES_40K, 5V reg and PMUX off
          stored_config[NV_SAMPLING_RATE] = SAMPLING_50HZ;
          stored_config[NV_BUFFER_SIZE] = 1;
          stored_config[NV_SENSORS0] = SENSOR_ACCEL;
          stored_config[NV_SENSORS1] = 0;
-         stored_config[NV_ACCEL_SENSITIVITY] = RANGE_1_5G;
+         stored_config[NV_ACCEL_RANGE] = RANGE_1_5G;
+         stored_config[NV_GSR_RANGE] = HW_RES_40K;
          stored_config[NV_CONFIG_SETUP_BYTE0] = 0;
          call InternalFlash.write((void*)0, (void*)stored_config, NV_NUM_CONFIG_BYTES);
       }
@@ -530,12 +595,6 @@ implementation {
          call shimmerAnalogSetup.addEMGInput();
          *channel_contents_ptr++ = EMG;
       }
-      // GSR
-      else if(stored_config[NV_SENSORS0] & SENSOR_GSR){
-         call shimmerAnalogSetup.addGSRInput();
-         *channel_contents_ptr++ = GSR_LO;
-         *channel_contents_ptr++ = GSR_HI;
-      }
       // AnEx A7
       if(stored_config[NV_SENSORS0] & SENSOR_ANEX_A7) {
          call shimmerAnalogSetup.addAnExInput(7);
@@ -551,6 +610,12 @@ implementation {
          call shimmerAnalogSetup.addStrainGaugeInputs();
          *channel_contents_ptr++ = STRAIN_HIGH;
          *channel_contents_ptr++ = STRAIN_LOW;
+      }
+      // GSR
+      // needs to be the last analog channel
+      else if(stored_config[NV_SENSORS0] & SENSOR_GSR){
+         call shimmerAnalogSetup.addGSRInput();
+         *channel_contents_ptr++ = GSR_RAW;
       }
       // Digital channels need to be after ADC channels to allow for DMA
       // Mag
@@ -603,7 +668,7 @@ implementation {
 
       p_packet = (uint16_t *)p8_packet;
       // ADC channels and 2 byte digi channels
-      for(i=0; i<nbr_adc_chans + nbr_2byte_digi_chans; i++, p_packet++, p_samples++){
+      for(i=0; i<(nbr_adc_chans + nbr_2byte_digi_chans); i++, p_packet++, p_samples++){
          *p_packet = *p_samples; 
       }
       
@@ -689,6 +754,10 @@ implementation {
       }
       else { 
          call DMA0.repeatTransfer((void*)ADC12MEM0_, (void*)sbuf0, nbr_adc_chans);
+      }
+      if(stored_config[NV_SENSORS0] & SENSOR_GSR) {
+         if(stored_config[NV_GSR_RANGE] == GSR_AUTORANGE)
+            post autorange_gsr();
       }
       if((nbr_1byte_digi_chans > 0) || (nbr_2byte_digi_chans > 0))
          post clockin_result();

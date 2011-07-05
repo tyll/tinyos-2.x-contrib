@@ -85,6 +85,10 @@ implementation {
    BoilerPlateC.DigitalHeartInit -> DigitalHeartRateC.Init;
    BoilerPlateC.DigitalHeartRate -> DigitalHeartRateC;
 
+   components GsrC;
+   BoilerPlateC.GsrInit -> GsrC.Init;
+   BoilerPlateC.Gsr     -> GsrC;
+
    components BPCommandParserC;
    BoilerPlateC.BPCommandParser -> BPCommandParserC;
 

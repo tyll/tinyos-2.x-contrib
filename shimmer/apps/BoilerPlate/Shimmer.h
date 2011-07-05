@@ -59,9 +59,9 @@ enum {
    TOGGLE_LED_COMMAND               = 0x06,
    START_STREAMING_COMMAND          = 0x07,
    SET_SENSORS_COMMAND              = 0x08,
-   SET_ACCEL_SENSITIVITY_COMMAND    = 0x09,
-   ACCEL_SENSITIVITY_RESPONSE       = 0x0A,
-   GET_ACCEL_SENSITIVITY_COMMAND    = 0x0B,
+   SET_ACCEL_RANGE_COMMAND          = 0x09,
+   ACCEL_RANGE_RESPONSE             = 0x0A,
+   GET_ACCEL_RANGE_COMMAND          = 0x0B,
    SET_5V_REGULATOR_COMMAND         = 0x0C,
    SET_PMUX_COMMAND                 = 0x0D,
    SET_CONFIG_SETUP_BYTE0_COMMAND   = 0x0E,
@@ -77,6 +77,11 @@ enum {
    MAG_CALIBRATION_RESPONSE         = 0x18,
    GET_MAG_CALIBRATION_COMMAND      = 0x19,
    STOP_STREAMING_COMMAND           = 0x20,
+   SET_GSR_RANGE_COMMAND            = 0x21,
+   GSR_RANGE_RESPONSE               = 0x22,
+   GET_GSR_RANGE_COMMAND            = 0x23,
+   GET_SHIMMER_VERSION_COMMAND      = 0x24,
+   SHIMMER_VERSION_RESPONSE         = 0x25,
    ACK_COMMAND_PROCESSED            = 0xFF
 };
 
@@ -109,8 +114,8 @@ enum {
    Z_MAG       = 0x08,
    ECG_RA_LL   = 0x09,
    ECG_LA_LL   = 0x0A,
-   GSR_LO      = 0x0B,
-   GSR_HI      = 0x0C,
+   GSR_RAW     = 0x0B,
+   GSR_RES     = 0x0C,     // GSR resistance (not used in this app)
    EMG         = 0x0D,
    ANEX_A0     = 0x0E,
    ANEX_A7     = 0x0F,
@@ -121,7 +126,7 @@ enum {
 
 // Infomem contents;
 enum {
-   NV_NUM_CONFIG_BYTES = 81
+   NV_NUM_CONFIG_BYTES = 82
 };
 
 enum {
@@ -129,11 +134,12 @@ enum {
    NV_BUFFER_SIZE        = 1,
    NV_SENSORS0           = 2,
    NV_SENSORS1           = 3,
-   NV_ACCEL_SENSITIVITY  = 12,
+   NV_ACCEL_RANGE        = 12,
    NV_CONFIG_SETUP_BYTE0 = 13,
    NV_ACCEL_CALIBRATION  = 18,
    NV_GYRO_CALIBRATION   = 39,
-   NV_MAG_CALIBRATION    = 60
+   NV_MAG_CALIBRATION    = 60, 
+   NV_GSR_RANGE          = 81
 };
 
 //Sensor bitmap
@@ -156,8 +162,14 @@ enum {
 
 // Config Byte0 bitmap
 enum {
-   CONFIG_5V_REG = 0x80,
-   CONFIG_PMUX   = 0x40
+   CONFIG_5V_REG        = 0x80,
+   CONFIG_PMUX          = 0x40,
+};
+
+// BoilerPlate specific extension to range values
+enum {
+   GSR_AUTORANGE  = 0x04,
+   GSR_X4         = 0x05
 };
 
 #endif // SHIMMER_H

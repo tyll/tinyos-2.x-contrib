@@ -56,18 +56,21 @@ implementation {
             case START_STREAMING_COMMAND:
             case STOP_STREAMING_COMMAND:
             case TOGGLE_LED_COMMAND:
-            case GET_ACCEL_SENSITIVITY_COMMAND:
+            case GET_ACCEL_RANGE_COMMAND:
             case GET_CONFIG_SETUP_BYTE0_COMMAND:
             case GET_ACCEL_CALIBRATION_COMMAND:
             case GET_GYRO_CALIBRATION_COMMAND:
             case GET_MAG_CALIBRATION_COMMAND:
+            case GET_GSR_RANGE_COMMAND:
+            case GET_SHIMMER_VERSION_COMMAND:
                signal BPCommandParser.activate(data, 0, NULL);
                break;
             case SET_SAMPLING_RATE_COMMAND:
-            case SET_ACCEL_SENSITIVITY_COMMAND:
+            case SET_ACCEL_RANGE_COMMAND:
             case SET_5V_REGULATOR_COMMAND:
             case SET_PMUX_COMMAND:
             case SET_CONFIG_SETUP_BYTE0_COMMAND:
+            case SET_GSR_RANGE_COMMAND:
                waiting_for_args = 1;
                pending_command = data;
                break;

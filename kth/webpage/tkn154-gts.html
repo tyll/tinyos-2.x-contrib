@@ -12,6 +12,10 @@
 
 	<!-- standalone page styling (can be removed) -->
 	<link rel="stylesheet" type="text/css" href="webpage/css/standalone.css"/>	
+
+	
+	<!-- tab styling -->
+	<link rel="stylesheet" type="text/css" href="webpage/css/tabs.css" />
 	
 	
 	<!-- tab pane styling -->
@@ -52,13 +56,6 @@ font-size: 0.8em;
 
 
 <div id="contents">
-	<!-- the tabs -->
-	<ul class="tabs">
-		<li><a href="#">IEEE 802.15.4 - GTS</a></li>
-		<li><a href="#">IEEE 802.15.4 - GTS modification</a></li>
-		<li><a href="#">LS7366R</a></li>
-	</ul>
-
 	<!-- tab "panes" -->
 	<div class="panes">
 		<div><p> 
@@ -108,45 +105,6 @@ font-size: 0.8em;
 		
 </p>
 	</span>
-
-
-	</div>
-		<div><p>
-		In a network with multiple nodes transmitting packets to the same sink, there is a high probability of collision if we do not have a good protocol. With the IEEE 802.15.4 standard protocol [4], we have the possibility to transmit within two different periods. In one of them the nodes compete each other to get the channel, and in the other they have their own time slot, where the channel is only available for them, so they do not collide. These two periods are called Contention Access Period (CAP) and Contention-Free Period (CFP) respectively. 
-		<br /><br />
-		For TinyOS we use an existent implementation, the TKN15.4 [1]. Base on that, we implemented the Guaranteed Time Slot (GTS) mechanisms [2]. 
-		<br /><br />
-		The IEEE 802.15.4 has been designed to allocate a maximum number of slots during the CFP. It is set to seven time slots, GTS slots. With this number in a Wireless Sensor Actuator Network (WSAN) scenario with multiple processes there is not enough. This is the motivation for the modification that we present in this document. 
-		<br /><br />
-		This technical report shows the modifications that are needed to have an in- creased number of GTS slots. In Chapter 2 the modifications are shown. Mainly, the modifications includes the superframe structure and the beacon frame. 
-		<br /><br />
-		The remainder of the documents is organized as follows. Chapter 3 shows an example scenario, where we use this modification. Chapter 5 explains step by steps the procedure to modify a network that is using the CAP to transmit during the CFP.		
-
-	<span class="links">
-<p>
-		Browse code: <a href="http://tinyos.cvs.sourceforge.net/viewvc/tinyos/tinyos-2.x-contrib/kth/tkn154-gts-mod">http://tinyos.cvs.sourceforge.net/viewvc/tinyos/tinyos-2.x-contrib/kth/tkn154-gts-mod<a/>
-<br />
-		<br /> Download documentation: <a href="tkn154-gts-mod/doc/pdf/ieee802154-gts-mod.pdf" title="Download the documentation"><img src="webpage/img/pdf.jpg" height="50px"/></a>
-		<br />
-	</span>
-
-
-
-	</div>
-	
-	<div><p>
-		It provides the driver for the LS7366R SPI external counter. The advantatge of this counter is the hability to communicate with other devices with the Serial Peripheral Interface (SPI) communication. Although this document focus on the TmoteSky / Telosb motes, it is easy to port the implementation for other motes as we show in Section 3.1.2. The SPI is a synchronous serial data link standard named by Motorola that operates in full duplex mode. Devices communicate in master/slave mode where the master device initiates the data frame. Multiple slave devices are allowed with individual slave select (chip select) lines. <br /></p>
-
-	<img src="webpage/img/SPI_interface_tmote.png"/>
-
-	<span class="links">
-<p>
-		Browse code: <a href="http://tinyos.cvs.sourceforge.net/viewvc/tinyos/tinyos-2.x-contrib/kth/ls7366r">http://tinyos.cvs.sourceforge.net/viewvc/tinyos/tinyos-2.x-contrib/kth/ls7366r<a/>
-
-		<br /> Download documentation:	<small>Not finished yet</small> <!--<a href="ls7366r/doc/pdf/ls7366r.pdf" title="Download the documentation"><img src="webpage/img/pdf.jpg" height="50px"/></a> -->
-</p>
-	</span>
-
 
 
 	</div>

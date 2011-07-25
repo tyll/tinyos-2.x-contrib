@@ -101,7 +101,6 @@ configuration TKN154BeaconEnabledP
 		interface Alarm<TSymbolIEEE802154,uint32_t> as Alarm12;
 		interface Alarm<TSymbolIEEE802154,uint32_t> as Alarm13;
 
-
 		interface Timer<TSymbolIEEE802154> as Timer1;
 		interface Timer<TSymbolIEEE802154> as Timer2;
 		interface Timer<TSymbolIEEE802154> as Timer3;
@@ -182,7 +181,6 @@ implementation
 	new NoDispatchSlottedCsmaP(OUTGOING_SUPERFRAME) as CoordCap,
 	NoCoordCfpP as CoordCfp,
 	new NoDispatchCfpQueueP() as CoordCfpQueue,
-	
 
 #ifndef IEEE154_GTS_DISABLED
 	DeviceCfpP as DeviceCfp,
@@ -195,7 +193,7 @@ implementation
 
 	new InactivePeriodP(INCOMING_SUPERFRAME) as DeviceInactivePeriod,
 	new InactivePeriodP(OUTGOING_SUPERFRAME) as CoordInactivePeriod,
-	
+
 #ifndef IEEE154_RXENABLE_DISABLED
 	RxEnableP,
 #else
@@ -630,7 +628,7 @@ implementation
 	CoordInactivePeriod.RadioOff -> CoordInactivePeriodClient;
 	CoordInactivePeriod.MLME_GET -> PibP;
 	CoordInactivePeriod.TimeCalc -> PibP;
-	
+
 	/* -------------------------- promiscuous mode ------------------------ */
 
 	components new RadioClientC(RADIO_CLIENT_PROMISCUOUSMODE) as PromiscuousModeRadioClient;

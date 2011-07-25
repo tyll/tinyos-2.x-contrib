@@ -125,6 +125,7 @@ implementation
 	PHY.LocalTime -> LocalTime62500hzC;
 	PHY.ReliableWait -> TKN154TimingP;
 	PHY.TimeCalc -> MAC;
+	PHY.CaptureTime -> TKN154TimingP;
 	TKN154TimingP.TimeCalc -> MAC;
 	TKN154TimingP.Leds -> LedsC;
 	TKN154TimingP.CCA -> PHY;
@@ -184,7 +185,7 @@ implementation
 	MAC.Random -> RandomC;
 	MAC.Leds -> LedsC;
 	PHY.Random -> RandomC;
-	
+
 	// D E B U G
 #ifdef TSCHDEBUG_ENABLED
 	components PinDebugC as PinDebug;

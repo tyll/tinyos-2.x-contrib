@@ -297,7 +297,7 @@ typedef bool ieee154_macPanCoordinator_t;
 #endif
 
 #ifndef CFP_NUMBER_SLOTS
-#define CFP_NUMBER_SLOTS 19
+#define CFP_NUMBER_SLOTS 32
 #endif
 
 enum {

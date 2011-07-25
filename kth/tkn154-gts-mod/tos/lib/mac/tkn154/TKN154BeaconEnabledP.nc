@@ -35,7 +35,7 @@
 /**
  * @author Jan Hauer <hauer@tkn.tu-berlin.de>
  * @author Aitor Hernandez <aitorhh@kth.se>
- * @modified 2011/04/13
+ * @modified 2011/06/01
  */
 
 #include "TKN154_PHY.h"
@@ -277,13 +277,15 @@ implementation
 	FrameUtility = PibP;
 	GtsUtility = PibP;
 
-	IsGtsOngoing = DeviceCfp.IsGtsOngoing;
+	IsGtsOngoing = BeaconSynchronizeP.IsGtsOngoing;
 	SetGtsCoordinatorDb = CoordCfp.SetGtsCoordinatorDb;
+	
 #ifdef IEEE154_BEACON_TX_DISABLED
 	IsEndSuperframe = CoordInactivePeriod.IsEndSuperframe;
 #else
 	IsEndSuperframe = DeviceInactivePeriod.IsEndSuperframe;
 #endif
+	
 	CoordCfp.SubGtsSpecUpdated = GtsSpecUpdated;
 
 	
@@ -559,7 +561,7 @@ implementation
 	CfpTransmitP.RadioRx -> CoordCfpRadioClient;
 	CfpTransmitP.RadioOff -> CoordCfpRadioClient;
 #else
-	CfpTransmitP.GetGtsDeviceDb -> DeviceCfp.GetGtsDeviceDb;
+	CfpTransmitP.GetGtsDeviceDb -> BeaconSynchronizeP.GetCfpTimeSlots;
 
 	components new RadioClientC(RADIO_CLIENT_DEVICECFP) as DeviceCfpRadioClient;
 
@@ -585,8 +587,6 @@ implementation
 	DeviceCfp.MLME_GET -> PibP;
 	//DeviceCfp.MLME_SET -> PibP.MLME_SET;
 	DeviceCfp.GtsRequestTx -> DeviceCapQueue.FrameTx[unique(CAP_TX_CLIENT)];
-	DeviceCfp.HasCfpTimeSlots -> BeaconSynchronizeP.HasCfpTimeSlots;
-	DeviceCfp.GetCfpTimeSlots -> BeaconSynchronizeP.GetCfpTimeSlots;
 	DeviceCfp.GTSDescPersistenceTimeout = Timer6;
 	DeviceCfp.FrameUtility -> PibP;
 	DeviceCfp.MLME_SYNC_LOSS -> BeaconSynchronizeP;
@@ -683,6 +683,4 @@ implementation
 	RadioControlP.RadioPromiscuousMode -> PromiscuousModeP;
 	RadioControlP.Leds = Leds;
 	
-	  components PrintfC;
-	  components SerialStartC;
 }

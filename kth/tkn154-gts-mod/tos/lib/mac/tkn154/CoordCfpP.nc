@@ -39,7 +39,7 @@
  * @modified 2011/04/13
  */
 #include "TKN154_MAC.h"
-#include "printf.h"
+//#include "printf.h"
 
 module CoordCfpP
 {
@@ -166,7 +166,7 @@ implementation
 
 				gtsSpecField = gtsSpecField + GTS_LIST_MULTIPLY;
 			}
-			printfflush();
+			//printfflush();
 
 			//GTS Directions
 			gtsSpecField = lastBytePtr - len + 1;

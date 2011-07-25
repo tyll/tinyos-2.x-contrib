@@ -38,7 +38,7 @@
  * 
  * @author Jan Hauer <hauer@tkn.tu-berlin.de>
  * @author Aitor Hernandez <aitorhh@kth.se>
- * @modified 2011/04/13
+ * @modified 2011/06/01
  */
 #include "TKN154_MAC.h"
 
@@ -55,7 +55,9 @@ module BeaconSynchronizeP
 		interface SplitControl as TrackSingleBeacon;
 
 		interface Notify<ieee154_status_t> as HasCfpTimeSlots;
-		interface Get<ieee154_GTSentry_t*> as GetCfpTimeSlots;
+		interface Get<ieee154_GTSdb_t*> as GetCfpTimeSlots;
+		
+		interface GetNow<bool> as IsGtsOngoing;
 	}
 	uses
 	{
@@ -104,10 +106,15 @@ implementation
 
 	//GTS variables
 	//We allocate space for the two GTS entry: tx and rx
-	norace ieee154_GTSentry_t GTSentry[2];
 	uint8_t m_gtsField[1 + GTS_DIRECTION_FIELD_LENGTH + GTS_LIST_MULTIPLY*CFP_NUMBER_SLOTS];
 
 
+	ieee154_GTSentry_t db[CFP_NUMBER_SLOTS];
+	ieee154_GTSdb_t GTSdb;
+	
+	/* ----------------------- Vars to GTS request ----------------------- */
+	norace bool m_gtsOngoing = FALSE;
+	
 	enum {
 		RX_PREPARE = 0x00,
 		RX_RECEIVING = 0x01,
@@ -167,6 +174,11 @@ implementation
 		resetInternalRequest();
 		resetExternalRequest();
 		setMode(MODE_INACTIVE);
+		
+		//Initialization of the coordinator db
+		GTSdb.db = db;
+		GTSdb.numGtsSlots = 0;
+		
 		return SUCCESS;
 	}
 
@@ -366,6 +378,11 @@ implementation
 			return tmp;
 		}
 	}
+	
+	/**
+	 * Indicates to the higher layer if the node has a GTS slot in the current superframe
+	 */
+	async command bool IsGtsOngoing.getNow() {atomic return m_gtsOngoing;}
 
 	task void processBeaconTask()
 	{
@@ -441,14 +458,15 @@ implementation
 			call SetMacSuperframeOrder.set(m_superframeOrder);
 			m_sfSlotDuration = (((uint32_t) 1) << (m_superframeOrder)) * IEEE154_aBaseSlotDuration;
 			memcpy(m_gtsField, &payload[2], gtsFieldLength);
+			
 #ifdef IEEE154_BEACON_TX_DISABLED
 			//check if we have a time slot
 			if(gtsFieldLength > 1) {
 				ieee154_status_t status = IEEE154_DENIED;
 
-				status = call GtsUtility.getSlotsById(payload, m_numGtsSlots, GTSentry);
+				status = call GtsUtility.getSlotsById(payload, m_numGtsSlots, &GTSdb);
 
-				signal HasCfpTimeSlots.notify(status);
+				m_gtsOngoing = (GTSdb.numGtsSlots > 0 ? TRUE : FALSE);
 			}
 #endif
 
@@ -611,5 +629,5 @@ implementation
 	command error_t HasCfpTimeSlots.disable() {return FAIL;}
 	default event void HasCfpTimeSlots.notify( ieee154_status_t val ) {return;}
 
-	command ieee154_GTSentry_t* GetCfpTimeSlots.get() {return GTSentry;}
+	command ieee154_GTSdb_t* GetCfpTimeSlots.get() {return &GTSdb;}
 }

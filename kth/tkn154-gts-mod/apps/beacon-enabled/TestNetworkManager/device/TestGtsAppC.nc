@@ -61,4 +61,7 @@ configuration TestGtsAppC
 	App.MLME_SET -> MAC;
 	App.MLME_GET -> MAC;
 
+	App.IsEndSuperframe -> MAC;
+	App.IsGtsOngoing -> MAC.IsGtsOngoing;
+
 }

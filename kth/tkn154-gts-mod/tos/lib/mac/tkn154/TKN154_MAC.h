@@ -312,7 +312,7 @@ enum {
 
 enum {
 	// MAC sublayer constants
-	IEEE154_aNumSuperframeSlots = 20,
+	IEEE154_aNumSuperframeSlots = 32,
 	IEEE154_aMaxMPDUUnsecuredOverhead = 25,
 	IEEE154_aMinMPDUOverhead = 9,
 	IEEE154_aBaseSlotDuration = 60,

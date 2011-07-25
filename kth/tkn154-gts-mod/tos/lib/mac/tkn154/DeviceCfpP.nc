@@ -37,7 +37,7 @@
  * 
  * @author Aitor Hernandez <aitorhh@kth.se>
  * @version  $Revision$
- * @modified 2011/04/13
+ * @modified 2011/06/01
  */
 
 #include "TKN154_MAC.h"
@@ -47,19 +47,12 @@ module DeviceCfpP
 	provides {
 		interface Init;
 		interface MLME_GTS;
-
-		interface Get<ieee154_GTSentry_t*> as GetGtsDeviceDb;
-		interface GetNow<bool> as IsGtsOngoing;
-
 	}uses {
 		interface MLME_SYNC_LOSS;
 		interface MLME_GET;
 
 		interface GtsUtility;
 		interface FrameUtility;
-
-		interface Notify<ieee154_status_t> as HasCfpTimeSlots;
-		interface Get<ieee154_GTSentry_t*> as GetCfpTimeSlots;
 
 		interface Pool<ieee154_txframe_t> as TxFramePool;
 		interface Pool<ieee154_txcontrol_t> as TxControlPool;
@@ -74,22 +67,13 @@ module DeviceCfpP
 }
 implementation
 {
-
-	norace ieee154_GTSentry_t deviceDb[2];
-	/* ----------------------- Vars to GTS request ----------------------- */
-	norace bool m_gtsOngoing = FALSE;
+	
+	ieee154_GTSdb_t* db;
 
 	/***************************************************************************************
 	 * INITIALIZE FUNCTIONS
 	 ***************************************************************************************/
-	error_t reset(error_t error)
-	{
-		call GtsUtility.setEmptyGtsEntry(deviceDb);
-		call GtsUtility.setEmptyGtsEntry(deviceDb + 1 );
-		m_gtsOngoing = FALSE;
-
-		return SUCCESS;
-	}
+	error_t reset(error_t error){return SUCCESS;}
 
 	command error_t Init.init()
 	{
@@ -109,36 +93,18 @@ implementation
 		dbg_serial("DeviceCfp", "MLME_SYNC_LOSS.indication: GTS deallocated\n");
 	}
 
-	command ieee154_GTSentry_t* GetGtsDeviceDb.get() {return deviceDb;}
 	/***************************************************************************************
 	 * GTS on going?
 	 ***************************************************************************************/
-	/**
-	 * Indicates to the higher layer if the node has a GTS slot in the current superframe
-	 */
-	async command bool IsGtsOngoing.getNow() {atomic return m_gtsOngoing;}
+
 	/***************************************************************************************
 	 * Send GTS requests commands
 	 ***************************************************************************************/
-	event void GtsRequestTx.transmitDone(ieee154_txframe_t *txFrame, ieee154_status_t status)
-	{}
+	event void GtsRequestTx.transmitDone(ieee154_txframe_t *txFrame, ieee154_status_t status){}
 
 	/*
 	 * GTS allocation/deallocation check
 	 ***************************************************************************************/
-	event void HasCfpTimeSlots.notify( ieee154_status_t status ) {
-		uint8_t i = 0;
-		ieee154_GTSentry_t* val = call GetCfpTimeSlots.get();
-
-		// 2. Copy the slot from the BeaconSynchornize
-		memcpy(deviceDb, val, 2*sizeof(ieee154_GTSentry_t));
-
-		// 3. Check if we don't use the GTS anymore
-		if ( ! deviceDb[GTS_RX_ONLY_REQUEST].startingSlot && ! deviceDb[GTS_TX_ONLY_REQUEST].startingSlot)
-		m_gtsOngoing = FALSE;
-		else m_gtsOngoing = TRUE;
-
-	}
 
 	/***************************************************************************************
 	 * Timers

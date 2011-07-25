@@ -36,11 +36,11 @@
  *
  * @author Aitor Hernandez <aitorhh@kth.se>
  * @version  $Revision$ 
- * @modified 2011/04/13
+ * @modified 2011/06/01
  */
 
 #include "TKN154_MAC.h"
-#include "printf.h"
+//#include "printf.h"
 
 module CfpTransmitP
 {
@@ -82,7 +82,7 @@ module CfpTransmitP
 #ifndef IEEE154_BEACON_TX_DISABLED
 		interface Get<ieee154_GTSdb_t*> as GetGtsCoordinatorDb;
 #else
-		interface Get<ieee154_GTSentry_t*> as GetGtsDeviceDb;
+		interface Get<ieee154_GTSdb_t*> as GetGtsDeviceDb;
 #endif
 		interface PinDebug;
 
@@ -157,7 +157,7 @@ implementation {
 	/* ----------------------- Vars to expiration GTS ----------------------- */
 	norace ieee154_GTSentry_t* currentEntry; //to go through the slots
 #ifdef IEEE154_BEACON_TX_DISABLED
-	ieee154_GTSentry_t* deviceDb;
+	ieee154_GTSdb_t* deviceDb;
 #endif
 	norace uint16_t m_expiredTimeout;
 
@@ -255,7 +255,7 @@ implementation {
 					m_lock = FALSE; // unlock
 					dbg_flush_state();
 					dbg_serial("CfpTransmitP", "Handing over to Inactive Period in %lu.\n", call CfpEndAlarm.getNow() );
-					
+
 					call RadioToken.transferTo(RADIO_CLIENT_DEVICE_INACTIVE_PERIOD);
 
 					return;
@@ -271,7 +271,7 @@ implementation {
 					// nothing more to do... just release the Token
 					m_lock = FALSE; // unlock
 					dbg_serial("CfpTransmitP", "Token requested: Handing over to Beacon Transmit/Synchronize.\n");
-					
+
 					call RadioToken.release();
 					return;
 				} else
@@ -417,15 +417,9 @@ implementation {
 		bool txSlot;
 		call PinDebug.ADC0toggle();
 
-		//dbg_serial("CfpTransmitP", "m_numGtsSlots= %u\n", m_numGtsSlots);
-
 		// to gts slot number = 6 (9) ..  0 (15)
 		currentEntry = &((call GetGtsCoordinatorDb.get())->db[--m_numGtsSlots]);
-//		printf("%u addrd=%u ; startingSlot=%u ; dir=%u \n", m_numGtsSlots, 
-//				currentEntry->shortAddress, 
-//				currentEntry->startingSlot,
-//				currentEntry->direction );
-		
+
 		dbg_serial("CfpTransmitP", "cE->direction: %u cE->length: %u\n", currentEntry->direction, currentEntry->length);
 
 		// the direction is refered to the device
@@ -450,28 +444,26 @@ implementation {
 #else
 
 	void hasStartSlot() {
-		uint8_t length = 0;
-		deviceDb = call GetGtsDeviceDb.get();
-		call PinDebug.ADC0toggle();
+		if (m_numGtsSlots != 0) {
+			// to gts slot number = 6 (9) ..  0 (15)
+			currentEntry = &((call GetGtsDeviceDb.get())->db[m_numGtsSlots-1]);
 
-		if (m_slotNumber == deviceDb[GTS_TX_ONLY_REQUEST].startingSlot) {
-			slot_mode = TX_MODE;
-		} else if(m_slotNumber == deviceDb[GTS_RX_ONLY_REQUEST].startingSlot) {
-			dbg_serial("CfpTransmitP", "\t \t \t \t Reception slot\n ");
+			// the direction is refered to the device
+			if ( m_slotNumber == currentEntry->startingSlot &&
+					currentEntry->shortAddress == call MLME_GET.macShortAddress()) {
+//				printf("%u addrd=%u ; startingSlot=%u ; dir=%u \n", m_numGtsSlots,
+//						currentEntry->shortAddress,
+//						currentEntry->startingSlot,
+//						currentEntry->direction );
 
-			slot_mode = RX_MODE;
-		} else {
+				slot_mode = (currentEntry->direction == GTS_TX_ONLY_REQUEST ? TX_MODE : RX_MODE );
+				m_numGtsSlots--; //go to the next slot
+			} else
 			slot_mode = IDLE_MODE;
-		}
-
-		// get slot length
-		if (slot_mode != IDLE_MODE) {
-			currentEntry = deviceDb + slot_mode;
-			length = currentEntry->length;
 		} else
-		length = 1; //fired every slot to check
+		slot_mode = IDLE_MODE;
 
-		call CfpSlotAlarm.startAt( m_slotDuration * m_slotNumber + call SF.sfStartTime(), m_slotDuration * length);
+		call CfpSlotAlarm.startAt( m_slotDuration * m_slotNumber + call SF.sfStartTime(), m_slotDuration * currentEntry->length);
 	}
 #endif
 
@@ -483,10 +475,10 @@ implementation {
 	{
 		m_gtsDuration = (IEEE154_aNumSuperframeSlots - call SF.numCapSlots()) *
 		(uint32_t) call SF.sfSlotDuration();
-		
+
 		//Warning: the functions call MLME_GET are sync but called from async context
 		m_guardTime = ( call MLME_GET.macBeaconOrder() == call MLME_GET.macSuperframeOrder() ? call SF.guardTime() : 0);
-//		dbg_serial("CfpTransmitP", "numCapSlots=%u ;m_gtsDuration=%u \n", call SF.numCapSlots(), m_gtsDuration);
+		//		dbg_serial("CfpTransmitP", "numCapSlots=%u ;m_gtsDuration=%u \n", call SF.numCapSlots(), m_gtsDuration);
 
 		if (m_gtsDuration < m_guardTime || m_gtsDuration == 0) {
 			// CFP is too short to do something
@@ -508,6 +500,8 @@ implementation {
 
 #ifndef IEEE154_BEACON_TX_DISABLED
 		m_numGtsSlots = (call GetGtsCoordinatorDb.get())->numGtsSlots;
+#else
+		m_numGtsSlots = (call GetGtsDeviceDb.get())->numGtsSlots;
 #endif
 
 		dbg_serial("CfpTransmitP", "Starting CFP at %lu\n", m_cfpInit);

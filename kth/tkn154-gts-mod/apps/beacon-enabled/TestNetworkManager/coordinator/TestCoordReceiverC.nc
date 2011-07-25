@@ -71,12 +71,16 @@ module TestCoordReceiverC
 	uint8_t m_payloadLen;
 	uint8_t m_payload[10];
 	bool startSend;
+	uint8_t switchDescriptor; //Switch between the desired GTS descriptor
 
 	task void packetSendTask();
+	void setDefaultGtsDescriptor();
+	void setEmptyGtsDescriptor();
 
 	event void Boot.booted() {
 		call MLME_RESET.request(TRUE);
 		startSend = FALSE;
+		switchDescriptor = FALSE;
 	}
 	event void SendTimer.fired() {startSend = TRUE;}
 
@@ -147,11 +151,15 @@ module TestCoordReceiverC
 			);
 		}
 
-		call SendTimer.startOneShot(10000);
 	}
 
 	event message_t* MCPS_DATA.indication ( message_t* frame )
 	{
+		ieee154_address_t deviceAddr;
+		call Frame.getSrcAddr(frame, &deviceAddr);
+		
+		if (deviceAddr.shortAddress == 0x01) post packetSendTask();
+		
 		call Leds.led1Toggle();
 		return frame;
 	}
@@ -177,7 +185,36 @@ module TestCoordReceiverC
 		else
 		call Leds.led2Off();
 
-		if (startSend) post packetSendTask();
+		
+	}
+
+	/*****************************************************************************************
+	 * G T S   F U N C T I O N S 
+	 *****************************************************************************************/
+	void setEmptyGtsDescriptor() {
+		ieee154_GTSdb_t* GTSdb;
+		GTSdb = call SetGtsCoordinatorDb.get();
+
+		GTSdb->numGtsSlots = 0;
+		signal GtsSpecUpdated.notify(TRUE);
+	}
+	
+	void setDefaultGtsDescriptor() {
+		uint8_t i;
+		ieee154_GTSdb_t* GTSdb;
+
+		GTSdb = call SetGtsCoordinatorDb.get();
+
+		GTSdb->numGtsSlots = 0;
+
+		i=0;
+		call GtsUtility.addGtsEntry(GTSdb, i+1, IEEE154_aNumSuperframeSlots - (i+1), 1, GTS_RX_ONLY_REQUEST);
+		call GtsUtility.addGtsEntry(GTSdb, i+1, IEEE154_aNumSuperframeSlots - (i+1 + 1), 1, GTS_TX_ONLY_REQUEST);
+
+		for (i=2; i < 17; i++)
+		call GtsUtility.addGtsEntry(GTSdb, i+1, IEEE154_aNumSuperframeSlots - (i+1+1), 1, GTS_TX_ONLY_REQUEST);
+		
+		signal GtsSpecUpdated.notify(TRUE);
 	}
 
 	event void MLME_GTS.confirm (
@@ -193,21 +230,14 @@ module TestCoordReceiverC
 	 *Superframe events
 	 ***************************************************************************************/
 	event void IsEndSuperframe.notify( bool val ) {
-		uint8_t i=0, LIM_SLOTS = 23;
-		GTSdb = call SetGtsCoordinatorDb.get();
-
-		GTSdb->numGtsSlots = 0;
-
-		i=0;
-		call GtsUtility.addGtsEntry(GTSdb, i+1, IEEE154_aNumSuperframeSlots - (i+1), 1, GTS_TX_ONLY_REQUEST/*(i%2 ? GTS_RX_ONLY_REQUEST : GTS_TX_ONLY_REQUEST)*/);
-		call GtsUtility.addGtsEntry(GTSdb, i+1, IEEE154_aNumSuperframeSlots - (i+1 + 1), 1, GTS_RX_ONLY_REQUEST/*(i%2 ? GTS_RX_ONLY_REQUEST : GTS_TX_ONLY_REQUEST)*/);
-
-		for (i=2; i < (LIM_SLOTS -1); i++)
-		call GtsUtility.addGtsEntry(GTSdb, i+1, IEEE154_aNumSuperframeSlots - (i+1+1), 1, GTS_TX_ONLY_REQUEST);
-
-		signal GtsSpecUpdated.notify(TRUE);
-
-		return;
+		// Switch between the default GTS Descriptor and the empty
+		if (switchDescriptor == 0){
+			setEmptyGtsDescriptor();
+			switchDescriptor = 1;
+		}else{
+			setDefaultGtsDescriptor();
+			switchDescriptor = 0;
+		}
 	}
 
 	/***************************************************************************************

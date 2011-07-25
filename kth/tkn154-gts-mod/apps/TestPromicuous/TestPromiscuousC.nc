@@ -56,7 +56,7 @@ module TestPromiscuousC
 		"Orphan notification", "Beacon request", "Coordinator realignment", "GTS request"};
 
 	enum {
-		RADIO_CHANNEL = 0x1A,
+		RADIO_CHANNEL = 0x10,
 	};
 
 	uint8_t m_payload[IEEE154_aMaxBeaconPayloadLength];

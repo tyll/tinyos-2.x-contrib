@@ -51,6 +51,7 @@ module NoBeaconSynchronizeP
 		interface Notify<ieee154_status_t> as HasCfpTimeSlots;
 		interface Get<ieee154_GTSentry_t*> as GetCfpTimeSlots;
 
+		interface GetNow<bool> as IsGtsOngoing;
 	}
 	uses
 	{
@@ -134,4 +135,7 @@ implementation
 	default event void HasCfpTimeSlots.notify( ieee154_status_t val ) {return;}
 
 	command ieee154_GTSentry_t* GetCfpTimeSlots.get() {return NULL;}
+	
+	async command bool IsGtsOngoing.getNow() {atomic return FALSE;}
+
 }

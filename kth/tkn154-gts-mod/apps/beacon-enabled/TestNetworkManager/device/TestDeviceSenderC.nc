@@ -58,6 +58,9 @@ module TestDeviceSenderC
 		interface Packet;
 		interface Random;
 
+		interface Notify<bool> as IsEndSuperframe;
+		interface GetNow<bool> as IsGtsOngoing;
+
 	}
 }implementation {
 
@@ -72,12 +75,12 @@ module TestDeviceSenderC
 
 	void startApp();
 	task void packetSendTask();
-	
+
 	event void Boot.booted() {
 
 		char payload[] = "Hello Coordinator";
 		uint8_t *payloadRegion;
-		
+
 		m_payloadLen = sizeof(payload);
 		payloadRegion = call Packet.getPayload(&m_frame, m_payloadLen);
 		if (m_payloadLen <= call Packet.maxPayloadLength()) {
@@ -142,7 +145,9 @@ module TestDeviceSenderC
 			}
 		} else {
 
-			post packetSendTask();
+			// Transmit a packet if we have a slot allocated for us
+			if (call IsGtsOngoing.getNow()) post packetSendTask();
+
 
 			//received a beacon during synchronization, toggle LED2
 			if (beaconSequenceNumber & 1)
@@ -217,21 +222,27 @@ module TestDeviceSenderC
 			uint8_t msduHandle,
 			ieee154_status_t status,
 			uint32_t timestamp )
-	{	if (status == IEEE154_SUCCESS)
+	{	
+		if (status == IEEE154_SUCCESS)
 		call Leds.led1Toggle();
 	}
 
-	event message_t* MCPS_DATA.indication (message_t* frame)
-	{return frame;}
+	event message_t* MCPS_DATA.indication (message_t* frame) {return frame;}
+
+	event void IsEndSuperframe.notify( bool val ) {}
+
+	/*****************************************************************************************
+	 * G T S   F U N C T I O N S 
+	 *****************************************************************************************/
+	event void MLME_GTS.indication (
+			uint16_t DeviceAddress,
+			uint8_t GtsCharacteristics,
+			ieee154_security_t *security
+	) {}
 
 	event void MLME_GTS.confirm (
 			uint8_t GtsCharacteristics,
 			ieee154_status_t status
 	) {}
 
-	event void MLME_GTS.indication (
-			uint16_t DeviceAddress,
-			uint8_t GtsCharacteristics,
-			ieee154_security_t *security
-	) {}
 }

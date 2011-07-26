@@ -211,7 +211,7 @@ module TestCoordReceiverC
 		call GtsUtility.addGtsEntry(GTSdb, i+1, IEEE154_aNumSuperframeSlots - (i+1), 1, GTS_RX_ONLY_REQUEST);
 		call GtsUtility.addGtsEntry(GTSdb, i+1, IEEE154_aNumSuperframeSlots - (i+1 + 1), 1, GTS_TX_ONLY_REQUEST);
 
-		for (i=2; i < 17; i++)
+		for (i=2; i < 30; i++)
 		call GtsUtility.addGtsEntry(GTSdb, i+1, IEEE154_aNumSuperframeSlots - (i+1+1), 1, GTS_TX_ONLY_REQUEST);
 		
 		signal GtsSpecUpdated.notify(TRUE);

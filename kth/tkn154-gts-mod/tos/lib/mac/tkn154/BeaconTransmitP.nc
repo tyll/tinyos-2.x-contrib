@@ -43,6 +43,8 @@
 
 #include "TKN154_MAC.h"
 #include "TKN154_PHY.h"
+#include "printf.h"
+
 module BeaconTransmitP
 {
 	provides
@@ -559,9 +561,13 @@ implementation
 		// update superframe-related variables
 		m_numGtsSlots =
 		(frame->payload[BEACON_INDEX_GTS_SPEC] & GTS_DESCRIPTOR_COUNT_MASK) >> GTS_DESCRIPTOR_COUNT_OFFSET;
-		gtsFieldLength = 1 + ((m_numGtsSlots > 0) ? 1 + m_numGtsSlots * 3: 0);
+		gtsFieldLength = 1 + ((m_numGtsSlots > 0) ? 1 + m_numGtsSlots * GTS_LIST_MULTIPLY: 0);
+		if (m_numGtsSlots != IEEE154_aNumSuperframeSlots)
 		m_numCapSlots =
 		((frame->payload[BEACON_INDEX_SF_SPEC2] & SF_SPEC2_FINAL_CAPSLOT_MASK) >> SF_SPEC2_FINAL_CAPSLOT_OFFSET) + 1;
+		else
+		m_numCapSlots = 0;
+
 		m_sfSlotDuration =
 		(((uint32_t) 1) << ((frame->payload[BEACON_INDEX_SF_SPEC1] & SF_SPEC1_SO_MASK) >> SF_SPEC1_SO_OFFSET)) *
 		IEEE154_aBaseSlotDuration;
@@ -571,16 +577,7 @@ implementation
 		else
 		m_framePendingBit = FALSE;
 		memcpy(m_gtsField, &frame->payload[BEACON_INDEX_GTS_SPEC], gtsFieldLength);
-		if (frame->payload[BEACON_INDEX_SF_SPEC2] & SF_SPEC2_BATT_LIFE_EXT) {
-			// BLE is active; calculate the time offset from slot 0
-			m_battLifeExtDuration = IEEE154_SHR_DURATION +
-			(frame->headerLen + frame->payloadLen + 2) * IEEE154_SYMBOLS_PER_OCTET;
-			if (frame->headerLen + frame->payloadLen + 2 > IEEE154_aMaxSIFSFrameSize)
-			m_battLifeExtDuration += IEEE154_MIN_LIFS_PERIOD;
-			else
-			m_battLifeExtDuration += IEEE154_MIN_SIFS_PERIOD;
-			m_battLifeExtDuration = m_battLifeExtDuration + m_battLifeExtPeriods * 20;
-		} else
+
 		m_battLifeExtDuration = 0;
 
 		// we pass on the token now, but make a reservation to get it back 
@@ -696,7 +693,7 @@ implementation
 		// (2) GTS spec
 		// (3) SF spec
 		// (4) beacon payload (if there's enough time)
-		uint8_t len=0, *beaconSpecs = &m_payload[IEEE154_aMaxBeaconOverhead]; // going backwards
+		uint8_t len=0, *beaconSpecs = &m_payload[MAX_BEACON_PAYLOAD_SIZE-m_updateBeaconLength]; // going backwards
 		uint8_t beaconPayloadUpdated = 0, numGtsSlots = m_numGtsSlots;
 
 		atomic {
@@ -739,13 +736,18 @@ implementation
 				beaconSpecs[BEACON_INDEX_SF_SPEC2] |= SF_SPEC2_ASSOCIATION_PERMIT;
 				if (call MLME_GET.macPanCoordinator())
 				beaconSpecs[BEACON_INDEX_SF_SPEC2] |= SF_SPEC2_PAN_COORD;
+
+				// Final CAP Slot
+				if (numGtsSlots != IEEE154_aNumSuperframeSlots)
 				beaconSpecs[BEACON_INDEX_SF_SPEC2] |=
 				((IEEE154_aNumSuperframeSlots - 1 - numGtsSlots) & SF_SPEC2_FINAL_CAPSLOT_MASK);
+				else
+				beaconSpecs[BEACON_INDEX_SF_SPEC2] |= IEEE154_aNumSuperframeSlots & SF_SPEC2_FINAL_CAPSLOT_MASK;
 			}
 			m_beaconFrame.payloadLen = (m_pendingAddrLen + m_pendingGtsLen + 2) + m_beaconPayloadLen;
-			dbg_serial("BeaconTransmitP", "headerLen = %u ; payloadLen =  3+ %u + %u = %u\n", 
+			dbg_serial("BeaconTransmitP", "headerLen = %u ; payloadLen =  3+ %u + %u = %u\n",
 					m_beaconFrame.headerLen,
-					m_pendingGtsLen, 
+					m_pendingGtsLen,
 					m_beaconPayloadLen,
 					m_beaconFrame.payloadLen);
 			m_beaconFrame.payload = beaconSpecs;

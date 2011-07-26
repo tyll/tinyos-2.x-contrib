@@ -105,7 +105,7 @@ module TestPromiscuousC
 			 */
 
 			//Timestamp and FrameType
-			printf("[%ld - 0x%02X] %s",  call Frame.getDSN(frame), 
+			printf("[%ld - 0x%02X] %s", call Frame.getDSN(frame),
 					call Frame.getTimestamp(frame), m_frametype[frameType]);
 
 			//Src Address and PANID
@@ -135,28 +135,27 @@ module TestPromiscuousC
 				for (i=0; i<payloadLen; i++) {
 					printf("0x%02X ", payload[i]);
 				}
-			}else{
+			} else {
 				printf("\n");
 
 				//Beacom Frame
 				parseBeacon(payload);
 			}
 
-
-//			else if (frameType == 0) {
-//				// parse the beacon with the new GTS Descriptor
-//				compareBeacon(payload, payloadLen);
-//
-//				memcpy(m_payload, payload, payloadLen);
-//				memcpy(m_payload+payloadLen, NULL, IEEE154_aMaxBeaconPayloadLength - payloadLen);
-//
-//				//compareBeacon(header, headerLen);
-//
-//				memcpy(m_header, header, headerLen);
-//				memcpy(m_header+headerLen, NULL, IEEE154_aMaxBeaconPayloadLength - headerLen);
-//
-//				parseBeacon(payload);
-//			}
+			//			else if (frameType == 0) {
+			//				// parse the beacon with the new GTS Descriptor
+			//				compareBeacon(payload, payloadLen);
+			//
+			//				memcpy(m_payload, payload, payloadLen);
+			//				memcpy(m_payload+payloadLen, NULL, IEEE154_aMaxBeaconPayloadLength - payloadLen);
+			//
+			//				//compareBeacon(header, headerLen);
+			//
+			//				memcpy(m_header, header, headerLen);
+			//				memcpy(m_header+headerLen, NULL, IEEE154_aMaxBeaconPayloadLength - headerLen);
+			//
+			//				parseBeacon(payload);
+			//			}
 
 			printfflush();
 		}
@@ -203,24 +202,19 @@ module TestPromiscuousC
 
 		m_numGtsSlots = payload[BEACON_INDEX_GTS_SPEC] & GTS_DESCRIPTOR_COUNT_MASK;
 		gtsFieldLength = 1 + ((m_numGtsSlots > 0) ? GTS_DIRECTION_FIELD_LENGTH + m_numGtsSlots * GTS_LIST_MULTIPLY: 0);
-		m_numCapSlots = ((payload[BEACON_INDEX_SF_SPEC2] & SF_SPEC2_FINAL_CAPSLOT_MASK) >> SF_SPEC2_FINAL_CAPSLOT_OFFSET) + 1;
+		if (m_numGtsSlots != IEEE154_aNumSuperframeSlots)
+			m_numCapSlots = ((payload[BEACON_INDEX_SF_SPEC2] & SF_SPEC2_FINAL_CAPSLOT_MASK) >> SF_SPEC2_FINAL_CAPSLOT_OFFSET) + 1;
+		else
+		m_numCapSlots = 0;
+		
 		m_superframeOrder = (payload[BEACON_INDEX_SF_SPEC1] & SF_SPEC1_SO_MASK) >> SF_SPEC1_SO_OFFSET;
 		m_sfSlotDuration = (((uint32_t) 1) << (m_superframeOrder)) * IEEE154_aBaseSlotDuration;
 
-		// check for battery life extension
-		if (payload[BEACON_INDEX_SF_SPEC2] & SF_SPEC2_BATT_LIFE_EXT) {
-			// BLE is active; calculate the time offset from slot0
-			m_battLifeExtDuration = IEEE154_SHR_DURATION + frameLen * IEEE154_SYMBOLS_PER_OCTET;
-			if (frameLen > IEEE154_aMaxSIFSFrameSize)
-			m_battLifeExtDuration += call MLME_GET.macMinLIFSPeriod();
-			else
-			m_battLifeExtDuration += call MLME_GET.macMinSIFSPeriod();
-			m_battLifeExtDuration = m_battLifeExtDuration + call MLME_GET.macBattLifeExtPeriods() * 20;
-		} else
+		
 		m_battLifeExtDuration = 0;
 
 		m_beaconOrder = (payload[BEACON_INDEX_SF_SPEC1] & SF_SPEC1_BO_MASK) >> SF_SPEC1_BO_OFFSET;
-		printf("\t\tSF Spec: BO=%u ; SO=%u ; F.SLot=%u ; BatteryLife=%u\n"
+		printf("\t\tSF Spec: BO=%u ; SO=%u ; CAP slots=%u ; BatteryLife=%u\n"
 				, m_beaconOrder, m_superframeOrder, m_numCapSlots, m_battLifeExtDuration);
 		printf("\t\tGTS Spec: DescCount=%u ; Length=%u bytes\n", m_numGtsSlots, gtsFieldLength);
 

@@ -470,16 +470,6 @@ implementation
 			}
 #endif
 
-			// check for battery life extension
-			if (payload[BEACON_INDEX_SF_SPEC2] & SF_SPEC2_BATT_LIFE_EXT) {
-				// BLE is active; calculate the time offset from slot0
-				m_battLifeExtDuration = IEEE154_SHR_DURATION + frameLen * IEEE154_SYMBOLS_PER_OCTET;
-				if (frameLen > IEEE154_aMaxSIFSFrameSize)
-				m_battLifeExtDuration += call MLME_GET.macMinLIFSPeriod();
-				else
-				m_battLifeExtDuration += call MLME_GET.macMinSIFSPeriod();
-				m_battLifeExtDuration = m_battLifeExtDuration + call MLME_GET.macBattLifeExtPeriods() * 20;
-			} else
 			m_battLifeExtDuration = 0;
 
 			m_framePendingBit = mhr[MHR_INDEX_FC1] & FC1_FRAME_PENDING ? TRUE : FALSE;

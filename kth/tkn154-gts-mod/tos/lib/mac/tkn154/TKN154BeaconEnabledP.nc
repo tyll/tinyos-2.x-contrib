@@ -683,4 +683,6 @@ implementation
 	RadioControlP.RadioPromiscuousMode -> PromiscuousModeP;
 	RadioControlP.Leds = Leds;
 	
+	components PrintfC;
+	components SerialStartC;
 }

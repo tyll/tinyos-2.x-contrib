@@ -145,8 +145,8 @@ implementation
 		uint8_t i;
 		uint8_t* gtsSpecField = lastBytePtr - len + 1;
 
-		if (maxlen == 0)
-		return 0;
+		if (len >= maxlen)
+		return 1;
 
 		//GTS Specification
 		//gtsSpecField[0] = ( GTSdb.numGtsSlots << 0) | (call MLME_GET.macGTSPermit() << 7);
@@ -177,7 +177,6 @@ implementation
 			gtsSpecField[1] = (directionMask >> 24) & GTS_DIRECTIONS_MASK;
 
 		}
-		
 		
 		return len;
 	}

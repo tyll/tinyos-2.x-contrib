@@ -1,4 +1,9 @@
- 		  		  		  
+# load the modified2 files from the default GTS
+TKN154_GTS_MOD_ALL_TOS=$(TOSCONTRIB)/kth/tkn154-gts-mod-all/tos
+CFLAGS += -I$(TKN154_GTS_MOD_ALL_TOS)/lib/mac/tkn154 \
+		  -I$(TKN154_GTS_MOD_ALL_TOS)/lib/mac/tkn154/dummies \
+		  -I$(TKN154_GTS_MOD_ALL_TOS)/lib/mac/tkn154/interfaces/public \
+		  		  		  		  
 # load the modified files from the default GTS
 TKN154_GTS_MOD_TOS=$(TOSCONTRIB)/kth/tkn154-gts-mod/tos
 CFLAGS += -I$(TKN154_GTS_MOD_TOS)/lib/mac/tkn154 \

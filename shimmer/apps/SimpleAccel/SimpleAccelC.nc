@@ -75,7 +75,10 @@ implementation {
       call AccelInit.init();
       call Accel.setSensitivity(RANGE_6_0G);
     
+      TOSH_SET_PWRMUX_SEL_PIN();
+
       call shimmerAnalogSetup.addAccelInputs();
+      call shimmerAnalogSetup.addAnExInput(7);
       call shimmerAnalogSetup.finishADCSetup(sbuf0);
       NBR_ADC_CHANS = call shimmerAnalogSetup.getNumberOfChannels();
    }
@@ -142,8 +145,8 @@ implementation {
    }
 
    async event void DMA0.transferDone(error_t success) {
-      atomic DMA0DA += 6;
-      if(++dma_blocks == 20)
+      atomic DMA0DA += 8;
+      if(++dma_blocks == 15)
       {
          dma_blocks = 0;
          if(current_buffer == 0){

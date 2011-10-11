@@ -39,6 +39,10 @@ configuration BlazePacketC {
     interface BlazePacket;
     interface BlazePacketBody;
     interface LinkPacketMetadata;
+    
+    interface PacketTimeStamp<T32khz, uint32_t> as PacketTimeStamp32khz;
+    interface PacketTimeStamp<TMilli, uint32_t> as PacketTimeStampMilli;
+    interface PacketTimeSyncOffset;
   }
 }
 
@@ -48,6 +52,20 @@ implementation {
   BlazePacket = BlazePacketP;
   BlazePacketBody = BlazePacketP;
   LinkPacketMetadata = BlazePacketP;
+  
+  PacketTimeStamp32khz = BlazePacketP;
+  PacketTimeStampMilli = BlazePacketP;
+  PacketTimeSyncOffset = BlazePacketP;
+
+  
+  components Counter32khz32C, new CounterToLocalTimeC(T32khz);
+  CounterToLocalTimeC.Counter -> Counter32khz32C;
+  BlazePacketP.LocalTime32khz -> CounterToLocalTimeC;
+
+  //DummyTimer is introduced to compile apps that use no timers
+  components HilTimerMilliC, new TimerMilliC() as DummyTimer;
+  BlazePacketP.LocalTimeMilli -> HilTimerMilliC;
+  
   
 }
 

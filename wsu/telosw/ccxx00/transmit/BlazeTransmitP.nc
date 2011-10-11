@@ -58,6 +58,10 @@
 #include "AM.h"
 #include "BlazeTransmit.h"
 #include "Wor.h"
+//mingsen
+#include "BlazeTimeSyncMessage.h"
+#include "PrintfUART.h"
+#include "TimeSyncMsg.h"
 
 module BlazeTransmitP {
 
@@ -76,7 +80,7 @@ module BlazeTransmitP {
     interface ReceiveMode;
     
     interface BlazeFifo as TXFIFO;
-  
+
     interface BlazeStrobe as STX;
     interface BlazeStrobe as SFRX;
       
@@ -95,6 +99,13 @@ module BlazeTransmitP {
 #if BLAZE_ENABLE_CRC_32
     interface PacketCrc;
 #endif
+    //mingsen
+    interface LocalTime<TMilli> as LocalTimeMilli;
+    interface LocalTime<T32khz> as LocalTime32khz;
+    interface PacketTimeStamp<TMilli,uint32_t>;
+    interface PacketTimeSyncOffset;
+    interface Packet;
+    interface PacketFooter;
   }
 }
 
@@ -117,7 +128,9 @@ implementation {
   bool force;
   uint16_t duration;
   uint32_t transmittedPacketCount = 0;
-    
+  //mingsen
+  message_t timeMsg;
+  message_t* tempMsg;
   /***************** Prototypes ****************/
   error_t transmit();
   void disableWor();
@@ -129,6 +142,10 @@ implementation {
   /***************** AsyncSend Commands ****************/
   async command error_t AsyncSend.send[ radio_id_t id ](void *msg, bool forcePkt, uint16_t preambleDurationMs) {
     error_t error;
+    uint32_t time32; //mingsen
+    uint32_t offset;
+    void* payload;
+
     if(call State.requestState(S_TX_PACKET) != SUCCESS) {
       return FAIL;
     }
@@ -142,10 +159,23 @@ implementation {
     atomic force = forcePkt;
     atomic duration = preambleDurationMs;
     
+
+    //mingsen
+    tempMsg = (message_t*)myMsg;
+    time32 = call LocalTime32khz.get();
+    if (call PacketTimeSyncOffset.isSet(tempMsg)) {
+
+	timesync_footer_t* footer = (timesync_footer_t*)(tempMsg->data + call Packet.payloadLength(tempMsg));
+	offset = time32 - footer->timestamp;
+	PXDBG(printfUART("^*****^^In transmitP offset %lu.\n",offset));
+	call PacketFooter.setoffvalue(tempMsg, offset);
+	footer->timestamp = offset;
+    }
 #if BLAZE_ENABLE_CRC_32
     call PacketCrc.computeCrc( myMsg );
 #endif
-    
+
+
     if((error = transmit()) == SUCCESS) {
       transmittedPacketCount++;
     }
@@ -235,7 +265,8 @@ implementation {
     bool forcing;    
     uint16_t transmitDelay;
     uint16_t killSwitch;
-    
+
+
     atomic {
       msg = myMsg;
       id = m_id;
@@ -360,6 +391,7 @@ implementation {
       post startTimer();
       
     } else {
+      call Leds.led2Toggle();
       call TXFIFO.write(msg, (call BlazePacketBody.getHeader(msg))->length + 1);
     }
     
@@ -446,7 +478,7 @@ implementation {
       msg = myMsg;
       id = m_id;
     }
-    
+    call Leds.led2Toggle();
     call TXFIFO.write(msg, (call BlazePacketBody.getHeader(msg))->length + 1);
   }
   

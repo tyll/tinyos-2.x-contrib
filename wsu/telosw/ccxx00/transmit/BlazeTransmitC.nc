@@ -83,7 +83,7 @@ implementation {
   
   BlazeTransmitP.RadioStatus -> Spi.RadioStatus;
   BlazeTransmitP.TXFIFO -> Spi.TXFIFO;
-  
+
   BlazeTransmitP.STX -> Spi.STX;
   BlazeTransmitP.SFRX -> Spi.SFRX;
   BlazeTransmitP.TxReg -> Spi.TXREG;
@@ -108,4 +108,16 @@ implementation {
   components PacketCrcC;
   BlazeTransmitP.PacketCrc -> PacketCrcC;
 #endif
+  components Counter32khz32C, new CounterToLocalTimeC(T32khz) as LocalTime32khzC, LocalTimeMilliC;
+  LocalTime32khzC.Counter -> Counter32khz32C;
+  BlazeTransmitP.LocalTime32khz -> LocalTime32khzC;
+  BlazeTransmitP.LocalTimeMilli -> LocalTimeMilliC;
+  BlazeTransmitP.PacketTimeStamp -> BlazePacketC;
+  BlazeTransmitP.PacketTimeSyncOffset -> BlazePacketC;
+  
+  components BlazeTimeSyncMessageC;
+  BlazeTransmitP.Packet -> BlazeTimeSyncMessageC;
+  BlazeTransmitP.PacketFooter->BlazeTimeSyncMessageC;
+
+
 }

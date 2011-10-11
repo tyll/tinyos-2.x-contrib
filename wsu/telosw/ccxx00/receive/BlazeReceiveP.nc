@@ -83,6 +83,11 @@ module BlazeReceiveP {
 #if BLAZE_ENABLE_CRC_32  
     interface PacketCrc;
 #endif
+    //mingsen
+    interface LocalTime<TMilli> as LocalTimeMilli;
+    interface PacketTimeStamp<TMilli,uint32_t>;
+
+
   }
 
 }
@@ -137,8 +142,16 @@ implementation {
 
     /** The location of the CRC bit in the LQI byte */
     CRC_BIT = 0x80,
+    
+    TIMESTAMP_QUEUE_SIZE = 8UL,
   };
   
+  //mingsen
+  uint32_t m_timestamp_queue[ TIMESTAMP_QUEUE_SIZE ];
+
+  uint8_t m_timestamp_head;
+  
+  uint8_t m_timestamp_size;
   
   /***************** Prototypes ****************/
   task void receiveDone();
@@ -228,6 +241,13 @@ implementation {
     
     if(call State.requestState(S_RX_LENGTH) != SUCCESS) {
       return;
+    }
+    //mingsen 
+    if ( m_timestamp_size < TIMESTAMP_QUEUE_SIZE ) {
+      uint8_t tail =  ( ( m_timestamp_head + m_timestamp_size ) % 
+                        TIMESTAMP_QUEUE_SIZE );
+      m_timestamp_queue[ tail ] = call LocalTimeMilli.get();
+      m_timestamp_size++;
     }
     
     call RxInterrupt.disable[id]();
@@ -437,6 +457,21 @@ implementation {
     
     metadata->lqi = myLqi;
     metadata->rssi = myRssi;
+    
+    //mingsen
+    if (m_timestamp_size==1){
+      call PacketTimeStamp.set(m_msg, m_timestamp_queue[ m_timestamp_head ]);
+      //call Leds.led2Toggle();
+    }
+    m_timestamp_head = ( m_timestamp_head + 1 ) % TIMESTAMP_QUEUE_SIZE;
+    m_timestamp_size--;
+
+    if (m_timestamp_size>0) {
+      call PacketTimeStamp.clear(m_msg);
+      m_timestamp_head = 0;
+      m_timestamp_size = 0;
+    }
+    
     
     atomicMsg = signal Receive.receive[atomicId]( m_msg, m_msg->data, rxFrameLength );
     

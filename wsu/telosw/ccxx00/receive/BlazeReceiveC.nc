@@ -116,4 +116,9 @@ implementation {
   components PacketCrcC;
   BlazeReceiveP.PacketCrc -> PacketCrcC;
 #endif
+
+  components LocalTimeMilliC;
+  BlazeReceiveP.LocalTimeMilli -> LocalTimeMilliC;
+  BlazeReceiveP.PacketTimeStamp -> BlazePacketC;
+
 }

@@ -87,6 +87,9 @@ typedef nx_struct blaze_metadata_t {
   nx_uint16_t rxInterval;
   nx_uint16_t maxRetries;
   nx_uint16_t retryDelay;
+  nx_uint32_t timestamp; //mingsen for FTSP
+  nx_bool timesync; //mingsen for FTSP
+  nx_uint8_t offset;
 } blaze_metadata_t;
 
 
@@ -222,6 +225,12 @@ enum blaze_config_reg_addr_enums {
   BLAZE_TXBYTES = 0x3A | BLAZE_BURST,
   BLAZE_RXBYTES = 0x3B | BLAZE_BURST,
 
+};
+
+
+enum
+{
+  CC1101_INVALID_TIMESTAMP  = 0x80000000L,
 };
 
 #ifndef UQ_BLAZE_RADIO

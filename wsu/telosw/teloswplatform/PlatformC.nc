@@ -38,6 +38,7 @@ implementation
   PlatformP.MoteClockInit -> MoteClockC;
   PlatformP.MoteInit -> MotePlatformC;
 
+
 	components EnergyMeterC, WakeupADCC, AccelerometerC;
 	PlatformP.EnergyMeter -> EnergyMeterC;
 	PlatformP.WakeupADC0 -> WakeupADCC.ADC0;

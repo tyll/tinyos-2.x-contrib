@@ -23,7 +23,10 @@ configuration ActiveMessageC {
     interface Packet;
     interface AMPacket;
     interface PacketAcknowledgements;
-    
+    //mingsen 
+    interface PacketTimeStamp<T32khz, uint32_t> as PacketTimeStamp32khz;
+    interface PacketTimeStamp<TMilli, uint32_t> as PacketTimeStampMilli;
+
     interface RadioSelect;
     interface PacketLink;
     interface BlazePacket;
@@ -48,5 +51,10 @@ implementation {
   PacketLink = BlazeC;
   BlazePacket = BlazeC;
   Csma = BlazeC;
+
+
+  components BlazePacketC;
+  PacketTimeStamp32khz = BlazePacketC;
+  PacketTimeStampMilli = BlazePacketC;
   
 }

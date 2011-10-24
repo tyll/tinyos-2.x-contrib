@@ -39,7 +39,7 @@
  * @modified 2011/04/13
  */
 #include "TKN154_MAC.h"
-//#include "printf.h"
+#include "printf.h"
 
 module CoordCfpP
 {
@@ -142,9 +142,10 @@ implementation
 		// GTS Specification (1byte) + GTS Directions (0/4 byte) + GTS List (3bytes * #Slots)
 		uint8_t len = 1 + ((GTSdb.numGtsSlots > 0) ? GTS_DIRECTION_FIELD_LENGTH + GTSdb.numGtsSlots * GTS_LIST_MULTIPLY: 0);
 		uint32_t directionMask = 0x00;
+		uint32_t tmp;
 		uint8_t i;
 		uint8_t* gtsSpecField = lastBytePtr - len + 1;
-
+		
 		if (len >= maxlen)
 		return 1;
 
@@ -153,12 +154,12 @@ implementation
 		gtsSpecField[0] = ( GTSdb.numGtsSlots << 0) | (1 << 7);
 		//jump the GTS_DIRECTION_FIELD_LENGTH -1
 		gtsSpecField += GTS_DIRECTION_FIELD_LENGTH+1;
-		
+
 		if(GTSdb.numGtsSlots > 0) {
 			//GTS List
 			for(i = 0; i < GTSdb.numGtsSlots; i++) {
-
-				directionMask = directionMask | (db[i].direction << i);
+				tmp = (uint32_t) (db[i].direction);
+				directionMask = directionMask | (tmp << i);
 				gtsSpecField[0] = db[i].shortAddress;
 				gtsSpecField[1] = db[i].shortAddress >> 8;
 				gtsSpecField[2] = ( (db[i].length << GTS_LENGTH_OFFSET) & GTS_LENGTH_MASK )
@@ -166,7 +167,7 @@ implementation
 
 				gtsSpecField = gtsSpecField + GTS_LIST_MULTIPLY;
 			}
-			//printfflush();
+
 
 			//GTS Directions
 			gtsSpecField = lastBytePtr - len + 1;

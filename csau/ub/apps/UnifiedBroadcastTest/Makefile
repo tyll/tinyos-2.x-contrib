@@ -15,7 +15,7 @@ CFLAGS += -DLPL_INTERVAL=200 #for FTSP
 
 ##### End #####
 
-CFLAGS += -I$(TOSCONTRIB)/csau/ub/tos/lib/net/ub
+CFLAGS += -I$(TOSCSAU)/ub/tos/lib/net/ub
 
 BUILD_EXTRA_DEPS += 
 CLEAN_EXTRA = simbuild build doc app.xml 

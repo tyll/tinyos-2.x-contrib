@@ -36,13 +36,13 @@ configuration BmacListenerC
 	uses interface RadioPowerControl;
 	uses interface AsyncReceive as SubReceive;
 	uses interface State as SendState;
-	uses interface AMPacket;
 	uses interface Alarm<TMilli, uint16_t> as TimeoutAlarm;
 }
 implementation
 {
 	components FixedSleepLplListenerC as Listener;
 	components BmacListenerQueueP as Filter;
+	components ActiveMessageC;
 
 	Receive = Listener.Receive;
 	FixedSleepLplListener = Listener;
@@ -52,12 +52,11 @@ implementation
 	Listener.RadioPowerControl = RadioPowerControl;
 	Listener.SubReceive -> Filter;
 	Listener.SendState = SendState;
-	Listener.AMPacket = AMPacket;
 	Listener.TimeoutAlarm = TimeoutAlarm;
 	
 	Filter.SubReceive = SubReceive;
 	Filter.RadioPowerControl = RadioPowerControl;
-	Filter.AMPacket = AMPacket;
+	Filter.AMPacket -> ActiveMessageC;
 	Filter.SendState = SendState;
 	Filter.FixedSleepLplListener -> Listener;
 	Filter.ChannelMonitor = ChannelMonitor;

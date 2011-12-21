@@ -38,7 +38,6 @@ configuration MacC
 	uses interface AsyncSend as SubSend;
 	uses interface Resend;
 	uses interface PacketAcknowledgements;
-	uses interface AMPacket;
 	uses interface CcaControl as SubCcaControl[am_id_t amId];
 }
 implementation
@@ -50,6 +49,7 @@ implementation
  	components ScpSplitControlC;
 	components ChannelPollerC as Poller;
 	components new StateC() as SendState;
+	components ActiveMessageC as AM;
 	
 	components new VirtualizedAlarmMilli16C() as SendAlarm;
 	components new VirtualizedAlarmMilli16C() as LplAlarm;
@@ -59,7 +59,7 @@ implementation
 	SplitControl = ScpSplitControlC;
 	CcaControl = Sender;
 	
-	Control.SubLpl -> Sender;
+	Control.SubScp -> Sender;
 	Control.SubSyncInterval -> SyncSender;
 	
 	Sender.RadioPowerControl = RadioPowerControl;
@@ -67,34 +67,34 @@ implementation
 	Sender.SubCcaControl = SubCcaControl;
 	Sender.Resend = Resend;
 	Sender.PacketAcknowledgements = PacketAcknowledgements;
-	Sender.AMPacket = AMPacket;
+	Sender.AMPacket -> AM;
 	Sender.SendState -> SendState;
 	Sender.SendAlarm -> SendAlarm;
-	Sender.SubLpl -> Poller;
+	Sender.ChannelPoller -> Poller;
 	Sender.ChannelMonitor = ChannelMonitor;
 	
 	Listener.ChannelPoller -> Poller;
 	Listener.RadioPowerControl = RadioPowerControl;
 	Listener.SubReceive -> SyncReceiver;
 	Listener.SendState -> SendState;
-	Listener.AMPacket = AMPacket;
+	Listener.AMPacket -> AM;
 	
 	Poller.ChannelMonitor = ChannelMonitor;
 	Poller.Alarm -> LplAlarm;
 	
 	SyncSender.SubSend -> Boot;
-	SyncSender.AMPacket = AMPacket;
+	SyncSender.AMPacket -> AM;
 	SyncSender.LplAlarm -> LplAlarm;
 	
 	Boot.SubSend = SubSend;
 	Boot.Resend = Resend;
-	Boot.AMPacket = AMPacket;
-	Boot.LowPowerListening -> Sender;
+	Boot.AMPacket -> AM;
+	Boot.Scp -> Sender;
 	
 	SyncReceiver.ScpSyncSender -> SyncSender;
 	SyncReceiver.SendState -> SendState;
 	SyncReceiver.SubReceive = SubReceive;
-	SyncReceiver.AMPacket = AMPacket;
+	SyncReceiver.AMPacket -> AM;
 	SyncReceiver.SendAlarm -> SendAlarm;
 	SyncReceiver.LplAlarm -> LplAlarm;
 	

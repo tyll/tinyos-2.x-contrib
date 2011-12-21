@@ -27,14 +27,14 @@
  */
 configuration MacControlC
 {
-	provides interface LowPowerListening;
+	provides interface Scp;
 	provides interface Interval as SyncInterval;
 	
-	uses interface LowPowerListening as SubLpl;
+	uses interface Scp as SubScp;
 	uses interface Interval as SubSyncInterval;
 }
 implementation
 {
-	LowPowerListening = SubLpl;
+	Scp = SubScp;
 	SyncInterval = SubSyncInterval;
 }

@@ -26,15 +26,15 @@
  *
  * @author Greg Hackmann
  */
-module AsyncReceiveAdapterP
+module AsyncReceiveAdapterP @safe()
 {
 	provides interface Receive;
 	uses interface AsyncReceive;
 }
 implementation
 {
-	message_t * msg_;
-	void * payload_;
+	message_t * ONE_NOK msg_;
+	void * ONE_NOK payload_;
 	uint8_t len_;
 	
 	task void receiveDone_task();

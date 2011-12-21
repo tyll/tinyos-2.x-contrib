@@ -26,7 +26,7 @@
  *
  * @author Greg Hackmann
  */
-module PreambleSenderP
+module PreambleSenderP @safe()
 {
 	provides interface AsyncSend as Send;
 	provides interface PreambleSender;
@@ -62,7 +62,7 @@ implementation
 		S_STOPPING = 6
 	};
 	
-	message_t * msg_;
+	message_t * ONE_NOK msg_;
 	uint8_t len_;
 	uint16_t ms_;
 	norace bool useCca_;
@@ -158,7 +158,7 @@ implementation
 		return call SubSend.getPayload(msg, len);
 	}
 	
-	void signalPreambleDone(message_t * msg, error_t err)
+	void signalPreambleDone(message_t * ONE msg, error_t err)
 	{
 //		atomic
 //		{

@@ -58,25 +58,31 @@ module SenderDispatcherP {
 	
 	async command error_t Send.send[uint8_t slotType](message_t * msg, uint8_t len) {
  		error_t err;
- 		uint8_t prev_id;
- 		atomic prev_id = last_id;
+ 		message_t *prev_toSend;
+ 		uint8_t prev_toSendLen, prev_id;
+ 		
+ 		atomic {
+ 			prev_toSend = toSend;
+ 			prev_toSendLen = toSendLen;
+ 			prev_id = last_id;
+ 		}
  		
  		if (prev_id != NO_SLOT) {
  			return FAIL;
  		}
  		
- 		
+		atomic {
+			toSend = msg;
+			toSendLen = len;
+			last_id = slotType;
+		}
  		err = call SubSend.send(msg, len);
- 		if (err == SUCCESS) {
+ 		if (err != SUCCESS) {
 			atomic {
- 				last_id = slotType;
- 				toSend = msg;
- 				toSendLen = len;
+				toSend = prev_toSend;
+				toSendLen = prev_toSendLen;
+				last_id = prev_id;
 			}
-			
-			#if TRACE_SEND == 1
-			call Pin.set();
-			#endif
  		}
  		return err;
  	}

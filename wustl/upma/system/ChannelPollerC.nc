@@ -28,7 +28,6 @@
 configuration ChannelPollerC
 {
 	provides interface ChannelPoller;
-	provides interface LowPowerListening;
 	provides interface StdControl;
 
 	uses interface ChannelMonitor;
@@ -40,7 +39,6 @@ implementation
 	components new StateC();
 	
 	ChannelPoller = ChannelPollerP;
-	LowPowerListening = ChannelPollerP;
 	StdControl = ChannelPollerP;
 
 	ChannelPollerP.ChannelMonitor = ChannelMonitor;

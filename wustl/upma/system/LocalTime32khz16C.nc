@@ -37,7 +37,7 @@ configuration LocalTime32khz16C {
 implementation {
 	components MainC;
 	components Counter32khz16C as Counter;
-	components LocalTime32khz16P as LocalTimeP;
+	components new LocalTime16P(T32khz) as LocalTimeP;
 	
 	LocalTime = LocalTimeP;
 	

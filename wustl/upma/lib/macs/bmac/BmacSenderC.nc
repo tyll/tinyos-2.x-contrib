@@ -31,37 +31,43 @@ configuration BmacSenderC
 	provides interface AsyncSend as Send;
 	provides interface StdControl;
 	provides interface CcaControl[am_id_t amId];
+	provides interface LowPowerListening;
 	
 	uses interface RadioPowerControl;
 	uses interface AsyncSend as SubSend;
 	uses interface Resend;
+	uses interface ChannelPoller;
 	uses interface FixedSleepLplListener;
 	uses interface PacketAcknowledgements;
-	uses interface LowPowerListening;
 	uses interface State as SendState;
-	uses interface AMPacket;
 	uses interface Alarm<TMilli, uint16_t> as PreambleAlarm;
 	uses interface CcaControl as SubCcaControl[am_id_t amId];
 }
 implementation
 {
 	components BmacSenderP as BP;
+	components BmacLplPacketC as LplC;
 	components PreambleSenderC as Sender;
+	components SystemLowPowerListeningC;
 	components LedsC;
 	
-	Send = BP;
+	Send = LplC;
 	StdControl = BP;
 	CcaControl = BP;
+	LowPowerListening = LplC;
+
+	LplC.SubSend -> BP;
+	LplC = ChannelPoller;
 
 	BP.SubSend -> Sender;
 	BP.FixedSleepLplListener = FixedSleepLplListener;
-	BP.SendState = SendState;
+	BP.PacketAcknowledgements = PacketAcknowledgements;
 	BP.PreambleSender -> Sender;
 	BP.SenderControl -> Sender;
-	BP.PacketAcknowledgements = PacketAcknowledgements;
-	BP.LowPowerListening = LowPowerListening;
+	BP.SendState = SendState;
+	BP.LowPowerListening -> LplC;
+	BP.SystemLowPowerListening -> SystemLowPowerListeningC;
 	BP.Leds -> LedsC;
-	BP.AMPacket = AMPacket;
 	BP.SubCcaControl -> Sender;
 	
 	Sender.RadioPowerControl = RadioPowerControl;

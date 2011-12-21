@@ -38,6 +38,8 @@
 configuration CC2420PacketC {
 
   provides {
+    interface PacketPower;
+    interface PacketQuality;
     interface CC2420Packet;
     interface PacketAcknowledgements as Acks;
     interface CC2420PacketBody;
@@ -59,9 +61,8 @@ implementation {
   PacketTimeStamp32khz = CC2420PacketP;
   PacketTimeStampMilli = CC2420PacketP;
   PacketTimeSyncOffset = CC2420PacketP;
-
-  components CC2420ActiveMessageC;
-  CC2420PacketP.Packet -> CC2420ActiveMessageC;
+  PacketPower          = CC2420PacketP;
+  PacketQuality        = CC2420PacketP;
 
   components Counter32khz32C, new CounterToLocalTimeC(T32khz);
   CounterToLocalTimeC.Counter -> Counter32khz32C;

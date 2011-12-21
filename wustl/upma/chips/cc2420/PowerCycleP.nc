@@ -79,6 +79,7 @@
 module PowerCycleP {
   provides {
     interface ChannelMonitor;
+    interface LplAccounting;
   }
 
   uses {
@@ -95,6 +96,7 @@ module PowerCycleP {
 }
 
 implementation {
+  uint32_t detected = 0, free = 0;
 
   enum {
     DEFAULT_CCA_LENGTH = 8 * 32,
@@ -117,12 +119,12 @@ implementation {
     call Leds.led2Off();
   }
     
-  async command void ChannelMonitor.setCheckLength(uint16_t length) {
-    ccaCheckLength = length;
+  async command void ChannelMonitor.setCheckLength(uint16_t ms) {
+    ccaCheckLength = ms * 32;
   }
   
   async command uint16_t ChannelMonitor.getCheckLength() {
-    return ccaCheckLength;
+    return ccaCheckLength / 32;
   }
 
   async command void ChannelMonitor.check() {
@@ -148,6 +150,7 @@ implementation {
     atomic {
       for(ccaChecks = 0; ccaChecks < MAX_LPL_CCA_CHECKS; ccaChecks++) {
         if(call PacketIndicator.isReceiving()) {
+          detected++;
           signal ChannelMonitor.busy();
           return;
         }
@@ -155,12 +158,14 @@ implementation {
         if(call EnergyIndicator.isReceiving()) {
           detects++;
           if(detects > MIN_SAMPLES_BEFORE_DETECT) {
+            detected++;
             signal ChannelMonitor.busy(); 
             return;
           }
           // Leave the radio on for upper layers to perform some transaction
         }
       }
+      free++;
       signal ChannelMonitor.free();
     }
 #else
@@ -186,23 +191,28 @@ implementation {
         break;
       }
 			
-      if(call EnergyIndicator.isReceiving()) {
-        detects++;
-        if(detects > MIN_SAMPLES_BEFORE_DETECT) {
-          break;
-        }
-        // Leave the radio on for upper layers to perform some transaction
-      }
+       if(call EnergyIndicator.isReceiving()) {
+         detects++;
+         if(detects > MIN_SAMPLES_BEFORE_DETECT) {
+           break;
+         }
+         // Leave the radio on for upper layers to perform some transaction
+       }
     }
     
     if(detects > MIN_SAMPLES_BEFORE_DETECT) {
+      detected++;
       signal ChannelMonitor.busy();
     } else {
+      free++;
       signal ChannelMonitor.free();
     }
 #endif
     
   }
+  
+  command uint32_t LplAccounting.detected() { return detected; }
+  command uint32_t LplAccounting.free() { return free; }
 }
 
 

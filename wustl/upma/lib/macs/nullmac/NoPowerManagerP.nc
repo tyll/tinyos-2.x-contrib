@@ -33,7 +33,6 @@ module NoPowerManagerP
 	uses interface ChannelMonitor;
 	uses interface Resend;
 	uses interface PacketAcknowledgements;
-	uses interface AMPacket;
 }
 implementation
 {

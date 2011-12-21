@@ -35,7 +35,7 @@ module ScpBootP
 	uses interface AMPacket;
 	uses interface Alarm<TMilli, uint16_t> as BootAlarm;
 	uses interface State as BootState;
-	uses interface LowPowerListening;
+	uses interface Scp;
 }
 implementation
 {
@@ -59,7 +59,7 @@ implementation
 		call AMPacket.setSource(&boot, TOS_NODE_ID);
 		call AMPacket.setDestination(&boot, AM_BROADCAST_ADDR);
 
-		call BootAlarm.start(call LowPowerListening.getLocalSleepInterval() * 2);
+		call BootAlarm.start(call Scp.getWakeupInterval() * 2);
 		send();
 		
 		return SUCCESS;

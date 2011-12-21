@@ -51,8 +51,8 @@ implementation {
 
 	command error_t Init.init() {
 		atomic {
-			slotLength = 100;
-			frameLength = 10;
+			slotLength = 320;
+			frameLength = 17;
 			sync = FALSE;
 		}
 		return SUCCESS;

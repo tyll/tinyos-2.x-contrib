@@ -81,5 +81,11 @@ implementation {
   
   components LedsC as Leds;
   CsmaP.Leds -> Leds;
-  
+
+#ifdef CC2420_ACCOUNTING
+  components Counter32khz32C as Counter;
+  CsmaP.Counter -> Counter;
+  components new AlarmMilli16C() as Alarm;
+  CsmaP.Alarm -> Alarm;
+#endif
 }

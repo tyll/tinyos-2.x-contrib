@@ -29,7 +29,6 @@ configuration FixedSleepLplListenerC
 {
 	provides interface AsyncReceive as Receive;
 	provides interface FixedSleepLplListener;
-	provides interface Interval as RadioTimeout;
 	
 	uses interface ChannelPoller;
 	uses interface StdControl as PollerControl;
@@ -42,11 +41,11 @@ configuration FixedSleepLplListenerC
 implementation
 {
 	components FixedSleepLplListenerP as Listener;
+	components SystemLowPowerListeningC;
 	components LedsC;
 
 	Receive = Listener.Receive;
 	FixedSleepLplListener = Listener;
-	RadioTimeout = Listener;
 	
 	Listener.ChannelPoller = ChannelPoller;
 	Listener.PollerControl = PollerControl;
@@ -55,5 +54,6 @@ implementation
 	Listener.SendState = SendState;
 	Listener.AMPacket = AMPacket;
 	Listener.TimeoutAlarm = TimeoutAlarm;
+	Listener.SystemLowPowerListening -> SystemLowPowerListeningC;
 	Listener.Leds -> LedsC;
 }

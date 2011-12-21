@@ -33,7 +33,7 @@ configuration ScpBootC
 	uses interface AsyncSend as SubSend;
 	uses interface Resend;
 	uses interface AMPacket;
-	uses interface LowPowerListening;
+	uses interface Scp;
 }
 implementation
 {
@@ -49,5 +49,5 @@ implementation
 	Boot.AMPacket = AMPacket;
 	Boot.BootAlarm -> BootAlarm;
 	Boot.BootState -> BootState;
-	Boot.LowPowerListening = LowPowerListening;
+	Boot.Scp = Scp;
 }

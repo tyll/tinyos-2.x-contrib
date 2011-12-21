@@ -103,4 +103,8 @@ implementation {
 	
 	
 	DummyChannelMonitorC.ChannelMonitor = ChannelMonitor;
+	
+	//components HplMsp430GeneralIOC;
+	
+	//PureTDMASchedulerP.Pin -> HplMsp430GeneralIOC.Port26;
 }

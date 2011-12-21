@@ -78,4 +78,13 @@ implementation {
   CC2420ReceiveP.PacketTimeStamp -> CC2420PacketC;
   CC2420ReceiveP.CC2420Config -> CC2420ControlC;
 
+  CC2420ReceiveP.SECCTRL0 -> Spi.SECCTRL0;
+  CC2420ReceiveP.SECCTRL1 -> Spi.SECCTRL1;
+  CC2420ReceiveP.SRXDEC -> Spi.SRXDEC;
+  CC2420ReceiveP.RXNONCE -> Spi.RXNONCE;
+  CC2420ReceiveP.KEY0 -> Spi.KEY0;
+  CC2420ReceiveP.KEY1 -> Spi.KEY1;
+  CC2420ReceiveP.RXFIFO_RAM -> Spi.RXFIFO_RAM;
+  CC2420ReceiveP.SNOP -> Spi.SNOP;
+
 }

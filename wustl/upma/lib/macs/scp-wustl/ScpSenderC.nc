@@ -29,7 +29,7 @@
 configuration ScpSenderC
 {
 	provides interface AsyncSend as Send;
-	provides interface LowPowerListening;
+	provides interface Scp;
 	provides interface StdControl;
 	provides interface CcaControl[am_id_t amId];
 	
@@ -39,21 +39,21 @@ configuration ScpSenderC
 	uses interface State as SendState;
 	uses interface PacketAcknowledgements;
 	uses interface Alarm<TMilli, uint16_t> as SendAlarm;
-	uses interface LowPowerListening as SubLpl;
 	uses interface AMPacket;
 	uses interface CcaControl as SubCcaControl[am_id_t amId];
 	uses interface ChannelMonitor;
+	uses interface ChannelPoller;
 }
 implementation
 {
 	components ScpSenderP;
-	components PreambleSenderC as Sender; 
+	components PreambleSenderC as Sender;
 	components RandomC;
 	components new VirtualizedAlarmMilli16C() as PreambleAlarm;
 	components new VirtualizedAlarmMilli16C() as AdaptiveAlarm;
 	
 	Send = ScpSenderP;
-	LowPowerListening = ScpSenderP;
+	Scp = ScpSenderP;
 	StdControl = ScpSenderP;
 	CcaControl = ScpSenderP;
 	
@@ -63,11 +63,11 @@ implementation
 	ScpSenderP.SendAlarm = SendAlarm;
 	ScpSenderP.AdaptiveAlarm -> AdaptiveAlarm;
 	ScpSenderP.AMPacket = AMPacket;
-	ScpSenderP.SubLpl = SubLpl;
 	ScpSenderP.Random -> RandomC;
 	ScpSenderP.PreambleSender -> Sender;
 	ScpSenderP.SenderControl -> Sender;
 	ScpSenderP.ChannelMonitor = ChannelMonitor;
+	ScpSenderP.ChannelPoller = ChannelPoller;
 	ScpSenderP.SubCcaControl -> Sender;
 
 	Sender.RadioPowerControl = RadioPowerControl;

@@ -40,11 +40,12 @@ configuration MacC
 	uses interface AsyncSend as SubSend;
 	uses interface Resend;
 	uses interface PacketAcknowledgements;
-	uses interface AMPacket;
+	//uses interface AMPacket;//test
 	uses interface CcaControl as SubCcaControl[am_id_t amId];
 }
 implementation
 {
+	components ActiveMessageC;//test
 	components SSTdmaSchedulerC, DummyChannelMonitorC;
 	
 	Receive = SSTdmaSchedulerC;
@@ -59,5 +60,6 @@ implementation
 	SSTdmaSchedulerC.SubReceive = SubReceive;
 	SSTdmaSchedulerC.Resend = Resend;
 	SSTdmaSchedulerC.PacketAcknowledgements = PacketAcknowledgements;
-	SSTdmaSchedulerC.AMPacket = AMPacket;
+	//SSTdmaSchedulerC.AMPacket = AMPacket;//test
+	SSTdmaSchedulerC.AMPacket -> ActiveMessageC;//test
 }

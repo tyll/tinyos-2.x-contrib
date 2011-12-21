@@ -38,7 +38,6 @@ configuration MacC
 	uses interface AsyncSend as SubSend;
 	uses interface Resend;
 	uses interface PacketAcknowledgements;
-	uses interface AMPacket;
 	uses interface CcaControl as SubCcaControl[am_id_t amId];
 }
 implementation
@@ -54,5 +53,4 @@ implementation
 	PM = ChannelMonitor;
 	PM = Resend;
 	PM = PacketAcknowledgements;
-	PM = AMPacket;
 }

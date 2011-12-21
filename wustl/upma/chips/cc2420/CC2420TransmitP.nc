@@ -72,7 +72,6 @@ module CC2420TransmitP @safe() {
   provides interface AsyncStdControl;
   provides interface CC2420Transmit as Send;
   provides interface Resend;
-  provides interface RadioTimeStamping as TimeStamp;
   provides interface ReceiveIndicator as EnergyIndicator;
   provides interface ReceiveIndicator as ByteIndicator;
   provides interface CcaControl[am_id_t amId];
@@ -97,6 +96,13 @@ module CC2420TransmitP @safe() {
   uses interface CC2420Strobe as STXONCCA;
   uses interface CC2420Strobe as SFLUSHTX;
   uses interface CC2420Register as MDMCTRL1;
+
+  uses interface CC2420Strobe as STXENC;
+  uses interface CC2420Register as SECCTRL0;
+  uses interface CC2420Register as SECCTRL1;
+  uses interface CC2420Ram as KEY0;
+  uses interface CC2420Ram as KEY1;
+  uses interface CC2420Ram as TXNONCE;
 
   uses interface CC2420Receive;
   uses interface Random;
@@ -233,15 +239,6 @@ implementation {
     return SUCCESS;
   }
 
-  inline uint32_t time16to32(uint16_t time, uint32_t recent_time)
-  {
-    if ((recent_time&0xFFFF)<time)
-      return ((recent_time-0x10000UL)&0xFFFF0000UL)|time;
-    else
-      return (recent_time&0xFFFF0000UL)|time;
-  }
-
-
   async command error_t Send.modify( uint8_t offset, uint8_t* buf, 
                                      uint8_t len ) {
     call CSN.clr();
@@ -262,6 +259,12 @@ implementation {
   }  
   
   
+  inline uint32_t getTime32(uint16_t time)
+  {
+    uint32_t recent_time=call BackoffTimer.getNow();
+    return recent_time + (int16_t)(time - recent_time);
+  }
+
   /**
    * The CaptureSFD event is actually an interrupt from the capture pin
    * which is connected to timing circuitry and timer modules.  This
@@ -276,23 +279,30 @@ implementation {
    * would have picked up and executed had our microcontroller been fast enough.
    */
   async event void CaptureSFD.captured( uint16_t time ) {
-    uint32_t time32 = time16to32(time, call BackoffTimer.getNow());
+    uint32_t time32;
+    uint8_t sfd_state = 0;
     atomic {
+      time32 = getTime32(time);
       switch( m_state ) {
         
       case S_SFD:
         m_state = S_EFD;
         sfdHigh = TRUE;
+        // in case we got stuck in the receive SFD interrupts, we can reset
+        // the state here since we know that we are not receiving anymore
+        m_receiving = FALSE;
         call CaptureSFD.captureFallingEdge();
         call PacketTimeStamp.set(m_msg, time32);
         if (call PacketTimeSyncOffset.isSet(m_msg)) {
-           nx_uint8_t *taddr = m_msg->data + (call PacketTimeSyncOffset.get(m_msg) - sizeof(cc2420_header_t));
-           timesync_radio_t *timesync = (timesync_radio_t*)taddr;
+           uint8_t absOffset = sizeof(message_header_t)-sizeof(cc2420_header_t)+call PacketTimeSyncOffset.get(m_msg);
+           timesync_radio_t *timesync = (timesync_radio_t *)((nx_uint8_t*)m_msg+absOffset);
            // set timesync event time as the offset between the event time and the SFD interrupt time (TEP  133)
            *timesync  -= time32;
            call CSN.clr();
-           call TXFIFO_RAM.write( call PacketTimeSyncOffset.get(m_msg), (uint8_t*)timesync, sizeof(timesync_radio_t) );
+           call TXFIFO_RAM.write( absOffset, (uint8_t*)timesync, sizeof(timesync_radio_t) );
            call CSN.set();
+           //restoring the event time to the original value
+           *timesync  += time32;
         }
         if ( (call CC2420PacketBody.getHeader( m_msg ))->fcf & ( 1 << IEEE154_FCF_ACK_REQ ) ) {
           // This is an ack packet, don't release the chip's SPI bus lock.
@@ -301,11 +311,6 @@ implementation {
         releaseSpiResource();
         call BackoffTimer.stop();
                 
-        if ( ( ( (call CC2420PacketBody.getHeader( m_msg ))->fcf >> IEEE154_FCF_FRAME_TYPE ) & 7 ) == IEEE154_TYPE_DATA ) {
-          call PacketTimeStamp.set(m_msg, time32);
-        }
-
-
         if ( call SFD.get() ) {
           break;
         }
@@ -328,9 +333,12 @@ implementation {
         /** Fall Through because the next interrupt was already received */
         
       default:
-        if ( !m_receiving ) {
+        /* this is the SFD for received messages */
+        if ( !m_receiving && sfdHigh == FALSE ) {
           sfdHigh = TRUE;
           call CaptureSFD.captureFallingEdge();
+          // safe the SFD pin status for later use
+          sfd_state = call SFD.get();
           call CC2420Receive.sfd( time32 );
           m_receiving = TRUE;
           m_prev_time = time;
@@ -338,18 +346,29 @@ implementation {
             // wait for the next interrupt before moving on
             return;
           }
+          // if SFD.get() = 0, then an other interrupt happened since we
+          // reconfigured CaptureSFD! Fall through
         }
         
-        sfdHigh = FALSE;
-        call CaptureSFD.captureRisingEdge();
-        m_receiving = FALSE;
-        if ( time - m_prev_time < 10 ) {
-          call CC2420Receive.sfd_dropped();
-          if (m_msg)
-            call PacketTimeStamp.clear(m_msg);
+        if ( sfdHigh == TRUE ) {
+          sfdHigh = FALSE;
+          call CaptureSFD.captureRisingEdge();
+          m_receiving = FALSE;
+          /* if sfd_state is 1, then we fell through, but at the time of
+           * saving the time stamp the SFD was still high. Thus, the timestamp
+           * is valid.
+           * if the sfd_state is 0, then either we fell through and SFD
+           * was low while we safed the time stamp, or we didn't fall through.
+           * Thus, we check for the time between the two interrupts.
+           * FIXME: Why 10 tics? Seams like some magic number...
+           */
+          if ((sfd_state == 0) && (time - m_prev_time < 10) ) {
+            call CC2420Receive.sfd_dropped();
+            if (m_msg)
+              call PacketTimeStamp.clear(m_msg);
+          }
+          break;
         }
-        break;
-      
       }
     }
   }
@@ -377,7 +396,6 @@ implementation {
     if ( type == IEEE154_TYPE_ACK && m_msg) {
       ack_header = call CC2420PacketBody.getHeader( ack_msg );
       msg_header = call CC2420PacketBody.getHeader( m_msg );
-
       
       if ( m_state == S_ACK_WAIT && msg_header->dsn == ack_header->dsn ) {
         call BackoffTimer.stop();

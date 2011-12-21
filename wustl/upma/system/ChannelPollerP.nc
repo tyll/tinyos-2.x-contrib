@@ -19,16 +19,17 @@
  * OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
  * MODIFICATIONS."
  */
+
+#include "Lpl.h"
  
 /**
  * Automatically performs periodic LPL checks.
  *
  * @author Greg Hackmann
  */
-module ChannelPollerP
+module ChannelPollerP @safe()
 {
 	provides interface ChannelPoller;
-	provides interface LowPowerListening;
 	provides interface StdControl;
 	
 	uses interface Alarm<TMilli, uint16_t>;
@@ -50,9 +51,8 @@ implementation
 	};
 	
 	bool running_ = FALSE;
-	uint16_t ms_ = 0;
-	
-	uint16_t getActualDutyCycle(uint16_t dutyCycle);
+
+	uint16_t ms_ = LPL_DEF_LOCAL_WAKEUP;
 	
 	async event void Alarm.fired()
 	{
@@ -92,7 +92,7 @@ implementation
 	
 	async event void ChannelMonitor.error() { }
 	
-	async command void LowPowerListening.setLocalSleepInterval(uint16_t ms)
+	async command void ChannelPoller.setWakeupInterval(uint16_t ms)
 	{
 		atomic ms_ = ms;
 		if(running_)
@@ -100,37 +100,9 @@ implementation
 		// Save the sleep interval, and reset the alarm if the poller is active
 	}
 	
-	async command uint16_t LowPowerListening.getLocalSleepInterval()
+	async command uint16_t ChannelPoller.getWakeupInterval()
 	{
 		atomic return ms_;
-	}
-	
-	async command void LowPowerListening.setLocalDutyCycle(uint16_t dutyCycle)
-	{
-		uint16_t ms = call LowPowerListening.dutyCycleToSleepInterval(dutyCycle);
-		call LowPowerListening.setLocalSleepInterval(ms);
-	}
-	
-	async command uint16_t LowPowerListening.getLocalDutyCycle()
-	{
-		uint16_t ms = call LowPowerListening.getLocalSleepInterval();
-		return call LowPowerListening.sleepIntervalToDutyCycle(ms);
-	}
-	
-	async command uint16_t LowPowerListening.dutyCycleToSleepInterval(uint16_t dutyCycle)
-	{
-		dutyCycle = getActualDutyCycle(dutyCycle);
-		if(dutyCycle == 10000)
-			return 0;
-		
-		return (DUTY_ON_TIME * (10000 - dutyCycle)) / dutyCycle;
-	}
-	
-	async command uint16_t LowPowerListening.sleepIntervalToDutyCycle(uint16_t ms)
-	{
-		if(ms == 0)
-			return 10000;
-		return getActualDutyCycle((DUTY_ON_TIME * 10000) / (ms + DUTY_ON_TIME));
 	}
 	
 	command error_t StdControl.start()
@@ -151,14 +123,5 @@ implementation
 		atomic running_ = FALSE;
 		// Note that we're inactive and stop the alarm
 		return SUCCESS;
-	}
-
-	uint16_t getActualDutyCycle(uint16_t dutyCycle)
-	{
-		if(dutyCycle > 10000)
-			return 10000;
-		else if(dutyCycle == 0)
-			return 1;
-		return dutyCycle;
 	}
 }

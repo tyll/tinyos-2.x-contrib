@@ -52,6 +52,8 @@ module PureTDMASchedulerP {
 		
 		interface Boot;
 		interface Leds;
+		
+		//interface HplMsp430GeneralIO as Pin;
 	}
 }
 implementation {
@@ -76,6 +78,7 @@ implementation {
 	}
 	
 	command error_t Init.init() {		
+	  //call Pin.makeOutput();
 		currentSlot = 0xff;
 		slotSize = 10 * 32;     //10ms
 		bi = 16; //# of slots
@@ -95,7 +98,7 @@ implementation {
  		error_t err;
  		if (init == FALSE) {
  			call FrameConfiguration.setSlotLength(slotSize);
- 			call FrameConfiguration.setFrameLength(bi);
+ 			call FrameConfiguration.setFrameLength(bi+1);
  		}
  		
  		err = call RadioPowerControl.start();
@@ -109,7 +112,6 @@ implementation {
  		call RadioPowerControl.stop();
  		return SUCCESS;
  	}
- 	
  	
  	event void RadioPowerControl.startDone(error_t error) {
  		//call Leds.led2On();
@@ -143,6 +145,7 @@ implementation {
  		message_t *tmpToSend;
  		uint8_t tmpToSendLen;
  		
+ 		//printf("slot,%d\n",slot);printfflush();//sha
  		
  		atomic currentSlot = slot;
  	
@@ -154,15 +157,19 @@ implementation {
  			return;
  		} 
  		
- 		if (slot >= sd) {
+ 		if (slot >= sd+1) {
  			//sleep 			
- 			if (slot == sd) {
+ 			if (slot == sd+1) {
  				call RadioPowerControl.stop();
+ 				//call Pin.clr();
+ 				call Leds.led0Off();
  			}
  			
  			//wakeup
- 			if (slot == bi - 1) {
+ 			if (slot == bi) {
  				call RadioPowerControl.start();
+ 				//call Pin.set();
+ 				call Leds.led0On();
  			} 
  			return;
  		}
@@ -170,9 +177,15 @@ implementation {
  		if (slot < cap) {
  			//signal CSMASlotSend.send(slot); 
  		} else {
- 			if (coordinatorId == TOS_NODE_ID) {
- 				//the coordinator will do the receiving
- 			} else {
+ 				if(TOS_NODE_ID==0&& slot == 8)
+ 				{
+ 					atomic {
+ 						tmpToSend = toSend;
+ 						tmpToSendLen = toSendLen;
+ 					}
+ 					call SubSend.send(tmpToSend, tmpToSendLen);
+ 				}
+ 				
  				if (slot == TOS_NODE_ID)  {
  					//call Pin.set();
  					atomic {
@@ -180,7 +193,6 @@ implementation {
  						tmpToSendLen = toSendLen;
  					}
  					call SubSend.send(tmpToSend, tmpToSendLen);
- 				}
  			}
  		}
 
@@ -206,6 +218,7 @@ implementation {
 	async event void SubSend.sendDone(message_t * msg, error_t error) {	
 		if (msg == toSend) {
 			if (call AMPacket.type(msg) != SIMPLE_TDMA_SYNC) { 
+			//printf("PureIDMASchedulerP,senddone\n");printfflush();
 				signal Send.sendDone(msg, error);
 			} else {
 				//call Slotter.stop();
@@ -246,13 +259,13 @@ implementation {
  	}
  	command void Frame.setFrameLength(uint8_t numSlots) {
  		atomic bi = numSlots;
-		call FrameConfiguration.setFrameLength(bi);
+		call FrameConfiguration.setFrameLength(bi+1);
  	}
  	command uint32_t Frame.getSlotLength() {
  		return slotSize;
  	}
  	command uint8_t Frame.getFrameLength() {
- 		return bi;
+ 		return bi+1;
  	}
 
 	

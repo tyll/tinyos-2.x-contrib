@@ -35,4 +35,8 @@ interface ChannelPoller
 	 * if it is free.
 	 */
 	async event void activityDetected(bool detected);
+	
+	async command void setWakeupInterval(uint16_t intervalMs);
+  
+	async command uint16_t getWakeupInterval();
 }

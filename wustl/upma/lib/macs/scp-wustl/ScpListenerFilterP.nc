@@ -53,6 +53,16 @@ implementation
 			(call SendState.getState() == S_BOOTING));
 	}
 	
+	async command void ChannelPoller.setWakeupInterval(uint16_t ms)
+	{
+		call SubChannelPoller.setWakeupInterval(ms);
+	}
+	
+	async command uint16_t ChannelPoller.getWakeupInterval()
+	{
+		return call SubChannelPoller.getWakeupInterval();
+	}
+
 	command void Receive.updateBuffer(message_t * msg)
 	{
 		call SubReceive.updateBuffer(msg);

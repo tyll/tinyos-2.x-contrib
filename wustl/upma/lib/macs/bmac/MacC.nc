@@ -38,7 +38,6 @@ configuration MacC
 	uses interface AsyncSend as SubSend;
 	uses interface Resend;
 	uses interface PacketAcknowledgements;
-	uses interface AMPacket;
 	uses interface CcaControl as SubCcaControl[am_id_t amId];
 }
 implementation
@@ -59,16 +58,15 @@ implementation
 	CcaControl = Sender;
 	SplitControl = BmacSplitControlC;
 	
-	MacControlC.SubLpl -> ChannelPollerC;
+	MacControlC.SubLpl -> Sender;
 	
 	Sender.RadioPowerControl = RadioPowerControl;
 	Sender.SubSend = SubSend;
 	Sender.SubCcaControl = SubCcaControl;
 	Sender.Resend = Resend;
 	Sender.PacketAcknowledgements = PacketAcknowledgements;
-	Sender.LowPowerListening -> ChannelPollerC;
+	Sender.ChannelPoller -> ChannelPollerC;
 	Sender.SendState -> SendState;
-	Sender.AMPacket = AMPacket;
 	Sender.PreambleAlarm -> PreambleAlarm;
 	Sender.FixedSleepLplListener -> Listener;
 	
@@ -78,7 +76,6 @@ implementation
 	Listener.RadioPowerControl = RadioPowerControl;
 	Listener.SubReceive = SubReceive;
 	Listener.SendState -> SendState;
-	Listener.AMPacket = AMPacket;
 	Listener.TimeoutAlarm -> TimeoutAlarm;
 
 	ChannelPollerC.ChannelMonitor = ChannelMonitor;

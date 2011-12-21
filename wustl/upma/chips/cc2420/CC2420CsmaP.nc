@@ -47,9 +47,19 @@ module CC2420CsmaP @safe() {
   uses interface CC2420Packet;
   uses interface CC2420PacketBody;
   uses interface State as SplitControlState;
+  
+#ifdef CC2420_ACCOUNTING
+  uses interface Counter<T32khz, uint32_t>;
+  uses interface Alarm<TMilli, uint16_t>;
+  provides interface CC2420Accounting;
+#endif
 }
 
 implementation {
+#ifdef CC2420_ACCOUNTING
+  norace uint32_t vRegStartedAt, oscStartedAt, radioStartedAt, radioStoppedAt;
+  uint32_t vRegTime, oscTime, radioTime;
+#endif
 
   enum {
     S_STOPPED,
@@ -80,12 +90,16 @@ implementation {
   
   async command error_t RadioPowerControl.start() {
     if(call SplitControlState.requestState(S_STARTING) == SUCCESS) {
+#ifdef CC2420_ACCOUNTING
+      call Alarm.start(1024UL);
+      vRegStartedAt = call Counter.get();
+#endif
       call CC2420Power.startVReg();
       return SUCCESS;
     
     } else if(call SplitControlState.isState(S_STARTED)) {
-      post signalStartDone();
       return EALREADY;
+      
     } else if(call SplitControlState.isState(S_STARTING)) {
       return SUCCESS;
     }
@@ -99,12 +113,14 @@ implementation {
 
   async command error_t RadioPowerControl.stop() {
     if (call SplitControlState.isState(S_STARTED)) {
+#ifdef CC2420_ACCOUNTING
+      call Alarm.stop();
+#endif
       call SplitControlState.forceState(S_STOPPING);
       shutdown();
       return SUCCESS;
       
     } else if(call SplitControlState.isState(S_STOPPED)) {
-      post signalStopDone();
       return EALREADY;
     
     } else if(call SplitControlState.isState(S_TRANSMITTING)) {
@@ -139,7 +155,11 @@ implementation {
     }
 
     header->length = len + CC2420_SIZE;
+#ifdef CC2420_HW_SECURITY
+    header->fcf &= ((1 << IEEE154_FCF_ACK_REQ)|(1 << IEEE154_FCF_SECURITY_ENABLED));
+#else
     header->fcf &= 1 << IEEE154_FCF_ACK_REQ;
+#endif
     header->fcf |= ( ( IEEE154_TYPE_DATA << IEEE154_FCF_FRAME_TYPE ) |
 		     ( 1 << IEEE154_FCF_INTRAPAN ) |
 		     ( IEEE154_ADDR_SHORT << IEEE154_FCF_DEST_ADDR_MODE ) |
@@ -148,7 +168,7 @@ implementation {
     metadata->ack = FALSE;
     metadata->rssi = 0;
     metadata->lqi = 0;
-    metadata->timesync = FALSE;
+    //metadata->timesync = FALSE;
     metadata->timestamp = CC2420_INVALID_TIMESTAMP;
     
     call CC2420Transmit.send( p_msg );
@@ -158,7 +178,7 @@ implementation {
 
   async command void* Send.getPayload(message_t* m, uint8_t len) {
     if (len <= call Send.maxPayloadLength()) {
-      return (void* COUNT_NOK(len))m->data;
+      return (void* COUNT_NOK(len ))(m->data);
     }
     else {
       return NULL;
@@ -180,6 +200,9 @@ implementation {
   }
   
   event void Resource.granted() {
+#ifdef CC2420_ACCOUNTING
+    oscStartedAt = call Counter.get();
+#endif
     call CC2420Power.startOscillator();
   }
 
@@ -206,8 +229,22 @@ implementation {
     signal Send.sendDone( packet, packetErr );
   }
 
+#ifdef CC2420_ACCOUNTING
+  async event void Alarm.fired() {
+    uint32_t now = call Counter.get();
+    vRegTime += (now - vRegStartedAt);
+    oscTime += (now - oscStartedAt);
+    radioTime += (now - radioStartedAt);
+    vRegStartedAt = oscStartedAt = radioStartedAt = now;
+    call Alarm.start(1024UL);
+  }
+#endif
+
   task void startDone_task() {
     call SubControl.start();
+#ifdef CC2420_ACCOUNTING
+    radioStartedAt = call Counter.get();
+#endif
     call CC2420Power.rxOn();
     call Resource.release();
     call SplitControlState.forceState(S_STARTED);
@@ -215,6 +252,17 @@ implementation {
   }
   
   task void stopDone_task() {
+#ifdef CC2420_ACCOUNTING
+    atomic {
+      uint32_t vRegDelta = radioStoppedAt - vRegStartedAt;
+      uint32_t oscDelta = radioStoppedAt - oscStartedAt;
+      uint32_t radioDelta = radioStoppedAt - radioStartedAt;
+    
+      vRegTime += vRegDelta;
+      oscTime += oscDelta;
+      radioTime += radioDelta;
+    }
+#endif
     call SplitControlState.forceState(S_STOPPED);
     signal RadioPowerControl.stopDone( SUCCESS );
   }
@@ -227,6 +275,9 @@ implementation {
   void shutdown() {
     call SubControl.stop();
     call CC2420Power.stopVReg();
+#ifdef CC2420_ACCOUNTING
+ 	radioStoppedAt = call Counter.get();
+#endif
     post stopDone_task();
   }
 
@@ -237,6 +288,12 @@ implementation {
   default event void RadioPowerControl.stopDone(error_t error) {
   }
   
+#ifdef CC2420_ACCOUNTING
+  async event void Counter.overflow() { }
   
+  command uint32_t CC2420Accounting.voltageRegulator() { atomic return vRegTime; }
+  command uint32_t CC2420Accounting.oscillator() { atomic return oscTime; }
+  command uint32_t CC2420Accounting.radio() { atomic return radioTime; }
+#endif  
 }
 

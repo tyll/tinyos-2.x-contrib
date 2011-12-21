@@ -31,7 +31,7 @@
 module ScpSenderP
 {
 	provides interface AsyncSend as Send;
-	provides interface LowPowerListening;
+	provides interface Scp;
 	provides interface StdControl;
 	provides interface CcaControl[am_id_t amId];
 	
@@ -46,7 +46,7 @@ module ScpSenderP
 	uses interface State as SendState;
 	uses interface Alarm<TMilli, uint16_t> as SendAlarm;
 	uses interface Alarm<TMilli, uint16_t> as AdaptiveAlarm;
-	uses interface LowPowerListening as SubLpl;
+	uses interface ChannelPoller;
 	uses interface AMPacket;
 	uses interface Random;
 	uses interface CcaControl as SubCcaControl[am_id_t amId];
@@ -70,43 +70,19 @@ implementation
 	
 	task void doStop();
 	
-	async command void LowPowerListening.setLocalSleepInterval(uint16_t ms)
+	async command void Scp.setWakeupInterval(uint16_t ms)
 	{
 		call SendAlarm.start(ms - TX_TIME_SCHED);
-		call SubLpl.setLocalSleepInterval(ms);
+		call ChannelPoller.setWakeupInterval(ms);
 		// Intercept the command and reset the send alarm, offset by the
 		// appropriate interval
 	}
 	
-	async command uint16_t LowPowerListening.getLocalSleepInterval()
+	async command uint16_t Scp.getWakeupInterval()
 	{
-		return call SubLpl.getLocalSleepInterval();
+		return call ChannelPoller.getWakeupInterval();
 	}
 	
-	async command void LowPowerListening.setLocalDutyCycle(uint16_t dutyCycle)
-	{
-		call SubLpl.setLocalDutyCycle(dutyCycle);
-		call SendAlarm.start(call LowPowerListening.getLocalSleepInterval() -
-			TX_TIME_SCHED);
-		// Intercept the command and reset the send alarm, offset by the
-		// appropriate interval
-	}
-	
-	async command uint16_t LowPowerListening.getLocalDutyCycle()
-	{
-		return call SubLpl.getLocalDutyCycle();
-	}
-	
-	async command uint16_t LowPowerListening.sleepIntervalToDutyCycle(uint16_t ms)
-	{
-		return call SubLpl.sleepIntervalToDutyCycle(ms);
-	}	
-	
-	async command uint16_t LowPowerListening.dutyCycleToSleepInterval(uint16_t dutyCycle)
-	{
-		return call SubLpl.dutyCycleToSleepInterval(dutyCycle);
-	}
-
 	async command error_t Send.send(message_t * msg, uint8_t len)
 	{
 		atomic
@@ -145,7 +121,7 @@ implementation
 
 	async event void SendAlarm.fired()
 	{
-		call SendAlarm.start(call LowPowerListening.getLocalSleepInterval());
+		call SendAlarm.start(call Scp.getWakeupInterval());
 		// Reset the alarm
 
 		if(call SendState.getState() != S_BUFFERED)
@@ -339,6 +315,7 @@ implementation
 		// Move to the off state
 	}
 	
+	async event void ChannelPoller.activityDetected(bool detected) { }
 	async event void ChannelMonitor.error() { }
 	async event void ChannelMonitor.busy() { }
 	async event void ChannelMonitor.free() { }

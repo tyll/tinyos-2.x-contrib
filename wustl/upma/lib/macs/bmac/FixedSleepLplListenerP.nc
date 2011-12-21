@@ -29,7 +29,6 @@ module FixedSleepLplListenerP
 {
 	provides interface AsyncReceive as Receive;
 	provides interface FixedSleepLplListener;
-	provides interface Interval as RadioTimeout;
 	
 	uses interface ChannelPoller;
 	uses interface StdControl as PollerControl;
@@ -38,26 +37,16 @@ module FixedSleepLplListenerP
 	uses interface State as SendState;
 	uses interface AMPacket;
 	uses interface Alarm<TMilli, uint16_t> as TimeoutAlarm;
+	uses interface SystemLowPowerListening;
 	uses interface Leds;
 }
 implementation
 {
-	uint16_t timeout = 100;
-	
-	async command void RadioTimeout.set(uint16_t ms)
-	{
-		atomic timeout = ms;
-	}
-	
-	async command uint16_t RadioTimeout.get()
-	{
-		atomic return timeout;
-	}
-	
 	async command void FixedSleepLplListener.startTimeout()
 	{
 		call TimeoutAlarm.stop();
-		call TimeoutAlarm.start(timeout);
+		if(call ChannelPoller.getWakeupInterval() > 0)
+			call TimeoutAlarm.start(call SystemLowPowerListening.getDelayAfterReceive());
 	}
 	
 	async command void FixedSleepLplListener.cancelTimeout()

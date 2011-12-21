@@ -41,8 +41,8 @@ module BmacSenderP
 	uses interface PacketAcknowledgements;
 
 	uses interface LowPowerListening;
+	uses interface SystemLowPowerListening;
 	uses interface Leds;
-	uses interface AMPacket;
 	uses interface CcaControl as SubCcaControl[am_id_t amId];
 }
 implementation
@@ -89,7 +89,7 @@ implementation
 	
 	event void SenderControl.startDone(error_t err)
 	{
-		uint16_t ms = call LowPowerListening.getLocalSleepInterval();
+		uint16_t ms;
 		message_t * msg;
 		uint8_t len;
 		
@@ -107,6 +107,10 @@ implementation
 			return;
 		}
 		// If we couldn't turn on the radio, give up
+		
+		ms = call LowPowerListening.getRemoteWakeupInterval(msg);
+		if(ms == 0)
+			ms = call SystemLowPowerListening.getDefaultRemoteWakeupInterval();
 	
 		call PacketAcknowledgements.noAck(msg);
 		// Turn off ACKing for the packet

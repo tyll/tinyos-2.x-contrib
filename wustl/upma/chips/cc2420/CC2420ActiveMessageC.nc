@@ -1,26 +1,4 @@
 /*
- * "Copyright (c) 2007-2008 Washington University in St. Louis.
- * All rights reserved.
- *
- * Permission to use, copy, modify, and distribute this software and its
- * documentation for any purpose, without fee, and without written agreement is
- * hereby granted, provided that the above copyright notice, the following
- * two paragraphs and the author appear in all copies of this software.
- *
- * IN NO EVENT SHALL WASHINGTON UNIVERSITY IN ST. LOUIS BE LIABLE TO ANY PARTY
- * FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING
- * OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF WASHINGTON
- * UNIVERSITY IN ST. LOUIS HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * WASHINGTON UNIVERSITY IN ST. LOUIS SPECIFICALLY DISCLAIMS ANY WARRANTIES,
- * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
- * AND FITNESS FOR A PARTICULAR PURPOSE.  THE SOFTWARE PROVIDED HEREUNDER IS
- * ON AN "AS IS" BASIS, AND WASHINGTON UNIVERSITY IN ST. LOUIS HAS NO
- * OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
- * MODIFICATIONS."
- */
- 
-/*									tab:4
  * "Copyright (c) 2005 Stanford University. All rights reserved.
  *
  * Permission to use, copy, modify, and distribute this software and
@@ -53,14 +31,16 @@
  *
  * @author Philip Levis
  * @author David Moss
- * @author Greg Hackmann
- * @author Kevin Klues
- * @author Octav Chipara 
  * @version $Revision$ $Date$
  */
 
 #include "CC2420.h"
 #include "AM.h"
+#include "Ieee154.h"
+
+#ifdef IEEE154FRAMES_ENABLED
+#error "CC2420 AM layer cannot work when IEEE 802.15.4 frames only are used"
+#endif
 
 configuration CC2420ActiveMessageC {
   provides {
@@ -72,71 +52,53 @@ configuration CC2420ActiveMessageC {
     interface Packet;
     interface CC2420Packet;
     interface PacketAcknowledgements;
-    interface PacketLink;
-	interface LinkPacketMetadata;
+    interface LinkPacketMetadata;
 	interface CcaControl[am_id_t amId];
-	interface SendNotifier[am_id_t amId];
+    interface PacketLink;
+    interface PacketQuality;
+    interface PacketPower;
+    interface SendNotifier[am_id_t amId];
   }
 }
 implementation {
+  enum {
+    CC2420_AM_SEND_ID     = unique(IEEE154_SEND_CLIENT),
+  };
 
+  components CC2420RadioC as Radio;
   components CC2420ActiveMessageP as AM;
-  components CC2420CsmaC as CsmaC;
   components ActiveMessageAddressC;
-  components UniqueSendC;
-  components UniqueReceiveC;
-  components CC2420TinyosNetworkC;
-  components CC2420PacketC;
+  components CC2420CsmaC as CsmaC;
   components CC2420ControlC;
-  components AsyncAdapterC;
-  components PowerCycleC;
-  components MacC;
+  components CC2420PacketC;
   
-#if defined(PACKET_LINK)
-  components PacketLinkC as LinkC;
-#else
-  components PacketLinkDummyC as LinkC;
-#endif
-
-  
+  SplitControl = Radio;
+  CcaControl = AM;
   Packet = AM;
   AMSend = AM;
   SendNotifier = AM;
   Receive = AM.Receive;
   Snoop = AM.Snoop;
   AMPacket = AM;
-  PacketLink = LinkC;
-  CC2420Packet = CC2420PacketC;
-  PacketAcknowledgements = CC2420PacketC;
-  LinkPacketMetadata = CC2420PacketC;
+  PacketLink = Radio;
+  PacketQuality = Radio;
+  PacketPower = Radio;
+  CC2420Packet = Radio;
+  PacketAcknowledgements = Radio;
+  LinkPacketMetadata = Radio;
   
-  // SplitControl Layers
-  SplitControl = MacC;
-  CcaControl = AM;
-  AM.SubCcaControl -> MacC;
-  
-  // Send Layers
-  AM.SubSend -> UniqueSendC;
-  UniqueSendC.SubSend -> LinkC;
-  LinkC.SubSend -> CC2420TinyosNetworkC.Send;
-  CC2420TinyosNetworkC.SubSend -> AsyncAdapterC.Send;
-  AsyncAdapterC.AsyncSend -> MacC;
-  MacC.SubSend -> CsmaC;
-  
-  // Receive Layers
-  AM.SubReceive -> UniqueReceiveC.Receive;
-  UniqueReceiveC.SubReceive -> CC2420TinyosNetworkC.Receive;
-  CC2420TinyosNetworkC.SubReceive -> AsyncAdapterC.Receive;
-  AsyncAdapterC.AsyncReceive -> MacC;
-  MacC.SubReceive -> CsmaC;
-  
-  MacC.PacketAcknowledgements -> CC2420PacketC;
-  MacC.ChannelMonitor -> PowerCycleC;
-  MacC.RadioPowerControl -> CsmaC;
-  MacC.Resend -> CsmaC;
-  MacC.AMPacket -> AM;
+  // Radio resource for the AM layer
+  AM.RadioResource -> Radio.Resource[CC2420_AM_SEND_ID];
+  AM.SubSend -> Radio.ActiveSend;
+  AM.SubReceive -> Radio.ActiveReceive;
 
   AM.ActiveMessageAddress -> ActiveMessageAddressC;
+  AM.CC2420Packet -> CC2420PacketC;
   AM.CC2420PacketBody -> CC2420PacketC;
   AM.CC2420Config -> CC2420ControlC;
+  
+  AM.SubCcaControl -> CsmaC;
+
+  components LedsC;
+  AM.Leds -> LedsC;
 }

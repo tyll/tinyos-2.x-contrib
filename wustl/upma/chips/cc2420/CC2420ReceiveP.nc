@@ -62,6 +62,15 @@ module CC2420ReceiveP @safe() {
   uses interface CC2420Config;
   uses interface PacketTimeStamp<T32khz,uint32_t>;
 
+  uses interface CC2420Strobe as SRXDEC;
+  uses interface CC2420Register as SECCTRL0;
+  uses interface CC2420Register as SECCTRL1;
+  uses interface CC2420Ram as KEY0;
+  uses interface CC2420Ram as KEY1;
+  uses interface CC2420Ram as RXNONCE;
+  uses interface CC2420Ram as RXFIFO_RAM;
+  uses interface CC2420Strobe as SNOP;
+
   uses interface Leds;
 }
 
@@ -126,6 +135,10 @@ implementation {
       reset_state();
       m_state = S_STARTED;
       atomic receivingPacket = FALSE;
+      /* Note:
+         We use the falling edge because the FIFOP polarity is reversed. 
+         This is done in CC2420Power.startOscillator from CC2420ControlP.nc.
+       */
       call InterruptFIFOP.enableFallingEdge();
     }
     return SUCCESS;
@@ -267,28 +280,36 @@ implementation {
           return;
         }
       }
-      
       // Didn't flip CSn, we're ok to continue reading.
       call RXFIFO.continueRead(buf + 1 + SACK_HEADER_LENGTH, 
           rxFrameLength - SACK_HEADER_LENGTH);
       break;
     
     case S_RX_PAYLOAD:
-      call CSN.set();
       
+      call CSN.set();
       if(!m_missed_packets) {
         // Release the SPI only if there are no more frames to download
         call SpiResource.release();
       }
       
-      if ( m_timestamp_size ) {
-        if ( rxFrameLength > 10 ) {
-          call PacketTimeStamp.set(m_p_rx_buf, m_timestamp_queue[ m_timestamp_head ]);
+      //new packet is buffered up, or we don't have timestamp in fifo, or ack
+      if ( ( m_missed_packets && call FIFO.get() ) || !call FIFOP.get()
+            || !m_timestamp_size
+            || rxFrameLength <= 10) {
+        call PacketTimeStamp.clear(m_p_rx_buf);
+      }
+      else {
+          if (m_timestamp_size==1)
+            call PacketTimeStamp.set(m_p_rx_buf, m_timestamp_queue[ m_timestamp_head ]);
           m_timestamp_head = ( m_timestamp_head + 1 ) % TIMESTAMP_QUEUE_SIZE;
           m_timestamp_size--;
-        }
-      } else {
-        call PacketTimeStamp.clear(m_p_rx_buf);
+
+          if (m_timestamp_size>0) {
+            call PacketTimeStamp.clear(m_p_rx_buf);
+            m_timestamp_head = 0;
+            m_timestamp_size = 0;
+          }
       }
       
       // We may have received an ack that should be processed by Transmit
@@ -336,8 +357,7 @@ implementation {
     if (passesAddressCheck(m_p_rx_buf) && length >= CC2420_SIZE) {
       signal Receive.receive( m_p_rx_buf, m_p_rx_buf->data, 
 					   length - CC2420_SIZE);
-    }
-    else {
+    } else {
       atomic receivingPacket = FALSE;
       waitForNextPacket();
     }
@@ -359,7 +379,6 @@ implementation {
    */
   void beginReceive() { 
     m_state = S_RX_LENGTH;
-    
     atomic receivingPacket = TRUE;
     if(call SpiResource.isOwner()) {
       receive();
@@ -377,6 +396,7 @@ implementation {
    */
   void flush() {
     reset_state();
+    
     call CSN.set();
     call CSN.clr();
     call SFLUSHRX.strobe();
@@ -420,6 +440,7 @@ implementation {
        * If the line stays low without generating an interrupt, that means
        * there's still more data to be received.
        */
+
       if ( ( m_missed_packets && call FIFO.get() ) || !call FIFOP.get() ) {
         // A new packet is buffered up and ready to go
         if ( m_missed_packets ) {
@@ -461,4 +482,5 @@ implementation {
     return (header->dest == call CC2420Config.getShortAddr()
         || header->dest == AM_BROADCAST_ADDR);
   }
+
 }

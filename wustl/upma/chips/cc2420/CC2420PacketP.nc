@@ -43,6 +43,8 @@
 module CC2420PacketP @safe() {
 
   provides {
+    interface PacketPower;
+    interface PacketQuality;
     interface CC2420Packet;
     interface PacketAcknowledgements as Acks;
     interface CC2420PacketBody;
@@ -53,7 +55,6 @@ module CC2420PacketP @safe() {
     interface PacketTimeSyncOffset;
   }
 
-  uses interface Packet;
   uses interface LocalTime<T32khz> as LocalTime32khz;
   uses interface LocalTime<TMilli> as LocalTimeMilli;
 }
@@ -75,6 +76,79 @@ implementation {
   async command bool Acks.wasAcked( message_t* p_msg ) {
     return (call CC2420PacketBody.getMetadata( p_msg ))->ack;
   }
+  
+  /***************** PacketPower Commands ****************/
+  async command void PacketPower.setPower( message_t* p_msg, uint8_t power ) {
+    (call CC2420PacketBody.getMetadata( p_msg ))->tx_power = (4 * power) + 3;
+  }
+
+  async command uint8_t PacketPower.getPower( message_t* p_msg ) {
+    uint8_t tx_power = (call CC2420PacketBody.getMetadata( p_msg ))->tx_power;
+    if(tx_power == 0)
+      return 7;
+    return (tx_power - 3) / 4;
+  }
+  
+  async command uint8_t PacketPower.minimum() {
+    return 0;
+  }
+   
+  async command uint8_t PacketPower.maximum() {
+    return 7;
+  }
+  
+  async command uint8_t PacketPower.cost(uint8_t powerLevel) {
+    switch(powerLevel) {
+#ifdef PACKET_COST_SCALING
+    case 0:
+      return 10;
+    case 1:
+      return 13;
+    case 2:
+      return 16;
+    case 3:
+      return 19;
+    case 4:
+      return 22;
+    case 5:
+      return 25;
+    case 6:
+      return 28;
+    default:
+      return 30;
+#else
+    case 0:
+      return 85;
+    case 1:
+      return 99;
+    case 2:
+      return 112;
+    case 3:
+      return 125;
+    case 4:
+      return 139;
+    case 5:
+      return 152;
+    case 6:
+      return 165;
+    default:
+      return 174;
+#endif
+    }
+  }
+  
+  async command uint8_t PacketPower.rxCost() {
+#ifdef PACKET_COST_SCALING
+    return 33;
+#else
+    return 188;
+#endif    
+  }
+  
+  /***************** PacketQuality Commands ****************/
+  async command int8_t PacketQuality.getRssi( message_t* p_msg ) {
+    return (call CC2420PacketBody.getMetadata( p_msg ))->rssi;
+  }
 
   /***************** CC2420Packet Commands ****************/
   async command void CC2420Packet.setPower( message_t* p_msg, uint8_t power ) {
@@ -94,6 +168,21 @@ implementation {
   async command uint8_t CC2420Packet.getLqi( message_t* p_msg ) {
     return (call CC2420PacketBody.getMetadata( p_msg ))->lqi;
   }
+
+  async command uint8_t CC2420Packet.getNetwork( message_t* p_msg ) {
+#if defined(TFRAMES_ENABLED)
+    return TINYOS_6LOWPAN_NETWORK_ID;
+#else
+    return (call CC2420PacketBody.getHeader( p_msg ))->network;
+#endif
+  }
+
+  async command void CC2420Packet.setNetwork( message_t* p_msg , uint8_t networkId ) {
+#if ! defined(TFRAMES_ENABLED)
+    (call CC2420PacketBody.getHeader( p_msg ))->network = networkId;
+#endif
+  }    
+
 
   /***************** CC2420PacketBody Commands ****************/
   async command cc2420_header_t * ONE CC2420PacketBody.getHeader( message_t* ONE msg ) {
@@ -138,10 +227,13 @@ implementation {
     return call PacketTimeStamp32khz.isValid(msg);
   }
 
+  //timestmap is always represented in 32khz
+  //28.1 is coefficient difference between T32khz and TMilli on MicaZ
   async command uint32_t PacketTimeStampMilli.timestamp(message_t* msg)
   {
-    int32_t offset = call PacketTimeStamp32khz.timestamp(msg) - call LocalTime32khz.get();
-    return (offset >> 5) + call LocalTimeMilli.get();
+    int32_t offset = (call LocalTime32khz.get()-call PacketTimeStamp32khz.timestamp(msg));
+    offset/=28.1;
+    return call LocalTimeMilli.get() - offset;
   }
 
   async command void PacketTimeStampMilli.clear(message_t* msg)

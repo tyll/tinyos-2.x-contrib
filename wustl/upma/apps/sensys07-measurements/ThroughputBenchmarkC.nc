@@ -22,7 +22,7 @@
  
 /**
  * 
- * @author Greg Hackmann
+ * @author Greg Hackmann,Mo Sha
  * @version $Revision$
  * @date $Date$
  */
@@ -34,7 +34,7 @@ module ThroughputBenchmarkC
 	uses interface AMSend as AMSender;
 	uses interface Receive as AMReceiver;
 	uses interface Packet;
-	uses interface CC2420Packet;
+	//uses interface CC2420Packet;
 	uses interface SplitControl;
 	uses interface LowPowerListening;
 #ifdef SCP
@@ -57,53 +57,41 @@ implementation
 	
 	message_t packet;
 
-	void send();
 	task void sendResult();
 	
-	task void doSend() { send(); }
-	void send()
+	task void send()
 	{
+	#ifdef UPMA
+		#ifndef TDMA
+			call LowPowerListening.setRemoteWakeupInterval(&packet,PREAMBLE_LENGTH);
+		#endif
+		#endif
 		if(call AMSender.send(RECEIVER, &packet, PACKET_LENGTH) != SUCCESS)
-			post doSend();
+			post send();
 	}
 	
 	event void Boot.booted()
 	{
-#ifdef UPMA
-#ifndef TDMA
-		call LowPowerListening.setLocalSleepInterval(PREAMBLE_LENGTH);
-#endif
-#ifdef SCP
-		call SyncInterval.set(PREAMBLE_LENGTH * 100U + 10);
-#endif
-#else
-		call LowPowerListening.setLocalSleepInterval(PREAMBLE_LENGTH);
-		call LowPowerListening.setRxSleepInterval(&packet, PREAMBLE_LENGTH);
-#endif
 		call SplitControl.start();
 	}
 	
 	event void AMSender.sendDone(message_t * msg, error_t err)
-	{
-		uint8_t * payload = (uint8_t *)call Packet.getPayload(&packet, PACKET_LENGTH);
-		if(err == SUCCESS)
-		{
-			packetCount++;
-			payload[0] = (uint8_t)(packetCount >> 8);
-			payload[1] = (uint8_t)packetCount;
-		}
-		
+	{	
+		//call Leds.led0On();
 		if(TOS_NODE_ID != RECEIVER)
-//		if(call BenchmarkTimer.isRunning())
-			send();
-//		else
-//			post sendResult();
+			post send();
 	}
 	
 	event void SplitControl.startDone(error_t err)
 	{
-		memset(call Packet.getPayload(&packet, PACKET_LENGTH), TOS_NODE_ID, PACKET_LENGTH);
-		call CC2420Packet.setPower(&packet, 0);
+#ifdef UPMA
+#ifndef TDMA
+		call LowPowerListening.setLocalWakeupInterval(PREAMBLE_LENGTH);
+#endif
+#ifdef SCP
+		call SyncInterval.set(PREAMBLE_LENGTH * 100U + 10);
+#endif
+#endif
 
 #ifdef SCP
 		call StartTimer.startOneShot(15000);
@@ -116,19 +104,19 @@ implementation
 	{
 		call BenchmarkTimer.startOneShot(BENCHMARK_LENGTH);
 		if(TOS_NODE_ID != RECEIVER)
-			send();
+			post send();
 	}
 	
 	event message_t * AMReceiver.receive(message_t * msg, void * payload, uint8_t len)
 	{
+		//call Leds.led1On();
+		//call Leds.led0On();
 		if(call BenchmarkTimer.isRunning())
 			packetCount++;
 		return msg;
 	}
 
 	event void SplitControl.stopDone(error_t err) { }
-	
-//	message_t result;
 	
 	task void sendResult()
 	{

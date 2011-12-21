@@ -21,10 +21,11 @@
  */
  
 /**
- * @author Greg Hackmann
+ * 
+ * @author Greg Hackmann,Mo Sha
  * @version $Revision$
  * @date $Date$
- */ 
+ */
 module DutyCycleBenchmarkC
 {
 	uses interface Boot;
@@ -32,7 +33,7 @@ module DutyCycleBenchmarkC
 	uses interface AMSend as AMSender;
 	uses interface Receive as AMReceiver;
 	uses interface Packet;
-	uses interface CC2420Packet;
+	//uses interface CC2420Packet;
 	uses interface SplitControl;
 	uses interface LowPowerListening;
 #ifdef SCP
@@ -72,14 +73,14 @@ implementation
 	{
 #ifdef UPMA
 #ifndef TDMA
-		call LowPowerListening.setLocalSleepInterval(PREAMBLE_LENGTH);
+		call LowPowerListening.setLocalWakeupInterval(PREAMBLE_LENGTH);
 #endif
 #ifdef SCP
 		call SyncInterval.set(PREAMBLE_LENGTH * 10U);
 #endif
 #else
-		call LowPowerListening.setLocalSleepInterval(PREAMBLE_LENGTH);
-		call LowPowerListening.setRxSleepInterval(&packet, PREAMBLE_LENGTH);
+		call LowPowerListening.setLocalWakeupInterval(PREAMBLE_LENGTH);
+		call LowPowerListening.setRemoteWakeupInterval(&packet, PREAMBLE_LENGTH);
 #endif
 		call SplitControl.start();
 	}
@@ -104,7 +105,7 @@ implementation
 	event void SplitControl.startDone(error_t err)
 	{
 		memset(call Packet.getPayload(&packet, PACKET_LENGTH), TOS_NODE_ID, PACKET_LENGTH);
-		call CC2420Packet.setPower(&packet, 0);
+		//call CC2420Packet.setPower(&packet, 0);
 
 #ifdef SCP
 		call StartTimer.startOneShot(15000);

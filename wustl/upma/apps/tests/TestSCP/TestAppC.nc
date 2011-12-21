@@ -48,7 +48,7 @@ implementation
 	App.Timer -> Timer;
 	App.Leds -> LedsC;
 	App.SyncInterval -> MacControlC.SyncInterval;
-	App.LowPowerListening -> MacControlC.LowPowerListening;
+	App.Scp -> MacControlC.Scp;
 	App.RadioControl -> AM.SplitControl;
 	App.AMSend -> AM.AMSend[AM_TESTMSG];
 	App.Receive -> AM.Receive[AM_TESTMSG];

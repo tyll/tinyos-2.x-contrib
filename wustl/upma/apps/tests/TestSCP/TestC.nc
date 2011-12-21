@@ -32,7 +32,7 @@
 generic module TestC(bool sends)
 {
 	uses interface Boot;
-	uses interface LowPowerListening;
+	uses interface Scp;
 	uses interface Interval as SyncInterval;
 	uses interface Timer<TMilli> as Timer;
 	uses interface Leds;
@@ -54,7 +54,7 @@ implementation
 	event void RadioControl.startDone(error_t err)
 	{
 		call SyncInterval.set(15000);
-		call LowPowerListening.setLocalSleepInterval(3000);
+		call Scp.setWakeupInterval(3000);
 		call Timer.startPeriodic(5000);
 	}
 	

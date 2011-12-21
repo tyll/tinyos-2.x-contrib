@@ -21,7 +21,8 @@
  */
  
 /**
- * @author Greg Hackmann
+ * 
+ * @author Greg Hackmann,Mo Sha
  * @version $Revision$
  * @date $Date$
  */
@@ -41,7 +42,7 @@ configuration DutyCycleBenchmarkAppC
 implementation
 {
 	components MainC;
-	components CC2420ActiveMessageC;
+	components ActiveMessageC;
 	
 	components DutyCycleBenchmarkC as App;
 	components new AMSenderC(240) as AMSender;
@@ -53,9 +54,9 @@ implementation
 	components new TimerMilliC() as StartTimer;
 	
 	App.Boot -> MainC;
-	App.Packet -> CC2420ActiveMessageC;
-	App.CC2420Packet -> CC2420ActiveMessageC;
-	App.SplitControl -> CC2420ActiveMessageC;
+	App.Packet -> ActiveMessageC;
+	//App.CC2420Packet -> ActiveMessageC;
+	App.SplitControl -> ActiveMessageC;
 	App.AMSender -> AMSender;
 	App.AMReceiver -> AMReceiver;
 	App.Leds -> LedsC;
@@ -74,7 +75,7 @@ implementation
 	App.SyncInterval -> MacControlC;
 #endif /* SCP */
 #else
-	App.LowPowerListening -> CC2420ActiveMessageC;
+	App.LowPowerListening -> ActiveMessageC;
 #endif /* UPMA */
 }
 

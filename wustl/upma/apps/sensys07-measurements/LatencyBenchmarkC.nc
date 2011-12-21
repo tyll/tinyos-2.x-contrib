@@ -20,9 +20,9 @@
  * MODIFICATIONS."
  */
  
-/**      
- *
- * @author Greg Hackmann
+/**
+ * 
+ * @author Greg Hackmann,Mo Sha
  * @version $Revision$
  * @date $Date$
  */
@@ -177,7 +177,7 @@ implementation
 		call SyncInterval.set(PREAMBLE_LENGTH * 100U + 10);
 #endif
 #else
-		call LowPowerListening.setRxSleepInterval(&packet, PREAMBLE_LENGTH);
+		call LowPowerListening.setRemoteWakeupInterval(&packet, PREAMBLE_LENGTH);
 #endif
 		call SplitControl.start();
 	}
@@ -201,7 +201,9 @@ implementation
 	event void SplitControl.startDone(error_t err)
 	{
 		memset(call Packet.getPayload(&packet, PACKET_LENGTH), TOS_NODE_ID, PACKET_LENGTH);
-		call LowPowerListening.setLocalSleepInterval(PREAMBLE_LENGTH);
+		#ifndef TDMA
+		call LowPowerListening.setLocalWakeupInterval(PREAMBLE_LENGTH);
+		#endif
 		benchmarkStart = call Counter.get();
 
 #ifdef SCP

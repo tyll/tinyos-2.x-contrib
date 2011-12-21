@@ -1,6 +1,6 @@
 CFLAGS += -I../.. \
 	-I$(TOSDIR)/lib/printf \
-	-DPREAMBLE_LENGTH=100
+	-DPREAMBLE_LENGTH=3000
 PFLAGS = -DCC2420_DEF_CHANNEL=25
 ifeq ($(UPMA),1)
 	include $(UPMA_DIR)/Makefile.include

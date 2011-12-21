@@ -20,9 +20,9 @@
  * MODIFICATIONS."
  */
  
-/**      
- *
- * @author Greg Hackmann
+/**
+ * 
+ * @author Greg Hackmann,Mo Sha
  * @version $Revision$
  * @date $Date$
  */
@@ -42,7 +42,7 @@ configuration LatencyBenchmarkAppC
 implementation
 {
 	components MainC;
-	components CC2420ActiveMessageC;
+	components ActiveMessageC;
 	
 	components LatencyBenchmarkC as App;
 	components new AMSenderC(240) as AMSender;
@@ -55,9 +55,9 @@ implementation
 	components CounterMilli32C as Counter;
 	
 	App.Boot -> MainC;
-	App.Packet -> CC2420ActiveMessageC;
-	App.AMPacket -> CC2420ActiveMessageC;
-	App.SplitControl -> CC2420ActiveMessageC;
+	App.Packet -> ActiveMessageC;
+	App.AMPacket -> ActiveMessageC;
+	App.SplitControl -> ActiveMessageC;
 	App.AMSender -> AMSender;
 	App.AMReceiver -> AMReceiver;
 	App.Leds -> LedsC;
@@ -69,11 +69,13 @@ implementation
 	
 #ifdef UPMA
 	components MacControlC;
+#ifndef TDMA
 	App.LowPowerListening -> MacControlC;
+#endif
 #ifdef SCP
 	App.SyncInterval -> MacControlC;
 #endif /* SCP */
 #else
-	App.LowPowerListening -> CC2420ActiveMessageC;
+	App.LowPowerListening -> ActiveMessageC;
 #endif /* UPMA */
 }

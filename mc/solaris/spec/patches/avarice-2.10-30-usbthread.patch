@@ -1,0 +1,743 @@
+--- avarice-2.10_orig/src/jtag.h	Tue Oct  7 17:52:35 2008
++++ avarice-2.10/src/jtag.h	Fri Aug 19 21:39:05 2011
+@@ -608,9 +608,6 @@
+   // For the mkII device, is the box attached via USB?
+   bool is_usb;
+ 
+-  // A control pipe to talk to the USB daemon.
+-  int ctrlPipe;
+-
+   // The type of our emulator: JTAG ICE, or AVR Dragon.
+   emulator emu_type;
+ 
+@@ -634,7 +631,8 @@
+   } dchain;
+ 
+   protected:
+-  pid_t openUSB(const char *jtagDeviceName);
++  void openUSB(const char *jtagDeviceName);
++  void resetUSB(void);
+   int safewrite(const void *b, int count);
+   void changeLocalBitRate(int newBitRate);
+   void restoreSerialPort(void);
+--- avarice-2.10_orig/src/jtaggeneric.cc	Mon May 26 13:37:14 2008
++++ avarice-2.10/src/jtaggeneric.cc	Fri Aug 19 19:47:22 2011
+@@ -69,7 +69,6 @@
+   jtagBox = 0;
+   device_name = 0;
+   oldtioValid = is_usb = false;
+-  ctrlPipe = -1;
+ }
+ 
+ jtag::jtag(const char *jtagDeviceName, char *name, emulator type)
+@@ -78,7 +77,6 @@
+ 
+     jtagBox = 0;
+     oldtioValid = is_usb = false;
+-    ctrlPipe = -1;
+     device_name = name;
+     emu_type = type;
+     if (strncmp(jtagDeviceName, "usb", 3) == 0)
+--- avarice-2.10_orig/src/jtag2usb.cc	Sat Feb 17 23:41:46 2007
++++ avarice-2.10/src/jtag2usb.cc	Fri Aug 19 22:11:06 2011
+@@ -42,6 +42,7 @@
+ #include <errno.h>
+ 
+ #include <usb.h>
++#include <pthread.h>
+ 
+ #include "jtag.h"
+ 
+@@ -56,15 +57,17 @@
+ #define JTAGICE_BULK_EP_READ  0x82
+ #define JTAGICE_MAX_XFER 64
+ 
+-static volatile sig_atomic_t signalled, exiting, ready;
+-static pid_t usb_kid;
++static usb_dev_handle *udev = NULL;
++static int fd;
++static pthread_t rtid, wtid;
+ 
+ /*
+  * Walk down all USB devices, and see whether we can find our emulator
+  * device.
+  */
+-static usb_dev_handle *opendev(const char *jtagDeviceName, emulator emu_type,
+-			       int &usb_interface)
++static usb_dev_handle *
++opendev (const char *jtagDeviceName, emulator emu_type,
++         int &usb_interface)
+ {
+   char string[256];
+   struct usb_bus *bus;
+@@ -71,7 +74,7 @@
+   struct usb_device *dev;
+   usb_dev_handle *udev;
+   char *serno, *cp2;
+-  u_int16_t pid;
++  uint16_t pid;
+   size_t x;
+ 
+   switch (emu_type)
+@@ -95,409 +98,255 @@
+    * right-to-left, so only the least significant nibbles need to be
+    * specified.
+    */
+-  if ((serno = strchr(jtagDeviceName, ':')) != NULL)
++  if ((serno = strchr (jtagDeviceName, ':')) != NULL)
+     {
+       /* first, drop all colons there if any */
+       cp2 = ++serno;
+ 
+-      while ((cp2 = strchr(cp2, ':')) != NULL)
+-	{
+-	  x = strlen(cp2) - 1;
+-	  memmove(cp2, cp2 + 1, x);
+-	  cp2[x] = '\0';
+-	}
++      while ((cp2 = strchr (cp2, ':')) != NULL)
++        {
++          x = strlen (cp2) - 1;
++          memmove (cp2, cp2 + 1, x);
++          cp2[x] = '\0';
++        }
+ 
+-      unixCheck(strlen(serno) <= 12, "invalid serial number \"%s\"", serno);
++      unixCheck (strlen (serno) <= 12, "invalid serial number \"%s\"", serno);
+     }
+ 
+-  usb_init();
++  usb_init ();
+ 
+-  usb_find_busses();
+-  usb_find_devices();
++  usb_find_busses ();
++  usb_find_devices ();
+ 
+   udev = NULL;
+   bool found = false;
+-  for (bus = usb_get_busses(); !found && bus; bus = bus->next)
++  for (bus = usb_get_busses (); !found && bus; bus = bus->next)
+     {
+       for (dev = bus->devices; !found && dev; dev = dev->next)
+-	{
+-	  udev = usb_open(dev);
+-	  if (udev)
+-	    {
+-	      if (dev->descriptor.idVendor == USB_VENDOR_ATMEL &&
+-		  dev->descriptor.idProduct == pid)
+-		{
+-		  /* yeah, we found something */
+-		  int rv = usb_get_string_simple(udev,
+-						 dev->descriptor.iSerialNumber,
+-						 string, sizeof(string));
+-		  unixCheck(rv >= 0, "cannot read serial number \"%s\"",
+-			    usb_strerror());
++        {
++          udev = usb_open (dev);
++          if (udev)
++            {
++              if (dev->descriptor.idVendor == USB_VENDOR_ATMEL &&
++                  dev->descriptor.idProduct == pid)
++                {
++                  /* yeah, we found something */
++                  int rv = usb_get_string_simple (udev,
++                                                  dev->descriptor.iSerialNumber,
++                                                  string, sizeof (string));
++                  unixCheck (rv >= 0, "cannot read serial number \"%s\"",
++                             usb_strerror ());
+ 
+-		  debugOut("Found JTAG ICE, serno: %s\n", string);
+-		  if (serno != NULL)
+-		    {
+-		      /*
+-		       * See if the serial number requested by the
+-		       * user matches what we found, matching
+-		       * right-to-left.
+-		       */
+-		      x = strlen(string) - strlen(serno);
+-		      if (strcasecmp(string + x, serno) != 0)
+-			{
+-			  debugOut("serial number doesn't match\n");
+-			  usb_close(udev);
+-			  continue;
+-			}
+-		    }
++                  debugOut ("Found JTAG ICE, serno: %s\n", string);
++                  if (serno != NULL)
++                    {
++                      /*
++                       * See if the serial number requested by the
++                       * user matches what we found, matching
++                       * right-to-left.
++                       */
++                      x = strlen (string) - strlen (serno);
++                      if (strcasecmp (string + x, serno) != 0)
++                        {
++                          debugOut ("serial number doesn't match\n");
++                          usb_close (udev);
++                          continue;
++                        }
++                    }
+ 
+-		  // we found what we want
+-		  found = true;
+-		  break;
+-		}
+-	      usb_close(udev);
+-	    }
+-	}
++                  // we found what we want
++                  found = true;
++                  break;
++                }
++              usb_close (udev);
++            }
++        }
+     }
+   if (!found)
+-  {
+-    printf("did not find any%s USB device \"%s\"\n",
+-	   serno? " (matching)": "", jtagDeviceName);
+-    return NULL;
+-  }
++    {
++      printf ("did not find any%s USB device \"%s\"\n",
++              serno ? " (matching)" : "", jtagDeviceName);
++      return NULL;
++    }
+ 
+   if (dev->config == NULL)
+-  {
+-      statusOut("USB device has no configuration\n");
+-    fail:
+-      usb_close(udev);
++    {
++      statusOut ("USB device has no configuration\n");
++fail:
++      usb_close (udev);
+       return NULL;
+-  }
+-  if (usb_set_configuration(udev, dev->config[0].bConfigurationValue))
+-  {
+-      statusOut("error setting configuration %d: %s\n",
+-                dev->config[0].bConfigurationValue,
+-                usb_strerror());
++    }
++  if (usb_set_configuration (udev, dev->config[0].bConfigurationValue))
++    {
++      statusOut ("error setting configuration %d: %s\n",
++                 dev->config[0].bConfigurationValue,
++                 usb_strerror ());
+       goto fail;
+-  }
++    }
+   usb_interface = dev->config[0].interface[0].altsetting[0].bInterfaceNumber;
+-  if (usb_claim_interface(udev, usb_interface))
+-  {
+-      statusOut("error claiming interface %d: %s\n",
+-                usb_interface, usb_strerror());
++  if (usb_claim_interface (udev, usb_interface))
++    {
++      statusOut ("error claiming interface %d: %s\n",
++                 usb_interface, usb_strerror ());
+       goto fail;
+-  }
++    }
+ 
+   return udev;
+ }
+ 
+ /*
+- * Various signal handlers for the USB daemon child.
++ * The USB thread itself.  Polls the USB device for data as long as
++ * there is room in the AVaRICE pipe.  Polls the AVaRICE descriptor
++ * for data, and sends them to the USB device.
+  */
+-static void sigtermhandler(int signo)
+-{
+-  // give the pipes some time to flush before exiting
+-  exiting++;
+-  alarm(1);
+-}
+ 
+-static void alarmhandler(int signo)
++static void *
++usb_thread_read (void *data)
+ {
+-  signalled++;
+-}
++  while (1)
++    {
++      char buf[JTAGICE_MAX_XFER];
++      int rv;
+ 
+-static void usr1handler(int signo)
+-{
+-  ready++;
+-}
++      rv = usb_bulk_read (udev, JTAGICE_BULK_EP_READ, buf,
++                          JTAGICE_MAX_XFER, 0);
++      if (rv == 0 || rv == -EINTR || rv == -EAGAIN || rv == -ETIMEDOUT)
++        {
++          /* OK, try again */
++        }
++      else if (rv < 0)
++        {
++          //fprintf(stderr, "USB bulk read error: %s\n", usb_strerror());
++          //exit(1);
++          /* OK, try again */
++        }
++      else
++        {
++          /*
++           * We read a (partial) packet from USB.  Return
++           * what we've got so far to AVaRICE, and examine
++           * the length field to see whether we have to
++           * expect more.
++           */
+ 
+-static void dummyhandler(int signo)
+-{
+-  /* nothing to do, just abort the current read()/select() */
+-}
++          if ((buf[0] != MESSAGE_START) || (buf[7] != TOKEN))
++            {
++              fprintf (stderr, "Badly formated AVR packet or not in sync.\n");
++              exit (1);
++            }
+ 
+-/*
+- * atexit() handler
+- */
+-static void kill_daemon(void)
+-{
+-  kill(usb_kid, SIGTERM);
+-}
++          if (write (fd, buf, rv) != rv)
++            {
++              fprintf (stderr, "short write to AVaRICE: %s\n",
++                       strerror (errno));
++              exit (1);
++            }
+ 
+-/*
+- * Signal handler for the parent (i.e. for AVaRICE).
+- */
+-static void inthandler(int signo)
+-{
+-  int status;
++          unsigned int pkt_len = (unsigned char) buf[3] +
++                  ((unsigned char) buf[4] << 8) + ((unsigned char) buf[5] << 16) +
++                  ((unsigned char) buf[6] << 24);
++          const unsigned int header_size = 8;
++          const unsigned int crc_size = 2;
++          pkt_len += header_size + crc_size;
+ 
+-  kill(usb_kid, SIGTERM);
+-  (void)wait(&status);
+-  signal(signo, SIG_DFL);
+-  kill(getpid(), signo);
++          pkt_len -= rv;
++          /* OK, if there is more to read, do so. */
++          while (pkt_len > 0)
++            {
++              fprintf (stderr, "R2");
++              rv = usb_bulk_read (udev, JTAGICE_BULK_EP_READ, buf,
++                                  pkt_len > JTAGICE_MAX_XFER ? JTAGICE_MAX_XFER : pkt_len,
++                                  0);
++              /*
++               * Zero-length reads are not expected here,
++               * as we carefully examined the packet
++               * length from the header.
++               */
++              if (rv == -EINTR || rv == -EAGAIN || rv == -ETIMEDOUT)
++                {
++                  continue;
++                }
++              if (rv <= 0)
++                {
++                  fprintf (stderr,
++                           "USB bulk read error in continuation block: %s\n",
++                           usb_strerror ());
++                  exit (1);
++                }
++              if (write (fd, buf, rv) != rv)
++                {
++                  fprintf (stderr, "short write to AVaRICE: %s\n",
++                           strerror (errno));
++                  exit (1);
++                }
++              pkt_len -= rv;
++            }
++        }
++    }
++
+ }
+ 
+-static void childhandler(int signo)
++static void *
++usb_thread_write (void * data)
+ {
+-  int status;
+-  char b[500];
++  while (1)
++    {
++      char buf[JTAGICE_MAX_XFER];
++      int rv;
+ 
+-  (void)wait(&status);
+-
+-#define PRINTERR(msg) write(fileno(stderr), msg, strlen(msg))
+-  if (ready)
+-    PRINTERR("USB daemon died\n");
+-  _exit(1);
++      if ((rv = read (fd, buf, JTAGICE_MAX_XFER)) > 0)
++        {
++          if (usb_bulk_write (udev, JTAGICE_BULK_EP_WRITE, buf,
++                              rv, 0) !=
++              rv)
++            {
++              fprintf (stderr, "USB bulk write error: %s\n",
++                       usb_strerror ());
++              exit (1);
++            }
++          continue;
++        }
++      else if (errno != EINTR && errno != EAGAIN)
++        {
++          fprintf (stderr, "read error from AVaRICE: %s\n",
++                   strerror (errno));
++          exit (1);
++        }
++    }
+ }
+ 
+-/*
+- * The USB daemon itself.  Polls the USB device for data as long as
+- * there is room in the AVaRICE pipe.  Polls the AVaRICE descriptor
+- * for data, and sends them to the USB device.
+- */
+-static void usb_daemon(usb_dev_handle *udev, int fd, int cfd, int usb_interface)
++void
++jtag::resetUSB (void)
+ {
+-  signal(SIGALRM, alarmhandler);
+-  signal(SIGTERM, sigtermhandler);
+-  signal(SIGINT, sigtermhandler);
+-
+-#if defined(O_ASYNC)
+-  int ioflags;
+-
+-  if (fcntl(fd, F_GETFL, &ioflags) != -1)
++  if (udev)
+     {
+-      ioflags |= O_ASYNC;
+-      if (fcntl(fd, F_SETFL, &ioflags) != -1)
+-	signal(SIGIO, dummyhandler);
++      usb_resetep (udev, JTAGICE_BULK_EP_READ);
++      usb_resetep (udev, JTAGICE_BULK_EP_WRITE);
+     }
+-#endif /* defined(O_ASYNC) */
+-
+-  int highestfd = fd > cfd? fd: cfd;
+-  bool polling = false;
+-
+-  for (; !signalled;)
+-    {
+-      fd_set r;
+-      struct timeval tv;
+-      int rv;
+-      bool do_read, clear_eps;
+-      char buf[JTAGICE_MAX_XFER];
+-
+-      do_read = false;
+-      clear_eps = false;
+-      /*
+-       * See if our parent has something to tell us, or requests
+-       * something from us.
+-       */
+-      FD_ZERO(&r);
+-      FD_SET(fd, &r);
+-      FD_SET(cfd, &r);
+-      if (polling)
+-	{
+-	  tv.tv_sec = 0;
+-	  tv.tv_usec = 100000;
+-	}
+-      else
+-	{
+-	  tv.tv_sec = 1;
+-	  tv.tv_usec = 0;
+-	}
+-      if (!exiting && select(highestfd + 1, &r, NULL, NULL, &tv) > 0)
+-	{
+-	  if (FD_ISSET(fd, &r))
+-	    {
+-	      if ((rv = read(fd, buf, JTAGICE_MAX_XFER)) > 0)
+-		{
+-		  if (usb_bulk_write(udev, JTAGICE_BULK_EP_WRITE, buf,
+-				     rv, 5000) !=
+-		      rv)
+-		    {
+-		      fprintf(stderr, "USB bulk write error: %s\n",
+-			      usb_strerror());
+-		      exit(1);
+-		    }
+-		  continue;
+-		}
+-	      if (rv < 0 && errno != EINTR && errno != EAGAIN)
+-		{
+-		  fprintf(stderr, "read error from AVaRICE: %s\n",
+-			  strerror(errno));
+-		  exit(1);
+-		}
+-	    }
+-	  if (FD_ISSET(cfd, &r))
+-	    {
+-	      char buf[JTAGICE_MAX_XFER];
+-	      char cmd[1];
+-
+-	      if (FD_ISSET(cfd, &r))
+-		{
+-		  if ((rv = read(cfd, cmd, 1)) > 0)
+-		    {
+-		      /*
+-		       * Examine AVaRICE's command.
+-		       */
+-		      if (cmd[0] == 'r')
+-			{
+-			  polling = false;
+-			  do_read = true;
+-			}
+-		      else if (cmd[0] == 'p')
+-			{
+-			  polling = true;
+-			}
+-		      else if (cmd[0] == 'c')
+-			{
+-			  clear_eps = true;
+-			}
+-		      else
+-			{
+-			  fprintf(stderr, "unknown command in USB_daemon: %c\n",
+-				  cmd[0]);
+-			}
+-		    }
+-		  if (rv < 0 && errno != EINTR && errno != EAGAIN)
+-		    {
+-		      fprintf(stderr, "read error on control pipe from AVaRICE: %s\n",
+-			      strerror(errno));
+-		      exit(1);
+-		    }
+-		}
+-	    }
+-	}
+-
+-      if (clear_eps)
+-	{
+-	  usb_resetep(udev, JTAGICE_BULK_EP_READ);
+-	  usb_resetep(udev, JTAGICE_BULK_EP_WRITE);
+-	}
+-
+-      if (!exiting && (do_read || polling))
+-	{
+-	  rv = usb_bulk_read(udev, JTAGICE_BULK_EP_READ, buf,
+-			     JTAGICE_MAX_XFER, 500);
+-	  if (rv == 0 || rv == -EINTR || rv == -EAGAIN || rv == -ETIMEDOUT)
+-	    {
+-	      /* OK, try again */
+-	    }
+-	  else if (rv < 0)
+-	    {
+-	      if (!exiting)
+-		fprintf(stderr, "USB bulk read error: %s\n",
+-			usb_strerror());
+-	      exit(1);
+-	    }
+-	  else
+-	    {
+-	      /*
+-	       * We read a (partial) packet from USB.  Return
+-	       * what we've got so far to AVaRICE, and examine
+-	       * the length field to see whether we have to
+-	       * expect more.
+-	       */
+-	      polling = false;
+-	      if (write(fd, buf, rv) != rv)
+-		{
+-		  fprintf(stderr, "short write to AVaRICE: %s\n",
+-			  strerror(errno));
+-		  exit(1);
+-		}
+-	      unsigned int pkt_len = (unsigned char)buf[3] +
+-		((unsigned char)buf[4] << 8) + ((unsigned char)buf[5] << 16) +
+-		((unsigned char)buf[6] << 24);
+-	      const unsigned int header_size = 8;
+-	      const unsigned int crc_size = 2;
+-	      pkt_len += header_size + crc_size;
+-	      pkt_len -= rv;
+-	      /* OK, if there is more to read, do so. */
+-	      while (!exiting && pkt_len > 0)
+-		{
+-		  rv = usb_bulk_read(udev, JTAGICE_BULK_EP_READ, buf,
+-				     pkt_len > JTAGICE_MAX_XFER? JTAGICE_MAX_XFER: pkt_len,
+-				     100);
+-
+-		  /*
+-		   * Zero-length reads are not expected here,
+-		   * as we carefully examined the packet
+-		   * length from the header.
+-		   */
+-		  if (rv == -EINTR || rv == -EAGAIN || rv == -ETIMEDOUT)
+-		    {
+-		      continue;
+-		    }
+-		  if (rv <= 0)
+-		    {
+-		      if (!exiting)
+-			fprintf(stderr,
+-				"USB bulk read error in continuation block: %s\n",
+-				usb_strerror());
+-		      exit(1);
+-		    }
+-		  if (write(fd, buf, rv) != rv)
+-		    {
+-		      fprintf(stderr, "short write to AVaRICE: %s\n",
+-			      strerror(errno));
+-		      exit(1);
+-		    }
+-		  pkt_len -= rv;
+-		}
+-	    }
+-	}
+-    }
+ }
+ 
+-pid_t jtag::openUSB(const char *jtagDeviceName)
++void
++jtag::openUSB (const char *jtagDeviceName)
+ {
+   int usb_interface;
+-  pid_t p;
+-  int pype[2], cpipe[2];
+-  usb_dev_handle *udev;
++  int pype[2];
+ 
+-  unixCheck(socketpair(AF_UNIX, SOCK_STREAM, PF_UNSPEC, pype) == 0,
+-            "cannot create pipe");
+-  unixCheck(socketpair(AF_UNIX, SOCK_STREAM, PF_UNSPEC, cpipe) == 0,
+-	    "cannot create control pipe");
++  unixCheck (socketpair (AF_UNIX, SOCK_STREAM, PF_UNSPEC, pype) == 0,
++             "cannot create data pipe");
+ 
+-  signal(SIGCHLD, childhandler);
+-  signal(SIGUSR1, usr1handler);
+-  switch ((p = fork()))
+-    {
+-    case 0:
+-      signal(SIGCHLD, SIG_DFL);
+-      signal(SIGUSR1, SIG_DFL);
+-      close(pype[1]);
+-      close(cpipe[1]);
++  udev = opendev (jtagDeviceName, emu_type, usb_interface);
++  check (udev != NULL, "USB device not found");
+ 
+-      udev = opendev(jtagDeviceName, emu_type, usb_interface);
+-      check(udev != NULL, "USB device not found");
+-      kill(getppid(), SIGUSR1); // tell the parent we are ready to go
++  fd = pype[0];
+ 
+-      usb_daemon(udev, pype[0], cpipe[0], usb_interface);
++  pthread_create (&rtid, NULL, usb_thread_read, NULL);
++  pthread_create (&wtid, NULL, usb_thread_write, NULL);
+ 
+-      (void)usb_release_interface(udev, usb_interface);
+-      usb_close(udev);
+-      exit(0);
+-      break;
++  // thread never returns
++  //      (void)usb_release_interface(udev, usb_interface);
++  //      usb_close(udev);
+ 
+-    case -1:
+-      unixCheck(-1, "Cannot fork");
+-      break;
+-
+-    default:
+-      close(pype[0]);
+-      close(cpipe[0]);
+-      jtagBox = pype[1];
+-      ctrlPipe = cpipe[1];
+-      usb_kid = p;
+-    }
+-  atexit(kill_daemon);
+-  signal(SIGTERM, inthandler);
+-  signal(SIGINT, inthandler);
+-  signal(SIGQUIT, inthandler);
+-
+-  while (!ready)
+-    /* wait for child to become ready */ ;
+-  signal(SIGUSR1, SIG_DFL);
++  jtagBox = pype[1];
+ }
+ 
+ #endif /* HAVE_LIBUSB */
+--- avarice-2.10_orig/src/jtag2run.cc	Tue Oct  7 20:14:23 2008
++++ avarice-2.10/src/jtag2run.cc	Fri Aug 19 21:57:06 2011
+@@ -87,9 +87,8 @@
+ 
+ 	bool rv = doJtagCommand(cmd, 2, resp, respSize);
+ 	delete [] resp;
+-
+ 	/* Await the BREAK event that is posted by the ICE. */
+-	(void)eventLoop();
++        (void)eventLoop();
+ 
+ 	return rv;
+     }
+@@ -123,13 +122,6 @@
+     // Now that we are "going", wait for either a response from the JTAG
+     // box or a nudge from GDB.
+ 
+-    if (ctrlPipe != -1)
+-      {
+-	  /* signal the USB daemon to start polling. */
+-	  char cmd[1] = { 'p' };
+-	  (void)write(ctrlPipe, cmd, 1);
+-      }
+-
+     for (;;)
+       {
+ 	  debugOut("Waiting for input.\n");
+--- avarice-2.10_orig/src/jtag2io.cc	Mon Sep 29 22:52:20 2008
++++ avarice-2.10/src/jtag2io.cc	Fri Aug 19 21:57:25 2011
+@@ -111,13 +111,6 @@
+ 
+     msg = NULL;
+ 
+-    if (ctrlPipe != -1)
+-      {
+-	/* signal the USB daemon we are ready to get data */
+-	char cmd[1] = { 'r' };
+-	(void)write(ctrlPipe, cmd, 1);
+-      }
+-
+     while (state != sDONE) {
+ 	if (state == sDATA) {
+ 	    debugOut("sDATA: reading %d bytes\n", msglen);
+@@ -344,12 +337,11 @@
+ 	    // in retrying the command.
+ 	    return false;
+ 
+-	if (tryCount > 3 && ctrlPipe != -1)
++	if (tryCount > 3 && is_usb)
+ 	  {
+ 	    /* signal the USB daemon to reset the EPs */
+ 	    debugOut("Resetting EPs...\n");
+-	    char cmd[1] = { 'c' };
+-	    (void)write(ctrlPipe, cmd, 1);
++            resetUSB();
+ 	  }
+     }
+ }

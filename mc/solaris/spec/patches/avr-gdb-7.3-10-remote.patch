@@ -1,0 +1,11 @@
+--- gdb/remote.c_orig	Wed Aug 10 08:18:40 2011
++++ gdb/remote.c	Sat Aug  6 11:06:45 2011
+@@ -8266,6 +8266,8 @@
+       return -1;
+     }
+ 
++  if (offset>0) return 0;
++
+   /* Note: a zero OFFSET and LEN can be used to query the minimum
+      buffer size.  */
+   if (offset == 0 && len == 0)

@@ -1,0 +1,14 @@
+--- src/unparse.c.orig	Sun Jul 25 20:38:34 2010
++++ src/unparse.c	Mon Aug 15 22:34:47 2011
+@@ -257,9 +257,9 @@
+   startline_noindent();
+   if (include_filename)
+     {
+-      output("# %lu \"", l->lineno);
++      output("#line %lu \"", l->lineno);
+       output_quoted(l->filename);
+-      outputln("\"%s", l->in_system_header ? " 3" : "");
++      outputln("\"");
+     }
+   else
+     outputln("#line %lu", l->lineno);

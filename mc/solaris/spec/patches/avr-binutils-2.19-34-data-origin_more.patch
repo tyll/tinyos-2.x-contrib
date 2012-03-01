@@ -1,0 +1,36 @@
+--- ld/emulparams/avr25.sh_orig	Sat Aug  9 07:35:13 2008
++++ ld/emulparams/avr25.sh	Mon Aug 15 12:34:02 2011
+@@ -7,5 +7,6 @@
+ TEMPLATE_NAME=elf32
+ 
+ TEXT_LENGTH=8K
++DATA_ORIGIN=0x800060
+ DATA_LENGTH=0xffa0
+ EXTRA_EM_FILE=avrelf
+--- ld/emulparams/avr31.sh_orig	Sat Aug  9 07:35:13 2008
++++ ld/emulparams/avr31.sh	Mon Aug 15 12:34:02 2011
+@@ -7,5 +7,6 @@
+ TEMPLATE_NAME=elf32
+ 
+ TEXT_LENGTH=128K
++DATA_ORIGIN=0x800060
+ DATA_LENGTH=0xffa0
+ EXTRA_EM_FILE=avrelf
+--- ld/emulparams/avr35.sh_orig	Sat Aug  9 07:35:13 2008
++++ ld/emulparams/avr35.sh	Mon Aug 15 12:34:02 2011
+@@ -7,5 +7,6 @@
+ TEMPLATE_NAME=elf32
+ 
+ TEXT_LENGTH=64K
++DATA_ORIGIN=0x800060
+ DATA_LENGTH=0xffa0
+ EXTRA_EM_FILE=avrelf
+--- ld/emulparams/avr51.sh_orig	Sat Aug  9 07:35:13 2008
++++ ld/emulparams/avr51.sh	Mon Aug 15 12:34:02 2011
+@@ -7,5 +7,6 @@
+ TEMPLATE_NAME=elf32
+ 
+ TEXT_LENGTH=128K
++DATA_ORIGIN=0x800060
+ DATA_LENGTH=0xffa0
+ EXTRA_EM_FILE=avrelf

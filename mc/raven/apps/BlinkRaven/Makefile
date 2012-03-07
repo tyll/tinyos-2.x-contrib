@@ -1,0 +1,3 @@
+COMPONENT=BlinkRavenAppC
+include $(MAKERULES)
+

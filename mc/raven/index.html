@@ -1,0 +1,48 @@
+<html>
+<head>
+   <title>TinyOS - Martin Cerveny contributions - Atmel AVR RAVEN</title>
+</head>
+<body TEXT="#000000" BGCOLOR="#FFFFFF" LINK="#0000EF" VLINK="#55188A" ALINK="#FF0000">
+
+<img src="http://tinyos.net/tos-jwall.jpg"></img>
+
+<h1>Atmel AVR RAVEN</h1>
+
+<p>
+This subproject contains port of the <a href="http://www.atmel.com/tools/AVRRAVEN.aspx">Atmel AVR RAVEN</a> to TinyOS.
+Atmel AVR RAVEN contains (see AVR2016: RZRAVEN Hardware User's Guide):
+<ul>
+<li><b>rf subsystem</b> - atmega1284p, radio at86rf230 on SPI, serial number/EUI64 in at24c02b on TWI</li>
+<li><b>peripheral subsystem</b> - atmega3290p, LCD display, 4 way joystick, external flash at45db161d, battery voltage monitor, temperature monitor (thermistor), relay driver, audio speaker and microphone</li>
+<li><b>SIPC - serial inter-platform communication</b> - platform interconnect serial UART (38400 baud)</li>
+</ul>
+</p>
+
+<p>Implementation:
+<ul>
+<li>platform led on ports A0,A1,A2 on atmega1284p routed to pinheader</li>
+<li>most sources taken/ported from micaz/mica/iris platform (copied not linked in .platform)</li>
+<li>atmega1284p uses internal clock source (8Mhz) (HiFuse=0x18/LoFuse=0xc2)</li>
+<li>firmware for atmega3290p (LCD) is modified from BitCloud_ATAVRRZRAVEN_1_11_0 (binary <ahref="lcd/flash.srec">srec</a>)</li>
+<li>implemented LocalIeeeEui64C->RavenIeeeEui64P from at24c02b on TWI (Eui64 is available later in Boot.booted() due to disabled interrupt and uninitialized arbiter subsystem in SoftwareInit.init() (problem with "TEP 107: Boot Sequence" and "TEP122: IEEE EUI-64 Unique Node Identifier"))</li>
+<li>implemented RavenC that uses communication link (SIPC) to atmega3290p (LCD) (see <a href="apps/BlinkRaven">hello world application</a>)</li>
+<li>not fully tested :-(</li>
+</ul>
+</p>
+
+<p>TODO:
+<ul>
+<li>review code</li>
+<li>rewrite firmware atmega3290p to TinyOS with more commands (uploading/downloading audio, relay driver, more LCD commands ...)</li>
+<li>review/delete imported modules (MicaTimer)</li>
+<li>use CLKM from at89rf230 as clock source to XTAL1 atmega1284p, resolve power saving</li>
+</ul>
+</p>
+
+
+<hr/>
+
+<a href="../index.html">back</a> to MC contributions
+
+</body>
+</html>

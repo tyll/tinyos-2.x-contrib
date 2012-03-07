@@ -1,0 +1,5 @@
+#-*-Makefile-*- vim:syntax=make
+#$Id$
+
+OPTFLAGS += -O0 -g -fnesc-no-inline
+

@@ -1,0 +1,39 @@
+#-*-Makefile-*- vim:syntax=make
+
+ifeq ($(JTAGICEMKII),)
+$(error JTAGICEMKII must be defined, try "make $(TARGETS) help")
+endif
+
+PROGRAM = jtagicemkii
+
+ifeq ($(PROGRAMMER),avrdude)
+    ifdef BOOTLOADER_IMG
+      ifeq ($(shell [ -f /bin/cygwin1.dll ] && echo cygwin),cygwin)
+        BOOTLOADER_IMG := $(shell cygpath -m $(BOOTLOADER_IMG))
+      endif
+    endif
+    PROGRAMMER_FLAGS = -c jtag2fast -P $(JTAGICEMKII) -U hfuse:w:$(AVR_FUSE_H):m -U lfuse:w:$(AVR_FUSE_L):m $(PROGRAMMER_PART) $(PROGRAMMER_EXTRA_FLAGS)
+#    PROGRAMMER_FLAGS = -c jtag2fast -P $(JTAGICEMKII) $(PROGRAMMER_PART) $(PROGRAMMER_EXTRA_FLAGS)
+    PROGRAMMER_INSTALL_SREC_FLAGS = -U flash:w:$(INSTALL_SREC):a
+    PROGRAMMER_INSTALL_BOOTLOADER_FLAGS = -D -U flash:w:$(BOOTLOADER_IMG):a
+endif
+
+ifeq ($(PROGRAMMER),avarice)
+    ifdef BOOTLOADER_IMG
+      ifeq ($(shell [ -f /bin/cygwin1.dll ] && echo cygwin),cygwin)
+        BOOTLOADER_IMG := $(shell cygpath -m $(BOOTLOADER_IMG))
+      endif
+    endif
+#    PROGRAMMER_FLAGS = --mkII --jtag $(JTAGICEMKII) --jtag-bitrate 1000 --write-fuses $(AVR_FUSE_E:0x%=%)$(AVR_FUSE_H:0x%=%)$(AVR_FUSE_L:0x%=%) $(PROGRAMMER_PART) $(PROGRAMMER_EXTRA_FLAGS)
+    PROGRAMMER_FLAGS = --mkII --jtag $(JTAGICEMKII) --jtag-bitrate 1000 $(PROGRAMMER_PART) $(PROGRAMMER_EXTRA_FLAGS)
+    PROGRAMMER_INSTALL_SREC_FLAGS = --file $(INSTALL_SREC) --program --erase
+    PROGRAMMER_INSTALL_BOOTLOADER_FLAGS = --file $(BOOTLOADER_IMG) --program
+endif
+
+program: FORCE
+	@echo "    installing $(PLATFORM) binary using AVR JTAGICE mkII"
+	$(PROGRAMMER) $(PROGRAMMER_FLAGS) $(PROGRAMMER_INSTALL_SREC_FLAGS)
+
+program_bl: FORCE
+	@echo "    installing $(PLATFORM) bootloader using AVR JTAGICE mkII"
+	$(PROGRAMMER) $(PROGRAMMER_FLAGS) $(PROGRAMMER_INSTALL_BOOTLOADER_FLAGS)

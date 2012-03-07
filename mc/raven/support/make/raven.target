@@ -1,0 +1,33 @@
+#-*-Makefile-*- vim:syntax=make
+
+PLATFORM = raven
+SENSORBOARD ?= 
+PROGRAMMER ?= avarice
+
+ifeq ($(PROGRAMMER),avrdude)
+  PROGRAMMER_PART ?= -pm1284p -U efuse:w:0xff:m
+  JTAGICEMKII ?= /dev/term/0
+endif
+
+ifeq ($(PROGRAMMER),uisp)
+  PROGRAMMER_PART ?= -dpart=ATmega1284p --wr_fuse_e=ff
+  JTAGICEMKII ?= /dev/term/0
+endif
+
+ifeq ($(PROGRAMMER),avarice)
+  PROGRAMMER_PART ?= --part atmega1284p
+  JTAGICEMKII ?= usb:3fc4
+  AVR_FUSE_E ?= 0xff
+endif
+
+AVR_FUSE_H ?= 0x18
+AVR_FUSE_L ?= 0xC2
+
+ifdef RF230_CHANNEL
+PFLAGS += -DRF230_DEF_CHANNEL=$(RF230_CHANNEL)
+endif
+
+$(call TOSMake_include_platform,avr)
+
+raven: $(BUILD_DEPS)
+	@:

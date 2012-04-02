@@ -1,6 +1,6 @@
 <html>
 <head>
-   <title>Index Placeholder</title>
+   <title>Simulation of MAC protocols of Wireless Sensor Networks</title>
 </head>
 <body TEXT="#000000" BGCOLOR="#FFFFFF" LINK="#0000EF" VLINK="#55188A" ALINK="#FF0000">
 
@@ -9,7 +9,28 @@
 <h1>Index Placeholder</h1>
 
 <p>
-This file is a placeholder for your personal index file.  It is linked to from your entry in the main index file found in <i>tinyos-2.x-contrib/index.html</i>.  It should be used to document any projects contained in this directory.  Please update it as appropriate. 
+In Wireless Sensor Networks (WSN), sensor nodes are often inaccessible for battery
+replacement. To increase the network lifetime, energy consumption by sensor nodes should be
+minimum. Recent researches have presented many Medim Access Control (MAC) protocols with
+an aim to minimize energy consumption. However, the MAC protocols behave differently under
+different network scenarios.
+In this project, we aim to evaluate MAC protocols based on energy consumption, by simulating
+them under same simulation scenarios and platform. Implementation of MAC protocols is done
+in TOSSIM, a simulator for WSN applications, which directly simulates code to be run on real
+hardware, thus reducing the gap between simulation and real hardware. Current implementation
+includes CSMA/CA, Sensor-MAC, Timeout-MAC, Berkley-MAC and Berkley+ MAC
+protocols. Each MAC protocols is then integrated with PowerTOSSIM-Z, a power modelling
+tool, to measure the energy consumption.
+Implementation of MAC protocols is done as low level components and high level abstraction is
+provided to enable users to switch between different MAC protocols. During simulating their
+WSN applicaions, users can switch between different MAC protocols and evaluate that which
+MAC protocols is best suited to their specific application.
+
+Jump to source code:
+http://tinyos.cvs.sourceforge.net/viewvc/tinyos/tinyos-2.x-contrib/iitk/
+
+For any queries, please contact us at himanshu[dot]singh[dot]cse07[@]itbhu[dot]ac[dot]in
+
 </p>
 
 </body>

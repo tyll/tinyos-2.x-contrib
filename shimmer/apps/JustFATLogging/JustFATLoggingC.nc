@@ -42,6 +42,9 @@ implementation {
   components MainC, JustFATLoggingP;
   JustFATLoggingP -> MainC.Boot;
 
+  components FastClockC;
+  MainC.SoftwareInit -> FastClockC;
+
   components LedsC;
   JustFATLoggingP.Leds -> LedsC;
   

@@ -39,11 +39,14 @@ configuration HostTimeLoggingC {
 }
 implementation {
   components MainC, HostTimeLoggingP;
-  HostTimeLoggingP -> MainC.Boot;
+  HostTimeLoggingP.Boot -> MainC.Boot;
+
+  components FastClockC;
+  MainC.SoftwareInit -> FastClockC;
 
   components LedsC;
   HostTimeLoggingP.Leds -> LedsC;
-  
+
   components new AlarmMilli16C() as sampleTimer;
   components new TimerMilliC() as warningTimer;
   HostTimeLoggingP.sampleTimerInit -> sampleTimer;

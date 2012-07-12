@@ -177,7 +177,7 @@ implementation {
          call Accel.wake(FALSE);
       if((stored_config[NV_SENSORS0] & SENSOR_GYRO) || (stored_config[NV_SENSORS0] & SENSOR_MAG)){
          call GyroStdControl.stop();
-	      call Magnetometer.disableBus();
+	 call Magnetometer.disableBus();
       }
       if(stored_config[NV_SENSORS1] & SENSOR_STRAIN) {
          call StrainGauge.powerOff();

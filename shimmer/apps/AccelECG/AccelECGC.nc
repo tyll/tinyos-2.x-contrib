@@ -69,6 +69,8 @@
 module AccelECGC {
    uses {
       interface Boot;
+      interface FastClock;
+      interface Init as FastClockInit;
       interface Init as BluetoothInit;
       interface Init as AccelInit;
       interface Leds;
@@ -139,41 +141,8 @@ implementation {
 
    void init() {
 #ifdef USE_8MHZ_CRYSTAL
-      register uint8_t i;
-      /* 
-       * set up 8mhz clock to max out 
-       * msp430 throughput 
-       */
-
-      atomic CLR_FLAG(BCSCTL1, XT2OFF); // basic clock system control reg, turn off XT2 osc
-
-      call Leds.led0On();
-      do{
-         CLR_FLAG(IFG1, OFIFG);
-         for(i = 0; i < 0xff; i++);
-      }
-      while(READ_FLAG(IFG1, OFIFG));
-
-      call Leds.led0Off();
-
-      call Leds.led1On();
-      TOSH_uwait(50000UL);
-      //call BusyWait.wait(50000UL);
-
-      atomic{ 
-         BCSCTL2 = 0; 
-         SET_FLAG(BCSCTL2, SELM_2); /* select master clock source, XT2CLK when XT2 oscillator present */
-      }                            /*on-chip. LFXT1CLK when XT2 oscillator not present on-chip. */
-
-      call Leds.led1Off();
-
-      atomic{
-         SET_FLAG(BCSCTL2, SELS);  // smclk from xt2
-         SET_FLAG(BCSCTL2, DIVS_3);  // divide it by 8
-      }
-      /* 
-       * end clock set up 
-       */
+     call FastClockInit.init();
+     call FastClock.setSMCLK(1);
 #endif /* USE_8MHZ_CRYSTAL */
 
       call BluetoothInit.init();

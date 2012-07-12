@@ -54,6 +54,10 @@ implementation {
   components MainC, AccelGyroC;
   AccelGyroC -> MainC.Boot; 
 
+  components FastClockC;
+  AccelGyroC.FastClockInit -> FastClockC;
+  AccelGyroC.FastClock     -> FastClockC;
+  
   components LedsC;
   AccelGyroC.Leds -> LedsC;
 

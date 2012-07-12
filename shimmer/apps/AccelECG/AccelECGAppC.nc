@@ -51,6 +51,10 @@ implementation {
   components MainC, AccelECGC;
   AccelECGC -> MainC.Boot; 
 
+  components FastClockC;
+  AccelECGC.FastClockInit -> FastClockC;
+  AccelECGC.FastClock     -> FastClockC;
+  
   components LedsC;
   AccelECGC.Leds -> LedsC;
 

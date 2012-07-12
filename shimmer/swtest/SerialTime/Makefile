@@ -1,3 +1,4 @@
 COMPONENT=TestSerialTimeAppC
 include $(MAKERULES)
 
+PFLAGS += -DHOST_TIME

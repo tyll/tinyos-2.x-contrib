@@ -40,6 +40,9 @@ implementation {
   components MainC, TestGyroBoardP;
   TestGyroBoardP -> MainC.Boot;
 
+  components FastClockC;
+  MainC.SoftwareInit -> FastClockC;
+  
   components LedsC;
   TestGyroBoardP.Leds -> LedsC;
   

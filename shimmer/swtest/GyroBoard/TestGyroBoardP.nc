@@ -236,43 +236,7 @@ implementation {
     TOSH_MAKE_DOCK_N_INPUT();
   }
   
-  void initialize_8mhz_clock(){
-    /* 
-     * set up 8mhz clock to max out 
-     * msp430 throughput 
-     */
-    register uint8_t i;
-
-    atomic CLR_FLAG(BCSCTL1, XT2OFF);
-
-    call Leds.led0On();
-    do{
-      CLR_FLAG(IFG1, OFIFG);
-      for(i = 0; i < 0xff; i++);
-    }
-    while(READ_FLAG(IFG1, OFIFG));
-
-    call Leds.led0Off();
-
-    call Leds.led1On();
-    TOSH_uwait(50000U);
-
-    atomic{
-      BCSCTL2 = 0;
-      SET_FLAG(BCSCTL2, SELM_2);
-    }
-    
-    call Leds.led1Off();
-
-    atomic{
-      SET_FLAG(BCSCTL2, SELS);  // smclk from xt2
-      SET_FLAG(BCSCTL2, DIVS_1);  // divide it by 2; smclk will run at 8 mhz / 2; spi bus will run at 4mhz / 2
-    }
-  }
-
   event void Boot.booted() {
-    //    initialize_8mhz_clock();
-
     sample_period = 20;   // 50 hz
 
     // just a flag so we only do this once

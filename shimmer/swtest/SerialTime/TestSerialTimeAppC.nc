@@ -39,6 +39,9 @@ implementation {
   components MainC, TestSerialTimeC;
   TestSerialTimeC -> MainC.Boot;
 
+  components FastClockC;
+  MainC.SoftwareInit -> FastClockC;
+  
   components LedsC;
   TestSerialTimeC.Leds -> LedsC;
 

@@ -784,13 +784,13 @@ implementation {
    }
 
 
-   event void Magnetometer.readDone(uint8_t * data, error_t success) {
+   async event void Magnetometer.readDone(uint8_t * data, error_t success) {
       memcpy(readBuf, data, 7);
       post collect_results();
    }
 
 
-   event void Magnetometer.writeDone(error_t success){
+   async event void Magnetometer.writeDone(error_t success){
    }
 
    async event void DigitalHeartRate.beat(uint32_t time) {

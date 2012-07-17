@@ -434,13 +434,13 @@ implementation {
     call Magnetometer.readData();
   }
 
-  event void Magnetometer.readDone(uint8_t * data, error_t success){
+  async event void Magnetometer.readDone(uint8_t * data, error_t success){
     //    call GyroMagBoard.ledToggle();
     memcpy(readBuf, data, 7);
     post collect_results();
   }
   
-  event void Magnetometer.writeDone(error_t success){
+  async event void Magnetometer.writeDone(error_t success){
   }
 
   async event void Bluetooth.connectionMade(uint8_t status) { 

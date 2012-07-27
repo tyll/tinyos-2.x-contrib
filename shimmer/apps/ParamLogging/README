@@ -1,0 +1,32 @@
+a parameterized version of JustFATLogging, which determines which
+sensors to sample and at what frequency by reading a configuration
+file called sample.cfg -- included here -- on the shimmer's
+sd-filesystem.  here's what it looks like:
+
+accel=1
+gyro=0
+mag=1
+ecg=0
+emg=0
+gsr=0
+str=0
+sample_rate=50
+
+reminder that there are mutually-exclusive choices due to the
+configurations of shimmer daughter cards and the fact that you can
+only install one at a time.  the on-board accel can always be chosen
+along with daughter-card sensors, of course, but others must be
+according to what's on a particular card:
+
+the "9DoF" board has both gyro and magnetometer, so choose either/or
+each of the others has just the one circuit, so going in order from
+top of the above list to the bottom, if you choose more than one, the
+first valid selection will stick and the others will be disabled,
+e.g. if you select ecg and gsr, the app will cancel the gsr choice.
+
+two other notes:  due to the board architectures of both shimmer and
+9dof, selecting the magnetometer
+
+1) may result in a few dropped mag samples every n-hundred or so, and
+2) after sampling the magnetometer, a reset will be required to read
+the sd filesystem from the dock.

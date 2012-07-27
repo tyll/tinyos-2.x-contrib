@@ -1,0 +1,42 @@
+SyncedRadioTx is a simple test of one method for
+synchronizing-by-time-segregation a set of nodes transmitting
+simultaneously on the same channel.  
+
+the idea is that by using the radio's clear channel assessment
+collisions will still occur and data loss can be extensive, so by
+confining each node's tx to a time window, collisions should be
+mostly avoidable (modulo clock drift, a subject for another day).
+
+          < -----   100ms  ----- >        
+ -------------------------------------------
+|  node 1  |  node 2  |  node 3  |  node 4  | 
+ -------------------------------------------
+  <-25ms->   <-25ms->   <-25ms->   <-25ms->
+
+SyncedRadioTx begins transmitting after receiving a start signal from
+the host (running basestation on the same channel); see
+syncedRadioStats.py, which provides start and stop signals and radio
+reception stats, to see that.  
+
+however, instead of starting immediately, a delay calculated from the node_id
+is inserted, which is the amount of time between transmissions -- here
+100ms -- divided by the number of nodes that might be transmitting at
+once (here we chose four).  
+
+to ground this example, this code assumes that node ids will be
+assigned from 1 (the default) - <n-nodes>, and delays (node-id - 1) *
+25ms, which is tx-interval (100) / nodes (4).  note that the delay for
+node 1 is then 0ms...
+
+to assign a node id, or, in tinyos parlance, TOS_NODE_ID, of 2 on the compile
+line, append the node id to the install command, thus:
+
+make shimmer2r install,2 bsl,/dev/ttyUSB1
+
+the default is 1 if you forget.
+
+have fun finding uses for this.
+
+Steve Ayer
+July, 2012
+

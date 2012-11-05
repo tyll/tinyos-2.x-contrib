@@ -344,7 +344,6 @@ implementation {
 	  sendSensorBusy = FALSE;
 
           if(!inicio && !envioAnterior){
-             //Un timer de 2 segundos, para que vaya mas fluida la red???
              envioAnterior = TRUE;
              call SendAnteriorTimer.startOneShot(INT_SEND_ANTERIOR);
           }else{

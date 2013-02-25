@@ -36,7 +36,8 @@ This radio stack behaves as follows: As long as there is no time information abo
 packet burst (see original T2 CC2420 radio stack for documentation). As time goes by, received packets add time information about the neighbourhood of a node. For every neighbour,
 a time measurement history is saved. Packets for those neighbours are then exactly scheduled at its wakeup time (plus/minus some backoff). The bigger the History gets, the more accurately
 the drift to every neighbour can be calculated.
-<br>With time information, packets can be sent with almost no extra energy wasted.
+<br>With time information, packets can be sent with almost no extra energy wasted. There is a poster abstract available <a href="#harvester_poster">[1]</a> that describes this mechanism e bit more in detail and also provides a performance comparison to the default LPL stack.
+<br>
 <br><br>
 The following picture shows a typical current curve, measured on a TmoteSky. The second peak is caused by a transmission, where the others are channel samplings between sleep phases:
 <br><img src="harvester_power.png" width="1291" height="411">
@@ -92,5 +93,11 @@ Information about the DSN-Monitor can be found on the BTNode webpage: <a href="h
 </p>
 <a href="../content.html">back</a>
 
+<h3>References</h3>
+<dl>
+  <dt>[1]</dt>
+  <dd><a id="harvester_poster"></a>
+Roman Lim, Matthias Woehrle, Andreas F. Meier and Jan Beutel: <i>Poster Abstract: Harvester - Energy Savings Through Synchronized Low-power Listening</i>, Adjunct Proc. 6th European Workshop on Sensor Networks (EWSN 2009), Cork, Ireland (<a href="ftp://ftp.tik.ee.ethz.ch/pub/people/rlim/LWMB2009.pdf">PDF</a>)
+</dd>
 </body>
 </html>
